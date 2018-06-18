@@ -5,15 +5,16 @@ import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
 import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { CourseModel } from 'data/models';
+import { LegacyTypes } from 'data/types';
 
 const getReadableResourceType = (documentResource: Resource) => {
   switch (documentResource && documentResource.type) {
-    case 'x-oli-workbook_page':
+    case LegacyTypes.workbook_page:
       return 'Page';
-    case 'x-oli-inline-assessment':
-    case 'x-oli-assessment2':
+    case LegacyTypes.inline:
+    case LegacyTypes.assessment2:
       return 'Assessment';
-    case 'x-oli-assessment2-pool':
+    case LegacyTypes.assessment2_pool:
       return 'Pool';
     default:
       return 'Resource';
