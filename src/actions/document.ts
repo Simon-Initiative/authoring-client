@@ -86,6 +86,36 @@ export const modelUpdated = (documentId: string, model: models.ContentModel)
     model,
   });
 
+export type SAVE_INITIATED = 'document/SAVE_INITIATED';
+export const SAVE_INITIATED: SAVE_INITIATED = 'document/SAVE_INITIATED';
+
+export type SaveInitiatedAction = {
+  type: SAVE_INITIATED,
+  documentId: string,
+};
+
+export const saveRequestInitiated = (documentId: string)
+  : SaveInitiatedAction => ({
+    type: SAVE_INITIATED,
+    documentId,
+  });
+
+
+export type SAVE_COMPLETED = 'document/SAVE_COMPLETED';
+export const SAVE_COMPLETED: SAVE_COMPLETED = 'document/SAVE_COMPLETED';
+
+export type SaveCompletedAction = {
+  type: SAVE_COMPLETED,
+  documentId: string,
+};
+
+export const saveRequestCompleted = (documentId: string)
+  : SaveCompletedAction => ({
+    type: SAVE_COMPLETED,
+    documentId,
+  });
+
+
 
 export type DOCUMENT_RELEASED = 'document/DOCUMENT_RELEASED';
 export const DOCUMENT_RELEASED: DOCUMENT_RELEASED = 'document/DOCUMENT_RELEASED';
@@ -129,11 +159,16 @@ export const changeRedone = (documentId: string): ChangeRedoneAction => ({
 });
 
 function saveCompleted(dispatch, getState, documentId, document) {
+
+  dispatch(saveRequestCompleted(documentId));
+
   dispatch(
     dismissSpecificMessage(new Messages.Message().with({ guid: documentId + '_PERSISTENCE' })));
 }
 
 function saveFailed(dispatch, getState, courseId, documentId, error) {
+
+  dispatch(saveRequestCompleted(documentId));
 
   const message = error === 'Forbidden'
     ? buildLockExpiredMessage({
@@ -142,6 +177,10 @@ function saveFailed(dispatch, getState, courseId, documentId, error) {
     : buildPersistenceFailureMessage(error, getState().user.profile);
 
   dispatch(showMessage(message.with({ guid: documentId + '_PERSISTENCE' })));
+}
+
+function saveInitiated(dispatch, getState, courseId, documentId) {
+  dispatch(saveRequestInitiated(documentId));
 }
 
 function logResourceDetails(resource: Resource) {
@@ -209,6 +248,7 @@ export function load(courseId: string, documentId: string) {
           document, userName,
           saveCompleted.bind(undefined, dispatch, getState, documentId),
           saveFailed.bind(undefined, dispatch, getState, courseId, documentId),
+          saveInitiated.bind(undefined, dispatch, getState, courseId, documentId),
         ).then((editingAllowed) => {
 
           if (!editingAllowed) {

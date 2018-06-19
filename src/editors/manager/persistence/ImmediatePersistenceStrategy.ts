@@ -8,6 +8,11 @@ import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
 export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
 
   save(doc: persistence.Document) {
+
+    if (this.beginSaveCallback !== null) {
+      this.beginSaveCallback();
+    }
+
     this.saveDocument(doc, 3, undefined, undefined)
       .then((doc) => {
         if (this.successCallback !== null) {

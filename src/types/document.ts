@@ -20,6 +20,7 @@ export type EditedDocumentParams = {
   editingAllowed?: boolean;
   currentPage?: Maybe<string>;
   currentNode?: Maybe<contentTypes.Node>;
+  saveInProcess?: boolean;
 };
 
 const defaultContent = {
@@ -35,6 +36,7 @@ const defaultContent = {
   editingAllowed: false,
   currentPage: Maybe.nothing<string>(),
   currentNode: Maybe.nothing<contentTypes.Node>(),
+  saveInProcess: false,
 };
 
 export class EditedDocument extends Immutable.Record(defaultContent) {
@@ -51,6 +53,7 @@ export class EditedDocument extends Immutable.Record(defaultContent) {
   editingAllowed: boolean;
   currentPage: Maybe<string>;
   currentNode: Maybe<contentTypes.Node>;
+  saveInProcess: boolean;
 
   constructor(params?: EditedDocumentParams) {
     super(params);

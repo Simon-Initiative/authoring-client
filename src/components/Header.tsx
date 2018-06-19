@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ViewActions } from '../actions/view';
 import { CourseModel } from 'data/models';
 import { UserState } from 'reducers/user';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import './Header.scss';
 
@@ -11,6 +12,7 @@ export interface HeaderProps {
   course: CourseModel;
   user: UserState;
   viewActions: ViewActions;
+  isSaveInProcess: boolean;
 }
 
 type LinkProps = {
@@ -101,6 +103,10 @@ class Header extends React.PureComponent<HeaderProps, {}> {
 
   render() {
 
+    const saveNotification = this.props.isSaveInProcess
+      ? <div className="save-notification">Saving...</div>
+      : null;
+
     return (
       <div className="header">
         <div className="header-logo">
@@ -112,6 +118,10 @@ class Header extends React.PureComponent<HeaderProps, {}> {
         <div className="header-content">
           {this.props.course ? this.renderPackageActions() : this.renderApplicationLabel()}
         </div>
+        <ReactCSSTransitionGroup transitionName="saving"
+          transitionEnterTimeout={250} transitionLeaveTimeout={500}>
+          {saveNotification}
+        </ReactCSSTransitionGroup>
         <div className="header-logout">
           <a className="header-link" href={this.props.user.logoutUrl}>Logout</a>
         </div>

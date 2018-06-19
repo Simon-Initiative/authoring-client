@@ -74,6 +74,10 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
       this.inFlight = this.pending;
       this.pending = null;
 
+      if (this.beginSaveCallback !== null) {
+        this.beginSaveCallback();
+      }
+
       persistence.persistDocument(this.inFlight)
         .then((result) => {
 

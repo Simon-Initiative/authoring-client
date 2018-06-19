@@ -6,6 +6,8 @@ import { ModelTypes, AssessmentModel } from 'data/models';
 import { Maybe } from 'tsmonad';
 
 export type ActionTypes =
+  documentActions.SaveCompletedAction |
+  documentActions.SaveInitiatedAction |
   documentActions.ChangeRedoneAction |
   documentActions.ChangeUndoneAction |
   documentActions.DocumentReleasedAction |
@@ -64,6 +66,16 @@ export const documents = (
 ): DocumentsState => {
 
   switch (action.type) {
+
+    case documentActions.SAVE_INITIATED:
+      return state.set(action.documentId, state.get(action.documentId).with({
+        saveInProcess: true,
+      }));
+    case documentActions.SAVE_COMPLETED:
+      return state.set(action.documentId, state.get(action.documentId).with({
+        saveInProcess: false,
+      }));
+
     case documentActions.DOCUMENT_REQUESTED:
       // Newly requested documents simply get a new record in the map
 

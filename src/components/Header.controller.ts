@@ -6,6 +6,7 @@ import * as viewActions from 'actions/view';
 interface StateProps {
   course: any;
   user: any;
+  isSaveInProcess: boolean;
 }
 
 interface DispatchProps {
@@ -19,11 +20,15 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const {
     course,
     user,
+    documents,
   } = state;
+
+  const isSaveInProcess = documents.toArray().some(d => d.saveInProcess);
 
   return {
     course,
     user,
+    isSaveInProcess,
   };
 };
 
