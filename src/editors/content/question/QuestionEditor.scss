@@ -2,7 +2,8 @@
 @import 'oli/mixins';
 
 .question-editor {
-  margin-left: 30px;
+  margin-left: 10px;
+  padding: 0 10px;
 
   .question-title {
     display: flex;
