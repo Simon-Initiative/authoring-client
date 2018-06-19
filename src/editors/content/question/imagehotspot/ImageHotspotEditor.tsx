@@ -288,7 +288,7 @@ export class ImageHotspotEditor
             className={classes.removeHotspotButton}
             tooltip={selectedHotspot.caseOf({ just: () => true, nothing: () => false })
               && model.hotspots.size <= 1
-                ? 'An Image Hotspot must contain at least one hotspot. '
+                ? 'An image hotspot question must contain at least one hotspot. '
                   + 'Please add another hotspot before removing this one.'
                 : 'Remove selected hotspot'
             }
