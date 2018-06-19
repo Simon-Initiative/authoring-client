@@ -39,11 +39,6 @@ export default class LinkEditor
     return null;
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    const doesSuperWantToUpdate = super.shouldComponentUpdate(nextProps, nextState);
-    return doesSuperWantToUpdate || this.state.isExternal !== nextState.isExternal;
-  }
-
   renderSideBarExternal() {
     const { editMode, model, onEdit } = this.props;
 

@@ -32,12 +32,6 @@ export default class BlockCodeToolbar
     super(props);
   }
 
-
-  shouldComponentUpdate(nextProps: BlockCodeToolbarProps, nextState) {
-    return super.shouldComponentUpdate(nextProps, nextState)
-    || nextProps.selection !== this.props.selection;
-  }
-
   renderActiveEntity(entity) {
 
     const { key, data } = entity;

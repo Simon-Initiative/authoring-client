@@ -33,11 +33,6 @@ export default class BlockQuoteToolbar
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: BlockQuoteToolbarProps, nextState) {
-    return super.shouldComponentUpdate(nextProps, nextState)
-    || nextProps.selection !== this.props.selection;
-  }
-
   renderActiveEntity(entity) {
 
     const { key, data } = entity;
