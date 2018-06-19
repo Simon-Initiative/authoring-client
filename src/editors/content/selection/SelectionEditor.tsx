@@ -44,17 +44,6 @@ export class SelectionEditor
     this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps: SelectionProps) {
-    return this.props.model !== nextProps.model
-      || this.props.parent !== nextProps.parent
-      || this.props.editMode !== nextProps.editMode
-      || this.props.activeContentGuid !== nextProps.activeContentGuid
-      || this.props.hover !== nextProps.hover
-      || this.props.isParentAssessmentGraded !== nextProps.isParentAssessmentGraded
-      || this.props.allSkills !== nextProps.allSkills
-      || this.props.canRemove !== nextProps.canRemove;
-  }
-
   /** Override Parent Method */
   handleOnClick(e) {
     if (this.props.onHandleClick !== undefined) {
