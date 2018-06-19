@@ -1,0 +1,18 @@
+@import 'oli/colors';
+@import 'oli/mixins';
+
+.ordering-feedback {
+  @include disable-select;
+
+  .feedback-items {
+    .response {
+      margin-bottom: 25px;
+    }
+  }
+
+  .message {
+    margin: 8px 0;
+    padding: 6px 10px;
+    flex: 1;
+  }
+}
