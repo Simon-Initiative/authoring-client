@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
-import { Checkbox, Select } from '../common/controls';
+import { Select } from '../common/controls';
 import {
   Question, QuestionProps, QuestionState,
 } from './Question';
@@ -8,6 +8,7 @@ import {
   TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 
@@ -28,7 +29,7 @@ export class ShortAnswer
 
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
-    this.onCaseSensitive = this.onCaseSensitive.bind(this);
+    this.onToggleCaseSensitive = this.onToggleCaseSensitive.bind(this);
   }
 
   /** Implement required abstract method to set className */
@@ -44,12 +45,16 @@ export class ShortAnswer
     this.props.onEdit(this.props.itemModel.with({ whitespace }), this.props.partModel, null);
   }
 
-  onCaseSensitive(caseSensitive) {
-    this.props.onEdit(this.props.itemModel.with({ caseSensitive }), this.props.partModel, null);
+  onToggleCaseSensitive() {
+    const { itemModel, partModel, onEdit } = this.props;
+
+    const caseSensitive = !itemModel.caseSensitive;
+
+    onEdit(itemModel.with({ caseSensitive }), partModel, null);
   }
 
   renderDetails() {
-    const { partModel } = this.props;
+    const { partModel, itemModel, editMode } = this.props;
 
     return (
       <React.Fragment>
@@ -58,20 +63,20 @@ export class ShortAnswer
           <TabSectionContent>
             <div style={{ display: 'inline' }}>
               <Select
-                editMode={this.props.editMode}
+                editMode={editMode}
                 label="Whitespace"
-                value={this.props.itemModel.whitespace}
+                value={itemModel.whitespace}
                 onChange={this.onWhitespaceChange}>
                 <option value="preserve">Preserve</option>
                 <option value="trim">Trim</option>
                 <option value="normalize">Normalize</option>
               </Select>
 
-              <Checkbox
-                editMode={this.props.editMode}
+              <ToggleSwitch
+                editMode={editMode}
+                checked={itemModel.caseSensitive}
                 label="Case Sensitive"
-                value={this.props.itemModel.caseSensitive}
-                onEdit={this.onCaseSensitive} />
+                onClick={this.onToggleCaseSensitive} />
             </div>
           </TabSectionContent>
           <TabSectionHeader title="Feedback"/>

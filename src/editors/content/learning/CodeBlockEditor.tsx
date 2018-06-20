@@ -3,13 +3,14 @@ import { CodeBlock as CodeBlockType } from 'data/content/learning/codeblock';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { Checkbox, Select, TextInput } from '../common/controls';
+import { Select, TextInput } from '../common/controls';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import guid from 'utils/guid';
 import { Discoverable } from 'components/common/Discoverable.controller';
 import { DiscoverableId } from 'types/discoverable';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 import AceEditor from 'react-ace';
 
@@ -51,7 +52,6 @@ export default class CodeBlock
 
     this.onSourceEdit = this.onSourceEdit.bind(this);
     this.onSyntaxChange = this.onSyntaxChange.bind(this);
-    this.onNumberEdit = this.onNumberEdit.bind(this);
     this.onStartEdit = this.onStartEdit.bind(this);
     this.onHighlightEdit = this.onHighlightEdit.bind(this);
 
@@ -68,11 +68,6 @@ export default class CodeBlock
     this.props.onEdit(model, model);
   }
 
-  onNumberEdit(number) {
-    const model = this.props.model.with({ number });
-    this.props.onEdit(model, model);
-  }
-
   onHighlightEdit(highlight) {
     const model = this.props.model.with({ highlight });
     this.props.onEdit(model, model);
@@ -83,6 +78,13 @@ export default class CodeBlock
     this.props.onEdit(model, model);
   }
 
+  onToggleLineNumbers() {
+    const { model } = this.props;
+
+    const updatedModel = model.with({ number: !model.number });
+    this.props.onEdit(updatedModel, updatedModel);
+  }
+
   renderSidebar() {
     const syntax = this.props.model.syntax;
 
@@ -90,26 +92,30 @@ export default class CodeBlock
       <SidebarContent title="Code Block">
         <SidebarGroup label="Language / Syntax">
           <Discoverable id={DiscoverableId.CodeBlockEditorLanguage} focusChild>
-            <Select
-              editMode={this.props.editMode}
-              label=""
-              value={syntax}
-              onChange={this.onSyntaxChange}>
-              <option value="actionscript3">ActionScript</option>
-              <option value="bash">Bash</option>
-              <option value="c">C</option>
-              <option value="cpp">C++</option>
-              <option value="html">HTML</option>
-              <option value="java">Java</option>
-              <option value="python">Python</option>
-              <option value="text">Text</option>
-              <option value="xml">XML</option>
-            </Select>
-            <Checkbox
-              editMode={this.props.editMode}
-              label="Show line numbers"
-              value={this.props.model.number}
-              onEdit={this.onNumberEdit} />
+            <SidebarRow>
+              <Select
+                editMode={this.props.editMode}
+                label=""
+                value={syntax}
+                onChange={this.onSyntaxChange}>
+                <option value="actionscript3">ActionScript</option>
+                <option value="bash">Bash</option>
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+                <option value="html">HTML</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+                <option value="text">Text</option>
+                <option value="xml">XML</option>
+              </Select>
+            <SidebarRow>
+            </SidebarRow>
+              <ToggleSwitch
+                editMode={this.props.editMode}
+                checked={this.props.model.number}
+                label="Show line numbers"
+                onClick={this.onToggleLineNumbers} />
+            </SidebarRow>
           </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="First line number">
