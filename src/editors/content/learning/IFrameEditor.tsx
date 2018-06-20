@@ -112,7 +112,7 @@ export default class IFrameEditor
 
     return (
       <div className="iframeEditor">
-        <iframe src={fullSrc} height={height} width={width} />
+        <iframe src={fullSrc} height={height} width={width} sandbox="" />
       </div>
     );
   }
