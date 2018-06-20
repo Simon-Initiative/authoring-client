@@ -14,9 +14,9 @@ export interface MessageState {
 }
 
 const classesForSeverity = {
-  [Messages.Severity.Error]: 'navbar-dark bg-danger error-message',
-  [Messages.Severity.Warning]: 'navbar-light bg-warning warning-message',
-  [Messages.Severity.Information]: 'navbar-light bg-info info-message',
+  [Messages.Severity.Error]: 'navbar-dark message message--error',
+  [Messages.Severity.Warning]: 'navbar-light message message--warning',
+  [Messages.Severity.Information]: 'navbar-light message message--information',
 };
 
 export class Message

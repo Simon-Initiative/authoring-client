@@ -92,19 +92,19 @@ const missingObjectivesDetails =
 export function buildMissingObjectivesMessage(courseId: string) {
 
   const actions = [
-    buildModalMessageAction('Learn more', missingObjectivesDetails),
-    goToObjectivesPage('Create Objectives', courseId),
+    buildModalMessageAction('Learn', missingObjectivesDetails),
+    goToObjectivesPage('Create', courseId),
   ];
 
   const content = new Messages.TitledContent().with({
-    title: 'No Learning Objectives:',
+    title: 'No Learning Objectives',
     // tslint:disable-next-line:max-line-length
     message: 'Your course\'s effectiveness is driven by student-centered Learning Objectives and Skills.',
   });
 
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
-    severity: Messages.Severity.Warning,
+    severity: Messages.Severity.Information,
     canUserDismiss: false,
     actions: Immutable.List(actions),
     content,
@@ -127,8 +127,8 @@ const missingSkillsDetails =
 export function buildMissingSkillsMessage(courseId: string) {
 
   const actions = [
-    buildModalMessageAction('Learn more', missingSkillsDetails),
-    goToObjectivesPage('Create Skills', courseId),
+    buildModalMessageAction('Learn', missingSkillsDetails),
+    goToObjectivesPage('Create', courseId),
   ];
 
   const content = new Messages.TitledContent().with({
@@ -139,7 +139,7 @@ export function buildMissingSkillsMessage(courseId: string) {
 
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
-    severity: Messages.Severity.Warning,
+    severity: Messages.Severity.Information,
     canUserDismiss: false,
     actions: Immutable.List(actions),
     content,
