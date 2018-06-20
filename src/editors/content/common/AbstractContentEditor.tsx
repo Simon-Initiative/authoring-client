@@ -39,7 +39,7 @@ export interface AbstractContentEditorState {}
 export abstract class
   AbstractContentEditor
     <ModelType, P extends AbstractContentEditorProps<ModelType>,
-    S extends AbstractContentEditorState> extends React.PureComponent<P, S> {
+    S extends AbstractContentEditorState> extends React.Component<P, S> {
 
   constructor(props) {
     super(props);
