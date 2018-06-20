@@ -1,6 +1,25 @@
 @import 'oli/colors';
 @import 'oli/typography';
 
+
+.saving-enter {
+  opacity: 0.1;
+}
+
+.saving-enter.saving-enter-active {
+  transition: opacity 250ms ease-in-out;
+  opacity: 1;
+}
+
+.saving-leave {
+  opacity: 1;
+}
+
+.saving-leave.saving-leave-active {
+  transition: opacity 500ms ease-in-out;
+  opacity: 0;
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -22,6 +41,12 @@
     &:hover {
       text-decoration: underline !important;
     }
+  }
+
+  .save-notification {
+    font-weight: 300;
+    padding-right: 30px;
+
   }
 
   .course-link {
