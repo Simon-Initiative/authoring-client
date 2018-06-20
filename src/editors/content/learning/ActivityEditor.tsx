@@ -112,9 +112,15 @@ export default class ActivityEditor
   renderMain() {
     const { classes } = this.props;
 
+    const resource = this.props.context.courseModel.resourcesById.get(this.props.model.idref);
+
+    const titleOrPlaceholder = resource !== undefined
+      ? resource.title
+      : 'Loading...';
+
     return (
       <div className={classes.activity}>
-        <h5>{this.props.context.courseModel.resourcesById.get(this.props.model.idref).title}</h5>
+        <h5>{titleOrPlaceholder}</h5>
         <button
           onClick={this.onClick}
           type="button"
