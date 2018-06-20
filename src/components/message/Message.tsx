@@ -50,8 +50,6 @@ export class Message
   }
 
   renderActions(message: Messages.Message) {
-    const buttons = message.actions.toArray().map(a => this.renderMessageAction(message, a));
-
     if (message.canUserDismiss || message.actions.size > 0) {
       return (
         <form className="form-inline my-2 my-lg-0">
