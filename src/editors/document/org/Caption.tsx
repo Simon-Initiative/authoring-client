@@ -29,10 +29,7 @@ export interface CaptionProps {
 
 export interface CaptionState {
   mouseOver: boolean;
-
 }
-
-
 
 export class Caption
   extends React.PureComponent<CaptionProps, CaptionState> {
@@ -59,17 +56,18 @@ export class Caption
     this.props.onViewEdit();
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const { model } = this.props;
 
     const buttons = this.props.isHoveredOver
-        ? [(
-          <span className="flex-spacer"/>
-        ), (
-          <Remove editMode={this.props.editMode} processCommand={this.props.processCommand}/>
-        )]
-        : null;
+      ? [(
+        <span key="flex-spacer" className="flex-spacer" />
+      ), (
+        <Remove key="remove" editMode={this.props.editMode}
+          processCommand={this.props.processCommand} />
+      )]
+      : null;
     return (
       <div className="caption">
         <button

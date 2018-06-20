@@ -41,6 +41,7 @@ export class Message
   renderMessageAction(message: Messages.Message, action: Messages.MessageAction) {
     return (
       <button
+        key={`${action.label}`}
         className="btn btn-action"
         onClick={() => this.props.executeAction(message, action)}
         type="button">{action.label}
@@ -49,6 +50,7 @@ export class Message
   }
 
   renderActions(message: Messages.Message) {
+    const buttons = message.actions.toArray().map(a => this.renderMessageAction(message, a));
 
     if (message.canUserDismiss || message.actions.size > 0) {
       return (
@@ -78,7 +80,7 @@ export class Message
     );
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const { message } = this.props;
     const classes = 'navbar justify-content-between '
@@ -90,8 +92,5 @@ export class Message
         {this.renderActions(message)}
       </nav>
     );
-
   }
-
 }
-
