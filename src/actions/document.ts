@@ -10,10 +10,11 @@ import { showMessage, dismissScopedMessages, dismissSpecificMessage } from './me
 import { lookUpByName } from 'editors/manager/registry';
 import { buildPersistenceFailureMessage } from 'utils/error';
 import { buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
-
+import { Maybe } from 'tsmonad';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
-import { PersistenceStrategy } from 'editors/manager/persistence/PersistenceStrategy';
+import { PersistenceStrategy,
+  PersistenceState } from 'editors/manager/persistence/PersistenceStrategy';
 
 export type DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
 export const DOCUMENT_REQUESTED: DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
@@ -86,35 +87,37 @@ export const modelUpdated = (documentId: string, model: models.ContentModel)
     model,
   });
 
-export type SAVE_INITIATED = 'document/SAVE_INITIATED';
-export const SAVE_INITIATED: SAVE_INITIATED = 'document/SAVE_INITIATED';
+export type IS_SAVING_UPDATED = 'document/IS_SAVING_UPDATED';
+export const IS_SAVING_UPDATED: IS_SAVING_UPDATED = 'document/IS_SAVING_UPDATED';
 
-export type SaveInitiatedAction = {
-  type: SAVE_INITIATED,
+export type IsSavingUpdatedAction = {
+  type: IS_SAVING_UPDATED,
   documentId: string,
+  isSaving: boolean,
 };
 
-export const saveRequestInitiated = (documentId: string)
-  : SaveInitiatedAction => ({
-    type: SAVE_INITIATED,
+export const isSavingUpdated = (documentId: string, isSaving: boolean)
+  : IsSavingUpdatedAction => ({
+    type: IS_SAVING_UPDATED,
     documentId,
+    isSaving,
   });
 
+export type LAST_SAVE_SUCEEDED = 'document/LAST_SAVE_SUCEEDED';
+export const LAST_SAVE_SUCEEDED: LAST_SAVE_SUCEEDED = 'document/LAST_SAVE_SUCEEDED';
 
-export type SAVE_COMPLETED = 'document/SAVE_COMPLETED';
-export const SAVE_COMPLETED: SAVE_COMPLETED = 'document/SAVE_COMPLETED';
-
-export type SaveCompletedAction = {
-  type: SAVE_COMPLETED,
+export type LastSaveSucceededAction = {
+  type: LAST_SAVE_SUCEEDED,
   documentId: string,
+  lastRequestSucceeded: Maybe<boolean>,
 };
 
-export const saveRequestCompleted = (documentId: string)
-  : SaveCompletedAction => ({
-    type: SAVE_COMPLETED,
+export const lastSaveSucceeded = (documentId: string, lastRequestSucceeded: Maybe<boolean>)
+  : LastSaveSucceededAction => ({
+    type: LAST_SAVE_SUCEEDED,
     documentId,
+    lastRequestSucceeded,
   });
-
 
 
 export type DOCUMENT_RELEASED = 'document/DOCUMENT_RELEASED';
@@ -160,7 +163,7 @@ export const changeRedone = (documentId: string): ChangeRedoneAction => ({
 
 function saveCompleted(dispatch, getState, documentId, document) {
 
-  dispatch(saveRequestCompleted(documentId));
+  dispatch(lastSaveSucceeded(documentId, Maybe.just(true)));
 
   dispatch(
     dismissSpecificMessage(new Messages.Message().with({ guid: documentId + '_PERSISTENCE' })));
@@ -168,7 +171,7 @@ function saveCompleted(dispatch, getState, documentId, document) {
 
 function saveFailed(dispatch, getState, courseId, documentId, error) {
 
-  dispatch(saveRequestCompleted(documentId));
+  dispatch(lastSaveSucceeded(documentId, Maybe.just(false)));
 
   const message = error === 'Forbidden'
     ? buildLockExpiredMessage({
@@ -179,8 +182,10 @@ function saveFailed(dispatch, getState, courseId, documentId, error) {
   dispatch(showMessage(message.with({ guid: documentId + '_PERSISTENCE' })));
 }
 
-function saveInitiated(dispatch, getState, courseId, documentId) {
-  dispatch(saveRequestInitiated(documentId));
+function stateChangeListener(
+  dispatch, getState, courseId, documentId, currentState: PersistenceState) {
+
+  dispatch(isSavingUpdated(documentId, currentState.isInFlight || currentState.isPending));
 }
 
 function logResourceDetails(resource: Resource) {
@@ -248,7 +253,7 @@ export function load(courseId: string, documentId: string) {
           document, userName,
           saveCompleted.bind(undefined, dispatch, getState, documentId),
           saveFailed.bind(undefined, dispatch, getState, courseId, documentId),
-          saveInitiated.bind(undefined, dispatch, getState, courseId, documentId),
+          stateChangeListener.bind(undefined, dispatch, getState, courseId, documentId),
         ).then((editingAllowed) => {
 
           if (!editingAllowed) {
@@ -303,6 +308,7 @@ export function save(documentId: string, model: models.ContentModel, isUndoRedo?
     }
 
     const doc = editedDocument.document.with({ model });
+
     editedDocument.persistence.save(doc);
 
   };

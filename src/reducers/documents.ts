@@ -6,8 +6,8 @@ import { ModelTypes, AssessmentModel } from 'data/models';
 import { Maybe } from 'tsmonad';
 
 export type ActionTypes =
-  documentActions.SaveCompletedAction |
-  documentActions.SaveInitiatedAction |
+  documentActions.IsSavingUpdatedAction |
+  documentActions.LastSaveSucceededAction |
   documentActions.ChangeRedoneAction |
   documentActions.ChangeUndoneAction |
   documentActions.DocumentReleasedAction |
@@ -67,13 +67,18 @@ export const documents = (
 
   switch (action.type) {
 
-    case documentActions.SAVE_INITIATED:
+    case documentActions.IS_SAVING_UPDATED:
+      if (state.get(action.documentId) !== undefined) {
+        return state.set(action.documentId, state.get(action.documentId).with({
+          isSaving: action.isSaving,
+        }));
+      }
+      return state;
+
+    case documentActions.LAST_SAVE_SUCEEDED:
       return state.set(action.documentId, state.get(action.documentId).with({
-        saveInProcess: true,
-      }));
-    case documentActions.SAVE_COMPLETED:
-      return state.set(action.documentId, state.get(action.documentId).with({
-        saveInProcess: false,
+        lastRequestSucceeded: action.lastRequestSucceeded,
+        saveCount: state.get(action.documentId).saveCount + 1,
       }));
 
     case documentActions.DOCUMENT_REQUESTED:

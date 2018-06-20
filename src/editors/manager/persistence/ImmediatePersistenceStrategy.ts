@@ -9,8 +9,8 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
 
   save(doc: persistence.Document) {
 
-    if (this.beginSaveCallback !== null) {
-      this.beginSaveCallback();
+    if (this.stateChangeCallback !== null) {
+      this.stateChangeCallback({ isInFlight: true, isPending: false });
     }
 
     this.saveDocument(doc, 3, undefined, undefined)
@@ -18,10 +18,16 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
         if (this.successCallback !== null) {
           this.successCallback(doc);
         }
+        if (this.stateChangeCallback !== null) {
+          this.stateChangeCallback({ isInFlight: false, isPending: false });
+        }
       })
       .catch((err) => {
         if (this.failureCallback !== null) {
           this.failureCallback(err);
+        }
+        if (this.stateChangeCallback !== null) {
+          this.stateChangeCallback({ isInFlight: false, isPending: false });
         }
       });
   }

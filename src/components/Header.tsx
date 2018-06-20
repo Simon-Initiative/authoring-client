@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ViewActions } from '../actions/view';
 import { CourseModel } from 'data/models';
 import { UserState } from 'reducers/user';
+import { Maybe } from 'tsmonad';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import './Header.scss';
@@ -13,6 +14,12 @@ export interface HeaderProps {
   user: UserState;
   viewActions: ViewActions;
   isSaveInProcess: boolean;
+  lastRequestSucceeded: Maybe<boolean>;
+  saveCount: number;
+}
+
+export interface HeaderState {
+  showIncrementalSave: boolean;
 }
 
 type LinkProps = {
@@ -63,7 +70,16 @@ const MenuItem: React.StatelessComponent<MenuItemProps> = ({
 );
 
 
-class Header extends React.PureComponent<HeaderProps, {}> {
+class Header extends React.Component<HeaderProps, HeaderState> {
+
+  timer: any;
+
+  constructor(props) {
+    super(props);
+
+    this.state = { showIncrementalSave: false };
+    this.timer = null;
+  }
 
   renderPackageActions() {
 
@@ -97,15 +113,50 @@ class Header extends React.PureComponent<HeaderProps, {}> {
     );
   }
 
+  componentWillReceiveProps(nextProps: HeaderProps) {
+
+    if (nextProps.saveCount > this.props.saveCount
+      && nextProps.isSaveInProcess
+      && nextProps.isSaveInProcess === this.props.isSaveInProcess) {
+
+      this.setState({ showIncrementalSave: true });
+
+      this.timer = setTimeout(() => this.setState({ showIncrementalSave: false }), 1000);
+    }
+
+    if (nextProps.isSaveInProcess && !this.props.isSaveInProcess
+      && this.state.showIncrementalSave) {
+
+      this.setState({ showIncrementalSave: false });
+      if (this.timer !== null) {
+        clearTimeout(this.timer);
+      }
+      this.timer = null;
+    }
+  }
+
   renderApplicationLabel() {
     return <span>OLI Course Authoring</span>;
   }
 
-  render() {
+  renderSaveNotification() {
 
-    const saveNotification = this.props.isSaveInProcess
-      ? <div className="save-notification">Saving...</div>
-      : null;
+    const lastSucceeded
+      = this.props.lastRequestSucceeded.caseOf({ just: v => v, nothing: () => false });
+
+    if (this.props.isSaveInProcess && this.state.showIncrementalSave) {
+      return <div className="save-notification">Saved</div>;
+    }
+    if (this.props.isSaveInProcess) {
+      return <div className="save-notification">Saving...</div>;
+    }
+    if (lastSucceeded) {
+      return <div className="save-notification">All changes saved</div>;
+    }
+    return null;
+  }
+
+  render() {
 
     return (
       <div className="header">
@@ -120,7 +171,7 @@ class Header extends React.PureComponent<HeaderProps, {}> {
         </div>
         <ReactCSSTransitionGroup transitionName="saving"
           transitionEnterTimeout={250} transitionLeaveTimeout={500}>
-          {saveNotification}
+          {this.renderSaveNotification()}
         </ReactCSSTransitionGroup>
         <div className="header-logout">
           <a className="header-link" href={this.props.user.logoutUrl}>Logout</a>

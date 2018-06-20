@@ -5,7 +5,13 @@ export type onSaveCompletedCallback = (lastSavedDocument: persistence.Document) 
 
 export type onFailureCallback = (result: any) => void;
 
-export type onBeginSaveCallback = () => void;
+export type PersistenceState = {
+  isPending: boolean;
+  isInFlight: boolean;
+};
+
+export type onStateChangeCallback = (state: PersistenceState) => void;
+
 
 export interface PersistenceStrategy {
 
@@ -17,7 +23,7 @@ export interface PersistenceStrategy {
                userName: string,
                onSuccess: onSaveCompletedCallback,
                onFailure: onFailureCallback,
-               onBeginSave: onBeginSaveCallback,
+               onStateChange: onStateChangeCallback,
               ) => Promise<boolean>;
 
   /**

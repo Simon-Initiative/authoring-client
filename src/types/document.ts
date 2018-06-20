@@ -6,7 +6,6 @@ import { PersistenceStrategy } from 'editors/manager/persistence/PersistenceStra
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 
-
 export type EditedDocumentParams = {
   documentId? : string,
   document?: Document;
@@ -20,7 +19,9 @@ export type EditedDocumentParams = {
   editingAllowed?: boolean;
   currentPage?: Maybe<string>;
   currentNode?: Maybe<contentTypes.Node>;
-  saveInProcess?: boolean;
+  isSaving?: boolean;
+  lastRequestSucceeded?: Maybe<boolean>;
+  saveCount?: number;
 };
 
 const defaultContent = {
@@ -36,7 +37,9 @@ const defaultContent = {
   editingAllowed: false,
   currentPage: Maybe.nothing<string>(),
   currentNode: Maybe.nothing<contentTypes.Node>(),
-  saveInProcess: false,
+  isSaving: false,
+  lastRequestSucceeded: Maybe.nothing(),
+  saveCount: 0,
 };
 
 export class EditedDocument extends Immutable.Record(defaultContent) {
@@ -53,7 +56,9 @@ export class EditedDocument extends Immutable.Record(defaultContent) {
   editingAllowed: boolean;
   currentPage: Maybe<string>;
   currentNode: Maybe<contentTypes.Node>;
-  saveInProcess: boolean;
+  isSaving: boolean;
+  lastRequestSucceeded: Maybe<boolean>;
+  saveCount: number;
 
   constructor(params?: EditedDocumentParams) {
     super(params);

@@ -37,6 +37,10 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
 
     this.pending = doc;
 
+    if (this.stateChangeCallback !== null) {
+      this.stateChangeCallback({ isInFlight: this.inFlight !== null, isPending: true });
+    }
+
     if (this.inFlight === null) {
       this.queueSave();
     }
@@ -74,8 +78,8 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
       this.inFlight = this.pending;
       this.pending = null;
 
-      if (this.beginSaveCallback !== null) {
-        this.beginSaveCallback();
+      if (this.stateChangeCallback !== null) {
+        this.stateChangeCallback({ isInFlight: true, isPending: false });
       }
 
       persistence.persistDocument(this.inFlight)
@@ -92,6 +96,10 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
 
           this.inFlight = null;
 
+          if (this.stateChangeCallback !== null) {
+            this.stateChangeCallback({ isInFlight: false, isPending: this.pending !== null });
+          }
+
           if (this.pending !== null) {
             this.pending = this.pending.with({ _rev: result._rev });
             this.queueSave();
@@ -99,6 +107,10 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
           resolve(result);
         })
         .catch((err) => {
+
+          if (this.stateChangeCallback !== null) {
+            this.stateChangeCallback({ isInFlight: false, isPending: this.pending !== null });
+          }
 
           this.inFlight = null;
           if (this.failureCallback !== null) {
