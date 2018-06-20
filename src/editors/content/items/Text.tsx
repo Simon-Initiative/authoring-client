@@ -11,6 +11,7 @@ import {
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
 import guid from 'utils/guid';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
 
@@ -127,10 +128,10 @@ export class Text
             <option value="large">large</option>
           </Select>
 
-          <Checkbox editMode={editMode}
+          <ToggleSwitch
+            checked={itemModel.caseSensitive}
             label="Case Sensitive"
-            value={itemModel.caseSensitive}
-            onEdit={this.onCaseSensitive} />
+            onClick={() => this.onCaseSensitive(!itemModel.caseSensitive)} />
         </TabSectionContent>
         <TabSectionHeader title="Feedback">
           <TabOptionControl name="add-feedback">
