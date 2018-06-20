@@ -2,12 +2,14 @@ import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
 
 import {
-  onFailureCallback, onSaveCompletedCallback, PersistenceStrategy,
+  onFailureCallback, onSaveCompletedCallback,
+  onStateChangeCallback, PersistenceStrategy,
 } from './PersistenceStrategy';
 
 export interface AbstractPersistenceStrategy {
   successCallback: onSaveCompletedCallback;
   failureCallback: onFailureCallback;
+  stateChangeCallback: onStateChangeCallback;
   writeLockedDocumentId: string;
   courseId: string;
   destroyed: boolean;
@@ -19,6 +21,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
   constructor() {
     this.successCallback = null;
     this.failureCallback = null;
+    this.stateChangeCallback = null;
     this.writeLockedDocumentId = null;
     this.courseId = null;
     this.destroyed = false;
@@ -48,10 +51,12 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
   initialize(doc: persistence.Document, userName: string,
              onSuccess: onSaveCompletedCallback,
              onFailure: onFailureCallback,
+             onStateChange: onStateChangeCallback,
             ): Promise<boolean> {
 
     this.successCallback = onSuccess;
     this.failureCallback = onFailure;
+    this.stateChangeCallback = onStateChange;
 
     return new Promise((resolve, reject) => {
 

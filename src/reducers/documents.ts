@@ -6,6 +6,8 @@ import { ModelTypes, AssessmentModel } from 'data/models';
 import { Maybe } from 'tsmonad';
 
 export type ActionTypes =
+  documentActions.IsSavingUpdatedAction |
+  documentActions.LastSaveSucceededAction |
   documentActions.ChangeRedoneAction |
   documentActions.ChangeUndoneAction |
   documentActions.DocumentReleasedAction |
@@ -64,6 +66,21 @@ export const documents = (
 ): DocumentsState => {
 
   switch (action.type) {
+
+    case documentActions.IS_SAVING_UPDATED:
+      if (state.get(action.documentId) !== undefined) {
+        return state.set(action.documentId, state.get(action.documentId).with({
+          isSaving: action.isSaving,
+        }));
+      }
+      return state;
+
+    case documentActions.LAST_SAVE_SUCEEDED:
+      return state.set(action.documentId, state.get(action.documentId).with({
+        lastRequestSucceeded: action.lastRequestSucceeded,
+        saveCount: state.get(action.documentId).saveCount + 1,
+      }));
+
     case documentActions.DOCUMENT_REQUESTED:
       // Newly requested documents simply get a new record in the map
 

@@ -9,6 +9,7 @@ import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
+import { REMOVE_QUESTION_DISABLED_MSG } from 'editors/content/question/Question';
 
 import './SelectionEditor.scss';
 
@@ -17,6 +18,7 @@ export interface SelectionProps extends AbstractContentEditorProps<contentTypes.
   onDuplicate?: () => void;
   isParentAssessmentGraded?: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
+  canRemove: boolean;
 }
 
 export interface SelectionState {
@@ -104,13 +106,17 @@ export class SelectionEditor
   }
 
   renderTitle() {
-    const { model, onRemove } = this.props;
+    const { model, canRemove, onRemove } = this.props;
 
     const title = model.source.contentType === 'Pool'
       ? 'Pool' : 'Shared Pool';
 
     return (
-      <ContentTitle title={title} onRemove={() => onRemove(model.guid)} canRemove={true} />
+      <ContentTitle
+        title={title}
+        onRemove={() => onRemove(model.guid)}
+        canRemove={canRemove}
+        removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG} />
     );
   }
 

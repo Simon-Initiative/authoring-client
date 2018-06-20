@@ -91,6 +91,7 @@ export function renderAssessmentNode(
             onUpdateHover={props.onUpdateHover}
             allSkills={props.skills}
             model={n}
+            canRemove={canRemove}
             onEdit={(c, src) => onEdit(n.guid, c, src)}
             onRemove={() => onRemove(n.guid)}
             />;
