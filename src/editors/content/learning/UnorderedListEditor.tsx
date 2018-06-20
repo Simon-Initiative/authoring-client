@@ -156,7 +156,12 @@ export default class UnorderedList
     this.props.onEdit(model, listItem);
   }
 
-  onListItemsEdit(elements, src) {
+  onListItemsEdit(elements: ContentElements, src) {
+
+    // Prevent deletion of the last list item
+    if (elements.content.size === 0) {
+      return;
+    }
 
     const items = elements
       .content
