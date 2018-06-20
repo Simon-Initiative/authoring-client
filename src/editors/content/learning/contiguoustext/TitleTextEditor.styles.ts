@@ -4,33 +4,32 @@ import { JSSStyles } from 'styles/jss';
 export const styles: JSSStyles = {
   titleTextEditor: {
     position: 'relative',
+    padding: '6px',
+    border: '2px solid #f3f3f4',
+    transition: 'all .2s ease-in-out',
+    borderRadius: 4,
 
-    '&:hover $hoverUnderline': {
-      width: '100%',
-      transition: 'width 200ms ease, opacity 100ms ease',
-      opacity: 1,
+    '&:hover': {
+      backgroundColor: 'white',
     },
-
-    '&:hover $editIcon': {
-      opacity: 1,
-      transition: 'opacity 200ms ease',
+    '&:focus': {
+      backgroundColor: 'white',
+      borderColor: 'rgb(76, 154, 255)',
+    },
+    '&:active': {
+      backgroundColor: 'white',
+      borderColor: 'rgb(76, 154, 255)',
     },
   },
   contiguousTextEditor: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    padding: 0,
-  },
-  editIcon: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    color: colors.selection,
-    opacity: 0,
-  },
-  hoverUnderline: {
-    borderBottom: [1, 'solid', colors.selection],
-    width: '50%',
-    opacity: 0,
+    // backgroundColor: 'transparent',
+    '&:focus': {
+      backgroundColor: 'white',
+      borderColor: 'rgb(76, 154, 255)',
+    },
+    '&:active': {
+      backgroundColor: 'white',
+      borderColor: 'rgb(76, 154, 255)',
+    },
   },
 };
