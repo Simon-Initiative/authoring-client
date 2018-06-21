@@ -14,6 +14,7 @@ import { ContentTitle } from 'editors/content/common/ContentTitle';
 import guid from 'utils/guid';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { containsDynaDropCustom } from 'editors/content/question/QuestionEditor';
+import { Badge } from '../common/Badge';
 
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
@@ -337,12 +338,19 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     const showAdditionalTabs = this.renderAdditionalTabs() !== true
       && this.renderAdditionalTabs() !== false;
 
+    const renderSkillsLabel = (part: contentTypes.Part) => (
+      <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
+          {part.skills.size}
+        </Badge>
+      </span>
+    );
+
     return items.map((item, index) => (
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
             ...(this.renderDetails() ? ['Details'] : []),
-            ...(this.renderSkillsTab(item, parts[index]) ? ['Skills'] : []),
+            ...(this.renderSkillsTab(item, parts[index]) ? [renderSkillsLabel(parts[index])] : []),
             ...(this.renderHintsTab(item, parts[index]) ? ['Hints'] : []),
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             ...(showAdditionalTabs
