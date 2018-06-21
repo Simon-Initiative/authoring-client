@@ -52,7 +52,7 @@ export class Objective
       titleBlock = <div style={ { marginLeft: '10px' } }>
             <span>
               <i className="icon"></i>
-            </span>&nbsp;
+            </span>
           <b>Objective:</b> {title}
           </div>;
     } else if (isExpanded) {

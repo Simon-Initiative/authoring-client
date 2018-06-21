@@ -86,17 +86,19 @@ export class Title
     }
 
     const linkStyle : any = {
+      whiteSpace: 'normal',
+      textAlign: 'left',
       color: 'black',
       fontWeight: 'normal',
     };
 
-    const renameButton = this.props.isHoveredOver && this.props.editMode
+    const rewordButton = this.props.isHoveredOver && this.props.editMode
         ? <button
-            key="rename"
+            key="reword"
             onClick={this.onBeginEdit}
             type="button"
             className="btn btn-link btn-sm">
-            Rename
+            Reword
           </button>
         : null;
 
@@ -105,7 +107,7 @@ export class Title
         >
         <button key="itemClick" onClick={() => this.props.onToggleExpanded()}
         type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
-        {renameButton}
+        {rewordButton}
       </div>
     );
   }
