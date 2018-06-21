@@ -86,6 +86,7 @@ export class Title
     }
 
     const linkStyle : any = {
+      display: 'inline-block',
       whiteSpace: 'normal',
       textAlign: 'left',
       color: 'black',
@@ -103,12 +104,11 @@ export class Title
         : null;
 
     return (
-      <div style={ { display: 'inline' } }
-        >
+      <React.Fragment>
         <button key="itemClick" onClick={() => this.props.onToggleExpanded()}
         type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
         {rewordButton}
-      </div>
+      </React.Fragment>
     );
   }
 }

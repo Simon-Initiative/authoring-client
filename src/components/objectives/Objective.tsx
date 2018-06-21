@@ -3,7 +3,7 @@ import * as contentTypes from '../../data/contentTypes';
 import { Title } from './Title';
 import { Remove } from 'components/common/Remove';
 
-import './objective.scss';
+import './Objective.scss';
 
 export interface Objective {
 
@@ -105,14 +105,13 @@ export class Objective
           : null;
 
     return (
-      <div>
+      <div className={mouseOver ? 'objective--mouseover-highlight' : ''}>
         <Title title={model.title}
           editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
           isHoveredOver={mouseOver}
           onEdit={this.onTitleEdit}>{titleBlock}</Title>
         {skillButtons}
-
       </div>
     );
   }
