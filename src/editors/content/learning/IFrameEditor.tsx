@@ -45,7 +45,7 @@ export default class IFrameEditor
         <SidebarGroup label="URL">
           <Discoverable id={DiscoverableId.IFrameEditorWebpageURL} focusChild>
             <TextInput
-              {...this.props}
+              editMode={this.props.editMode}
               width="100%"
               type="text"
               label=""
