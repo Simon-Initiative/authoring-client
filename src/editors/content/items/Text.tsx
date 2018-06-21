@@ -5,12 +5,13 @@ import {
     AbstractItemPartEditor, AbstractItemPartEditorProps,
     AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { Checkbox, Select, Button } from '../common/controls';
+import { Select, Button } from '../common/controls';
 import {
   TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
 import guid from 'utils/guid';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
 
@@ -32,8 +33,8 @@ export class Text
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
-    this.onCaseSensitive = this.onCaseSensitive.bind(this);
     this.onSizeChange = this.onSizeChange.bind(this);
+    this.onToggleCaseSensitive = this.onToggleCaseSensitive.bind(this);
   }
 
   onPartEdit(partModel: contentTypes.Part, src) {
@@ -76,18 +77,6 @@ export class Text
     onEdit(updated, partModel, updated);
   }
 
-  onCaseSensitive(caseSensitive) {
-    const {
-      partModel,
-      itemModel,
-      onEdit,
-    } = this.props;
-
-    const updated = itemModel.with({ caseSensitive });
-
-    onEdit(updated, partModel, updated);
-  }
-
   onSizeChange(inputSize) {
     const {
       partModel,
@@ -96,6 +85,18 @@ export class Text
     } = this.props;
 
     const updated = itemModel.with({ inputSize });
+
+    onEdit(updated, partModel, updated);
+  }
+
+  onToggleCaseSensitive() {
+    const {
+      partModel,
+      itemModel,
+      onEdit,
+    } = this.props;
+
+    const updated = itemModel.with({ caseSensitive: !itemModel.caseSensitive });
 
     onEdit(updated, partModel, updated);
   }
@@ -127,10 +128,11 @@ export class Text
             <option value="large">large</option>
           </Select>
 
-          <Checkbox editMode={editMode}
+          <ToggleSwitch
+            editMode={this.props.editMode}
+            checked={itemModel.caseSensitive}
             label="Case Sensitive"
-            value={itemModel.caseSensitive}
-            onEdit={this.onCaseSensitive} />
+            onClick={this.onToggleCaseSensitive} />
         </TabSectionContent>
         <TabSectionHeader title="Feedback">
           <TabOptionControl name="add-feedback">

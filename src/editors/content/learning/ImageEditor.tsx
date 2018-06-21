@@ -175,6 +175,7 @@ export class ImageSizeSidebar extends
           </ToolbarButton>
         </SidebarGroup>
         <SidebarGroup label="Size">
+          <SidebarRow>
           <div className="form-check">
             <label className="form-check-label">
               <input className="form-check-input"
@@ -186,7 +187,7 @@ export class ImageSizeSidebar extends
               Default
             </label>
           </div>
-          <div className="form-check" style={{ marginBottom: '30px' }}>
+          <div className="form-check">
             <label className="form-check-label">
               <input className="form-check-input"
                 name="sizingOptions"
@@ -197,8 +198,9 @@ export class ImageSizeSidebar extends
               Custom
             </label>
           </div>
-
+          </SidebarRow>
           <SidebarRow label="Width">
+            <form>
             <div className="input-group input-group-sm">
               <TextInput width="100px" label=""
                 editMode={this.props.editMode && !this.state.isNativeSize}
@@ -206,6 +208,7 @@ export class ImageSizeSidebar extends
                 type="number"
                 onEdit={this.onEditWidth}
               /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
+            </form>
           </SidebarRow>
           <SidebarRow label="Height">
             <div className="input-group input-group-sm">
