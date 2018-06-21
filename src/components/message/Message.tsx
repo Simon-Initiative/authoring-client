@@ -41,7 +41,7 @@ export class Message
   renderMessageAction(message: Messages.Message, action: Messages.MessageAction) {
     return (
       <button
-        key={`${action.label}`}
+        key={action.label}
         className="btn btn-action"
         onClick={() => this.props.executeAction(message, action)}
         type="button">{action.label}

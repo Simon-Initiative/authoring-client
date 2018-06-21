@@ -15,8 +15,9 @@ function buildModalMessageAction(label, text) : Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
+      const dismiss = () => dispatch(modalActions.dismiss());
       dispatch(modalActions.display(
-        <ModalMessage onCancel={() => dispatch(modalActions.dismiss())}>{text}</ModalMessage>));
+        <ModalMessage onCancel={dismiss}>{text}</ModalMessage>));
     },
   };
 }
