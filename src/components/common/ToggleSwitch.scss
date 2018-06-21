@@ -1,8 +1,9 @@
 @import 'oli/colors';
 
 .toggle-switch {
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
+  vertical-align: middle;
   cursor: pointer;
 
   &.disabled {
@@ -113,8 +114,13 @@
     }
   }
 
+  label {
+    margin-bottom: 0;
+  }
+
   .label {
     color: $black;
+    font-size: inherit !important;
 
     &.before {
       margin-right: 5px;

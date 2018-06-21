@@ -55,6 +55,17 @@ export abstract class ChoiceFeedback
     this.placeholderResponse = this.buildResponsePlaceholder();
   }
 
+  shouldComponentUpdate(nextProps: ChoiceFeedbackProps, nextState: ChoiceFeedbackState) {
+    return this.props.model !== nextProps.model
+      || this.props.parent !== nextProps.parent
+      || this.props.editMode !== nextProps.editMode
+      || this.props.activeContentGuid !== nextProps.activeContentGuid
+      || this.props.hover !== nextProps.hover
+      || this.props.simpleFeedback !== nextProps.simpleFeedback
+      || this.props.choices !== nextProps.choices
+      || this.state.invalidFeedback !== nextState.invalidFeedback;
+  }
+
   onResponseEdit(response, src) {
     const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
@@ -230,21 +241,17 @@ export abstract class ChoiceFeedback
                       multiple
                       bsSize="small"
                       onChange={(selected) => {
+                        if (selected.length > 0) {
+                          this.onEditMatchSelections(response.guid, choices, selected);
 
-                        if (this.getSelectedMatches(response, choices).length !== selected.length) {
-                          if (selected.length > 0) {
-                            this.onEditMatchSelections(response.guid, choices, selected);
-
-                            this.setState({
-                              invalidFeedback: invalidFeedback.set(response.guid, false),
-                            });
-                          } else {
-                            this.setState({
-                              invalidFeedback: invalidFeedback.set(response.guid, true),
-                            });
-                          }
+                          this.setState({
+                            invalidFeedback: invalidFeedback.set(response.guid, false),
+                          });
+                        } else {
+                          this.setState({
+                            invalidFeedback: invalidFeedback.set(response.guid, true),
+                          });
                         }
-
                       }}
                       options={choices.map(c => c.guid)}
                       labelKey={id => choices.find(c => c.guid === id).value}

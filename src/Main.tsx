@@ -34,7 +34,7 @@ import * as Msg from 'types/messages';
 import { getQueryVariableFromString } from 'utils/params';
 import * as messageActions from 'actions//messages';
 import { Resource, ResourceState } from 'data/content/resource';
-
+import { GlobalError } from 'components/GlobalError';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
 import CourseEditor from 'editors/document/course//CourseEditor.controller';
@@ -143,27 +143,40 @@ interface MainProps {
 }
 
 interface MainState {
-
+  hasErrored: boolean;
 }
+
 
 /**
  * Main React Component
  */
 @DragDropContext(HTML5Backend)
 export default class Main extends React.Component<MainProps, MainState> {
+
   modalActions: Object;
   viewActions: Object;
+  error: Object;
+  info: Object;
 
   constructor(props) {
     super(props);
-    const { location, onDispatch } = this.props;
+    const { onDispatch } = this.props;
 
     this.modalActions = bindActionCreators((modalActions as any), onDispatch);
     this.viewActions = bindActionCreators((viewActions as any), onDispatch);
 
     this.state = {
-      current: location,
+      hasErrored: false,
     };
+  }
+
+  componentDidCatch(error, info) {
+    // Display fallback UI
+    this.error = error;
+    this.info = info;
+
+    this.setState({ hasErrored: true });
+
   }
 
   componentDidMount() {
@@ -304,6 +317,24 @@ export default class Main extends React.Component<MainProps, MainState> {
 
   render(): JSX.Element {
     const { modal, user, hover, onUpdateHover } = this.props;
+
+    if (this.state.hasErrored) {
+      const userName = user === null
+        ? ''
+        : user.profile.firstName + ' ' + user.profile.lastName;
+      const email = user === null
+        ? ''
+        : user.profile.email;
+
+      return (
+        <GlobalError
+          info={this.info}
+          error={this.error}
+          userName={userName}
+          email={email}
+        />
+      );
+    }
 
     if (user === null) {
       return null;

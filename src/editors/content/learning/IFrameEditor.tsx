@@ -13,6 +13,7 @@ import {
   Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
+const IFRAME_PERMISSIONS = 'allow-forms allow-scripts';
 
 export interface IFrameEditorProps extends AbstractContentEditorProps<IFrame> {
   onShowSidebar: () => void;
@@ -112,7 +113,7 @@ export default class IFrameEditor
 
     return (
       <div className="iframeEditor">
-        <iframe src={fullSrc} height={height} width={width} />
+        <iframe src={fullSrc} height={height} width={width} sandbox={IFRAME_PERMISSIONS} />
       </div>
     );
   }

@@ -18,9 +18,9 @@ import { containsDynaDropCustom } from 'editors/content/question/QuestionEditor'
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
-const REMOVE_QUESTION_DISABLED_MSG =
-  'An assessment must contain at least one question. '
-  + 'Please add another question before removing';
+export const REMOVE_QUESTION_DISABLED_MSG =
+  'An assessment must contain at least one question or pool. '
+  + 'Please add another question or pool before removing this one';
 
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
