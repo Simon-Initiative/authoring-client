@@ -3,7 +3,7 @@ import * as contentTypes from '../../data/contentTypes';
 import { Title } from './Title';
 import { Remove } from 'components/common/Remove';
 
-import './Objective.scss';
+import './objective.scss';
 
 export interface Objective {
 
