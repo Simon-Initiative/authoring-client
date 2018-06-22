@@ -11,16 +11,17 @@ export interface ExistingSkillSelection {
 
 export interface ExistingSkillSelectionProps {
   skills: Immutable.List<contentTypes.Skill>;
-  onInsert: (selected: Immutable.Set<string>) => void;
+  objective: contentTypes.LearningObjective;
+  onInsert: (objective: contentTypes.LearningObjective, selected: Immutable.Set<string>) => void;
   onCancel: () => void;
+  disableInsert: boolean;
 }
-
 
 export interface ExistingSkillSelectionState {
-  selected: Immutable.Set<string>; 
+  selected: Immutable.Set<string>;
 }
 
-export class ExistingSkillSelection 
+export class ExistingSkillSelection
   extends React.PureComponent<ExistingSkillSelectionProps, ExistingSkillSelectionState> {
 
   constructor(props) {
@@ -31,13 +32,15 @@ export class ExistingSkillSelection
     };
   }
 
+  onInsert = () => this.props.onInsert(this.props.objective, this.state.selected);
+
   clickResource(selected) {
     this.setState({ selected });
   }
 
   renderRows() {
-    const link = (r: contentTypes.Skill) => 
-      <button onClick={this.clickResource.bind(this, r.id)} 
+    const link = (r: contentTypes.Skill) =>
+      <button onClick={this.clickResource.bind(this, r.id)}
         className="btn btn-link">{r.title}</button>;
 
     return this.props.skills.map((r) => {
@@ -48,27 +51,24 @@ export class ExistingSkillSelection
     });
   }
 
+
   render() {
     return (
-      <ModalSelection title="Select Existing Skill" 
-        onCancel={this.props.onCancel} 
-        onInsert={() => this.props.onInsert(this.state.selected)}>
+      <ModalSelection title="Select Existing Skill"
+        disableInsert={this.props.disableInsert}
+        onCancel={this.props.onCancel}
+        onInsert={this.onInsert}>
         <table className="table table-hover table-sm">
           <thead>
-              <tr>
-                  <th>Skill</th>
-              </tr>
+            <tr>
+              <th>Skill</th>
+            </tr>
           </thead>
           <tbody>
             {this.renderRows()}
           </tbody>
         </table>
-      </ModalSelection>    
+      </ModalSelection>
     );
   }
-
 }
-
-
-
-
