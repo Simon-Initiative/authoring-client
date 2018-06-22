@@ -68,7 +68,7 @@ export class Actions
       disabled
       className="btn btn-block btn-primary"
       onClick={() => { }}>
-      <LoadingSpinner className="u-no-padding" message="Publishing" />
+      <LoadingSpinner className="u-no-padding text-white" message="Publishing" />
     </button>;
 
     const publishButton = <button
