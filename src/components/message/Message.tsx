@@ -73,7 +73,7 @@ export class Message
   renderMessage(content: Messages.TitledContent) {
     return (
       <span className="navbar-text message-text">
-        <b>{content.title}</b> {content.message}
+        <span className="message-title">{content.title}</span> {content.message}
       </span>
     );
   }
