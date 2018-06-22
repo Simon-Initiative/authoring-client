@@ -24,6 +24,10 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
     (window as any).$(this.modal).modal('hide');
   }
 
+  onInsert = (e) => { e.preventDefault(); this.props.onInsert(); };
+
+  onCancel = (e) => { e.preventDefault(); this.props.onCancel(); };
+
   render() {
     const disableInsert = this.props.disableInsert;
     const okLabel = this.props.okLabel !== undefined
@@ -51,10 +55,10 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
               <button
                 disabled={disableInsert}
                 type="button"
-                onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }
+                onClick={this.onInsert}
                 className={`btn btn-${okClassName}`}>{okLabel}</button>
               <button type="button" className="btn btn-link"
-                onClick={(e) => { e.preventDefault(); this.props.onCancel(); } }
+                onClick={this.onCancel}
                 data-dismiss="modal">{cancelLabel}</button>
             </div>
           </div>
