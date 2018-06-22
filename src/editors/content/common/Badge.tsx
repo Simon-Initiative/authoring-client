@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Part } from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
 import { injectSheetSFC, classNames } from 'styles/jss';
 
