@@ -99,7 +99,7 @@ export class CircleEditor
     dragPointBegin.lift((dragPointBeginVal) => {
       dragMouseBegin.lift((dragMouseBeginVal) => {
         boundingClientRect.lift((boundingClient) => {
-          const { left, top, width, height } = boundingClient;
+          const { width, height } = boundingClient;
           const { clientX, clientY } = e;
 
           // calculate the offset distance from where the drag began to where the mouse is
