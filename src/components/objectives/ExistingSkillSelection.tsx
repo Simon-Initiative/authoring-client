@@ -9,16 +9,18 @@ export interface ExistingSkillSelection {
 
 }
 
+type SkillId = string;
+
 export interface ExistingSkillSelectionProps {
   skills: Immutable.List<contentTypes.Skill>;
   objective: contentTypes.LearningObjective;
-  onInsert: (objective: contentTypes.LearningObjective, selected: Immutable.Set<string>) => void;
+  onInsert: (objective: contentTypes.LearningObjective, selected: SkillId) => void;
   onCancel: () => void;
   disableInsert: boolean;
 }
 
 export interface ExistingSkillSelectionState {
-  selected: Immutable.Set<string>;
+  selected: SkillId;
 }
 
 export class ExistingSkillSelection
@@ -28,23 +30,26 @@ export class ExistingSkillSelection
     super(props);
 
     this.state = {
-      selected: Immutable.Set<string>(),
+      selected: undefined,
     };
+
+    this.clickResource = this.clickResource.bind(this);
   }
 
   onInsert = () => this.props.onInsert(this.props.objective, this.state.selected);
 
-  clickResource(selected) {
+  clickResource(e) {
+    const selected = e.target.value;
     this.setState({ selected });
   }
 
   renderRows() {
     const link = (r: contentTypes.Skill) =>
-      <button onClick={this.clickResource.bind(this, r.id)}
+      <button value={r.id} onClick={this.clickResource}
         className="btn btn-link">{r.title}</button>;
 
     return this.props.skills.map((r) => {
-      const active = this.state.selected.includes(r.id) ? 'table-active' : '';
+      const active = this.state.selected === r.id ? 'table-active' : '';
       return <tr key={r.id} className={active}>
         <td>{link(r)}</td>
       </tr>;
@@ -55,7 +60,7 @@ export class ExistingSkillSelection
   render() {
     return (
       <ModalSelection title="Select Existing Skill"
-        disableInsert={this.props.disableInsert}
+        disableInsert={this.state.selected === undefined && this.props.disableInsert}
         onCancel={this.props.onCancel}
         onInsert={this.onInsert}>
         <table className="table table-hover table-sm">

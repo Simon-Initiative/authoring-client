@@ -398,10 +398,10 @@ export class ObjectiveSkillView
       });
   }
 
-  onExistingSkillInsert(model: contentTypes.LearningObjective, skillIds: Immutable.Set<string>) {
+  onExistingSkillInsert(model: contentTypes.LearningObjective, skillId: string) {
     this.services.dismissModal();
 
-    const updated = model.with({ skills: model.skills.concat(skillIds).toList() });
+    const updated = model.with({ skills: model.skills.concat(skillId) as Immutable.List<string> });
     this.onObjectiveEdit(updated);
   }
 
