@@ -98,7 +98,7 @@ export interface MediaManagerProps {
   onEdit: (updated: Media) => void;
   onLoadCourseMediaNextPage: (
     mimeFilter: string, searchText: string,
-    orderBy: string, order: string) => void;
+    orderBy: string, order: string) => Promise<Maybe<Immutable.List<MediaItem>>>;
   onResetMedia: () => void;
   onSelectionChange: (selection: MediaItem[]) => void;
   onLoadMediaItemByPath: (path: string) => Promise<Maybe<MediaItem>>;
@@ -240,7 +240,15 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     createWebContentPromiseFactory(courseModel.guid, fileList.pop())
       .then((result) => {
         onResetMedia();
-        onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
+        onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order)
+          // select the most recently uploaded item
+          .then((mediaItems) => {
+            mediaItems.lift((files) => {
+              if (files.size > 0) {
+                this.onSelect(files.sortBy(file => file.dateUpdated).last().guid);
+              }
+            });
+          });
       });
   }
 
