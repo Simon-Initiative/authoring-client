@@ -75,6 +75,7 @@ export class RectangleEditor
     window.addEventListener('mousemove', this.onResizeDrag);
     window.addEventListener('mouseup', this.endResize);
 
+    // stop event propagation to keep item selected
     e.stopPropagation();
   }
 
@@ -94,8 +95,6 @@ export class RectangleEditor
       dragMouseBegin: Maybe.nothing<Point>(),
       dragPointIndices: Maybe.nothing<Point>(),
     });
-
-    e.stopPropagation();
   }
 
   onResizeDrag(e) {
@@ -106,13 +105,13 @@ export class RectangleEditor
       dragPointBegin.lift((dragPointBeginVal) => {
         dragMouseBegin.lift((dragMouseBeginVal) => {
           boundingClientRect.lift((boundingClient) => {
-            const { x, y, width, height } = boundingClient;
+            const { left, top, width, height } = boundingClient;
             const { clientX, clientY } = e;
 
             // ensure new position is inside the bounds of the image
             const dragMouse = {
-              x: Math.min(Math.max(clientX, x), x + width),
-              y: Math.min(Math.max(clientY, y), y + height),
+              x: Math.min(Math.max(clientX, left), left + width),
+              y: Math.min(Math.max(clientY, top), top + height),
             };
 
             // calculate the offset distance from where the drag began to where the mouse is
@@ -128,7 +127,7 @@ export class RectangleEditor
             };
 
             // maintain minimum hotspot size using opposite point as constraint
-            const MINIMUM_SIZE_PX = 10;
+            const MINIMUM_SIZE_PX = 30;
             const constraintIndices = {
               x: (dragPointIndicesVal.x + 2) % 4,  // opposite point x coords index
               y: (dragPointIndicesVal.y + 2) % 4,  // opposite point y coords index
@@ -167,8 +166,6 @@ export class RectangleEditor
     // register global mouse listeners
     window.addEventListener('mousemove', this.onMoveDrag);
     window.addEventListener('mouseup', this.endMove);
-
-    e.stopPropagation();
   }
 
   endMove(e) {
@@ -187,8 +184,6 @@ export class RectangleEditor
       dragMouseBegin: Maybe.nothing<Point>(),
       dragPointIndices: Maybe.nothing<Point>(),
     });
-
-    e.stopPropagation();
   }
 
   onMoveDrag(e) {
@@ -215,13 +210,17 @@ export class RectangleEditor
           };
 
           // ensure new location is inside the hotspot area
+          const halfWidth = Math.floor(width / 2);
+          const halfHeight = Math.floor(height / 2);
           calculatedCoords = {
-            x1: Math.min(Math.max(calculatedCoords.x1, 0), (boundingClient.width - width)),
-            y1: Math.min(Math.max(calculatedCoords.y1, 0), (boundingClient.height - height)),
+            x1: Math.min(
+              Math.max(calculatedCoords.x1, 0 - halfWidth), (boundingClient.width - halfWidth)),
+            y1: Math.min(
+              Math.max(calculatedCoords.y1, 0 - halfHeight), (boundingClient.height - halfHeight)),
             x2: Math.min(
-              Math.max(calculatedCoords.x2, width), boundingClient.width),
+              Math.max(calculatedCoords.x2, halfWidth), boundingClient.width + halfWidth),
             y2: Math.min(
-              Math.max(calculatedCoords.y2, height), boundingClient.height),
+              Math.max(calculatedCoords.y2, halfHeight), boundingClient.height + halfHeight),
           };
 
           this.setState({
