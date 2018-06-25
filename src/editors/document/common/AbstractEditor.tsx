@@ -70,14 +70,14 @@ export abstract class AbstractEditor<ModelType,
       () => true,
       this.undo.bind(this));
     handleKey(
-      '⌘+shift+z, ctrl+shift+y',
+      '⌘+shift+z, ctrl+shift+z',
       () => true,
       this.redo.bind(this));
   }
 
   componentWillUnmount() {
     unhandleKey('⌘+z, ctrl+z');
-    unhandleKey('⌘+y, ctrl+y');
+    unhandleKey('⌘+shift+z, ctrl+shift+z');
   }
 
   undo() {
