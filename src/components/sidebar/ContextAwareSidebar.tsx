@@ -186,7 +186,7 @@ export class ContextAwareSidebar
 
     onEditModel(
       assessmentModel.with({
-        pages: assessmentModel.pages.set(page.guid, page)
+        pages: assessmentModel.pages.set(page.guid, page),
       }),
     );
   }
