@@ -107,7 +107,6 @@ export abstract class AbstractEditor<ModelType extends HasGuid,
 
   redo() {
     const { dispatch, model } = this.props;
-    console.log('model guid', model. guid)
     dispatch(redo(model.guid));
   }
 }
