@@ -9,14 +9,14 @@ import { HasGuid } from 'data/types';
 
 
 export interface AbstractEditor
-  <ModelType extends HasGuid,
+  <ModelType,
   P extends AbstractEditorProps<ModelType>,
   S extends AbstractEditorState> {
   undoStack: Immutable.Stack<ModelType>;
   redoStack: Immutable.Stack<ModelType>;
 }
 
-export interface AbstractEditorProps<ModelType extends HasGuid> {
+export interface AbstractEditorProps<ModelType> {
   // The initial document model passed into the editor.
   model: ModelType;
 
@@ -45,7 +45,7 @@ export interface AbstractEditorState {
  * An abstract editor that provides the basis for reusable
  * persistence and undo/redo.
  */
-export abstract class AbstractEditor<ModelType extends HasGuid,
+export abstract class AbstractEditor<ModelType,
   P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState>
   extends React.Component<P, S> {
   constructor(props: P, childState: Object) {
@@ -64,7 +64,9 @@ export abstract class AbstractEditor<ModelType extends HasGuid,
         childState,
       ) as S
     );
+  }
 
+  componentDidMount() {
     handleKey(
       '⌘+z, ctrl+z',
       () => true,
@@ -75,18 +77,14 @@ export abstract class AbstractEditor<ModelType extends HasGuid,
       this.redo.bind(this));
   }
 
-  componentDidMount() {
-
-  }
-
   componentWillUnmount() {
     unhandleKey('⌘+z, ctrl+z');
     unhandleKey('⌘+y, ctrl+y');
   }
 
   undo() {
-    const { dispatch, model } = this.props;
-    dispatch(undo(model.guid));
+    const { dispatch, context } = this.props;
+    dispatch(undo(context.documentId));
   }
 
   handleEdit(model: ModelType, callback?: () => void) {
@@ -106,7 +104,7 @@ export abstract class AbstractEditor<ModelType extends HasGuid,
   }
 
   redo() {
-    const { dispatch, model } = this.props;
-    dispatch(redo(model.guid));
+    const { dispatch, context } = this.props;
+    dispatch(redo(context.documentId));
   }
 }
