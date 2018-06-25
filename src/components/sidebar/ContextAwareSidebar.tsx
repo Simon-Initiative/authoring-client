@@ -22,6 +22,8 @@ import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
 
 import { styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.styles';
+import { relativeToNow, adjustForSkew } from 'utils/date';
+import { Tooltip } from 'utils/tooltip';
 
 interface SidebarRowProps {
   label?: string;
@@ -52,9 +54,9 @@ const SidebarHeader = injectSheetSFC<SidebarHeaderProps>(styles)(({
   return (
     <h3 className={classes.header}>
       {title}
-      <div className="flex-spacer"/>
+      <div className="flex-spacer" />
       <button className={classes.closeButton} onClick={onHide}>
-        <i className="fa fa-angle-double-right"/>
+        <i className="fa fa-angle-double-right" />
       </button>
     </h3>
   );
@@ -74,7 +76,7 @@ export const SidebarContent = injectSheetSFC<SidebarContentProps>(styles)(({
 }: StyledComponentProps<SidebarContentProps>) => {
   return (
     <div className={classNames([classes.sidebarContent, className])}>
-      <SidebarHeader title={title} onHide={onHide}/>
+      <SidebarHeader title={title} onHide={onHide} />
       {children
         ? children
         : (
@@ -123,6 +125,7 @@ export interface ContextAwareSidebarProps {
   onEdit: (content: Object) => void;
   onHide: () => void;
   onSetCurrentPage: (documentId: string, pageId: string) => void;
+  timeSkewInMs: number;
 }
 
 export interface ContextAwareSidebarState {
@@ -134,7 +137,7 @@ export interface ContextAwareSidebarState {
  */
 @injectSheet(styles)
 export class ContextAwareSidebar
-    extends React.PureComponent<ContextAwareSidebarProps & JSSProps, ContextAwareSidebarState> {
+  extends React.PureComponent<ContextAwareSidebarProps & JSSProps, ContextAwareSidebarState> {
 
   constructor(props) {
     super(props);
@@ -183,7 +186,8 @@ export class ContextAwareSidebar
 
     onEditModel(
       assessmentModel.with({
-        pages: assessmentModel.pages.set(page.guid, page) }),
+        pages: assessmentModel.pages.set(page.guid, page)
+      }),
     );
   }
 
@@ -193,18 +197,29 @@ export class ContextAwareSidebar
       onEditModel,
     } = this.props;
 
+    const dateOptions = {
+      month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric',
+    };
+    const dateFormatted = (date: Date): string =>
+      date.toLocaleDateString('en-US', dateOptions);
+
+    const adjusted = (date: Date): Date => adjustForSkew(date, this.props.timeSkewInMs);
+
     switch (model.modelType) {
       case ModelTypes.WorkbookPageModel:
         return (
           <SidebarContent title="Page Details" onHide={this.props.onHide}>
             <SidebarGroup>
-              <SidebarRow label="Created">
-                {`${resource.dateCreated.toLocaleDateString()}, \
-                ${resource.dateCreated.toLocaleTimeString()}`}
-              </SidebarRow>
-              <SidebarRow label="Last Updated">
-                {`${resource.dateUpdated.toLocaleDateString()}, \
-                ${resource.dateUpdated.toLocaleTimeString()}`}
+              <SidebarRow label="">
+                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateCreated))}
+                  delay={0} distance={5} size="small" arrowSize="small">
+                  <small>{`Created ${relativeToNow(adjusted(resource.dateCreated))}`}</small>
+                </Tooltip>
+                <br />
+                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateUpdated))}
+                  delay={0} distance={5} size="small" arrowSize="small">
+                  <small>{`Updated ${relativeToNow(adjusted(resource.dateCreated))}`}</small>
+                </Tooltip>
               </SidebarRow>
             </SidebarGroup>
           </SidebarContent>
@@ -224,17 +239,17 @@ export class ContextAwareSidebar
             </SidebarGroup>
             <SidebarGroup label="Pages">
               <SidebarRow>
-              <PageSelection
-                {...this.props}
-                onFocus={() => {}}
-                onRemove={this.onRemovePage}
-                editMode={editMode}
-                pages={model.pages}
-                current={model.pages.get(currentPage)}
-                onChangeCurrent={(newPage) => {
-                  onSetCurrentPage(this.props.context.documentId, newPage);
-                }}
-                onEdit={this.onPageEdit}/>
+                <PageSelection
+                  {...this.props}
+                  onFocus={() => { }}
+                  onRemove={this.onRemovePage}
+                  editMode={editMode}
+                  pages={model.pages}
+                  current={model.pages.get(currentPage)}
+                  onChangeCurrent={(newPage) => {
+                    onSetCurrentPage(this.props.context.documentId, newPage);
+                  }}
+                  onEdit={this.onPageEdit} />
                 <button
                   disabled={!this.props.editMode}
                   type="button" className="btn btn-link btn-sm"
@@ -242,59 +257,59 @@ export class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {model.type === LegacyTypes.assessment2 &&
-            <SidebarGroup label="Settings">
-              <SidebarRow label="Recommended Attempts">
-              <TextInput
-                editMode={editMode}
-                width="50px"
-                label=""
-                type="number"
-                value={model.recommendedAttempts}
-                onEdit={(recommendedAttempts) => {
-                  const recommended = parseInt(recommendedAttempts, 10);
-                  const max = parseInt(model.maxAttempts, 10);
-                  if (recommended < 1) {
-                    return onEditModel(model.with({
-                      recommendedAttempts: '1',
-                      maxAttempts: '1',
-                    }));
-                  }
-                  if (recommended > max) {
-                    return onEditModel(model.with({
-                      recommendedAttempts,
-                      maxAttempts: recommendedAttempts,
-                    }));
-                  }
-                  return onEditModel(model.with({ recommendedAttempts }));
-                }}
-              />
-              </SidebarRow>
-              <SidebarRow label="Maximum Attempts">
-                <TextInput
-                  editMode={this.props.editMode}
-                  width="50px"
-                  label=""
-                  type="number"
-                  value={model.maxAttempts}
-                  onEdit={(maxAttempts) => {
-                    const recommended = parseInt(model.recommendedAttempts, 10);
-                    const max = parseInt(maxAttempts, 10);
-                    if (max < 1) {
-                      return onEditModel(model.with({
-                        recommendedAttempts: '1',
-                        maxAttempts: '1',
-                      }));
-                    }
-                    if (max < recommended) {
-                      return onEditModel(model.with({
-                        recommendedAttempts: maxAttempts,
-                        maxAttempts,
-                      }));
-                    }
-                    return onEditModel(model.with({ maxAttempts }));
-                  }} />
-              </SidebarRow>
-            </SidebarGroup>
+              <SidebarGroup label="Settings">
+                <SidebarRow label="Recommended Attempts">
+                  <TextInput
+                    editMode={editMode}
+                    width="50px"
+                    label=""
+                    type="number"
+                    value={model.recommendedAttempts}
+                    onEdit={(recommendedAttempts) => {
+                      const recommended = parseInt(recommendedAttempts, 10);
+                      const max = parseInt(model.maxAttempts, 10);
+                      if (recommended < 1) {
+                        return onEditModel(model.with({
+                          recommendedAttempts: '1',
+                          maxAttempts: '1',
+                        }));
+                      }
+                      if (recommended > max) {
+                        return onEditModel(model.with({
+                          recommendedAttempts,
+                          maxAttempts: recommendedAttempts,
+                        }));
+                      }
+                      return onEditModel(model.with({ recommendedAttempts }));
+                    }}
+                  />
+                </SidebarRow>
+                <SidebarRow label="Maximum Attempts">
+                  <TextInput
+                    editMode={this.props.editMode}
+                    width="50px"
+                    label=""
+                    type="number"
+                    value={model.maxAttempts}
+                    onEdit={(maxAttempts) => {
+                      const recommended = parseInt(model.recommendedAttempts, 10);
+                      const max = parseInt(maxAttempts, 10);
+                      if (max < 1) {
+                        return onEditModel(model.with({
+                          recommendedAttempts: '1',
+                          maxAttempts: '1',
+                        }));
+                      }
+                      if (max < recommended) {
+                        return onEditModel(model.with({
+                          recommendedAttempts: maxAttempts,
+                          maxAttempts,
+                        }));
+                      }
+                      return onEditModel(model.with({ maxAttempts }));
+                    }} />
+                </SidebarRow>
+              </SidebarGroup>
             }
           </SidebarContent>
         );
@@ -348,12 +363,12 @@ export class ContextAwareSidebar
         onEdit,
         parent: contentParent,
         activeContentGuid: contentParent.props.activeContentGuid,
-        onFocus: () => {},
+        onFocus: () => { },
         context: contentParent.props.context,
         services: contentParent.props.services,
         editMode: contentParent.props.editMode,
         hover: null,
-        onUpdateHover: () => {},
+        onUpdateHover: () => { },
       };
 
       contentRenderer = React.createElement(
@@ -363,14 +378,14 @@ export class ContextAwareSidebar
 
     return (
       <ReactCSSTransitionGroup
-          transitionName={{
-            enter: classes.enter,
-            enterActive: classes.enterActive,
-            leave: classes.leave,
-            leaveActive: classes.leaveActive,
-          }}
-          transitionEnterTimeout={SIDEBAR_CLOSE_ANIMATION_DURATION_MS}
-          transitionLeaveTimeout={SIDEBAR_CLOSE_ANIMATION_DURATION_MS}>
+        transitionName={{
+          enter: classes.enter,
+          enterActive: classes.enterActive,
+          leave: classes.leave,
+          leaveActive: classes.leaveActive,
+        }}
+        transitionEnterTimeout={SIDEBAR_CLOSE_ANIMATION_DURATION_MS}
+        transitionLeaveTimeout={SIDEBAR_CLOSE_ANIMATION_DURATION_MS}>
         {show ?
           <div className={classNames([classes.contextAwareSidebar, className])}>
             <div className={classes.content}>
