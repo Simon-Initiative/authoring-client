@@ -212,12 +212,12 @@ export class ContextAwareSidebar
             <SidebarGroup>
               <SidebarRow label="">
                 <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateCreated))}
-                  delay={0} distance={5} size="small" arrowSize="small">
+                  delay={150} distance={5} size="small" arrowSize="small">
                   <small>{`Created ${relativeToNow(adjusted(resource.dateCreated))}`}</small>
                 </Tooltip>
                 <br />
                 <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateUpdated))}
-                  delay={0} distance={5} size="small" arrowSize="small">
+                  delay={150} distance={5} size="small" arrowSize="small">
                   <small>{`Updated ${relativeToNow(adjusted(resource.dateCreated))}`}</small>
                 </Tooltip>
               </SidebarRow>
