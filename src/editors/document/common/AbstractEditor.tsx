@@ -4,15 +4,19 @@ import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
 import { handleKey, unhandleKey } from './keyhandlers';
 import { Maybe } from 'tsmonad';
+import { undo, redo } from 'actions/document';
+import { HasGuid } from 'data/types';
 
 
-export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>,
+export interface AbstractEditor
+  <ModelType extends HasGuid,
+  P extends AbstractEditorProps<ModelType>,
   S extends AbstractEditorState> {
   undoStack: Immutable.Stack<ModelType>;
   redoStack: Immutable.Stack<ModelType>;
 }
 
-export interface AbstractEditorProps<ModelType> {
+export interface AbstractEditorProps<ModelType extends HasGuid> {
   // The initial document model passed into the editor.
   model: ModelType;
 
@@ -41,7 +45,7 @@ export interface AbstractEditorState {
  * An abstract editor that provides the basis for reusable
  * persistence and undo/redo.
  */
-export abstract class AbstractEditor<ModelType,
+export abstract class AbstractEditor<ModelType extends HasGuid,
   P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState>
   extends React.Component<P, S> {
   constructor(props: P, childState: Object) {
@@ -60,17 +64,19 @@ export abstract class AbstractEditor<ModelType,
         childState,
       ) as S
     );
+
+    handleKey(
+      '⌘+z, ctrl+z',
+      () => true,
+      this.undo.bind(this));
+    handleKey(
+      '⌘+shift+z, ctrl+shift+y',
+      () => true,
+      this.redo.bind(this));
   }
 
   componentDidMount() {
-    handleKey(
-      '⌘+z, ctrl+z',
-      () => this.undoStack.size > 1,
-      this.undo.bind(this));
-    handleKey(
-      '⌘+y, ctrl+y',
-      () => this.redoStack.size > 0,
-      this.redo.bind(this));
+
   }
 
   componentWillUnmount() {
@@ -79,8 +85,8 @@ export abstract class AbstractEditor<ModelType,
   }
 
   undo() {
-
-
+    const { dispatch, model } = this.props;
+    dispatch(undo(model.guid));
   }
 
   handleEdit(model: ModelType, callback?: () => void) {
@@ -100,9 +106,8 @@ export abstract class AbstractEditor<ModelType,
   }
 
   redo() {
-
+    const { dispatch, model } = this.props;
+    console.log('model guid', model. guid)
+    dispatch(redo(model.guid));
   }
-
-
 }
-
