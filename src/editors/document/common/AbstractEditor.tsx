@@ -5,8 +5,6 @@ import { AppContext } from '../../common/AppContext';
 import { handleKey, unhandleKey } from './keyhandlers';
 import { Maybe } from 'tsmonad';
 import { undo, redo } from 'actions/document';
-import { HasGuid } from 'data/types';
-
 
 export interface AbstractEditor
   <ModelType,
