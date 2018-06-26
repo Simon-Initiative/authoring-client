@@ -6,6 +6,9 @@ import * as viewActions from 'actions/view';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
 import { OrganizationModel } from 'data/models';
+import { EditedDocument } from 'types/document';
+import { DeferredPersistenceStrategy }
+  from 'editors/manager/persistence/DeferredPersistenceStrategy';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
 function invokePreview(orgId: string, isRefreshAttempt: boolean) {
@@ -54,7 +57,23 @@ export function preview(
 export function quickPreview(courseId: string, resource: Resource) {
 
   return function (dispatch, getState) {
-    const { course } = getState();
+    const { course, documents } = getState();
+    const document: EditedDocument = documents.get(resource.guid);
+
+    if (document.persistence instanceof DeferredPersistenceStrategy) {
+
+      // Turn waiting cursor on
+      return (document.persistence as DeferredPersistenceStrategy).flushPendingChanges()
+        .then((_) => {
+          // turn waiting cursor off
+          persistence.initiateQuickPreview(course.guid, resource.guid);
+        })
+        .catch((err) => {
+          // turn waiting cursor off
+          console.log(`Error saving changes: ${err}`);
+        });
+    }
+
     return persistence.initiateQuickPreview(course.guid, resource.guid);
   };
 }
