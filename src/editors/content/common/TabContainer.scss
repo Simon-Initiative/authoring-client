@@ -36,6 +36,11 @@
 
     .tab-control {
       padding: .5rem 1rem;
+      border-bottom: 1px solid #ddd;
+
+      & > button {
+        border-bottom: initial;
+      }
     }
   }
 

@@ -72,6 +72,7 @@ export class CourseCreation
         <div className="course-creation__content">
           <h1>{title}</h1>
           <input
+            ref={input => input && input.focus()}
             value={inputText}
             onChange={this.onChange}
             onKeyPress={this.handleKeyPress}

@@ -114,13 +114,13 @@ export class PolygonEditor
       dragPointBegin.lift((dragPointBeginVal) => {
         dragMouseBegin.lift((dragMouseBeginVal) => {
           boundingClientRect.lift((boundingClient) => {
-            const { x, y, width, height } = boundingClient;
+            const { left, top, width, height } = boundingClient;
             const { clientX, clientY } = e;
 
             // ensure new position is inside the bounds of the image
             const dragMouse = {
-              x: Math.min(Math.max(clientX, x), x + width),
-              y: Math.min(Math.max(clientY, y), y + height),
+              x: Math.min(Math.max(clientX, left), left + width),
+              y: Math.min(Math.max(clientY, top), top + height),
             };
 
             // calculate the offset distance from where the drag began to where the mouse is
@@ -188,12 +188,12 @@ export class PolygonEditor
 
     dragMouseBegin.lift((dragMouseBeginVal) => {
       boundingClientRect.lift((boundingClient) => {
-        const { x, y } = boundingClient;
+        const { left, top, width, height } = boundingClient;
         const { clientX, clientY } = e;
 
         const dragMouse = {
-          x: Math.min(Math.max(clientX, x), x + boundingClient.width),
-          y: Math.min(Math.max(clientY, y), y + boundingClient.height),
+          x: Math.min(Math.max(clientX, left), left + width),
+          y: Math.min(Math.max(clientY, top), top + height),
         };
 
         const offsets = {
