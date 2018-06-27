@@ -46,6 +46,10 @@ export const TitleTextEditor
           editorStyles={editorStyles}
           hideBorder={true}
           onEdit={onEdit} />
+        <div className={classes.editIcon}>
+          <i className="fa fa-pencil" />
+        </div>
+        <div className={classes.hoverUnderline} />
       </div>
     );
   }));
