@@ -9,8 +9,8 @@ import { Select, Button } from '../common/controls';
 import {
   TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
 } from 'editors/content/common/TabContainer';
-import { Feedback } from '../part/Feedback';
 import guid from 'utils/guid';
+import { NumericFeedback } from '../part/NumericFeedback';
 
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
 
@@ -109,7 +109,7 @@ export class Numeric
           </TabOptionControl>
         </TabSectionHeader>
         <TabSectionContent key="feedback" className="feedback">
-          <Feedback
+          <NumericFeedback
             {...this.props}
             model={partModel}
             onEdit={this.onPartEdit} />
