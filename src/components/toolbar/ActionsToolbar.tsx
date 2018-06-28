@@ -51,9 +51,6 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
       previewing: false,
     };
 
-    const { course, documentResource, documentId, onShowPageDetails, onQuickPreview,
-      onUndo, onRedo, onDismissModal, onDisplayModal } = this.props;
-
     this.undo = this.undo.bind(this);
     this.redo = this.redo.bind(this);
     this.showDeleteModal = this.showDeleteModal.bind(this);
@@ -85,9 +82,8 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
   }
 
   render() {
-    const { course, documentResource, documentId, canUndo, canRedo,
-      canPreview, onShowPageDetails, onQuickPreview, onUndo, onRedo,
-      onDismissModal, onDisplayModal } = this.props;
+    const { documentResource, canUndo, canRedo,
+      canPreview, onShowPageDetails } = this.props;
 
     const { previewing } = this.state;
 
