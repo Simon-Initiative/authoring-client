@@ -9,7 +9,7 @@ import {
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
+import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 import './MultipleChoice.scss';
@@ -70,6 +70,7 @@ export interface MultipleChoiceState
  */
 export class MultipleChoice
    extends Question<MultipleChoiceProps, MultipleChoiceState> {
+  generatedResponsesByMatch: Immutable.Map<string, contentTypes.Response>;
 
   constructor(props) {
     super(props);
@@ -83,6 +84,8 @@ export class MultipleChoice
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onRemoveChoice = this.onRemoveChoice.bind(this);
     this.onReorderChoices = this.onReorderChoices.bind(this);
+
+    this.generatedResponsesByMatch = Immutable.Map<string, contentTypes.Response>();
   }
 
   componentDidMount() {
@@ -210,16 +213,12 @@ export class MultipleChoice
   onReorderChoices(originalIndex: number, newIndex: number) {
     const { onEdit, itemModel, partModel } = this.props;
 
-    // indexOffset makes up for the missing item in the list when splicing,
-    // this is only an issue if the new item position is less than the current one
-    const indexOffset = originalIndex > newIndex ? 1 : 0;
-
     // convert OrderedMap to shallow javascript array
     const choices = itemModel.choices.toArray();
 
     // remove selected choice from array and insert it into new position
     const choice = choices.splice(originalIndex, 1)[0];
-    choices.splice((newIndex - 1) + indexOffset, 0, choice);
+    choices.splice(newIndex, 0, choice);
 
     // update item model
     const updatedItemModel = itemModel.with({
@@ -232,13 +231,10 @@ export class MultipleChoice
       ),
     });
 
-    // update models with new choices and references
-    const newModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
-
     onEdit(
-      newModels.itemModel,
-      newModels.partModel,
-      newModels.itemModel,
+      updatedItemModel,
+      partModel,
+      updatedItemModel,
     );
   }
 
@@ -246,22 +242,30 @@ export class MultipleChoice
     const { context, services, editMode, partModel, itemModel, advancedScoring } = this.props;
 
     const responsesByMatch = partModel.responses
-      .toArray()
       .reduce(
-        (o, response) => {
-          o[response.match] = response;
-          return o;
-        },
-        {},
-      );
+        (o, response) => o.set(response.match, response),
+        Immutable.Map<string, contentTypes.Response>(),
+      )
+      .toMap();
 
     const choices = itemModel.choices.toArray();
 
     return choices.map((choice, i) => {
+      // If a corresponding response for this choice does not exist AND there is
+      // a catch-all response with match '*' AND a response has not been generated,
+      // generate a response for this choice by cloning the catch-all response
+      if (!responsesByMatch.has(choice.value) && responsesByMatch.has('*')
+          && !this.generatedResponsesByMatch.has(choice.value)) {
+        this.generatedResponsesByMatch = this.generatedResponsesByMatch.set(
+          choice.value,
+          responsesByMatch.get('*').clone().with({ guid: guid(), match: choice.value }));
+      }
 
-      const response = responsesByMatch[choice.value];
+      // Get the response associated with the choice by match (either real or generated)
+      const response = responsesByMatch.get(choice.value)
+        || this.generatedResponsesByMatch.get(choice.value);
 
-      if (response !== undefined) {
+      if (response) {
         return (
           <Choice
             activeContentGuid={this.props.activeContentGuid}
