@@ -105,7 +105,7 @@ export class Objective
           : null;
 
     return (
-      <div className={mouseOver ? 'objective--mouseover-highlight' : ''}>
+      <div className={mouseOver ? 'objective-mouseover-highlight' : ''}>
         <Title title={model.title}
           editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}

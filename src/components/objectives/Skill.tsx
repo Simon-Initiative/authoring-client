@@ -53,7 +53,7 @@ export class Skill
     const titleBlock = <span><b>Skill: </b>{title}</span>;
 
     return (
-      <div className={mouseOver ? 'skill--mouseover-highlight' : ''}
+      <div className={mouseOver ? 'skill-mouseover-highlight' : ''}
         style={ { marginLeft: '45px' } }>
         <Title title={model.title}
           editMode={editMode}
