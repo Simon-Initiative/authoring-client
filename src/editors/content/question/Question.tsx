@@ -14,13 +14,14 @@ import { ContentTitle } from 'editors/content/common/ContentTitle';
 import guid from 'utils/guid';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { containsDynaDropCustom } from 'editors/content/question/QuestionEditor';
+import { Badge } from '../common/Badge';
 
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
-const REMOVE_QUESTION_DISABLED_MSG =
-  'An assessment must contain at least one question. '
-  + 'Please add another question before removing';
+export const REMOVE_QUESTION_DISABLED_MSG =
+  'An assessment must contain at least one question or pool. '
+  + 'Please add another question or pool before removing this one';
 
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
@@ -272,7 +273,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       <Tab className="criteria-tab">
         <TabSection className="criteria">
           <TabSectionHeader title="Grading Criteria">
-            <TabOptionControl key="add-cirteria" name="Add Criteria" hideLabel>
+            <TabOptionControl name="add-cirteria">
               <Button
                 editMode={editMode}
                 type="link"
@@ -309,7 +310,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       <Tab className="hints-tab">
         <TabSection className="hints">
           <TabSectionHeader title="Hints">
-            <TabOptionControl key="add-hint" name="Add Hint" hideLabel>
+            <TabOptionControl name="add-hint">
               <Button
                 editMode={this.props.editMode}
                 type="link"
@@ -337,12 +338,19 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     const showAdditionalTabs = this.renderAdditionalTabs() !== true
       && this.renderAdditionalTabs() !== false;
 
+    const renderSkillsLabel = (part: contentTypes.Part) => (
+      <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
+          {part.skills.size}
+        </Badge>
+      </span>
+    );
+
     return items.map((item, index) => (
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
             ...(this.renderDetails() ? ['Details'] : []),
-            ...(this.renderSkillsTab(item, parts[index]) ? ['Skills'] : []),
+            ...(this.renderSkillsTab(item, parts[index]) ? [renderSkillsLabel(parts[index])] : []),
             ...(this.renderHintsTab(item, parts[index]) ? ['Hints'] : []),
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             ...(showAdditionalTabs

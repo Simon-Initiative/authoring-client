@@ -10,7 +10,7 @@ export type TabElement = {
 
 export interface TabContainerProps {
   className?: string;
-  labels: string[];
+  labels: (string | JSX.Element)[];
   controls?: JSX.Element[];
   defaultTabIndex?: number;
   onTabSelect?: (index: number) => void;
@@ -49,7 +49,7 @@ export class TabContainer
       .map((title, index) => {
         const active = index === this.state.currentTabIndex ? 'active' : '';
         const classes = 'nav-link ' + active;
-        return <a key={title} className={classes}
+        return <a key={`${title}`} className={classes}
           onClick={this.onTabClick.bind(this, index)}>{title}</a>;
       });
 
@@ -145,17 +145,17 @@ export const TabSection: React.StatelessComponent<TabSectionProps> = ({ classNam
 type TabOptionControlProps = {
   className?: string;
   name: string,
-  hideLabel?: boolean,
+  label?: string,
   onClick?: (e, name: string) => void;
 };
 
 export const TabOptionControl: React.StatelessComponent<TabOptionControlProps>
-  = ({ name, hideLabel, onClick, children, className }) => (
+  = ({ name, label, onClick, children, className }) => (
   <div
     className={`control clickable ${convertStringToCSS(name)} ${className || ''}`}
     onClick={e => onClick && onClick(e, name)}>
-    {!hideLabel &&
-      <div className="control-label">{name}</div>
+    {label &&
+      <div className="control-label">{label}</div>
     }
     {children}
   </div>

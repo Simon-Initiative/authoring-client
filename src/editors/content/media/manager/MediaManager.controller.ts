@@ -42,7 +42,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
     onLoadCourseMediaNextPage: (mimeFilter, searchText, orderBy, order) => {
-      dispatch(fetchCourseMediaNextPage(
+      return dispatch(fetchCourseMediaNextPage(
         ownProps.courseModel.guid, mimeFilter, searchText, orderBy, order));
     },
     onResetMedia: () => {

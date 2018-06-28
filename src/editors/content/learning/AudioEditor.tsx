@@ -105,7 +105,7 @@ export default class AudioEditor
           <ToggleSwitch
             checked={this.props.model.controls}
             onClick={this.onControlEdit}
-            labelBefore="Display audio controls" />
+            label="Display audio controls" />
         </SidebarGroup>
         <MediaMetadataEditor
           {...this.props}

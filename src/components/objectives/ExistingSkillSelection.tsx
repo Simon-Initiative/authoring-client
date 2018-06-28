@@ -9,66 +9,71 @@ export interface ExistingSkillSelection {
 
 }
 
+type SkillId = string;
+
 export interface ExistingSkillSelectionProps {
   skills: Immutable.List<contentTypes.Skill>;
-  onInsert: (selected: Immutable.Set<string>) => void;
+  objective: contentTypes.LearningObjective;
+  onInsert: (objective: contentTypes.LearningObjective, selected: SkillId) => void;
   onCancel: () => void;
+  disableInsert: boolean;
 }
-
 
 export interface ExistingSkillSelectionState {
-  selected: Immutable.Set<string>; 
+  selected: SkillId;
 }
 
-export class ExistingSkillSelection 
+export class ExistingSkillSelection
   extends React.PureComponent<ExistingSkillSelectionProps, ExistingSkillSelectionState> {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      selected: Immutable.Set<string>(),
+      selected: undefined,
     };
+
+    this.clickResource = this.clickResource.bind(this);
   }
 
-  clickResource(selected) {
+  onInsert = () => this.props.onInsert(this.props.objective, this.state.selected);
+
+  clickResource(e) {
+    const selected = e.target.value;
     this.setState({ selected });
   }
 
   renderRows() {
-    const link = (r: contentTypes.Skill) => 
-      <button onClick={this.clickResource.bind(this, r.id)} 
+    const link = (r: contentTypes.Skill) =>
+      <button value={r.id} onClick={this.clickResource}
         className="btn btn-link">{r.title}</button>;
 
     return this.props.skills.map((r) => {
-      const active = this.state.selected.includes(r.id) ? 'table-active' : '';
+      const active = this.state.selected === r.id ? 'table-active' : '';
       return <tr key={r.id} className={active}>
         <td>{link(r)}</td>
       </tr>;
     });
   }
 
+
   render() {
     return (
-      <ModalSelection title="Select Existing Skill" 
-        onCancel={this.props.onCancel} 
-        onInsert={() => this.props.onInsert(this.state.selected)}>
+      <ModalSelection title="Select Existing Skill"
+        disableInsert={this.state.selected === undefined && this.props.disableInsert}
+        onCancel={this.props.onCancel}
+        onInsert={this.onInsert}>
         <table className="table table-hover table-sm">
           <thead>
-              <tr>
-                  <th>Skill</th>
-              </tr>
+            <tr>
+              <th>Skill</th>
+            </tr>
           </thead>
           <tbody>
             {this.renderRows()}
           </tbody>
         </table>
-      </ModalSelection>    
+      </ModalSelection>
     );
   }
-
 }
-
-
-
-

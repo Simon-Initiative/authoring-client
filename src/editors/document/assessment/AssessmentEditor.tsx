@@ -229,7 +229,10 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   canRemoveNode() {
     const page = this.getCurrentPage(this.props);
 
-    return page.nodes.filter(n => n.contentType === 'Question').size > 1;
+    const isQuestionOrPool = node =>
+      node.contentType === 'Question' || node.contentType === 'Selection';
+
+    return page.nodes.filter(isQuestionOrPool).size > 1;
   }
 
   onNodeRemove(guid: string) {

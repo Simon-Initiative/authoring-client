@@ -18,6 +18,7 @@ import { Maybe } from 'tsmonad';
 import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
+import { Badge } from '../common/Badge';
 
 export const isComplexScoring = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
@@ -224,12 +225,19 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
       return;
     }
 
+    const renderSkillsLabel = (part: contentTypes.Part) => (
+      <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
+          {part.skills.size}
+        </Badge>
+      </span>
+    );
+
     return [(
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
             initiator.text,
-            'Skills',
+            renderSkillsLabel(part),
             'Hints',
             ...(!hideGradingCriteria ? ['Criteria'] : []),
           ]}>
