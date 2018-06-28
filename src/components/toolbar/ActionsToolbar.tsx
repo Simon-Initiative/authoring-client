@@ -82,8 +82,7 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
   }
 
   render() {
-    const { documentResource, canUndo, canRedo,
-      canPreview, onShowPageDetails } = this.props;
+    const { documentResource, canUndo, canRedo, canPreview } = this.props;
 
     const { previewing } = this.state;
 
