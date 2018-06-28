@@ -58,8 +58,9 @@ let make = (~onTableCreate, ~onHide, _children) => {
     };
 
     let mapRow = row =>
-      <div>
+      <div key={"row" ++ string_of_int(row)}>
         {Array.map(col => <div
+          key={"col" ++ string_of_int(col)}
           style=cellStyle(isHighlighted(row, col))
           onMouseEnter=(_e => self.send(MouseEnter(row, col)))
           onClick={_e => { onHide(); onTableCreate(row, col); }}/>, cols)

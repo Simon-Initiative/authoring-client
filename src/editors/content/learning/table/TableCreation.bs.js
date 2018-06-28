@@ -56,8 +56,11 @@ function make(onTableCreate, onHide, _) {
         }
       };
       var mapRow = function (row) {
-        return React.createElement("div", undefined, $$Array.map((function (col) {
+        return React.createElement("div", {
+                    key: "row" + String(row)
+                  }, $$Array.map((function (col) {
                           return React.createElement("div", {
+                                      key: "col" + String(col),
                                       style: cellStyle(isHighlighted(row, col)),
                                       onClick: (function () {
                                           Curry._1(onHide, /* () */0);
