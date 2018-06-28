@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { ComponentProps } from 'types/component';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
@@ -44,11 +43,6 @@ export interface ActionsToolbarState {
  * ActionsToolbar React Stateless Component
  */
 export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, ActionsToolbarState> {
-  undo: () => void;
-  redo: () => void;
-  showPageDetails: () => void;
-  showDeleteModal: () => void;
-  preview: () => void;
 
   constructor(props) {
     super(props);
@@ -60,17 +54,32 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
     const { course, documentResource, documentId, onShowPageDetails, onQuickPreview,
       onUndo, onRedo, onDismissModal, onDisplayModal } = this.props;
 
-    this.undo = () => this.props.onUndo(this.props.documentId);
-    this.redo = () => this.props.onRedo(this.props.documentId);
-    this.showPageDetails = this.props.onShowPageDetails;
-    this.showDeleteModal = () => this.props.onDisplayModal(
+    this.undo = this.undo.bind(this);
+    this.redo = this.redo.bind(this);
+    this.showDeleteModal = this.showDeleteModal.bind(this);
+    this.preview = this.preview.bind(this);
+  }
+
+  undo() {
+    this.props.onUndo(this.props.documentId);
+  }
+
+  redo() {
+    this.props.onRedo(this.props.documentId);
+  }
+
+  showDeleteModal() {
+    this.props.onDisplayModal(
       <DeleteResourceModal
-        resource={documentResource}
-        course={course}
-        onDismissModal={onDismissModal} />);
-    this.preview = () => this.setState(
+        resource={this.props.documentResource}
+        course={this.props.course}
+        onDismissModal={this.props.onDismissModal} />);
+  }
+
+  preview() {
+    this.setState(
       { previewing: true },
-      () => onQuickPreview(course.guid, documentResource)
+      () => this.props.onQuickPreview(this.props.course.guid, this.props.documentResource)
         .then(_ => this.setState({ previewing: false }))
         .catch(_ => this.setState({ previewing: false })));
   }
@@ -102,7 +111,7 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
         </ToolbarLayout.Column>
         <ToolbarLayout.Inline>
           <ToolbarButton
-            onClick={this.showPageDetails}
+            onClick={this.props.onShowPageDetails}
             tooltip={`View and Edit ${ReadableResourceType} Details`}
             size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-info-circle" /></div>
