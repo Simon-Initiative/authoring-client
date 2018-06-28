@@ -56,25 +56,20 @@ export function preview(
 // the workbook page contents.
 export function quickPreview(courseId: string, resource: Resource) {
 
-  return function (dispatch, getState) {
+  return function (dispatch, getState): Promise<any> {
     const { course, documents } = getState();
     const document: EditedDocument = documents.get(resource.guid);
 
+    // Flush pending changes before initiating the preview so that the user doesn't see
+    // a stale preview page
     if (document.persistence instanceof DeferredPersistenceStrategy) {
-
-      // Turn waiting cursor on
       return (document.persistence as DeferredPersistenceStrategy).flushPendingChanges()
-        .then((_) => {
-          // turn waiting cursor off
-          persistence.initiateQuickPreview(course.guid, resource.guid);
-        })
-        .catch((err) => {
-          // turn waiting cursor off
-          console.log(`Error saving changes: ${err}`);
-        });
+        .then(_ => persistence.initiateQuickPreview(course.guid, resource.guid))
+        .catch(err => console.log(`Error saving changes: ${err}`));
     }
 
-    return persistence.initiateQuickPreview(course.guid, resource.guid);
+    persistence.initiateQuickPreview(course.guid, resource.guid);
+    return Promise.resolve();
   };
 }
 

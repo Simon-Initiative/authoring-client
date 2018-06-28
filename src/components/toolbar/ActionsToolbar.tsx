@@ -29,67 +29,106 @@ export interface ActionsToolbarProps {
   canRedo: boolean;
   canPreview: boolean;
   onShowPageDetails: () => void;
-  onQuickPreview: (courseId: string, resource: Resource) => void;
+  onQuickPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
 }
 
+export interface ActionsToolbarState {
+  previewing: boolean;
+}
+
 /**
  * ActionsToolbar React Stateless Component
  */
-export const ActionsToolbar = (({
-  course, documentResource, documentId, canUndo, canRedo,
-  canPreview, onShowPageDetails, onQuickPreview, onUndo, onRedo,
-  onDismissModal, onDisplayModal,
-}: ComponentProps<ActionsToolbarProps>) => {
-  const ReadableResourceType = getReadableResourceType(documentResource);
+export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, ActionsToolbarState> {
+  undo: () => void;
+  redo: () => void;
+  showPageDetails: () => void;
+  showDeleteModal: () => void;
+  preview: () => void;
 
-  return (
-    <React.Fragment>
-      <ToolbarLayout.Column>
-        <ToolbarButton
-            onClick={() => onUndo(documentId)}
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      previewing: false,
+    };
+
+    const { course, documentResource, documentId, onShowPageDetails, onQuickPreview,
+      onUndo, onRedo, onDismissModal, onDisplayModal } = this.props;
+
+    this.undo = () => this.props.onUndo(this.props.documentId);
+    this.redo = () => this.props.onRedo(this.props.documentId);
+    this.showPageDetails = this.props.onShowPageDetails;
+    this.showDeleteModal = () => this.props.onDisplayModal(
+      <DeleteResourceModal
+        resource={documentResource}
+        course={course}
+        onDismissModal={onDismissModal} />);
+    this.preview = () => this.setState(
+      { previewing: true },
+      () => onQuickPreview(course.guid, documentResource)
+        .then(_ => this.setState({ previewing: false }))
+        .catch(_ => this.setState({ previewing: false })));
+  }
+
+  render() {
+    const { course, documentResource, documentId, canUndo, canRedo,
+      canPreview, onShowPageDetails, onQuickPreview, onUndo, onRedo,
+      onDismissModal, onDisplayModal } = this.props;
+
+    const { previewing } = this.state;
+
+    const ReadableResourceType = getReadableResourceType(documentResource);
+
+    return (
+      <React.Fragment>
+        <ToolbarLayout.Column>
+          <ToolbarButton
+            onClick={this.undo}
             disabled={!canUndo}
             size={ToolbarButtonSize.Full}>
-          <i className={'fa fa-undo'}/> Undo
+            <i className={'fa fa-undo'} /> Undo
         </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onRedo(documentId)}
+          <ToolbarButton
+            onClick={this.redo}
             disabled={!canRedo}
             size={ToolbarButtonSize.Full}>
-          <i className={'fa fa-repeat'}/> Redo
+            <i className={'fa fa-repeat'} /> Redo
         </ToolbarButton>
-      </ToolbarLayout.Column>
-      <ToolbarLayout.Inline>
-        <ToolbarButton
-          onClick={() => onShowPageDetails()}
-          tooltip={`View and Edit ${ReadableResourceType} Details`}
-          size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-info-circle" /></div>
-          <div>Info</div>
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => onDisplayModal(
-            <DeleteResourceModal
-              resource={documentResource}
-              course={course}
-              onDismissModal={onDismissModal} />)}
-          size={ToolbarButtonSize.Large}
-          tooltip={`Delete this ${ReadableResourceType}`}>
-          <div><i className="fa fa-trash-o" /></div>
-        <div>Delete</div>
-      </ToolbarButton>
-      <ToolbarButton
-        onClick={() => onQuickPreview(course.guid, documentResource)}
-        tooltip={`Preview this ${ReadableResourceType}`}
-        disabled={!canPreview}
-        size={ToolbarButtonSize.Large}>
-        <div><i className="fa fa-eye" /></div>
-        <div>Preview</div>
-      </ToolbarButton>
-      </ToolbarLayout.Inline>
-    </React.Fragment >
-  );
-});
+        </ToolbarLayout.Column>
+        <ToolbarLayout.Inline>
+          <ToolbarButton
+            onClick={this.showPageDetails}
+            tooltip={`View and Edit ${ReadableResourceType} Details`}
+            size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-info-circle" /></div>
+            <div>Info</div>
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={this.showDeleteModal}
+            size={ToolbarButtonSize.Large}
+            tooltip={`Delete this ${ReadableResourceType}`}>
+            <div><i className="fa fa-trash-o" /></div>
+            <div>Delete</div>
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={this.preview}
+            tooltip={`Preview this ${ReadableResourceType}`}
+            disabled={previewing || !canPreview}
+            size={ToolbarButtonSize.Large}>
+            <div>{previewing
+              ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+              : <i className="fa fa-eye" />}</div>
+            <div>{previewing
+              ? 'Previewing'
+              : 'Preview'}</div>
+          </ToolbarButton>
+        </ToolbarLayout.Inline>
+      </React.Fragment>
+    );
+  }
+}
