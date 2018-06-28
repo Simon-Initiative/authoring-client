@@ -4,10 +4,6 @@ import { RowType } from './types';
 import { Objective } from './Objective';
 import { Skill } from './Skill';
 
-export interface Row {
-  timer: any;
-}
-
 export interface RowProps {
   isExpanded: boolean;        // Is node expanded or not
   onEdit: (model: RowType) => void;
@@ -32,8 +28,6 @@ export class Row
   constructor(props) {
     super(props);
 
-    this.timer = null;
-
     this.onEnter = this.onEnter.bind(this);
     this.onLeave = this.onLeave.bind(this);
     this.onObjectiveRemove = this.onObjectiveRemove.bind(this);
@@ -43,18 +37,10 @@ export class Row
   }
 
   onEnter() {
-    if (this.timer !== null) {
-      clearTimeout(this.timer);
-    }
-    this.timer = setTimeout(() => this.setState({ mouseOver: true }), 250);
-
+    this.setState({ mouseOver: true });
   }
 
   onLeave() {
-    if (this.timer !== null) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
     this.setState({ mouseOver: false });
   }
 
