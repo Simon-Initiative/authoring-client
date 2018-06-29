@@ -116,8 +116,7 @@ export class AddQuestion
 
     const item = new contentTypes.ShortAnswer();
 
-    const body = ContentElements.fromText('Enter feedback here', '', ALT_FLOW_ELEMENTS);
-    const feedback = new contentTypes.Feedback().with({ body });
+    const feedback = contentTypes.Feedback.fromText('', guid());
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
       .set(feedback.guid, feedback);
 
@@ -146,8 +145,7 @@ export class AddQuestion
 
     const item = new contentTypes.Essay();
 
-    const body = ContentElements.fromText('Enter feedback here', '', ALT_FLOW_ELEMENTS);
-    const feedback = new contentTypes.Feedback().with({ body });
+    const feedback = contentTypes.Feedback.fromText('', guid());
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
       .set(feedback.guid, feedback);
 

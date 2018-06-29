@@ -3,6 +3,7 @@ import * as contentTypes from '../../data/contentTypes';
 import { Title } from './Title';
 import { Remove } from 'components/common/Remove';
 
+import './Skill.scss';
 
 export interface Skill {
 
@@ -52,7 +53,8 @@ export class Skill
     const titleBlock = <span><b>Skill: </b>{title}</span>;
 
     return (
-      <div style={ { marginLeft: '45px' } }>
+      <div className={mouseOver ? 'skill-mouseover-highlight' : ''}
+        style={ { marginLeft: '45px' } }>
         <Title title={model.title}
           editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}

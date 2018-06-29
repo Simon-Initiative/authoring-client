@@ -834,7 +834,7 @@ export class ObjectiveSkillView
           buttonLabel="Create"
           width={600}
           value=""
-          placeholder="New Objective Title"
+          placeholder="New Learning Objective"
           existing={this.state.objectives === null ? Immutable.List<string>()
             : this.state.objectives.objectives.toList().map(o => o.title).toList()}
           onClick={this.createNew} />

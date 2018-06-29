@@ -36,7 +36,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
   canDuplicate() {
     const { activeContext } = this.props;
 
-    const disallowDuplicates = ['WbInline', 'Activity', 'Speaker', 'Line'];
+    const disallowDuplicates = ['WbInline', 'Activity', 'Speaker', 'Line', 'Hint'];
 
     return activeContext.activeChild.caseOf({
       just: activeChild => activeChild &&
