@@ -593,6 +593,7 @@ export class DynaDragDropEditor
               isHeader={isHeader}
               assessmentId={col.assessmentId}
               selectedInitiator={selectedInitiator}
+              canToggleType={question.parts.first().responses.size > 1}
               onToggleType={this.toggleCellType}
               editMode={editMode}
               onDrop={this.onTargetDrop}
@@ -611,6 +612,7 @@ export class DynaDragDropEditor
                 fontStyle: col.fontStyle as any,
                 textDecoration: col.textDecoration,
               }}
+              canToggleType={true}
               onToggleType={this.toggleCellType}
               isHeader={isHeader}
               editMode={editMode}
