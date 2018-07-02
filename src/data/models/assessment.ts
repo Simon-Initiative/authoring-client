@@ -93,8 +93,12 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     model = model.with({ resource: contentTypes.Resource.fromPersistence(a) });
     model = model.with({ guid: a.guid });
     model = model.with({ type: a.type });
-    model = model.with({ title: new contentTypes.Title({ guid: guid(),
-      text: ContentElements.fromText(a.title, '', TEXT_ELEMENTS) }) });
+    model = model.with({
+      title: new contentTypes.Title({
+        guid: guid(),
+        text: ContentElements.fromText(a.title, '', TEXT_ELEMENTS),
+      }),
+    });
 
     if (a.lock !== undefined && a.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
@@ -106,12 +110,34 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       assessment = a.doc.assessment;
     }
 
-    if (assessment['@recommended_attempts'] !== undefined) {
-      model = model.with({ recommendedAttempts: assessment['@recommended_attempts'] });
+    // Recommended attempts should never be higher than maximum attempts.
+    // Handle the four cases where recommended / maximum attempts are already set in the model
+    const recommended = parseInt(assessment['@recommended_attempts'], 10);
+    const maximum = parseInt(assessment['@max_attempts'], 10);
+
+    // 1. Both values defined
+    if (!isNaN(recommended) && !isNaN(maximum)) {
+      model = model.with({
+        recommendedAttempts: assessment['@recommended_attempts'],
+        maxAttempts: maximum > recommended
+          ? assessment['@max_attempts']
+          : assessment['@recommended_attempts'],
+      });
     }
-    if (assessment['@max_attempts'] !== undefined) {
-      model = model.with({ maxAttempts: assessment['@max_attempts'] });
+    // 2, 3. One value defined
+    if (!isNaN(assessment['@recommended_attempts'])) {
+      model = model.with({
+        recommendedAttempts: assessment['@recommended_attempts'],
+        maxAttempts: Math.max(recommended, parseInt(model.maxAttempts, 10)).toString(),
+      });
     }
+    if (!isNaN(assessment['@max_attempts'])) {
+      model = model.with({
+        recommendedAttempts: Math.min(parseInt(model.recommendedAttempts, 10), maximum).toString(),
+        maxAttempts: assessment['@max_attempts'],
+      });
+    }
+    // 4. Neither value defined: handled implicitly by applying both default parameter values
 
     assessment['#array'].forEach((item) => {
 
@@ -156,7 +182,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       nothing: () => '',
     });
 
-    const shortTitle =  titleText.length > 30 ? titleText.substr(0, 30) : titleText;
+    const shortTitle = titleText.length > 30 ? titleText.substr(0, 30) : titleText;
 
     const children = [
       this.title.toPersistence(),
