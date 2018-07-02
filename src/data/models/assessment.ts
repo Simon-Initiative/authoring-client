@@ -125,13 +125,13 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       });
     }
     // 2, 3. One value defined
-    if (!isNaN(assessment['@recommended_attempts'])) {
+    if (!isNaN(recommended)) {
       model = model.with({
         recommendedAttempts: assessment['@recommended_attempts'],
         maxAttempts: Math.max(recommended, parseInt(model.maxAttempts, 10)).toString(),
       });
     }
-    if (!isNaN(assessment['@max_attempts'])) {
+    if (!isNaN(maximum)) {
       model = model.with({
         recommendedAttempts: Math.min(parseInt(model.recommendedAttempts, 10), maximum).toString(),
         maxAttempts: assessment['@max_attempts'],
