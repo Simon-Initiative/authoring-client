@@ -94,7 +94,7 @@ export default class WbInlineEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Activity" highlightColor={CONTENT_COLORS.Activity} columns={3}>
+      <ToolbarGroup label="Assessment" highlightColor={CONTENT_COLORS.WbInline} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders" /></div>

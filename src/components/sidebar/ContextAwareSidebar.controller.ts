@@ -20,6 +20,7 @@ interface StateProps {
   show: boolean;
   resource: Resource;
   currentPage: string;
+  timeSkewInMs: number;
 }
 
 interface DispatchProps {
@@ -39,7 +40,7 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
-  const activeContext : ActiveContextState = state.activeContext;
+  const activeContext: ActiveContextState = state.activeContext;
 
   const documentId = activeContext.documentId.caseOf({ just: d => d, nothing: () => '' });
   const resource = (state.documents.get(documentId).document.model as any).resource;
@@ -49,12 +50,15 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     nothing: () => Immutable.List<string>(),
   });
 
+  const { server: { timeSkewInMs } } = state;
+
   return {
     content: activeContext.activeChild,
     container: activeContext.container,
     supportedElements,
     show: state.editorSidebar.show,
     resource,
+    timeSkewInMs,
     currentPage: activeContext.documentId.caseOf({
       just: docId => state.documents.get(docId).currentPage.valueOr(null),
       nothing: null,
@@ -65,7 +69,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
     onInsert: content => dispatch(insert(content)),
-    onEdit: content =>  dispatch(edit(content)),
+    onEdit: content => dispatch(edit(content)),
     onHide: () => dispatch(showSidebar(false)),
     onSetCurrentPage: (documentId: string, pageId: string) =>
       dispatch(setCurrentPage(documentId, pageId)),
@@ -73,7 +77,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(ContextAwareSidebar);
+  (mapStateToProps, mapDispatchToProps)(ContextAwareSidebar);
 
 export { controller as ContextAwareSidebar };
 
@@ -92,8 +96,12 @@ interface SidebarContentOwnProps {
 const mapSidebarContentStateToProps = (
   state: State,
   ownProps: SidebarContentOwnProps): SidebarContentStateProps => {
-  return {
+  const {
+    server: { timeSkewInMs },
+  } = state;
 
+  return {
+    timeSkewInMs,
   };
 };
 

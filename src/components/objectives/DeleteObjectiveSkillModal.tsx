@@ -33,7 +33,6 @@ export default class DeleteObjectiveSkillModal extends
   }
 
   edgeResource(resourceId: string): Resource {
-    console.log('edgeResource', this.props.course.resourcesById.get(resourceId));
     return this.props.course.resourcesById.get(resourceId);
   }
 

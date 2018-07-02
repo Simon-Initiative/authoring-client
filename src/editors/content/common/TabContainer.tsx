@@ -10,7 +10,7 @@ export type TabElement = {
 
 export interface TabContainerProps {
   className?: string;
-  labels: string[];
+  labels: (string | JSX.Element)[];
   controls?: JSX.Element[];
   defaultTabIndex?: number;
   onTabSelect?: (index: number) => void;
@@ -49,7 +49,7 @@ export class TabContainer
       .map((title, index) => {
         const active = index === this.state.currentTabIndex ? 'active' : '';
         const classes = 'nav-link ' + active;
-        return <a key={title} className={classes}
+        return <a key={`${title}`} className={classes}
           onClick={this.onTabClick.bind(this, index)}>{title}</a>;
       });
 
