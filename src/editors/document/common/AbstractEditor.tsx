@@ -4,9 +4,11 @@ import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
 import { handleKey, unhandleKey } from './keyhandlers';
 import { Maybe } from 'tsmonad';
+import { undo, redo } from 'actions/document';
 
-
-export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>,
+export interface AbstractEditor
+  <ModelType,
+  P extends AbstractEditorProps<ModelType>,
   S extends AbstractEditorState> {
   undoStack: Immutable.Stack<ModelType>;
   redoStack: Immutable.Stack<ModelType>;
@@ -65,22 +67,22 @@ export abstract class AbstractEditor<ModelType,
   componentDidMount() {
     handleKey(
       '⌘+z, ctrl+z',
-      () => this.undoStack.size > 1,
+      () => true,
       this.undo.bind(this));
     handleKey(
-      '⌘+y, ctrl+y',
-      () => this.redoStack.size > 0,
+      '⌘+shift+z, ctrl+shift+z',
+      () => true,
       this.redo.bind(this));
   }
 
   componentWillUnmount() {
     unhandleKey('⌘+z, ctrl+z');
-    unhandleKey('⌘+y, ctrl+y');
+    unhandleKey('⌘+shift+z, ctrl+shift+z');
   }
 
   undo() {
-
-
+    const { dispatch, context } = this.props;
+    dispatch(undo(context.documentId));
   }
 
   handleEdit(model: ModelType, callback?: () => void) {
@@ -100,9 +102,7 @@ export abstract class AbstractEditor<ModelType,
   }
 
   redo() {
-
+    const { dispatch, context } = this.props;
+    dispatch(redo(context.documentId));
   }
-
-
 }
-
