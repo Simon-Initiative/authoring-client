@@ -52,7 +52,7 @@ export class Objective
       titleBlock = <div style={ { marginLeft: '10px' } }>
             <span>
               <i className="icon"></i>
-            </span>&nbsp;
+            </span>
           <b>Objective:</b> {title}
           </div>;
     } else if (isExpanded) {
@@ -105,14 +105,13 @@ export class Objective
           : null;
 
     return (
-      <div>
+      <div className={mouseOver ? 'objective-mouseover-highlight' : ''}>
         <Title title={model.title}
           editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
           isHoveredOver={mouseOver}
           onEdit={this.onTitleEdit}>{titleBlock}</Title>
         {skillButtons}
-
       </div>
     );
   }

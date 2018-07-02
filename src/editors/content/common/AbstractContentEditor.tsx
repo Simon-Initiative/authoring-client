@@ -39,10 +39,19 @@ export interface AbstractContentEditorState {}
 export abstract class
   AbstractContentEditor
     <ModelType, P extends AbstractContentEditorProps<ModelType>,
-    S extends AbstractContentEditorState> extends React.PureComponent<P, S> {
+    S extends AbstractContentEditorState> extends React.Component<P, S> {
 
   constructor(props) {
     super(props);
+  }
+
+  shouldComponentUpdate(nextProps: AbstractContentEditorProps<ModelType>, nextState) {
+    return this.props.model !== nextProps.model
+      || this.props.parent !== nextProps.parent
+      || this.props.editMode !== nextProps.editMode
+      || this.props.styles !== nextProps.styles
+      || this.props.activeContentGuid !== nextProps.activeContentGuid
+      || this.props.hover !== nextProps.hover;
   }
 
   abstract renderMain() : JSX.Element;

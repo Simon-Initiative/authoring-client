@@ -7,7 +7,7 @@ import {
 const DEFAULT_TOOLTIP_PROPS = {
   animation: 'shift',
   arrow: true,
-  theme: 'light',
+  theme: 'dark',
 };
 
 const mergeWithDefaultProps = props =>

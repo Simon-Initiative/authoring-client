@@ -1,37 +1,43 @@
 @import 'oli/colors';
 
-.btn-action {
-  background-color: $gray-lightest !important;
-  border: 1px solid $gray-light;
-  color: $black;
+.message {
+  .btn-action {
+    font-weight: 700;
+    font-size: .9rem;
+    padding: .5rem 1rem;
+    text-transform: uppercase;
+    border: 2px solid hsla(0,0%,100%,.2);
+    border-radius: 5px;
+    color: white;
 
-  &:hover {
-    background-color: $gray-lighter !important;
+    &:not(:last-child) {
+      margin-right: 8px;
+    }
   }
-  margin-right: 8px;
-}
 
-.message-title {
-  font-weight: bold;
-  margin-right: 8px;
-}
-
-.error-message {
-  background-color: #AA0000;
-  .message-text {
-    color: #FFFFFF;
+  .message__title {
+    font-weight: bold;
+    margin-right: 8px;
   }
-}
 
-.warning-message {
-  .message-text {
-    color: #000000;
+  &.message--error {
+    background-color: $alizarin;
+    .message__text {
+      color: white;
+    }
   }
-}
 
-.info-message {
-  background-color: rgb(103, 198, 227);
-  .message-text {
-    color: #FFFFFF;
+  &.message--warning {
+    background-color: $info;
+    .message__text {
+      color: white;
+    }
+  }
+
+  &.message--information {
+    background-color: $peter-river;
+    .message__text {
+      color: white;
+    }
   }
 }

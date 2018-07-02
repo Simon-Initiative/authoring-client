@@ -196,7 +196,7 @@ export class EditableCaption
       this.renderInsertNew().forEach(e => buttons.push(e));
       this.renderInsertExisting().forEach(e => buttons.push(e));
 
-      buttons.push(<span className="flex-spacer"/>);
+      buttons.push(<span key="flex-spacer" className="flex-spacer"/>);
 
       buttons.push(<Remove key="remove" editMode={this.props.editMode}
         processCommand={this.props.processCommand}/>);

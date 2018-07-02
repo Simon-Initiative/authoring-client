@@ -71,6 +71,7 @@ export class CircleEditor
     window.addEventListener('mousemove', this.onResizeDrag);
     window.addEventListener('mouseup', this.endResize);
 
+    // stop event propagation to keep item selected
     e.stopPropagation();
   }
 
@@ -89,8 +90,6 @@ export class CircleEditor
       dragPointBegin: Maybe.nothing<Point>(),
       dragMouseBegin: Maybe.nothing<Point>(),
     });
-
-    e.stopPropagation();
   }
 
   onResizeDrag(e) {
@@ -100,32 +99,28 @@ export class CircleEditor
     dragPointBegin.lift((dragPointBeginVal) => {
       dragMouseBegin.lift((dragMouseBeginVal) => {
         boundingClientRect.lift((boundingClient) => {
-          const { x, y, width, height } = boundingClient;
+          const { width, height } = boundingClient;
           const { clientX, clientY } = e;
-
-          // ensure new position is inside the bounds of the image
-          const dragMouse = {
-            x: Math.min(Math.max(clientX, x), x + width),
-            y: Math.min(Math.max(clientY, y), y + height),
-          };
 
           // calculate the offset distance from where the drag began to where the mouse is
           const offsets = {
-            x: dragMouse.x - dragMouseBeginVal.x,
-            y: dragMouse.y - dragMouseBeginVal.y,
+            x: clientX - dragMouseBeginVal.x,
+            y: clientY - dragMouseBeginVal.y,
           };
 
           // calculate the new point position using the offsets
           let newRadius = (dragPointBeginVal.x - newCoords.valueOr(coords).get(0)) + offsets.x;
 
           // maintain minimum hotspot size using opposite point as constraint
-          const MINIMUM_SIZE_PX = 10;
+          const MINIMUM_SIZE_PX = 15;
           newRadius = Math.min(
             Math.max(newRadius, MINIMUM_SIZE_PX),
-            newCoords.valueOr(coords).get(0),
-            width - newCoords.valueOr(coords).get(0),
-            newCoords.valueOr(coords).get(1),
-            height - newCoords.valueOr(coords).get(1),
+            Math.max(
+              newCoords.valueOr(coords).get(0),
+              width - newCoords.valueOr(coords).get(0),
+              newCoords.valueOr(coords).get(1),
+              height - newCoords.valueOr(coords).get(1),
+            ),
           );
 
           // update point location in state
@@ -150,8 +145,6 @@ export class CircleEditor
     // register global mouse listeners
     window.addEventListener('mousemove', this.onMoveDrag);
     window.addEventListener('mouseup', this.endMove);
-
-    e.stopPropagation();
   }
 
   endMove(e) {
@@ -169,8 +162,6 @@ export class CircleEditor
       dragPointBegin: Maybe.nothing<Point>(),
       dragMouseBegin: Maybe.nothing<Point>(),
     });
-
-    e.stopPropagation();
   }
 
   onMoveDrag(e) {

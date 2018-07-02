@@ -14,9 +14,9 @@ export interface MessageState {
 }
 
 const classesForSeverity = {
-  [Messages.Severity.Error]: 'navbar-dark bg-danger error-message',
-  [Messages.Severity.Warning]: 'navbar-light bg-warning warning-message',
-  [Messages.Severity.Information]: 'navbar-light bg-info info-message',
+  [Messages.Severity.Error]: 'navbar-dark message message--error',
+  [Messages.Severity.Warning]: 'navbar-light message message--warning',
+  [Messages.Severity.Information]: 'navbar-light message message--information',
 };
 
 export class Message
@@ -41,6 +41,7 @@ export class Message
   renderMessageAction(message: Messages.Message, action: Messages.MessageAction) {
     return (
       <button
+        key={action.label}
         className="btn btn-action"
         onClick={() => this.props.executeAction(message, action)}
         type="button">{action.label}
@@ -49,7 +50,6 @@ export class Message
   }
 
   renderActions(message: Messages.Message) {
-
     if (message.canUserDismiss || message.actions.size > 0) {
       return (
         <form className="form-inline my-2 my-lg-0">
@@ -72,13 +72,13 @@ export class Message
 
   renderMessage(content: Messages.TitledContent) {
     return (
-      <span className="navbar-text message-text">
-        <span className="message-title">{content.title}</span> {content.message}
+      <span className="message__text">
+        <span role="alert" className="message__title">{content.title}</span> {content.message}
       </span>
     );
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const { message } = this.props;
     const classes = 'navbar justify-content-between '
@@ -90,8 +90,5 @@ export class Message
         {this.renderActions(message)}
       </nav>
     );
-
   }
-
 }
-

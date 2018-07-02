@@ -98,6 +98,7 @@ export class ObjectiveSkillView
     this.onAddNewSkill = this.onAddNewSkill.bind(this);
     this.onAddExistingSkill = this.onAddExistingSkill.bind(this);
     this.onToggleExpanded = this.onToggleExpanded.bind(this);
+    this.onExistingSkillInsert = this.onExistingSkillInsert.bind(this);
 
     this.services = new DispatchBasedServices(
       this.props.dispatch,
@@ -116,8 +117,10 @@ export class ObjectiveSkillView
     if (this.state.aggregateModel !== null
       && this.state.aggregateModel.isLocked) {
 
-      this.releaseAllLocks([...this.state.objectives.documents,
-        ...this.state.skills.documents]);
+      this.releaseAllLocks([
+        ...this.state.objectives.documents,
+        ...this.state.skills.documents,
+      ]);
 
     }
   }
@@ -153,7 +156,6 @@ export class ObjectiveSkillView
 
         } else {
 
-          // Log objectives and skills
           this.logObjectivesAndSkills(aggregateModel);
 
           if (aggregateModel.isLocked) {
@@ -396,47 +398,58 @@ export class ObjectiveSkillView
       });
   }
 
-  onExistingSkillInsert(model: contentTypes.LearningObjective, skillIds: Immutable.Set<string>) {
+  onExistingSkillInsert(model: contentTypes.LearningObjective, skillId: string) {
     this.services.dismissModal();
 
-    const updated = model.with({ skills: model.skills.concat(skillIds).toList() });
+    const updated = model.with({ skills: model.skills.concat(skillId) as Immutable.List<string> });
     this.onObjectiveEdit(updated);
   }
 
   onAddExistingSkill(model: contentTypes.LearningObjective) {
+    const availableSkills = [];
 
-    const usedSkills = [];
+    interface SkillsMap {
+      [id: string]: contentTypes.Skill;
+    }
 
-    const skillsById = this.state.skills.skills
-      .toArray()
-      .reduce(
-        (map, skill) => {
-          map[skill.id] = skill;
-          return map;
-        },
-        {});
+    const toSkillsMap = (skills: contentTypes.Skill[]): SkillsMap =>
+      skills
+        .reduce(
+          (map, skill) => {
+            map[skill.id] = skill;
+            return map;
+          },
+          {});
 
+    const allSkills =
+      toSkillsMap(this.state.skills.skills.toArray());
+
+    const attachedSkills =
+      toSkillsMap(model.skills.map(id => allSkills[id]).toArray());
+
+    // Not all skills fetched from server are attached to any objectives.
+    // We filter out the completely unattached skills and the skills already attached
+    // to this objective.
     this.state.objectives.objectives
       .toArray()
       .forEach((objective: contentTypes.LearningObjective) => {
-
-        objective.skills.forEach((skillId) => {
-
-          const skill = skillsById[skillId];
-          if (skill !== undefined) {
-            usedSkills.push(skill);
+        objective.skills.forEach((id) => {
+          const skill = allSkills[id];
+          if (skill !== undefined && !attachedSkills[id]) {
+            availableSkills.push(skill);
           }
         });
-
       });
 
-    const skills = Immutable.Set<contentTypes.Skill>(usedSkills);
+    const skills = Immutable.Set<contentTypes.Skill>(availableSkills);
 
     // Allow the user to choose the skills to attach
     this.services.displayModal(<ExistingSkillSelection
       skills={skills.toList()}
-      onInsert={this.onExistingSkillInsert.bind(this, model)}
-      onCancel={() => this.services.dismissModal()} />);
+      objective={model}
+      onInsert={this.onExistingSkillInsert}
+      onCancel={() => this.services.dismissModal()}
+      disableInsert={skills.size === 0} />);
 
     // Attach the skill ids to the objective and then persist that
   }
@@ -821,7 +834,7 @@ export class ObjectiveSkillView
           buttonLabel="Create"
           width={600}
           value=""
-          placeholder="New Objective Title"
+          placeholder="New Learning Objective"
           existing={this.state.objectives === null ? Immutable.List<string>()
             : this.state.objectives.objectives.toList().map(o => o.title).toList()}
           onClick={this.createNew} />

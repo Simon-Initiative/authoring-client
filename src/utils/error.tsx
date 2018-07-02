@@ -61,8 +61,9 @@ function buildModalMessageAction(label, text): Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
+      const dismiss = () => dispatch(modalActions.dismiss());
       dispatch(modalActions.display(
-        <ModalMessage onCancel={dispatch(modalActions.dismiss())}>{text}</ModalMessage>));
+        <ModalMessage onCancel={dismiss}>{text}</ModalMessage>));
     },
   };
 }
@@ -92,8 +93,8 @@ const missingObjectivesDetails =
 export function buildMissingObjectivesMessage(courseId: string) {
 
   const actions = [
-    buildModalMessageAction('Learn more', missingObjectivesDetails),
-    goToObjectivesPage('Create Objectives', courseId),
+    buildModalMessageAction('Learn', missingObjectivesDetails),
+    goToObjectivesPage('Create', courseId),
   ];
 
   const content = new Messages.TitledContent().with({
@@ -104,7 +105,7 @@ export function buildMissingObjectivesMessage(courseId: string) {
 
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
-    severity: Messages.Severity.Warning,
+    severity: Messages.Severity.Information,
     canUserDismiss: false,
     actions: Immutable.List(actions),
     content,
@@ -127,8 +128,8 @@ const missingSkillsDetails =
 export function buildMissingSkillsMessage(courseId: string) {
 
   const actions = [
-    buildModalMessageAction('Learn more', missingSkillsDetails),
-    goToObjectivesPage('Create Skills', courseId),
+    buildModalMessageAction('Learn', missingSkillsDetails),
+    goToObjectivesPage('Create', courseId),
   ];
 
   const content = new Messages.TitledContent().with({
@@ -139,7 +140,7 @@ export function buildMissingSkillsMessage(courseId: string) {
 
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
-    severity: Messages.Severity.Warning,
+    severity: Messages.Severity.Information,
     canUserDismiss: false,
     actions: Immutable.List(actions),
     content,
