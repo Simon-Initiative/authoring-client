@@ -18,6 +18,7 @@ export interface DynaDropTargetProps {
   initiators: InitiatorModel[];
   editMode: boolean;
   connectDropTarget?: any;
+  canToggleType: boolean;
   isHovered?: boolean;
   onDrop: (
     initiatorId: string, targetAssessmentId: string, originalTargetAssessmentId: string) => void;
@@ -62,7 +63,7 @@ export class DynaDropTarget
   render() {
     const { className, classes, id, assessmentId, connectDropTarget, isHeader,
       isHovered, label, initiators, editMode, onRemoveInitiator, selectedInitiator,
-      onToggleType } = this.props;
+      canToggleType, onToggleType } = this.props;
 
     const TCell = isHeader ? 'th' : 'td';
 
@@ -85,7 +86,7 @@ export class DynaDropTarget
           </div>
         </div>
 
-        <TargetToggle id={id} onToggleType={onToggleType} />
+        <TargetToggle id={id} onToggleType={onToggleType} canToggle={canToggleType} />
       </TCell>
     ));
   }

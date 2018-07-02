@@ -73,6 +73,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   componentDidMount() {
+    super.componentDidMount();
     const { context, showMessage } = this.props;
     const { objectives, courseId } = context;
 

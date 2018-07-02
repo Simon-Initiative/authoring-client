@@ -19,6 +19,7 @@ interface OwnProps {
   isHeader?: boolean;
   initiators: InitiatorModel[];
   editMode: boolean;
+  canToggleType: boolean;
   className?: string;
   onDrop: (
     initiatorId: string, targetAssessmentId: string, originalTargetAssessmentId: string) => void;

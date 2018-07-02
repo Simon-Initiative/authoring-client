@@ -12,6 +12,7 @@ import { lookUpByName } from 'editors/manager/registry';
 import { LearningObjective, Skill } from 'data//contentTypes';
 
 import './EditorManager.scss';
+import { Toast, Severity } from 'components/common/Toast';
 
 export interface EditorManagerProps {
   document: persistence.Document;
@@ -73,7 +74,7 @@ export default class EditorManager
   }
 
   renderFailed() {
-    return <span/>;
+    return <span />;
   }
 
   renderLoaded(document: persistence.Document) {
@@ -114,22 +115,16 @@ export default class EditorManager
 
 
   renderLoading() {
+    const waitingIcon = <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />;
+    const waitingHeading = 'Please wait';
+    const waitingContent = <p>We're loading the course material.</p>;
     return (
-      <div className="container waiting-notification">
-        <div className="row">
-          <div className="col-2">
-            &nbsp;
-          </div>
-          <div className="col-8">
-            <div className="alert alert-info" role="alert">
-              <strong>Please wait.</strong> Loading the course material.
-            </div>
-          </div>
-          <div className="col-2">
-            &nbsp;
-          </div>
-        </div>
-
+      <div className="waiting-notification scale-in-center">
+        <Toast
+          icon={waitingIcon}
+          heading={waitingHeading}
+          content={waitingContent}
+          severity={Severity.Waiting} />
       </div>
     );
   }
@@ -148,7 +143,7 @@ export default class EditorManager
     } else if (document !== null) {
       component = this.renderLoaded(document);
     } else {
-      component = <span/>;
+      component = <span />;
     }
 
     return (
