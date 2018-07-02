@@ -2,6 +2,14 @@ import { JSSStyles } from 'styles/jss';
 
 export const styles: JSSStyles = {
   NumericMatchOptions: {
-    color: 'green',
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  condition: {
+
+  },
+  value: {
+    marginLeft: 10,
+    flex: 1,
   },
 };

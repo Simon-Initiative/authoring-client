@@ -6,7 +6,7 @@ var Block = require("bs-platform/lib/js/block.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
-var ListUtils$CourseEditor = require("../../../../utils/ListUtils.bs.js");
+var ListUtils$CourseEditor = require("../../../../utils/reason/ListUtils.bs.js");
 
 var component = ReasonReact.reducerComponent("TableCreation");
 
