@@ -16,7 +16,7 @@ interface StateProps {
 
 interface DispatchProps {
   onShowPageDetails: () => void;
-  onQuickPreview: (courseId: string, resource: Resource) => void;
+  onQuickPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
 }

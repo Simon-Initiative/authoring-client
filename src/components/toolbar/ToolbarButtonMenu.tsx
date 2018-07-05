@@ -36,12 +36,14 @@ export interface ToolbarButtonMenuItemProps {
 }
 
 export const ToolbarButtonMenuForm = (props) => {
+  // Only pass through the onHide prop when the child is a TableCreation component
+  const passthroughProps = c => c.props && c.props.onTableCreate ? { onHide: props.onHide } : {};
   return (
     <form className="px-3 py-0">
       <div className="form-group toolbarButtonMenuForm">
         {React.Children.map(
           props.children,
-          c => React.cloneElement(c as any, { onHide: props.onHide }))}
+          c => React.cloneElement(c as any, passthroughProps(c)))}
       </div>
     </form>
   );

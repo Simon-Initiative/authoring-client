@@ -15,6 +15,7 @@ export const Checkbox = (props: CheckboxProps) => {
       <input disabled={!props.editMode}
         onChange={e => props.onEdit(e.target.checked)}
         type="checkbox" checked={props.value} className="form-check-input"/>
-      {props.label}
-    </label>);
+        {props.label}
+    </label>
+  );
 };

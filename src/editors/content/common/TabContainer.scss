@@ -36,6 +36,11 @@
 
     .tab-control {
       padding: .5rem 1rem;
+      border-bottom: 1px solid #ddd;
+
+      & > button {
+        border-bottom: initial;
+      }
     }
   }
 
@@ -78,7 +83,7 @@
 
           /** fix for buttons in controls */
           button {
-            margin-top: -10px;
+            margin-top: -5px;
           }
         }
       }

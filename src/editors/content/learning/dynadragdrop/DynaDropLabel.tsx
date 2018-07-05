@@ -11,6 +11,7 @@ export interface DynaDropLabelProps {
   text: string;
   isHeader?: boolean;
   style: any;
+  canToggleType: boolean;
   onEdit: (text: string) => void;
   onToggleType: (id: string) => void;
 }
@@ -100,7 +101,7 @@ export class DynaDropLabel
   }
 
   renderEdit(): JSX.Element {
-    const { className, classes, style, id, isHeader, onToggleType } = this.props;
+    const { className, classes, style, id, isHeader, canToggleType, onToggleType } = this.props;
     const html = { __html: this.state.text };
 
     const TCell = isHeader ? 'th' : 'td';
@@ -118,7 +119,7 @@ export class DynaDropLabel
           contentEditable
           dangerouslySetInnerHTML={html} />
 
-        <TargetToggle id={id} onToggleType={onToggleType} />
+        <TargetToggle id={id} onToggleType={onToggleType} canToggle={canToggleType} />
       </TCell>
     );
   }

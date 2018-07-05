@@ -59,6 +59,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onEdit = this.onEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.onEditNodes = this.onEditNodes.bind(this);
+    this.canRemoveNode = this.canRemoveNode.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
@@ -73,6 +74,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   componentDidMount() {
+    super.componentDidMount();
     // We have no direct access to a skills list through props.context since
     // skills cannot be deleted. Looking at skills attached to objectives
     // will show the banner if skills are present in the course but 'deleted',
@@ -160,6 +162,14 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     const pool = this.props.model.pool.with({ questions });
     this.handleEdit(this.props.model.with({ pool }));
+  }
+
+  canRemoveNode() {
+    const { model } = this.props;
+
+    const isQuestion = node => node.contentType === 'Question';
+
+    return model.pool.questions.filter(isQuestion).size > 1;
   }
 
   onChangeExpansion(nodes: Immutable.Set<string>) {
@@ -298,7 +308,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                   just: node => renderAssessmentNode(
                     node, assesmentNodeProps, this.onEdit,
                     this.onRemove, this.onFocus,
-                    true, this.onDuplicateNode, null),
+                    this.canRemoveNode(), this.onDuplicateNode, null),
                   nothing: () => null,
                 })}
               </div>

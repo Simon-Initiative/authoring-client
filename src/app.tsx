@@ -16,7 +16,7 @@ import { loadCourse } from 'actions/course';
 import { AppContainer } from 'react-hot-loader';
 import initEditorRegistry from './editors/manager/registrar';
 import { registerContentTypes } from 'data/registrar';
-
+import { releaseAll } from 'actions/document';
 import { ApplicationRoot } from './ApplicationRoot';
 
 // import application styles
@@ -142,6 +142,7 @@ function clearHeldLocks() {
 
 window.addEventListener('beforeunload', (event) => {
   if (store !== null) {
+    store.dispatch(releaseAll());
     store.dispatch(clearHeldLocks());
   }
 });

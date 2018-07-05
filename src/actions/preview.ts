@@ -6,6 +6,10 @@ import * as viewActions from 'actions/view';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
 import { OrganizationModel } from 'data/models';
+import { EditedDocument } from 'types/document';
+import { DeferredPersistenceStrategy }
+  from 'editors/manager/persistence/DeferredPersistenceStrategy';
+import { buildPersistenceFailureMessage } from 'utils/error';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
 function invokePreview(orgId: string, isRefreshAttempt: boolean) {
@@ -53,9 +57,20 @@ export function preview(
 // the workbook page contents.
 export function quickPreview(courseId: string, resource: Resource) {
 
-  return function (dispatch, getState) {
-    const { course } = getState();
-    return persistence.initiateQuickPreview(course.guid, resource.guid);
+  return function (dispatch, getState): Promise<any> {
+    const { course, documents, user } = getState();
+    const document: EditedDocument = documents.get(resource.guid);
+
+    // Flush pending changes before initiating the preview so that the user doesn't see
+    // a stale preview page
+    if (document.persistence instanceof DeferredPersistenceStrategy) {
+      return (document.persistence as DeferredPersistenceStrategy).flushPendingChanges()
+        .then(_ => persistence.initiateQuickPreview(course.guid, resource.guid))
+        .catch(err => dispatch(showMessage(buildPersistenceFailureMessage(err, user.profile))));
+    }
+
+    persistence.initiateQuickPreview(course.guid, resource.guid);
+    return Promise.resolve();
   };
 }
 

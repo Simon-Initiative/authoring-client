@@ -35,13 +35,13 @@ export default class LinkEditor
     };
   }
 
-  renderMain() {
-    return null;
-  }
-
   shouldComponentUpdate(nextProps, nextState) {
     const doesSuperWantToUpdate = super.shouldComponentUpdate(nextProps, nextState);
     return doesSuperWantToUpdate || this.state.isExternal !== nextState.isExternal;
+  }
+
+  renderMain() {
+    return null;
   }
 
   renderSideBarExternal() {

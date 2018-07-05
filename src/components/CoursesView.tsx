@@ -47,7 +47,7 @@ function buildReportProblemAction(): Messages.MessageAction {
 function buildErrorMessage(): Messages.Message {
 
   const content = new Messages.TitledContent().with({
-    title: 'Error contacting server.',
+    title: 'Error contacting server',
     message: 'Try reloading the page. If the problem persists, please contact support.',
   });
 

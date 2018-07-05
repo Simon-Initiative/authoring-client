@@ -18,4 +18,16 @@ export const styles: JSSStyles = {
       color: colors.selection,
     },
   },
+  disabled: {
+    cursor: 'default',
+    color: colors.grayLight,
+
+    '&:hover': {
+      color: colors.grayLight,
+    },
+
+    '&:active': {
+      color: colors.grayLight,
+    },
+  },
 };

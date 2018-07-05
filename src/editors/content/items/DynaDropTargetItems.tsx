@@ -146,9 +146,11 @@ DynaDropTargetItems
     return (
       <TabSection className="targets">
       <TabSectionHeader title="Label">
-        <TabOptionControl key="advanced" name="">
+        <TabOptionControl name="advanced">
           <ToggleSwitch
-            labelBefore="Advanced" checked={advancedScoring} onClick={onToggleAdvanced} />
+            checked={advancedScoring}
+            label="Advanced"
+            onClick={onToggleAdvanced} />
         </TabOptionControl>
       </TabSectionHeader>
       <TabSectionContent>

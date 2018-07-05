@@ -136,7 +136,7 @@ export const fetchCourseMedia = (
         const items = List<MediaItem>(
           response.results.map(item => new FileNode(item.fileNode)));
 
-        // check if the response if for the latest request
+        // check if the response is for the latest request
         if (getState().media.get(courseId).lastReqId === reqId) {
           // request is latest, update state
           dispatch(receiveMediaPage(courseId, items, response.totalResults));

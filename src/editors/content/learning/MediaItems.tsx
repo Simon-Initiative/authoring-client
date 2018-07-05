@@ -174,16 +174,19 @@ export class MediaMetadataEditor
             onEdit={this.onTitleEdit} />
         </SidebarGroup>
         <SidebarGroup label="Popout">
-          <ToggleSwitch
-            {...this.props}
-            checked={popout.enable}
-            onClick={this.onPopoutEnableToggle}
-            labelBefore="Enabled" />
-          <TextInput width="100%" label="Content"
-            editMode={this.props.editMode}
-            value={popout.content}
-            type="text"
-            onEdit={this.onPopoutEdit} />
+          <SidebarRow>
+            <ToggleSwitch
+              checked={popout.enable}
+              onClick={this.onPopoutEnableToggle}
+              label="Enabled" />
+          </SidebarRow>
+          <SidebarRow>
+            <TextInput width="100%" label="Content"
+              editMode={this.props.editMode}
+              value={popout.content}
+              type="text"
+              onEdit={this.onPopoutEdit} />
+          </SidebarRow>
         </SidebarGroup>
         {/* Leaving alternate out for now */}
         {/* <SidebarGroup label="Alternate">
