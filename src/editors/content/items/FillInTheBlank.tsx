@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { OrderedMap } from 'immutable';
+import { OrderedMap, Map } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
     AbstractItemPartEditor, AbstractItemPartEditorProps,
@@ -30,6 +30,8 @@ FillInTheBlank
   extends AbstractItemPartEditor<contentTypes.FillInTheBlank,
     FillInTheBlankProps, FillInTheBlankState> {
 
+  generatedResponsesByMatch: Map<string, contentTypes.Response>;
+
   constructor(props) {
     super(props);
 
@@ -41,6 +43,8 @@ FillInTheBlank
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onReorderChoices = this.onReorderChoices.bind(this);
+
+    this.generatedResponsesByMatch = Map<string, contentTypes.Response>();
   }
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback, src) {
@@ -180,11 +184,26 @@ FillInTheBlank
   renderChoices() {
     const { context, services, editMode, partModel, itemModel } = this.props;
 
-    const responses = partModel.responses.toArray();
+    const responsesByMatch = partModel.responses
+      .reduce(
+        (o, response) => o.set(response.match, response),
+        Map<string, contentTypes.Response>(),
+      )
+      .toMap();
+
     const choices = itemModel.choices.toArray();
 
     return choices.map((choice, i) => {
-      const response = responses[i];
+
+      if (!responsesByMatch.has(choice.value) && responsesByMatch.has('*')
+          && !this.generatedResponsesByMatch.has(choice.value)) {
+        this.generatedResponsesByMatch = this.generatedResponsesByMatch.set(
+          choice.value,
+          responsesByMatch.get('*').clone().with({ guid: guid(), match: choice.value }));
+      }
+      const response = responsesByMatch.get(choice.value)
+        || this.generatedResponsesByMatch.get(choice.value);
+
       return (
         <Choice
           activeContentGuid={this.props.activeContentGuid}
