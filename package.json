@@ -47,7 +47,7 @@
     "react-jss": "^8.3.3",
     "react-redux": "^5.0.2",
     "react-tippy": "^1.2.2",
-    "reason-react": "^0.3.4",
+    "reason-react": "^0.4.2",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
@@ -68,7 +68,7 @@
     "xml-beautifier": "^0.3.0"
   },
   "devDependencies": {
-    "bs-platform": "^2.2.3",
+    "bs-platform": "^3.1.4",
     "chokidar-cli": "^1.2.0",
     "del-cli": "^1.1.0",
     "jasmine": "^2.5.3",

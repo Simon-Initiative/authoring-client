@@ -33,6 +33,7 @@ export abstract class NumericFeedback
     this.onResponseRemove = this.onResponseRemove.bind(this);
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onBodyEdit = this.onBodyEdit.bind(this);
+    this.onEditMatch = this.onEditMatch.bind(this);
   }
 
   onResponseEdit(response, source) {
@@ -122,16 +123,10 @@ export abstract class NumericFeedback
             options={
               <ItemOptions>
                 <ItemOption className="matches" label="Matching Condition" flex>
-                  {/* <input
-                    className="form-control input-sm form-control-sm"
-                    disabled={!this.props.editMode}
-                    value={response.match}
-                    onChange={({ target: { value } }) =>
-                      this.onEditMatch(response.guid, value)} /> */}
                   <NumericMatchOptions
                     editMode={this.props.editMode}
                     responseId={response.guid}
-                    match={response.match}
+                    matchPattern={response.match}
                     onEditMatch={this.onEditMatch} />
                 </ItemOption>
                 <ItemOption className="score" label="Score">
