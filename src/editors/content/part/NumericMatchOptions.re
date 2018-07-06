@@ -179,7 +179,7 @@ let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
         value
         onChange={event => {
           let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
-          onEditMatch(. responseId, operator ++ value ++ "#" ++ precisionValue);
+          onEditMatch(. responseId, operator ++ value ++ (precisionValue !== "" ? "#" ++ precisionValue : ""));
         }} />
     </div>
   </div>

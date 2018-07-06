@@ -295,7 +295,10 @@ function renderValue(jssClass, editMode, matchPattern, responseId, onEditMatch) 
                       value: value,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
-                          return onEditMatch(responseId, operator + (value + ("#" + precisionValue)));
+                          var match = precisionValue !== "";
+                          return onEditMatch(responseId, operator + (value + (
+                                        match ? "#" + precisionValue : ""
+                                      )));
                         })
                     })));
 }
