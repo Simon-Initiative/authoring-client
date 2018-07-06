@@ -15,37 +15,38 @@ var StringUtils$CourseEditor = require("../../../utils/reason/StringUtils.bs.js"
 var ToggleSwitch$CourseEditor = require("../../../components/common/ToggleSwitch.bs.js");
 var NumericMatchOptionsStyle = require("./NumericMatchOptions.style");
 
-function isNumeric($$char) {
-  if ($$char >= 48) {
-    return $$char <= 57;
+function isInequalityOp(c) {
+  if (c >= 60) {
+    return c < 63;
   } else {
-    return false;
+    return c === 33;
   }
 }
 
-function isInequalityOp($$char) {
-  if ($$char === /* "=" */61 || $$char === /* "<" */60 || $$char === /* ">" */62) {
-    return true;
+function isRangeOp(c) {
+  var switcher = c - 40 | 0;
+  if (switcher > 51 || switcher < 0) {
+    return switcher === 53;
   } else {
-    return $$char === /* "!" */33;
+    return switcher > 50 || switcher < 2;
   }
 }
 
-function getInequalityOperator(expression) {
-  var operatorIndex = StringUtils$CourseEditor.findIndex(/* None */0, expression, isInequalityOp);
+function getInequalityOperator(matchPattern) {
+  var operatorIndex = StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, isInequalityOp);
   if (operatorIndex) {
     var index = operatorIndex[0];
-    var match = Caml_string.get(expression, index);
+    var match = Caml_string.get(matchPattern, index);
     if (match >= 60) {
       if (match >= 63) {
-        return /* Unknown */6;
+        return /* Unknown */7;
       } else {
         switch (match - 60 | 0) {
           case 0 : 
               var exit = 0;
               var val;
               try {
-                val = Caml_string.get(expression, index + 1 | 0);
+                val = Caml_string.get(matchPattern, index + 1 | 0);
                 exit = 1;
               }
               catch (exn){
@@ -57,7 +58,7 @@ function getInequalityOperator(expression) {
               }
               if (exit === 1) {
                 if (val !== 61) {
-                  return /* Unknown */6;
+                  return /* LT */3;
                 } else {
                   return /* LTE */5;
                 }
@@ -69,7 +70,7 @@ function getInequalityOperator(expression) {
               var exit$1 = 0;
               var val$1;
               try {
-                val$1 = Caml_string.get(expression, index + 1 | 0);
+                val$1 = Caml_string.get(matchPattern, index + 1 | 0);
                 exit$1 = 1;
               }
               catch (exn$1){
@@ -81,7 +82,7 @@ function getInequalityOperator(expression) {
               }
               if (exit$1 === 1) {
                 if (val$1 !== 61) {
-                  return /* Unknown */6;
+                  return /* GT */2;
                 } else {
                   return /* GTE */4;
                 }
@@ -91,24 +92,24 @@ function getInequalityOperator(expression) {
         }
       }
     } else if (match !== 33) {
-      return /* Unknown */6;
+      return /* Unknown */7;
     } else {
       var exit$2 = 0;
       var val$2;
       try {
-        val$2 = Caml_string.get(expression, index + 1 | 0);
+        val$2 = Caml_string.get(matchPattern, index + 1 | 0);
         exit$2 = 1;
       }
       catch (exn$2){
         if (exn$2 === Caml_builtin_exceptions.not_found) {
-          return /* Unknown */6;
+          return /* Unknown */7;
         } else {
           throw exn$2;
         }
       }
       if (exit$2 === 1) {
         if (val$2 !== 61) {
-          return /* Unknown */6;
+          return /* Unknown */7;
         } else {
           return /* NE */1;
         }
@@ -116,7 +117,7 @@ function getInequalityOperator(expression) {
       
     }
   } else {
-    return /* Unknown */6;
+    return /* EQ */0;
   }
 }
 
@@ -135,12 +136,8 @@ function isRange(matchPattern) {
   if (matchPattern.length) {
     var first = Caml_string.get(matchPattern, 0);
     var last = Caml_string.get(matchPattern, matchPattern.length - 1 | 0);
-    if (first === /* "[" */91 || first === /* "(" */40) {
-      if (last === /* "]" */93) {
-        return true;
-      } else {
-        return last === /* ")" */41;
-      }
+    if (isRangeOp(first)) {
+      return isRangeOp(last);
     } else {
       return false;
     }
@@ -149,12 +146,12 @@ function isRange(matchPattern) {
   }
 }
 
-function getConditionTypeFromMatch(matchPattern) {
+function getConditionFromMatch(matchPattern) {
   var match = isRange(matchPattern);
   if (match) {
-    return /* Range */1;
+    return /* Range */6;
   } else {
-    return /* Value */0;
+    return getInequalityOperator(matchPattern);
   }
 }
 
@@ -164,7 +161,34 @@ function onTogglePrecision(matchPattern, responseId, onEditMatch) {
   return onEditMatch(responseId, newMatchPattern);
 }
 
-function renderConditionSelect() {
+function renderConditionSelect(editMode, responseId, matchPattern, onEditMatch) {
+  var match = getConditionFromMatch(matchPattern);
+  var tmp;
+  switch (match) {
+    case 1 : 
+        tmp = "ne";
+        break;
+    case 2 : 
+        tmp = "gt";
+        break;
+    case 3 : 
+        tmp = "lt";
+        break;
+    case 4 : 
+        tmp = "gte";
+        break;
+    case 5 : 
+        tmp = "lte";
+        break;
+    case 6 : 
+        tmp = "range";
+        break;
+    case 0 : 
+    case 7 : 
+        tmp = "eq";
+        break;
+    
+  }
   return React.createElement("select", {
               className: StyleUtils$CourseEditor.classNames(/* :: */[
                     "form-control-sm",
@@ -184,7 +208,47 @@ function renderConditionSelect() {
                         ]
                       ]
                     ]
-                  ])
+                  ]),
+              disabled: !editMode,
+              value: tmp,
+              onChange: (function ($$event) {
+                  var value = $$event.target.value;
+                  var c = Caml_string.get(matchPattern, 0);
+                  var matchPattern$1 = isInequalityOp(c) ? StringUtils$CourseEditor.substr(matchPattern, Option$CourseEditor.valueOr(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                                    return !isInequalityOp(c);
+                                  })), 0), matchPattern.length) : (
+                      isRangeOp(c) ? StringUtils$CourseEditor.substr(matchPattern, 1, Option$CourseEditor.valueOr(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                                        return c === /* "," */44;
+                                      })), 1)) : matchPattern
+                    );
+                  var matchPattern$2;
+                  switch (value) {
+                    case "eq" : 
+                        matchPattern$2 = "=" + matchPattern$1;
+                        break;
+                    case "gt" : 
+                        matchPattern$2 = ">" + matchPattern$1;
+                        break;
+                    case "gte" : 
+                        matchPattern$2 = ">=" + matchPattern$1;
+                        break;
+                    case "lt" : 
+                        matchPattern$2 = "<" + matchPattern$1;
+                        break;
+                    case "lte" : 
+                        matchPattern$2 = "<=" + matchPattern$1;
+                        break;
+                    case "ne" : 
+                        matchPattern$2 = "!=" + matchPattern$1;
+                        break;
+                    case "range" : 
+                        matchPattern$2 = "[" + (matchPattern$1 + ("," + (matchPattern$1 + "]")));
+                        break;
+                    default:
+                      matchPattern$2 = "=" + matchPattern$1;
+                  }
+                  return onEditMatch(responseId, matchPattern$2);
+                })
             }, React.createElement("option", {
                   value: "eq"
                 }, ReactUtils$CourseEditor.strEl("Equal to")), React.createElement("option", {
@@ -197,27 +261,32 @@ function renderConditionSelect() {
                   value: "gte"
                 }, ReactUtils$CourseEditor.strEl("Greater than Equal to")), React.createElement("option", {
                   value: "lte"
-                }, ReactUtils$CourseEditor.strEl("Less than Equal to")));
+                }, ReactUtils$CourseEditor.strEl("Less than Equal to")), React.createElement("option", {
+                  value: "range"
+                }, ReactUtils$CourseEditor.strEl("Range")));
 }
 
 function renderValue(jssClass, editMode, matchPattern, responseId, onEditMatch) {
-  var matchStr = Option$CourseEditor.valueOr(matchPattern, "");
-  var hashIndex = StringUtils$CourseEditor.findIndex(/* None */0, matchStr, (function (c) {
+  var hashIndex = StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
           return c === /* "#" */35;
         }));
-  var value = hashIndex ? StringUtils$CourseEditor.substr(matchStr, 0, hashIndex[0]) : matchStr;
+  var valueWithOp = hashIndex ? StringUtils$CourseEditor.substr(matchPattern, 0, hashIndex[0]) : matchPattern;
   var precisionValue;
   if (hashIndex) {
     var hashIndex$1 = hashIndex[0];
-    precisionValue = StringUtils$CourseEditor.substr(matchStr, hashIndex$1 + 1 | 0, (matchStr.length - hashIndex$1 | 0) + 1 | 0);
+    precisionValue = StringUtils$CourseEditor.substr(matchPattern, hashIndex$1 + 1 | 0, (matchPattern.length - hashIndex$1 | 0) + 1 | 0);
   } else {
     precisionValue = "";
   }
+  var operator = StringUtils$CourseEditor.substr(valueWithOp, 0, Option$CourseEditor.valueOr(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                  return !isInequalityOp(c);
+                })), 0));
+  var value = StringUtils$CourseEditor.substr(valueWithOp, Option$CourseEditor.valueOr(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                  return !isInequalityOp(c);
+                })), 0), matchPattern.length);
   return React.createElement("div", {
               className: Curry._1(jssClass, "optionItem")
             }, React.createElement("div", {
-                  className: Curry._1(jssClass, "condition")
-                }, renderConditionSelect(/* () */0)), React.createElement("div", {
                   className: Curry._1(jssClass, "value")
                 }, React.createElement("input", {
                       className: "form-control input-sm form-control-sm",
@@ -226,21 +295,20 @@ function renderValue(jssClass, editMode, matchPattern, responseId, onEditMatch) 
                       value: value,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
-                          return onEditMatch(responseId, value + ("#" + precisionValue));
+                          return onEditMatch(responseId, operator + (value + ("#" + precisionValue)));
                         })
                     })));
 }
 
 function renderPrecision(jssClass, editMode, matchPattern, responseId, onEditMatch) {
-  var matchStr = Option$CourseEditor.valueOr(matchPattern, "");
-  var hashIndex = StringUtils$CourseEditor.findIndex(/* None */0, matchStr, (function (c) {
+  var hashIndex = StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
           return c === /* "#" */35;
         }));
-  var value = hashIndex ? StringUtils$CourseEditor.substr(matchStr, 0, hashIndex[0]) : matchStr;
+  var value = hashIndex ? StringUtils$CourseEditor.substr(matchPattern, 0, hashIndex[0]) : matchPattern;
   var precisionValue;
   if (hashIndex) {
     var hashIndex$1 = hashIndex[0];
-    precisionValue = StringUtils$CourseEditor.substr(matchStr, hashIndex$1 + 1 | 0, (matchStr.length - hashIndex$1 | 0) + 1 | 0);
+    precisionValue = StringUtils$CourseEditor.substr(matchPattern, hashIndex$1 + 1 | 0, (matchPattern.length - hashIndex$1 | 0) + 1 | 0);
   } else {
     precisionValue = "";
   }
@@ -252,11 +320,11 @@ function renderPrecision(jssClass, editMode, matchPattern, responseId, onEditMat
                       /* [] */0
                     ]
                   ])
-            }, ReasonReact.element(/* None */0, /* None */0, ToggleSwitch$CourseEditor.make(/* None */0, /* Some */[StyleUtils$CourseEditor.classNames(/* :: */[
+            }, ReasonReact.element(/* None */0, /* None */0, ToggleSwitch$CourseEditor.make(/* Some */[editMode], /* Some */[StyleUtils$CourseEditor.classNames(/* :: */[
                             Curry._1(jssClass, "precisionToggle"),
                             /* [] */0
-                          ])], /* None */0, /* Some */[isPrecision(matchStr)], (function () {
-                        return onTogglePrecision(matchStr, responseId, onEditMatch);
+                          ])], /* None */0, /* Some */[isPrecision(matchPattern)], (function () {
+                        return onTogglePrecision(matchPattern, responseId, onEditMatch);
                       }), "Precision", /* array */[])), React.createElement("input", {
                   className: StyleUtils$CourseEditor.classNames(/* :: */[
                         Curry._1(jssClass, "precisionValue"),
@@ -265,7 +333,7 @@ function renderPrecision(jssClass, editMode, matchPattern, responseId, onEditMat
                           /* [] */0
                         ]
                       ]),
-                  disabled: !editMode || !isPrecision(matchStr),
+                  disabled: !editMode || !isPrecision(matchPattern),
                   type: "number",
                   value: precisionValue,
                   onChange: (function ($$event) {
@@ -319,32 +387,8 @@ function make(classes, className, editMode, responseId, matchPattern, onEditMatc
               var jssClass = function (param) {
                 return StyleUtils$CourseEditor.jssClass(classes, param);
               };
-              var match = getConditionTypeFromMatch(Option$CourseEditor.valueOr(matchPattern, ""));
-              var tmp;
-              switch (match) {
-                case 0 : 
-                    tmp = renderValue(jssClass, editMode, matchPattern, responseId, onEditMatch);
-                    break;
-                case 1 : 
-                    tmp = renderRange(jssClass);
-                    break;
-                case 2 : 
-                    tmp = renderUnknown(jssClass);
-                    break;
-                
-              }
-              var match$1 = getConditionTypeFromMatch(Option$CourseEditor.valueOr(matchPattern, ""));
-              var tmp$1;
-              switch (match$1) {
-                case 0 : 
-                    tmp$1 = renderPrecision(jssClass, editMode, matchPattern, responseId, onEditMatch);
-                    break;
-                case 1 : 
-                case 2 : 
-                    tmp$1 = React.createElement("div", undefined);
-                    break;
-                
-              }
+              var match = getConditionFromMatch(Option$CourseEditor.valueOr(matchPattern, ""));
+              var match$1 = getConditionFromMatch(Option$CourseEditor.valueOr(matchPattern, ""));
               return React.createElement("div", {
                           className: StyleUtils$CourseEditor.classNames(/* :: */[
                                 componentName,
@@ -359,14 +403,10 @@ function make(classes, className, editMode, responseId, matchPattern, onEditMatc
                         }, React.createElement("div", {
                               className: StyleUtils$CourseEditor.jssClass(classes, "optionsRow")
                             }, React.createElement("div", {
-                                  className: StyleUtils$CourseEditor.jssClass(classes, "conditionType")
-                                }, React.createElement("select", {
-                                      className: "form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0"
-                                    }, React.createElement("option", {
-                                          value: "value"
-                                        }, ReactUtils$CourseEditor.strEl("Value")), React.createElement("option", {
-                                          value: "range"
-                                        }, ReactUtils$CourseEditor.strEl("Range")))), tmp), tmp$1);
+                                  className: StyleUtils$CourseEditor.jssClass(classes, "condition")
+                                }, renderConditionSelect(editMode, responseId, Option$CourseEditor.valueOr(matchPattern, ""), onEditMatch)), match !== 6 ? (
+                                match >= 7 ? renderUnknown(jssClass) : renderValue(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)
+                              ) : renderRange(jssClass)), match$1 !== 6 && match$1 < 7 ? renderPrecision(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch) : React.createElement("div", undefined));
             }),
           /* initialState */component[/* initialState */10],
           /* retainedProps */component[/* retainedProps */11],
@@ -382,12 +422,12 @@ var jsComponentUnstyled = ReasonReact.wrapReasonForJs(component, (function (jsPr
 
 var jsComponent = StyleUtils$CourseEditor.injectSheet(NumericMatchOptionsStyle.styles, jsComponentUnstyled);
 
-exports.isNumeric = isNumeric;
 exports.isInequalityOp = isInequalityOp;
+exports.isRangeOp = isRangeOp;
 exports.getInequalityOperator = getInequalityOperator;
 exports.isPrecision = isPrecision;
 exports.isRange = isRange;
-exports.getConditionTypeFromMatch = getConditionTypeFromMatch;
+exports.getConditionFromMatch = getConditionFromMatch;
 exports.onTogglePrecision = onTogglePrecision;
 exports.renderConditionSelect = renderConditionSelect;
 exports.renderValue = renderValue;

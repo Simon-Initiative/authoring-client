@@ -3,11 +3,6 @@
 open ReactUtils;
 open StyleUtils;
 
-type conditionType =
-  | Value
-  | Range
-  | Unknown;
-
 type inequalityOperator =
   | EQ
   | NE
@@ -15,41 +10,49 @@ type inequalityOperator =
   | LT
   | GTE
   | LTE
+  | Range
   | Unknown;
 
-/* checks if the char ascii code is within the numeric range */
-let isNumeric = (char: char) => Char.code(char) >= 48 && Char.code(char) <= 57;
+let isInequalityOp = (c: char) => switch (c) {
+  | '=' => true
+  | '<' => true
+  | '>' => true
+  | '!' => true
+  | _ => false
+};
 
-let isInequalityOp = (char: char) =>
-  char === '='
-  || char === '<'
-  || char === '>'
-  || char === '!';
+let isRangeOp = (c: char) => switch (c) {
+  | '(' => true
+  | '[' => true
+  | ')' => true
+  | ']' => true
+  | _ => false
+};
 
-let getInequalityOperator = (expression: string) => {
-  let operatorIndex = StringUtils.findIndex(expression, c => isInequalityOp(c));
+let getInequalityOperator = (matchPattern: string) => {
+  let operatorIndex = StringUtils.findIndex(matchPattern, c => isInequalityOp(c));
 
   switch (operatorIndex) {
-    | Some(index) => switch (String.get(expression, index)) {
+    | Some(index) => switch (String.get(matchPattern, index)) {
         | '=' => EQ
-        | '!' => switch (String.get(expression, index + 1)) {
+        | '!' => switch (String.get(matchPattern, index + 1)) {
           | '=' => NE
           | exception Not_found => Unknown
           | _ => Unknown
         };
-        | '>' => switch (String.get(expression, index + 1)) {
+        | '>' => switch (String.get(matchPattern, index + 1)) {
             | '=' => GTE
             | exception Not_found => GT
-            | _ => Unknown
+            | _ => GT
           };
-        | '<' => switch (String.get(expression, index + 1)) {
+        | '<' => switch (String.get(matchPattern, index + 1)) {
           | '=' => LTE
           | exception Not_found => LT
-          | _ => Unknown
+          | _ => LT
         };
         | _ => Unknown
       };
-    | None => Unknown
+    | None => EQ
   };
 };
 
@@ -65,17 +68,17 @@ let isRange = (matchPattern: string) => {
     let first = String.get(matchPattern, 0);
     let last = String.get(matchPattern, String.length(matchPattern) - 1);
 
-    (first === '[' || first === '(') && (last === ']' || last === ')');
+    isRangeOp(first) && isRangeOp(last);
   }
   else {
     false
   }
 };
 
-let getConditionTypeFromMatch = (matchPattern: string) => {
+let getConditionFromMatch = (matchPattern: string) => {
   switch (isRange(matchPattern)) {
     | true => Range
-    | false => Value
+    | false => getInequalityOperator(matchPattern)
   };
 };
 
@@ -87,83 +90,134 @@ let onTogglePrecision = (matchPattern: string, responseId: string, onEditMatch: 
   onEditMatch(. responseId, newMatchPattern);
 };
 
-let renderConditionSelect = () => {
+let renderConditionSelect = (editMode, responseId, matchPattern, onEditMatch) => {
   <select className={classNames(["form-control-sm", "custom-select",
-      "mb-2", "mr-sm-2", "mb-sm-0", "condition"])}>
+      "mb-2", "mr-sm-2", "mb-sm-0", "condition"])}
+      disabled={!editMode}
+      value={switch (getConditionFromMatch(matchPattern)) {
+        | NE => "ne"
+        | GT => "gt"
+        | LT => "lt"
+        | GTE => "gte"
+        | LTE => "lte"
+        | Range => "range"
+        | (EQ | Unknown) => "eq"
+      }}
+      onChange={event => {
+        let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
+
+        /* remove current operator(s) from matchPattern */
+        let matchPattern = switch (String.get(matchPattern, 0)) {
+          | c when isInequalityOp(c) =>
+            StringUtils.substr(
+              matchPattern,
+              Option.valueOr(StringUtils.findIndex(matchPattern, c => !isInequalityOp(c)), 0),
+              String.length(matchPattern)
+            )
+          | c when isRangeOp(c) =>
+            StringUtils.substr(
+              matchPattern,
+              1,
+              Option.valueOr(StringUtils.findIndex(matchPattern, c => c === ','), 1)
+            )
+          | _ => matchPattern
+        };
+
+        let matchPattern = switch (value) {
+          | "ne" => "!=" ++ matchPattern
+          | "gt" => ">" ++ matchPattern
+          | "lt" => "<" ++ matchPattern
+          | "gte" => ">=" ++ matchPattern
+          | "lte" => "<=" ++ matchPattern
+          | "range" => "[" ++ matchPattern ++ "," ++ matchPattern ++ "]"
+          | ("eq" | _) => "=" ++ matchPattern
+        };
+
+        onEditMatch(. responseId, matchPattern);
+      }}>
     <option value="eq">{strEl("Equal to")}</option>
     <option value="ne">{strEl("Not Equal to")}</option>
     <option value="gt">{strEl("Greater than")}</option>
     <option value="lt">{strEl("Less than")}</option>
     <option value="gte">{strEl("Greater than Equal to")}</option>
     <option value="lte">{strEl("Less than Equal to")}</option>
+    <option value="range">{strEl("Range")}</option>
   </select>
 };
 
 let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) => {
-  let matchStr = Option.valueOr(matchPattern, "");
-  /* let hashIndex = Option.valueOr(StringUtils.findIndex(matchStr, c => c === '#'), 0);
-  let value = StringUtils.substr(matchStr, 0, hashIndex);
-  let precisionValue = StringUtils.substr(matchStr, hashIndex + 1, String.length(matchStr) - hashIndex + 1); */
 
-  let hashIndex = StringUtils.findIndex(matchStr, c => c === '#');
-  let value = switch (hashIndex) {
-    | Some(hashIndex) => StringUtils.substr(matchStr, 0, hashIndex)
-    | None => matchStr
+  /* seperate matchPattern into value and precision parts */
+  let hashIndex = StringUtils.findIndex(matchPattern, c => c === '#');
+  let valueWithOp = switch (hashIndex) {
+    | Some(hashIndex) => StringUtils.substr(matchPattern, 0, hashIndex)
+    | None => matchPattern
   };
   let precisionValue = switch (hashIndex) {
-    | Some(hashIndex) => StringUtils.substr(matchStr, hashIndex + 1, String.length(matchStr) - hashIndex + 1)
+    | Some(hashIndex) => StringUtils.substr(matchPattern, hashIndex + 1, String.length(matchPattern) - hashIndex + 1)
     | None => ""
   };
 
+  /* seperate operator and value */
+  let operator = StringUtils.substr(
+    valueWithOp,
+    0,
+    Option.valueOr(StringUtils.findIndex(matchPattern, c => !isInequalityOp(c)), 0),
+  );
+  let value = StringUtils.substr(
+    valueWithOp,
+    Option.valueOr(StringUtils.findIndex(matchPattern, c => !isInequalityOp(c)), 0),
+    String.length(matchPattern)
+  );
+
   <div className={jssClass("optionItem")}>
-    <div className={jssClass("condition")}>
-      {renderConditionSelect()}
-    </div>
     <div className={jssClass("value")}>
       <input
         _type="number"
         className="form-control input-sm form-control-sm"
         disabled={Js.Boolean.to_js_boolean(!editMode)}
-        value=value
+        value
         onChange={event => {
           let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
-          onEditMatch(. responseId, value ++ "#" ++ precisionValue);
+          onEditMatch(. responseId, operator ++ value ++ "#" ++ precisionValue);
         }} />
     </div>
   </div>
 };
 
 let renderPrecision = (jssClass, editMode, matchPattern, responseId, onEditMatch) => {
-  let matchStr = Option.valueOr(matchPattern, "");
-  let hashIndex = StringUtils.findIndex(matchStr, c => c === '#');
+  let hashIndex = StringUtils.findIndex(matchPattern, c => c === '#');
   let value = switch (hashIndex) {
-    | Some(hashIndex) => StringUtils.substr(matchStr, 0, hashIndex)
-    | None => matchStr
+    | Some(hashIndex) => StringUtils.substr(matchPattern, 0, hashIndex)
+    | None => matchPattern
   };
   let precisionValue = switch (hashIndex) {
-    | Some(hashIndex) => StringUtils.substr(matchStr, hashIndex + 1, String.length(matchStr) - hashIndex + 1)
+    | Some(hashIndex) => StringUtils.substr(matchPattern, hashIndex + 1, String.length(matchPattern) - hashIndex + 1)
     | None => ""
   };
 
   <div className={classNames([jssClass("optionsRow"), jssClass("precision")])}>
     <ToggleSwitch
       className={classNames([jssClass("precisionToggle")])}
+      editMode
       label="Precision"
-      checked=isPrecision(matchStr)
-      onClick={_ => onTogglePrecision(matchStr, responseId, onEditMatch)} />
+      checked=isPrecision(matchPattern)
+      onClick={_ => onTogglePrecision(matchPattern, responseId, onEditMatch)} />
     <input
       _type="number"
       className={classNames([jssClass("precisionValue"), "form-control input-sm form-control-sm"])}
-      disabled={Js.Boolean.to_js_boolean(!editMode) || !isPrecision(matchStr)}
+      disabled={Js.Boolean.to_js_boolean(!editMode) || !isPrecision(matchPattern)}
       value=precisionValue
       onChange={event => {
         let newPrecisionValue = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
         onEditMatch(. responseId, value ++ "#" ++ newPrecisionValue);
       }} />
-    <div className={classNames([jssClass("precisionLabel"), switch {hashIndex} {
-      | Some(_) => ""
-      | None => jssClass("precisionLabelDisabled")
-    }])}>
+    <div className={classNames([
+      jssClass("precisionLabel"),
+      switch {hashIndex} {
+        | Some(_) => ""
+        | None => jssClass("precisionLabelDisabled")
+      }])}>
       {strEl("Decimals")}
     </div>
     <div className={classNames([jssClass("precisionSpacer")])} />
@@ -201,23 +255,22 @@ let make = (
       Option.valueOr(className, "")
     ])}>
       <div className={jssClass("optionsRow")}>
-        <div className={jssClass("conditionType")}>
-          <select className="form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0">
-            <option value="value">{strEl("Value")}</option>
-            <option value="range">{strEl("Range")}</option>
-          </select>
+        <div className={jssClass("condition")}>
+          {renderConditionSelect(editMode, responseId, Option.valueOr(matchPattern, ""), onEditMatch)}
         </div>
         {
-          switch (getConditionTypeFromMatch(Option.valueOr(matchPattern, ""))) {
-            | Value => renderValue(jssClass, editMode, matchPattern, responseId, onEditMatch)
+          switch (getConditionFromMatch(Option.valueOr(matchPattern, ""))) {
+            | (EQ | NE | GT | LT | GTE | LTE) =>
+              renderValue(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)
             | Range => renderRange(jssClass)
             | Unknown => renderUnknown(jssClass)
           };
         }
-        </div>
+      </div>
       {
-        switch (getConditionTypeFromMatch(Option.valueOr(matchPattern, ""))) {
-          | Value => renderPrecision(jssClass, editMode, matchPattern, responseId, onEditMatch)
+        switch (getConditionFromMatch(Option.valueOr(matchPattern, ""))) {
+          | (EQ | NE | GT | LT | GTE | LTE) =>
+            renderPrecision(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)
           | Range => <div />
           | Unknown => <div />
         };
