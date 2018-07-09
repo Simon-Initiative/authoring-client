@@ -27,6 +27,13 @@ const decodeMatchOperators = (match: string) => {
     match);
 };
 
+const sanitizeMatch = (match: string) => {
+  // remove trailing # if no precision value is defined
+  return match.substr(match.length - 1, 1) === '#'
+    ? match.substr(0, match.length - 1)
+    : match;
+};
+
 export type ResponseParams = {
 
   feedback? : Immutable.OrderedMap<string, Feedback>,
@@ -139,7 +146,7 @@ export class Response extends Immutable.Record(defaultContent) {
 
     const o = {
       response: {
-        '@match': encodeMatchOperators(this.match),
+        '@match': encodeMatchOperators(sanitizeMatch(this.match)),
         '@score': this.score.trim() === '' ? '0' : this.score,
         '@name': this.name,
         '#array': [...concepts, ...feedback],

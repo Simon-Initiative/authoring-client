@@ -85,7 +85,7 @@ let getConditionFromMatch = (matchPattern: string) => {
 let onTogglePrecision = (matchPattern: string, responseId: string, onEditMatch: (. string, string) => unit) => {
   let newMatchPattern = isPrecision(matchPattern)
     ? StringUtils.remove(matchPattern, String.index(matchPattern, '#'), String.length(matchPattern) - String.index(matchPattern, '#'))
-    : matchPattern ++ "#1";
+    : matchPattern ++ "#";
 
   onEditMatch(. responseId, newMatchPattern);
 };

@@ -157,7 +157,7 @@ function getConditionFromMatch(matchPattern) {
 
 function onTogglePrecision(matchPattern, responseId, onEditMatch) {
   var match = isPrecision(matchPattern);
-  var newMatchPattern = match ? StringUtils$CourseEditor.remove(matchPattern, $$String.index(matchPattern, /* "#" */35), matchPattern.length - $$String.index(matchPattern, /* "#" */35) | 0) : matchPattern + "#1";
+  var newMatchPattern = match ? StringUtils$CourseEditor.remove(matchPattern, $$String.index(matchPattern, /* "#" */35), matchPattern.length - $$String.index(matchPattern, /* "#" */35) | 0) : matchPattern + "#";
   return onEditMatch(responseId, newMatchPattern);
 }
 
