@@ -126,7 +126,7 @@ function translateBlock(
   if (isParagraphBlock(rawBlock)) {
 
     // If the last block is an empty paragraph, do not translate it
-    if (rawBlock.text === ' ' && iterator.peek() === null) {
+    if (rawBlock.text === ' ' && rawBlock.entityRanges.length === 0 && iterator.peek() === null) {
       return;
     }
 
