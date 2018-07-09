@@ -27,7 +27,7 @@ export function buildPersistenceFailureMessage(reason: string, user: UserProfile
   if (reason === 'Bad Request') {
 
     const content = new Messages.TitledContent().with({
-      title: 'Cannot save.',
+      title: 'Cannot save',
       message: 'There was a problem saving your changes. Try reverting recent changes.',
     });
     return new Messages.Message().with({
@@ -42,7 +42,7 @@ export function buildPersistenceFailureMessage(reason: string, user: UserProfile
   }
 
   const content = new Messages.TitledContent().with({
-    title: 'Cannot save.',
+    title: 'Cannot save',
     message: 'An unknown error was encountered trying to save your changes.',
   });
   return new Messages.Message().with({
@@ -133,7 +133,7 @@ export function buildMissingSkillsMessage(courseId: string) {
   ];
 
   const content = new Messages.TitledContent().with({
-    title: 'No Skills:',
+    title: 'No Skills',
     // tslint:disable-next-line:max-line-length
     message: 'Skills are key to the effectiveness of a course. You should create some first.',
   });

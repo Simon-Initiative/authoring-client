@@ -74,6 +74,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   componentDidMount() {
+    super.componentDidMount();
     // We have no direct access to a skills list through props.context since
     // skills cannot be deleted. Looking at skills attached to objectives
     // will show the banner if skills are present in the course but 'deleted',

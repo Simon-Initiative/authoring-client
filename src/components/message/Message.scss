@@ -15,23 +15,28 @@
     }
   }
 
+  .message__title {
+    font-weight: bold;
+    margin-right: 8px;
+  }
+
   &.message--error {
     background-color: $alizarin;
-    .message-text {
+    .message__text {
       color: white;
     }
   }
 
   &.message--warning {
     background-color: $info;
-    .message-text {
+    .message__text {
       color: white;
     }
   }
 
   &.message--information {
     background-color: $peter-river;
-    .message-text {
+    .message__text {
       color: white;
     }
   }
