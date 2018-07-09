@@ -12,36 +12,21 @@ export const styles: JSSStyles = {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  addButton: {
-
+  error: {
+    color: colors.danger,
   },
-  testButton: {
-
-  },
-  removeButton: {
-
-  },
-  variable: {
-    display: 'flex',
-    paddingTop: '8px',
+  evaluated: {
+    color: colors.black,
   },
   variableLabel: {
     fontFamily: 'monospace',
-    fontSize: '10pt',
+    fontSize: '9pt',
   },
-  variableContent: {
-    flexGrow: 1,
-    paddingTop: '3px',
-    paddingLeft: '3px',
-  },
-  variableRemove: {
-
+  variableResult: {
+    fontFamily: 'monospace',
+    fontSize: '9pt',
   },
   header: {
     flex: 1,
-  },
-  variables: {
-    display: 'flex',
-    flexDirection: 'column',
   },
 };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-
+import { Evaluation, evaluate } from 'data/persistence/variables';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
@@ -27,7 +27,7 @@ export interface VariablesEditorProps extends AbstractContentEditorProps<Variabl
 }
 
 export interface VariablesEditorState {
-
+  results: Immutable.Map<string, Evaluation>;
 }
 
 type Variables = Immutable.OrderedMap<string, contentTypes.Variable>;
@@ -46,6 +46,15 @@ export class VariablesEditor
 
     this.onAddVariable = this.onAddVariable.bind(this);
     this.onTestExpressions = this.onTestExpressions.bind(this);
+
+    this.state = {
+      results: Immutable.Map<string, Evaluation>(),
+    };
+  }
+
+  shouldComponentUpdate(nextProps, nextState: VariablesEditorState) {
+    return super.shouldComponentUpdate(nextProps, nextState)
+      || this.state.results !== nextState.results;
   }
 
   onExpressionEdit(variable, expression) {
@@ -67,12 +76,21 @@ export class VariablesEditor
 
   renderVariable(variable: contentTypes.Variable) {
     const { classes, className, model, editMode } = this.props;
+
+    const evaluation = this.state.results.has(variable.name)
+      ? this.state.results.get(variable.name).errored
+        ? <span className={classNames([classes.error, className])}>Error</span>
+        : <span className={classNames([classes.evaluated, className])}>
+            {this.state.results.get(variable.name).result}
+          </span>
+      : null;
+
     return (
-      <div className={classNames([classes.variable, className])}>
-        <div className={classNames([classes.variableLabel, className])}>
-          {variable.name + ' = '}
-        </div>
-        <div className={classNames([classes.variableContent, className])}>
+      <tr>
+        <td className={classNames([classes.variableLabel, className])}>
+          {variable.name}
+        </td>
+        <td>
           <AceEditor
             name={variable.name}
             width="initial"
@@ -95,23 +113,38 @@ export class VariablesEditor
               highlightActiveLine: false,
             }}
           />
-        </div>
-        <div className={classNames([classes.variableRemove, className])}>
-        <span className="remove-btn">
-          <button
-            disabled={!editMode}
-            onClick={this.onRemoveVariable.bind(this, variable.guid)}
-            type="button"
-            className="btn btn-sm">
-            <i className="fa fa-close"></i>
-          </button>
-        </span>
-        </div>
-      </div>
+        </td>
+        <td className={classNames([classes.variableResult, className])}>
+          {evaluation}
+        </td>
+        <td>
+          <span className="remove-btn">
+            <button
+              disabled={!editMode}
+              onClick={this.onRemoveVariable.bind(this, variable.guid)}
+              type="button"
+              className="btn btn-sm">
+              <i className="fa fa-close"></i>
+            </button>
+          </span>
+        </td>
+      </tr>
     );
   }
 
   onTestExpressions() {
+
+    const { model } = this.props;
+
+    // Clear the current results and re-evaluate
+    this.setState(
+      { results: Immutable.Map<string, Evaluation>() },
+      () => evaluate(model).then((results) => {
+        this.setState({
+          results: Immutable.Map<string, Evaluation>(results.map(r => [r.variable, r])),
+        });
+      }));
+
 
   }
 
@@ -195,14 +228,27 @@ export class VariablesEditor
 
   renderMain() {
     const { classes, className, model } = this.props;
+
+    const tableOrNot = model.size > 0
+      ? <table className={classNames(['table', 'table-sm'])}>
+          <thead>
+            <tr>
+              <th>Var</th>
+              <th>Expression</th>
+              <th>Evaluation</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {model.toArray().map(v => this.renderVariable(v))}
+          </tbody>
+        </table>
+      : null;
+
     return (
       <div className={classNames([classes.VariablesEditor, className])}>
         {this.renderHeader()}
-
-        <div className={classNames([classes.variables, className])}>
-          {model.toArray().map(v => this.renderVariable(v))}
-        </div>
-
+        {tableOrNot}
         {this.renderButtonPanel()}
       </div>
     );
