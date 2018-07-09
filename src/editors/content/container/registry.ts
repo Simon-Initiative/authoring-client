@@ -14,6 +14,7 @@ import CompositeEditor from '../learning/CompositeEditor';
 import ConjugateEditor from 'editors/content/learning/conjugation/ConjugateEditor';
 import ConjugationEditor from 'editors/content/learning/conjugation/ConjugationEditor';
 import DefinitionEditor from '../learning/DefinitionEditor';
+import DefinitionListEditor from '../learning/DefinitionListEditor';
 import DialogEditor from 'editors/content/learning/dialog/DialogEditor';
 import DirectorEditor from '../learning/DirectorEditor';
 import ExampleEditor from '../learning/ExampleEditor';
@@ -87,6 +88,7 @@ function init() {
   registry['ContiguousText'] = connectEditor(ContiguousTextEditor);
   registry['Custom'] = connectEditor(CustomEditor);
   registry['Definition'] = connectEditor(DefinitionEditor);
+  registry['DefinitionList'] = connectEditor(DefinitionListEditor);
   registry['Dialog'] = connectEditor(DialogEditor);
   registry['Director'] = connectEditor(DirectorEditor);
   registry['Example'] = connectEditor(ExampleEditor);
