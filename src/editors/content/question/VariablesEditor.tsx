@@ -75,7 +75,7 @@ export class VariablesEditor
   }
 
   renderVariable(variable: contentTypes.Variable) {
-    const { classes, className, model, editMode } = this.props;
+    const { classes, className, editMode } = this.props;
 
     const evaluation = this.state.results.has(variable.name)
       ? this.state.results.get(variable.name).errored

@@ -192,7 +192,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   }
 
   renderOptions() {
-    const { hideGradingCriteria, model,
+    const { hideGradingCriteria,
       editMode, grading, onGradingChange } = this.props;
 
     let options = [];

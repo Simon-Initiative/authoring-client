@@ -1,7 +1,5 @@
 import { OrderedMap, List } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Dispatch } from 'react-redux';
-import { State } from 'reducers';
 import { configuration } from 'actions/utils/config';
 
 const fetch = (window as any).fetch;

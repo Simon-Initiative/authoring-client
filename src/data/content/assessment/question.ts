@@ -317,9 +317,7 @@ function parseVariables(item: any, model: Question) {
 
   getChildren(item.variables).forEach((root) => {
 
-    const key = getKey(root);
     const id = createGuid();
-
     vars.push([id, Variable.fromPersistence(root, id)]);
   });
 
