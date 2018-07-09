@@ -113,7 +113,6 @@
     "lint:watch": "chokidar \"src/**/*.ts*\" -c \"echo Running lint... && tslint -p . -c tslint.json 'src/**/*.ts*' && echo Linting Passed.\" --initial --verbose",
     "reason": "bsb -make-world -w",
     "test": "JEST_HTML_REPORTER_OUTPUT_PATH=./test-out/results.html jest",
-    "test:watch": "jest --watch",
-    "postinstall": "cp ./node_modules/reason-react/lib/js/src/*.js ./node_modules/reason-react/src"
+    "test:watch": "jest --watch"
   }
 }
