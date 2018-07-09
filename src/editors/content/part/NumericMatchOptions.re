@@ -276,6 +276,9 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
 
 let renderUnknown = (jssClass) => {
   <div className={jssClass("optionItem")}>
+    <div className="alert alert-danger" role="alert">
+      {strEl("Could not determine matching condition. Please check the original XML.")}
+    </div>
   </div>
 };
 
@@ -299,26 +302,33 @@ let make = (
       jssClass(componentName),
       Option.valueOr(className, "")
     ])}>
-      <div className={jssClass("optionsRow")}>
-        <div className={jssClass("condition")}>
-          {renderConditionSelect(editMode, responseId, Option.valueOr(matchPattern, ""), onEditMatch)}
-        </div>
-        {
-          switch (getConditionFromMatch(Option.valueOr(matchPattern, ""))) {
-            | (EQ | NE | GT | LT | GTE | LTE) =>
-              renderValue(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)
-            | Range => renderRange(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)
-            | Unknown => renderUnknown(jssClass)
-          };
-        }
-      </div>
       {
         switch (getConditionFromMatch(Option.valueOr(matchPattern, ""))) {
           | (EQ | NE | GT | LT | GTE | LTE) =>
-            renderPrecision(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)
-          | Range => renderRangeInstructions(jssClass)
-          | Unknown => <div />
-        };
+            <div>
+              <div className={jssClass("optionsRow")}>
+                  <div className={jssClass("condition")}>
+                    {renderConditionSelect(editMode, responseId, Option.valueOr(matchPattern, ""), onEditMatch)}
+                  </div>
+                  {renderValue(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)}
+              </div>
+              {renderPrecision(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)}
+            </div>
+          | Range =>
+            <div>
+              <div className={jssClass("optionsRow")}>
+                <div className={jssClass("condition")}>
+                  {renderConditionSelect(editMode, responseId, Option.valueOr(matchPattern, ""), onEditMatch)}
+                </div>
+                {renderRange(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)}
+              </div>
+              {renderRangeInstructions(jssClass)}
+            </div>
+          | Unknown =>
+            <div className={jssClass("optionsRow")}>
+              {renderUnknown(jssClass)}
+            </div>
+        }
       }
     </div>
   }

@@ -461,7 +461,10 @@ function renderRange(jssClass, editMode, matchPattern, responseId, onEditMatch) 
 function renderUnknown(jssClass) {
   return React.createElement("div", {
               className: Curry._1(jssClass, "optionItem")
-            });
+            }, React.createElement("div", {
+                  className: "alert alert-danger",
+                  role: "alert"
+                }, ReactUtils$CourseEditor.strEl("Could not determine matching condition. Please check the original XML.")));
 }
 
 var componentName = "NumericMatchOptions";
@@ -484,7 +487,6 @@ function make(classes, className, editMode, responseId, matchPattern, onEditMatc
                 return StyleUtils$CourseEditor.jssClass(classes, param);
               };
               var match = getConditionFromMatch(Option$CourseEditor.valueOr(matchPattern, ""));
-              var match$1 = getConditionFromMatch(Option$CourseEditor.valueOr(matchPattern, ""));
               return React.createElement("div", {
                           className: StyleUtils$CourseEditor.classNames(/* :: */[
                                 componentName,
@@ -496,15 +498,19 @@ function make(classes, className, editMode, responseId, matchPattern, onEditMatc
                                   ]
                                 ]
                               ])
-                        }, React.createElement("div", {
-                              className: StyleUtils$CourseEditor.jssClass(classes, "optionsRow")
-                            }, React.createElement("div", {
-                                  className: StyleUtils$CourseEditor.jssClass(classes, "condition")
-                                }, renderConditionSelect(editMode, responseId, Option$CourseEditor.valueOr(matchPattern, ""), onEditMatch)), match !== 6 ? (
-                                match >= 7 ? renderUnknown(jssClass) : renderValue(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)
-                              ) : renderRange(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)), match$1 !== 6 ? (
-                            match$1 >= 7 ? React.createElement("div", undefined) : renderPrecision(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)
-                          ) : renderRangeInstructions(jssClass));
+                        }, match !== 6 ? (
+                            match >= 7 ? React.createElement("div", {
+                                    className: StyleUtils$CourseEditor.jssClass(classes, "optionsRow")
+                                  }, renderUnknown(jssClass)) : React.createElement("div", undefined, React.createElement("div", {
+                                        className: StyleUtils$CourseEditor.jssClass(classes, "optionsRow")
+                                      }, React.createElement("div", {
+                                            className: StyleUtils$CourseEditor.jssClass(classes, "condition")
+                                          }, renderConditionSelect(editMode, responseId, Option$CourseEditor.valueOr(matchPattern, ""), onEditMatch)), renderValue(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)), renderPrecision(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch))
+                          ) : React.createElement("div", undefined, React.createElement("div", {
+                                    className: StyleUtils$CourseEditor.jssClass(classes, "optionsRow")
+                                  }, React.createElement("div", {
+                                        className: StyleUtils$CourseEditor.jssClass(classes, "condition")
+                                      }, renderConditionSelect(editMode, responseId, Option$CourseEditor.valueOr(matchPattern, ""), onEditMatch)), renderRange(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)), renderRangeInstructions(jssClass)));
             }),
           /* initialState */component[/* initialState */10],
           /* retainedProps */component[/* retainedProps */11],
