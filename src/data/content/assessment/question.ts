@@ -14,6 +14,7 @@ import { Numeric } from './numeric';
 import { Feedback } from './feedback';
 import { Response } from './response';
 import { Unsupported } from '../unsupported';
+import { Variable } from './variable';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
@@ -33,6 +34,7 @@ export type QuestionParams = {
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
   explanation?: ContentElements;
+  variables?: Immutable.OrderedMap<string, Variable>;
   guid?: string;
 };
 
@@ -47,6 +49,7 @@ const defaultQuestionParams = {
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
   explanation: new ContentElements(),
+  variables: Immutable.OrderedMap<string, Variable>(),
   guid: '',
 };
 
@@ -308,6 +311,21 @@ function cloneMultipleChoiceQuestion(question: Question) : Question {
   });
 }
 
+function parseVariables(item: any, model: Question) {
+
+  const vars = [];
+
+  getChildren(item.variables).forEach((root) => {
+
+    const id = createGuid();
+    vars.push([id, Variable.fromPersistence(root, id)]);
+  });
+
+  return model.with({
+    variables: Immutable.OrderedMap<string, Variable>(vars),
+  });
+}
+
 export class Question extends Immutable.Record(defaultQuestionParams) {
 
   contentType: 'Question';
@@ -320,6 +338,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
   explanation: ContentElements;
+  variables: Immutable.OrderedMap<string, Variable>;
   guid: string;
 
   constructor(params?: QuestionParams) {
@@ -407,6 +426,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       const id = createGuid();
 
       switch (key) {
+        case 'variables':
+          model = parseVariables(item, model);
+          break;
         case 'cmd:concept':
           model = model.with(
             { concepts: model.concepts.push((item as any)['cmd:concept']['#text']) });
@@ -504,6 +526,15 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
       { explanation: { '#array': this.explanation.toPersistence() } },
     ];
+
+    if (this.variables.size > 0) {
+      const vars = this.variables.toArray().map(v => v.toPersistence());
+      children.push({
+        variables: {
+          '#array': vars,
+        },
+      });
+    }
 
     return {
       question: {

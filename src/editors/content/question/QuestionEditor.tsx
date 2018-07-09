@@ -75,6 +75,7 @@ export class QuestionEditor
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.onGradingChange = this.onGradingChange.bind(this);
+    this.onVariablesChange = this.onVariablesChange.bind(this);
     this.onAddItemPart = this.onAddItemPart.bind(this);
 
     this.fillInTheBlankCommand
@@ -242,6 +243,11 @@ export class QuestionEditor
     this.props.onEdit(this.props.model.with({ grading }));
   }
 
+  onVariablesChange(variables: Immutable.OrderedMap<string, contentTypes.Variable>) {
+
+    this.props.onEdit(this.props.model.with({ variables }));
+  }
+
   handleOnFocus() {
     // Do nothing for questions
   }
@@ -280,9 +286,11 @@ export class QuestionEditor
       body: this.props.model.body,
       grading: this.props.model.grading,
       onGradingChange: this.onGradingChange,
+      onVariablesChange: this.onVariablesChange,
       onDuplicate: this.props.onDuplicate,
       onBodyEdit: this.onBodyEdit,
       hideGradingCriteria: !this.props.isParentAssessmentGraded,
+      hideVariables: !this.props.isParentAssessmentGraded,
       canRemoveQuestion: canRemove,
       onRemoveQuestion: this.props.onRemove.bind(this, this.props.model.guid),
       onEdit: (c, p, src) => this.onItemPartEdit(c, p, src),
