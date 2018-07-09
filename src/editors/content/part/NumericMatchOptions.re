@@ -107,20 +107,24 @@ let renderConditionSelect = (editMode, responseId, matchPattern, onEditMatch) =>
         let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
 
         /* remove current operator(s) from matchPattern */
-        let matchPattern = switch (String.get(matchPattern, 0)) {
-          | c when isInequalityOp(c) =>
-            StringUtils.substr(
-              matchPattern,
-              Option.valueOr(StringUtils.findIndex(matchPattern, c => !isInequalityOp(c)), 0),
-              String.length(matchPattern)
-            )
-          | c when isRangeOp(c) =>
-            StringUtils.substr(
-              matchPattern,
-              1,
-              Option.valueOr(StringUtils.findIndex(matchPattern, c => c === ','), 2) - 1
-            )
-          | _ => matchPattern
+        let matchPattern = try(
+          switch (String.get(matchPattern, 0)) {
+            | c when isInequalityOp(c) =>
+              StringUtils.substr(
+                matchPattern,
+                Option.valueOrThrow(StringUtils.findIndex(matchPattern, c => !isInequalityOp(c))),
+                String.length(matchPattern)
+              )
+            | c when isRangeOp(c) =>
+              StringUtils.substr(
+                matchPattern,
+                1,
+                Option.valueOrThrow(StringUtils.findIndex(matchPattern, c => c === ',')) - 1
+              )
+            | _ => "0"
+          }
+        ) {
+          | _ => "0"
         };
 
         let matchPattern = switch (value) {

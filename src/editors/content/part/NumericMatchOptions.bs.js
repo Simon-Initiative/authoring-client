@@ -213,14 +213,20 @@ function renderConditionSelect(editMode, responseId, matchPattern, onEditMatch) 
               value: tmp,
               onChange: (function ($$event) {
                   var value = $$event.target.value;
-                  var c = Caml_string.get(matchPattern, 0);
-                  var matchPattern$1 = isInequalityOp(c) ? StringUtils$CourseEditor.substr(matchPattern, Option$CourseEditor.valueOr(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
-                                    return !isInequalityOp(c);
-                                  })), 0), matchPattern.length) : (
-                      isRangeOp(c) ? StringUtils$CourseEditor.substr(matchPattern, 1, Option$CourseEditor.valueOr(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
-                                        return c === /* "," */44;
-                                      })), 2) - 1 | 0) : matchPattern
-                    );
+                  var matchPattern$1;
+                  try {
+                    var c = Caml_string.get(matchPattern, 0);
+                    matchPattern$1 = isInequalityOp(c) ? StringUtils$CourseEditor.substr(matchPattern, Option$CourseEditor.valueOrThrow(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                                      return !isInequalityOp(c);
+                                    }))), matchPattern.length) : (
+                        isRangeOp(c) ? StringUtils$CourseEditor.substr(matchPattern, 1, Option$CourseEditor.valueOrThrow(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                                          return c === /* "," */44;
+                                        }))) - 1 | 0) : "0"
+                      );
+                  }
+                  catch (exn){
+                    matchPattern$1 = "0";
+                  }
                   var matchPattern$2;
                   switch (value) {
                     case "eq" : 
