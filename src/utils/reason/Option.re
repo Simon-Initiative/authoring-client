@@ -12,6 +12,13 @@ let valueOrCompute = (opt: option('a), fn) => {
   }
 };
 
+let valueOrThrow = (opt: option('a)) => {
+  switch (opt) {
+    | Some(value) => value
+    | None => raise(Not_found)
+  }
+};
+
 let lift = (opt: option('a), fn) => {
   switch (opt) {
     | Some(value) => fn(value)

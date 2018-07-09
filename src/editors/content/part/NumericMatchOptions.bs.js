@@ -219,7 +219,7 @@ function renderConditionSelect(editMode, responseId, matchPattern, onEditMatch) 
                                   })), 0), matchPattern.length) : (
                       isRangeOp(c) ? StringUtils$CourseEditor.substr(matchPattern, 1, Option$CourseEditor.valueOr(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
                                         return c === /* "," */44;
-                                      })), 1)) : matchPattern
+                                      })), 2) - 1 | 0) : matchPattern
                     );
                   var matchPattern$2;
                   switch (value) {
@@ -359,10 +359,103 @@ function renderPrecision(jssClass, editMode, matchPattern, responseId, onEditMat
                 }));
 }
 
-function renderRange(jssClass) {
+function renderRangeInstructions(jssClass) {
+  return React.createElement("div", {
+              className: StyleUtils$CourseEditor.classNames(/* :: */[
+                    Curry._1(jssClass, "optionsRow"),
+                    /* :: */[
+                      Curry._1(jssClass, "rangeInstr"),
+                      /* [] */0
+                    ]
+                  ])
+            }, ReactUtils$CourseEditor.strEl("Range includes lower and upper bounds"), React.createElement("div", {
+                  className: StyleUtils$CourseEditor.classNames(/* :: */[
+                        Curry._1(jssClass, "precisionSpacer"),
+                        /* [] */0
+                      ])
+                }));
+}
+
+function renderRange(jssClass, editMode, matchPattern, responseId, onEditMatch) {
+  var rangeStart;
+  try {
+    rangeStart = StringUtils$CourseEditor.substr(matchPattern, 1, Option$CourseEditor.valueOrThrow(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                    return c === /* "," */44;
+                  }))) - 1 | 0);
+  }
+  catch (exn){
+    if (exn === Caml_builtin_exceptions.not_found) {
+      rangeStart = "0";
+    } else {
+      throw exn;
+    }
+  }
+  var rangeEnd;
+  try {
+    rangeEnd = StringUtils$CourseEditor.substr(matchPattern, Option$CourseEditor.valueOrThrow(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                    return c === /* "," */44;
+                  }))) + 1 | 0, (matchPattern.length - Option$CourseEditor.valueOrThrow(StringUtils$CourseEditor.findIndex(/* None */0, matchPattern, (function (c) {
+                      return c === /* "," */44;
+                    }))) | 0) - 2 | 0);
+  }
+  catch (exn$1){
+    if (exn$1 === Caml_builtin_exceptions.not_found) {
+      rangeEnd = "0";
+    } else {
+      throw exn$1;
+    }
+  }
   return React.createElement("div", {
               className: Curry._1(jssClass, "optionItem")
-            });
+            }, React.createElement("div", {
+                  className: Curry._1(jssClass, "range")
+                }, React.createElement("div", {
+                      className: Curry._1(jssClass, "rangeLabel")
+                    }, ReactUtils$CourseEditor.strEl("from")), React.createElement("input", {
+                      className: StyleUtils$CourseEditor.classNames(/* :: */[
+                            Curry._1(jssClass, "rangeInput"),
+                            /* :: */[
+                              "form-control",
+                              /* :: */[
+                                "input-sm",
+                                /* :: */[
+                                  "form-control-sm",
+                                  /* [] */0
+                                ]
+                              ]
+                            ]
+                          ]),
+                      disabled: !editMode,
+                      type: "number",
+                      value: rangeStart,
+                      onChange: (function ($$event) {
+                          var value = $$event.target.value;
+                          return onEditMatch(responseId, "[" + (value + ("," + (rangeEnd + "]"))));
+                        })
+                    }), React.createElement("div", {
+                      className: Curry._1(jssClass, "rangeLabel")
+                    }, ReactUtils$CourseEditor.strEl("to")), React.createElement("input", {
+                      className: StyleUtils$CourseEditor.classNames(/* :: */[
+                            Curry._1(jssClass, "rangeInput"),
+                            /* :: */[
+                              "form-control",
+                              /* :: */[
+                                "input-sm",
+                                /* :: */[
+                                  "form-control-sm",
+                                  /* [] */0
+                                ]
+                              ]
+                            ]
+                          ]),
+                      disabled: !editMode,
+                      type: "number",
+                      value: rangeEnd,
+                      onChange: (function ($$event) {
+                          var value = $$event.target.value;
+                          return onEditMatch(responseId, "[" + (rangeStart + ("," + (value + "]"))));
+                        })
+                    })));
 }
 
 function renderUnknown(jssClass) {
@@ -409,7 +502,9 @@ function make(classes, className, editMode, responseId, matchPattern, onEditMatc
                                   className: StyleUtils$CourseEditor.jssClass(classes, "condition")
                                 }, renderConditionSelect(editMode, responseId, Option$CourseEditor.valueOr(matchPattern, ""), onEditMatch)), match !== 6 ? (
                                 match >= 7 ? renderUnknown(jssClass) : renderValue(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)
-                              ) : renderRange(jssClass)), match$1 !== 6 && match$1 < 7 ? renderPrecision(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch) : React.createElement("div", undefined));
+                              ) : renderRange(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)), match$1 !== 6 ? (
+                            match$1 >= 7 ? React.createElement("div", undefined) : renderPrecision(jssClass, editMode, Option$CourseEditor.valueOr(matchPattern, ""), responseId, onEditMatch)
+                          ) : renderRangeInstructions(jssClass));
             }),
           /* initialState */component[/* initialState */10],
           /* retainedProps */component[/* retainedProps */11],
@@ -435,6 +530,7 @@ exports.onTogglePrecision = onTogglePrecision;
 exports.renderConditionSelect = renderConditionSelect;
 exports.renderValue = renderValue;
 exports.renderPrecision = renderPrecision;
+exports.renderRangeInstructions = renderRangeInstructions;
 exports.renderRange = renderRange;
 exports.renderUnknown = renderUnknown;
 exports.componentName = componentName;

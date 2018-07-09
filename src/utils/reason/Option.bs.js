@@ -2,6 +2,7 @@
 'use strict';
 
 var Curry = require("bs-platform/lib/js/curry.js");
+var Caml_builtin_exceptions = require("bs-platform/lib/js/caml_builtin_exceptions.js");
 
 function valueOr(opt, $$default) {
   if (opt) {
@@ -19,6 +20,14 @@ function valueOrCompute(opt, fn) {
   }
 }
 
+function valueOrThrow(opt) {
+  if (opt) {
+    return opt[0];
+  } else {
+    throw Caml_builtin_exceptions.not_found;
+  }
+}
+
 function lift(opt, fn) {
   if (opt) {
     return Curry._1(fn, opt[0]);
@@ -29,5 +38,6 @@ function lift(opt, fn) {
 
 exports.valueOr = valueOr;
 exports.valueOrCompute = valueOrCompute;
+exports.valueOrThrow = valueOrThrow;
 exports.lift = lift;
 /* No side effect */

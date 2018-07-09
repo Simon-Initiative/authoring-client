@@ -118,7 +118,7 @@ let renderConditionSelect = (editMode, responseId, matchPattern, onEditMatch) =>
             StringUtils.substr(
               matchPattern,
               1,
-              Option.valueOr(StringUtils.findIndex(matchPattern, c => c === ','), 1)
+              Option.valueOr(StringUtils.findIndex(matchPattern, c => c === ','), 2) - 1
             )
           | _ => matchPattern
         };
@@ -147,7 +147,7 @@ let renderConditionSelect = (editMode, responseId, matchPattern, onEditMatch) =>
 
 let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) => {
 
-  /* seperate matchPattern into value and precision parts */
+  /* separate matchPattern into value and precision parts */
   let hashIndex = StringUtils.findIndex(matchPattern, c => c === '#');
   let valueWithOp = switch (hashIndex) {
     | Some(hashIndex) => StringUtils.substr(matchPattern, 0, hashIndex)
@@ -158,7 +158,7 @@ let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
     | None => ""
   };
 
-  /* seperate operator and value */
+  /* separate operator and value */
   let operator = StringUtils.substr(
     valueWithOp,
     0,
@@ -224,8 +224,53 @@ let renderPrecision = (jssClass, editMode, matchPattern, responseId, onEditMatch
   </div>
 };
 
-let renderRange = (jssClass) => {
+let renderRangeInstructions = (jssClass) => {
+  <div className={classNames([jssClass("optionsRow"), jssClass("rangeInstr")])}>
+    {strEl("Range includes lower and upper bounds")}
+    <div className={classNames([jssClass("precisionSpacer")])} />
+  </div>
+};
+
+let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) => {
+  let rangeStart = try (StringUtils.substr(
+    matchPattern,
+    1,
+    Option.valueOrThrow(StringUtils.findIndex(matchPattern, c => c === ',')) - 1,
+  )) {
+    | Not_found => "0"
+  };
+
+  let rangeEnd = try (StringUtils.substr(
+    matchPattern,
+    Option.valueOrThrow(StringUtils.findIndex(matchPattern, c => c === ',')) + 1,
+    String.length(matchPattern) - Option.valueOrThrow(StringUtils.findIndex(matchPattern, c => c === ',')) - 2,
+  )) {
+    | Not_found => "0"
+  };
+
   <div className={jssClass("optionItem")}>
+    <div className={jssClass("range")}>
+      <div className={jssClass("rangeLabel")}>{strEl("from")}</div>
+      <input
+        _type="number"
+        className={classNames([jssClass("rangeInput"), "form-control", "input-sm", "form-control-sm"])}
+        disabled={Js.Boolean.to_js_boolean(!editMode)}
+        value=rangeStart
+        onChange={event => {
+          let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
+          onEditMatch(. responseId, "[" ++ value ++ "," ++ rangeEnd ++ "]");
+        }} />
+      <div className={jssClass("rangeLabel")}>{strEl("to")}</div>
+      <input
+        _type="number"
+        className={classNames([jssClass("rangeInput"), "form-control", "input-sm", "form-control-sm"])}
+        disabled={Js.Boolean.to_js_boolean(!editMode)}
+        value=rangeEnd
+        onChange={event => {
+          let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
+          onEditMatch(. responseId, "[" ++ rangeStart ++ "," ++ value ++ "]");
+        }} />
+    </div>
   </div>
 };
 
@@ -262,7 +307,7 @@ let make = (
           switch (getConditionFromMatch(Option.valueOr(matchPattern, ""))) {
             | (EQ | NE | GT | LT | GTE | LTE) =>
               renderValue(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)
-            | Range => renderRange(jssClass)
+            | Range => renderRange(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)
             | Unknown => renderUnknown(jssClass)
           };
         }
@@ -271,7 +316,7 @@ let make = (
         switch (getConditionFromMatch(Option.valueOr(matchPattern, ""))) {
           | (EQ | NE | GT | LT | GTE | LTE) =>
             renderPrecision(jssClass, editMode, Option.valueOr(matchPattern, ""), responseId, onEditMatch)
-          | Range => <div />
+          | Range => renderRangeInstructions(jssClass)
           | Unknown => <div />
         };
       }

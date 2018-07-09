@@ -46,4 +46,29 @@ export const styles: JSSStyles = {
   precisionSpacer: {
     flex: 1,
   },
+  range: {
+    display: 'flex',
+    flexDirection: 'row',
+    fontSize: '0.8em',
+
+    '& > *:last-child': {
+      marginRight: 0,
+    },
+  },
+  rangeInput: {
+    flex: 1,
+    marginRight: 10,
+  },
+  rangeLabel: {
+    marginRight: 10,
+    paddingTop: 5,
+  },
+  rangeInstr: {
+    fontSize: '0.8em',
+    marginTop: 5,
+    color: colors.gray,
+  },
+  rangeSpacer: {
+    flex: 1,
+  },
 };
