@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Select } from '../common/controls';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { Select } from 'editors/content/common/controls';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { Maybe } from 'tsmonad';
+import { Maybe } from 'tsmonad/lib/src';
 import * as contentTypes from 'data/contentTypes';
 import { PurposeTypes } from 'data/content/learning/common';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';

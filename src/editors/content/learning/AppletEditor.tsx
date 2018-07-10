@@ -4,17 +4,19 @@ import * as contentTypes from 'data/contentTypes';
 import { ParamContent } from 'data/content/learning/param';
 
 import { Applet as AppletType } from 'data/content/learning/applet';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { PurposeTypes } from 'data/content/learning/common';
-import { Select } from '../common/controls';
-import { Maybe } from 'tsmonad';
+import { Select } from 'editors/content/common/controls';
+import { Maybe } from 'tsmonad/lib/src';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { TextInput } from '../common/TextInput';
+import { TextInput } from 'editors/content/common/TextInput';
 import { ContentElements } from 'data/content/common/elements';
 
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';

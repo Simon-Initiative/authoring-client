@@ -1,8 +1,10 @@
 import * as React from 'react';
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import ContiguousTextEditor from '../learning/contiguoustext/ContiguousTextEditor';
-import { InputLabel } from '../common/InputLabel';
+import * as contentTypes from 'data/contentTypes';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
+import { InputLabel } from 'editors/content/common/InputLabel';
 
 export interface RichTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {

@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
-import { Maybe } from 'tsmonad';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { TextInput } from '../common/controls';
+import { Maybe } from 'tsmonad/lib/src';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { TextInput } from 'editors/content/common/controls';
 
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';

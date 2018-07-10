@@ -2,7 +2,9 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from '../../../utils/guid';
 import { augment } from '../common';
-import { DndLayout } from './dragdrop/dnd_layout';
+import { LegacyTableLayout } from './dragdrop/legacyTable/legacy_table_layout';
+
+export type DndLayout = LegacyTableLayout;
 
 export type CustomParams = {
   id?: string;
@@ -97,7 +99,7 @@ export class Custom extends Immutable.Record(defaultContent) {
 
     if (q['layoutData'] !== undefined) {
       model = model.with({
-        layoutData: Maybe.just(DndLayout.fromPersistence(q['layoutData'], createGuid())) });
+        layoutData: Maybe.just(LegacyTableLayout.fromPersistence(q['layoutData'], createGuid())) });
     }
 
     return model;

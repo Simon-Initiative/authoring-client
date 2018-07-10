@@ -1,19 +1,21 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
+import * as contentTypes from 'data/contentTypes';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import guid from 'utils/guid';
 import { ContentElements } from 'data/content/common/elements';
-import { MultipleChoice } from './MultipleChoice.controller';
-import { Essay } from './Essay';
-import { CheckAllThatApply } from './CheckAllThatApply.controller';
-import { ImageHotspot } from './ImageHotspot.controller';
-import { ShortAnswer } from './ShortAnswer';
-import { Ordering } from './Ordering.controller';
-import { DynaDropInput } from './DynaDropInput.controller';
-import { MultipartInput } from './MultipartInput.controller';
+import { MultipleChoice } from 'editors/content/question/MultipleChoice.controller';
+import { Essay } from 'editors/content/question/Essay';
+import { CheckAllThatApply } from 'editors/content/question/CheckAllThatApply.controller';
+import { ImageHotspot } from 'editors/content/question/ImageHotspot.controller';
+import { ShortAnswer } from 'editors/content/question/ShortAnswer';
+import { Ordering } from 'editors/content/question/Ordering.controller';
+import { DynaDropInput } from 'editors/content/question/DynaDropInput.controller';
+import { MultipartInput } from 'editors/content/question/MultipartInput.controller';
 import { Skill } from 'types/course';
-import { InsertInputRefCommand } from './commands';
+import { InsertInputRefCommand } from 'editors/content/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
 
 import './QuestionEditor.scss';

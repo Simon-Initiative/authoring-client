@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Cite } from '../../../data/content/learning/cite';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { InputLabel } from '../common/InputLabel';
-import { TextInput } from '../common/TextInput';
+import { Cite } from 'data/content/learning/cite';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { InputLabel } from 'editors/content/common/InputLabel';
+import { TextInput } from 'editors/content/common/TextInput';
 
 export interface CiteEditorProps extends AbstractContentEditorProps<Cite> {
 

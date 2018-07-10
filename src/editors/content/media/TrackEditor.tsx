@@ -1,12 +1,13 @@
 import * as React from 'react';
-import * as persistence from '../../../data/persistence';
-
-import { Track } from '../../../data/content/learning/track';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
-import { extractFileName, adjustPath } from './utils';
-import { TextInput } from '../common/TextInput';
-import { Button } from '../common/Button';
+import * as persistence from 'data/persistence';
+import { Track } from 'data/content/learning/track';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import guid from 'utils/guid';
+import { extractFileName, adjustPath } from 'editors/content/media/utils';
+import { TextInput } from 'editors/content/common/TextInput';
+import { Button } from 'editors/content/common/Button';
 
 export interface TrackEditorProps extends AbstractContentEditorProps<Track> {
   onRemove: (guid: string) => void;

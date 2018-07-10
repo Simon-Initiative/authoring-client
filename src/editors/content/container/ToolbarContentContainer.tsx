@@ -1,16 +1,18 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
-import { ContentContainer, ContentContainerProps } from './ContentContainer';
+import {
+  ContentContainer, ContentContainerProps,
+} from 'editors/content/container/ContentContainer';
 import { injectSheet, classNames } from 'styles/jss';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarDropdown } from 'components/toolbar/ToolbarDropdown';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { InlineStyles } from 'data/content/learning/contiguous';
-import { Maybe } from 'tsmonad';
+import { Maybe } from 'tsmonad/lib/src';
 import { TextSelection } from 'types/active';
 
-import { styles } from './ToolbarContentContainer.styles';
+import { styles } from 'editors/content/container/ToolbarContentContainer.styles';
 
 export interface ToolbarContentContainerProps extends ContentContainerProps {
   className?: string;

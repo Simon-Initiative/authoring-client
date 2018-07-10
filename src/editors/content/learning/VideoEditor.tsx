@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { OrderedMap } from 'immutable';
 import { Video } from 'data/content/learning/video';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { adjustPath } from 'editors/content/media/utils';

@@ -4,19 +4,19 @@ import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer } from 'types/active.ts';
-import { getEditorByContentType } from 'editors/content/container/registry.ts';
-import { Maybe } from 'tsmonad';
+import { ParentContainer } from 'types/active';
+import { getEditorByContentType } from 'editors/content/container/registry';
+import { Maybe } from 'tsmonad/lib/src';
 import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
-import { InsertToolbar } from './InsertToolbar';
-import { ItemToolbar } from './ItemToolbar.controller';
-import { ActionsToolbar } from './ActionsToolbar.controller';
+import { InsertToolbar } from 'components/toolbar/InsertToolbar';
+import { ItemToolbar } from 'components/toolbar/ItemToolbar.controller';
+import { ActionsToolbar } from 'components/toolbar/ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
 import { ContentModel, ModelTypes } from 'data/models';
-
-
-import { styles, TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.styles';
+import {
+  styles, TOOLBAR_HIDE_ANIMATION_DURATION_MS,
+} from 'components/toolbar/ContextAwareToolbar.styles';
 
 interface ToolbarGroupProps {
   className?: string;

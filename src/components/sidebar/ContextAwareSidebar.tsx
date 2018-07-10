@@ -2,26 +2,27 @@ import * as React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Maybe } from 'tsmonad';
+import { Maybe } from 'tsmonad/lib/src';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames, JSSProps } from 'styles/jss';
 import {
   RenderContext, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer } from 'types/active.ts';
-import { getEditorByContentType } from 'editors/content/container/registry.ts';
+import { ParentContainer } from 'types/active';
+import { getEditorByContentType } from 'editors/content/container/registry';
 import { Resource } from 'data/content/resource';
 import {
   ModelTypes, ContentModel, AssessmentModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
-import { PageSelection } from 'editors/document/assessment/PageSelection.tsx';
+import { PageSelection } from 'editors/document/assessment/PageSelection';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
-
-import { styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.styles';
+import {
+  styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS,
+} from 'components/sidebar/ContextAwareSidebar.styles';
 import { relativeToNow, adjustForSkew } from 'utils/date';
 import { Tooltip } from 'utils/tooltip';
 

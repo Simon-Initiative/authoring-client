@@ -3,17 +3,19 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { ParamContent } from 'data/content/learning/param';
 import { Flash as FlashType } from 'data/content/learning/flash';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { modalActions } from 'actions/modal';
-import { selectFile } from './file';
+import { selectFile } from 'editors/content/learning/file';
 import { PurposeTypes } from 'data/content/learning/common';
-import { Select } from '../common/controls';
-import { Maybe } from 'tsmonad';
+import { Select } from 'editors/content/common/controls';
+import { Maybe } from 'tsmonad/lib/src';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
