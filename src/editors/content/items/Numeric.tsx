@@ -49,6 +49,7 @@ export class Numeric
     const response = new contentTypes.Response({
       score: '0',
       match: '',
+      input: this.props.itemModel.id,
       feedback: feedbacks.set(feedback.guid, feedback),
     });
 
