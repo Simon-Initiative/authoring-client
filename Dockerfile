@@ -2,6 +2,7 @@ FROM node:carbon
 
 # Install global dependencies that we need
 RUN npm install -g yarn jest
+RUN chmod +x /usr/local/lib/node_modules/yarn/bin/yarn.js
 
 EXPOSE 9000
 
