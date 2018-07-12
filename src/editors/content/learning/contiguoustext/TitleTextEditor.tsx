@@ -3,12 +3,12 @@ import { StyledComponentProps } from 'types/component';
 import { injectSheetSFC, classNames } from 'styles/jss';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import ContiguousTextEditor from './ContiguousTextEditor';
+import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import { ParentContainer, TextSelection } from 'types/active';
 
-import { styles } from './TitleTextEditor.styles';
+import { styles } from 'editors/content/learning/contiguoustext/TitleTextEditor.styles';
 
 export interface TitleTextEditorProps {
   editorStyles?: any;

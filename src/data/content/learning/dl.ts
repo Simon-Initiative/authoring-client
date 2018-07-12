@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Title } from './title';
-import { Dt } from './dt';
-import { Dd } from './dd';
-import { augment, getChildren } from '../common';
-import { getKey } from './common';
+import { Title } from 'data/content/learning/title';
+import { Dt } from 'data/content/learning/dt';
+import { Dd } from 'data/content/learning/dd';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/content/learning/common';
 import createGuid from 'utils/guid';
 
 export type TermOrDefinition = Dt | Dd;

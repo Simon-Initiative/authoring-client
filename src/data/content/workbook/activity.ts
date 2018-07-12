@@ -1,9 +1,9 @@
 import * as Immutable from 'immutable';
 
-import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
-import { Image } from '../learning/image';
+import createGuid from 'utils/guid';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
+import { Image } from 'data/content/learning/image';
 import { Maybe } from 'tsmonad';
 
 export type ActivityParams = {

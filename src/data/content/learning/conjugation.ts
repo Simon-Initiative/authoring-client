@@ -1,11 +1,11 @@
 import * as Immutable from 'immutable';
 
-import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
-import { Cr, ConjugationCell } from './cr';
-import { CellHeader } from './cellheader';
-import { getKey } from '../../common';
-import { Title } from '../learning/title';
+import createGuid from 'utils/guid';
+import { augment, getChildren } from 'data/content/common';
+import { Cr, ConjugationCell } from 'data/content/learning/cr';
+import { CellHeader } from 'data/content/learning/cellheader';
+import { getKey } from 'data/common';
+import { Title } from 'data/content/learning/title';
 import { Pronunciation, ContiguousText } from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 

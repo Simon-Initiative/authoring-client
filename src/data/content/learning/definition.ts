@@ -1,11 +1,11 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Title } from './title';
-import { Pronunciation } from './pronunciation';
-import { Translation } from './translation';
-import { Meaning } from './meaning';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
+import { Title } from 'data/content/learning/title';
+import { Pronunciation } from 'data/content/learning/pronunciation';
+import { Translation } from 'data/content/learning/translation';
+import { Meaning } from 'data/content/learning/meaning';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 
 export type DefinitionParams = {

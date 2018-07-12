@@ -3,7 +3,7 @@
 
 import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
-import { WorkbookPageModel } from 'data/models//workbook';
+import { WorkbookPageModel } from 'data/models/workbook';
 
 import { registerContentTypes } from 'data/registrar';
 import { ContiguousText } from 'data/content/learning/contiguous';

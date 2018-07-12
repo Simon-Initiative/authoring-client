@@ -19,7 +19,7 @@ import {
   DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
-import { styles } from './Definition.styles';
+import { styles } from 'editors/content/learning/Definition.styles';
 
 export interface ExtraDefinitionEditorProps
   extends AbstractContentEditorProps<contentTypes.Extra> {

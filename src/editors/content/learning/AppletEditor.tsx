@@ -13,7 +13,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { PurposeTypes } from 'data/content/learning/common';
 import { Select } from 'editors/content/common/controls';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { TextInput } from 'editors/content/common/TextInput';

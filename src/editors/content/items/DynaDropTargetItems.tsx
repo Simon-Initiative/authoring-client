@@ -9,7 +9,7 @@ import {
 } from 'editors/content/common/TabContainer';
 import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { Initiator } from 'data/content/assessment/dragdrop/initiator';
+import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import {
   choiceAssessmentIdSort, responseAssessmentIdSort,
 } from 'editors/content/learning/dynadragdrop/utils';

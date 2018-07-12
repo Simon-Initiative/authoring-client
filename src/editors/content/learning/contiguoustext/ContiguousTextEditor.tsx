@@ -8,7 +8,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { TextSelection, Trigger } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';

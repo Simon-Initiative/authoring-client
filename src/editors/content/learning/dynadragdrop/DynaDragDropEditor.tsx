@@ -9,8 +9,8 @@ import {
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { TG_ROW } from 'data/content/assessment/dragdrop/target_group';
-import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
+// import { TG_ROW } from 'data/content/assessment/dragdrop/target_group';
+import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { Initiator } from './Initiator';
 import { DynaDropLabel } from './DynaDropLabel';
 import { DynaDropTarget } from './DynaDropTarget.controller';
@@ -19,11 +19,11 @@ import { Page, Question, Part, Choice, Response,
   FillInTheBlank } from 'data/contentTypes';
 import { AssessmentModel } from 'data/models';
 import guid from 'utils/guid';
-import { Target } from 'data/content/assessment/dragdrop/target';
+// import { Target } from 'data/content/assessment/dragdrop/target';
 import { Maybe } from 'tsmonad';
-import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
-import { DndText } from 'data/content/assessment/dragdrop/dnd_text';
-import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
+// import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
+// import { DndText } from 'data/content/assessment/dragdrop/dnd_text';
+// import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { Feedback } from 'data/content/assessment/feedback';
 import {
@@ -31,8 +31,14 @@ import {
   getTargetsFromLayout, buildTargetLabelsMap, buildTargetInitiatorsMap,
 } from 'editors/content/learning/dynadragdrop/utils';
 import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
+import { HTMLTableEditor } from './HTMLTableEditor';
 
 import { styles } from './DynaDragDropEditor.styles';
+import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
+import { LegacyLayout } from 'data/content/assessment/dragdrop/legacyLayout/legacy_layout';
+import {
+  TableTargetArea,
+} from 'data/content/assessment/dragdrop/htmlLayout/table/table_targetarea';
 
 export interface DynaDragDropEditorProps extends AbstractContentEditorProps<Custom> {
   documentId: string;
@@ -40,7 +46,6 @@ export interface DynaDragDropEditorProps extends AbstractContentEditorProps<Cust
   currentPage: Page;
   currentNode: Question;
   selectedInitiator: string;
-  onShowSidebar: () => void;
   onSaveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => void;
   onSelectInitiator: (id: string) => void;
 }
@@ -65,10 +70,10 @@ export class DynaDragDropEditor
     this.onTargetDrop = this.onTargetDrop.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.onEditLayoutData = this.onEditLayoutData.bind(this);
-    this.onAddColumn = this.onAddColumn.bind(this);
-    this.onAddRow = this.onAddRow.bind(this);
-    this.editColText = this.editColText.bind(this);
-    this.toggleCellType = this.toggleCellType.bind(this);
+    // this.onAddColumn = this.onAddColumn.bind(this);
+    // this.onAddRow = this.onAddRow.bind(this);
+    // this.editColText = this.editColText.bind(this);
+    // this.toggleCellType = this.toggleCellType.bind(this);
   }
 
   shouldComponentUpdate(nextProps: DynaDragDropEditorProps, nextState) {
@@ -84,16 +89,16 @@ export class DynaDragDropEditor
       || this.props.selectedInitiator !== nextProps.selectedInitiator;
   }
 
-  componentDidMount() {
-    const { model, onSelectInitiator } = this.props;
+  // componentDidMount() {
+  //   const { model, onSelectInitiator } = this.props;
 
-    const initiators = model.layoutData.caseOf({
-      just: ld => ld.initiatorGroup.initiators,
-      nothing: () => Immutable.List<InitiatorModel>(),
-    });
+  //   const initiators = model.layoutData.caseOf({
+  //     just: ld => ld.initiatorGroup.initiators,
+  //     nothing: () => Immutable.List<InitiatorModel>(),
+  //   });
 
-    onSelectInitiator(initiators.first() && initiators.first().assessmentId);
-  }
+  //   onSelectInitiator(initiators.first() && initiators.first().assessmentId);
+  // }
 
   renderSidebar(): JSX.Element {
     return (
@@ -138,7 +143,7 @@ export class DynaDragDropEditor
 
     const newInitiator = new InitiatorModel().with({
       text: 'New Choice',
-      assessmentId: guid(),
+      inputVal: guid(),
     });
 
     let targetAssessmentIds = [];
@@ -148,7 +153,7 @@ export class DynaDragDropEditor
     }
 
     const newItem = new FillInTheBlank().with({
-      id: newInitiator.assessmentId,
+      id: newInitiator.inputVal,
       choices: Immutable.OrderedMap<string, Choice>([
         ...targetAssessmentIds.map((t) => {
           const choice = new Choice().with({
@@ -164,7 +169,7 @@ export class DynaDragDropEditor
       responses: Immutable.OrderedMap<string, Response>([
         ...targetAssessmentIds.map((t) => {
           const response = new Response().with({
-            input: newInitiator.assessmentId,
+            input: newInitiator.inputVal,
             match: t,
             feedback: Immutable.OrderedMap<string, Feedback>().withMutations((fb) => {
               const newFeedback = new Feedback();
@@ -178,12 +183,10 @@ export class DynaDragDropEditor
 
     const newModel = model.with({
       layoutData: model.layoutData.caseOf({
-        just: ld => Maybe.just<DndLayout>(ld.with({
-          initiatorGroup: ld.initiatorGroup.with({
-            initiators: ld.initiatorGroup.initiators.push(newInitiator),
-          }),
+        just: ld => Maybe.just<HTMLLayout>(ld.with({
+          initiators: ld.initiators.push(newInitiator),
         })),
-        nothing: () => Maybe.nothing<DndLayout>(),
+        nothing: () => Maybe.nothing<HTMLLayout>(),
       }),
     });
 
@@ -202,7 +205,7 @@ export class DynaDragDropEditor
     const question = currentNode;
 
     const initiators = model.layoutData.caseOf({
-      just: ld => ld.initiatorGroup.initiators,
+      just: ld => (ld as HTMLLayout).initiators,
       nothing: () => Immutable.List<InitiatorModel>(),
     });
 
@@ -216,27 +219,24 @@ export class DynaDragDropEditor
 
     const updatedModel = model.with({
       layoutData: model.layoutData.caseOf({
-        just: ld => Maybe.just<DndLayout>(ld.with({
-          initiatorGroup: ld.initiatorGroup.with({
-            initiators: ld.initiatorGroup.initiators
-              .filter(i =>
-                i.assessmentId !== initiator.assessmentId) as Immutable.List<InitiatorModel>,
-          }),
+        just: ld => Maybe.just<HTMLLayout>(ld.with({
+          initiators: ld.initiators
+            .filter(i => i.inputVal !== initiator.inputVal) as Immutable.List<InitiatorModel>,
         })),
-        nothing: () => Maybe.nothing<DndLayout>(),
+        nothing: () => Maybe.nothing<HTMLLayout>(),
       }),
     });
 
     const itemKey = question.items.findKey(item =>
-      (item as FillInTheBlank).id === initiator.assessmentId);
+      (item as FillInTheBlank).id === initiator.inputVal);
     const partKey = question.parts.findKey(part =>
       part.responses.first() &&
-      part.responses.first().input === initiator.assessmentId);
+      part.responses.first().input === initiator.inputVal);
 
     // select the first initiator in the new model
-    updatedModel.layoutData.lift(ld =>
-      onSelectInitiator(ld.initiatorGroup.initiators.first()
-        && ld.initiatorGroup.initiators.first().assessmentId),
+    updatedModel.layoutData.lift((ld: HTMLLayout) =>
+      onSelectInitiator(ld.initiators.first()
+        && ld.initiators.first().inputVal),
     );
 
     // save question updates
@@ -268,12 +268,12 @@ export class DynaDragDropEditor
     }));
   }
 
-  onEditLayoutData(updatedLayoutData: DndLayout) {
+  onEditLayoutData(updatedLayoutData: HTMLLayout) {
     const { model, currentNode } = this.props;
     const question = currentNode;
 
     const updatedModel = model.with({
-      layoutData: Maybe.just<DndLayout>(updatedLayoutData),
+      layoutData: Maybe.just<HTMLLayout>(updatedLayoutData),
     });
 
     // save question updates
@@ -284,406 +284,46 @@ export class DynaDragDropEditor
     }));
   }
 
-  onAddColumn(index: number) {
-    const { model } = this.props;
-
-    model.layoutData.lift((ld) => {
-      const updatedLayoutData = ld.with({
-        targetGroup: ld.targetGroup.with({
-          rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
-            // HeaderRow
-            ? (r.with({ cols: r.cols.splice(index, 0, new DndText()) as Immutable.List<DndText> }))
-            // ContentRow
-            : (r.with({ cols: r.cols.splice(index, 0, new DndText()) as Immutable.List<DndText> })),
-          ) as Immutable.List<TG_ROW>,
-        }),
-      });
-
-      this.onEditLayoutData(updatedLayoutData);
-    });
-  }
-
-  onRemoveColumn(index: number) {
-    const { model, currentNode } = this.props;
-    const question = currentNode;
-
-    model.layoutData.lift((ld) => {
-      const updatedLayoutData = ld.with({
-        targetGroup: ld.targetGroup.with({
-          rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
-            // HeaderRow
-            ? (r.with({ cols: r.cols.splice(index, 1) as Immutable.List<DndText> }))
-            // ContentRow
-            : (r.with({ cols: r.cols.splice(index, 1) as Immutable.List<DndText> })),
-          ) as Immutable.List<TG_ROW>,
-        }),
-      });
-
-      const updatedModel = model.with({
-        layoutData: Maybe.just<DndLayout>(updatedLayoutData),
-      });
-
-      // removed column might contain targets, update item and parts accordingly
-      const { items, parts } = updateItemPartsFromTargets(
-        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
-        question.parts,
-        getTargetsFromLayout(updatedLayoutData),
-      );
-
-      // save question updates
-      this.onEditQuestion(question.with({
-        body: question.body.with({
-          content: question.body.content.set(updatedModel.guid, updatedModel),
-        }),
-        items,
-        parts,
-      }));
-    });
-  }
-
-  onAddRow(index: number) {
-    const { model, currentNode } = this.props;
-    const question = currentNode;
-
-    model.layoutData.lift((ld) => {
-      const updatedLayoutData = ld.with({
-        targetGroup: ld.targetGroup.with({
-          rows: ld.targetGroup.rows.splice(index, 0, new ContentRow().with({
-            // use the last row as a template for the new row cols (DndText or Target)
-            cols: Immutable.List<DndText | Target>(
-              ld.targetGroup.rows.last()
-              ? ld.targetGroup.rows.last().cols.toArray().map(c =>
-                  c.contentType === 'DndText'
-                  ? (new DndText())
-                  : (new Target({ assessmentId: guid() })),
-                )
-              : [],
-            ),
-          })) as Immutable.List<TG_ROW>,
-        }),
-      });
-
-      const updatedModel = model.with({
-        layoutData: Maybe.just<DndLayout>(updatedLayoutData),
-      });
-
-      // new row might contain targets, update item and parts accordingly
-      const { items, parts } = updateItemPartsFromTargets(
-        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
-        question.parts,
-        getTargetsFromLayout(updatedLayoutData),
-      );
-
-      // save question updates
-      this.onEditQuestion(question.with({
-        body: question.body.with({
-          content: question.body.content.set(updatedModel.guid, updatedModel),
-        }),
-        items,
-        parts,
-      }));
-    });
-  }
-
-  onRemoveRow(index: number) {
-    const { model, currentNode } = this.props;
-    const question = currentNode;
-
-    model.layoutData.lift((ld) => {
-      const updatedLayoutData = ld.with({
-        targetGroup: ld.targetGroup.with({
-          rows: ld.targetGroup.rows.splice(index, 1) as Immutable.List<TG_ROW>,
-        }),
-      });
-
-      const updatedModel = model.with({
-        layoutData: Maybe.just<DndLayout>(updatedLayoutData),
-      });
-
-      // removed row might contain targets, update item and parts accordingly
-      const { items, parts } = updateItemPartsFromTargets(
-        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
-        question.parts,
-        getTargetsFromLayout(updatedLayoutData),
-      );
-
-      // save question updates
-      this.onEditQuestion(question.with({
-        body: question.body.with({
-          content: question.body.content.set(updatedModel.guid, updatedModel),
-        }),
-        items,
-        parts,
-      }));
-    });
-  }
-
-  editColText(text: string, currentCol: DndText) {
-    const { model } = this.props;
-
-    model.layoutData.lift((ld) => {
-      const updatedLayoutData = ld.with({
-        targetGroup: ld.targetGroup.with({
-          rows: ld.targetGroup.rows.map(row => row.contentType === 'HeaderRow'
-            // HeaderRow
-            ? row.with({
-              cols: row.cols.map(col => col.guid === currentCol.guid
-                ? col.with({
-                  text,
-                })
-                : col,
-              ) as Immutable.List<DndText>,
-            })
-            // ContentRow
-            : row.with({
-              cols: row.cols.map(col => col.guid === currentCol.guid
-                && col.contentType === 'DndText'
-                ? col.with({
-                  text,
-                })
-                : col,
-              ) as Immutable.List<DndText>,
-            }),
-          ) as Immutable.List<TG_ROW>,
-        }),
-      });
-
-      this.onEditLayoutData(updatedLayoutData);
-    });
-  }
-
-  toggleCellType(cellGuid: string) {
-    const { model, currentNode } = this.props;
-    const question = currentNode;
-
-    model.layoutData.lift((ld) => {
-      const updatedLayoutData = ld.with({
-        targetGroup: ld.targetGroup.with({
-          rows: ld.targetGroup.rows.map(row => row.contentType === 'HeaderRow'
-            // HeaderRow
-            ? row
-            // ContentRow
-            : row.with({
-              cols: row.cols.map(col =>
-                // check if this cell is the toggle cell
-                col.guid === cellGuid
-                ? (
-                  // if cell is a label, return a new target
-                  col.contentType === 'DndText'
-                  ? (
-                    new Target().with({
-                      guid: guid(),
-                      assessmentId: guid(),
-                    })
-                  )
-                  // otherwise it is a target, return a new label
-                  : (
-                    new DndText().with({
-                      guid: guid(),
-                    })
-                  )
-                )
-                : (
-                  col
-                ),
-              ) as Immutable.List<DndText>,
-            }),
-          ) as Immutable.List<TG_ROW>,
-        }),
-      });
-
-      const updatedModel = model.with({
-        layoutData: Maybe.just<DndLayout>(updatedLayoutData),
-      });
-
-      // target changed, update item and parts accordingly
-      const { items, parts } = updateItemPartsFromTargets(
-        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
-        question.parts,
-        getTargetsFromLayout(updatedLayoutData),
-      );
-
-      // save question updates
-      this.onEditQuestion(question.with({
-        body: question.body.with({
-          content: question.body.content.set(updatedModel.guid, updatedModel),
-        }),
-        items,
-        parts,
-      }));
-    });
-  }
-
-  renderDropdown(
-    index: number, onInsert: (index: number) => void,
-    onRemove: (index: number) => void,
-    term: string, showOnRight: boolean) {
-
-    const { classes, className, editMode } = this.props;
-    return (
-      <div className={classNames([classes.dropdown,
-        showOnRight && classes.showOnRight, className])}>
-        <ToolbarDropdown
-          size={ToolbarDropdownSize.Tiny}
-          hideArrow
-          positionMenuOnRight={showOnRight}
-          label={<i className={classNames(['fa fa-ellipsis-v', classes.dropdownLabel,
-            classes.moreLabel])}/>} >
-          <button className="dropdown-item"
-            disabled={!editMode}
-            onClick={() => onInsert(index) }>
-            {`Insert ${term} before`}
-          </button>
-          <button className="dropdown-item"
-            disabled={!editMode}
-            onClick={() => onInsert(index + 1) }>
-            {`Insert ${term} after`}
-          </button>
-          <button className="dropdown-item"
-            disabled={!editMode}
-            onClick={() => onRemove(index) }>
-            {`Remove ${term}`}
-          </button>
-        </ToolbarDropdown>
-      </div>
-    );
-  }
-
   renderMain() : JSX.Element {
     const { classes, model, editMode, currentNode, selectedInitiator } = this.props;
     const question = currentNode;
 
-    const rows = model.layoutData.caseOf({
-      just: ld => ld.targetGroup.rows,
-      nothing: () => Immutable.List<TG_ROW>(),
-    });
+    return model.layoutData.lift((layout) => {
+      const targetArea = (layout as HTMLLayout).targetArea.caseOf({
+        just: targetArea => targetArea,
+        nothing: () => ({ contentType: 'UNKNOWN' }),
+      });
 
-    const initiators = model.layoutData.caseOf({
-      just: ld => ld.initiatorGroup.initiators,
-      nothing: () => Immutable.List<InitiatorModel>(),
-    });
-
-    // build a map of targets to initiators
-    const targetInitiators = buildTargetInitiatorsMap(question, initiators);
-
-    // build map of target ids to labels using the selected initiator
-    const targetLabels = buildTargetLabelsMap(question, selectedInitiator);
-
-    const renderTableRow = (row, index) => {
-      const isHeader = row.contentType === 'HeaderRow';
-      const TCell = isHeader ? 'th' : 'td';
-
-      return (
-        <tr key={row.guid}>
-          <TCell>
-            {this.renderDropdown(
-              index,
-              index => this.onAddRow(index),
-              index => this.onRemoveRow(index),
-              'row',
-              false,
-            )}
-          </TCell>
-          {row.cols.toArray().map(col => col.contentType === 'Target'
-          ? (
-            <DynaDropTarget
-              key={col.guid}
-              id={col.guid}
-              className={classNames([classes.cell, classes.targetCell])}
-              isHeader={isHeader}
-              assessmentId={col.assessmentId}
-              selectedInitiator={selectedInitiator}
-              canToggleType={question.parts.first().responses.size > 1}
-              onToggleType={this.toggleCellType}
-              editMode={editMode}
-              onDrop={this.onTargetDrop}
-              onRemoveInitiator={this.unassignInitiator}
-              label={`Target ${targetLabels[col.assessmentId]}`}
-              initiators={targetInitiators[col.assessmentId]} />
-          )
-          : (
-            <DynaDropLabel
-              key={col.guid}
-              id={col.guid}
-              className={classNames([classes.cell, isHeader && classes.cellHeader])}
-              style={{
-                fontWeight: col.fontWeight as any,
-                fontSize: col.fontWeight,
-                fontStyle: col.fontStyle as any,
-                textDecoration: col.textDecoration,
-              }}
-              canToggleType={true}
-              onToggleType={this.toggleCellType}
-              isHeader={isHeader}
-              editMode={editMode}
-              text={col.text}
-              onEdit={value => this.editColText(value, col)} />
-          ))}
-        </tr>
-      );
-    };
-
-    return (
-      <div className={classes.dynaDropTable}>
-        <p className={classes.instructions}>
-          Each cell can either be a label or a drop target. Hover over a cell and click
-          the toggle icon <i className="fa fa-crosshairs" /> to set/unset as a drop target.
-        </p>
-        <table>
-          <thead>
-            {/* Render column options menu */}
-            <tr>
-              <th/>
-              {rows.first() && rows.first().cols.toArray().map((val, index) => (
-                <th key={val.guid}>
-                {this.renderDropdown(
-                  index,
-                  index => this.onAddColumn(index),
-                  index => this.onRemoveColumn(index),
-                  'column',
-                  true,
-                )}
-                </th>
-              ))}
-            </tr>
-            {rows.filter(row => row.contentType === 'HeaderRow').toArray().map(renderTableRow)}
-          </thead>
-          <tbody>
-            {rows.filter(row => row.contentType === 'ContentRow').toArray().map(renderTableRow)}
-          </tbody>
-        </table>
-        <div>
-          <Button type="link" editMode={editMode}
-            onClick={() => this.onAddRow(rows.size)} >
-            <i className="fa fa-plus" /> Add a Row
-          </Button>
-          <Button type="link" editMode={editMode}
-            onClick={() => this.onAddColumn(rows.first() && rows.first().cols.size)} >
-            <i className="fa fa-plus" /> Add a Column
-          </Button>
-        </div>
-        <p className={classes.instructions}>
-          Select each choice below and provide feedback (both correct and incorrect)
-          for each target. Drag a choice to a drop target to assign it as a correct match.
-        </p>
-        <div className={classes.initiators}>
-          {initiators.map(initiator => (
-            <Initiator
-              key={initiator.guid}
-              model={initiator} editMode={editMode}
-              selected={initiator.assessmentId === selectedInitiator}
-              onSelect={this.selectInitiator}
-              canDelete={initiators.size > 1}
-              onDelete={this.deleteInitiator} />
-          ))}
-        </div>
-        <div>
-          <Button type="link" editMode={editMode}
-            onClick={this.addInitiator} >
-            <i className="fa fa-plus" /> Add a Choice
-          </Button>
-        </div>
-      </div>
+      switch (targetArea.contentType) {
+        case 'TableTargetArea':
+          return <HTMLTableEditor
+                    table={targetArea as TableTargetArea}
+                    initiators={layout.initiators}
+                    question={question}
+                    selectedInitiator={selectedInitiator}
+                    editMode={editMode}
+                    onEditTable={table => this.onEditLayoutData(layout.with({
+                      targetArea: Maybe.just(table),
+                    }))}
+                    onSelectInitiator={this.selectInitiator}
+                    onTargetDrop={this.onTargetDrop}
+                    onAddInitiator={this.addInitiator}
+                    onDeleteInitiator={this.deleteInitiator}
+                    onAssignInitiator={this.assignInitiator}
+                    onUnassignInitiator={this.unassignInitiator} />;
+        case 'UnsupportedTargetArea':
+        default:
+          return (
+            <div className="alert alert-warning" role="alert">
+              This drag and drop layout type is not supported.
+            </div>
+          );
+      }
+    })
+    .valueOr(
+      <div className="alert alert-danger" role="alert">
+        Could not load Drag and Drop layout. Please check the original XML.
+      </div>,
     );
   }
 }

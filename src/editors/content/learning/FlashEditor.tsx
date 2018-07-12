@@ -15,7 +15,7 @@ import { modalActions } from 'actions/modal';
 import { selectFile } from 'editors/content/learning/file';
 import { PurposeTypes } from 'data/content/learning/common';
 import { Select } from 'editors/content/common/controls';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';

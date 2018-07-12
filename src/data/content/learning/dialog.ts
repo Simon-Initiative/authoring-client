@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Title } from './title';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
+import { Title } from 'data/content/learning/title';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { IFrame } from 'data/content/learning/iframe';
 import { YouTube } from 'data/content/learning/youtube';

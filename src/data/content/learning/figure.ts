@@ -1,13 +1,13 @@
 import * as Immutable from 'immutable';
 
-import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
-import { getKey } from '../../common';
-import { Title } from '../learning/title';
+import createGuid from 'utils/guid';
+import { augment, getChildren, except } from 'data/content/common';
+import { getKey } from 'data/common';
+import { Title } from 'data/content/learning/title';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
-import { Caption } from './caption';
-import { Cite } from './cite';
+import { Caption } from 'data/content/learning/caption';
+import { Cite } from 'data/content/learning/cite';
 import { ContiguousText } from 'data/contentTypes';
 
 export type FigureParams = {

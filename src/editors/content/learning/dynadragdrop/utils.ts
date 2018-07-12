@@ -1,13 +1,14 @@
 import * as Immutable from 'immutable';
 import { Custom } from 'data/content/assessment/custom';
 import { convert } from 'utils/format';
-import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
+import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { Question, Part, Choice, Response,
   FillInTheBlank } from 'data/contentTypes';
-import { Target } from 'data/content/assessment/dragdrop/target';
-import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
+// import { Target } from 'data/content/assessment/dragdrop/target';
+// import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { Feedback } from 'data/content/assessment/feedback';
+import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
 
 export const choiceAssessmentIdSort = (a: Choice, b: Choice) =>
   a.value.localeCompare(b.value);
@@ -15,7 +16,8 @@ export const choiceAssessmentIdSort = (a: Choice, b: Choice) =>
 export const responseAssessmentIdSort = (a: Response, b: Response) =>
   a.match.localeCompare(b.match);
 
-export const targetAssessmentIdSort = (a: Target, b: Target) =>
+// export const targetAssessmentIdSort = (a: Target, b: Target) =>
+export const targetAssessmentIdSort = (a, b) =>
   a.assessmentId.localeCompare(b.assessmentId);
 
 export const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => {
@@ -40,9 +42,9 @@ export const buildInitiatorPartMap =
   (question: Question, initiators: Immutable.List<InitiatorModel>) => {
     return initiators.reduce(
       (acc, val) =>
-        acc.set(val.assessmentId, question.parts.find(part =>
+        acc.set(val.inputVal, question.parts.find(part =>
           part.responses.first() &&
-          part.responses.first().input === val.assessmentId,
+          part.responses.first().input === val.inputVal,
         )),
       Immutable.Map<string, Part>(),
     );
@@ -56,7 +58,7 @@ export const buildTargetInitiatorsMap =
       (acc, initiator) => {
         return {
           ...acc,
-          [initiator.assessmentId]: initiator,
+          [initiator.inputVal]: initiator,
         };
       },
       {},
@@ -88,7 +90,7 @@ export const setQuestionPartWithInitiatorScore = (
   model: Custom, question: Question) => {
 
   const initiators = model.layoutData.caseOf({
-    just: ld => ld.initiatorGroup.initiators,
+    just: ld => (ld as HTMLLayout).initiators,
     nothing: () => Immutable.List<InitiatorModel>(),
   });
 
@@ -97,13 +99,13 @@ export const setQuestionPartWithInitiatorScore = (
 
   const initiatorParts = buildInitiatorPartMap(question, initiators);
 
-  const updatedResponse = initiatorParts.get(initiator.assessmentId).responses.find(response =>
+  const updatedResponse = initiatorParts.get(initiator.inputVal).responses.find(response =>
     response.match === targetAssessmentId)
     .with({
       score: `${score}`,
     });
 
-  const updatedPart = initiatorParts.get(initiator.assessmentId).withMutations((part: Part) =>
+  const updatedPart = initiatorParts.get(initiator.inputVal).withMutations((part: Part) =>
     part.with({
       responses: part.responses.set(updatedResponse.guid, updatedResponse),
     }),
@@ -114,21 +116,23 @@ export const setQuestionPartWithInitiatorScore = (
   });
 };
 
-export const getTargetsFromLayout = (dndLayout: DndLayout) => {
-  return dndLayout.targetGroup.rows.reduce(
-    (accRows, row) =>
-      accRows.concat(row.cols.toArray().reduce(
-        (accCols, col) => col.contentType === 'Target' ? accCols.push(col) : accCols,
-        Immutable.List<Target>(),
-      )) as Immutable.List<Target>,
-    Immutable.List<Target>(),
-  );
+export const getTargetsFromLayout = (dndLayout: HTMLLayout) => {
+  // return dndLayout.targetGroup.rows.reduce(
+  //   (accRows, row) =>
+  //     accRows.concat(row.cols.toArray().reduce(
+  //       (accCols, col) => col.contentType === 'Target' ? accCols.push(col) : accCols,
+  //       Immutable.List<Target>(),
+  //     )) as Immutable.List<Target>,
+  //   Immutable.List<Target>(),
+  // );
+  return Immutable.List();
 };
 
 export const updateItemPartsFromTargets = (
   items: Immutable.OrderedMap<string, FillInTheBlank>,
   parts: Immutable.OrderedMap<string, Part>,
-  targets: Immutable.List<Target>,
+  // targets: Immutable.List<Target>,
+  targets,
   ) => {
   // sort targets to ensure consistent ordering
   const sortedTargets = targets.sort(targetAssessmentIdSort);

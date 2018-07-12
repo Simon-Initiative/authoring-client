@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
-import AssessmentEditor from './AssessmentEditor';
+import AssessmentEditor from 'editors/document/assessment/AssessmentEditor';
 import * as contentTypes from 'data/contentTypes';
 import { State } from 'reducers';
 import { fetchSkills } from 'actions/skills';
 import { setCurrentNode } from 'actions/document';
-import { AbstractEditorProps } from '../common/AbstractEditor';
+import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
 import { AssessmentModel, CourseModel } from 'data/models';
 import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';

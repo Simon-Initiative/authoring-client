@@ -3,12 +3,12 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { ContentModel, AssessmentModel } from 'data/models';
 import { injectSheet, JSSProps } from 'styles/jss';
-import { ToolbarLayout } from './ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
+import { ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import {
   ToolbarWideMenu, ToolbarButtonMenuItem, ToolbarQuadMenu,
   ToolbarButtonMenuForm, ToolbarButtonMenuDivider,
-} from './ToolbarButtonMenu';
+} from 'components/toolbar/ToolbarButtonMenu';
 import { AppContext } from 'editors/common/AppContext';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
@@ -20,7 +20,7 @@ import { selectFile } from 'editors/content/learning/file';
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { ContentElement } from 'data/content/common/interfaces';
-import { styles } from './InsertToolbar.style';
+import { styles } from 'components/toolbar/InsertToolbar.style';
 import { Resource, ResourceState } from 'data/content/resource';
 import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';

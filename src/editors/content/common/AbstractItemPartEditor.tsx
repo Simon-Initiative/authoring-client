@@ -1,7 +1,7 @@
 import * as React from 'react';
-import * as contentTypes from '../../../data/contentTypes';
-import { AppServices } from '../../common/AppServices';
-import { AppContext } from '../../common/AppContext';
+import * as contentTypes from 'data/contentTypes';
+import { AppServices } from 'editors/common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 

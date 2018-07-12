@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren } from '../common';
+import { augment, getChildren } from 'data/content/common';
 
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 

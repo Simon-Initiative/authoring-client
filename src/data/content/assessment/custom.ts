@@ -2,16 +2,16 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from '../../../utils/guid';
 import { augment } from '../common';
-import { LegacyTableLayout } from './dragdrop/legacyTable/legacy_table_layout';
-
-export type DndLayout = LegacyTableLayout;
+import { LegacyLayout } from './dragdrop/legacyLayout/legacy_layout';
+import { HTMLLayout } from './dragdrop/htmlLayout/html_layout';
+import { convertLegacyToHtmlTable } from 'data/content/assessment/dragdrop/convert';
 
 export type CustomParams = {
   id?: string;
   guid?: string;
   type?: string;
   layout?: string;
-  layoutData?: Maybe<DndLayout>;
+  layoutData?: Maybe<HTMLLayout>;
   src?: string;
   width?: number;
   height?: number;
@@ -27,7 +27,7 @@ const defaultContent = {
   guid: '',
   type: 'javascript',
   layout: '',
-  layoutData: Maybe.nothing(),
+  layoutData: Maybe.nothing<HTMLLayout>(),
   src: '',
   width: 100,
   height: 100,
@@ -44,7 +44,7 @@ export class Custom extends Immutable.Record(defaultContent) {
   guid: string;
   type: string;
   layout: string;
-  layoutData: Maybe<DndLayout>;
+  layoutData: Maybe<HTMLLayout>;
   src: string;
   width: number;
   height: number;
@@ -98,12 +98,23 @@ export class Custom extends Immutable.Record(defaultContent) {
     }
 
     if (q['layoutData'] !== undefined) {
-      model = model.with({
-        layoutData: Maybe.just(LegacyTableLayout.fromPersistence(q['layoutData'], createGuid())) });
+      if (q['layoutData'].dragdrop
+        && q['layoutData'].dragdrop['#array']
+        && q['layoutData'].dragdrop['#array'].find(obj => obj.hasOwnProperty('targetArea'))) {
+        // HTML Layout
+        model = model.with({
+          layoutData: Maybe.just(HTMLLayout.fromPersistence(q['layoutData'], createGuid())) });
+      } else {
+        // Convert Legacy Layout to HTML Layout
+        const convertedLayout =
+          convertLegacyToHtmlTable(LegacyLayout.fromPersistence(q['layoutData'], createGuid()));
+        model = model.with({
+          layoutData: Maybe.just(convertedLayout),
+        });
+      }
     }
 
     return model;
-
   }
 
   toPersistence() : Object {

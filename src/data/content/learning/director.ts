@@ -1,13 +1,13 @@
 import * as Immutable from 'immutable';
 
 import createGuid from 'utils/guid';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
-import { Popout } from './popout';
-import { Alternate } from './alternate';
-import { Title } from './title';
-import { Caption } from './caption';
-import { Cite } from './cite';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
+import { Popout } from 'data/content/learning/popout';
+import { Alternate } from 'data/content/learning/alternate';
+import { Title } from 'data/content/learning/title';
+import { Caption } from 'data/content/learning/caption';
+import { Cite } from 'data/content/learning/cite';
 import { Maybe } from 'tsmonad';
 
 export type DirectorParams = {

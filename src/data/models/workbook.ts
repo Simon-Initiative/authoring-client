@@ -1,11 +1,11 @@
 import * as Immutable from 'immutable';
-import * as contentTypes from '../contentTypes';
-import guid from '../../utils/guid';
-import { getKey } from '../common';
+import * as contentTypes from 'data/contentTypes';
+import guid from 'utils/guid';
+import { getKey } from 'data/common';
 import { isArray } from 'util';
 import { ContentElements, TEXT_ELEMENTS, BODY_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
-import { LegacyTypes } from '../types';
+import { LegacyTypes } from 'data/types';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
 const WB_ELEMENTS = [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS];

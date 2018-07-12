@@ -9,7 +9,7 @@ import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarDropdown } from 'components/toolbar/ToolbarDropdown';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { InlineStyles } from 'data/content/learning/contiguous';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
 
 import { styles } from 'editors/content/container/ToolbarContentContainer.styles';

@@ -13,9 +13,7 @@ import { ActiveContext } from 'types/active';
 import guid from 'utils/guid';
 import './DynaDropInput.scss';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import { Initiator } from 'data/content/assessment/dragdrop/initiator';
-import { Maybe } from 'tsmonad';
-import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
+import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
 import { Badge } from '../common/Badge';
@@ -116,35 +114,36 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const customElement = (model.body.content.find(c =>
       c.contentType === 'Custom') as contentTypes.Custom);
 
-    customElement.layoutData
-      .lift(ld => ld.initiatorGroup.initiators)
-      .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
-      .lift((initiator) => {
-        const updatedInitiator = initiator.with({
-          text,
-        });
+    //TODO
+    // customElement.layoutData
+    //   .lift(ld => ld.initiatorGroup.initiators)
+    //   .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
+    //   .lift((initiator) => {
+    //     const updatedInitiator = initiator.with({
+    //       text,
+    //     });
 
-        // update custom element in question body with the updated initiator
-        const newCustomElement = customElement.withMutations(
-            (custom: contentTypes.Custom) => custom.with({
-              layoutData: custom.layoutData.caseOf({
-                just: ld => Maybe.just<DndLayout>(ld.with({
-                  initiatorGroup: ld.initiatorGroup.with({
-                    initiators: ld.initiatorGroup.initiators.map(i =>
-                      i.guid === updatedInitiator.guid ? updatedInitiator : i,
-                    ) as Immutable.List<Initiator>,
-                  }),
-                })),
-                nothing: () => Maybe.nothing<DndLayout>(),
-              }),
-            }),
-          ) as contentTypes.Custom;
+    //     // update custom element in question body with the updated initiator
+    //     const newCustomElement = customElement.withMutations(
+    //         (custom: contentTypes.Custom) => custom.with({
+    //           layoutData: custom.layoutData.caseOf({
+    //             just: ld => Maybe.just<DndLayout>(ld.with({
+    //               initiatorGroup: ld.initiatorGroup.with({
+    //                 initiators: ld.initiatorGroup.initiators.map(i =>
+    //                   i.guid === updatedInitiator.guid ? updatedInitiator : i,
+    //                 ) as Immutable.List<Initiator>,
+    //               }),
+    //             })),
+    //             nothing: () => Maybe.nothing<DndLayout>(),
+    //           }),
+    //         }),
+    //       ) as contentTypes.Custom;
 
-        // save updates
-        onBodyEdit(model.body.with({
-          content: model.body.content.set(newCustomElement.guid, newCustomElement),
-        }));
-      });
+    //     // save updates
+    //     onBodyEdit(model.body.with({
+    //       content: model.body.content.set(newCustomElement.guid, newCustomElement),
+    //     }));
+    //   });
   }
 
   /** Implement parent absract methods */
@@ -214,8 +213,8 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const initiator = (model.body.content.find(c =>
       c.contentType === 'Custom') as contentTypes.Custom)
       .layoutData
-      .lift(ld => ld.initiatorGroup.initiators)
-      .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
+      .lift(ld => ld.contentType === 'HTMLLayout' ? ld.initiators : undefined)
+      .lift(initiators => initiators.find(i => i.inputVal === selectedInitiator))
       .caseOf({
         just: initiator => initiator,
         nothing: () => undefined,

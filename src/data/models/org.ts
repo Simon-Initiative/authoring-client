@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable';
-import * as contentTypes from '../contentTypes';
-import guid from '../../utils/guid';
+import * as contentTypes from 'data/contentTypes';
+import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
-import { getKey } from '../common';
+import { getKey } from 'data/common';
 
-import { LegacyTypes } from '../types';
+import { LegacyTypes } from 'data/types';
 
 export type OrganizationModelParams = {
   resource?: contentTypes.Resource,

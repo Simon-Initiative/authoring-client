@@ -3,8 +3,8 @@
 
 import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
-import { WorkbookPageModel } from 'data/models//workbook';
-import { ContiguousText } from 'data/content/learning//contiguous';
+import { WorkbookPageModel } from 'data/models/workbook';
+import { ContiguousText } from 'data/content/learning/contiguous';
 import { registerContentTypes } from 'data/registrar';
 import { convertToRaw } from 'draft-js';
 

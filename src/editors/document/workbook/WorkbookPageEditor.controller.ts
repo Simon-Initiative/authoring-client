@@ -1,8 +1,8 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
-import WorkbookPageEditor from './WorkbookPageEditor';
+import WorkbookPageEditor from 'editors/document/workbook/WorkbookPageEditor';
 import { fetchObjectives } from 'actions/objectives';
-import { AbstractEditorProps } from '../common/AbstractEditor';
+import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
 import { WorkbookPageModel } from 'data/models';
 import { updateHover } from 'actions/hover';
 import { ParentContainer, TextSelection } from 'types/active';

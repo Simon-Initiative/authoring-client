@@ -15,13 +15,13 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Select, TextInput } from '../common/controls';
+import { Select, TextInput } from 'editors/content/common/controls';
 import { Maybe } from 'tsmonad';
 import {
   Discoverable, FocusAction, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
-import { styles } from './List.styles';
+import { styles } from 'editors/content/learning/List.styles';
 
 export interface OrderedListEditorProps
   extends AbstractContentEditorProps<contentTypes.Ol> {

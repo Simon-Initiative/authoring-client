@@ -1,16 +1,16 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentState, SelectionState, Modifier, Entity, convertFromHTML } from 'draft-js';
-import { augment } from '../common';
-import { cloneContent } from '../common/clone';
-import { toDraft } from './draft/todraft';
+import { augment } from 'data/content/common';
+import { cloneContent } from 'data/content/common/clone';
+import { toDraft } from 'data/content/learning/draft/todraft';
 import { TextSelection } from 'types/active';
 import {
   getEntities, getAllEntities, removeInputRef as removeInputRefDraft, EntityInfo,
   Changes, detectChanges, removeEntity as internalRemoveEntity,
-} from './draft/changes';
-import { EntityTypes } from '../learning/common';
-import { fromDraft } from './draft/topersistence';
+} from 'data/content/learning/draft/changes';
+import { EntityTypes } from 'data/content/learning/common';
+import { fromDraft } from 'data/content/learning/draft/topersistence';
 import createGuid from 'utils/guid';
 
 const emptyContent = ContentState.createFromText(' ');

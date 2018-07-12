@@ -6,7 +6,7 @@ import { throttle } from 'utils/timing';
 import { Maybe } from 'tsmonad';
 import { BoundingClientRect, Point } from 'types/common';
 
-import { styles } from './CircleEditor.styles';
+import { styles } from 'editors/content/question/imagehotspot/CircleEditor.styles';
 
 const mapCoordsToCircleProps = (coords: Immutable.List<number>) => {
   return {

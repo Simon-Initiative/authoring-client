@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren } from '../common';
-import { Image } from './image';
-import { LinkTarget } from './common';
+import { augment, getChildren } from 'data/content/common';
+import { Image } from 'data/content/learning/image';
+import { LinkTarget } from 'data/content/learning/common';
 
 export type LinkParams = {
   target?: LinkTarget,
