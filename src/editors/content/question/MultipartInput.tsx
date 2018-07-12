@@ -97,6 +97,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
         .set(correctFeedback.guid, correctFeedback),
       score: '1',
+      input: (this.props.itemModel as any).id,
       match,
     });
 
@@ -105,6 +106,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
         .set(otherFeedback.guid, otherFeedback),
       score: '0',
+      input: (this.props.itemModel as any).id,
       match: '*',
     });
 
