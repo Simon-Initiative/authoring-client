@@ -164,8 +164,6 @@ export class QuestionEditor
         const itemArray = items.toArray();
         const partsArray = parts.toArray();
         delta.deletions.toArray().forEach((d) => {
-
-
           // Find the item whose id matches this entity @input data field
           // and remove it and the corresponding part
           for (let i = 0; i < itemArray.length; i += 1) {
@@ -177,7 +175,6 @@ export class QuestionEditor
               break;
             }
           }
-
         });
         question = question.with({ items, parts });
 
@@ -209,8 +206,6 @@ export class QuestionEditor
     }
 
     this.lastBody = body;
-
-
 
     this.props.onEdit(question, src);
   }

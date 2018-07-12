@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
 
-
 import { ContentElements } from 'data/content/common/elements';
 import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from './types';
 import { Part } from './part';
@@ -21,6 +20,8 @@ import { augment, getChildren } from '../common';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Changes } from 'data/content/learning/draft/changes';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
+import { EntityTypes } from 'data/content/learning/common';
+import { EntityInfo } from 'data/content/learning/changes';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
@@ -73,28 +74,34 @@ export function buildItemMap(model: Question) {
 }
 
 export function detectInputRefChanges(
-  current: ContentElements, previous: ContentElements) : Changes {
+  current: ContentElements, previous: ContentElements): Changes {
 
-  const initial : Changes = {
-    additions: Immutable.List(),
-    deletions: Immutable.List(),
+  const inputRefMap = (content: ContentElements): Immutable.Map<string, EntityInfo> =>
+    content.content.toArray()
+      .filter(c => c.contentType === 'ContiguousText')
+      .reduce(
+        (refMap: Immutable.Map<string, EntityInfo>, c: ContiguousText) =>
+          refMap.concat(
+            c.getEntitiesByType(EntityTypes.input_ref)
+              .reduce(
+                (tempMap, ref) => tempMap.set(ref.entity.data['@input'], ref),
+                Immutable.Map(),
+            )).toMap(),
+        Immutable.Map());
+
+  const currentRefMap = inputRefMap(current);
+  const previousRefMap = inputRefMap(previous);
+
+  const currentKeys = Immutable.Set.fromKeys(currentRefMap);
+  const previousKeys = Immutable.Set.fromKeys(previousRefMap);
+
+  // Find the changes by comparing the current and previous lists of input_refs
+  return {
+    additions: currentRefMap.filter((_, key) =>
+      currentKeys.subtract(previousKeys).contains(key)).toList(),
+    deletions: previousRefMap.filter((_, key) =>
+      previousKeys.subtract(currentKeys).contains(key)).toList(),
   };
-
-  return current.content.toArray()
-    .filter(c => c.contentType === 'ContiguousText')
-    .reduce(
-      (delta, c) => {
-        const p = previous.content.get(c.guid);
-        if (p !== undefined) {
-          const changes = (c as ContiguousText).detectInputRefChanges(p as ContiguousText);
-          return {
-            additions: delta.additions.concat(changes.additions).toList(),
-            deletions: delta.deletions.concat(changes.deletions).toList(),
-          };
-        }
-        return delta;
-      },
-      initial);
 }
 
 function ensureResponsesExist(model: Question) {
@@ -139,13 +146,13 @@ function ensureResponsesExist(model: Question) {
 // are added to the skills set. This function looks to see if
 // the concepts list has any skills present and adds them to the new
 // skills set.
-function migrateSkillsToParts(model: Question) : Question {
+function migrateSkillsToParts(model: Question): Question {
 
   const partsArray = model.parts.toArray();
   let updated = model;
 
-  const noSkillsAtParts : boolean = partsArray.every(p => p.skills.size === 0);
-  const skillsAtQuestion : boolean = model.skills.size > 0 || model.concepts.size > 0;
+  const noSkillsAtParts: boolean = partsArray.every(p => p.skills.size === 0);
+  const skillsAtQuestion: boolean = model.skills.size > 0 || model.concepts.size > 0;
 
   if (skillsAtQuestion && noSkillsAtParts) {
 
@@ -166,7 +173,7 @@ function migrateSkillsToParts(model: Question) : Question {
 
 // If an explanation is found for a question that has just a short answer,
 // migrate that explanation content into a feedback
-function migrateExplanationToFeedback(model: Question) : Question {
+function migrateExplanationToFeedback(model: Question): Question {
 
   const itemsArray = model.items.toArray();
   const partsArray = model.parts.toArray();
@@ -214,7 +221,7 @@ function migrateExplanationToFeedback(model: Question) : Question {
 //    question body to point to the newly assigned item id.
 // 2. update the response input attribute to point to the newly assigned
 //    item id.
-function cloneInputQuestion(question: Question) : Question {
+function cloneInputQuestion(question: Question): Question {
 
   // The approach here is to gust clone the whole thing first, then
   // go back and post-process to make the updates that we need:
@@ -266,7 +273,7 @@ function cloneInputQuestion(question: Question) : Question {
 // Cloning a single select multiple choice question requires that
 // we update the choice#value attribute in lock step with the
 // response#match attribute:
-function cloneMultipleChoiceQuestion(question: Question) : Question {
+function cloneMultipleChoiceQuestion(question: Question): Question {
 
   // Remap existing value ids to newly assigned ones, storing
   // the mapping in valueMap for later use.
@@ -346,7 +353,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   }
 
 
-  clone() : Question {
+  clone(): Question {
 
     const item = this.items.first();
 
@@ -446,7 +453,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         // We do not yet support image_hotspot:
         case 'image_hotspot':
           model = model.with({
-            items: model.items.set(id, ImageHotspot.fromPersistence(item, id)) });
+            items: model.items.set(id, ImageHotspot.fromPersistence(item, id)),
+          });
           break;
         case 'multiple_choice':
           model = model.with(
@@ -469,8 +477,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with({ parts: model.parts.set(id, Part.fromPersistence(copy, id)) });
           break;
         case 'explanation':
-          model = model.with({ explanation:
-            ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
+          model = model.with({
+            explanation:
+              ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS),
+          });
           break;
         case 'skillref':
           model = model.with({ skills: model.skills.add((item as any).skillref['@idref']) });
@@ -489,26 +499,28 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     if (body !== null) {
 
       const backingTextProvider = buildItemMap(model);
-      model = model.with({ body: ContentElements.fromPersistence(
-        body['body'], createGuid(), QUESTION_BODY_ELEMENTS, backingTextProvider) });
+      model = model.with({
+        body: ContentElements.fromPersistence(
+          body['body'], createGuid(), QUESTION_BODY_ELEMENTS, backingTextProvider),
+      });
     }
 
 
     return migrateExplanationToFeedback(
-        ensureResponsesExist(migrateSkillsToParts(model)));
+      ensureResponsesExist(migrateSkillsToParts(model)));
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     // For a question with no items, serialize with a default one
     const itemsAndParts = this.items.size === 0
       ? [defaultItem, defaultPart]
       : [...this.items
-          .toArray()
-          .map(item => item.toPersistence()),
+        .toArray()
+        .map(item => item.toPersistence()),
         ...this.parts
-          .toArray()
-          .map(part => part.toPersistence())];
+        .toArray()
+        .map(part => part.toPersistence())];
 
     const children = [
 
