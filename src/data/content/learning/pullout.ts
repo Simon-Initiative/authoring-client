@@ -17,7 +17,7 @@ export enum PulloutType {
   ToSumUp = 'tosumup',
 }
 
-function fromStr(value: string) : Maybe<PulloutType> {
+function fromStr(value: string): Maybe<PulloutType> {
   switch (value) {
     case 'note': return Maybe.just(PulloutType.Note);
     case 'notation': return Maybe.just(PulloutType.Notation);
@@ -30,7 +30,7 @@ function fromStr(value: string) : Maybe<PulloutType> {
 }
 
 export type PulloutParams = {
-  id?: Maybe<string>,
+  id?: string,
   title?: Title,
   orient?: Orientation,
   content?: ContentElements,
@@ -41,7 +41,7 @@ export type PulloutParams = {
 const defaultContent = {
   contentType: 'Pullout',
   elementType: 'pullout',
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Title.fromText('Title'),
   orient: Orientation.Horizontal,
   pulloutType: Maybe.nothing(),
@@ -52,7 +52,7 @@ const defaultContent = {
 export class Pullout extends Immutable.Record(defaultContent) {
   contentType: 'Pullout';
   elementType: 'pullout';
-  id: Maybe<string>;
+  id: string;
   title: Title;
   orient: Orientation;
   content: ContentElements;
@@ -67,20 +67,23 @@ export class Pullout extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Pullout {
+  clone(): Pullout {
     return this.with({
+      id: createGuid(),
       content: this.content.clone(),
       title: this.title.clone(),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Pullout {
+  static fromPersistence(root: Object, guid: string): Pullout {
     const t = (root as any).pullout;
 
     let model = new Pullout({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
+    if (t['@id']) {
+      model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (t['@orient'] !== undefined) {
       model = model.with({
@@ -106,20 +109,23 @@ export class Pullout extends Immutable.Record(defaultContent) {
       }
     });
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const content = this.content.content.size === 0
-       ? [{ p: { '#text': ' ' } }]
-       : this.content.toPersistence();
+      ? [{ p: { '#text': ' ' } }]
+      : this.content.toPersistence();
 
     const s = {
       pullout: {
+        '@id': this.id,
         '@orient': this.orient,
         '#array': [
           this.title.toPersistence(),
@@ -128,7 +134,6 @@ export class Pullout extends Immutable.Record(defaultContent) {
       },
     };
 
-    this.id.lift(p => s.pullout['@id'] = p);
     this.pulloutType.lift(p => s.pullout['@type'] = p);
 
     return s;

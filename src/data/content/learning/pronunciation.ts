@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
-
+import createGuid from 'utils/guid';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export type PronunciationParams = {
   content?: ContentElements,
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<string>,
   src?: Maybe<string>,
   srcContentType?: Maybe<string>
@@ -17,7 +17,7 @@ const defaultContent = {
   contentType: 'Pronunciation',
   elementType: 'pronunciation',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Maybe.nothing(),
   src: Maybe.nothing(),
   srcContentType: Maybe.nothing(),
@@ -29,7 +29,7 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
   contentType: 'Pronunciation';
   elementType: 'pronunciation';
   content: ContentElements;
-  id: Maybe<string>;
+  id: string;
   title: Maybe<string>;
   src: Maybe<string>;
   srcContentType: Maybe<string>;
@@ -45,6 +45,7 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
 
   clone() {
     return this.with({
+      id: createGuid(),
       content: this.content.clone(),
     });
   }
@@ -53,9 +54,9 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
 
     const t = (root as any).pronunciation;
 
-    const id = t['@id'] !== undefined
-      ? Maybe.just(t['@id'])
-      : Maybe.nothing();
+    const id = t['@id']
+      ? t['@id']
+      : createGuid();
 
     const title = t['@title'] !== undefined
       ? Maybe.just(t['@title'])
@@ -82,11 +83,11 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const t = {
       pronunciation: {
+        '@id': this.id,
         '#array': this.content.toPersistence(),
       },
     };
 
-    this.id.lift(id => t.pronunciation['@id'] = id);
     this.title.lift(title => t.pronunciation['@title'] = title);
     this.src.lift(src => t.pronunciation['@src'] = src);
     this.srcContentType.lift(ty => t.pronunciation['@type'] = ty);

@@ -9,7 +9,7 @@ import { Maybe } from 'tsmonad';
 import { Instructions } from './instructions';
 
 export type CompositeParams = {
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<Title>,
   purpose?: Maybe<string>,
   instructions?: Maybe<Instructions>,
@@ -20,7 +20,7 @@ export type CompositeParams = {
 const defaultContent = {
   contentType: 'Composite',
   elementType: 'composite',
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Maybe.nothing(),
   purpose: Maybe.nothing(),
   instructions: Maybe.nothing(),
@@ -31,7 +31,7 @@ const defaultContent = {
 export class Composite extends Immutable.Record(defaultContent) {
   contentType: 'Composite';
   elementType: 'composite';
-  id: Maybe<string>;
+  id: string;
   title: Maybe<Title>;
   purpose: Maybe<string>;
   instructions: Maybe<Instructions>;
@@ -57,8 +57,10 @@ export class Composite extends Immutable.Record(defaultContent) {
 
     let model = new Composite({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
+    if (t['@id']) {
+      model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (t['@purpose'] !== undefined) {
       model = model.with({ purpose: Maybe.just(t['@purpose']) });
@@ -99,11 +101,10 @@ export class Composite extends Immutable.Record(defaultContent) {
 
     const s = {
       composite_activity: {
+        '@id': this.id,
         '#array': [...optional, ...required],
       },
     };
-
-    this.id.lift(p => s.composite_activity['@id'] = p);
     this.purpose.lift(p => s.composite_activity['@purpose'] = p);
 
     return s;

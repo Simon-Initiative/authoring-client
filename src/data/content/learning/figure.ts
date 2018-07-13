@@ -13,7 +13,7 @@ import { ContiguousText } from 'data/contentTypes';
 export type FigureParams = {
   guid?: string,
   // core.attrs
-  id?: Maybe<string>,
+  id?: string,
   // labeled.content
   title?: Title,
   caption?: Maybe<Caption>,
@@ -27,7 +27,7 @@ const defaultContent = {
   elementType: 'figure',
 
   guid: '',
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Title.fromText('Title'),
   caption: Maybe.nothing(),
   cite: Maybe.nothing(),
@@ -39,7 +39,7 @@ export class Figure extends Immutable.Record(defaultContent) {
   elementType: 'figure';
 
   guid: string;
-  id: Maybe<string>;
+  id: string;
   title: Title;
   caption: Maybe<Caption>;
   cite: Maybe<Cite>;
@@ -54,9 +54,11 @@ export class Figure extends Immutable.Record(defaultContent) {
   }
 
   clone(): Figure {
+    const guid = createGuid();
+
     return this.with({
-      guid: createGuid(),
-      id: Maybe.nothing(),
+      guid,
+      id: guid,
       title: this.title.clone(),
       caption: this.caption.caseOf({
         just: caption => Maybe.just(caption.clone()),
@@ -75,8 +77,10 @@ export class Figure extends Immutable.Record(defaultContent) {
 
     let model = new Figure({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
+    if (t['@id']) {
+      model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
@@ -126,14 +130,13 @@ export class Figure extends Immutable.Record(defaultContent) {
 
     const s = {
       figure: {
+        '@id': this.id,
         '#array': [
           ...children,
           ...content,
         ],
       },
     };
-
-    this.id.lift(p => s.figure['@id'] = p);
 
     return s;
   }

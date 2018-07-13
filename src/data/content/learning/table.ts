@@ -22,7 +22,7 @@ export type TableParams = {
 };
 
 const defaultContent = {
-  id: '',
+  id: createGuid(),
   contentType: 'Table',
   elementType: 'table',
   summary: '',
@@ -77,7 +77,7 @@ export class Table extends Immutable.Record(defaultContent) {
 
     let model = new Table({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

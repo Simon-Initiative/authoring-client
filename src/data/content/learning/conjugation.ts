@@ -21,7 +21,7 @@ export type ConjugationParams = {
 const defaultContent = {
   contentType: 'Conjugation',
   elementType: 'conjugation',
-  id: '',
+  id: createGuid(),
   verb: '',
   pronunciation: Maybe.nothing(),
   title: Title.fromText('Title'),
@@ -56,7 +56,7 @@ export class Conjugation extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Conjugation {
+  clone(): Conjugation {
     return this.with({
       id: createGuid(),
       rows: this.rows.map(r => r.clone().with({ guid: createGuid() })).toOrderedMap(),
@@ -64,13 +64,13 @@ export class Conjugation extends Immutable.Record(defaultContent) {
   }
 
 
-  static fromPersistence(root: Object, guid: string) : Conjugation {
+  static fromPersistence(root: Object, guid: string): Conjugation {
 
     const t = (root as any).conjugation;
 
     let model = new Conjugation({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });
@@ -100,11 +100,10 @@ export class Conjugation extends Immutable.Record(defaultContent) {
       }
     });
 
-
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [];
 

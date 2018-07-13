@@ -9,7 +9,7 @@ import { Default } from './default';
 import { Alternative } from './alternative';
 
 export type AlternativesParams = {
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<Title>,
   default?: Maybe<Default>,
   content?: Immutable.OrderedMap<string, Alternative>,
@@ -20,7 +20,7 @@ export type AlternativesParams = {
 const defaultContent = {
   contentType: 'Alternatives',
   elementType: 'alternatives',
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Maybe.nothing(),
   group: Maybe.nothing(),
   content: Immutable.OrderedMap<string, Alternative>(),
@@ -31,7 +31,7 @@ const defaultContent = {
 export class Alternatives extends Immutable.Record(defaultContent) {
   contentType: 'Alternatives';
   elementType: 'alternatives';
-  id: Maybe<string>;
+  id: string;
   title: Maybe<Title>;
   default: Maybe<Default>;
   content: Immutable.OrderedMap<string, Alternative>;
@@ -46,15 +46,14 @@ export class Alternatives extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-
-
-  clone() : Alternatives {
+  clone(): Alternatives {
     return this.with({
+      id: createGuid(),
       content: this.content.map(c => c.clone()).toOrderedMap(),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Alternatives {
+  static fromPersistence(root: Object, guid: string): Alternatives {
     const t = (root as any).alternatives;
 
     let model = new Alternatives({ guid });
@@ -62,8 +61,10 @@ export class Alternatives extends Immutable.Record(defaultContent) {
     if (t['@group'] !== undefined) {
       model = model.with({ group: Maybe.just(t['@group']) });
     }
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
+    if (t['@id']) {
+      model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
 
     getChildren(t).forEach((item) => {
@@ -79,8 +80,10 @@ export class Alternatives extends Immutable.Record(defaultContent) {
           model = model.with({ default: Maybe.just(Default.fromPersistence(item, id)) });
           break;
         case 'alternative':
-          model = model.with({ content:
-            model.content.set(id, Alternative.fromPersistence(item, id)) });
+          model = model.with({
+            content:
+              model.content.set(id, Alternative.fromPersistence(item, id)),
+          });
           break;
         default:
       }
@@ -89,7 +92,7 @@ export class Alternatives extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [];
     this.title.lift(title => children.push(title.toPersistence()));
@@ -98,11 +101,11 @@ export class Alternatives extends Immutable.Record(defaultContent) {
 
     const s = {
       alternatives: {
+        '@id': this.id,
         '#array': children,
       },
     };
 
-    this.id.lift(g => s.alternatives['@id'] = g);
     this.group.lift(g => s.alternatives['@group'] = g);
 
     return s;

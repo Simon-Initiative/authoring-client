@@ -25,7 +25,7 @@ export type UlParams = {
 const defaultContent = {
   contentType: 'Ul',
   elementType: 'ul',
-  id: '',
+  id: createGuid(),
   style: Maybe.nothing(),
   title: Maybe.nothing(),
   listItems: Immutable.OrderedMap<string, Li>(),
@@ -50,17 +50,24 @@ export class Ul extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Ul {
+  clone(): Ul {
     return this.with({
+      id: createGuid(),
       listItems: this.listItems.map(d => d.clone().with({ guid: createGuid() })).toOrderedMap(),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Ul {
+  static fromPersistence(root: Object, guid: string): Ul {
 
     const t = (root as any).ul;
 
     let model = new Ul().with({ guid });
+
+    if (t['@id']) {
+      model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
+    }
 
     if (t['@style'] !== undefined) {
       model = model.with({ style: Maybe.just(t['@style']) });
@@ -87,7 +94,7 @@ export class Ul extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [];
     this.title.lift(title => children.push(title.toPersistence()));

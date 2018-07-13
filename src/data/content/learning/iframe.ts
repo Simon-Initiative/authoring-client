@@ -26,7 +26,7 @@ export type IFrameParams = {
 const defaultContent = {
   contentType: 'IFrame',
   elementType: 'iframe',
-  id: '',
+  id: createGuid(),
   title: '',
   src: 'https://www.example.com',
   width: '800',
@@ -80,7 +80,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
 
     let model = new IFrame({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

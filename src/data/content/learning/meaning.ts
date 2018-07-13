@@ -8,7 +8,7 @@ import createGuid from 'utils//guid';
 
 export type MeaningParams = {
   examples?: Immutable.OrderedMap<string, Example>,
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<string>,
   material?: Material,
   guid?: string,
@@ -17,7 +17,7 @@ export type MeaningParams = {
 const defaultContent = {
   contentType: 'Meaning',
   elementType: 'meaning',
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Maybe.nothing(),
   examples: Immutable.OrderedMap<string, Example>(),
   material: Material,
@@ -29,7 +29,7 @@ export class Meaning extends Immutable.Record(defaultContent) {
   contentType: 'Meaning';
   elementType: 'meaning';
   examples: Immutable.OrderedMap<string, Example>;
-  id: Maybe<string>;
+  id: string;
   title: Maybe<string>;
   material: Material;
   guid: string;
@@ -54,8 +54,10 @@ export class Meaning extends Immutable.Record(defaultContent) {
     const m = (root as any).meaning;
     let model = new Meaning().with({ guid });
 
-    if (m['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(m['@id']) });
+    if (m['@id']) {
+      model = model.with({ id: m['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
@@ -82,6 +84,7 @@ export class Meaning extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const m = {
       meaning: {
+        '@id': this.id,
         '#array': [
           this.material.toPersistence(),
         ],
@@ -92,7 +95,6 @@ export class Meaning extends Immutable.Record(defaultContent) {
       this.examples.toArray().forEach(e => m.meaning['#array'].push(e.toPersistence()));
     }
 
-    this.id.lift(id => m.meaning['@id'] = id);
     this.title.lift(title => m.meaning['@title'] = title);
 
     return m;

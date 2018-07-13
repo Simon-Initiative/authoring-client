@@ -16,7 +16,7 @@ const defaultContent = {
   contentType: 'Speaker',
   elementType: 'speaker',
   guid: '',
-  id: '',
+  id: createGuid(),
   title: Maybe.nothing<string>(),
   content: Maybe.nothing<string | Image>(),
 };
@@ -39,8 +39,11 @@ export class Speaker extends Immutable.Record(defaultContent) {
   }
 
   clone() {
+    const id = createGuid();
+
     return this.with({
-      guid: createGuid(),
+      id,
+      guid: id,
     });
   }
 
@@ -49,8 +52,10 @@ export class Speaker extends Immutable.Record(defaultContent) {
     const m = (root as any).speaker;
     let model = new Speaker().with({ guid });
 
-    if (m['@id'] !== undefined) {
+    if (m['@id']) {
       model = model.with({ id: m['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });

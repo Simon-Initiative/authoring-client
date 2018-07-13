@@ -30,7 +30,7 @@ export type OlParams = {
 const defaultContent = {
   contentType: 'Ol',
   elementType: 'ol',
-  id: '',
+  id: createGuid,
   style: Maybe.nothing(),
   start: Maybe.nothing(),
   title: Maybe.nothing(),
@@ -57,17 +57,24 @@ export class Ol extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Ol {
+  clone(): Ol {
     return this.with({
+      id: createGuid(),
       listItems: this.listItems.map(d => d.clone().with({ guid: createGuid() })).toOrderedMap(),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Ol {
+  static fromPersistence(root: Object, guid: string): Ol {
 
     const t = (root as any).ol;
 
     let model = new Ol().with({ guid });
+
+    if (t['@id']) {
+      model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
+    }
 
     if (t['@style'] !== undefined) {
       model = model.with({ style: Maybe.just(t['@style']) });
@@ -97,7 +104,7 @@ export class Ol extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [];
     this.title.lift(title => children.push(title.toPersistence()));
@@ -109,7 +116,6 @@ export class Ol extends Immutable.Record(defaultContent) {
         '#array': children,
       },
     };
-
 
     this.style.lift(value => ol.ol['@style'] = value);
     this.start.lift(value => ol.ol['@start'] = value);

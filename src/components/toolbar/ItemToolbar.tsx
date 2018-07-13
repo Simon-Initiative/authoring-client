@@ -7,14 +7,15 @@ import { ActiveContextState } from 'reducers/active';
 
 import { styles } from './ItemToolbar.styles';
 import { loadFromLocalStorage } from 'utils/localstorage';
+import { ContentElement } from 'data/content/common/interfaces';
 
 export interface ItemToolbarProps {
   context: AppContext;
   activeContext: ActiveContextState;
-  onCut: (item) => void;
-  onCopy: (item) => void;
+  onCut: (item: ContentElement) => void;
+  onCopy: (item: ContentElement) => void;
   onPaste: () => void;
-  onRemove: (item) => void;
+  onRemove: (item: ContentElement) => void;
   parentSupportsElementType: (type: string) => boolean;
 }
 
@@ -24,13 +25,16 @@ export interface ItemToolbarProps {
 @injectSheet(styles)
 export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps> {
 
-  constructor(props) {
+  constructor(props: ItemToolbarProps) {
     super(props);
   }
 
   hasSelection() {
     const { activeContext } = this.props;
-    return !!activeContext.activeChild.valueOr(false);
+    return activeContext.activeChild.caseOf({
+      just: _ => true,
+      nothing: () => false,
+    });
   }
 
   canDuplicate() {
@@ -39,8 +43,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     const disallowDuplicates = ['WbInline', 'Activity', 'Speaker', 'Line', 'Hint'];
 
     return activeContext.activeChild.caseOf({
-      just: activeChild => activeChild &&
-        (disallowDuplicates.indexOf((activeChild as any).contentType) === -1),
+      just: activeChild => disallowDuplicates.indexOf(activeChild.contentType) === -1,
       nothing: () => false,
     });
   }
@@ -72,7 +75,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     const clipboardItem: any = loadFromLocalStorage('clipboard');
     // saveToLocalStorage handles saving contiguous text as a special
     // case, so we handle that here
-    let clipboardElementType = null;
+    let clipboardElementType: string = null;
 
     if (clipboardItem !== null) {
       clipboardElementType = clipboardItem.isContiguousText

@@ -25,7 +25,7 @@ export type PanoptoParams = {
 const defaultContent = {
   contentType: 'Panopto',
   elementType: 'panopto',
-  id: '',
+  id: createGuid(),
   width: '800',
   height: '450',
   src: '',
@@ -77,7 +77,7 @@ export class Panopto extends Immutable.Record(defaultContent) {
 
     let model = new Panopto({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

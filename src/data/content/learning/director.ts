@@ -27,7 +27,7 @@ export type DirectorParams = {
 const defaultContent = {
   contentType: 'Director',
   elementType: 'director',
-  id: '',
+  id: createGuid(),
   width: '800',
   height: '450',
   src: '',
@@ -81,7 +81,7 @@ export class Director extends Immutable.Record(defaultContent) {
 
     let model = new Director({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

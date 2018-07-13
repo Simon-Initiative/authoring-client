@@ -15,7 +15,7 @@ import { MediaItem } from 'data/contentTypes';
 
 export type DialogParams = {
   guid?: string,
-  id?: Maybe<string>,
+  id?: string,
   title?: Title,
   media?: Maybe<MediaItem>,
   speakers?: Immutable.OrderedMap<string, Speaker>,
@@ -25,7 +25,7 @@ export type DialogParams = {
 const defaultContent = {
   contentType: 'Dialog',
   elementType: 'dialog',
-  guid: '',
+  guid: createGuid(),
   id: Maybe.nothing<string>(),
   title: Title.fromText('Dialog Title'),
   media: Maybe.nothing<MediaItem>(),
@@ -66,7 +66,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
   contentType: 'Dialog';
   elementType: 'dialog';
   guid: string;
-  id: Maybe<string>;
+  id: string;
   title: Title;
   media: Maybe<MediaItem>;
   speakers: Immutable.OrderedMap<string, Speaker>;
@@ -82,6 +82,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
   clone() {
     return this.with({
+      id: createGuid(),
       title: this.title.clone(),
       media: this.media.lift(media => media.clone()),
       speakers: this.speakers.map(s => s.clone()).toOrderedMap(),
@@ -94,8 +95,10 @@ export class Dialog extends Immutable.Record(defaultContent) {
     const m = (root as any).dialog;
     let model = new Dialog().with({ guid });
 
-    if (m['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(m['@id']) });
+    if (m['@id']) {
+      model = model.with({ id: m['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (m['@title'] !== undefined) {
       model = model.with({ title: m['@title'] });
@@ -160,6 +163,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
     const m = {
       dialog: {
+        '@id': this.id,
         '#array': [
           this.title.toPersistence(),
           ...media,
@@ -168,8 +172,6 @@ export class Dialog extends Immutable.Record(defaultContent) {
         ],
       },
     };
-
-    this.id.lift(id => m.dialog['@id'] = id);
 
     return m;
   }

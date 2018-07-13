@@ -199,8 +199,8 @@ export class ContentContainer
     }
   }
 
-  onPaste(item, textSelection: Maybe<TextSelection>) {
-    const duplicate = (item.clone() as any).with({
+  onPaste(item: ContentElement, textSelection: Maybe<TextSelection>) {
+    const duplicate: ContentElement = item.clone().with({
       guid: guid(),
     });
     this.onAddNew(duplicate, textSelection);

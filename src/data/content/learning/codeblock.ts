@@ -17,7 +17,7 @@ export type CodeBlockParams = {
 const defaultContent = {
   contentType: 'CodeBlock',
   elementType: 'codeblock',
-  id: '',
+  id: createGuid(),
   title: '',
   source: '',
   syntax: 'text',

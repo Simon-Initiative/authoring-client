@@ -16,14 +16,14 @@ export type ExtraParams = {
   translation?: ContiguousText;
   meaning?: Immutable.OrderedMap<string, Meaning>;
   content?: ContentElements,
-  id?: Maybe<string>,
+  id?: string,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Extra',
   elementType: 'extra',
-  id: Maybe.nothing(),
+  id: createGuid(),
   anchor: new Anchor(),
   pronunciation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
   translation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
@@ -42,7 +42,7 @@ export class Extra extends Immutable.Record(defaultContent) {
   translation: ContiguousText;
   meaning: Immutable.OrderedMap<string, Meaning>;
   content: ContentElements;
-  id: Maybe<string>;
+  id: string;
   guid: string;
 
   constructor(params?: ExtraParams) {
@@ -55,6 +55,7 @@ export class Extra extends Immutable.Record(defaultContent) {
 
   clone() {
     return this.with({
+      id: createGuid(),
       anchor: this.anchor.clone(),
       meaning: this.meaning.map(m => m.clone().with({ guid: createGuid() })).toOrderedMap(),
       content: this.content.clone(),
@@ -66,8 +67,10 @@ export class Extra extends Immutable.Record(defaultContent) {
     const m = (root as any).extra;
     let model = new Extra().with({ guid });
 
-    if (m['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(m['@id']) });
+    if (m['@id']) {
+      model = model.with({ id: m['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
 
     getChildren(m).forEach((item) => {
@@ -152,11 +155,10 @@ export class Extra extends Immutable.Record(defaultContent) {
 
     const m = {
       extra: {
+        '@id': this.id,
         '#array': children,
       },
     };
-
-    this.id.lift(id => m.extra['@id'] = id);
 
     return m;
   }

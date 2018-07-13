@@ -14,14 +14,14 @@ export type DefinitionParams = {
   pronunciation?: Maybe<Pronunciation>;
   translation?: Immutable.OrderedMap<string, Translation>;
   meaning?: Immutable.OrderedMap<string, Meaning>;
-  id?: Maybe<string>,
+  id?: string,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Definition',
   elementType: 'definition',
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Maybe.nothing(),
   term: '',
   pronunciation: Maybe.nothing(),
@@ -39,7 +39,7 @@ export class Definition extends Immutable.Record(defaultContent) {
   pronunciation: Maybe<Pronunciation>;
   translation: Immutable.OrderedMap<string, Translation>;
   meaning: Immutable.OrderedMap<string, Meaning>;
-  id: Maybe<string>;
+  id: string;
   guid: string;
 
   constructor(params?: DefinitionParams) {
@@ -66,8 +66,10 @@ export class Definition extends Immutable.Record(defaultContent) {
     const m = (root as any).definition;
     let model = new Definition().with({ guid });
 
-    if (m['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(m['@id']) });
+    if (m['@id']) {
+      model = model.with({ id: m['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
 
     getChildren(m).forEach((item) => {
@@ -110,11 +112,10 @@ export class Definition extends Immutable.Record(defaultContent) {
 
     const m = {
       definition: {
+        '@id': this.id,
         '#array': children,
       },
     };
-
-    this.id.lift(id => m.definition['@id'] = id);
 
     return m;
   }

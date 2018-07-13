@@ -8,7 +8,7 @@ import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export type ExampleParams = {
-  id?: Maybe<string>,
+  id?: string,
   title?: Title,
   purpose?: Maybe<string>,
   content?: ContentElements,
@@ -18,7 +18,7 @@ export type ExampleParams = {
 const defaultContent = {
   contentType: 'Example',
   elementType: 'example',
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Title.fromText('Title'),
   purpose: Maybe.nothing(),
   content: new ContentElements().with({ supportedElements: Immutable.List<string>(BOX_ELEMENTS) }),
@@ -28,7 +28,7 @@ const defaultContent = {
 export class Example extends Immutable.Record(defaultContent) {
   contentType: 'Example';
   elementType: 'example';
-  id: Maybe<string>;
+  id: string;
   title: Title;
   purpose: Maybe<string>;
   content: ContentElements;
@@ -44,6 +44,7 @@ export class Example extends Immutable.Record(defaultContent) {
 
   clone() : Example {
     return this.with({
+      id: createGuid(),
       content: this.content.clone(),
     });
   }
@@ -53,8 +54,10 @@ export class Example extends Immutable.Record(defaultContent) {
 
     let model = new Example({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
+    if (t['@id']) {
+      model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (t['@purpose'] !== undefined) {
       model = model.with({ purpose: Maybe.just(t['@purpose']) });
@@ -87,6 +90,7 @@ export class Example extends Immutable.Record(defaultContent) {
 
     const s = {
       example: {
+        '@id': this.id,
         '#array': [
           this.title.toPersistence(),
           ...content,
@@ -94,7 +98,6 @@ export class Example extends Immutable.Record(defaultContent) {
       },
     };
 
-    this.id.lift(p => s.example['@id'] = p);
     this.purpose.lift(p => s.example['@purpose'] = p);
 
     return s;

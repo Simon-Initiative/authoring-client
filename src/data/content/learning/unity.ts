@@ -29,7 +29,7 @@ export type UnityParams = {
 const defaultContent = {
   contentType: 'Unity',
   elementType: 'unity',
-  id: '',
+  id: createGuid(),
   width: '800',
   height: '450',
   src: '',
@@ -85,7 +85,7 @@ export class Unity extends Immutable.Record(defaultContent) {
 
     let model = new Unity({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

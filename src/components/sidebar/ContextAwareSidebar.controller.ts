@@ -12,9 +12,10 @@ import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentModel } from 'data/models';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
-  content: Maybe<Object>;
+  content: Maybe<ContentElement>;
   container: Maybe<ParentContainer>;
   supportedElements: Immutable.List<string>;
   show: boolean;
@@ -24,8 +25,8 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onInsert: (content: Object, textSelection) => void;
-  onEdit: (content: Object) => void;
+  onInsert: (content: ContentElement, textSelection) => void;
+  onEdit: (content: ContentElement) => void;
   onHide: () => void;
   onSetCurrentPage: (documentId: string, pageId: string) => void;
 }

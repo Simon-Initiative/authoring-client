@@ -30,7 +30,7 @@ export type FlashParams = {
 const defaultContent = {
   contentType: 'Flash',
   elementType: 'flash',
-  id: '',
+  id: createGuid(),
   width: '800',
   height: '450',
   logging: true,
@@ -88,7 +88,7 @@ export class Flash extends Immutable.Record(defaultContent) {
 
     let model = new Flash({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

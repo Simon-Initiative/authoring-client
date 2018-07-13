@@ -20,7 +20,7 @@ const defaultContent = {
   pronouns: '',
   src: '',
   type: '',
-  id: '',
+  id: createGuid(),
   content: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
   guid: '',
 };
@@ -46,6 +46,7 @@ export class Conjugate extends Immutable.Record(defaultContent) {
 
   clone() : Conjugate {
     return this.with({
+      id: createGuid(),
       content: this.content.clone(),
     });
   }
@@ -56,8 +57,10 @@ export class Conjugate extends Immutable.Record(defaultContent) {
 
     let model = new Conjugate({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (t['@pronouns'] !== undefined) {
       model = model.with({ pronouns: t['@pronouns'] });
@@ -79,7 +82,7 @@ export class Conjugate extends Immutable.Record(defaultContent) {
 
     return {
       conjugate: {
-        '@id': this.id !== '' ? this.id : undefined,
+        '@id': this.id,
         '@src': this.src !== '' ? this.src : undefined,
         '@type': this.type !== '' ? this.type : undefined,
         '@pronouns': this.pronouns !== '' ? this.pronouns : undefined,

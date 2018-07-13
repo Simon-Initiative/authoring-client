@@ -72,7 +72,6 @@ export class Audio extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-
   clone() : Audio {
     return this.with({
       id: createGuid(),
@@ -89,7 +88,7 @@ export class Audio extends Immutable.Record(defaultContent) {
 
     let model = new Audio({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

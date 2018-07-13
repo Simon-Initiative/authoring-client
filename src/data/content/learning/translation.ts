@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
-
+import createGuid from 'utils/guid';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export type TranslationParams = {
   content?: ContentElements,
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<string>,
   guid?: string,
 };
@@ -15,7 +15,7 @@ const defaultContent = {
   contentType: 'Translation',
   elementType: 'translation',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Maybe.nothing(),
   guid: '',
 };
@@ -25,7 +25,7 @@ export class Translation extends Immutable.Record(defaultContent) {
   contentType: 'Translation';
   elementType: 'translation';
   content: ContentElements;
-  id: Maybe<string>;
+  id: string;
   title: Maybe<string>;
   guid: string;
 
@@ -47,9 +47,9 @@ export class Translation extends Immutable.Record(defaultContent) {
 
     const t = (root as any).translation;
 
-    const id = t['@id'] !== undefined
-      ? Maybe.just(t['@id'])
-      : Maybe.nothing();
+    const id = t['@id']
+      ? t['@id']
+      : createGuid();
 
     const title = t['@title'] !== undefined
       ? Maybe.just(t['@title'])
@@ -66,11 +66,11 @@ export class Translation extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const t = {
       translation: {
+        '@id': this.id,
         '#array': this.content.toPersistence(),
       },
     };
 
-    this.id.lift(id => t.translation['@id'] = id);
     this.title.lift(title => t.translation['@title'] = title);
 
     return t;

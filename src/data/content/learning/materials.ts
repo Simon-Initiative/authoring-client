@@ -8,7 +8,7 @@ import { Orientation } from 'data/content/learning/common';
 
 export type MaterialsParams = {
   content?: Immutable.OrderedMap<string, Material>,
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<string>,
   orient?: Orientation,
   guid?: string,
@@ -17,7 +17,7 @@ export type MaterialsParams = {
 const defaultContent = {
   contentType: 'Materials',
   elementType: 'materials',
-  id: Maybe.nothing(),
+  id: createGuid(),
   title: Maybe.nothing(),
   content: Immutable.OrderedMap<string, Material>(),
   orient: Orientation.Horizontal,
@@ -29,7 +29,7 @@ export class Materials extends Immutable.Record(defaultContent) {
   contentType: 'Materials';
   elementType: 'materials';
   content: Immutable.OrderedMap<string, Material>;
-  id: Maybe<string>;
+  id: string;
   title: Maybe<string>;
   orient: Orientation;
   guid: string;
@@ -44,6 +44,7 @@ export class Materials extends Immutable.Record(defaultContent) {
 
   clone() {
     return this.with({
+      id: createGuid(),
       content: this.content.map(c => c.clone().with({ guid: createGuid() })).toOrderedMap(),
     });
   }
@@ -53,8 +54,10 @@ export class Materials extends Immutable.Record(defaultContent) {
     const m = (root as any).materials;
     let model = new Materials().with({ guid });
 
-    if (m['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(m['@id']) });
+    if (m['@id']) {
+      model = model.with({ id: m['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
@@ -96,12 +99,12 @@ export class Materials extends Immutable.Record(defaultContent) {
 
     const m = {
       materials: {
+        '@id': this.id,
         '@orient': 'horizontal',
         '#array': content,
       },
     };
 
-    this.id.lift(id => m.materials['@id'] = id);
     this.title.lift(title => m.materials['@title'] = title);
 
     return m;

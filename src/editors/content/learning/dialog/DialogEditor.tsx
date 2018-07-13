@@ -104,7 +104,7 @@ export default class DialogEditor
 
     const line = new contentTypes.Line().with({
       guid: id,
-      id: Maybe.just(id),
+      id,
       // If there are multiple lines, swap the default speaker
       // when adding new lines
       speaker: lines.size > 1

@@ -13,6 +13,7 @@ import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
   skills: OrderedMap<string, Skill>;
@@ -56,11 +57,11 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onFetchSkills: (courseId: string) => {
       return dispatch(fetchSkills(courseId));
     },
-    onUpdateContent: (documentId: string, content: Object) => {
+    onUpdateContent: (documentId: string, content: ContentElement) => {
       return dispatch(activeActions.updateContent(documentId, content));
     },
     onUpdateContentSelection: (
-      documentId: string, content: Object,
+      documentId: string, content: ContentElement,
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));

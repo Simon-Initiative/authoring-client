@@ -35,7 +35,7 @@ export type VideoParams = {
 const defaultContent = {
   contentType: 'Video',
   elementType: 'video',
-  id: '',
+  id: createGuid(),
   title: '',
   src: '',
   type: 'video/mpeg',
@@ -101,7 +101,7 @@ export class Video extends Immutable.Record(defaultContent) {
 
     let model = new Video({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

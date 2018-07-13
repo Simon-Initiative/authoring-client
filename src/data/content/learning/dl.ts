@@ -10,6 +10,7 @@ import createGuid from 'utils/guid';
 export type TermOrDefinition = Dt | Dd;
 
 export type DlParams = {
+  id?: string,
   title?: Maybe<Title>,
   content?: Immutable.OrderedMap<string, TermOrDefinition>,
   guid?: string,
@@ -18,6 +19,7 @@ export type DlParams = {
 const defaultContent = {
   contentType: 'Dl',
   elementType: 'dl',
+  id: createGuid(),
   title: Maybe.nothing(),
   content: Immutable.OrderedMap<string, TermOrDefinition>(),
   guid: '',
@@ -27,6 +29,7 @@ export class Dl extends Immutable.Record(defaultContent) {
 
   contentType: 'Dl';
   elementType: 'dl';
+  id: string;
   title: Maybe<Title>;
   content: Immutable.OrderedMap<string, TermOrDefinition>;
   guid: string;
@@ -41,6 +44,7 @@ export class Dl extends Immutable.Record(defaultContent) {
 
   clone() : Dl {
     return this.with({
+      id: createGuid(),
       content: this.content.map(d => d.clone()).toOrderedMap(),
     });
   }
@@ -50,6 +54,12 @@ export class Dl extends Immutable.Record(defaultContent) {
     const t = (root as any).dl;
 
     let model = new Dl().with({ guid });
+
+    if (t['@id']) {
+      model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
+    }
 
     getChildren(t).forEach((item) => {
 
@@ -82,6 +92,7 @@ export class Dl extends Immutable.Record(defaultContent) {
 
     return {
       dl: {
+        '@id': this.id,
         '#array': children,
       },
     };

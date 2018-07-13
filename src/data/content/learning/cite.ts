@@ -16,7 +16,7 @@ const defaultContent = {
   contentType: 'Cite',
   elementType: 'cite',
   title: '',
-  id: '',
+  id: createGuid(),
   entry: '',
   content: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   guid: '',
@@ -57,8 +57,10 @@ export class Cite extends Immutable.Record(defaultContent) {
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (t['@entry'] !== undefined) {
       model = model.with({ entry: t['@entry'] === '' ? ' ' : t['@entry'] });

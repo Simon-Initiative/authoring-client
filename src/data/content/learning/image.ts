@@ -30,7 +30,7 @@ export type ImageParams = {
 const defaultContent = {
   contentType: 'Image',
   elementType: 'image',
-  id: '',
+  id: createGuid(),
   title: '',
   src: '',
   alt: '',
@@ -90,7 +90,7 @@ export class Image extends Immutable.Record(defaultContent) {
 
     let model = new Image({ guid });
 
-    if (t['@id'] !== undefined) {
+    if (t['@id']) {
       model = model.with({ id: t['@id'] });
     } else {
       model = model.with({ id: createGuid() });

@@ -24,6 +24,7 @@ import { LegacyTypes } from 'data/types';
 import { styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.styles';
 import { relativeToNow, adjustForSkew } from 'utils/date';
 import { Tooltip } from 'utils/tooltip';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface SidebarRowProps {
   label?: string;
@@ -110,7 +111,7 @@ export const SidebarGroup = injectSheetSFC<SidebarGroupProps>(styles)(({
 
 export interface ContextAwareSidebarProps {
   className?: string;
-  content: Maybe<Object>;
+  content: Maybe<ContentElement>;
   container: Maybe<ParentContainer>;
   context: AppContext;
   editMode: boolean;
@@ -121,8 +122,8 @@ export interface ContextAwareSidebarProps {
   onEditModel: (model: ContentModel) => void;
   supportedElements: Immutable.List<string>;
   show: boolean;
-  onInsert: (content: Object, textSelection) => void;
-  onEdit: (content: Object) => void;
+  onInsert: (content: ContentElement, textSelection) => void;
+  onEdit: (content: ContentElement) => void;
   onHide: () => void;
   onSetCurrentPage: (documentId: string, pageId: string) => void;
   timeSkewInMs: number;
