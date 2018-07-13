@@ -64,7 +64,7 @@ export class Variable extends Immutable.Record(defaultContent) {
 
     const root = { variable: {} };
 
-    root.variable['#text'] = this.expression;
+    root.variable['#cdata'] = this.expression;
     root.variable['@name'] = this.name;
     if (this.id !== '') {
       root.variable['@id'] = this.id;
