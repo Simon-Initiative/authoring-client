@@ -13,15 +13,22 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ResourceState } from 'data/content/resource';
 import { Clipboard } from 'types/clipboard';
+import { ContentElement } from 'data/content/common/interfaces';
+import { CourseModel } from 'data/models';
+import { Label } from 'editors/content/common/Sidebar';
+import { ModalMessage } from 'utils/ModalMessage';
 
 export interface XrefEditorProps
   extends AbstractContentEditorProps<contentTypes.Xref> {
   onShowSidebar: () => void;
   clipboard: Clipboard;
+  displayModal: (component: any) => void;
+  dismissModal: () => void;
+  course: CourseModel;
 }
 
 export interface XrefEditorState {
-
+  noItemCopied: boolean,
 }
 
 /**
@@ -34,18 +41,127 @@ export default class XrefEditor
   constructor(props) {
     super(props);
 
+    this.state = {
+      noItemCopied: false,
+    };
+
     this.onSetTargetElement = this.onSetTargetElement.bind(this);
   }
 
+  validXrefTargets = {
+    alternatives: true,
+    applet: true,
+    audio: true,
+    cite: true,
+    codeblock: true,
+    composite: true,
+    conjugate: true,
+    conjugation: true,
+    definition: true,
+    dialog: true,
+    director: true,
+    example: true,
+    extra: true,
+    figure: true,
+    flash: true,
+    iframe: true,
+    image: true,
+    line: true,
+    materials: true,
+    mathematica: true,
+    meaning: true,
+    ol: true,
+    panopto: true,
+    pronunciation: true,
+    pullout: true,
+    speaker: true,
+    table: true,
+    translation: true,
+    ul: true,
+    unity: true,
+    video: true,
+    youtube: true,
+  };
+
   onSetTargetElement() {
-    // pull copied item from redux?
-    this.props.clipboard.item.caseOf({
-      just: item => console.log({ item }),
-      // this.props.onEdit(this.props.model.with({
-      //   idref: item.guid,
-      // })),
-      nothing: () => console.log('no item copied'),
+    const { onEdit, model, displayModal, dismissModal, clipboard } = this.props;
+
+    const infoModal = (copiedElement: ContentElement) => <ModalMessage onCancel={dismissModal}>
+      <React.Fragment>
+        Cross-references don't support {copiedElement.contentType} elements.
+        You can make cross-references to any of these element types:
+        <br /><br />
+        <ul>
+          <li>Alternatives</li>
+          <li>Applet</li>
+          <li>Audio</li>
+          <li>Citation</li>
+          <li>Code block</li>
+          <li>Composite</li>
+          <li>Conjugate</li>
+          <li>Conjugation</li>
+          <li>Definition</li>
+          <li>Dialog</li>
+          <li>Director</li>
+          <li>Example</li>
+          <li>Extra</li>
+          <li>Figure</li>
+          <li>Flash</li>
+          <li>IFrame</li>
+          <li>Image</li>
+          <li>Line</li>
+          <li>Materials</li>
+          <li>Mathematica</li>
+          <li>Meaning</li>
+          <li>Ordered List</li>
+          <li>Panopto</li>
+          <li>Pronunciation</li>
+          <li>Pullout</li>
+          <li>Speaker</li>
+          <li>Table</li>
+          <li>Translation</li>
+          <li>Unordered List</li>
+          <li>Unity</li>
+          <li>Video</li>
+          <li>Youtube</li>
+        </ul>
+      </React.Fragment>
+    </ModalMessage>;
+
+    const isValidXrefTarget = (item: ContentElement): boolean =>
+      this.validXrefTargets[item.elementType];
+
+    clipboard.item.caseOf({
+      just: (item) => {
+        if (console.log({ item }) || isValidXrefTarget(item)) {
+          onEdit(model.with({ idref: item.id }));
+          this.setState({ noItemCopied: false });
+        } else {
+          displayModal(infoModal(item));
+        }
+      },
+      nothing: () => this.setState({ noItemCopied: true }),
     });
+  }
+
+  renderNoItemCopiedWarning() {
+    return (
+      <div style={{ backgroundColor: 'tomato' }}>
+        Clipboard is empty
+      </div>
+    );
+  }
+
+  renderTarget() {
+    const { course, model } = this.props;
+    console.log('idref', model.idref);
+    console.log('resource?', course.resourcesById.get(model.idref));
+    return (
+      <React.Fragment>
+        <Label>Linked Element</Label>
+        {course.resourcesById.get(model.idref)}
+      </React.Fragment>
+    );
   }
 
   renderSidebar() {
@@ -74,7 +190,12 @@ export default class XrefEditor
             button in the toolbar</small><br />
           <small>3. Link to the copied element with the button below.</small><br />
           <Button editMode={editMode} onClick={this.onSetTargetElement}>Link Element</Button>
-          {/* Look up the item with the model's idref and display it somehow */}
+          {model.idref
+            ? this.renderTarget()
+            : null}
+          {this.state.noItemCopied
+            ? this.renderNoItemCopiedWarning()
+            : null}
         </SidebarGroup>
         <SidebarGroup label="Target">
           <Select
