@@ -1,8 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
-import * as viewActions from 'actions/view';
-import * as messageActions from 'actions/messages';
 import * as Messages from 'types/messages';
 import { Maybe } from 'tsmonad';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
@@ -20,9 +18,7 @@ function reportProblemAction(): Messages.MessageAction {
   
   return {
     label: 'Report Problem',
-    execute: (message, dispatch) => {
-      window.open(url, 'ReportProblemTab');
-    },
+    execute: () => window.open(url, 'ReportProblemTab'),
   };
 }
 
@@ -54,7 +50,10 @@ export type CourseDescription = {
 export type CoursesViewProps = {
   serverTimeSkewInMs: number,
   userId: string,
-  dispatch: any,
+  createCourse: () => any,
+  importCourse: () => any,
+  onSelect: (string) => any, // the id of the course to be viewed
+  sendMessage: (msg : Messages.Message) => any;
 };
 
 export type CoursesViewState = {
@@ -63,7 +62,6 @@ export type CoursesViewState = {
 };
 
 class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, CoursesViewState> {
-  onSelect: (string) => void;
 
   constructor(props) {
     super(props);
@@ -72,7 +70,6 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
       courses: Maybe.nothing<CourseDescription[]>(),
       searchText: '',
     };
-    this.onSelect = id => this.props.dispatch(viewActions.viewCourse(id));
   }
 
   // called to update state when search text changes
@@ -102,8 +99,6 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
     });
   }
 
-  createCourse = () => this.props.dispatch(viewActions.viewCreateCourse());
-  importCourse = () => this.props.dispatch(viewActions.viewImportCourse());
 
   componentDidMount() {
     persistence.getEditablePackages()
@@ -124,7 +119,7 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
       })
       .catch((err) => {
         console.log(err);
-        this.props.dispatch(messageActions.showMessage(errorMessageAction()));
+        this.props.sendMessage(errorMessageAction());
       });
 
   }
@@ -137,14 +132,14 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
           { 
             this.state.courses.caseOf({
               just: courses => courses.length === 0 ? <NoCourses/> :
-                <CoursesViewSearchableTable 
+                <CoursesViewSearchableTable
                 searchText={this.state.searchText}
                 textChange={this.textChange}
                 serverTimeSkewInMs={this.props.serverTimeSkewInMs}
-                createCourse={this.createCourse}
-                importCourse={this.importCourse}
+                createCourse={this.props.createCourse}
+                importCourse={this.props.importCourse}
                 rows={this.filterCourses()} 
-                onSelect={this.onSelect}
+                onSelect={this.props.onSelect}
                 />,
               nothing: () => <Waiting/>,
             })
