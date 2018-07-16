@@ -15,7 +15,7 @@ import { safeCompare } from 'components/ResourceView';
 function reportProblemAction(): Messages.MessageAction {
 
   const url = buildFeedbackFromCurrent('', '');
-  
+
   return {
     label: 'Report Problem',
     execute: () => window.open(url, 'ReportProblemTab'),
@@ -28,7 +28,7 @@ function errorMessageAction(): Messages.Message {
     title: 'Error contacting server',
     message: 'Try reloading the page. If the problem persists, please contact support.',
   });
-  
+
   return new Messages.Message().with({
     content,
     actions: Immutable.List([reportProblemAction(), Messages.RELOAD_ACTION]),
@@ -129,7 +129,7 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
       <div className="courses-view">
         <div className="my-course-packages">
           <h2 style={{ display: 'inline' }}>My Courses</h2>
-          { 
+          {
             this.state.courses.caseOf({
               just: courses => courses.length === 0 ? <NoCourses/> :
                 <CoursesViewSearchableTable
@@ -138,7 +138,7 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
                 serverTimeSkewInMs={this.props.serverTimeSkewInMs}
                 createCourse={this.props.createCourse}
                 importCourse={this.props.importCourse}
-                rows={this.filterCourses()} 
+                rows={this.filterCourses()}
                 onSelect={this.props.onSelect}
                 />,
               nothing: () => <Waiting/>,
@@ -229,7 +229,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
       adjustForSkew(r.dateCreated, serverTimeSkewInMs))}</span>,
   ];
 
-  const highlightedColumnRenderer = (prop: string, r: CourseDescription) => 
+  const highlightedColumnRenderer = (prop: string, r: CourseDescription) =>
     searchText.length < 3
       ? <span>{r[prop]}</span>
       : highlightMatches(prop, r, searchText);
@@ -244,23 +244,19 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
   ];
 
   return (
-    <div className="resource-view container-fluid new">
-      <div className="row">
-        <div className="col-sm-12 col-md-12 document">
-          <div className="container-fluid editor">
-            <div className="row">
-              <div className="col-12">
-                <TableToolbar importCourse={importCourse} textChange={textChange}
-                createCourse={createCourse}/>
-                <SortableTable
-                model={rows.map(r => ({ key: r.guid, data: r }))}
-                columnComparators={comparators}
-                columnRenderers={columnRenderers}
-                columnLabels={labels} />
-              </div>
-            </div>
+    <div className="resource-view new">
+        <div className="document">
+          <div className="editor">
+            <TableToolbar
+              importCourse={importCourse}
+              textChange={textChange}
+              createCourse={createCourse}/>
+            <SortableTable
+              model={rows.map(r => ({ key: r.guid, data: r }))}
+              columnComparators={comparators}
+              columnRenderers={columnRenderers}
+              columnLabels={labels} />
           </div>
-        </div>
       </div>
     </div>
   );
