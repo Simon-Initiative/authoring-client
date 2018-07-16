@@ -196,7 +196,9 @@ function inputRefHandler(
   workingBlock.entities.push({ offset, length, key });
 
   const data = extractAttrs(item);
-  data['$type'] = backingTextProvider[item['input_ref']['@input']].contentType;
+  data['$type'] = backingTextProvider
+    ? backingTextProvider[item['input_ref']['@input']].contentType
+    : 'unstyled';
   data[common.CDATA] = item[common.getKey(item)][common.CDATA];
   data[common.TEXT] = item[common.getKey(item)][common.TEXT];
 
