@@ -155,15 +155,15 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
   }
 }
 
-function Waiting(): JSX.Element {
+const Waiting = (): JSX.Element => {
   return (
     <div className="lead" style={{ width: '175px' }} >
       <LoadingSpinner message="Loading courses..." />
     </div>
   );
-}
+};
 
-function NoCourses(): JSX.Element {
+const NoCourses = (): JSX.Element => {
   return (
     <div>
       <p className="lead">
@@ -180,10 +180,9 @@ function NoCourses(): JSX.Element {
 
     </div>
   );
-}
+};
 
-
-function TableToolbar({ textChange, createCourse, importCourse }): JSX.Element {
+const TableToolbar = ({ textChange, createCourse, importCourse }): JSX.Element => {
   return (
       <div className="table-toolbar">
         <SearchBar
@@ -211,10 +210,10 @@ function TableToolbar({ textChange, createCourse, importCourse }): JSX.Element {
         </div>
       </div>
   );
-}
+};
 
-function CoursesViewSearchableTable({ rows, onSelect, searchText, serverTimeSkewInMs,
-  textChange, createCourse, importCourse }): JSX.Element {
+const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkewInMs,
+  textChange, createCourse, importCourse }): JSX.Element => {
 
   const labels = [
     'Title',
@@ -270,6 +269,6 @@ function CoursesViewSearchableTable({ rows, onSelect, searchText, serverTimeSkew
       </div>
     </div>
   );
-}
+};
 
 export default CoursesViewSearchable;
