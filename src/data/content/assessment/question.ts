@@ -270,6 +270,32 @@ function cloneInputQuestion(question: Question): Question {
   });
 }
 
+// This ensures that existing input-based questions (aka Numeric, Text, FillInTheBlank)
+// have the 'input' attribute specified on all the responses. This input attr is
+// required only when there is more than one item in the question - but we have to
+// add it in all cases (in case someone goes and edits to add a second item)
+function ensureInputAttrsExist(question: Question) : Question {
+
+  let modifiedQuestion = question;
+
+  question.items.toArray().forEach((item, index) => {
+
+    if (item.contentType === 'Numeric'
+      || item.contentType === 'Text' || item.contentType === 'FillInTheBlank') {
+
+      const originalPart = question.parts.toArray()[index];
+      const responses = originalPart.responses
+        .map(response => response.with({ input: item.id })).toOrderedMap();
+      const part = originalPart.with({ responses });
+
+      modifiedQuestion = modifiedQuestion.with(
+        { parts: modifiedQuestion.parts.set(part.guid, part) });
+    }
+  });
+
+  return modifiedQuestion;
+}
+
 // Cloning a single select multiple choice question requires that
 // we update the choice#value attribute in lock step with the
 // response#match attribute:
@@ -506,8 +532,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     }
 
 
-    return migrateExplanationToFeedback(
-      ensureResponsesExist(migrateSkillsToParts(model)));
+
+    return ensureInputAttrsExist(migrateExplanationToFeedback(
+      ensureResponsesExist(migrateSkillsToParts(model))));
   }
 
   toPersistence(): Object {
