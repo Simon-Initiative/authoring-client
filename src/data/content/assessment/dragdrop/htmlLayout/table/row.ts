@@ -1,7 +1,5 @@
 import * as Immutable from 'immutable';
-import { Maybe } from 'tsmonad';
 import { augment } from 'data/content/common';
-import { domParser } from 'utils/domParser';
 import { Cell } from 'data/content/assessment/dragdrop/htmlLayout/table/cell';
 import createGuid from 'utils/guid';
 

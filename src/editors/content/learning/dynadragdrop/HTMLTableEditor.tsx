@@ -3,9 +3,6 @@ import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
-import {
-  AbstractContentEditor, AbstractContentEditorProps,
-} from '../../common/AbstractContentEditor';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { Initiator } from './Initiator';
 import { DynaDropLabel } from './DynaDropLabel';

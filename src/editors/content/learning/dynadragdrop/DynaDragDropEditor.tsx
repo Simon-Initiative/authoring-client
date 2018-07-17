@@ -257,7 +257,7 @@ export class DynaDragDropEditor
   }
 
   renderMain() : JSX.Element {
-    const { classes, model, editMode, currentNode, selectedInitiator } = this.props;
+    const { model, editMode, currentNode, selectedInitiator } = this.props;
     const question = currentNode;
 
     return model.layoutData.lift((layout) => {
