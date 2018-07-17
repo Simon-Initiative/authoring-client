@@ -44,7 +44,7 @@ function convertHour(hour: number, isPM: boolean) : number {
   return hour === 12 ? 0 : hour;
 }
 
-function parseDate(value: string) : Date {
+export function parseDate(value: string) : Date {
 
   const p = value.split(' ');
   const t = p[3].split(':');
@@ -89,7 +89,7 @@ export class Resource extends Immutable.Record(
       guid: a.guid,
       id: a.id,
       type: a.type,
-      title: a.title,
+      title: a.title || '',
       dateCreated: a.dateCreated === undefined || a.dateCreate === null
         ? new Date() : parseDate(a.dateCreated),
       dateUpdated: a.dateUpdated === undefined || a.dateUpdated === null
