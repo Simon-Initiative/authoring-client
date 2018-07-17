@@ -229,13 +229,13 @@ export function createNew(model: models.ContentModel) {
 }
 
 export function load(courseId: string, documentId: string) {
-  return function (dispatch, getState) : Promise<boolean> {
+  return function (dispatch, getState) : Promise<any> {
 
     const userName = getState().user.profile.username;
 
     dispatch(documentRequested(documentId));
 
-    persistence.retrieveDocument(courseId, documentId)
+    return persistence.retrieveDocument(courseId, documentId)
       .then((document) => {
 
         // Notify that the course has changed when a user views a course
@@ -269,10 +269,7 @@ export function load(courseId: string, documentId: string) {
           dispatch(documentLoaded(documentId, document, strategy, editingAllowed));
 
         });
-      })
-      .catch(error => console.log('load-error:' + error));
-
-    return Promise.resolve(true);
+      });
   };
 }
 

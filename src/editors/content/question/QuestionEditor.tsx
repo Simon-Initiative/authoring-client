@@ -77,6 +77,7 @@ export class QuestionEditor
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.onGradingChange = this.onGradingChange.bind(this);
+    this.onVariablesChange = this.onVariablesChange.bind(this);
     this.onAddItemPart = this.onAddItemPart.bind(this);
 
     this.fillInTheBlankCommand
@@ -165,8 +166,6 @@ export class QuestionEditor
         const itemArray = items.toArray();
         const partsArray = parts.toArray();
         delta.deletions.toArray().forEach((d) => {
-
-
           // Find the item whose id matches this entity @input data field
           // and remove it and the corresponding part
           for (let i = 0; i < itemArray.length; i += 1) {
@@ -178,7 +177,6 @@ export class QuestionEditor
               break;
             }
           }
-
         });
         question = question.with({ items, parts });
 
@@ -211,8 +209,6 @@ export class QuestionEditor
 
     this.lastBody = body;
 
-
-
     this.props.onEdit(question, src);
   }
 
@@ -242,6 +238,11 @@ export class QuestionEditor
   onGradingChange(grading) {
 
     this.props.onEdit(this.props.model.with({ grading }));
+  }
+
+  onVariablesChange(variables: Immutable.OrderedMap<string, contentTypes.Variable>) {
+
+    this.props.onEdit(this.props.model.with({ variables }));
   }
 
   handleOnFocus() {
@@ -282,9 +283,11 @@ export class QuestionEditor
       body: this.props.model.body,
       grading: this.props.model.grading,
       onGradingChange: this.onGradingChange,
+      onVariablesChange: this.onVariablesChange,
       onDuplicate: this.props.onDuplicate,
       onBodyEdit: this.onBodyEdit,
       hideGradingCriteria: !this.props.isParentAssessmentGraded,
+      hideVariables: !this.props.isParentAssessmentGraded,
       canRemoveQuestion: canRemove,
       onRemoveQuestion: this.props.onRemove.bind(this, this.props.model.guid),
       onEdit: (c, p, src) => this.onItemPartEdit(c, p, src),

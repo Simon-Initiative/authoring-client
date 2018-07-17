@@ -19,7 +19,7 @@ import { LegacyTypes } from 'data/types';
 import { Maybe } from 'tsmonad';
 import Header from 'components/Header.controller';
 import Footer from 'components/Footer';
-import CoursesView from 'components/CoursesView';
+import { CoursesViewSearchable } from './components/CoursesViewSearchable.controller';
 import DocumentView from 'components/DocumentView';
 import ResourceView from 'components/ResourceView';
 import Preview from 'components/Preview';
@@ -237,7 +237,9 @@ export default class Main extends React.Component<MainProps, MainState> {
     const { onDispatch, expanded, user, course } = this.props;
 
     if (url === '/') {
-      return <CoursesView dispatch={onDispatch} userId={user.userId} />;
+      return <CoursesViewSearchable
+              serverTimeSkewInMs={this.props.server.timeSkewInMs}
+              userId={user.userId} />;
     }
     if (url === '/create') {
       return <CreateCourseView dispatch={onDispatch} />;

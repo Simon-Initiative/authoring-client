@@ -158,28 +158,6 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       'Last Updated',
     ];
 
-    const safeCompare =
-      (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
-        if (a[primaryKey] === null && b[primaryKey] === null) {
-          return 0;
-        }
-        if (a[primaryKey] === null) {
-          return direction === SortDirection.Ascending ? 1 : -1;
-        }
-        if (b[primaryKey] === null) {
-          return direction === SortDirection.Ascending ? -1 : 1;
-        }
-        if (a[primaryKey] === b[primaryKey]) {
-          if (a[secondaryKey] === b[secondaryKey]) {
-            return 0;
-          }
-          return safeCompare(secondaryKey, primaryKey, direction, a, b);
-        }
-        return direction === SortDirection.Ascending
-          ? a[primaryKey].localeCompare(b[primaryKey])
-          : b[primaryKey].localeCompare(a[primaryKey]);
-      };
-
     const comparators = [
       (direction, a, b) => safeCompare('title', 'id', direction, a, b),
       (direction, a, b) => safeCompare('id', 'title', direction, a, b),
@@ -191,7 +169,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         : compareDates(b.dateUpdated, a.dateUpdated),
     ];
 
-    const highlightedColumnRenderer = (prop: string, r: Resource) =>
+    const highlightedColumnRenderer = (prop: string, r: Resource) => 
       this.state.searchText.length < 3
         ? <span>{r[prop]}</span>
         : highlightMatches(prop, r, this.state.searchText);
@@ -264,4 +242,26 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     );
   }
 
+}
+
+export function safeCompare(primaryK: string, secondaryK: string, direction: SortDirection, a, b) {
+
+  if (a[primaryK] === null && b[primaryK] === null) {
+    return 0;
+  }
+  if (a[primaryK] === null) {
+    return direction === SortDirection.Ascending ? 1 : -1;
+  }
+  if (b[primaryK] === null) {
+    return direction === SortDirection.Ascending ? -1 : 1;
+  }
+  if (a[primaryK] === b[primaryK]) {
+    if (a[secondaryK] === b[secondaryK]) {
+      return 0;
+    }
+    return safeCompare(secondaryK, primaryK, direction, a, b);
+  }
+  return direction === SortDirection.Ascending
+    ? a[primaryK].localeCompare(b[primaryK])
+    : b[primaryK].localeCompare(a[primaryK]);
 }

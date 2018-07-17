@@ -183,6 +183,10 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return Maybe.just({ key, data: entity.getData() });
   }
 
+  getEntitiesByType(type: EntityTypes): EntityInfo[] {
+    return getEntities(type, this.content);
+  }
+
   toggleStyle(style: InlineStyles, selection: TextSelection): ContiguousText {
 
     // Determine whether we need to apply or remove the style based
