@@ -4,13 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import guid from 'utils/guid';
 import { ContentElements } from 'data/content/common/elements';
 import { QUESTION_BODY_ELEMENTS, ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
-// import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
-// import { InitiatorGroup } from 'data/content/assessment/dragdrop/initiator_group';
-// import { TargetGroup } from 'data/content/assessment/dragdrop/target_group';
 import { Maybe } from 'tsmonad';
-// import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
-// import { DndText } from 'data/content/assessment/dragdrop/dnd_text';
-// import { Target } from 'data/content/assessment/dragdrop/target';
 import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import {
   getTargetsFromLayout, updateItemPartsFromTargets,
