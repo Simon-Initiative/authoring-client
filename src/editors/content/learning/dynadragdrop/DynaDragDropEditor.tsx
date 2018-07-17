@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { injectSheet } from 'styles/jss';
 import { Custom } from 'data/content/assessment/custom';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -9,33 +9,20 @@ import {
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-// import { TG_ROW } from 'data/content/assessment/dragdrop/target_group';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
-import { Initiator } from './Initiator';
-import { DynaDropLabel } from './DynaDropLabel';
-import { DynaDropTarget } from './DynaDropTarget.controller';
-import { Button } from 'editors/content/common/Button';
 import { Page, Question, Part, Choice, Response,
   FillInTheBlank } from 'data/contentTypes';
 import { AssessmentModel } from 'data/models';
 import guid from 'utils/guid';
-// import { Target } from 'data/content/assessment/dragdrop/target';
 import { Maybe } from 'tsmonad';
-// import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
-// import { DndText } from 'data/content/assessment/dragdrop/dnd_text';
-// import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { Feedback } from 'data/content/assessment/feedback';
 import {
-  setQuestionPartWithInitiatorScore, updateItemPartsFromTargets,
-  getTargetsFromLayout, buildTargetLabelsMap, buildTargetInitiatorsMap,
+  setQuestionPartWithInitiatorScore,
 } from 'editors/content/learning/dynadragdrop/utils';
-import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 import { HTMLTableEditor } from './HTMLTableEditor';
-
 import { styles } from './DynaDragDropEditor.styles';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
-import { LegacyLayout } from 'data/content/assessment/dragdrop/legacyLayout/legacy_layout';
 import {
   TableTargetArea,
 } from 'data/content/assessment/dragdrop/htmlLayout/table/table_targetarea';
@@ -70,10 +57,6 @@ export class DynaDragDropEditor
     this.onTargetDrop = this.onTargetDrop.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.onEditLayoutData = this.onEditLayoutData.bind(this);
-    // this.onAddColumn = this.onAddColumn.bind(this);
-    // this.onAddRow = this.onAddRow.bind(this);
-    // this.editColText = this.editColText.bind(this);
-    // this.toggleCellType = this.toggleCellType.bind(this);
   }
 
   shouldComponentUpdate(nextProps: DynaDragDropEditorProps, nextState) {
@@ -88,17 +71,6 @@ export class DynaDragDropEditor
       || this.props.currentNode !== nextProps.currentNode
       || this.props.selectedInitiator !== nextProps.selectedInitiator;
   }
-
-  // componentDidMount() {
-  //   const { model, onSelectInitiator } = this.props;
-
-  //   const initiators = model.layoutData.caseOf({
-  //     just: ld => ld.initiatorGroup.initiators,
-  //     nothing: () => Immutable.List<InitiatorModel>(),
-  //   });
-
-  //   onSelectInitiator(initiators.first() && initiators.first().assessmentId);
-  // }
 
   renderSidebar(): JSX.Element {
     return (
@@ -300,6 +272,7 @@ export class DynaDragDropEditor
                     table={targetArea as TableTargetArea}
                     initiators={layout.initiators}
                     question={question}
+                    model={model}
                     selectedInitiator={selectedInitiator}
                     editMode={editMode}
                     onEditTable={table => this.onEditLayoutData(layout.with({
@@ -310,7 +283,8 @@ export class DynaDragDropEditor
                     onAddInitiator={this.addInitiator}
                     onDeleteInitiator={this.deleteInitiator}
                     onAssignInitiator={this.assignInitiator}
-                    onUnassignInitiator={this.unassignInitiator} />;
+                    onUnassignInitiator={this.unassignInitiator}
+                    onEditQuestion={this.onEditQuestion} />;
         case 'UnsupportedTargetArea':
         default:
           return (

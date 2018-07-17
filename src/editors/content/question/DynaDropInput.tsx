@@ -17,7 +17,8 @@ import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
 import { Badge } from '../common/Badge';
-
+import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
+import { Maybe } from 'tsmonad';
 export const isComplexScoring = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
 
@@ -114,36 +115,33 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const customElement = (model.body.content.find(c =>
       c.contentType === 'Custom') as contentTypes.Custom);
 
-    //TODO
-    // customElement.layoutData
-    //   .lift(ld => ld.initiatorGroup.initiators)
-    //   .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
-    //   .lift((initiator) => {
-    //     const updatedInitiator = initiator.with({
-    //       text,
-    //     });
+    customElement.layoutData
+      .lift(ld => ld.initiators)
+      .lift(initiators => initiators.find(i => i.inputVal === selectedInitiator))
+      .lift((initiator) => {
+        const updatedInitiator = initiator.with({
+          text,
+        });
 
-    //     // update custom element in question body with the updated initiator
-    //     const newCustomElement = customElement.withMutations(
-    //         (custom: contentTypes.Custom) => custom.with({
-    //           layoutData: custom.layoutData.caseOf({
-    //             just: ld => Maybe.just<DndLayout>(ld.with({
-    //               initiatorGroup: ld.initiatorGroup.with({
-    //                 initiators: ld.initiatorGroup.initiators.map(i =>
-    //                   i.guid === updatedInitiator.guid ? updatedInitiator : i,
-    //                 ) as Immutable.List<Initiator>,
-    //               }),
-    //             })),
-    //             nothing: () => Maybe.nothing<DndLayout>(),
-    //           }),
-    //         }),
-    //       ) as contentTypes.Custom;
+        // update custom element in question body with the updated initiator
+        const newCustomElement = customElement.withMutations(
+            (custom: contentTypes.Custom) => custom.with({
+              layoutData: custom.layoutData.caseOf({
+                just: ld => Maybe.just<HTMLLayout>(ld.with({
+                  initiators: ld.initiators.map(i =>
+                    i.guid === updatedInitiator.guid ? updatedInitiator : i,
+                  ).toList(),
+                })),
+                nothing: () => Maybe.nothing<HTMLLayout>(),
+              }),
+            }),
+          ) as contentTypes.Custom;
 
-    //     // save updates
-    //     onBodyEdit(model.body.with({
-    //       content: model.body.content.set(newCustomElement.guid, newCustomElement),
-    //     }));
-    //   });
+        // save updates
+        onBodyEdit(model.body.with({
+          content: model.body.content.set(newCustomElement.guid, newCustomElement),
+        }));
+      });
   }
 
   /** Implement parent absract methods */

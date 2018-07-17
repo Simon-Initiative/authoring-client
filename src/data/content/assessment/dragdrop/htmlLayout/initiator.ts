@@ -42,6 +42,6 @@ export class Initiator extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : string {
-    return `<div input_val="${this.inputVal}" class="initiator">${this.text}</div>`;
+    return `<div input_val="${this.inputVal}" class="dnd-initiator">${this.text}</div>`;
   }
 }

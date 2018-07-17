@@ -6,39 +6,32 @@ import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_lay
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from '../../common/AbstractContentEditor';
-import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { Initiator } from './Initiator';
 import { DynaDropLabel } from './DynaDropLabel';
 import { DynaDropTarget } from './DynaDropTarget.controller';
 import { Button } from 'editors/content/common/Button';
-import { Page, Question, Part, Choice, Response,
-  FillInTheBlank } from 'data/contentTypes';
-import { AssessmentModel } from 'data/models';
-import guid from 'utils/guid';
-// import { Target } from 'data/content/assessment/dragdrop/target';
-import { Maybe } from 'tsmonad';
-// import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
-// import { DndText } from 'data/content/assessment/dragdrop/dnd_text';
-// import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
-import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
-import { Feedback } from 'data/content/assessment/feedback';
 import {
-  setQuestionPartWithInitiatorScore, updateItemPartsFromTargets,
-  getTargetsFromLayout, buildTargetLabelsMap, buildTargetInitiatorsMap,
+  Question, FillInTheBlank, Custom,
+} from 'data/contentTypes';
+import guid from 'utils/guid';
+import { Maybe } from 'tsmonad';
+import {
+  updateItemPartsFromTargets, getTargetsFromLayout, buildTargetLabelsMap,
+  buildTargetInitiatorsMap,
 } from 'editors/content/learning/dynadragdrop/utils';
 import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
-
-import { styles } from './HTMLTableEditor.styles';
 import {
   TableTargetArea,
 } from 'data/content/assessment/dragdrop/htmlLayout/table/table_targetarea';
 import { Row } from 'data/content/assessment/dragdrop/htmlLayout/table/row';
+import { Cell } from 'data/content/assessment/dragdrop/htmlLayout/table/cell';
+
+import { styles } from './HTMLTableEditor.styles';
 
 export interface HTMLTableEditorProps {
   table: TableTargetArea;
+  model: Custom;
   initiators: Immutable.List<InitiatorModel>;
   selectedInitiator: string;
   editMode: boolean;
@@ -51,6 +44,7 @@ export interface HTMLTableEditorProps {
   onAssignInitiator: (initiatorId: string, targetAssessmentId: string) => void;
   onUnassignInitiator: (initiatorId: string, targetAssessmentId: string) => void;
   onDeleteInitiator: (initiatorId: string) => void;
+  onEditQuestion: (question: Question) => void;
 }
 
 export interface HTMLTableEditorState {
@@ -71,236 +65,205 @@ export class HTMLTableEditor
   }
 
   onAddColumn(index: number) {
-  //   const { model } = this.props;
+    const { table, onEditTable } = this.props;
 
-  //   model.layoutData.lift((ld) => {
-  //     const updatedLayoutData = ld.with({
-  //       targetGroup: ld.targetGroup.with({
-  //         rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
-  //           // HeaderRow
-  //           ? (r.with({
-  //               cols: r.cols.splice(index, 0, new DndText()) as Immutable.List<DndText> }))
-  //           // ContentRow
-  //           : (r.with({
-  //               cols: r.cols.splice(index, 0, new DndText()) as Immutable.List<DndText> })),
-  //         ) as Immutable.List<TG_ROW>,
-  //       }),
-  //     });
+    const updatedTable = table.with({
+      rows: table.rows.map(r => r.with({
+        cells: r.cells.splice(index, 0, new Cell()).toList(),
+      })).toList(),
+    });
 
-  //     this.onEditLayoutData(updatedLayoutData);
-  //   });
+    onEditTable(updatedTable);
   }
 
   onRemoveColumn(index: number) {
-  //   const { model, currentNode } = this.props;
-  //   const question = currentNode;
+    const { model, table, question, onEditQuestion } = this.props;
 
-  //   model.layoutData.lift((ld) => {
-  //     const updatedLayoutData = ld.with({
-  //       targetGroup: ld.targetGroup.with({
-  //         rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
-  //           // HeaderRow
-  //           ? (r.with({ cols: r.cols.splice(index, 1) as Immutable.List<DndText> }))
-  //           // ContentRow
-  //           : (r.with({ cols: r.cols.splice(index, 1) as Immutable.List<DndText> })),
-  //         ) as Immutable.List<TG_ROW>,
-  //       }),
-  //     });
+    model.layoutData.lift((layoutData) => {
+      const updatedTable = table.with({
+        rows: table.rows.map(r => r.with({
+          cells: r.cells.splice(index, 1).toList(),
+        })).toList(),
+      });
 
-  //     const updatedModel = model.with({
-  //       layoutData: Maybe.just<DndLayout>(updatedLayoutData),
-  //     });
+      const updatedLayoutData = layoutData.with({
+        targetArea: Maybe.just(updatedTable),
+      });
 
-  //     // removed column might contain targets, update item and parts accordingly
-  //     const { items, parts } = updateItemPartsFromTargets(
-  //       question.items as Immutable.OrderedMap<string, FillInTheBlank>,
-  //       question.parts,
-  //       getTargetsFromLayout(updatedLayoutData),
-  //     );
+      const updatedModel = model.with({
+        layoutData: Maybe.just<HTMLLayout>(updatedLayoutData),
+      });
 
-  //     // save question updates
-  //     this.onEditQuestion(question.with({
-  //       body: question.body.with({
-  //         content: question.body.content.set(updatedModel.guid, updatedModel),
-  //       }),
-  //       items,
-  //       parts,
-  //     }));
-  //   });
+      // removed column might contain targets, update item and parts accordingly
+      const { items, parts } = updateItemPartsFromTargets(
+        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
+        question.parts,
+        getTargetsFromLayout(updatedLayoutData),
+      );
+
+      // save question updates
+      onEditQuestion(question.with({
+        body: question.body.with({
+          content: question.body.content.set(updatedModel.guid, updatedModel),
+        }),
+        items,
+        parts,
+      }));
+    });
   }
 
   onAddRow(index: number) {
-  //   const { model, currentNode } = this.props;
-  //   const question = currentNode;
+    const { model, table, question, onEditQuestion } = this.props;
 
-  //   model.layoutData.lift((ld) => {
-  //     const updatedLayoutData = ld.with({
-  //       targetGroup: ld.targetGroup.with({
-  //         rows: ld.targetGroup.rows.splice(index, 0, new ContentRow().with({
-  //           // use the last row as a template for the new row cols (DndText or Target)
-  //           cols: Immutable.List<DndText | Target>(
-  //             ld.targetGroup.rows.last()
-  //             ? ld.targetGroup.rows.last().cols.toArray().map(c =>
-  //                 c.contentType === 'DndText'
-  //                 ? (new DndText())
-  //                 : (new Target({ assessmentId: guid() })),
-  //               )
-  //             : [],
-  //           ),
-  //         })) as Immutable.List<TG_ROW>,
-  //       }),
-  //     });
+    model.layoutData.lift((layoutData) => {
+      const updatedTable = table.with({
+        rows: table.rows.splice(
+          index,
+          0,
+          new Row().with({
+            // use the last row as a template for the new row cols (label or target)
+            cells: table.rows.last().cells.map(c => c.target.caseOf({
+              just: target => new Cell().with({
+                target: Maybe.just(guid()),
+              }),
+              nothing: () => new Cell(),
+            })).toList(),
+          }),
+        ).toList(),
+      });
 
-  //     const updatedModel = model.with({
-  //       layoutData: Maybe.just<DndLayout>(updatedLayoutData),
-  //     });
+      const updatedLayoutData = layoutData.with({
+        targetArea: Maybe.just(updatedTable),
+      });
 
-  //     // new row might contain targets, update item and parts accordingly
-  //     const { items, parts } = updateItemPartsFromTargets(
-  //       question.items as Immutable.OrderedMap<string, FillInTheBlank>,
-  //       question.parts,
-  //       getTargetsFromLayout(updatedLayoutData),
-  //     );
+      const updatedModel = model.with({
+        layoutData: Maybe.just<HTMLLayout>(updatedLayoutData),
+      });
 
-  //     // save question updates
-  //     this.onEditQuestion(question.with({
-  //       body: question.body.with({
-  //         content: question.body.content.set(updatedModel.guid, updatedModel),
-  //       }),
-  //       items,
-  //       parts,
-  //     }));
-  //   });
+      // new row might contain targets, update item and parts accordingly
+      const { items, parts } = updateItemPartsFromTargets(
+        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
+        question.parts,
+        getTargetsFromLayout(updatedLayoutData),
+      );
+
+      // save question updates
+      onEditQuestion(question.with({
+        body: question.body.with({
+          content: question.body.content.set(updatedModel.guid, updatedModel),
+        }),
+        items,
+        parts,
+      }));
+    });
   }
 
   onRemoveRow(index: number) {
-  //   const { model, currentNode } = this.props;
-  //   const question = currentNode;
+    const { model, table, question, onEditQuestion } = this.props;
 
-  //   model.layoutData.lift((ld) => {
-  //     const updatedLayoutData = ld.with({
-  //       targetGroup: ld.targetGroup.with({
-  //         rows: ld.targetGroup.rows.splice(index, 1) as Immutable.List<TG_ROW>,
-  //       }),
-  //     });
+    model.layoutData.lift((layoutData) => {
+      const updatedTable = table.with({
+        rows: table.rows.splice(index, 1).toList(),
+      });
 
-  //     const updatedModel = model.with({
-  //       layoutData: Maybe.just<DndLayout>(updatedLayoutData),
-  //     });
+      const updatedLayoutData = layoutData.with({
+        targetArea: Maybe.just(updatedTable),
+      });
 
-  //     // removed row might contain targets, update item and parts accordingly
-  //     const { items, parts } = updateItemPartsFromTargets(
-  //       question.items as Immutable.OrderedMap<string, FillInTheBlank>,
-  //       question.parts,
-  //       getTargetsFromLayout(updatedLayoutData),
-  //     );
+      const updatedModel = model.with({
+        layoutData: Maybe.just<HTMLLayout>(updatedLayoutData),
+      });
 
-  //     // save question updates
-  //     this.onEditQuestion(question.with({
-  //       body: question.body.with({
-  //         content: question.body.content.set(updatedModel.guid, updatedModel),
-  //       }),
-  //       items,
-  //       parts,
-  //     }));
-  //   });
+      // removed row might contain targets, update item and parts accordingly
+      const { items, parts } = updateItemPartsFromTargets(
+        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
+        question.parts,
+        getTargetsFromLayout(updatedLayoutData),
+      );
+
+      // save question updates
+      onEditQuestion(question.with({
+        body: question.body.with({
+          content: question.body.content.set(updatedModel.guid, updatedModel),
+        }),
+        items,
+        parts,
+      }));
+    });
   }
 
-  // editColText(text: string, currentCol: DndText) {
-  editColText(text: string, currentCol) {
-  //   const { model } = this.props;
+  editColText(text: string, currentCell: Cell) {
+    const { table, onEditTable } = this.props;
 
-  //   model.layoutData.lift((ld) => {
-  //     const updatedLayoutData = ld.with({
-  //       targetGroup: ld.targetGroup.with({
-  //         rows: ld.targetGroup.rows.map(row => row.contentType === 'HeaderRow'
-  //           // HeaderRow
-  //           ? row.with({
-  //             cols: row.cols.map(col => col.guid === currentCol.guid
-  //               ? col.with({
-  //                 text,
-  //               })
-  //               : col,
-  //             ) as Immutable.List<DndText>,
-  //           })
-  //           // ContentRow
-  //           : row.with({
-  //             cols: row.cols.map(col => col.guid === currentCol.guid
-  //               && col.contentType === 'DndText'
-  //               ? col.with({
-  //                 text,
-  //               })
-  //               : col,
-  //             ) as Immutable.List<DndText>,
-  //           }),
-  //         ) as Immutable.List<TG_ROW>,
-  //       }),
-  //     });
+    const updatedTable = table.with({
+      rows: table.rows.map(row => row.with({
+        cells: row.cells.map(cell => cell.guid === currentCell.guid
+          ? (
+            cell.with({
+              text,
+            })
+          )
+          : cell,
+        ).toList(),
+      })).toList(),
+    });
 
-  //     this.onEditLayoutData(updatedLayoutData);
-  //   });
+    onEditTable(updatedTable);
   }
 
-  toggleCellType(cellGuid: string) {
-  //   const { model, currentNode } = this.props;
-  //   const question = currentNode;
+  toggleCellType = (cellGuid: string) => {
+    const { model, table, question, onEditQuestion } = this.props;
 
-  //   model.layoutData.lift((ld) => {
-  //     const updatedLayoutData = ld.with({
-  //       targetGroup: ld.targetGroup.with({
-  //         rows: ld.targetGroup.rows.map(row => row.contentType === 'HeaderRow'
-  //           // HeaderRow
-  //           ? row
-  //           // ContentRow
-  //           : row.with({
-  //             cols: row.cols.map(col =>
-  //               // check if this cell is the toggle cell
-  //               col.guid === cellGuid
-  //               ? (
-  //                 // if cell is a label, return a new target
-  //                 col.contentType === 'DndText'
-  //                 ? (
-  //                   new Target().with({
-  //                     guid: guid(),
-  //                     assessmentId: guid(),
-  //                   })
-  //                 )
-  //                 // otherwise it is a target, return a new label
-  //                 : (
-  //                   new DndText().with({
-  //                     guid: guid(),
-  //                   })
-  //                 )
-  //               )
-  //               : (
-  //                 col
-  //               ),
-  //             ) as Immutable.List<DndText>,
-  //           }),
-  //         ) as Immutable.List<TG_ROW>,
-  //       }),
-  //     });
+    model.layoutData.lift((layoutData) => {
+      const updatedTable = table.with({
+        rows: table.rows.map(row => row.with({
+          cells: row.cells.map(cell =>
+            // check if this cell is the toggle cell
+            cell.guid === cellGuid
+            ? (
+              // toggle between target and label cell
+              cell.target.caseOf({
+                just: () => cell.with({
+                  target: Maybe.nothing(),
+                }),
+                nothing: () => cell.with({
+                  target: Maybe.just(guid()),
+                  text: '',
+                }),
+              })
+            )
+            : (
+              cell
+            ),
+          ).toList(),
+          }),
+        ).toList(),
+      });
 
-  //     const updatedModel = model.with({
-  //       layoutData: Maybe.just<DndLayout>(updatedLayoutData),
-  //     });
+      const updatedLayoutData = layoutData.with({
+        targetArea: Maybe.just(updatedTable),
+      });
 
-  //     // target changed, update item and parts accordingly
-  //     const { items, parts } = updateItemPartsFromTargets(
-  //       question.items as Immutable.OrderedMap<string, FillInTheBlank>,
-  //       question.parts,
-  //       getTargetsFromLayout(updatedLayoutData),
-  //     );
+      const updatedModel = model.with({
+        layoutData: Maybe.just<HTMLLayout>(updatedLayoutData),
+      });
 
-  //     // save question updates
-  //     this.onEditQuestion(question.with({
-  //       body: question.body.with({
-  //         content: question.body.content.set(updatedModel.guid, updatedModel),
-  //       }),
-  //       items,
-  //       parts,
-  //     }));
-  //   });
+      // target changed, update item and parts accordingly
+      const { items, parts } = updateItemPartsFromTargets(
+        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
+        question.parts,
+        getTargetsFromLayout(updatedLayoutData),
+      );
+
+      // save question updates
+      onEditQuestion(question.with({
+        body: question.body.with({
+          content: question.body.content.set(updatedModel.guid, updatedModel),
+        }),
+        items,
+        parts,
+      }));
+    });
   }
 
   renderDropdown(
@@ -346,8 +309,6 @@ export class HTMLTableEditor
 
     const rows = table.rows;
 
-    console.log('initiators', initiators)
-
     // build a map of targets to initiators
     const targetInitiators = buildTargetInitiatorsMap(question, initiators);
 
@@ -387,6 +348,7 @@ export class HTMLTableEditor
                 key={cell.guid}
                 id={cell.guid}
                 className={classNames([classes.cell])}
+                // TODO
                 // style={cell.style}
                 canToggleType={true}
                 onToggleType={this.toggleCellType}

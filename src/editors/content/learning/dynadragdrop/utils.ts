@@ -4,11 +4,10 @@ import { convert } from 'utils/format';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { Question, Part, Choice, Response,
   FillInTheBlank } from 'data/contentTypes';
-// import { Target } from 'data/content/assessment/dragdrop/target';
-// import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { Feedback } from 'data/content/assessment/feedback';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
+import { Cell } from 'data/content/assessment/dragdrop/htmlLayout/table/cell';
 
 export const choiceAssessmentIdSort = (a: Choice, b: Choice) =>
   a.value.localeCompare(b.value);
@@ -16,9 +15,9 @@ export const choiceAssessmentIdSort = (a: Choice, b: Choice) =>
 export const responseAssessmentIdSort = (a: Response, b: Response) =>
   a.match.localeCompare(b.match);
 
-// export const targetAssessmentIdSort = (a: Target, b: Target) =>
-export const targetAssessmentIdSort = (a, b) =>
-  a.assessmentId.localeCompare(b.assessmentId);
+export const targetAssessmentIdSort = (a: Cell, b: Cell) =>
+  // parameters must always be targets. If they arent, just throw an error
+  a.target.valueOrThrow().localeCompare(b.target.valueOrThrow());
 
 export const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => {
   const currentItem = question.items.toArray().find(
@@ -71,7 +70,7 @@ export const buildTargetInitiatorsMap =
       (accParts, part) => ({
         ...accParts,
         ...part.responses.reduce(
-          (accResponses, response) => (+response.score > 0)
+          (accResponses, response) => (+response.score > 0) && initiatorsMap[response.input]
             ? ({
               ...accResponses,
               [response.match]:
@@ -116,40 +115,55 @@ export const setQuestionPartWithInitiatorScore = (
   });
 };
 
-export const getTargetsFromLayout = (dndLayout: HTMLLayout) => {
-  // return dndLayout.targetGroup.rows.reduce(
-  //   (accRows, row) =>
-  //     accRows.concat(row.cols.toArray().reduce(
-  //       (accCols, col) => col.contentType === 'Target' ? accCols.push(col) : accCols,
-  //       Immutable.List<Target>(),
-  //     )) as Immutable.List<Target>,
-  //   Immutable.List<Target>(),
-  // );
-  return Immutable.List();
+export const getTargetsFromLayout = (layout: HTMLLayout) => {
+  return layout.targetArea.lift((ta) => {
+    switch (ta.contentType) {
+      case 'TableTargetArea':
+        return ta.rows.reduce(
+          (accRows, row) =>
+            accRows.concat(row.cells.reduce(
+              (accCells, cell) => cell.target.caseOf({
+                just: () => accCells.push(cell),
+                nothing: () => accCells,
+              }),
+              Immutable.List<Cell>(),
+            ),
+          ).toList(),
+          Immutable.List<Cell>(),
+        );
+      default:
+        return Immutable.List<Cell>();
+    }
+  })
+  .valueOr(Immutable.List<Cell>());
 };
 
+/**
+ * This function expects targetCells to be a list of targets.
+ * If there are any cells that are not targets, this function will
+ * throw an error.
+ */
 export const updateItemPartsFromTargets = (
   items: Immutable.OrderedMap<string, FillInTheBlank>,
   parts: Immutable.OrderedMap<string, Part>,
-  // targets: Immutable.List<Target>,
-  targets,
+  targetCells: Immutable.List<Cell>,
   ) => {
   // sort targets to ensure consistent ordering
-  const sortedTargets = targets.sort(targetAssessmentIdSort);
+  const sortedTargetCells = targetCells.sort(targetAssessmentIdSort);
 
   // compute updated parts based on targets
   const updatedParts = parts.reduce(
     (accParts, part) => accParts.set(part.guid, part.with({
-      responses: sortedTargets.reduce(
-        (accResponses, target) => {
+      responses: sortedTargetCells.reduce(
+        (accResponses, targetCell) => {
           const input = part.responses.first() && part.responses.first().input;
           const f = new Feedback();
 
           // find existing response with assessmentId or create a new one
           const response = part.responses.find(r =>
-            r.match === target.assessmentId) || new Response().with({
+            r.match === targetCell.target.valueOrThrow()) || new Response().with({
               input,
-              match: target.assessmentId,
+              match: targetCell.target.valueOrThrow(),
               feedback: Immutable.OrderedMap<string, Feedback>().set(f.guid, f),
             });
 
@@ -163,11 +177,11 @@ export const updateItemPartsFromTargets = (
 
   const updatedItems = items.reduce(
     (accItems, item) => accItems.set(item.guid, item.with({
-      choices: sortedTargets.reduce(
-        (accChoices, target) => {
+      choices: sortedTargetCells.reduce(
+        (accChoices, targetCell) => {
           const choice = item.choices.find(c =>
-            c.value === target.assessmentId) || new Choice().with({
-              value: target.assessmentId,
+            c.value === targetCell.target.valueOrThrow()) || new Choice().with({
+              value: targetCell.target.valueOrThrow(),
               body: new ContentElements().with({
                 supportedElements: Immutable.List(FLOW_ELEMENTS) }),
             });

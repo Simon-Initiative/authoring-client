@@ -32,8 +32,8 @@ export interface DynaDropTargetState {
 
 const target = {
   drop(props, monitor) {
-    const { assessmentId, onDrop } = props;
-    onDrop(monitor.getItem().initiator, assessmentId, monitor.getItem().originalTargetId);
+    const { inputVal, onDrop } = props;
+    onDrop(monitor.getItem().initiator, inputVal, monitor.getItem().originalTargetId);
   },
   canDrop(props, monitor) {
     return true;
