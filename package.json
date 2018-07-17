@@ -68,6 +68,9 @@
     "xml-beautifier": "^0.3.0"
   },
   "devDependencies": {
+    "@types/draft-js": "^0.10.23",
+    "@types/history": "^4.6.2",
+    "@types/jss": "^9.5.3",
     "bs-platform": "^2.2.3",
     "chokidar-cli": "^1.2.0",
     "del-cli": "^1.1.0",
