@@ -133,9 +133,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   getFirstReferenceId(): string | undefined {
     const firstBlock = this.content.getFirstBlock();
     if (firstBlock) {
-      console.log(
-        'The firstBlocks id is',
-        (firstBlock.data as Immutable.Map<string, string>).get('id'))
       return (firstBlock.data as Immutable.Map<string, string>).get('id');
     }
     return undefined;

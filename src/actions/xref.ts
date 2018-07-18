@@ -35,10 +35,8 @@ export function fetchAndSetTargetNode(targetId: string, documentId: string) {
       const node = findNodes(
         wbpage,
         node => node.contentType === 'ContiguousText'
-          ? console.log('The node is a contiguous text', node, 'looking for targetId', targetId) ||
-            (node as ContiguousText).getFirstReferenceId() === targetId
+          ? (node as ContiguousText).getFirstReferenceId() === targetId
           : node.id === targetId)[0];
-      console.log({ node });
       dispatch(setTargetNode(node ? Either.right(node) : Either.left(targetId)));
     });
   };
