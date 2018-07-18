@@ -20,7 +20,7 @@ export type AlternativesParams = {
 const defaultContent = {
   contentType: 'Alternatives',
   elementType: 'alternatives',
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing(),
   group: Maybe.nothing(),
   content: Immutable.OrderedMap<string, Alternative>(),
@@ -101,7 +101,7 @@ export class Alternatives extends Immutable.Record(defaultContent) {
 
     const s = {
       alternatives: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': children,
       },
     };

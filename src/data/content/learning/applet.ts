@@ -32,7 +32,7 @@ export type AppletParams = {
 const defaultContent = {
   contentType: 'Applet',
   elementType: 'applet',
-  id: createGuid(),
+  id: '',
   width: '800',
   height: '450',
   logging: true,
@@ -170,7 +170,7 @@ export class Applet extends Immutable.Record(defaultContent) {
 
     return {
       applet: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@codebase': this.codebase !== '' ? this.codebase : undefined,

@@ -17,7 +17,7 @@ export type MaterialsParams = {
 const defaultContent = {
   contentType: 'Materials',
   elementType: 'materials',
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing(),
   content: Immutable.OrderedMap<string, Material>(),
   orient: Orientation.Horizontal,
@@ -99,7 +99,7 @@ export class Materials extends Immutable.Record(defaultContent) {
 
     const m = {
       materials: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@orient': 'horizontal',
         '#array': content,
       },

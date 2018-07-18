@@ -30,7 +30,7 @@ export type OlParams = {
 const defaultContent = {
   contentType: 'Ol',
   elementType: 'ol',
-  id: createGuid,
+  id: '',
   style: Maybe.nothing(),
   start: Maybe.nothing(),
   title: Maybe.nothing(),
@@ -112,7 +112,7 @@ export class Ol extends Immutable.Record(defaultContent) {
 
     const ol = {
       ol: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': children,
       },
     };

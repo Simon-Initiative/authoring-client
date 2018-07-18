@@ -30,7 +30,7 @@ export type FlashParams = {
 const defaultContent = {
   contentType: 'Flash',
   elementType: 'flash',
-  id: createGuid(),
+  id: '',
   width: '800',
   height: '450',
   logging: true,
@@ -158,7 +158,7 @@ export class Flash extends Immutable.Record(defaultContent) {
 
     return {
       flash: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@logging': this.logging ? 'true' : 'false',

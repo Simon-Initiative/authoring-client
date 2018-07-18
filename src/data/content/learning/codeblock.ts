@@ -17,7 +17,7 @@ export type CodeBlockParams = {
 const defaultContent = {
   contentType: 'CodeBlock',
   elementType: 'codeblock',
-  id: createGuid(),
+  id: '',
   title: '',
   source: '',
   syntax: 'text',
@@ -90,7 +90,7 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       codeblock: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@syntax': this.syntax,
         '@title': this.title,
         '@highlight': this.highlight,

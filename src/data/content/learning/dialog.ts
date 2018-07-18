@@ -25,8 +25,8 @@ export type DialogParams = {
 const defaultContent = {
   contentType: 'Dialog',
   elementType: 'dialog',
-  guid: createGuid(),
-  id: Maybe.nothing<string>(),
+  guid: '',
+  id: '',
   title: Title.fromText('Dialog Title'),
   media: Maybe.nothing<MediaItem>(),
   speakers: Immutable.OrderedMap<string, Speaker>(),
@@ -163,7 +163,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
     const m = {
       dialog: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': [
           this.title.toPersistence(),
           ...media,

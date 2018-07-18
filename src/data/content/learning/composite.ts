@@ -20,7 +20,7 @@ export type CompositeParams = {
 const defaultContent = {
   contentType: 'Composite',
   elementType: 'composite',
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing(),
   purpose: Maybe.nothing(),
   instructions: Maybe.nothing(),
@@ -101,7 +101,7 @@ export class Composite extends Immutable.Record(defaultContent) {
 
     const s = {
       composite_activity: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': [...optional, ...required],
       },
     };

@@ -25,7 +25,7 @@ export type UlParams = {
 const defaultContent = {
   contentType: 'Ul',
   elementType: 'ul',
-  id: createGuid(),
+  id: '',
   style: Maybe.nothing(),
   title: Maybe.nothing(),
   listItems: Immutable.OrderedMap<string, Li>(),
@@ -102,7 +102,7 @@ export class Ul extends Immutable.Record(defaultContent) {
 
     const ul = {
       ul: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': children,
       },
     };

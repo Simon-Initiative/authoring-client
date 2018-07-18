@@ -15,7 +15,7 @@ const defaultContent = {
   contentType: 'Translation',
   elementType: 'translation',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing(),
   guid: '',
 };
@@ -66,7 +66,7 @@ export class Translation extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const t = {
       translation: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': this.content.toPersistence(),
       },
     };

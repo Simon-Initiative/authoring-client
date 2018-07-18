@@ -26,7 +26,7 @@ export type IFrameParams = {
 const defaultContent = {
   contentType: 'IFrame',
   elementType: 'iframe',
-  id: createGuid(),
+  id: '',
   title: '',
   src: 'https://www.example.com',
   width: '800',
@@ -141,7 +141,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
 
     return {
       iframe: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@title': this.title,
         '@src': this.src === '' ? 'http://www.google.com' : this.src,
         '@height': this.height,

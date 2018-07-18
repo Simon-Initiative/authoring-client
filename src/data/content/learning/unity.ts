@@ -29,7 +29,7 @@ export type UnityParams = {
 const defaultContent = {
   contentType: 'Unity',
   elementType: 'unity',
-  id: createGuid(),
+  id: '',
   width: '800',
   height: '450',
   src: '',
@@ -151,7 +151,7 @@ export class Unity extends Immutable.Record(defaultContent) {
 
     return {
       unity: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@src': this.src,

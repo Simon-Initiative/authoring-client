@@ -30,7 +30,7 @@ export type ImageParams = {
 const defaultContent = {
   contentType: 'Image',
   elementType: 'image',
-  id: createGuid(),
+  id: '',
   title: '',
   src: '',
   alt: '',
@@ -161,7 +161,7 @@ export class Image extends Immutable.Record(defaultContent) {
 
     const obj = {
       image: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@title': this.title,
         '@src': this.src === '' ? 'https://via.placeholder.com/400x300'
           + '?text=Click+to+edit+image' : this.src,

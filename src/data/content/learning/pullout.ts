@@ -41,7 +41,7 @@ export type PulloutParams = {
 const defaultContent = {
   contentType: 'Pullout',
   elementType: 'pullout',
-  id: createGuid(),
+  id: '',
   title: Title.fromText('Title'),
   orient: Orientation.Horizontal,
   pulloutType: Maybe.nothing(),
@@ -125,7 +125,7 @@ export class Pullout extends Immutable.Record(defaultContent) {
 
     const s = {
       pullout: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@orient': this.orient,
         '#array': [
           this.title.toPersistence(),

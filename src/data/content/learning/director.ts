@@ -27,7 +27,7 @@ export type DirectorParams = {
 const defaultContent = {
   contentType: 'Director',
   elementType: 'director',
-  id: createGuid(),
+  id: '',
   width: '800',
   height: '450',
   src: '',
@@ -142,7 +142,7 @@ export class Director extends Immutable.Record(defaultContent) {
 
     return {
       director: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@purpose': this.purpose.caseOf({ just: p => p, nothing: () => undefined }),

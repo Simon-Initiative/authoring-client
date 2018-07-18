@@ -22,7 +22,7 @@ export type ExtraParams = {
 const defaultContent = {
   contentType: 'Extra',
   elementType: 'extra',
-  id: createGuid(),
+  id: '',
   anchor: new Anchor(),
   pronunciation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
   translation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
@@ -154,7 +154,7 @@ export class Extra extends Immutable.Record(defaultContent) {
 
     const m = {
       extra: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': children,
       },
     };

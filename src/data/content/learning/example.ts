@@ -18,7 +18,7 @@ export type ExampleParams = {
 const defaultContent = {
   contentType: 'Example',
   elementType: 'example',
-  id: createGuid(),
+  id: '',
   title: Title.fromText('Title'),
   purpose: Maybe.nothing(),
   content: new ContentElements().with({ supportedElements: Immutable.List<string>(BOX_ELEMENTS) }),
@@ -90,7 +90,7 @@ export class Example extends Immutable.Record(defaultContent) {
 
     const s = {
       example: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': [
           this.title.toPersistence(),
           ...content,

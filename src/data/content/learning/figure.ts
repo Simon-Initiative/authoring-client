@@ -27,7 +27,7 @@ const defaultContent = {
   elementType: 'figure',
 
   guid: '',
-  id: createGuid(),
+  id: '',
   title: Title.fromText('Title'),
   caption: Maybe.nothing(),
   cite: Maybe.nothing(),
@@ -130,7 +130,7 @@ export class Figure extends Immutable.Record(defaultContent) {
 
     const s = {
       figure: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': [
           ...children,
           ...content,

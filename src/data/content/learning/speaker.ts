@@ -16,7 +16,7 @@ const defaultContent = {
   contentType: 'Speaker',
   elementType: 'speaker',
   guid: '',
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing<string>(),
   content: Maybe.nothing<string | Image>(),
 };
@@ -81,7 +81,7 @@ export class Speaker extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const m = {
       speaker: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
       },
     };
 

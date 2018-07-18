@@ -21,7 +21,7 @@ export type DefinitionParams = {
 const defaultContent = {
   contentType: 'Definition',
   elementType: 'definition',
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing(),
   term: '',
   pronunciation: Maybe.nothing(),
@@ -112,7 +112,7 @@ export class Definition extends Immutable.Record(defaultContent) {
 
     const m = {
       definition: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': children,
       },
     };

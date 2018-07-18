@@ -172,7 +172,7 @@ export class Audio extends Immutable.Record(defaultContent) {
 
     return {
       audio: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@title': this.title,
         '@src': this.src,
         '@type': this.type,

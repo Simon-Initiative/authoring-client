@@ -21,7 +21,7 @@ export type ConjugationParams = {
 const defaultContent = {
   contentType: 'Conjugation',
   elementType: 'conjugation',
-  id: createGuid(),
+  id: '',
   verb: '',
   pronunciation: Maybe.nothing(),
   title: Title.fromText('Title'),
@@ -121,7 +121,7 @@ export class Conjugation extends Immutable.Record(defaultContent) {
 
     return {
       conjugation: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@verb': this.verb,
         '#array': children,
       },

@@ -17,7 +17,7 @@ const defaultContent = {
   contentType: 'Pronunciation',
   elementType: 'pronunciation',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing(),
   src: Maybe.nothing(),
   srcContentType: Maybe.nothing(),
@@ -83,7 +83,7 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const t = {
       pronunciation: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': this.content.toPersistence(),
       },
     };

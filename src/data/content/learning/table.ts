@@ -22,7 +22,7 @@ export type TableParams = {
 };
 
 const defaultContent = {
-  id: createGuid(),
+  id: '',
   contentType: 'Table',
   elementType: 'table',
   summary: '',
@@ -132,7 +132,7 @@ export class Table extends Immutable.Record(defaultContent) {
 
     return {
       table: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@summary': this.summary,
         '@rowstyle': this.rowstyle,
         '#array': children,

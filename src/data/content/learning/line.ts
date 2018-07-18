@@ -19,7 +19,7 @@ const defaultContent = {
   contentType: 'Line',
   elementType: 'line',
   guid: '',
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing<string>(),
   speaker: '',
   material: new Material(),
@@ -98,7 +98,7 @@ export class Line extends Immutable.Record(defaultContent) {
 
     const m = {
       line: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@speaker': this.speaker,
         '#array': children,
       },

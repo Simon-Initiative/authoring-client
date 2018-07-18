@@ -16,7 +16,7 @@ const defaultContent = {
   contentType: 'Cite',
   elementType: 'cite',
   title: '',
-  id: createGuid(),
+  id: '',
   entry: '',
   content: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   guid: '',
@@ -78,7 +78,7 @@ export class Cite extends Immutable.Record(defaultContent) {
     const o = {
       cite: {
         '@title': this.title,
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
       },
     };
 

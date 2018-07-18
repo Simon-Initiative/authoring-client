@@ -27,7 +27,7 @@ export type MathematicaParams = {
 const defaultContent = {
   contentType: 'Mathematica',
   elementType: 'mathematica',
-  id: createGuid(),
+  id: '',
   width: '800',
   height: '450',
   src: '',
@@ -143,7 +143,7 @@ export class Mathematica extends Immutable.Record(defaultContent) {
 
     return {
       mathematica: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@src': this.src,

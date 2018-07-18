@@ -20,7 +20,7 @@ const defaultContent = {
   pronouns: '',
   src: '',
   type: '',
-  id: createGuid(),
+  id: '',
   content: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
   guid: '',
 };
@@ -82,7 +82,7 @@ export class Conjugate extends Immutable.Record(defaultContent) {
 
     return {
       conjugate: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@src': this.src !== '' ? this.src : undefined,
         '@type': this.type !== '' ? this.type : undefined,
         '@pronouns': this.pronouns !== '' ? this.pronouns : undefined,

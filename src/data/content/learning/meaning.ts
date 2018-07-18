@@ -17,7 +17,7 @@ export type MeaningParams = {
 const defaultContent = {
   contentType: 'Meaning',
   elementType: 'meaning',
-  id: createGuid(),
+  id: '',
   title: Maybe.nothing(),
   examples: Immutable.OrderedMap<string, Example>(),
   material: Material,
@@ -84,7 +84,7 @@ export class Meaning extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const m = {
       meaning: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': [
           this.material.toPersistence(),
         ],
