@@ -86,9 +86,8 @@ export default class XrefEditor
       let id: string;
       // Handle contiguous text as a special case, retrieving the ID of the first paragraph
       if (item.contentType === 'ContiguousText') {
-        id = (item as contentTypes.ContiguousText).getReferenceId();
-        console.log({ id });
-        // Else, if it's a valid xref target, it must have an ID
+        id = (item as contentTypes.ContiguousText).getFirstReferenceId();
+      // Else, if it's a valid xref target, it must have an ID
       } else if (isValidXrefTarget(item)) {
         id = (item as any).id;
       }
@@ -109,10 +108,6 @@ export default class XrefEditor
     if (model.idref) {
       updateTarget(model.idref, page);
     }
-    // target.caseOf({
-    //   left: id => updateTarget(id, page),
-    //   right: target => updateTarget(target.id, page),
-    // });
   }
 
   renderSidebar() {
@@ -211,7 +206,7 @@ const Target = ({ target, editMode, clipboard, onChangeTarget }: TargetProps) =>
               {getContentIcon('')} Target not found in page
             </span>,
           })
-          : null}
+          : <span className="italic">No target element</span>}
       </div>
     </div>
   );

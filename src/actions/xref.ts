@@ -5,6 +5,7 @@ import * as persistence from 'data/persistence';
 import { WorkbookPageModel } from 'data/models';
 import { findNodes } from 'data/models/utils/workbook';
 import { Either } from 'tsmonad';
+import { ContiguousText } from 'data/contentTypes';
 
 export type SET_TARGET = 'SET_TARGET';
 export const SET_TARGET = 'SET_TARGET';
@@ -23,19 +24,20 @@ function setTargetNode(node): SetXrefTargetAction {
   };
 }
 
-
 // targetId is an id
 // documentId is a guid
 export function fetchAndSetTargetNode(targetId: string, documentId: string) {
   return (dispatch: Dispatch<State>, getState: () => State): Promise<any> => {
-    // console.log({ targetId, documentId });
     const { course } = getState();
-    // console.log({ course });
     return persistence.retrieveDocument(course.guid, documentId).then((doc) => {
       const wbpage = doc.model as WorkbookPageModel;
-      // console.log({ wbpage });
       // Find the target node in the workbook page's content tree
-      const node = findNodes(wbpage, node => node.id === targetId)[0];
+      const node = findNodes(
+        wbpage,
+        node => node.contentType === 'ContiguousText'
+          ? console.log('The node is a contiguous text', node, 'looking for targetId', targetId) ||
+            (node as ContiguousText).getFirstReferenceId() === targetId
+          : node.id === targetId)[0];
       console.log({ node });
       dispatch(setTargetNode(node ? Either.right(node) : Either.left(targetId)));
     });

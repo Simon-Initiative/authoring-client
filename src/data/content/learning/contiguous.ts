@@ -103,16 +103,18 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   static fromPersistence(
     root: Object[], guid: string, mode = ContiguousTextMode.Regular,
-    backingTextProvider: Object = null) : ContiguousText {
-    return new ContiguousText({ guid, mode,
-      content: toDraft(root, mode === ContiguousTextMode.SimpleText, backingTextProvider) });
+    backingTextProvider: Object = null): ContiguousText {
+    return new ContiguousText({
+      guid, mode,
+      content: toDraft(root, mode === ContiguousTextMode.SimpleText, backingTextProvider),
+    });
   }
 
   static fromText(text: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
     return new ContiguousText({ guid, mode, content: ContentState.createFromText(text) });
   }
 
-  static fromHTML(html: string, guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
+  static fromHTML(html: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
 
     const blocksFromHTML = convertFromHTML(html);
     const content = ContentState.createFromBlockArray(
@@ -128,13 +130,20 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   // Return the OLI ID of the first paragraph in the text block
-  getReferenceId(): string | undefined {
+  getFirstReferenceId(): string | undefined {
     const firstBlock = this.content.getFirstBlock();
-    console.log({ firstBlock });
     if (firstBlock) {
+      console.log(
+        'The firstBlocks id is',
+        (firstBlock.data as Immutable.Map<string, string>).get('id'))
       return (firstBlock.data as Immutable.Map<string, string>).get('id');
     }
     return undefined;
+  }
+
+  getAllReferenceIds(): string[] {
+    return this.content.getBlocksAsArray()
+      .map(block => (block.data as Immutable.Map<string, string>).get('id'));
   }
 
   selectionOverlapsEntity(selection: TextSelection): boolean {
@@ -332,7 +341,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   insertEntity(
     type: string, isMutable: boolean, data: Object,
-    selection: TextSelection, backingText: string) : ContiguousText {
+    selection: TextSelection, backingText: string): ContiguousText {
 
     const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
     const selectionState = selection.getRawSelectionState();

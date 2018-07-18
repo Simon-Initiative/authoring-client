@@ -24,7 +24,7 @@ export const setItem = (item: ContentElement): SetItemAction => ({
 export function cut(item: ContentElement) {
   return function (dispatch: Dispatch<State>, getState: () => State) {
     const { activeContext } = getState();
-    copy(item);
+    dispatch(copy(item));
     activeContext.container.lift(parent => parent.onRemove(item));
   };
 }

@@ -43,7 +43,8 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     const disallowDuplicates = ['WbInline', 'Activity', 'Speaker', 'Line', 'Hint'];
 
     return activeContext.activeChild.caseOf({
-      just: activeChild => disallowDuplicates.indexOf(activeChild.contentType) === -1,
+      just: activeChild => activeChild &&
+        disallowDuplicates.indexOf(activeChild.contentType) === -1,
       nothing: () => false,
     });
   }

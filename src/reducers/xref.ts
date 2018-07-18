@@ -20,7 +20,6 @@ const initialState: XrefState = {
 export function xref(state: XrefState = initialState, action: XrefAction): XrefState {
   switch (action.type) {
     case SET_TARGET:
-      console.log('setting target to', action.target);
       return {
         target: action.target,
       };
