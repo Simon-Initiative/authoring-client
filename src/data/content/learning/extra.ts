@@ -1,5 +1,4 @@
 import * as Immutable from 'immutable';
-import { Maybe } from 'tsmonad';
 import { Meaning } from './meaning';
 import { Anchor } from './anchor';
 import { augment, getChildren, except } from '../common';

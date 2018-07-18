@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
-
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps }
+  from 'editors/content/common/AbstractContentEditor';
 import { LinkTarget } from 'data/content/learning/common';
-import { Select, Button } from '../common/controls';
+import { Select, Button } from 'editors/content/common/controls';
 import { LegacyTypes } from 'data/types';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon } from 'editors/content/utils/content';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ResourceState } from 'data/content/resource';
@@ -16,24 +16,31 @@ import { Clipboard } from 'types/clipboard';
 import { ContentElement } from 'data/content/common/interfaces';
 import { CourseModel } from 'data/models';
 import { Label } from 'editors/content/common/Sidebar';
-import { ModalMessage } from 'utils/ModalMessage';
+import { Either } from 'tsmonad';
+import { MissingTargetId } from 'actions/xref';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
+import './XrefEditor.scss';
 
 export interface XrefEditorProps
   extends AbstractContentEditorProps<contentTypes.Xref> {
   onShowSidebar: () => void;
-  clipboard: Clipboard;
   displayModal: (component: any) => void;
   dismissModal: () => void;
+  updateTarget: (targetId: string, documentId: string) => Promise<any>;
+  clipboard: Clipboard;
   course: CourseModel;
+  target: Either<MissingTargetId, ContentElement>;
 }
 
 export interface XrefEditorState {
-  noItemCopied: boolean,
+
 }
 
-/**
- * React Component
- */
+/* Cross Reference is essentially an internal link. It allows you to link to another
+ workbook page (identified by the 'page' attribute, which is saved as a resource guid)
+ and also, optionally, a specific element known as a 'target' within the page.
+ The target is identified by the 'idref' attribute which points to a Content Element's id)
+*/
 export default class XrefEditor
   extends AbstractContentEditor
   <contentTypes.Xref, XrefEditorProps & JSSProps, XrefEditorState> {
@@ -41,137 +48,77 @@ export default class XrefEditor
   constructor(props) {
     super(props);
 
-    this.state = {
-      noItemCopied: false,
-    };
-
-    this.onSetTargetElement = this.onSetTargetElement.bind(this);
+    this.onChangeTarget = this.onChangeTarget.bind(this);
+    this.onChangePage = this.onChangePage.bind(this);
   }
 
-  validXrefTargets = {
-    alternatives: true,
-    applet: true,
-    audio: true,
-    cite: true,
-    codeblock: true,
-    composite: true,
-    conjugate: true,
-    conjugation: true,
-    definition: true,
-    dialog: true,
-    director: true,
-    example: true,
-    extra: true,
-    figure: true,
-    flash: true,
-    iframe: true,
-    image: true,
-    line: true,
-    materials: true,
-    mathematica: true,
-    meaning: true,
-    ol: true,
-    panopto: true,
-    pronunciation: true,
-    pullout: true,
-    speaker: true,
-    table: true,
-    translation: true,
-    ul: true,
-    unity: true,
-    video: true,
-    youtube: true,
-  };
+  shouldComponentUpdate(nextProps: XrefEditorProps, nextState: XrefEditorState) {
+    return super.shouldComponentUpdate(nextProps, nextState)
+      || nextState !== this.state
+      || nextProps.target !== this.props.target;
+  }
 
-  onSetTargetElement() {
-    const { onEdit, model, displayModal, dismissModal, clipboard } = this.props;
+  componentDidMount() {
+    const { target, model, updateTarget } = this.props;
 
-    const infoModal = (copiedElement: ContentElement) => <ModalMessage onCancel={dismissModal}>
-      <React.Fragment>
-        Cross-references don't support {copiedElement.contentType} elements.
-        You can make cross-references to any of these element types:
-        <br /><br />
-        <ul>
-          <li>Alternatives</li>
-          <li>Applet</li>
-          <li>Audio</li>
-          <li>Citation</li>
-          <li>Code block</li>
-          <li>Composite</li>
-          <li>Conjugate</li>
-          <li>Conjugation</li>
-          <li>Definition</li>
-          <li>Dialog</li>
-          <li>Director</li>
-          <li>Example</li>
-          <li>Extra</li>
-          <li>Figure</li>
-          <li>Flash</li>
-          <li>IFrame</li>
-          <li>Image</li>
-          <li>Line</li>
-          <li>Materials</li>
-          <li>Mathematica</li>
-          <li>Meaning</li>
-          <li>Ordered List</li>
-          <li>Panopto</li>
-          <li>Pronunciation</li>
-          <li>Pullout</li>
-          <li>Speaker</li>
-          <li>Table</li>
-          <li>Translation</li>
-          <li>Unordered List</li>
-          <li>Unity</li>
-          <li>Video</li>
-          <li>Youtube</li>
-        </ul>
-      </React.Fragment>
-    </ModalMessage>;
+    // Xref must have a page set in order to allow linking to a target element. We set the default
+    // page to be the first workbook page so that an error is not thrown in case the user chooses
+    // a target element without changing the page using the 'page to link to' dropdown
+    if (!this.props.model.page) {
+      this.props.onEdit(this.props.model.with({ page: this.pages[0].guid }));
+    }
 
-    const isValidXrefTarget = (item: ContentElement): boolean =>
-      this.validXrefTargets[item.elementType];
+    // Check if we need to fetch the target element from its workbook page
+    if (!target && model.idref) {
+      updateTarget(model.idref, model.page);
+    }
+  }
 
-    clipboard.item.caseOf({
-      just: (item) => {
-        if (console.log({ item }) || isValidXrefTarget(item)) {
-          onEdit(model.with({ idref: item.id }));
-          this.setState({ noItemCopied: false });
-        } else {
-          displayModal(infoModal(item));
-        }
-      },
-      nothing: () => this.setState({ noItemCopied: true }),
+  pages = this.props.context.courseModel.resources
+    .toArray()
+    .filter(r => r.type === LegacyTypes.workbook_page &&
+      r.resourceState !== ResourceState.DELETED);
+
+  onChangeTarget() {
+    const { onEdit, model, clipboard, updateTarget } = this.props;
+
+    clipboard.item.lift((item) => {
+      let id: string;
+      // Handle contiguous text as a special case, retrieving the ID of the first paragraph
+      if (item.contentType === 'ContiguousText') {
+        id = (item as contentTypes.ContiguousText).getReferenceId();
+        console.log({ id });
+        // Else, if it's a valid xref target, it must have an ID
+      } else if (isValidXrefTarget(item)) {
+        id = (item as any).id;
+      }
+
+      if (id) {
+        onEdit(model.with({ idref: id }));
+        updateTarget(id, model.page);
+      }
     });
   }
 
-  renderNoItemCopiedWarning() {
-    return (
-      <div style={{ backgroundColor: 'tomato' }}>
-        Clipboard is empty
-      </div>
-    );
-  }
+  onChangePage(page: string) {
+    const { onEdit, model, updateTarget } = this.props;
 
-  renderTarget() {
-    const { course, model } = this.props;
-    console.log('idref', model.idref);
-    console.log('resource?', course.resourcesById.get(model.idref));
-    return (
-      <React.Fragment>
-        <Label>Linked Element</Label>
-        {course.resourcesById.get(model.idref)}
-      </React.Fragment>
-    );
+    onEdit(model.with({ page }));
+
+    // Search for the target element in the new page
+    if (model.idref) {
+      updateTarget(model.idref, page);
+    }
+    // target.caseOf({
+    //   left: id => updateTarget(id, page),
+    //   right: target => updateTarget(target.id, page),
+    // });
   }
 
   renderSidebar() {
-    const { editMode, model, onEdit, context } = this.props;
+    const { editMode, model, onEdit, target } = this.props;
 
-    const pages = context.courseModel.resources
-      .toArray()
-      .filter(r => r.type === LegacyTypes.workbook_page &&
-        r.resourceState !== ResourceState.DELETED)
-      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+    const pageOptions = this.pages.map(r => <option key={r.guid} value={r.guid}>{r.title}</option>);
 
     return (
       <SidebarContent title="Cross Reference">
@@ -180,22 +127,12 @@ export default class XrefEditor
             editMode={this.props.editMode}
             label=""
             value={model.page}
-            onChange={page => onEdit(model.with({ page }))}>
-            {pages}
+            onChange={this.onChangePage}>
+            {pageOptions}
           </Select>
         </SidebarGroup>
         <SidebarGroup label="Element to link to">
-          <small>1. Open the target page in a new tab</small><br />
-          <small>2. Select the target element and then copy it using the Copy
-            button in the toolbar</small><br />
-          <small>3. Link to the copied element with the button below.</small><br />
-          <Button editMode={editMode} onClick={this.onSetTargetElement}>Link Element</Button>
-          {model.idref
-            ? this.renderTarget()
-            : null}
-          {this.state.noItemCopied
-            ? this.renderNoItemCopiedWarning()
-            : null}
+          <Target {...this.props} target={target} onChangeTarget={this.onChangeTarget} />
         </SidebarGroup>
         <SidebarGroup label="Target">
           <Select
@@ -228,3 +165,104 @@ export default class XrefEditor
     return null;
   }
 }
+
+interface TargetProps extends XrefEditorProps {
+  onChangeTarget: () => void;
+}
+const Target = ({ target, editMode, clipboard, onChangeTarget }: TargetProps) => {
+
+  const validItemCopied = clipboard.item.caseOf({
+    just: item => isValidXrefTarget(item),
+    nothing: () => false,
+  });
+
+  return (
+    <div className="target__container">
+      <div className="target__instructions">
+        <small>
+          1. Open the target page in a new tab.
+        </small>
+        <br />
+        <small>
+          2. Select a valid target element and then copy it using the Copy
+          button in the toolbar.
+        <HelpPopover activateOnClick><ValidElementsHelp /></HelpPopover>
+        </small>
+        <br />
+        <small>
+          3. Use the button to link to the copied element.
+        </small>
+      </div>
+      <Button editMode={editMode && validItemCopied} onClick={onChangeTarget}>
+        Link Element
+      </Button>
+      <div className="target__description">
+
+        {/* Target can be undefined (no target set),
+        Either.right with the linked element, or
+        Either.left indicating the linked element was not found (maybe deleted from the page) */}
+        {target
+          ? target.caseOf({
+            right: element => <Label>
+              <span style={{ color: CONTENT_COLORS[element.contentType] }}>
+                {getContentIcon(element.contentType)}</span> {validXrefTargets[element.elementType]}
+            </Label>,
+            left: () => <span className="italic">
+              {getContentIcon('')} Target not found in page
+            </span>,
+          })
+          : null}
+      </div>
+    </div>
+  );
+};
+
+const isValidXrefTarget = (item: ContentElement): boolean =>
+  validXrefTargets[item.elementType];
+
+const validXrefTargets = {
+  alternatives: 'Alternatives',
+  applet: 'Applet',
+  audio: 'Audio',
+  cite: 'Citation',
+  codeblock: 'Code Block',
+  composite: 'Composite',
+  conjugate: 'Conjugate',
+  conjugation: 'Conjugation',
+  definition: 'Definition',
+  dialog: 'Dialog',
+  director: 'Director',
+  example: 'Example',
+  extra: 'Extra',
+  figure: 'Figure',
+  flash: 'Flash',
+  iframe: 'IFrame',
+  image: 'Image',
+  line: 'Line',
+  materials: 'Materials',
+  mathematica: 'Mathematica',
+  meaning: 'Meaning',
+  ol: 'Ordered List',
+  panopto: 'Panopto',
+  pronunciation: 'Pronunciation',
+  pullout: 'Pullout',
+  speaker: 'Speaker',
+  table: 'Table',
+  '#text': 'Text block',
+  translation: 'Translation',
+  ul: 'Unordered List',
+  unity: 'Unity',
+  video: 'Video',
+  youtube: 'YouTube',
+};
+
+const ValidElementsHelp = () =>
+  <React.Fragment>
+    You can make cross-references to any of these element types:
+    <br /><br />
+    <ul>
+      {Object.getOwnPropertyNames(validXrefTargets)
+        .map(key => validXrefTargets[key])
+        .map(target => <li>{target}</li>)}
+    </ul>
+  </React.Fragment>;

@@ -127,6 +127,16 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return fromDraft(this.content, this.mode === ContiguousTextMode.SimpleText);
   }
 
+  // Return the OLI ID of the first paragraph in the text block
+  getReferenceId(): string | undefined {
+    const firstBlock = this.content.getFirstBlock();
+    console.log({ firstBlock });
+    if (firstBlock) {
+      return (firstBlock.data as Immutable.Map<string, string>).get('id');
+    }
+    return undefined;
+  }
+
   selectionOverlapsEntity(selection: TextSelection): boolean {
     return this.content.getBlocksAsArray()
       .reduce(

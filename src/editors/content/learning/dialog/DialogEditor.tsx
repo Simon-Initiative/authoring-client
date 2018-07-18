@@ -9,7 +9,6 @@ import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTe
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import './DialogEditor.scss';
-import { Maybe } from 'tsmonad';
 import guid from 'utils/guid';
 import { ContentContainer, Layout } from 'editors/content/container/ContentContainer';
 import { ContentElements } from 'data/content/common/elements';
