@@ -15,7 +15,7 @@ export const convertLegacyToHtmlTable = (legacyLayout: LegacyLayout) => {
         text: initiator.text,
       }),
     ).toList(),
-    targetArea: Maybe.just(new TableTargetArea().with({
+    targetArea: new TableTargetArea().with({
       rows: legacyLayout.targetGroup.rows.map(row =>
         new Row().with({
           cells: Immutable.List<Cell>(row.cols.toArray().map(col =>
@@ -34,6 +34,6 @@ export const convertLegacyToHtmlTable = (legacyLayout: LegacyLayout) => {
           )),
         }),
       ).toList(),
-    })),
+    }),
   });
 };

@@ -31,6 +31,10 @@ export class Initiator extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() {
+    return this;
+  }
+
   static fromPersistence(initiatorEl: Element, guid: string): Initiator {
     const model = new Initiator({
       guid,

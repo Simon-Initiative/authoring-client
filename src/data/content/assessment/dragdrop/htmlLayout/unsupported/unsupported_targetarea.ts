@@ -30,6 +30,10 @@ export class UnsupportedTargetArea extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() {
+    return this;
+  }
+
   static fromPersistence(json: Object, guid: string) : UnsupportedTargetArea {
     const q = (json as any).targetArea;
 

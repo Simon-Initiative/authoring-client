@@ -12,7 +12,7 @@ export type TableTargetAreaParams = {
 
 const defaultContent = {
   contentType: 'TableTargetArea',
-  elementType: 'unsupportedtargetarea',
+  elementType: 'tabletargetarea',
   guid: '',
   rows: Immutable.List<Row>(),
 };
@@ -20,7 +20,7 @@ const defaultContent = {
 export class TableTargetArea extends Immutable.Record(defaultContent) {
 
   contentType: 'TableTargetArea';
-  elementType: 'unsupportedtargetarea';
+  elementType: 'tabletargetarea';
   guid: string;
   rows: Immutable.List<Row>;
 
@@ -30,6 +30,10 @@ export class TableTargetArea extends Immutable.Record(defaultContent) {
 
   with(values: TableTargetAreaParams) {
     return this.merge(values) as this;
+  }
+
+  clone() {
+    return this;
   }
 
   static fromPersistence(json: Object, guid: string) : TableTargetArea {

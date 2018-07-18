@@ -61,7 +61,12 @@ export class Custom extends Immutable.Record(defaultContent) {
   }
 
   clone() {
-    return this.with({ id: createGuid() });
+    return this.with({
+      id: createGuid(),
+      layout: '',
+      layoutData: this.layoutData.lift(ld => ld.clone()),
+      src: 'DynaDrop.js',
+    });
   }
 
   static fromPersistence(json: Object, guid: string) : Custom {

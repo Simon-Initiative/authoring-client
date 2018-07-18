@@ -185,7 +185,7 @@ export class AddQuestion
         inputVal,
         text: 'New Choice',
       })),
-      targetArea: Maybe.just(new TableTargetArea().with({
+      targetArea: new TableTargetArea().with({
         rows: [new Row(), new Row(), new Row()].reduce(
           (accRows, newRow) => accRows.push(newRow.with({
             cells: Immutable.List<Cell>([
@@ -202,7 +202,7 @@ export class AddQuestion
           })),
           Immutable.List<Row>(),
         ),
-      })),
+      }),
     });
 
     const newCustom = new contentTypes.Custom().with({
@@ -263,6 +263,8 @@ export class AddQuestion
         items,
         parts,
       });
+
+    console.log('new question', q)
 
     this.props.onQuestionAdd(q);
   }

@@ -84,7 +84,7 @@ export class HTMLTableEditor
       });
 
       const updatedLayoutData = layoutData.with({
-        targetArea: Maybe.just(updatedTable),
+        targetArea: updatedTable,
       });
 
       const updatedModel = model.with({
@@ -130,7 +130,7 @@ export class HTMLTableEditor
       });
 
       const updatedLayoutData = layoutData.with({
-        targetArea: Maybe.just(updatedTable),
+        targetArea: updatedTable,
       });
 
       const updatedModel = model.with({
@@ -164,7 +164,7 @@ export class HTMLTableEditor
       });
 
       const updatedLayoutData = layoutData.with({
-        targetArea: Maybe.just(updatedTable),
+        targetArea: updatedTable,
       });
 
       const updatedModel = model.with({
@@ -238,7 +238,7 @@ export class HTMLTableEditor
       });
 
       const updatedLayoutData = layoutData.with({
-        targetArea: Maybe.just(updatedTable),
+        targetArea: updatedTable,
       });
 
       const updatedModel = model.with({

@@ -2,6 +2,7 @@ import * as React from 'react';
 import colors from 'styles/colors';
 import distinct from 'styles/palettes/distinct';
 import flatui from 'styles/palettes/flatui';
+import { ContentElements } from 'data/content/common/elements';
 
 export const CONTENT_COLORS = {
   Activity: flatui.amethyst,
@@ -108,3 +109,11 @@ export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.
 
 export const getContentIcon = (type: string) => CONTENT_ICONS[type]
   || <i className={'fa fa-question'} />;
+
+export const containsDynaDropCustom = (modelBody: ContentElements) => modelBody.content.reduce(
+  (acc, val) => {
+    return acc || val.contentType === 'Custom'
+      && val.src.substr(val.src.length - 11) === 'DynaDrop.js';
+  },
+  false,
+);

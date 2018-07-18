@@ -261,10 +261,7 @@ export class DynaDragDropEditor
     const question = currentNode;
 
     return model.layoutData.lift((layout) => {
-      const targetArea = (layout as HTMLLayout).targetArea.caseOf({
-        just: targetArea => targetArea,
-        nothing: () => ({ contentType: 'UNKNOWN' }),
-      });
+      const targetArea = (layout as HTMLLayout).targetArea;
 
       switch (targetArea.contentType) {
         case 'TableTargetArea':
@@ -275,9 +272,8 @@ export class DynaDragDropEditor
                     model={model}
                     selectedInitiator={selectedInitiator}
                     editMode={editMode}
-                    onEditTable={table => this.onEditLayoutData(layout.with({
-                      targetArea: Maybe.just(table),
-                    }))}
+                    onEditTable={targetArea =>
+                      this.onEditLayoutData(layout.with({ targetArea }))}
                     onSelectInitiator={this.selectInitiator}
                     onTargetDrop={this.onTargetDrop}
                     onAddInitiator={this.addInitiator}

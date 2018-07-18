@@ -58,7 +58,7 @@ export const stringifyInitiators = (initiators: Immutable.List<Initiator>) => {
 export type HTMLLayoutParams = {
   guid?: string;
   layoutStyles?: string;
-  targetArea?: Maybe<TargetArea>;
+  targetArea?: TargetArea;
   initiators?: Immutable.List<Initiator>;
 };
 
@@ -67,7 +67,7 @@ const defaultContent = {
   elementType: 'htmllayout',
   guid: '',
   layoutStyles: MINIFIED_TABLE_STYLES,
-  targetArea: Maybe.nothing<TargetArea>(),
+  targetArea: new TableTargetArea(),
   initiators: Immutable.List<Initiator>(),
 };
 
@@ -77,11 +77,18 @@ export class HTMLLayout extends Immutable.Record(defaultContent) {
   elementType: 'htmllayout';
   guid: string;
   layoutStyles: string;
-  targetArea: Maybe<TargetArea>;
+  targetArea: TargetArea;
   initiators: Immutable.List<Initiator>;
 
   constructor(params?: HTMLLayoutParams) {
     super(augment(params));
+  }
+
+  clone() {
+    return this.with({
+      targetArea: this.targetArea.clone(),
+      initiators: this.initiators.map(i => i.clone()).toList(),
+    });
   }
 
   with(values: HTMLLayoutParams) {
@@ -98,19 +105,18 @@ export class HTMLLayout extends Immutable.Record(defaultContent) {
       const id = createGuid();
       switch (key) {
         case 'layoutStyles':
-          if (item[key] && item[key]['#cdata']) {
-            model = model.with({ layoutStyles: item[key] && item[key]['#cdata'] });
-          }
+          model = model.with({
+            layoutStyles: item[key] && item[key]['#cdata'] || MINIFIED_TABLE_STYLES });
           break;
         case 'targetArea':
           switch (true) {
             case item[key]['#cdata'] && item[key]['#cdata'].indexOf('oli-dnd-table') > -1:
               model = model.with({
-                targetArea: Maybe.just(TableTargetArea.fromPersistence(item, id)) });
+                targetArea: TableTargetArea.fromPersistence(item, id) });
               break;
             case item[key]['#cdata']:
               model = model.with({
-                targetArea: Maybe.just(UnsupportedTargetArea.fromPersistence(item, id)) });
+                targetArea: UnsupportedTargetArea.fromPersistence(item, id) });
               break;
             default:
               break;
@@ -134,10 +140,7 @@ export class HTMLLayout extends Immutable.Record(defaultContent) {
             layoutStyles: { '#cdata': this.layoutStyles },
           },
           {
-            targetArea: this.targetArea.caseOf({
-              just: targetArea => ({ '#cdata': targetArea.toPersistence() }),
-              nothing: () => ({ '#cdata': '' }),
-            }),
+            targetArea: ({ '#cdata': this.targetArea.toPersistence() }),
           },
           {
             initiators: { '#cdata': stringifyInitiators(this.initiators) },

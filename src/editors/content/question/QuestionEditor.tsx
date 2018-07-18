@@ -17,16 +17,9 @@ import { MultipartInput } from 'editors/content/question/MultipartInput.controll
 import { Skill } from 'types/course';
 import { InsertInputRefCommand } from 'editors/content/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
+import { containsDynaDropCustom } from 'editors/content/utils/content';
 
 import './QuestionEditor.scss';
-
-export const containsDynaDropCustom = (modelBody: ContentElements) => modelBody.content.reduce(
-  (acc, val) => {
-    return acc || val.contentType === 'Custom'
-      && val.src.substr(val.src.length - 11) === 'DynaDrop.js';
-  },
-  false,
-);
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;

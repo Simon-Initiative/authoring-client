@@ -116,26 +116,23 @@ export const setQuestionPartWithInitiatorScore = (
 };
 
 export const getTargetsFromLayout = (layout: HTMLLayout) => {
-  return layout.targetArea.lift((ta) => {
-    switch (ta.contentType) {
-      case 'TableTargetArea':
-        return ta.rows.reduce(
-          (accRows, row) =>
-            accRows.concat(row.cells.reduce(
-              (accCells, cell) => cell.target.caseOf({
-                just: () => accCells.push(cell),
-                nothing: () => accCells,
-              }),
-              Immutable.List<Cell>(),
-            ),
-          ).toList(),
-          Immutable.List<Cell>(),
-        );
-      default:
-        return Immutable.List<Cell>();
-    }
-  })
-  .valueOr(Immutable.List<Cell>());
+  switch (layout.targetArea.contentType) {
+    case 'TableTargetArea':
+      return layout.targetArea.rows.reduce(
+        (accRows, row) =>
+          accRows.concat(row.cells.reduce(
+            (accCells, cell) => cell.target.caseOf({
+              just: () => accCells.push(cell),
+              nothing: () => accCells,
+            }),
+            Immutable.List<Cell>(),
+          ),
+        ).toList(),
+        Immutable.List<Cell>(),
+      );
+    default:
+      throw Error(`Layout targetArea "${layout.targetArea.contentType}" is not supported`);
+  }
 };
 
 /**
@@ -198,4 +195,28 @@ export const updateItemPartsFromTargets = (
     items: updatedItems,
     parts: updatedParts,
   };
+};
+
+export const updateHTMLLayoutTargetRefs = (
+  targetValMap: { [oldValue: string]: string },
+  initiatorInputMap: { [oldValue: string]: string },
+  layout: HTMLLayout,
+  ) => {
+  switch (layout.targetArea.contentType) {
+    case 'TableTargetArea':
+      return layout.with({
+        targetArea: layout.targetArea.with({
+          rows: layout.targetArea.rows.map(row => row.with({
+            cells: row.cells.map(cell => cell.with({
+              target: cell.target.lift(target => targetValMap[target]),
+            })).toList(),
+          })).toList(),
+        }),
+        initiators: layout.initiators.map(initiator =>
+          initiator.with({ inputVal: initiatorInputMap[initiator.inputVal] }),
+        ).toList(),
+      });
+    default:
+      throw Error(`Layout targetArea "${layout.targetArea.contentType}" is not supported`);
+  }
 };

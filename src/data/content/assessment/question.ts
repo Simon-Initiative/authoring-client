@@ -1,5 +1,4 @@
 import * as Immutable from 'immutable';
-
 import { ContentElements } from 'data/content/common/elements';
 import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from './types';
 import { Part } from './part';
@@ -22,6 +21,11 @@ import { Changes } from 'data/content/learning/draft/changes';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
 import { EntityTypes } from 'data/content/learning/common';
 import { EntityInfo } from 'data/content/learning/changes';
+import { containsDynaDropCustom } from 'editors/content/utils/content';
+import {
+  updateHTMLLayoutTargetRefs,
+} from 'editors/content/learning/dynadragdrop/utils';
+import { Custom } from 'data/content/assessment/custom';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
@@ -270,6 +274,68 @@ function cloneInputQuestion(question: Question): Question {
   });
 }
 
+function cloneDragDropQuestion(question: Question): Question {
+  // Remap existing value ids to newly assigned ones, storing
+  // the mapping in valueMap for later use.
+  const valueMap = {};
+  const inputMap = {};
+  // const initialItemsClone = question.items.map(p => p.clone()).toOrderedMap();
+  const items = question.items.map((item: FillInTheBlank) => {
+    const id = createGuid();
+    inputMap[item.id] = id;
+
+    // Clone all the choices, but assign new values and track
+    // the mapping of old choice values to new ones
+    const fitb = item as FillInTheBlank;
+    const choices = fitb.choices.map((choice) => {
+      const value = createGuid();
+      valueMap[choice.value] = value;
+
+      return choice.clone().with({
+        value,
+      });
+    }).toOrderedMap();
+
+    return (item as FillInTheBlank).with({
+      id,
+      choices,
+    });
+  }).toOrderedMap();
+
+  // Now clone parts, but post process to update the match and input attributes
+  // of response objects to use the new choice values
+  const initialPartsClone = question.parts.map(p => p.clone()).toOrderedMap();
+  const parts = initialPartsClone.map((part) => {
+    return part.with({
+      responses: part.responses.map((response) => {
+        return response.with({
+          match: valueMap[response.match],
+          input: inputMap[response.input],
+        });
+      }).toOrderedMap(),
+    });
+  }).toOrderedMap();
+
+  const customContent = (question.body.content.find(ce => ce.contentType === 'Custom') as Custom);
+  let clonedCustomContent = customContent.clone();
+
+  // update targetArea targets to use new values
+  clonedCustomContent = clonedCustomContent.with({
+    layoutData: clonedCustomContent.layoutData.lift(ld =>
+      updateHTMLLayoutTargetRefs(valueMap, inputMap, ld)),
+  });
+
+  return question.with({
+    id: createGuid(),
+    body: question.body.with({
+      content: question.body.content.set(customContent.guid, clonedCustomContent),
+    }).clone(),
+    explanation: question.explanation.clone(),
+    parts,
+    items,
+  });
+}
+
 // Cloning a single select multiple choice question requires that
 // we update the choice#value attribute in lock step with the
 // response#match attribute:
@@ -373,6 +439,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return cloneMultipleChoiceQuestion(this);
     }
+    if (containsDynaDropCustom(this.body)) {
+      return cloneDragDropQuestion(this);
+    }
     if (item.contentType === 'Numeric'
       || item.contentType === 'Text'
       || item.contentType === 'FillInTheBlank') {
@@ -450,7 +519,6 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with(
             { items: model.items.set(id, FillInTheBlank.fromPersistence(item, id)) });
           break;
-        // We do not yet support image_hotspot:
         case 'image_hotspot':
           model = model.with({
             items: model.items.set(id, ImageHotspot.fromPersistence(item, id)),
