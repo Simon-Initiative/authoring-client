@@ -8,18 +8,63 @@ import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { Feedback } from 'data/content/assessment/feedback';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
 import { Cell } from 'data/content/assessment/dragdrop/htmlLayout/table/cell';
+import { Row } from 'data/content/assessment/dragdrop/htmlLayout/table/row';
 
-export const choiceAssessmentIdSort = (a: Choice, b: Choice) =>
-  a.value.localeCompare(b.value);
+export const sortTargetsByRowColumn = (
+  layout: HTMLLayout,
+) => {
+  switch (layout.targetArea.contentType) {
+    case 'TableTargetArea':
+      return layout.targetArea.rows.reduce(
+        (accRow, row: Row) => accRow.concat(
+          row.cells.reduce(
+            (accCell, cell) => cell.target.caseOf({
+              just: target => accCell.push(target),
+              nothing: () => accCell,
+            }),
+            Immutable.List<string>(),
+          ),
+        ).toList(),
+        Immutable.List<string>(),
+      );
+    default:
+      throw Error(`layout type ${layout.targetArea.contentType} not supported`);
+  }
+};
 
-export const responseAssessmentIdSort = (a: Response, b: Response) =>
-  a.match.localeCompare(b.match);
+export const sortChoicesByLayout = (
+  choices: Immutable.OrderedMap<string, Choice>,
+  layout: HTMLLayout,
+) => {
+  const sortedTargets = sortTargetsByRowColumn(layout);
+
+  const choiceValueMap = choices.reduce(
+    (acc, choice) => acc.set(choice.value, choice),
+    Immutable.OrderedMap<string, Choice>(),
+  );
+
+  return sortedTargets.map(target => choiceValueMap.get(target)).toArray();
+};
+
+export const sortResponsesByChoice = (
+  responses: Immutable.OrderedMap<string, Response>,
+  choices: Choice[],
+) => {
+  const responseMatchMap = responses.reduce(
+    (acc, response) => acc.set(response.match, response),
+    Immutable.OrderedMap<string, Response>(),
+  );
+
+  return choices.map(choice => responseMatchMap.get(choice.value));
+};
+
 
 export const targetAssessmentIdSort = (a: Cell, b: Cell) =>
   // parameters must always be targets. If they arent, just throw an error
   a.target.valueOrThrow().localeCompare(b.target.valueOrThrow());
 
-export const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => {
+export const buildTargetLabelsMap = (
+  question: Question, selectedInitiator: string, layout: HTMLLayout) => {
   const currentItem = question.items.toArray().find(
     (item: FillInTheBlank) => item.id === selectedInitiator) as FillInTheBlank;
 
@@ -27,7 +72,7 @@ export const buildTargetLabelsMap = (question: Question, selectedInitiator: stri
     return {};
   }
 
-  return currentItem.choices.sort(choiceAssessmentIdSort).toArray().reduce(
+  return sortChoicesByLayout(currentItem.choices, layout).reduce(
     (acc, choice: Choice, index) => ({
       ...acc,
       [choice.value]:

@@ -11,13 +11,15 @@ import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import {
-  choiceAssessmentIdSort, responseAssessmentIdSort,
+  sortChoicesByLayout, sortResponsesByChoice,
 } from 'editors/content/learning/dynadragdrop/utils';
+import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
 
 export interface DynaDropTargetItemsProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
   initiator: Initiator;
   advancedScoring: boolean;
+  layout: HTMLLayout;
   onEditInitiatorText: (text: string, initiator: Initiator) => void;
   onToggleAdvanced: () => void;
 }
@@ -100,10 +102,11 @@ DynaDropTargetItems
   }
 
   renderChoices() {
-    const { context, services, editMode, partModel, itemModel, advancedScoring } = this.props;
+    const { context, services, editMode, partModel, itemModel,
+      layout, advancedScoring } = this.props;
 
-    const responses = partModel.responses.toArray().sort(responseAssessmentIdSort);
-    const choices = itemModel.choices.toArray().sort(choiceAssessmentIdSort);
+    const choices = sortChoicesByLayout(itemModel.choices, layout);
+    const responses = sortResponsesByChoice(partModel.responses, choices);
 
     return choices.map((choice, i) => {
       const response = responses[i];

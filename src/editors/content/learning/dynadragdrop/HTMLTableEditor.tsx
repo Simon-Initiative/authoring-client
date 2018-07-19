@@ -300,7 +300,7 @@ export class HTMLTableEditor
 
   render() {
     const {
-      classes, table, initiators, editMode, question, selectedInitiator,
+      classes, table, model, initiators, editMode, question, selectedInitiator,
       onTargetDrop, onAddInitiator, onDeleteInitiator, onSelectInitiator, onUnassignInitiator,
     } = this.props;
 
@@ -310,7 +310,8 @@ export class HTMLTableEditor
     const targetInitiators = buildTargetInitiatorsMap(question, initiators);
 
     // build map of target ids to labels using the selected initiator
-    const targetLabels = buildTargetLabelsMap(question, selectedInitiator);
+    const targetLabels = buildTargetLabelsMap(
+      question, selectedInitiator, model.layoutData.valueOrThrow());
 
     const renderTableRow = (row: Row, index) => {
       return (

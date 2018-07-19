@@ -218,6 +218,10 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
         nothing: () => undefined,
       });
 
+    // we always expect layoutData to be defined here
+    const layout = (model.body.content.find(c => c.contentType === 'Custom') as contentTypes.Custom)
+      .layoutData.valueOrThrow();
+
     if (!initiator) {
       return;
     }
@@ -256,6 +260,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
               onToggleAdvanced={this.onToggleAdvanced}
               itemModel={item}
               partModel={part}
+              layout={layout}
               onEdit={this.props.onEdit} />
 
           {this.renderSkillsTab(item, part)}
