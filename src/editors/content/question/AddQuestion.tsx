@@ -264,8 +264,6 @@ export class AddQuestion
         parts,
       });
 
-    console.log('new question', q)
-
     this.props.onQuestionAdd(q);
   }
 
