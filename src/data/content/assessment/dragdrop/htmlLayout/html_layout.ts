@@ -137,13 +137,15 @@ export class HTMLLayout extends Immutable.Record(defaultContent) {
       dragdrop: {
         '#array': [
           {
-            layoutStyles: { '#cdata': this.layoutStyles },
+            layoutStyles: {
+              '#cdata': this.layoutStyles,
+            },
           },
+          this.targetArea.toPersistence(),
           {
-            targetArea: ({ '#cdata': this.targetArea.toPersistence() }),
-          },
-          {
-            initiators: { '#cdata': stringifyInitiators(this.initiators) },
+            initiators: {
+              '#cdata': stringifyInitiators(this.initiators),
+            },
           },
         ],
       },

@@ -68,8 +68,12 @@ export class TableTargetArea extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
-    return '<div class="oli-dnd-table">'
-      + this.rows.reduce((acc, row) => `${acc} ${row.toPersistence()}`, '')
-      + '</div>';
+    return {
+      targetArea: ({
+        '#cdata': '<div class="oli-dnd-table">'
+          + this.rows.reduce((acc, row) => `${acc} ${row.toPersistence()}`, '')
+          + '</div>',
+      }),
+    };
   }
 }

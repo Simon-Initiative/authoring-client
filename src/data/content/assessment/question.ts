@@ -279,22 +279,22 @@ function cloneDragDropQuestion(question: Question): Question {
   // the mapping in valueMap for later use.
   const valueMap = {};
   const inputMap = {};
-  // const initialItemsClone = question.items.map(p => p.clone()).toOrderedMap();
+
+  // Clone all the choices using first item as a template,
+  // but assign new values and track the mapping of old choice values to new ones
+  const fitb = question.items.first() as FillInTheBlank;
+  const choices = fitb.choices.map((choice) => {
+    const value = createGuid();
+    valueMap[choice.value] = value;
+
+    return choice.clone().with({
+      value,
+    });
+  }).toOrderedMap();
+
   const items = question.items.map((item: FillInTheBlank) => {
     const id = createGuid();
     inputMap[item.id] = id;
-
-    // Clone all the choices, but assign new values and track
-    // the mapping of old choice values to new ones
-    const fitb = item as FillInTheBlank;
-    const choices = fitb.choices.map((choice) => {
-      const value = createGuid();
-      valueMap[choice.value] = value;
-
-      return choice.clone().with({
-        value,
-      });
-    }).toOrderedMap();
 
     return (item as FillInTheBlank).with({
       id,
