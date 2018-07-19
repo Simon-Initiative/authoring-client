@@ -21,7 +21,7 @@ import { Changes } from 'data/content/learning/draft/changes';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
 import { EntityTypes } from 'data/content/learning/common';
 import { EntityInfo } from 'data/content/learning/changes';
-import { containsDynaDropCustom } from 'editors/content/utils/content';
+import { containsDynaDropCustom } from 'editors/content/utils/common';
 import {
   updateHTMLLayoutTargetRefs,
 } from 'editors/content/learning/dynadragdrop/utils';

@@ -13,7 +13,7 @@ import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import guid from 'utils/guid';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { containsDynaDropCustom } from 'editors/content/utils/content';
+import { containsDynaDropCustom } from 'editors/content/utils/common';
 import { Badge } from '../common/Badge';
 import { VariablesEditor } from './VariablesEditor';
 

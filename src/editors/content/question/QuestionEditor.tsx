@@ -17,7 +17,7 @@ import { MultipartInput } from 'editors/content/question/MultipartInput.controll
 import { Skill } from 'types/course';
 import { InsertInputRefCommand } from 'editors/content/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
-import { containsDynaDropCustom } from 'editors/content/utils/content';
+import { containsDynaDropCustom } from 'editors/content/utils/common';
 
 import './QuestionEditor.scss';
 
