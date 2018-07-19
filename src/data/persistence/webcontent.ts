@@ -10,13 +10,25 @@ import { WebContent } from 'data/content/webcontent';
  * that the file is being stored as. Rejects if the file name conflicts
  * with another file.
  */
-export function createWebContent(courseId: string, file): Promise<string> {
+export function createWebContent(courseId: string, file: File): Promise<string> {
 
   const method = 'POST';
   const url = `${configuration.baseUrl}/${courseId}/webcontents/upload`;
   const headers = getFormHeaders(credentials);
   const body = new FormData();
-  body.append('file', file);
+
+  // Lowercase file extension. File.name is read only, so we need to create a new file from the
+  // contents of the file blob.
+  const blob = file.slice(0, -1, file.type);
+  const fileNameWithDot = file.name.slice(
+    0, file.name.indexOf('.') !== -1
+      ? file.name.indexOf('.') + 1
+      : file.name.length);
+  const extension = file.name.indexOf('.') !== -1
+    ? file.name.substr(file.name.indexOf('.') + 1).toLowerCase()
+    : '';
+  const newFile = new File([blob], fileNameWithDot + extension, { type: file.type });
+  body.append('file', newFile);
 
   return authenticatedFetch({ method, url, headers, body })
     .then(result => result[0].fileNode.pathTo);
@@ -27,9 +39,9 @@ export function createWebContent(courseId: string, file): Promise<string> {
  * a list of webcontents
  */
 export function fetchWebContent(
-    courseId: string, offset?: number, limit?: number,
-    mimeFilter?: string, pathFilter?: string, searchText?: string, orderBy?: string,
-    order?: string): Promise<PaginatedResponse<WebContent>> {
+  courseId: string, offset?: number, limit?: number,
+  mimeFilter?: string, pathFilter?: string, searchText?: string, orderBy?: string,
+  order?: string): Promise<PaginatedResponse<WebContent>> {
 
   const method = 'GET';
   const url = `${configuration.baseUrl}/${courseId}/webcontents`;
