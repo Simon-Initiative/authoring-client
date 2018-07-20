@@ -25,8 +25,6 @@ interface OwnProps {
   documentResource: Resource;
   documentId: string;
   canPreview: boolean;
-  onDisplayModal: (component: any) => void;
-  onDismissModal: () => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

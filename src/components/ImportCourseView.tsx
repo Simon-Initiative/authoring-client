@@ -59,10 +59,11 @@ export class ImportCourseView
       </React.Fragment>;
     const toast =
       <Toast
+        style={{ width: 600 }}
         icon={toastIcon}
         heading={toastHeading}
         content={toastContent}
-        severity={Severity.Info} />;
+        severity={Severity.Warning} />;
 
     return (
       <CourseCreation

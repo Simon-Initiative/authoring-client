@@ -76,6 +76,10 @@ export const styles: JSSStyles = {
     },
   },
 
+  deleteButton: {
+    border: [[1, 'solid', colors.danger]],
+  },
+
   sidebarContent: {
 
   },
