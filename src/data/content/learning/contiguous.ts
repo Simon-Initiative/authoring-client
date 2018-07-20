@@ -71,8 +71,6 @@ function appendText(contentBlock, contentState, text) {
     text);
 }
 
-
-
 export class ContiguousText extends Immutable.Record(defaultContent) {
 
   contentType: 'ContiguousText';
@@ -105,7 +103,8 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     root: Object[], guid: string, mode = ContiguousTextMode.Regular,
     backingTextProvider: Object = null): ContiguousText {
     return new ContiguousText({
-      guid, mode,
+      guid,
+      mode,
       content: toDraft(root, mode === ContiguousTextMode.SimpleText, backingTextProvider),
     });
   }

@@ -2,15 +2,15 @@ import * as Immutable from 'immutable';
 
 import { Choice } from './choice';
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, setId } from '../common';
 import { getKey } from '../../common';
 
 
 export type OrderingParams = {
-  choices? : Immutable.OrderedMap<string, Choice>,
-  id? : string,
-  name? : string,
-  shuffle? : boolean,
+  choices?: Immutable.OrderedMap<string, Choice>,
+  id?: string,
+  name?: string,
+  shuffle?: boolean,
   guid?: string,
 };
 
@@ -28,17 +28,17 @@ export class Ordering extends Immutable.Record(defaultContent) {
 
   contentType: 'Ordering';
   elementType: 'ordering';
-  choices : Immutable.OrderedMap<string, Choice>;
-  id : string;
-  name : string;
-  shuffle : boolean;
+  choices: Immutable.OrderedMap<string, Choice>;
+  id: string;
+  name: string;
+  shuffle: boolean;
   guid: string;
 
   constructor(params?: OrderingParams) {
     super(augment(params));
   }
 
-  clone() : Ordering {
+  clone(): Ordering {
     return this.with({
       id: createGuid(),
       choices: this.choices.map(c => c.clone()).toOrderedMap(),
@@ -49,14 +49,13 @@ export class Ordering extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : Ordering {
+  static fromPersistence(json: Object, guid: string, notify: () => void): Ordering {
 
     const q = (json as any).ordering;
     let model = new Ordering({ guid });
 
-    if (q['@id'] !== undefined) {
-      model = model.with({ id: q['@id'] });
-    }
+    model = setId(model, q, notify);
+
     if (q['@name'] !== undefined) {
       model = model.with({ name: q['@name'] });
     }
@@ -71,7 +70,9 @@ export class Ordering extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'choice':
-          model = model.with({ choices: model.choices.set(id, Choice.fromPersistence(item, id)) });
+          model = model.with({
+            choices: model.choices.set(id, Choice.fromPersistence(item, id, notify)),
+          });
           break;
         default:
       }
@@ -81,7 +82,7 @@ export class Ordering extends Immutable.Record(defaultContent) {
 
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const arr = this.choices.toArray();
 

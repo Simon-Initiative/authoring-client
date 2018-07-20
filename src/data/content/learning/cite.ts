@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type CiteParams = {
@@ -33,7 +33,7 @@ export class Cite extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: CiteParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: CiteParams) {
@@ -41,14 +41,13 @@ export class Cite extends Immutable.Record(defaultContent) {
   }
 
 
-  clone() : Cite {
-    return this.with({
+  clone(): Cite {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-      id: createGuid(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Cite {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Cite {
 
     const t = (root as any).cite;
 
@@ -67,14 +66,16 @@ export class Cite extends Immutable.Record(defaultContent) {
     }
 
     if (!Object.keys(t).every(k => k.startsWith('@'))) {
-      model = model.with({ content: ContentElements
-        .fromPersistence(except(getChildren(t), 'title'), '', TEXT_ELEMENTS) });
+      model = model.with({
+        content: ContentElements
+          .fromPersistence(except(getChildren(t), 'title'), '', TEXT_ELEMENTS, null, notify),
+      });
     }
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     const o = {
       cite: {
         '@title': this.title,

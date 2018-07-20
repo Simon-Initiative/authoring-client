@@ -56,7 +56,7 @@ export class Response extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : Response {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : Response {
 
     const r = (json as any).response;
     let model = new Response({ guid });
@@ -86,7 +86,7 @@ export class Response extends Immutable.Record(defaultContent) {
         case 'feedback':
           model = model.with(
             { feedback: model.feedback.set(
-              id, Feedback.fromPersistence(item, id))});
+              id, Feedback.fromPersistence(item, id, notify))});
           break;
         default:
       }

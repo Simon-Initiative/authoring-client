@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren } from '../common';
-
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type TitleParams = {
@@ -31,9 +30,9 @@ export class Title extends Immutable.Record(defaultContent) {
   }
 
   clone() : Title {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       text: this.text.clone(),
-    });
+    }));
   }
 
   static fromText(str: string) : Title {
@@ -41,14 +40,14 @@ export class Title extends Immutable.Record(defaultContent) {
     return new Title({ text });
   }
 
-  static fromPersistence(root: Object, guid: string) : Title {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Title {
 
     // Handle the case where there is a completely empty title object
     const t = Object.keys((root as any).title).length > 0
       ? (root as any).title
       : { '#text': '' };
 
-    const text = ContentElements.fromPersistence(getChildren(t), '', TEXT_ELEMENTS);
+    const text = ContentElements.fromPersistence(getChildren(t), '', TEXT_ELEMENTS, null, notify);
     return new Title({ guid, text });
 
   }

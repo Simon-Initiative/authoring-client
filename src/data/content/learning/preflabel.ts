@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type PrefLabelParams = {
   preference?: string,
@@ -29,10 +29,10 @@ export class PrefLabel extends Immutable.Record(defaultContent) {
   }
 
   clone() : PrefLabel {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) : PrefLabel {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : PrefLabel {
 
     const p = (root as any)['pref:label'];
 

@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { Param } from '../learning/param';
 
@@ -47,11 +47,13 @@ export class WbInline extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : WbInline {
-    return this;
+  clone(): WbInline {
+    return ensureIdGuidPresent(this.with({
+      params: this.params.map(p => p.clone()).toOrderedMap(),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : WbInline {
+  static fromPersistence(root: Object, guid: string, notify: () => void): WbInline {
 
     const wb = (root as any)['wb:inline'];
 
@@ -80,7 +82,9 @@ export class WbInline extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'param':
-          model = model.with({ params: model.params.set(id, Param.fromPersistence(item, id)) });
+          model = model.with({
+            params: model.params.set(id, Param.fromPersistence(item, id, notify)),
+          });
           break;
         default:
 
@@ -90,7 +94,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       'wb:inline': {
         '@idref': this.idref,

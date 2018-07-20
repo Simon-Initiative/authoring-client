@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 
@@ -46,13 +46,13 @@ export class Section extends Immutable.Record(defaultContent) {
   }
 
   clone(): Section {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
       body: this.body.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Section {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Section {
     const t = (root as any).section;
 
     let model = new Section({ guid });
@@ -71,11 +71,13 @@ export class Section extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         case 'body':
-          model = model.with({ body: ContentElements
-            .fromPersistence(item['body'], id, [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS]) });
+          model = model.with({
+            body: ContentElements.fromPersistence(
+              item['body'], id, [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS], null, notify),
+          });
           break;
         default:
       }
@@ -84,11 +86,11 @@ export class Section extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const content = this.body.content.size === 0
-       ? [{ p: { '#text': ' ' } }]
-       : this.body.toPersistence();
+      ? [{ p: { '#text': ' ' } }]
+      : this.body.toPersistence();
     const s = {
       section: {
         '#array': [

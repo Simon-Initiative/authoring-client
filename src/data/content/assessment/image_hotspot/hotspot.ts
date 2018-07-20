@@ -38,7 +38,7 @@ export class Hotspot extends Immutable.Record(defaultContent) {
     return this;
   }
 
-  static fromPersistence(json: Object, guid: string): Hotspot {
+  static fromPersistence(json: Object, guid: string, notify: () => void): Hotspot {
     const q = (json as any).hotspot;
     let model = new Hotspot({ guid });
 

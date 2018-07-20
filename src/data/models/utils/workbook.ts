@@ -19,8 +19,6 @@ export function findNodes(
     }
   };
 
-  console.log(model.body.content);
-
   visitNodes(visitor, model.body.content, getChildren);
 
   return matching;

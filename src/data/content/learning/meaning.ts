@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Material } from './material';
 import { Example } from './example';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils//guid';
 
@@ -35,7 +35,7 @@ export class Meaning extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: MeaningParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: MeaningParams) {
@@ -43,22 +43,19 @@ export class Meaning extends Immutable.Record(defaultContent) {
   }
 
   clone() {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       examples: this.examples.map(c => this.clone()).toOrderedMap(),
       material: this.material.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Meaning {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Meaning {
 
     const m = (root as any).meaning;
     let model = new Meaning().with({ guid });
 
-    if (m['@id']) {
-      model = model.with({ id: m['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, m, notify);
+
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
     }
@@ -70,10 +67,10 @@ export class Meaning extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'example':
           model = model.with({ examples:
-            model.examples.set(id, Example.fromPersistence(item, id)) });
+            model.examples.set(id, Example.fromPersistence(item, id, notify)) });
           break;
         case 'material':
-          model = model.with({ material: Material.fromPersistence(item, id) });
+          model = model.with({ material: Material.fromPersistence(item, id, notify) });
           break;
         default:
       }

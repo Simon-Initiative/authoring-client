@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, setId } from '../common';
 import createGuid from 'utils/guid';
 
 export type TextParams = {
@@ -47,14 +47,13 @@ export class Text extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : Text {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : Text {
 
     const n = (json as any).text;
     let model = new Text({ guid });
 
-    if (n['@id'] !== undefined) {
-      model = model.with({ id: n['@id'] });
-    }
+    model = setId(model, n, notify);
+
     if (n['@name'] !== undefined) {
       model = model.with({ name: n['@name'] });
     }

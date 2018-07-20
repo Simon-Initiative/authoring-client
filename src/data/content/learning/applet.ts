@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from 'utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Popout } from './popout';
 import { Alternate } from './alternate';
@@ -70,35 +70,32 @@ export class Applet extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: AppletParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: AppletParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Applet {
-    return this.with({
-      id: createGuid(),
+  clone(): Applet {
+    return ensureIdGuidPresent(this.with({
+      popout: this.popout.clone(),
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+      params: this.params.map(p => p.clone()).toOrderedMap(),
+    }));
   }
 
-
-  static fromPersistence(root: Object, guid: string) : Applet {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Applet {
 
     const t = (root as any).applet;
 
     let model = new Applet({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@height'] !== undefined) {
       model = model.with({ height: t['@height'] });
     }
@@ -129,24 +126,26 @@ export class Applet extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+            { alternate: Alternate.fromPersistence(item, id, notify) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         case 'param':
-          model = model.with({ params: model.params.set(id, Param.fromPersistence(item, id)) });
+          model = model.with({
+            params: model.params.set(id, Param.fromPersistence(item, id, notify)),
+          });
           break;
         default:
 
@@ -156,7 +155,7 @@ export class Applet extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [
       this.titleContent.toPersistence(),

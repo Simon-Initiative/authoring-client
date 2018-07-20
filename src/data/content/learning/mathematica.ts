@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from 'utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Popout } from './popout';
 import { Alternate } from './alternate';
@@ -57,7 +57,7 @@ export class Mathematica extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: MathematicaParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: MathematicaParams) {
@@ -65,27 +65,24 @@ export class Mathematica extends Immutable.Record(defaultContent) {
   }
 
   clone() : Mathematica {
-    return this.with({
-      id: createGuid(),
+    return ensureIdGuidPresent(this.with({
+      popout: this.popout.clone(),
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+    }));
   }
 
 
-  static fromPersistence(root: Object, guid: string) : Mathematica {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Mathematica {
 
     const t = (root as any).mathematica;
 
     let model = new Mathematica({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@height'] !== undefined) {
       model = model.with({ height: t['@height'] });
     }
@@ -107,21 +104,21 @@ export class Mathematica extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+            { alternate: Alternate.fromPersistence(item, id, notify) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         default:
 

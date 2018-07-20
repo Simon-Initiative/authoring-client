@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Material } from './material';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils//guid';
 import { Orientation } from 'data/content/learning/common';
@@ -35,30 +35,26 @@ export class Materials extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: MaterialsParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: MaterialsParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
-      id: createGuid(),
-      content: this.content.map(c => c.clone().with({ guid: createGuid() })).toOrderedMap(),
-    });
+  clone(): Materials {
+    return ensureIdGuidPresent(this.with({
+      content: this.content.map(c => c.clone()).toOrderedMap(),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Materials {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Materials {
 
     const m = (root as any).materials;
     let model = new Materials().with({ guid });
 
-    if (m['@id']) {
-      model = model.with({ id: m['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, m, notify);
+
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
     }
@@ -74,7 +70,7 @@ export class Materials extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'material':
           model = model.with({ content:
-            model.content.set(id, Material.fromPersistence(item, id)) });
+            model.content.set(id, Material.fromPersistence(item, id, notify)) });
           break;
         default:
       }

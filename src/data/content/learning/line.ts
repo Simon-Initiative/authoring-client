@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Translation } from './translation';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils//guid';
 import { Material } from 'data/content/learning/material';
@@ -38,31 +38,27 @@ export class Line extends Immutable.Record(defaultContent) {
   translations: Immutable.OrderedMap<string, Translation>;
 
   constructor(params?: LineParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: LineParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
-      guid: createGuid(),
+  clone(): Line {
+    return ensureIdGuidPresent(this.with({
       material: this.material.clone(),
       translations: this.translations.map(t => t.clone()).toOrderedMap(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Line {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Line {
 
     const m = (root as any).line;
     let model = new Line().with({ guid });
 
-    if (m['@id']) {
-      model = model.with({ id: m['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, m, notify);
+
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
     }
@@ -75,12 +71,12 @@ export class Line extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'material':
           model = model.with({
-            material: Material.fromPersistence(item, ''),
+            material: Material.fromPersistence(item, '', notify),
           });
           break;
         case 'translation':
           model = model.with({
-            translations: model.translations.set(id, Translation.fromPersistence(item, id)),
+            translations: model.translations.set(id, Translation.fromPersistence(item, id, notify)),
           });
           break;
         default:

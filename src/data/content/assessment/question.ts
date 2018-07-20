@@ -16,7 +16,7 @@ import { Unsupported } from '../unsupported';
 import { Variable } from './variable';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, setId } from '../common';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Changes } from 'data/content/learning/draft/changes';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
@@ -412,15 +412,14 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     return ContentElements.fromText('', '', QUESTION_BODY_ELEMENTS);
   }
 
-  static fromPersistence(json: any, guid: string) {
+  static fromPersistence(json: any, guid: string, notify?: () => void) {
 
     let model = new Question({ guid });
 
     const question = json.question;
 
-    if (question['@id'] !== undefined) {
-      model = model.with({ id: question['@id'] });
-    }
+    model = setId(model, question, notify);
+
     if (question['@grading'] !== undefined) {
       model = model.with({ grading: question['@grading'] });
     }
@@ -444,52 +443,69 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           body = item;
           break;
         case 'essay':
-          model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, Essay.fromPersistence(item, id, notify)),
+          });
           break;
         case 'fill_in_the_blank':
-          model = model.with(
-            { items: model.items.set(id, FillInTheBlank.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, FillInTheBlank.fromPersistence(item, id, notify)),
+          });
           break;
         // We do not yet support image_hotspot:
         case 'image_hotspot':
           model = model.with({
-            items: model.items.set(id, ImageHotspot.fromPersistence(item, id)),
+            items: model.items.set(id, ImageHotspot.fromPersistence(item, id, notify)),
           });
           break;
         case 'multiple_choice':
-          model = model.with(
-            { items: model.items.set(id, MultipleChoice.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, MultipleChoice.fromPersistence(item, id, notify)),
+          });
           break;
         case 'numeric':
-          model = model.with({ items: model.items.set(id, Numeric.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, Numeric.fromPersistence(item, id, notify)),
+          });
           break;
         case 'ordering':
-          model = model.with({ items: model.items.set(id, Ordering.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, Ordering.fromPersistence(item, id, notify)),
+          });
           break;
         case 'part':
-          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });
+          model = model.with({
+            parts: model.parts.set(id, Part.fromPersistence(item, id, notify)),
+          });
           break;
         case 'responses':
           // read weird legacy format where individual response elements are under a
           // 'responses' element instead of a 'part'
           const copy = Object.assign({}, item);
           copy['part'] = copy['responses'];
-          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(copy, id)) });
+          model = model.with({
+            parts: model.parts.set(id, Part.fromPersistence(copy, id, notify)),
+          });
           break;
         case 'explanation':
           model = model.with({
             explanation:
-              ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS),
+              ContentElements.fromPersistence(
+                (item as any).explanation, id, ALT_FLOW_ELEMENTS, null, notify),
           });
           break;
         case 'skillref':
           model = model.with({ skills: model.skills.add((item as any).skillref['@idref']) });
           break;
         case 'short_answer':
-          model = model.with({ items: model.items.set(id, ShortAnswer.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, ShortAnswer.fromPersistence(item, id, notify)),
+          });
           break;
         case 'text':
-          model = model.with({ items: model.items.set(id, Text.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, Text.fromPersistence(item, id, notify)),
+          });
           break;
         default:
 
@@ -501,7 +517,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       const backingTextProvider = buildItemMap(model);
       model = model.with({
         body: ContentElements.fromPersistence(
-          body['body'], createGuid(), QUESTION_BODY_ELEMENTS, backingTextProvider),
+          body['body'], createGuid(), QUESTION_BODY_ELEMENTS, backingTextProvider, notify),
       });
     }
 

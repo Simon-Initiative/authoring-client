@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Title } from './title';
 import { Li } from './li';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from './common';
 import createGuid from 'utils/guid';
 
@@ -50,7 +50,7 @@ export class Ol extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: OlParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: OlParams) {
@@ -58,13 +58,13 @@ export class Ol extends Immutable.Record(defaultContent) {
   }
 
   clone(): Ol {
-    return this.with({
-      id: createGuid(),
-      listItems: this.listItems.map(d => d.clone().with({ guid: createGuid() })).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      title: this.title.lift(t => t.clone()),
+      listItems: this.listItems.map(li => li.clone()).toOrderedMap(),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Ol {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Ol {
 
     const t = (root as any).ol;
 
@@ -90,10 +90,11 @@ export class Ol extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'li':
-          model = model.with({ listItems: model.listItems.set(id, Li.fromPersistence(item, id)) });
+          model = model.with({
+            listItems: model.listItems.set(id, Li.fromPersistence(item, id, notify)) });
           break;
 
         default:

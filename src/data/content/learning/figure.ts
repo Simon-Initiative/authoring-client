@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
@@ -46,7 +46,7 @@ export class Figure extends Immutable.Record(defaultContent) {
   content: ContentElements;
 
   constructor(params?: FigureParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: FigureParams) {
@@ -54,34 +54,21 @@ export class Figure extends Immutable.Record(defaultContent) {
   }
 
   clone(): Figure {
-    const guid = createGuid();
-
-    return this.with({
-      guid,
-      id: guid,
+    return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
-      caption: this.caption.caseOf({
-        just: caption => Maybe.just(caption.clone()),
-        nothing: () => Maybe.nothing() as Maybe<Caption>,
-      }),
-      cite: this.cite.caseOf({
-        just: cite => Maybe.just(cite.clone()),
-        nothing: () => Maybe.nothing()as Maybe<Cite>,
-      }),
+      caption: this.caption.lift(c => c.clone()),
+      cite: this.cite.lift(c => c.clone()),
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Figure {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Figure {
     const t = (root as any).figure;
 
     let model = new Figure({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -93,13 +80,13 @@ export class Figure extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Maybe.just(Cite.fromPersistence(item, id)) });
+          model = model.with({ cite: Maybe.just(Cite.fromPersistence(item, id, notify)) });
           break;
         case 'caption':
-          model = model.with({ caption: Maybe.just(Caption.fromPersistence(item, id)) });
+          model = model.with({ caption: Maybe.just(Caption.fromPersistence(item, id, notify)) });
           break;
         default:
       }
@@ -107,7 +94,8 @@ export class Figure extends Immutable.Record(defaultContent) {
 
     model = model.with({
       content: ContentElements
-        .fromPersistence(except(getChildren(t), 'title', 'caption', 'cite'), '', BOX_ELEMENTS),
+        .fromPersistence(
+          except(getChildren(t), 'title', 'caption', 'cite'), '', BOX_ELEMENTS, null, notify),
     });
 
     return model;

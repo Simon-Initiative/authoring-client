@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 
@@ -31,20 +31,20 @@ export class BlockFormula extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : BlockFormula {
-    return this.with({
+  clone(): BlockFormula {
+    return ensureIdGuidPresent(this.with({
       text: this.text.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : BlockFormula {
+  static fromPersistence(root: Object, guid: string, notify: () => void): BlockFormula {
 
     const t = (root as any).formula;
     const text = ContiguousText.fromPersistence(getChildren(t), '', ContiguousTextMode.SimpleText);
     return new BlockFormula({ guid, text });
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     return {
       formula: {

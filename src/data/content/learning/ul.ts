@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Title } from './title';
 import { Li } from './li';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from './common';
 import createGuid from 'utils/guid';
 
@@ -43,7 +43,7 @@ export class Ul extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: UlParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: UlParams) {
@@ -51,23 +51,19 @@ export class Ul extends Immutable.Record(defaultContent) {
   }
 
   clone(): Ul {
-    return this.with({
-      id: createGuid(),
-      listItems: this.listItems.map(d => d.clone().with({ guid: createGuid() })).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      title: this.title.lift(t => t.clone()),
+      listItems: this.listItems.map(d => d.clone()).toOrderedMap(),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Ul {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Ul {
 
     const t = (root as any).ul;
 
     let model = new Ul().with({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
 
     if (t['@style'] !== undefined) {
       model = model.with({ style: Maybe.just(t['@style']) });
@@ -80,10 +76,12 @@ export class Ul extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'li':
-          model = model.with({ listItems: model.listItems.set(id, Li.fromPersistence(item, id)) });
+          model = model.with({
+            listItems: model.listItems.set(id, Li.fromPersistence(item, id, notify)),
+          });
           break;
 
         default:

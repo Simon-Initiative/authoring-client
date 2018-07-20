@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 
@@ -32,12 +32,12 @@ export class BlockCode extends Immutable.Record(defaultContent) {
   }
 
   clone() : BlockCode {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       text: this.text.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : BlockCode {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : BlockCode {
 
     const t = (root as any).code;
     const text = ContiguousText.fromPersistence(getChildren(t), '', ContiguousTextMode.SimpleText);

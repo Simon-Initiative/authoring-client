@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type ObjRefParams = {
   idref?: string;
@@ -30,10 +30,10 @@ export class ObjRef extends Immutable.Record(defaultObjRefParams) {
 
 
   clone() : ObjRef {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(json: any, guid: string) {
+  static fromPersistence(json: any, guid: string, notify?: () => void) {
 
     let model = new ObjRef({ guid });
 

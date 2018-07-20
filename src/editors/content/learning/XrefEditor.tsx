@@ -203,7 +203,7 @@ const Target = ({ target, editMode, clipboard, onChangeTarget }: TargetProps) =>
                 {getContentIcon(element.contentType)}</span> {validXrefTargets[element.elementType]}
             </Label>,
             left: () => <span className="italic">
-              {getContentIcon('')} Target not found in page
+              {getContentIcon('')} Target not found in selected page
             </span>,
           })
           : <span className="italic">No target element</span>}

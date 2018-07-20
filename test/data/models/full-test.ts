@@ -13,7 +13,7 @@ it('Single, top-level section', () => {
   registerContentTypes();
 
   const workbookPage = require('./single-section.json');
-  const model = WorkbookPageModel.fromPersistence(workbookPage);
+  const model = WorkbookPageModel.fromPersistence(workbookPage, () => null);
 
   const body = model.body.content.toArray();
 

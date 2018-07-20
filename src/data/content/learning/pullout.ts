@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { Orientation } from 'data/content/learning/common';
@@ -60,7 +60,7 @@ export class Pullout extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: PulloutParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: PulloutParams) {
@@ -68,23 +68,19 @@ export class Pullout extends Immutable.Record(defaultContent) {
   }
 
   clone(): Pullout {
-    return this.with({
-      id: createGuid(),
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
       title: this.title.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Pullout {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Pullout {
     const t = (root as any).pullout;
 
     let model = new Pullout({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@orient'] !== undefined) {
       model = model.with({
         orient: t['@orient'] === 'vertical'
@@ -103,7 +99,7 @@ export class Pullout extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         default:
       }
@@ -111,7 +107,7 @@ export class Pullout extends Immutable.Record(defaultContent) {
 
     model = model.with({
       content: ContentElements
-        .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS),
+        .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS, null, notify),
     });
 
     return model;

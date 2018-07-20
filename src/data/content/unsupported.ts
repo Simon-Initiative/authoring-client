@@ -31,7 +31,7 @@ export class Unsupported extends Immutable.Record(
     return this.data;
   }
 
-  static fromPersistence(data: Object, guid: string) : Unsupported {
+  static fromPersistence(data: Object, guid: string, notify?: () => void) : Unsupported {
     return new Unsupported().with({ data, guid });
   }
 }

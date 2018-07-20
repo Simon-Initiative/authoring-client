@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { Maybe } from 'tsmonad';
@@ -39,7 +39,7 @@ export class Alternatives extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: AlternativesParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: AlternativesParams) {
@@ -47,25 +47,29 @@ export class Alternatives extends Immutable.Record(defaultContent) {
   }
 
   clone(): Alternatives {
-    return this.with({
-      id: createGuid(),
+    return ensureIdGuidPresent(this.with({
+      title: this.title.caseOf({
+        just: t => Maybe.just(t.clone()),
+        nothing: () => Maybe.nothing<Title>(),
+      }),
+      default: this.default.caseOf({
+        just: d => Maybe.just(d.clone()),
+        nothing: () => Maybe.nothing<Default>(),
+      }),
       content: this.content.map(c => c.clone()).toOrderedMap(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Alternatives {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Alternatives {
     const t = (root as any).alternatives;
 
     let model = new Alternatives({ guid });
 
-    if (t['@group'] !== undefined) {
+    if (t['@group']) {
       model = model.with({ group: Maybe.just(t['@group']) });
     }
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+
+    model = setId(model, t, notify);
 
     getChildren(t).forEach((item) => {
 
@@ -74,15 +78,15 @@ export class Alternatives extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'default':
-          model = model.with({ default: Maybe.just(Default.fromPersistence(item, id)) });
+          model = model.with({ default: Maybe.just(Default.fromPersistence(item, id, notify)) });
           break;
         case 'alternative':
           model = model.with({
             content:
-              model.content.set(id, Alternative.fromPersistence(item, id)),
+              model.content.set(id, Alternative.fromPersistence(item, id, notify)),
           });
           break;
         default:

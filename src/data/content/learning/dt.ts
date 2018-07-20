@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 import createGuid from 'utils/guid';
 
 export type DtParams = {
@@ -35,12 +35,12 @@ export class Dt extends Immutable.Record(defaultContent) {
   }
 
   clone() : Dt {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Dt {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Dt {
 
     const t = (root as any).dt;
 
@@ -51,7 +51,7 @@ export class Dt extends Immutable.Record(defaultContent) {
     }
 
     model = model.with({ content: ContentElements
-      .fromPersistence(t, createGuid(), INLINE_ELEMENTS) });
+      .fromPersistence(t, createGuid(), INLINE_ELEMENTS, null, notify) });
 
     return model;
   }

@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Image } from './image';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils/guid';
 
@@ -31,32 +31,26 @@ export class Speaker extends Immutable.Record(defaultContent) {
   content: Maybe<string | Image>;
 
   constructor(params?: SpeakerParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: SpeakerParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    const id = createGuid();
-
-    return this.with({
-      id,
-      guid: id,
-    });
+  clone(): Speaker {
+    return ensureIdGuidPresent(this.with({
+      content: this.content.lift(c => typeof c === 'string' ? c : c.clone()),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Speaker {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Speaker {
 
     const m = (root as any).speaker;
     let model = new Speaker().with({ guid });
 
-    if (m['@id']) {
-      model = model.with({ id: m['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, m, notify);
+
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
     }
@@ -70,7 +64,7 @@ export class Speaker extends Immutable.Record(defaultContent) {
           model = model.with({ content: Maybe.just(item.toString()) });
           break;
         case 'image':
-          model = model.with({ content: Maybe.just(Image.fromPersistence(item, id)) });
+          model = model.with({ content: Maybe.just(Image.fromPersistence(item, id, notify)) });
           break;
         default:
       }

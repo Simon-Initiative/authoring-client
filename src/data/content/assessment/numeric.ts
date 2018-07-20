@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, setId } from '../common';
 import createGuid from 'utils/guid';
 
 export type NumericParams = {
@@ -44,14 +44,13 @@ export class Numeric extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : Numeric {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : Numeric {
 
     const n = (json as any).numeric;
     let model = new Numeric({ guid });
 
-    if (n['@id'] !== undefined) {
-      model = model.with({ id: n['@id'] });
-    }
+    model = setId(model, n, notify);
+
     if (n['@name'] !== undefined) {
       model = model.with({ name: n['@name'] });
     }

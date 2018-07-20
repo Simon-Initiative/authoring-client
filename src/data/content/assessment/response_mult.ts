@@ -46,7 +46,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : ResponseMult {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : ResponseMult {
 
     const p = (root as any).response_mult;
 

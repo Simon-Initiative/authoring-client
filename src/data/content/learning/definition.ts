@@ -4,7 +4,7 @@ import { Title } from './title';
 import { Pronunciation } from './pronunciation';
 import { Translation } from './translation';
 import { Meaning } from './meaning';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils/guid';
 
@@ -43,25 +43,23 @@ export class Definition extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: DefinitionParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: DefinitionParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
-      pronunciation: this.pronunciation.caseOf({
-        just: p => Maybe.just(p.clone().with({ guid: createGuid() })),
-        nothing: () => Maybe.nothing<Pronunciation>(),
-      }),
-      translation: this.translation.map(t => t.clone().with({ guid: createGuid() })).toOrderedMap(),
-      meaning: this.meaning.map(m => m.clone().with({ guid: createGuid() })).toOrderedMap(),
-    });
+  clone(): Definition {
+    return ensureIdGuidPresent(this.with({
+      pronunciation: this.pronunciation.lift(p => p.clone()),
+      title: this.title.lift(t => t.clone()),
+      translation: this.translation.map(t => t.clone()).toOrderedMap(),
+      meaning: this.meaning.map(m => m.clone()).toOrderedMap(),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Definition {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Definition {
 
     const m = (root as any).definition;
     let model = new Definition().with({ guid });
@@ -78,23 +76,31 @@ export class Definition extends Immutable.Record(defaultContent) {
       const id = createGuid();
       switch (key) {
         case 'title':
-          model = model.with({ title:
-            Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({
+            title:
+              Maybe.just(Title.fromPersistence(item, id, notify)),
+          });
           break;
         case 'term':
           model = model.with({ term: item['term']['#text'] });
           break;
         case 'pronunciation':
-          model = model.with({ pronunciation:
-            Maybe.just(Pronunciation.fromPersistence(item, id)) });
+          model = model.with({
+            pronunciation:
+              Maybe.just(Pronunciation.fromPersistence(item, id, notify)),
+          });
           break;
         case 'translation':
-          model = model.with({ translation:
-            model.translation.set(id, Translation.fromPersistence(item, id)) });
+          model = model.with({
+            translation:
+              model.translation.set(id, Translation.fromPersistence(item, id, notify)),
+          });
           break;
         case 'meaning':
-          model = model.with({ meaning:
-            model.meaning.set(id, Meaning.fromPersistence(item, id)) });
+          model = model.with({
+            meaning:
+              model.meaning.set(id, Meaning.fromPersistence(item, id, notify)),
+          });
           break;
         default:
       }
@@ -102,8 +108,8 @@ export class Definition extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
-    const children : any = [];
+  toPersistence(): Object {
+    const children: any = [];
     this.title.lift(t => children.push(t.toPersistence()));
     children.push({ term: { '#text': this.term } });
     this.pronunciation.lift(p => children.push(p.toPersistence()));

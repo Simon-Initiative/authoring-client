@@ -2,17 +2,17 @@ import * as Immutable from 'immutable';
 
 import { Choice } from './choice';
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, setId } from '../common';
 import { getKey } from '../../common';
 
 
 export type MultipleChoiceParams = {
-  choices? : Immutable.OrderedMap<string, Choice>,
-  id? : string,
-  name? : string,
-  labels? : boolean,
-  select? : string,
-  shuffle? : boolean,
+  choices?: Immutable.OrderedMap<string, Choice>,
+  id?: string,
+  name?: string,
+  labels?: boolean,
+  select?: string,
+  shuffle?: boolean,
   guid?: string,
 };
 
@@ -32,19 +32,19 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
 
   contentType: 'MultipleChoice';
   elementType: 'multiple_choice';
-  choices : Immutable.OrderedMap<string, Choice>;
-  id : string;
-  name : string;
-  labels : boolean;
-  select : string;
-  shuffle : boolean;
+  choices: Immutable.OrderedMap<string, Choice>;
+  id: string;
+  name: string;
+  labels: boolean;
+  select: string;
+  shuffle: boolean;
   guid: string;
 
   constructor(params?: MultipleChoiceParams) {
     super(augment(params));
   }
 
-  clone() : MultipleChoice {
+  clone(): MultipleChoice {
     return this.with({
       id: createGuid(),
       choices: this.choices.map(c => c.clone()).toOrderedMap(),
@@ -55,14 +55,13 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : MultipleChoice {
+  static fromPersistence(json: Object, guid: string, notify: () => void): MultipleChoice {
 
     const q = (json as any).multiple_choice;
     let model = new MultipleChoice({ guid });
 
-    if (q['@id'] !== undefined) {
-      model = model.with({ id: q['@id'] });
-    }
+    model = setId(model, q, notify);
+
     if (q['@name'] !== undefined) {
       model = model.with({ name: q['@name'] });
     }
@@ -83,7 +82,9 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'choice':
-          model = model.with({ choices: model.choices.set(id, Choice.fromPersistence(item, id)) });
+          model = model.with({
+            choices: model.choices.set(id, Choice.fromPersistence(item, id, notify)),
+          });
           break;
         default:
       }
@@ -93,7 +94,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
 
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const arr = this.choices.toArray();
 

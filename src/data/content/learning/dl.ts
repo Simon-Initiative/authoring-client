@@ -3,7 +3,7 @@ import { Maybe } from 'tsmonad';
 import { Title } from './title';
 import { Dt } from './dt';
 import { Dd } from './dd';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from './common';
 import createGuid from 'utils/guid';
 
@@ -42,24 +42,20 @@ export class Dl extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Dl {
-    return this.with({
-      id: createGuid(),
+  clone(): Dl {
+    return ensureIdGuidPresent(this.with({
+      title: this.title.lift(t => t.clone()),
       content: this.content.map(d => d.clone()).toOrderedMap(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Dl {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Dl {
 
     const t = (root as any).dl;
 
     let model = new Dl().with({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
 
     getChildren(t).forEach((item) => {
 
@@ -68,13 +64,17 @@ export class Dl extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'dt':
-          model = model.with({ content: model.content.set(id, Dt.fromPersistence(item, id)) });
+          model = model.with({
+            content: model.content.set(id, Dt.fromPersistence(item, id, notify)),
+          });
           break;
         case 'dd':
-          model = model.with({ content: model.content.set(id, Dd.fromPersistence(item, id)) });
+          model = model.with({
+            content: model.content.set(id, Dd.fromPersistence(item, id, notify)),
+          });
           break;
 
         default:
@@ -85,7 +85,7 @@ export class Dl extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = this.content.toArray().map(t => t.toPersistence());
     this.title.lift(t => children.push(t.toPersistence()));

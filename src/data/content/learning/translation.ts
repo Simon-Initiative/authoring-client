@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 import createGuid from 'utils/guid';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
@@ -30,26 +30,26 @@ export class Translation extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: TranslationParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: TranslationParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
+  clone(): Translation {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Translation {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Translation {
 
     const t = (root as any).translation;
 
     const id = t['@id']
       ? t['@id']
-      : createGuid();
+      : notify() || createGuid();
 
     const title = t['@title'] !== undefined
       ? Maybe.just(t['@title'])
@@ -57,7 +57,7 @@ export class Translation extends Immutable.Record(defaultContent) {
 
     return new Translation({
       guid,
-      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS),
+      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS, null, notify),
       id,
       title,
     });

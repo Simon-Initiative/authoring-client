@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
@@ -35,30 +35,27 @@ export class Example extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: ExampleParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: ExampleParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Example {
-    return this.with({
-      id: createGuid(),
+  clone(): Example {
+    return ensureIdGuidPresent(this.with({
+      title: this.title.clone(),
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Example {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Example {
     const t = (root as any).example;
 
     let model = new Example({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@purpose'] !== undefined) {
       model = model.with({ purpose: Maybe.just(t['@purpose']) });
     }
@@ -70,23 +67,25 @@ export class Example extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         default:
       }
     });
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS, null, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const content = this.content.content.size === 0
-       ? [{ p: { '#text': ' ' } }]
-       : this.content.toPersistence();
+      ? [{ p: { '#text': ' ' } }]
+      : this.content.toPersistence();
 
     const s = {
       example: {

@@ -38,7 +38,7 @@ export class Labels extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) {
+  static fromPersistence(root: Object, guid: string, notify?: () => void) {
 
     const s = (root as any).labels;
     let model = new Labels({ guid });

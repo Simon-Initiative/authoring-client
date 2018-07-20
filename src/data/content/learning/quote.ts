@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren } from '../common';
-
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type QuoteParams = {
@@ -35,16 +34,16 @@ export class Quote extends Immutable.Record(defaultContent) {
   }
 
   clone() : Quote {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       text: this.text.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Quote {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Quote {
 
     const t = (root as any).quote;
 
-    const text = ContentElements.fromPersistence(getChildren(t), '', TEXT_ELEMENTS);
+    const text = ContentElements.fromPersistence(getChildren(t), '', TEXT_ELEMENTS, null, notify);
     const entry = t['@entry'] === undefined
       ? Maybe.nothing()
       : Maybe.just(t['@entry']);

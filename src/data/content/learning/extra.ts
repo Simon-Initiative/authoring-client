@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Meaning } from './meaning';
 import { Anchor } from './anchor';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
 
@@ -45,23 +45,24 @@ export class Extra extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: ExtraParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: ExtraParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
-      id: createGuid(),
+  clone(): Extra {
+    return ensureIdGuidPresent(this.with({
+      pronunciation: this.pronunciation.clone(),
+      translation: this.translation.clone(),
       anchor: this.anchor.clone(),
-      meaning: this.meaning.map(m => m.clone().with({ guid: createGuid() })).toOrderedMap(),
+      meaning: this.meaning.map(m => m.clone()).toOrderedMap(),
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Extra {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Extra {
 
     const m = (root as any).extra;
     let model = new Extra().with({ guid });
@@ -78,7 +79,7 @@ export class Extra extends Immutable.Record(defaultContent) {
       const id = createGuid();
       switch (key) {
         case 'anchor':
-          model = model.with({ anchor: Anchor.fromPersistence(item, '') });
+          model = model.with({ anchor: Anchor.fromPersistence(item, '', notify) });
           break;
         case 'pronunciation':
           model = model.with({ pronunciation:
@@ -94,7 +95,7 @@ export class Extra extends Immutable.Record(defaultContent) {
           break;
         case 'meaning':
           model = model.with({ meaning:
-            model.meaning.set(id, Meaning.fromPersistence(item, id)) });
+            model.meaning.set(id, Meaning.fromPersistence(item, id, notify)) });
           break;
         default:
       }
@@ -104,12 +105,10 @@ export class Extra extends Immutable.Record(defaultContent) {
       .fromPersistence(
         except(getChildren(m), 'anchor', 'pronunciation', 'translation', 'meaning'),
         '',
-        EXTRA_ELEMENTS) });
+        EXTRA_ELEMENTS, null, notify) });
 
     return model;
   }
-
-
 
   isDefinition() : boolean {
 

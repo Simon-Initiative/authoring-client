@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 import createGuid from 'utils/guid';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
@@ -36,27 +36,26 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: PronunciationParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: PronunciationParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
-      id: createGuid(),
+  clone(): Pronunciation {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Pronunciation {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Pronunciation {
 
     const t = (root as any).pronunciation;
 
     const id = t['@id']
       ? t['@id']
-      : createGuid();
+      : notify() || createGuid();
 
     const title = t['@title'] !== undefined
       ? Maybe.just(t['@title'])
@@ -72,7 +71,7 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
 
     return new Pronunciation({
       guid,
-      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS),
+      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS, null, notify),
       id,
       title,
       src,

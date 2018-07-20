@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent, setId } from '../common';
 import createGuid from 'utils/guid';
 
 export const CONJUGATE_ELEMENTS = ['#text', 'em'];
@@ -37,7 +37,7 @@ export class Conjugate extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: ConjugateParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: ConjugateParams) {
@@ -45,23 +45,19 @@ export class Conjugate extends Immutable.Record(defaultContent) {
   }
 
   clone() : Conjugate {
-    return this.with({
-      id: createGuid(),
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Conjugate {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Conjugate {
 
     const t = (root as any).conjugate;
 
     let model = new Conjugate({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@pronouns'] !== undefined) {
       model = model.with({ pronouns: t['@pronouns'] });
     }

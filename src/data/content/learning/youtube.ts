@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Popout } from './popout';
 import { Alternate } from './alternate';
@@ -59,35 +59,31 @@ export class YouTube extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: YouTubeParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: YouTubeParams) {
     return this.merge(values) as this;
   }
 
-  clone() : YouTube {
-    return this.with({
-      id: createGuid(),
+  clone(): YouTube {
+    return ensureIdGuidPresent(this.with({
+      popout: this.popout.clone(),
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+    }));
   }
 
-
-  static fromPersistence(root: Object, guid: string) : YouTube {
+  static fromPersistence(root: Object, guid: string, notify: () => void): YouTube {
 
     const t = (root as any).youtube;
 
     let model = new YouTube({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -111,21 +107,21 @@ export class YouTube extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+            { alternate: Alternate.fromPersistence(item, id, notify) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         default:
 
@@ -135,7 +131,7 @@ export class YouTube extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [
       this.titleContent.toPersistence(),

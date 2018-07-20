@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, setId } from '../common';
 import { Row } from './row';
 import { CellData } from './celldata';
 import { getKey } from '../../common';
@@ -56,7 +56,7 @@ export class Table extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: TableParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: TableParams) {
@@ -65,23 +65,22 @@ export class Table extends Immutable.Record(defaultContent) {
 
   clone() : Table {
     return this.with({
-      id: createGuid(),
-      rows: this.rows.map(r => r.clone().with({ guid: createGuid() })).toOrderedMap(),
+      title: this.title.clone(),
+      caption: this.caption.clone(),
+      cite: this.cite.clone(),
+      rows: this.rows.map(r => r.clone()).toOrderedMap(),
     });
   }
 
 
-  static fromPersistence(root: Object, guid: string) : Table {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Table {
 
     const t = (root as any).table;
 
     let model = new Table({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@summary'] !== undefined) {
       model = model.with({ summary: t['@summary'] });
     }
@@ -96,17 +95,17 @@ export class Table extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'tr':
-          model = model.with({ rows: model.rows.set(id, Row.fromPersistence(item, id)) });
+          model = model.with({ rows: model.rows.set(id, Row.fromPersistence(item, id, notify)) });
           break;
         case 'title':
           model = model.with(
-            { title: Title.fromPersistence(item, id) });
+            { title: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         default:
 

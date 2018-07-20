@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, setId } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { ObjRef } from '../learning/objref';
 import { Title } from '../learning/title';
@@ -53,15 +53,13 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: any, guid: string) {
+  static fromPersistence(json: any, guid: string, notify?: () => void) {
 
     let model = new Pool({ guid });
 
     const s = json.pool;
 
-    if (s['@id'] !== undefined) {
-      model = model.with({ id: s['@id'] });
-    }
+    model = setId(model, s, notify);
 
     getChildren(s).forEach((item) => {
 
@@ -70,22 +68,24 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         case 'objref':
-          model = model.with({ objrefs: model.objrefs.set(id, ObjRef.fromPersistence(item, id)) });
+          model = model.with({
+            objrefs: model.objrefs.set(id, ObjRef.fromPersistence(item, id, notify)),
+          });
           break;
         case 'content':
-          model = model.with({ content: Content.fromPersistence(item, id) });
+          model = model.with({ content: Content.fromPersistence(item, id, notify) });
           break;
         case 'question':
           model = model.with({
-            questions: model.questions.set(id, Question.fromPersistence(item, id)),
+            questions: model.questions.set(id, Question.fromPersistence(item, id, notify)),
           });
           break;
         case 'section':
           model = model.with({
-            sections: model.sections.set(id, Unsupported.fromPersistence(item, id)),
+            sections: model.sections.set(id, Unsupported.fromPersistence(item, id, notify)),
           });
           break;
         default:
@@ -96,12 +96,12 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const questions = this.questions.size > 0
       ? this.questions
-      .toArray()
-      .map(item => item.toPersistence())
+        .toArray()
+        .map(item => item.toPersistence())
       : [new Question().with({ id: createGuid() }).toPersistence()];
 
     const children = [

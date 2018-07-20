@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 
 import { CellData } from './celldata';
@@ -36,14 +36,13 @@ export class Row extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Row {
-    return this.with({
-      cells: this.cells.map(c => c.clone().with({ guid: createGuid() })).toOrderedMap(),
-    });
+  clone(): Row {
+    return ensureIdGuidPresent(this.with({
+      cells: this.cells.map(c => c.clone()).toOrderedMap(),
+    }));
   }
 
-
-  static fromPersistence(root: Object, guid: string) : Row {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Row {
 
     const t = (root as any).tr;
 
@@ -56,10 +55,14 @@ export class Row extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'td':
-          model = model.with({ cells: model.cells.set(id, CellData.fromPersistence(item, id)) });
+          model = model.with({
+            cells: model.cells.set(id, CellData.fromPersistence(item, id, notify)),
+          });
           break;
         case 'th':
-          model = model.with({ cells: model.cells.set(id, CellHeader.fromPersistence(item, id)) });
+          model = model.with({
+            cells: model.cells.set(id, CellHeader.fromPersistence(item, id, notify)),
+          });
           break;
         default:
 
@@ -70,7 +73,7 @@ export class Row extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       tr: {
         '#array': this.cells.toArray().map(p => p.toPersistence()),

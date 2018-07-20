@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
@@ -39,29 +39,28 @@ export class Composite extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: CompositeParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: CompositeParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Composite {
-    return this.with({
+  clone(): Composite {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+      title: this.title.lift(t => t.clone()),
+      instructions: this.instructions.lift(i => i.clone()),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Composite {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Composite {
     const t = (root as any).composite_activity;
 
     let model = new Composite({ guid });
 
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@purpose'] !== undefined) {
       model = model.with({ purpose: Maybe.just(t['@purpose']) });
     }
@@ -73,22 +72,27 @@ export class Composite extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'instructions':
-          model = model.with({ instructions: Maybe.just(Instructions.fromPersistence(item, id)) });
+          model = model.with({
+            instructions: Maybe.just(Instructions.fromPersistence(item, id, notify)),
+          });
           break;
         default:
       }
     });
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(except(getChildren(t), 'title', 'instructions'), '', BOX_ELEMENTS) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(
+          except(getChildren(t), 'title', 'instructions'), '', BOX_ELEMENTS, null, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const optional = [];
 

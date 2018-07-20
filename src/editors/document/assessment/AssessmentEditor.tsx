@@ -367,7 +367,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <label className="col-3 col-form-label">Recommended attempts:</label>
               <TextInput
                 editMode={this.props.editMode}
-                width="50px"
+                width="100px"
                 label=""
                 type="number"
                 value={this.props.model.recommendedAttempts}
@@ -381,7 +381,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <label className="col-3 col-form-label">Maximum attempts:</label>
               <TextInput
                 editMode={this.props.editMode}
-                width="50px"
+                width="100px"
                 label=""
                 type="number"
                 value={this.props.model.maxAttempts}
