@@ -14,6 +14,8 @@ import { ContentTitle } from 'editors/content/common/ContentTitle';
 import guid from 'utils/guid';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { containsDynaDropCustom } from 'editors/content/question/QuestionEditor';
+import { Badge } from '../common/Badge';
+import { VariablesEditor } from './VariablesEditor';
 
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
@@ -30,7 +32,9 @@ export interface QuestionProps<ModelType>
   body: any;
   grading: any;
   onGradingChange: (value) => void;
+  onVariablesChange: (vars: Immutable.OrderedMap<string, contentTypes.Variable>) => void;
   hideGradingCriteria: boolean;
+  hideVariables: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   model: contentTypes.Question;
   canRemoveQuestion: boolean;
@@ -165,15 +169,38 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return [];
   }
 
+  renderVariables() {
+
+    const { hideVariables, model, editMode, services, context, onVariablesChange } = this.props;
+
+    // add variables
+    if (!hideVariables) {
+      return (
+        <VariablesEditor
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
+          onFocus={this.props.onFocus}
+          editMode={editMode}
+          services={services}
+          context={context}
+          model={model.variables}
+          onEdit={onVariablesChange} />
+      );
+    }
+    return null;
+  }
+
   renderOptions() {
-    const { hideGradingCriteria, editMode, grading, onGradingChange } = this.props;
+    const { hideGradingCriteria,
+      editMode, grading, onGradingChange } = this.props;
 
     let options = [];
 
     // add grading criteria option if not disabled
     if (!hideGradingCriteria) {
       options = options.concat(
-        <OptionControl key="grading" name="Grading">
+        <OptionControl key="grading" name="Grading" label="Grading">
           <Select
             editMode={editMode}
             label=""
@@ -337,12 +364,19 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     const showAdditionalTabs = this.renderAdditionalTabs() !== true
       && this.renderAdditionalTabs() !== false;
 
+    const renderSkillsLabel = (part: contentTypes.Part) => (
+      <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
+          {part.skills.size}
+        </Badge>
+      </span>
+    );
+
     return items.map((item, index) => (
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
             ...(this.renderDetails() ? ['Details'] : []),
-            ...(this.renderSkillsTab(item, parts[index]) ? ['Skills'] : []),
+            ...(this.renderSkillsTab(item, parts[index]) ? [renderSkillsLabel(parts[index])] : []),
             ...(this.renderHintsTab(item, parts[index]) ? ['Hints'] : []),
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             ...(showAdditionalTabs
@@ -380,6 +414,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
         {this.renderQuestionTitle()}
         {this.renderOptions()}
         {this.renderQuestionSection()}
+        {this.renderVariables()}
         {this.renderItemParts()}
       </div>
     );

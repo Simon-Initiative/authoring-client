@@ -15,6 +15,7 @@ import guid from 'utils/guid';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
+import { Badge } from '../common/Badge';
 
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
@@ -89,13 +90,14 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     return result;
   }
 
-  buildPartWithInitialResponse(match: string) : contentTypes.Part {
+  buildPartWithInitialResponse(match: string, input) : contentTypes.Part {
 
     const correctFeedback = contentTypes.Feedback.fromText('Correct!', guid());
     const correctResponse = new contentTypes.Response().with({
       feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
         .set(correctFeedback.guid, correctFeedback),
       score: '1',
+      input,
       match,
     });
 
@@ -104,6 +106,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
         .set(otherFeedback.guid, otherFeedback),
       score: '0',
+      input,
       match: '*',
     });
 
@@ -120,7 +123,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
     if (result !== null) {
       const item = new contentTypes.Numeric().with({ id: result[1] });
-      const part = this.buildPartWithInitialResponse('0');
+      const part = this.buildPartWithInitialResponse('0', result[1]);
 
       this.props.onAddItemPart(item, part, result[0]);
     }
@@ -131,7 +134,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
     if (result !== null) {
       const item = new contentTypes.Text().with({ id: result[1] });
-      const part = this.buildPartWithInitialResponse('answer');
+      const part = this.buildPartWithInitialResponse('answer', result[1]);
 
       this.props.onAddItemPart(item, part, result[0]);
     }
@@ -283,12 +286,19 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       }
     };
 
+    const renderSkillsLabel = (part: contentTypes.Part) => (
+      <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
+          {part.skills.size}
+        </Badge>
+      </span>
+    );
+
     return items.map((item, index) => (
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
             getTabNameFromContentType(item, index + 1),
-            'Skills',
+            renderSkillsLabel(parts[index]),
             'Hints',
             ...(!hideGradingCriteria ? ['Criteria'] : []),
           ]}

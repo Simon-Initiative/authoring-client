@@ -86,6 +86,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   componentDidMount() {
+    super.componentDidMount();
     // We have no direct access to a skills list through props.context since
     // skills cannot be deleted. Looking at skills attached to objectives
     // will show the banner if skills are present in the course but 'deleted',
@@ -513,7 +514,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                 {renderAssessmentNode(
                   currentNode, assessmentNodeProps, this.onEditNode,
                   this.onNodeRemove, this.onFocus, this.canRemoveNode(),
-                  this.onDuplicateQuestion, this)}
+                  this.onDuplicateQuestion, this, false)}
               </div>
             </div>
           </div>

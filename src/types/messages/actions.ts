@@ -1,4 +1,4 @@
 export const RELOAD_ACTION = {
-  label: 'Reload Page',
+  label: 'Reload',
   execute: () => location.reload(),
 };
