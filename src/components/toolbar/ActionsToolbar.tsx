@@ -2,7 +2,6 @@ import * as React from 'react';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
-import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { CourseModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
 
