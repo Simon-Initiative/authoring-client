@@ -1,9 +1,7 @@
 @import 'oli/colors';
 
 .toast {
-  width: 600px;
-  margin-top: 50px;
-  transition: all 1s ease;
+  margin-top: 10px;
   background-color: white;
   padding: 21px 0;
   border-radius: 4px;
@@ -46,15 +44,19 @@
   }
 
   &.waiting {
+    border: 1px solid $amethyst;
+
     .toast-icon {
-      color: $info;
+      color: $amethyst;
     }
     &:before {
-      background-color: $info;
+      background-color: $amethyst;
     }
   }
 
   &.error {
+    border: 1px solid $alizarin;
+
     .toast-icon {
       color: $alizarin;
     }
@@ -63,7 +65,9 @@
     }
   }
 
-  &.info {
+  &.warning {
+    border: 1px solid $sunflower;
+
     .toast-icon {
       color: $sunflower;
     }
@@ -72,7 +76,20 @@
     }
   }
 
+  &.info {
+    border: 1px solid $info;
+
+    .toast-icon {
+      color: $info;
+    }
+    &:before {
+      background-color: $info;
+    }
+  }
+
   &.success {
+    border: 1px solid $emerald;
+
     .toast-icon {
       color: $emerald;
     }

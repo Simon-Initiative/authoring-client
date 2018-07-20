@@ -514,7 +514,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                 {renderAssessmentNode(
                   currentNode, assessmentNodeProps, this.onEditNode,
                   this.onNodeRemove, this.onFocus, this.canRemoveNode(),
-                  this.onDuplicateQuestion, this)}
+                  this.onDuplicateQuestion, this, false)}
               </div>
             </div>
           </div>

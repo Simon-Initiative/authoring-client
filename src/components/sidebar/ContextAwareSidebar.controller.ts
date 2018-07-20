@@ -11,12 +11,14 @@ import { ParentContainer } from 'types/active.ts';
 import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
-import { ContentModel } from 'data/models';
 import { ContentElement } from 'data/content/common/interfaces';
+import { ContentModel, CourseModel } from 'data/models';
+import { modalActions } from 'actions/modal';
 
 interface StateProps {
   content: Maybe<ContentElement>;
   container: Maybe<ParentContainer>;
+  course: CourseModel;
   supportedElements: Immutable.List<string>;
   show: boolean;
   resource: Resource;
@@ -29,6 +31,8 @@ interface DispatchProps {
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
   onSetCurrentPage: (documentId: string, pageId: string) => void;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
 }
 
 interface OwnProps {
@@ -56,6 +60,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
     content: activeContext.activeChild,
     container: activeContext.container,
+    course: state.course,
     supportedElements,
     show: state.editorSidebar.show,
     resource,
@@ -74,6 +79,8 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onHide: () => dispatch(showSidebar(false)),
     onSetCurrentPage: (documentId: string, pageId: string) =>
       dispatch(setCurrentPage(documentId, pageId)),
+    onDisplayModal: component => dispatch(modalActions.display(component)),
+    onDismissModal: () => dispatch(modalActions.dismiss()),
   };
 };
 

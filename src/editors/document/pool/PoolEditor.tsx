@@ -308,7 +308,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                   just: node => renderAssessmentNode(
                     node, assesmentNodeProps, this.onEdit,
                     this.onRemove, this.onFocus,
-                    this.canRemoveNode(), this.onDuplicateNode, null),
+                    this.canRemoveNode(), this.onDuplicateNode, null, true),
                   nothing: () => null,
                 })}
               </div>

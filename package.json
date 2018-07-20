@@ -1,6 +1,6 @@
 {
   "name": "course-editor",
-  "version": "0.12.5",
+  "version": "0.13.0",
   "description": "",
   "main": "./src/app.tsx",
   "author": "",
@@ -47,7 +47,7 @@
     "react-jss": "^8.3.3",
     "react-redux": "^5.0.2",
     "react-tippy": "^1.2.2",
-    "reason-react": "^0.3.4",
+    "reason-react": "^0.4.2",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
@@ -68,7 +68,7 @@
     "xml-beautifier": "^0.3.0"
   },
   "devDependencies": {
-    "bs-platform": "^2.2.3",
+    "bs-platform": "^3.1.4",
     "chokidar-cli": "^1.2.0",
     "del-cli": "^1.1.0",
     "jasmine": "^2.5.3",
@@ -113,7 +113,6 @@
     "lint:watch": "chokidar \"src/**/*.ts*\" -c \"echo Running lint... && tslint -p . -c tslint.json 'src/**/*.ts*' && echo Linting Passed.\" --initial --verbose",
     "reason": "bsb -make-world -w",
     "test": "JEST_HTML_REPORTER_OUTPUT_PATH=./test-out/results.html jest",
-    "test:watch": "jest --watch",
-    "postinstall": "cp ./node_modules/reason-react/lib/js/src/*.js ./node_modules/reason-react/src"
+    "test:watch": "jest --watch"
   }
 }
