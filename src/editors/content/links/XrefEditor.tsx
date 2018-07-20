@@ -1,10 +1,12 @@
 import * as React from 'react';
-import * as persistence from '../../../data/persistence';
-import { Xref } from '../../../data/content/workbook/xref';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Select } from '../common/Select';
-import { InputLabel } from '../common/InputLabel';
-import { TextInput } from '../common/TextInput';
+import * as persistence from 'data/persistence';
+import { Xref } from 'data/content/workbook/xref';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { Select } from 'editors/content/common/Select';
+import { InputLabel } from 'editors/content/common/InputLabel';
+import { TextInput } from 'editors/content/common/TextInput';
 
 export interface XrefEditorProps extends AbstractContentEditorProps<Xref> {
 

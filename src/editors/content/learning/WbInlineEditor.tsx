@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { Select } from '../common/Select';
+import { Select } from 'editors/content/common/Select';
 import { PurposeTypes } from 'data/content/learning/common';
 import { LegacyTypes } from 'data/types';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';

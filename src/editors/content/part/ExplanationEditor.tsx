@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 

@@ -1,10 +1,14 @@
-export { InsertExampleCommand } from './commands/example';
-export { InsertSectionCommand } from './commands/section';
-export { InsertPulloutCommand } from './commands/pullout';
-export { InsertMediaCommand } from './commands/media';
-export { InsertBlockEntityCommand, InsertInlineEntityCommand } from './commands/insert';
-export { ToggleStyleCommand, ToggleBlockTypeCommand } from './commands/toggle';
-export { InsertAssessmentCommand } from './commands/wbinline';
-export { InsertDefinitionCommand } from './commands/definition';
-export { SetBlockTypeCommand } from './commands/blocktype';
-export { InsertActivityCommand } from './commands/activity';
+export { InsertExampleCommand } from 'editors/content/common/draft/commands/example';
+export { InsertSectionCommand } from 'editors/content/common/draft/commands/section';
+export { InsertPulloutCommand } from 'editors/content/common/draft/commands/pullout';
+export { InsertMediaCommand } from 'editors/content/common/draft/commands/media';
+export {
+  InsertBlockEntityCommand, InsertInlineEntityCommand,
+} from 'editors/content/common/draft/commands/insert';
+export {
+  ToggleStyleCommand, ToggleBlockTypeCommand,
+} from 'editors/content/common/draft/commands/toggle';
+export { InsertAssessmentCommand } from 'editors/content/common/draft/commands/wbinline';
+export { InsertDefinitionCommand } from 'editors/content/common/draft/commands/definition';
+export { SetBlockTypeCommand } from 'editors/content/common/draft/commands/blocktype';
+export { InsertActivityCommand } from 'editors/content/common/draft/commands/activity';

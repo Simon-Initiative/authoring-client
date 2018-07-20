@@ -1,9 +1,10 @@
 import * as React from 'react';
-
-import { YouTube as YouTubeType } from '../../../data/content/learning/youtube';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { YouTube as YouTubeType } from 'data/content/learning/youtube';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { ContentElements } from 'data/content/common/elements';
-import { TextInput } from '../common/TextInput';
+import { TextInput } from 'editors/content/common/TextInput';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';

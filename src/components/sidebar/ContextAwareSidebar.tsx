@@ -8,20 +8,22 @@ import { injectSheet, injectSheetSFC, classNames, JSSProps } from 'styles/jss';
 import {
   RenderContext, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer } from 'types/active.ts';
-import { getEditorByContentType } from 'editors/content/container/registry.ts';
+import { ParentContainer } from 'types/active';
+import { getEditorByContentType } from 'editors/content/container/registry';
 import { Resource } from 'data/content/resource';
 import {
   ModelTypes, ContentModel, AssessmentModel, CourseModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
-import { PageSelection } from 'editors/document/assessment/PageSelection.tsx';
+import { PageSelection } from 'editors/document/assessment/PageSelection';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
 import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
-import { styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.styles';
+import {
+  styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS,
+} from 'components/sidebar/ContextAwareSidebar.styles';
 import { relativeToNow, adjustForSkew } from 'utils/date';
 import { Tooltip } from 'utils/tooltip';
 import { Button } from 'editors/content/common/Button';

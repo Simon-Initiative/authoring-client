@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Link } from '../../../data/content/learning/link';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
+import { Link } from 'data/content/learning/link';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { TextInput } from 'editors/content/common/TextInput';
+import { InputLabel } from 'editors/content/common/InputLabel';
 
 export interface LinkEditorProps extends AbstractContentEditorProps<Link> {
 

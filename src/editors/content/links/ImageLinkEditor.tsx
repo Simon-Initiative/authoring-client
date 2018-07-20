@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Link } from '../../../data/content/learning/link';
-import { Image } from '../../../data/content/learning/image';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { LinkEditor } from './LinkEditor';
+import { Link } from 'data/content/learning/link';
+import { Image } from 'data/content/learning/image';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { LinkEditor } from 'editors/content/links/LinkEditor';
 
 export interface ImageLinkEditorProps extends AbstractContentEditorProps<ImageLinkModel> {
 
