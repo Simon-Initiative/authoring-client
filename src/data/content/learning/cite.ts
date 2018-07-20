@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, except, ensureIdGuidPresent } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type CiteParams = {
@@ -56,11 +56,7 @@ export class Cite extends Immutable.Record(defaultContent) {
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
-    if (t['@id']) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
     if (t['@entry'] !== undefined) {
       model = model.with({ entry: t['@entry'] === '' ? ' ' : t['@entry'] });
     }
