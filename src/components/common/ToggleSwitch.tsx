@@ -7,7 +7,7 @@ export interface ToggleSwitchProps {
   className?: string;
   style?: any;
   checked?: boolean;
-  onClick?: (e) => void;
+  onClick: (e) => void;
   label: string;
 }
 
