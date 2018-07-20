@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { Resource } from 'data/content/resource';
+import { CourseDescription } from 'components/CoursesViewSearchable';
 
 /** Split the text into matched/unmatched segments to allow each matched segment to be highlighted.
  *  Fn is memoized because we noticed performance issues when searching in larger courses.
  *  Raw strings are used to prevent performance issues seen with React.cloneElement
  */
 const cache = {};
-export const highlightMatches = (prop: string, r: Resource, searchText): JSX.Element => {
+type RowData= Resource | CourseDescription;
+
+export const highlightMatches = (prop: string, r: RowData, searchText): JSX.Element => {
   const textToSearchIn = r[prop];
   const lowercasedTextToSearchIn = textToSearchIn.trim().toLowerCase();
   const key = searchText + '|' + lowercasedTextToSearchIn;

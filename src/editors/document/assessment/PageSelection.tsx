@@ -6,6 +6,7 @@ import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { Remove } from 'components/common/Remove';
+import { Button } from 'editors/content/common/Button';
 
 export interface PageSelectionProps {
   onChangeCurrent: (guid: string) => void;
@@ -27,39 +28,30 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
 
   constructor(props) {
     super(props);
-
-    this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
-  onChange(page: contentTypes.Page) {
+  onChange = (page: contentTypes.Page) => {
     this.props.onChangeCurrent(page.guid);
   }
 
-  onTitleEdit(page: contentTypes.Page, text: string) {
+  onTitleEdit = (page: contentTypes.Page, text: string) => {
     this.props.onEdit(page.with({ title: new contentTypes.Title({
       text: ContentElements.fromText(text, '', TEXT_ELEMENTS) }) }));
   }
 
   renderPage(page: contentTypes.Page, pageNumber: number) {
-
-    const isCurrent = page === this.props.current;
-
-    const pageLabel = isCurrent
-      ? <b>Page {pageNumber}</b>
-      : 'Page ' + pageNumber;
-
-    const linkStyle = {
-      color: '#0067cb',
-      cursor: 'pointer',
-    };
-
     return (
       <tr key={page.guid}>
 
         <td style={ { minWidth: '75px', border: 'none' } } key="label">
-          <a style={linkStyle} onClick={this.onChange.bind(this, page)}>
-            {pageLabel}
-          </a>
+          <Button
+            editMode={true}
+            onClick={() => this.onChange(page)}
+            type="link">
+              <span style={{ fontWeight: page === this.props.current ? 'bolder' : 'normal' }}>
+                Page {pageNumber}
+              </span>
+          </Button>
         </td>
 
         <td style={ { width: '100%', border: 'none' } } key="title">

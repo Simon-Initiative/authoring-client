@@ -36,7 +36,7 @@ export function renderAssessmentNode(
   onRemove: RemoveHandler, onFocus: FocusHandler,
   canRemove: boolean,
   onDuplicate: DuplicateHandler,
-  parent: ParentContainer) {
+  parent: ParentContainer, isQuestionPool: boolean) {
 
   const isParentAssessmentGraded = props.model.resource.type !== LegacyTypes.inline;
 
@@ -45,6 +45,7 @@ export function renderAssessmentNode(
             key={n.guid}
             parent={parent}
             onFocus={onFocus}
+            isQuestionPool={isQuestionPool}
             isParentAssessmentGraded={isParentAssessmentGraded}
             editMode={props.editMode}
             services={props.services}

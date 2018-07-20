@@ -126,17 +126,21 @@ export class PoolRefEditor
     } else if (this.state.title === null) {
       details = '';
     } else {
-      details = <button onClick={this.onViewPool}
-              className="btn btn-link" type="button">{this.state.title}</button>;
+      details =
+        <span>
+          <button onClick={this.onViewPool}
+            className="btn btn-link" type="button">{this.state.title}</button>
+          <small style={{ paddingLeft: 15 }} className="tab-label">{this.props.model.idref}</small>
+        </span>;
     }
 
     return (
       <ul className="list-group">
-        <li style={ { paddingBottom: '0.25rem' } }
+        <li style={{ paddingBottom: '0.25rem', width: '84%' }}
           className="list-group-item justify-content-between">
           {details}
-          <button disabled={!this.props.editMode} onClick={this.onClick}
-              className="btn btn-primary btn-sm" type="button">Select</button>
+          <button disabled={!this.props.editMode} className="btn btn-primary btn-sm"
+            onClick={this.onClick} style={{ float: 'right' }} type="button">Select</button>
         </li>
       </ul>
     );

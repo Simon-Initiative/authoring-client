@@ -90,13 +90,14 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     return result;
   }
 
-  buildPartWithInitialResponse(match: string) : contentTypes.Part {
+  buildPartWithInitialResponse(match: string, input) : contentTypes.Part {
 
     const correctFeedback = contentTypes.Feedback.fromText('Correct!', guid());
     const correctResponse = new contentTypes.Response().with({
       feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
         .set(correctFeedback.guid, correctFeedback),
       score: '1',
+      input,
       match,
     });
 
@@ -105,6 +106,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
         .set(otherFeedback.guid, otherFeedback),
       score: '0',
+      input,
       match: '*',
     });
 
@@ -121,7 +123,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
     if (result !== null) {
       const item = new contentTypes.Numeric().with({ id: result[1] });
-      const part = this.buildPartWithInitialResponse('0');
+      const part = this.buildPartWithInitialResponse('0', result[1]);
 
       this.props.onAddItemPart(item, part, result[0]);
     }
@@ -132,7 +134,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
     if (result !== null) {
       const item = new contentTypes.Text().with({ id: result[1] });
-      const part = this.buildPartWithInitialResponse('answer');
+      const part = this.buildPartWithInitialResponse('answer', result[1]);
 
       this.props.onAddItemPart(item, part, result[0]);
     }

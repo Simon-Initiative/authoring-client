@@ -106,6 +106,7 @@ export class PoolEditor
     return <QuestionEditor
              key={question.guid}
              {...this.props}
+             isQuestionPool={false}
              model={question}
              onEdit={this.onEditQuestion}
              canRemove={true}

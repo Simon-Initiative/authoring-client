@@ -2,7 +2,6 @@ import * as React from 'react';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
-import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { CourseModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
 
@@ -31,8 +30,6 @@ export interface ActionsToolbarProps {
   onQuickPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  onDisplayModal: (component: any) => void;
-  onDismissModal: () => void;
 }
 
 export interface ActionsToolbarState {
@@ -53,7 +50,6 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
 
     this.undo = this.undo.bind(this);
     this.redo = this.redo.bind(this);
-    this.showDeleteModal = this.showDeleteModal.bind(this);
     this.preview = this.preview.bind(this);
   }
 
@@ -63,14 +59,6 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
 
   redo() {
     this.props.onRedo(this.props.documentId);
-  }
-
-  showDeleteModal() {
-    this.props.onDisplayModal(
-      <DeleteResourceModal
-        resource={this.props.documentResource}
-        course={this.props.course}
-        onDismissModal={this.props.onDismissModal} />);
   }
 
   preview() {
@@ -111,13 +99,6 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
             size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-info-circle" /></div>
             <div>Info</div>
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={this.showDeleteModal}
-            size={ToolbarButtonSize.Large}
-            tooltip={`Delete this ${ReadableResourceType}`}>
-            <div><i className="fa fa-trash-o" /></div>
-            <div>Delete</div>
           </ToolbarButton>
           <ToolbarButton
             onClick={this.preview}

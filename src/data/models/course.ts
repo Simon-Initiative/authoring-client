@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../contentTypes';
 import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
+import { parseDate } from 'data/content/resource';
 
 export type CourseModelParams = {
   rev?: number,
@@ -12,6 +13,7 @@ export type CourseModelParams = {
   type?: string,
   description?: string,
   buildStatus?: string,
+  dateCreated?: Date,
   metadata?: contentTypes.MetaData,
   options?: string,
   icon?: contentTypes.WebContent,
@@ -32,6 +34,7 @@ const defaultCourseModel = {
   title: '',
   description: '',
   buildStatus: '',
+  dateCreated: Date.now(),
   metadata: new contentTypes.MetaData(),
   options: '',
   icon: new contentTypes.WebContent(),
@@ -74,6 +77,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   type: string;
   description: string;
   buildStatus: string;
+  dateCreated: Date;
   metadata: contentTypes.MetaData;
   options: string;
   icon: contentTypes.WebContent;
@@ -131,6 +135,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       type: c.type,
       description: c.description,
       buildStatus: c.buildStatus,
+      dateCreated: parseDate(c.dateCreated),
       options: JSON.stringify(c.options),
       icon: new contentTypes.WebContent(),
       theme: c.theme,
