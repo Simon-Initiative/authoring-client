@@ -25,6 +25,7 @@ import { Resource, ResourceState } from 'data/content/resource';
 import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
 import { findNodes } from 'data/models/utils/workbook';
+import { getContentIcon, insertableContentTypes } from 'editors/content/utils/content';
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -47,7 +48,6 @@ export interface InsertToolbarProps {
   resourcePath: string;
   courseModel: CourseModel;
 }
-
 
 export interface InsertToolbarState {
   isWorkbookPage: boolean;
@@ -142,7 +142,7 @@ export class InsertToolbar
       }}
       tooltip="Insert Image"
       disabled={!parentSupportsElementType('image')}>
-      <i className={'fa fa-image'} />
+      {getContentIcon(insertableContentTypes.Image, null)}
     </ToolbarButton>;
 
     const audioButton = <ToolbarButton
@@ -157,7 +157,7 @@ export class InsertToolbar
       }}
       tooltip="Insert Audio"
       disabled={!parentSupportsElementType('audio')}>
-      <i className={'fa fa-volume-up'} />
+      {getContentIcon(insertableContentTypes.Audio, null)}
     </ToolbarButton>;
 
     const youtubeButton = <ToolbarButton
@@ -165,7 +165,7 @@ export class InsertToolbar
       onClick={() => onInsert(new contentTypes.YouTube())}
       tooltip="Insert YouTube Video"
       disabled={!parentSupportsElementType('youtube')}>
-      <i className={'fa fa-youtube'} />
+      {getContentIcon(insertableContentTypes.YouTube, null)}
     </ToolbarButton>;
 
     const iFrameButton = <ToolbarButton
@@ -173,14 +173,14 @@ export class InsertToolbar
       onClick={() => onInsert(new contentTypes.IFrame())}
       tooltip="Insert Webpage"
       disabled={!parentSupportsElementType('iframe')}>
-      <i className={'fa fa-window-maximize'} />
+      {getContentIcon(insertableContentTypes.IFrame, null)}
     </ToolbarButton>;
 
     const figureButton = <ToolbarButton
       onClick={() => onInsert(new contentTypes.Figure())}
       tooltip="Insert Figure"
       disabled={!parentSupportsElementType('figure')}>
-      <i className={'fa fa-address-card'} />
+      {getContentIcon(insertableContentTypes.Figure, null)}
     </ToolbarButton>;
 
     const quoteButton = <ToolbarButton
@@ -191,14 +191,14 @@ export class InsertToolbar
         }))}
       tooltip="Insert Quote"
       disabled={!parentSupportsElementType('quote')}>
-      <i className={'fa fa-quote-right'} />
+      {getContentIcon(insertableContentTypes.BlockQuote, null)}
     </ToolbarButton>;
 
     const codeBlockButton = <ToolbarButton
       onClick={() => onInsert(new contentTypes.CodeBlock())}
       tooltip="Insert Code Block"
       disabled={!parentSupportsElementType('codeblock')}>
-      <i className={'fa fa-code'} />
+      {getContentIcon(insertableContentTypes.CodeBlock, null)}
     </ToolbarButton>;
 
     const formulaButton = <ToolbarButton
@@ -208,7 +208,7 @@ export class InsertToolbar
       }))}
       tooltip="Insert Formula"
       disabled={!parentSupportsElementType('formula')}>
-      <i className="unicode-icon">&#8721;</i>
+      {getContentIcon(insertableContentTypes.BlockFormula, null)}
     </ToolbarButton>;
 
     return (
@@ -220,10 +220,10 @@ export class InsertToolbar
               size={ToolbarButtonSize.Wide}
               onClick={() => onInsert(contentTypes.ContiguousText.fromText('', guid()))}
               disabled={!parentSupportsElementType('p')}>
-              <i className="unicode-icon">T</i> Text
+              {getContentIcon(insertableContentTypes.ContiguousText, null)}
             </ToolbarButton>
             <ToolbarWideMenu
-              icon={<i className={'fa fa-table'} />}
+              icon={getContentIcon(insertableContentTypes.Table, null)}
               label={'Table'}
               disabled={!parentSupportsElementType('table')}>
               <ToolbarButtonMenuForm>
@@ -255,7 +255,7 @@ export class InsertToolbar
                   });
               }}
               disabled={!parentSupportsElementType('video')}>
-              <i style={{ width: 22 }} className={'fa fa-film'} />OLI hosted video
+              {getContentIcon(insertableContentTypes.Video, { width: 22 })} OLI hosted video
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuDivider />
             <ToolbarButtonMenuForm>
@@ -285,7 +285,7 @@ export class InsertToolbar
             <ToolbarButtonMenuItem
               disabled={!parentSupportsElementType('panopto')}
               onClick={() => pickFileThenInsert(new contentTypes.Panopto(), 'src')}>
-              <i style={{ width: 22 }} className={'fa fa-play'} /> Panopto
+              {getContentIcon(insertableContentTypes.Panopto, { width: 22 })} Panopto
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               disabled={!parentSupportsElementType('unity')}
@@ -309,7 +309,7 @@ export class InsertToolbar
             <ToolbarButtonMenuItem
               onClick={() => onInsert(new contentTypes.Example())}
               disabled={!parentSupportsElementType('example')}>
-              <i style={{ width: 22 }} className={'fa fa-bar-chart'} /> Example
+              {getContentIcon(insertableContentTypes.Example, { width: 22 })} Example
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
@@ -324,7 +324,7 @@ export class InsertToolbar
                   .with({ meaning: definition.meaning.set(meaning.guid, meaning) }));
               }}
               disabled={!parentSupportsElementType('definition')}>
-              <i style={{ width: 22 }} className={'fa fa-book'} /> Definition
+              {getContentIcon(insertableContentTypes.Definition, { width: 22 })} Definition
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
@@ -347,7 +347,7 @@ export class InsertToolbar
                 onInsert(dialog);
               }}
               disabled={!parentSupportsElementType('dialog')}>
-              <i style={{ width: 22 }} className={'fa fa-comments'} /> Dialog
+              {getContentIcon(insertableContentTypes.Dialog, { width: 22 })} Dialog
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
@@ -379,13 +379,13 @@ export class InsertToolbar
                 onInsert(conjugation);
               }}
               disabled={!parentSupportsElementType('conjugation')}>
-              <i style={{ width: 22 }} className={'fa fa-language'} /> Conjugation
+              {getContentIcon(insertableContentTypes.Conjugation, { width: 22 })} Conjugation
             </ToolbarButtonMenuItem>
           </ToolbarQuadMenu>
 
           <ToolbarLayout.Column maxWidth="100px">
             <ToolbarWideMenu
-              icon={<i className={'fa fa-list'} />}
+              icon={getContentIcon(insertableContentTypes.Li, null)}
               label={'Lists'}
               disabled={!supportsAtLeastOne(
                 'ul', 'ol')}>
@@ -398,7 +398,7 @@ export class InsertToolbar
                     }));
                 }}
                 disabled={!parentSupportsElementType('ol')}>
-                <i style={{ width: 22 }} className={'fa fa-list-ol'} /> Ordered list
+                {getContentIcon(insertableContentTypes.Ol, { width: 22 })} Ordered list
               </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
@@ -409,7 +409,7 @@ export class InsertToolbar
                     }));
                 }}
                 disabled={!parentSupportsElementType('ul')}>
-                <i style={{ width: 22 }} className={'fa fa-list-ul'} /> Unordered list
+                {getContentIcon(insertableContentTypes.Ul, { width: 22 })} Unordered list
               </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
 
@@ -446,7 +446,8 @@ export class InsertToolbar
                   });
                 }}
                 disabled={!parentSupportsElementType('wb:inline')}>
-                <i style={{ width: 22 }} className={'fa fa-flask'} /> Insert formative assessment
+                {getContentIcon(insertableContentTypes.WbInline, { width: 22 })}
+                Insert formative assessment
               </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
@@ -462,7 +463,8 @@ export class InsertToolbar
 
                 }}
                 disabled={!parentSupportsElementType('wb:inline')}>
-                <i style={{ width: 22 }} className={'fa fa-flask'} /> Create formative assessment
+                {getContentIcon(insertableContentTypes.WbInline, { width: 22 })}
+                Create formative assessment
               </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider/>
@@ -486,7 +488,8 @@ export class InsertToolbar
                   />)
                 }
                 disabled={!parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'fa fa-check'} /> Insert summative assessment
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
+                Insert summative assessment
               </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuItem
@@ -503,7 +506,8 @@ export class InsertToolbar
 
                 }}
                 disabled={!parentSupportsElementType('wb:inline')}>
-                <i style={{ width: 22 }} className={'fa fa-check'} /> Create summative assessment
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
+                Create summative assessment
               </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider/>
@@ -516,7 +520,7 @@ export class InsertToolbar
                   onInsert(composite);
                 }}
                 disabled={!parentSupportsElementType('composite_activity')}>
-                <i style={{ width: 22 }} className={'fa fa-square-o'} /> Composite activity
+                {getContentIcon(insertableContentTypes.Composite, { width: 22 })} Composite activity
               </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
@@ -529,12 +533,12 @@ export class InsertToolbar
               <ToolbarButtonMenuItem
                 onClick={() => onInsert(new contentTypes.Pullout())}
                 disabled={!parentSupportsElementType('pullout')}>
-                <i style={{ width: 22 }} className={'fa fa-external-link-square'} /> Pullout
+                {getContentIcon(insertableContentTypes.Pullout, { width: 22 })} Pullout
               </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => onInsert(new contentTypes.WorkbookSection())}
                 disabled={!parentSupportsElementType('section')}>
-                <i style={{ width: 22 }} className={'fa fa-list-alt'} /> Section
+                {getContentIcon(insertableContentTypes.Section, { width: 22 })} Section
               </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
@@ -550,7 +554,7 @@ export class InsertToolbar
                   onInsert(materials);
                 }}
                 disabled={!parentSupportsElementType('materials')}>
-                <i style={{ width: 22 }} className={'fa fa-columns'} /> Horizontal group
+                {getContentIcon(insertableContentTypes.Materials, { width: 22 })} Horizontal group
               </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
 
@@ -579,7 +583,7 @@ export class InsertToolbar
                   onInsert(alts);
                 }}
                 disabled={!parentSupportsElementType('alternatives')}>
-                <i style={{ width: 22 }} className={'fa fa-plus-square'} /> Variable content
+                {getContentIcon(insertableContentTypes.Alternatives, { width: 22 })}Variable content
               </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>

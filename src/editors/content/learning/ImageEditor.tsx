@@ -14,7 +14,8 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
 import { buildUrl } from 'utils/path';
 import { fetchImageSize, ImageSize } from 'utils/image';
 import ModalSelection from 'utils/selection/ModalSelection';
@@ -170,7 +171,7 @@ export class ImageSizeSidebar extends
       <div>
         <SidebarGroup label="">
           <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-image" /></div>
+            <div>{getContentIcon(insertableContentTypes.Image, null)}</div>
             <div>Change Image</div>
           </ToolbarButton>
         </SidebarGroup>

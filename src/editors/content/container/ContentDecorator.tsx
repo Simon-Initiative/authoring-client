@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames as jssClassNames } from 'styles/jss';
-import { getContentIcon } from 'editors/content/utils/content';
+import { getContentIcon, insertableContentTypes } from 'editors/content/utils/content';
 
 import { styles } from './ContentDecorator.styles';
 
@@ -72,7 +72,7 @@ export class ContentDecorator
               ])}
               onMouseDown={onSelect}>
               <div className={classes.label}>
-                {getContentIcon(contentType)}
+                {getContentIcon(insertableContentTypes[contentType], null)}
               </div>
               <div className={classes.grip} />
             </div>
