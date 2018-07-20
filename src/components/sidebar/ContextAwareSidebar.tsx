@@ -12,7 +12,7 @@ import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Resource } from 'data/content/resource';
 import {
-  ModelTypes, ContentModel, AssessmentModel,
+  ModelTypes, ContentModel, AssessmentModel, CourseModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
@@ -20,10 +20,11 @@ import { PageSelection } from 'editors/document/assessment/PageSelection.tsx';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
-
+import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.styles';
 import { relativeToNow, adjustForSkew } from 'utils/date';
 import { Tooltip } from 'utils/tooltip';
+import { Button } from 'editors/content/common/Button';
 
 interface SidebarRowProps {
   label?: string;
@@ -113,6 +114,7 @@ export interface ContextAwareSidebarProps {
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
   context: AppContext;
+  course: CourseModel;
   editMode: boolean;
   services: AppServices;
   resource: Resource;
@@ -125,6 +127,8 @@ export interface ContextAwareSidebarProps {
   onEdit: (content: Object) => void;
   onHide: () => void;
   onSetCurrentPage: (documentId: string, pageId: string) => void;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
   timeSkewInMs: number;
 }
 
@@ -191,10 +195,18 @@ export class ContextAwareSidebar
     );
   }
 
+  showDeleteModal = () => {
+    this.props.onDisplayModal(
+      <DeleteResourceModal
+        resource={this.props.resource}
+        course={this.props.course}
+        onDismissModal={this.props.onDismissModal} />);
+  }
+
   renderPageDetails() {
     const {
       model, resource, editMode, currentPage, onSetCurrentPage,
-      onEditModel,
+      onEditModel, classes,
     } = this.props;
 
     const dateOptions = {
@@ -205,36 +217,65 @@ export class ContextAwareSidebar
 
     const adjusted = (date: Date): Date => adjustForSkew(date, this.props.timeSkewInMs);
 
+    const MAX_DAYS = 30;
+    const relativeToNowIfLessThanDays = (date: Date, days: number) => {
+      const maxMilliseconds = days * 24 * 60 * 60 * 1000;
+      return (adjusted(new Date()).getMilliseconds()
+        - adjusted(date).getMilliseconds() < maxMilliseconds)
+      ? relativeToNow(date)
+      : dateFormatted(date);
+    };
+
     switch (model.modelType) {
       case ModelTypes.WorkbookPageModel:
         return (
-          <SidebarContent title="Page Details" onHide={this.props.onHide}>
-            <SidebarGroup>
-              <SidebarRow label="">
+          <SidebarContent title="Workbook Page" onHide={this.props.onHide}>
+            <SidebarGroup label="General">
+              <SidebarRow>
+                <span>Created </span>
                 <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateCreated))}
                   delay={150} distance={5} size="small" arrowSize="small">
-                  <small>{`Created ${relativeToNow(adjusted(resource.dateCreated))}`}</small>
+                  {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
                 </Tooltip>
-                <br />
+              </SidebarRow>
+              <SidebarRow>
+                <span>Updated </span>
                 <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateUpdated))}
                   delay={150} distance={5} size="small" arrowSize="small">
-                  <small>{`Updated ${relativeToNow(adjusted(resource.dateCreated))}`}</small>
+                  {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
                 </Tooltip>
+              </SidebarRow>
+            </SidebarGroup>
+            <SidebarGroup label="Advanced">
+              <SidebarRow>
+                <Button
+                  className={classes.deleteButton}
+                  onClick={this.showDeleteModal}
+                  editMode={editMode}
+                  type="outline-danger">
+                  Delete this Page
+                </Button>
               </SidebarRow>
             </SidebarGroup>
           </SidebarContent>
         );
       case ModelTypes.AssessmentModel:
         return (
-          <SidebarContent title="Assessment Details" onHide={this.props.onHide}>
-            <SidebarGroup>
-              <SidebarRow label="Created">
-                {`${resource.dateCreated.toLocaleDateString()}, \
-                ${resource.dateCreated.toLocaleTimeString()}`}
+          <SidebarContent title="Assessment" onHide={this.props.onHide}>
+            <SidebarGroup label="General">
+              <SidebarRow>
+                <span>Created </span>
+                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateCreated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                </Tooltip>
               </SidebarRow>
-              <SidebarRow label="Last Updated">
-                {`${resource.dateUpdated.toLocaleDateString()}, \
-                ${resource.dateUpdated.toLocaleTimeString()}`}
+              <SidebarRow>
+                <span>Updated </span>
+                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateUpdated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                </Tooltip>
               </SidebarRow>
             </SidebarGroup>
             <SidebarGroup label="Pages">
@@ -250,18 +291,20 @@ export class ContextAwareSidebar
                     onSetCurrentPage(this.props.context.documentId, newPage);
                   }}
                   onEdit={this.onPageEdit} />
-                <button
-                  disabled={!this.props.editMode}
-                  type="button" className="btn btn-link btn-sm"
-                  onClick={this.onAddPage}>Add Page</button>
+                <Button
+                  editMode={editMode}
+                  type="secondary" className="btn-sm"
+                  onClick={this.onAddPage}>
+                    Add Page
+                </Button>
               </SidebarRow>
             </SidebarGroup>
             {model.type === LegacyTypes.assessment2 &&
-              <SidebarGroup label="Settings">
+              <SidebarGroup label="Learning">
                 <SidebarRow label="Recommended Attempts">
                   <TextInput
                     editMode={editMode}
-                    width="50px"
+                    width="100%"
                     label=""
                     type="number"
                     value={model.recommendedAttempts}
@@ -287,7 +330,7 @@ export class ContextAwareSidebar
                 <SidebarRow label="Maximum Attempts">
                   <TextInput
                     editMode={this.props.editMode}
-                    width="50px"
+                    width="100%"
                     label=""
                     type="number"
                     value={model.maxAttempts}
@@ -311,19 +354,47 @@ export class ContextAwareSidebar
                 </SidebarRow>
               </SidebarGroup>
             }
+            <SidebarGroup label="Advanced">
+              <SidebarRow>
+                <Button
+                  className={classes.deleteButton}
+                  onClick={this.showDeleteModal}
+                  editMode={editMode}
+                  type="outline-danger">
+                  Delete this Assessment
+                </Button>
+              </SidebarRow>
+            </SidebarGroup>
           </SidebarContent>
         );
       case ModelTypes.PoolModel:
         return (
-          <SidebarContent title="Question Pool Details" onHide={this.props.onHide}>
-            <SidebarGroup>
-              <SidebarRow label="Created">
-                {`${resource.dateCreated.toLocaleDateString()}, \
-                ${resource.dateCreated.toLocaleTimeString()}`}
+          <SidebarContent title="Question Pool" onHide={this.props.onHide}>
+            <SidebarGroup label="General">
+              <SidebarRow>
+                <span>Created </span>
+                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateCreated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                </Tooltip>
               </SidebarRow>
-              <SidebarRow label="Last Updated">
-                {`${resource.dateUpdated.toLocaleDateString()}, \
-                ${resource.dateUpdated.toLocaleTimeString()}`}
+              <SidebarRow>
+                <span>Updated </span>
+                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateUpdated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+            </SidebarGroup>
+            <SidebarGroup label="Advanced">
+              <SidebarRow>
+                <Button
+                  className={classes.deleteButton}
+                  onClick={this.showDeleteModal}
+                  editMode={editMode}
+                  type="outline-danger">
+                  Delete this Pool
+                </Button>
               </SidebarRow>
             </SidebarGroup>
           </SidebarContent>

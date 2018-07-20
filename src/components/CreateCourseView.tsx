@@ -60,6 +60,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     const waitingContent = <p>We'll take you there as soon as it's ready.</p>;
     const waiting =
       <Toast
+        style={{ width: 600 }}
         icon={waitingIcon}
         heading={waitingHeading}
         content={waitingContent}
@@ -71,6 +72,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     if the problem remains you can contact us with the link in the bottom left.</p>;
     const error =
       <Toast
+        style={{ width: 600 }}
         icon={errorIcon}
         heading={errorHeading}
         content={errorContent}
