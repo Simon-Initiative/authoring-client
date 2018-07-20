@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, ensureIdGuidPresent } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 
@@ -11,7 +11,7 @@ import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 import { PurposeType } from 'data/content/learning/common';
 
 export type SectionParams = {
-  id?: Maybe<string>,
+  id?: string,
   title?: Title,
   purpose?: Maybe<PurposeType>,
   body?: ContentElements,
@@ -21,7 +21,7 @@ export type SectionParams = {
 const defaultContent = {
   contentType: 'Section',
   elementType: 'section',
-  id: Maybe.nothing(),
+  id:'',
   title: Title.fromText('New Section Title'),
   purpose: Maybe.nothing(),
   body: new ContentElements().with({ supportedElements: Immutable.List<string>(BODY_ELEMENTS) }),
@@ -31,7 +31,7 @@ const defaultContent = {
 export class Section extends Immutable.Record(defaultContent) {
   contentType: 'Section';
   elementType: 'section';
-  id: Maybe<string>;
+  id: string;
   title: Title;
   purpose: Maybe<string>;
   body: ContentElements;
@@ -57,9 +57,8 @@ export class Section extends Immutable.Record(defaultContent) {
 
     let model = new Section({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
-    }
+    model = setId(model, t, notify);
+
     if (t['@purpose'] !== undefined) {
       model = model.with({ purpose: Maybe.just(t['@purpose']) });
     }
@@ -93,6 +92,7 @@ export class Section extends Immutable.Record(defaultContent) {
       : this.body.toPersistence();
     const s = {
       section: {
+        '@id': this.id ? this.id : createGuid(),
         '#array': [
           this.title.toPersistence(),
           {
@@ -104,7 +104,6 @@ export class Section extends Immutable.Record(defaultContent) {
       },
     };
 
-    this.id.lift(p => s.section['@id'] = p);
     this.purpose.lift(p => s.section['@purpose'] = p);
 
     return s;
