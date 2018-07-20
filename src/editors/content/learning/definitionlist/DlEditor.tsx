@@ -29,12 +29,15 @@ export interface DefinitionListEditorState {
 export default class DefinitionListEditor extends AbstractContentEditor
   <contentTypes.Dl, DefinitionListEditorProps, DefinitionListEditorState> {
 
+  defaultTitle : contentTypes.Title;
+
   constructor(props) {
     super(props);
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddTerm = this.onAddTerm.bind(this);
     this.onTermEdit = this.onTermEdit.bind(this);
+    this.defaultTitle = contentTypes.Title.fromText('Title');
   }
 
   onTitleEdit(ct: contentTypes.ContiguousText, sourceObject) {
@@ -42,7 +45,11 @@ export default class DefinitionListEditor extends AbstractContentEditor
       just: title => title.with({
         text: title.text.with({ content: title.text.content.set(ct.guid, ct) }),
       }), 
-      nothing: () => contentTypes.Title.fromText(ct.extractPlainText().valueOr('')),
+      nothing: () => this.defaultTitle.with({
+        text: this.defaultTitle.text.with({
+          content: this.defaultTitle.text.content.set(ct.guid, ct),
+        }),
+      }),
     });
 
     const m = this.props.model.with({ title: Maybe.just(currentTitle) });
@@ -107,7 +114,7 @@ export default class DefinitionListEditor extends AbstractContentEditor
 
     const title = model.title.caseOf({
       just: t => t,
-      nothing: () => contentTypes.Title.fromText('Title'),
+      nothing: () => this.defaultTitle,
     });
 
     return (
