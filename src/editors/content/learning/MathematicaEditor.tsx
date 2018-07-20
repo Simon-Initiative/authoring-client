@@ -13,7 +13,7 @@ import { modalActions } from 'actions/modal';
 import { selectFile } from 'editors/content/learning/file';
 import { PurposeTypes } from 'data/content/learning/common';
 import { Select } from 'editors/content/common/controls';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import {

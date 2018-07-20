@@ -6,7 +6,7 @@ import * as contentTypes from 'data/contentTypes';
 import { Select } from 'editors/content/common/controls';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { Orientation } from 'data/content/learning/common';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';

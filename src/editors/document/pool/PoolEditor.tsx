@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import {
   AbstractEditor, AbstractEditorProps, AbstractEditorState,
 } from 'editors/document/common/AbstractEditor';

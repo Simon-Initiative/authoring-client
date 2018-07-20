@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames, JSSProps } from 'styles/jss';
 import {

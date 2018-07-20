@@ -10,7 +10,7 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';

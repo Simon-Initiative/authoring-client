@@ -8,7 +8,7 @@ import {
 import { ContentDecorator } from 'editors/content/container/ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
 import guid from 'utils/guid';
 

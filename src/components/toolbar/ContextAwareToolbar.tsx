@@ -6,7 +6,7 @@ import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
-import { Maybe } from 'tsmonad/lib/src';
+import { Maybe } from 'tsmonad';
 import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { InsertToolbar } from 'components/toolbar/InsertToolbar';
