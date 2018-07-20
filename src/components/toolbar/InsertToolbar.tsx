@@ -446,13 +446,13 @@ export class InsertToolbar
                   });
                 }}
                 disabled={!parentSupportsElementType('wb:inline')}>
-                <i style={{ width: 22 }} className={'fa fa-check'} /> Insert existing assessment...
+                <i style={{ width: 22 }} className={'fa fa-flask'} /> Insert formative assessment
               </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
                   const model = new AssessmentModel({
                     type: LegacyTypes.inline,
-                    title: contentTypes.Title.fromText('New Assessment'),
+                    title: contentTypes.Title.fromText('New Formative Assessment'),
                   });
 
                   onCreateNew(model)
@@ -462,7 +462,7 @@ export class InsertToolbar
 
                 }}
                 disabled={!parentSupportsElementType('wb:inline')}>
-                <i style={{ width: 22 }} className={'fa fa-check'} /> Create new assessment
+                <i style={{ width: 22 }} className={'fa fa-flask'} /> Create formative assessment
               </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider/>
@@ -486,8 +486,28 @@ export class InsertToolbar
                   />)
                 }
                 disabled={!parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'fa fa-flask'} /> Activity
+                <i style={{ width: 22 }} className={'fa fa-check'} /> Insert summative assessment
               </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  const model = new AssessmentModel({
+                    type: LegacyTypes.assessment2,
+                    title: contentTypes.Title.fromText('New Summative Assessment'),
+                  });
+
+                  onCreateNew(model)
+                  .then((resource) => {
+                    onInsert(new contentTypes.Activity().with({ idref: resource.id }));
+                  });
+
+                }}
+                disabled={!parentSupportsElementType('wb:inline')}>
+                <i style={{ width: 22 }} className={'fa fa-check'} /> Create summative assessment
+              </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuDivider/>
+
               <ToolbarButtonMenuItem
                 onClick={() => {
                   const composite = new contentTypes.Composite({
