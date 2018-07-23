@@ -6,7 +6,7 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ParentContainer } from 'types/active';
 import { State } from 'reducers';
-import { Dispatch } from '../../node_modules/redux';
+import { Dispatch } from 'redux';
 
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';

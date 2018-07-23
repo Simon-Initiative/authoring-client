@@ -1,6 +1,6 @@
 import { ContentElement } from 'data/content/common/interfaces';
 import { State } from 'reducers/index';
-import { Dispatch } from '../../node_modules/redux';
+import { Dispatch } from 'redux';
 import * as persistence from 'data/persistence';
 import { WorkbookPageModel } from 'data/models';
 import { findNodes } from 'data/models/utils/workbook';
