@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
-
 import createGuid from 'utils/guid';
-import { augment, getChildren } from 'data/content/common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Popout } from 'data/content/learning/popout';
 import { Alternate } from 'data/content/learning/alternate';
@@ -57,7 +56,7 @@ export class Director extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: DirectorParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: DirectorParams) {
@@ -65,27 +64,24 @@ export class Director extends Immutable.Record(defaultContent) {
   }
 
   clone() : Director {
-    return this.with({
-      id: createGuid(),
+    return ensureIdGuidPresent(this.with({
+      popout: this.popout.clone(),
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+    }));
   }
 
 
-  static fromPersistence(root: Object, guid: string) : Director {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Director {
 
     const t = (root as any).director;
 
     let model = new Director({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@height'] !== undefined) {
       model = model.with({ height: t['@height'] });
     }
@@ -106,21 +102,21 @@ export class Director extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+            { alternate: Alternate.fromPersistence(item, id, notify) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         default:
 
@@ -142,7 +138,7 @@ export class Director extends Immutable.Record(defaultContent) {
 
     return {
       director: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@purpose': this.purpose.caseOf({ just: p => p, nothing: () => undefined }),

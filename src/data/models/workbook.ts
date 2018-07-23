@@ -61,7 +61,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     });
   }
 
-  static fromPersistence(json: Object): WorkbookPageModel {
+  static fromPersistence(json: Object, notify: () => void): WorkbookPageModel {
     let model = new WorkbookPageModel();
 
     const wb = (json as any);
@@ -86,11 +86,11 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
       switch (key) {
         case 'head':
-          model = model.with({ head: contentTypes.Head.fromPersistence(item, id) });
+          model = model.with({ head: contentTypes.Head.fromPersistence(item, id, notify) });
           break;
         case 'body':
           model = model.with({ body: ContentElements
-            .fromPersistence(item.body, id, WB_ELEMENTS) });
+            .fromPersistence(item.body, id, WB_ELEMENTS, null, notify) });
           break;
         case 'bib:file':
           model = model.with({ bibFile: Maybe.just(item) });

@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren } from '../common';
-
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { ContentElements, LINK_ELEMENTS } from 'data/content/common/elements';
 
 
@@ -44,12 +43,12 @@ export class Xref extends Immutable.Record(defaultContent) {
   }
 
   clone() : Xref {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Xref {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Xref {
 
     const t = (root as any).xref;
 
@@ -69,7 +68,7 @@ export class Xref extends Immutable.Record(defaultContent) {
     }
 
     model = model.with({ content: ContentElements
-      .fromPersistence(getChildren(t), '', LINK_ELEMENTS) });
+      .fromPersistence(getChildren(t), '', LINK_ELEMENTS, null, notify) });
 
     return model;
   }

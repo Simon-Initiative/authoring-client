@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 
 import { Source } from './source';
@@ -65,35 +65,38 @@ export class Audio extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: AudioParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: AudioParams) {
     return this.merge(values) as this;
   }
 
-
-  clone() : Audio {
-    return this.with({
-      id: createGuid(),
+  clone(): Audio {
+    return ensureIdGuidPresent(this.with({
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+      sources: this.sources.mapEntries(([_, v]) => {
+        const clone: Source = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Source>,
+      tracks: this.tracks.mapEntries(([_, v]) => {
+        const clone: Track = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Track>,
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Audio {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Audio {
 
     const t = (root as any).audio;
 
     let model = new Audio({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -114,27 +117,31 @@ export class Audio extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'source':
-          model = model.with({ sources: model.sources.set(id, Source.fromPersistence(item, id)) });
+          model = model.with({
+            sources: model.sources.set(id, Source.fromPersistence(item, id, notify)),
+          });
           break;
         case 'track':
-          model = model.with({ tracks: model.tracks.set(id, Track.fromPersistence(item, id)) });
+          model = model.with({
+            tracks: model.tracks.set(id, Track.fromPersistence(item, id, notify)),
+          });
           break;
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+            { alternate: Alternate.fromPersistence(item, id, notify) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         default:
 
@@ -153,7 +160,7 @@ export class Audio extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     let sources = this.sources.toArray();
     if (sources.length === 0

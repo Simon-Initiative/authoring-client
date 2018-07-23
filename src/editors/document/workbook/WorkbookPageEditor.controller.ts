@@ -10,6 +10,7 @@ import { Maybe } from 'tsmonad';
 import * as activeActions from 'actions/active';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
   activeContext: any;
@@ -18,7 +19,7 @@ interface StateProps {
 
 interface DispatchProps {
   fetchObjectives: (courseId: string) => void;
-  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
@@ -44,11 +45,11 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     fetchObjectives: (courseId: string) => {
       return dispatch(fetchObjectives(courseId));
     },
-    onUpdateContent: (documentId: string, content: Object) => {
+    onUpdateContent: (documentId: string, content: ContentElement) => {
       return dispatch(activeActions.updateContent(documentId, content));
     },
     onUpdateContentSelection: (
-      documentId: string, content: Object,
+      documentId: string, content: ContentElement,
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));

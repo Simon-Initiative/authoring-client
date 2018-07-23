@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
-
 import createGuid from 'utils/guid';
-import { augment, getChildren, except } from 'data/content/common';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Title } from 'data/content/learning/title';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
@@ -13,7 +12,7 @@ import { ContiguousText } from 'data/contentTypes';
 export type FigureParams = {
   guid?: string,
   // core.attrs
-  id?: Maybe<string>,
+  id?: string,
   // labeled.content
   title?: Title,
   caption?: Maybe<Caption>,
@@ -27,7 +26,7 @@ const defaultContent = {
   elementType: 'figure',
 
   guid: '',
-  id: Maybe.nothing(),
+  id: '',
   title: Title.fromText('Title'),
   caption: Maybe.nothing(),
   cite: Maybe.nothing(),
@@ -39,14 +38,14 @@ export class Figure extends Immutable.Record(defaultContent) {
   elementType: 'figure';
 
   guid: string;
-  id: Maybe<string>;
+  id: string;
   title: Title;
   caption: Maybe<Caption>;
   cite: Maybe<Cite>;
   content: ContentElements;
 
   constructor(params?: FigureParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: FigureParams) {
@@ -54,30 +53,21 @@ export class Figure extends Immutable.Record(defaultContent) {
   }
 
   clone(): Figure {
-    return this.with({
-      guid: createGuid(),
-      id: Maybe.nothing(),
+    return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
-      caption: this.caption.caseOf({
-        just: caption => Maybe.just(caption.clone()),
-        nothing: () => Maybe.nothing() as Maybe<Caption>,
-      }),
-      cite: this.cite.caseOf({
-        just: cite => Maybe.just(cite.clone()),
-        nothing: () => Maybe.nothing()as Maybe<Cite>,
-      }),
+      caption: this.caption.lift(c => c.clone()),
+      cite: this.cite.lift(c => c.clone()),
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Figure {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Figure {
     const t = (root as any).figure;
 
     let model = new Figure({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
-    }
+    model = setId(model, t, notify);
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -89,13 +79,13 @@ export class Figure extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Maybe.just(Cite.fromPersistence(item, id)) });
+          model = model.with({ cite: Maybe.just(Cite.fromPersistence(item, id, notify)) });
           break;
         case 'caption':
-          model = model.with({ caption: Maybe.just(Caption.fromPersistence(item, id)) });
+          model = model.with({ caption: Maybe.just(Caption.fromPersistence(item, id, notify)) });
           break;
         default:
       }
@@ -103,7 +93,8 @@ export class Figure extends Immutable.Record(defaultContent) {
 
     model = model.with({
       content: ContentElements
-        .fromPersistence(except(getChildren(t), 'title', 'caption', 'cite'), '', BOX_ELEMENTS),
+        .fromPersistence(
+          except(getChildren(t), 'title', 'caption', 'cite'), '', BOX_ELEMENTS, null, notify),
     });
 
     return model;
@@ -126,14 +117,13 @@ export class Figure extends Immutable.Record(defaultContent) {
 
     const s = {
       figure: {
+        '@id': this.id ? this.id : createGuid(),
         '#array': [
           ...children,
           ...content,
         ],
       },
     };
-
-    this.id.lift(p => s.figure['@id'] = p);
 
     return s;
   }

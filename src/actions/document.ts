@@ -233,9 +233,12 @@ export function load(courseId: string, documentId: string) {
 
     const userName = getState().user.profile.username;
 
+    const holder = { changeMade: false };
+    const notifyChangeMade = () => holder.changeMade = true;
+
     dispatch(documentRequested(documentId));
 
-    return persistence.retrieveDocument(courseId, documentId)
+    return persistence.retrieveDocument(courseId, documentId, notifyChangeMade)
       .then((document) => {
 
         // Notify that the course has changed when a user views a course
@@ -263,6 +266,9 @@ export function load(courseId: string, documentId: string) {
               execute: () => this.fetchDocument(this.props.course.guid, this.props.documentId)});
             dispatch(showMessage(message));
           } else {
+            if (holder.changeMade) {
+              strategy.save(document);
+            }
             dispatch(dismissScopedMessages(Messages.Scope.Resource));
           }
 

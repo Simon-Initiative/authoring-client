@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 import createGuid from 'utils/guid';
 
 export type CellDataParams = {
@@ -40,12 +40,12 @@ export class CellData extends Immutable.Record(defaultContent) {
   }
 
   clone() : CellData {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : CellData {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : CellData {
 
     const t = (root as any).td;
 
@@ -62,7 +62,7 @@ export class CellData extends Immutable.Record(defaultContent) {
     }
 
     model = model.with({ content: ContentElements
-      .fromPersistence(t, createGuid(), INLINE_ELEMENTS) });
+      .fromPersistence(t, createGuid(), INLINE_ELEMENTS, null, notify) });
 
     return model;
   }

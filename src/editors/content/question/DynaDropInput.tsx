@@ -113,7 +113,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const { model, selectedInitiator, onBodyEdit } = this.props;
 
     const customElement = (model.body.content.find(c =>
-      c.contentType === 'Custom') as contentTypes.Custom);
+      c.contentType === 'Custom') as any as contentTypes.Custom);
 
     customElement.layoutData
       .lift(ld => ld.initiators)
@@ -139,7 +139,8 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
 
         // save updates
         onBodyEdit(model.body.with({
-          content: model.body.content.set(newCustomElement.guid, newCustomElement),
+          content: model.body.content.set(
+            newCustomElement.guid, newCustomElement),
         }));
       });
   }

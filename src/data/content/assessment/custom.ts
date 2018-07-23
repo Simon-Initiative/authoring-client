@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from '../../../utils/guid';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent, setId } from '../common';
 import { LegacyLayout } from './dragdrop/legacyLayout/legacy_layout';
 import { HTMLLayout } from './dragdrop/htmlLayout/html_layout';
 import { convertLegacyToHtmlTable } from 'data/content/assessment/dragdrop/convert';
@@ -61,22 +61,21 @@ export class Custom extends Immutable.Record(defaultContent) {
   }
 
   clone() {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       id: createGuid(),
       layout: '',
       layoutData: this.layoutData.lift(ld => ld.clone()),
       src: 'DynaDrop.js',
-    });
+    })) as Custom;
   }
 
-  static fromPersistence(json: Object, guid: string) : Custom {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : Custom {
 
     const q = (json as any).custom;
     let model = new Custom({ guid });
 
-    if (q['@id'] !== undefined) {
-      model = model.with({ id: q['@id'] });
-    }
+    model = setId(model, q, notify);
+
     if (q['@type'] !== undefined) {
       model = model.with({ type: q['@type'] });
     }

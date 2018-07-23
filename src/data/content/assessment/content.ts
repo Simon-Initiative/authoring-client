@@ -33,19 +33,21 @@ export class Content extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromText(text: string, guid: string) : Content {
+  static fromText(text: string, guid: string): Content {
     return new Content().with({
       guid,
       body: ContentElements.fromText(text, '', Immutable.List(BOX_ELEMENTS).toArray()),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Content {
+  static fromPersistence(root: Object, guid: string, notify?: () => void): Content {
 
     const content = (root as any).content;
 
     let model = new Content({ guid });
-    model = model.with({ body: ContentElements.fromPersistence(content, '', BODY_ELEMENTS) });
+    model = model.with({
+      body: ContentElements.fromPersistence(content, '', BODY_ELEMENTS, null, notify),
+    });
 
     if (content['@available'] !== undefined) {
       model = model.with({ availability: content['@available'] });
@@ -54,7 +56,7 @@ export class Content extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const body = this.body.toPersistence();
     const content = { content: { '#array': (body as any) } };

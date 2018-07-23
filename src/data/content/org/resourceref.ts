@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
 import { augment } from 'data/content/common';
 import { Maybe } from 'tsmonad';
-
 import * as types from 'data/content/org/types';
 
 export type ResourceRefParams = {

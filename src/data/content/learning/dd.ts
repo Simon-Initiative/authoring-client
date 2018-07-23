@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
-import { augment } from 'data/content/common';
+import { augment, ensureIdGuidPresent } from 'data/content/common';
 import createGuid from 'utils/guid';
 
 export type DdParams = {
@@ -34,13 +34,13 @@ export class Dd extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Dd {
-    return this.with({
+  clone(): Dd {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Dd {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Dd {
 
     const t = (root as any).dd;
 
@@ -50,13 +50,15 @@ export class Dd extends Immutable.Record(defaultContent) {
       model = model.with({ title: Maybe.just(t['@title']) });
     }
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(t, createGuid(), INLINE_ELEMENTS) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(t, createGuid(), INLINE_ELEMENTS, null, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     const dd = {
       dd: {
         '#array': this.content.toPersistence(),

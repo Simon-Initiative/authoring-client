@@ -25,6 +25,7 @@ export interface QuestionEditorProps extends AbstractContentEditorProps<contentT
   onRemove: (guid: string) => void;
   onDuplicate?: () => void;
   isParentAssessmentGraded?: boolean;
+  isQuestionPool: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   canRemove: boolean;
   activeContentGuid: string;
@@ -280,7 +281,7 @@ export class QuestionEditor
       onDuplicate: this.props.onDuplicate,
       onBodyEdit: this.onBodyEdit,
       hideGradingCriteria: !this.props.isParentAssessmentGraded,
-      hideVariables: !this.props.isParentAssessmentGraded,
+      hideVariables: !this.props.isQuestionPool,
       canRemoveQuestion: canRemove,
       onRemoveQuestion: this.props.onRemove.bind(this, this.props.model.guid),
       onEdit: (c, p, src) => this.onItemPartEdit(c, p, src),

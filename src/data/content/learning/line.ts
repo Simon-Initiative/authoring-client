@@ -1,14 +1,14 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Translation } from 'data/content/learning/translation';
-import { augment, getChildren } from 'data/content/common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { Material } from 'data/content/learning/material';
 
 export type LineParams = {
   guid?: string,
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<string>,
   speaker?: string,
   material?: Material,
@@ -19,7 +19,7 @@ const defaultContent = {
   contentType: 'Line',
   elementType: 'line',
   guid: '',
-  id: Maybe.nothing<string>(),
+  id: '',
   title: Maybe.nothing<string>(),
   speaker: '',
   material: new Material(),
@@ -31,36 +31,37 @@ export class Line extends Immutable.Record(defaultContent) {
   contentType: 'Line';
   elementType: 'line';
   guid: string;
-  id: Maybe<string>;
+  id: string;
   title: Maybe<string>;
   speaker: '';
   material: Material;
   translations: Immutable.OrderedMap<string, Translation>;
 
   constructor(params?: LineParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: LineParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
-      guid: createGuid(),
+  clone(): Line {
+    return ensureIdGuidPresent(this.with({
       material: this.material.clone(),
-      translations: this.translations.map(t => t.clone()).toOrderedMap(),
-    });
+      translations: this.translations.mapEntries(([_, v]) => {
+        const clone: Translation = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Translation>,
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Line {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Line {
 
     const m = (root as any).line;
     let model = new Line().with({ guid });
 
-    if (m['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(m['@id']) });
-    }
+    model = setId(model, m, notify);
+
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
     }
@@ -73,12 +74,12 @@ export class Line extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'material':
           model = model.with({
-            material: Material.fromPersistence(item, ''),
+            material: Material.fromPersistence(item, '', notify),
           });
           break;
         case 'translation':
           model = model.with({
-            translations: model.translations.set(id, Translation.fromPersistence(item, id)),
+            translations: model.translations.set(id, Translation.fromPersistence(item, id, notify)),
           });
           break;
         default:
@@ -96,12 +97,12 @@ export class Line extends Immutable.Record(defaultContent) {
 
     const m = {
       line: {
+        '@id': this.id ? this.id : createGuid(),
         '@speaker': this.speaker,
         '#array': children,
       },
     };
 
-    this.id.lift(id => m.line['@id'] = id);
     this.title.lift(title => m.line['@title'] = title);
 
     return m;

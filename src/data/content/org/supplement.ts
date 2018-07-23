@@ -1,5 +1,4 @@
 import * as Immutable from 'immutable';
-
 import { augment, getChildren } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Maybe } from 'tsmonad';

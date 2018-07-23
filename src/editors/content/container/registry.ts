@@ -48,7 +48,7 @@ import UnorderedListEditor from 'editors/content/learning/UnorderedListEditor';
 import UnsupportedEditor from 'editors/content/learning/UnsupportedEditor';
 import VideoEditor from 'editors/content/learning/VideoEditor';
 import WbInlineEditor from 'editors/content/learning/WbInlineEditor';
-import XrefEditor from 'editors/content/learning/XrefEditor';
+import { XrefEditor } from 'editors/content/learning/XrefEditor.controller';
 import YouTubeEditor from 'editors/content/learning/YouTubeEditor';
 import {
   ContiguousTextEditor,

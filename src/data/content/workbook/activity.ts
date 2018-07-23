@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
-
 import createGuid from 'utils/guid';
-import { augment, getChildren } from 'data/content/common';
+import { augment, getChildren, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Image } from 'data/content/learning/image';
 import { Maybe } from 'tsmonad';
@@ -39,13 +38,12 @@ export class Activity extends Immutable.Record(defaultContent) {
   }
 
   clone() : Activity {
-    return this.with({
-      image: this.image.caseOf(
-        { just: i => Maybe.just(i.clone()), nothing: () => Maybe.nothing<Image>() }),
-    });
+    return ensureIdGuidPresent(this.with({
+      image: this.image.lift(i => i.clone()),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Activity {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Activity {
     const t = (root as any).activity;
 
     let model = new Activity({ guid });
@@ -64,7 +62,7 @@ export class Activity extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'image':
-          model = model.with({ image: Maybe.just(Image.fromPersistence(item, id)) });
+          model = model.with({ image: Maybe.just(Image.fromPersistence(item, id, notify)) });
           break;
         default:
       }

@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren } from 'data/content/common';
-
+import { augment, getChildren, ensureIdGuidPresent } from 'data/content/common';
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 
 export type BlockQuoteParams = {
@@ -35,12 +34,12 @@ export class BlockQuote extends Immutable.Record(defaultContent) {
   }
 
   clone() : BlockQuote {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       text: this.text.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : BlockQuote {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : BlockQuote {
 
     const t = (root as any).quote;
 

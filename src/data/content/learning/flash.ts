@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
-
 import createGuid from 'utils/guid';
-import { augment, getChildren } from 'data/content/common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Popout } from 'data/content/learning/popout';
 import { Alternate } from 'data/content/learning/alternate';
@@ -64,35 +63,35 @@ export class Flash extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: FlashParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: FlashParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Flash {
-    return this.with({
-      id: createGuid(),
+  clone(): Flash {
+    return ensureIdGuidPresent(this.with({
+      popout: this.popout.clone(),
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+      params: this.params.mapEntries(([_, v]) => {
+        const clone: Param = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Param>,
+    }));
   }
 
-
-  static fromPersistence(root: Object, guid: string) : Flash {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Flash {
 
     const t = (root as any).flash;
 
     let model = new Flash({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@height'] !== undefined) {
       model = model.with({ height: t['@height'] });
     }
@@ -117,24 +116,26 @@ export class Flash extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+            { alternate: Alternate.fromPersistence(item, id, notify) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         case 'param':
-          model = model.with({ params: model.params.set(id, Param.fromPersistence(item, id)) });
+          model = model.with({
+            params: model.params.set(id, Param.fromPersistence(item, id, notify)),
+          });
           break;
         default:
 
@@ -144,7 +145,7 @@ export class Flash extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [
       this.titleContent.toPersistence(),
@@ -158,7 +159,7 @@ export class Flash extends Immutable.Record(defaultContent) {
 
     return {
       flash: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@logging': this.logging ? 'true' : 'false',

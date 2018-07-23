@@ -28,3 +28,5 @@ export function injectSheetSFC<P>(style: any):
     => React.StatelessComponent<P> {
   return injectSheetJSS(style);
 }
+
+export const injectSheetRE = (style, component) => injectSheetSFC(style)(component);

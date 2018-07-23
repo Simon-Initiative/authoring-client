@@ -3,7 +3,36 @@ import * as Immutable from 'immutable';
 import { Feedback } from './feedback';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
+
+const encodeMatchOperators = (match: string) => {
+  const operatorEncodings = {
+    '<': '&lt;',
+    '>': '&gt;',
+  };
+
+  return Object.keys(operatorEncodings).reduce(
+    (match, encKey) => match.replace(encKey, operatorEncodings[encKey]),
+    match);
+};
+
+const decodeMatchOperators = (match: string) => {
+  const operatorDecodings = {
+    '&lt;': '<',
+    '&gt;': '>',
+  };
+
+  return Object.keys(operatorDecodings).reduce(
+    (match, decKey) => match.replace(decKey, operatorDecodings[decKey]),
+    match);
+};
+
+const sanitizeMatch = (match: string) => {
+  // remove trailing # if no precision value is defined
+  return match.substr(match.length - 1, 1) === '#'
+    ? match.substr(0, match.length - 1)
+    : match;
+};
 
 export type ResponseParams = {
 
@@ -46,9 +75,12 @@ export class Response extends Immutable.Record(defaultContent) {
 
 
   clone() : Response {
-    return this.with({
-      feedback: this.feedback.map(f => f.clone()).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      feedback: this.feedback.mapEntries(([_, v]) => {
+        const clone: Feedback = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Feedback>,
+    }));
   }
 
 
@@ -56,7 +88,7 @@ export class Response extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : Response {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : Response {
 
     const r = (json as any).response;
     let model = new Response({ guid });
@@ -68,7 +100,7 @@ export class Response extends Immutable.Record(defaultContent) {
       model = model.with({ name: r['@name'] });
     }
     if (r['@match'] !== undefined) {
-      model = model.with({ match: r['@match'] });
+      model = model.with({ match: decodeMatchOperators(r['@match']) });
     }
     if (r['@score'] !== undefined) {
       model = model.with({ score: r['@score'] });
@@ -86,7 +118,7 @@ export class Response extends Immutable.Record(defaultContent) {
         case 'feedback':
           model = model.with(
             { feedback: model.feedback.set(
-              id, Feedback.fromPersistence(item, id))});
+              id, Feedback.fromPersistence(item, id, notify))});
           break;
         default:
       }
@@ -117,7 +149,7 @@ export class Response extends Immutable.Record(defaultContent) {
 
     const o = {
       response: {
-        '@match': this.match,
+        '@match': encodeMatchOperators(sanitizeMatch(this.match)),
         '@score': this.score.trim() === '' ? '0' : this.score,
         '@name': this.name,
         '#array': [...concepts, ...feedback],

@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
-import { augment } from 'data/content/common';
-
+import { augment, ensureIdGuidPresent } from 'data/content/common';
+import createGuid from 'utils/guid';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export type TranslationParams = {
   content?: ContentElements,
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<string>,
   guid?: string,
 };
@@ -15,7 +15,7 @@ const defaultContent = {
   contentType: 'Translation',
   elementType: 'translation',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
-  id: Maybe.nothing(),
+  id: '',
   title: Maybe.nothing(),
   guid: '',
 };
@@ -25,31 +25,31 @@ export class Translation extends Immutable.Record(defaultContent) {
   contentType: 'Translation';
   elementType: 'translation';
   content: ContentElements;
-  id: Maybe<string>;
+  id: string;
   title: Maybe<string>;
   guid: string;
 
   constructor(params?: TranslationParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: TranslationParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
+  clone(): Translation {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Translation {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Translation {
 
     const t = (root as any).translation;
 
-    const id = t['@id'] !== undefined
-      ? Maybe.just(t['@id'])
-      : Maybe.nothing();
+    const id = t['@id']
+      ? t['@id']
+      : notify() || createGuid();
 
     const title = t['@title'] !== undefined
       ? Maybe.just(t['@title'])
@@ -57,7 +57,7 @@ export class Translation extends Immutable.Record(defaultContent) {
 
     return new Translation({
       guid,
-      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS),
+      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS, null, notify),
       id,
       title,
     });
@@ -66,11 +66,11 @@ export class Translation extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const t = {
       translation: {
+        '@id': this.id ? this.id : createGuid(),
         '#array': this.content.toPersistence(),
       },
     };
 
-    this.id.lift(id => t.translation['@id'] = id);
     this.title.lift(title => t.translation['@title'] = title);
 
     return t;

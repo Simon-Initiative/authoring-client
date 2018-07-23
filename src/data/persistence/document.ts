@@ -9,7 +9,7 @@ import * as models from '../models';
  * @param documentId the document guid
  */
 export function retrieveDocument(
-  courseId: CourseId, documentId: DocumentId): Promise<Document> {
+  courseId: CourseId, documentId: DocumentId, notify?: () => void): Promise<Document> {
 
   const url = `${configuration.baseUrl}/${courseId}/resources/${documentId}`;
 
@@ -20,7 +20,7 @@ export function retrieveDocument(
         _courseId: courseId,
         _id: json.guid,
         _rev: json.rev,
-        model: models.createModel(json),
+        model: models.createModel(json, notify),
       });
     });
 }
