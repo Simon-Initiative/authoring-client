@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 
 export type CellHeaderParams = {
@@ -39,13 +39,13 @@ export class CellHeader extends Immutable.Record(defaultContent) {
   }
 
 
-  clone() : CellHeader {
-    return this.with({
+  clone(): CellHeader {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : CellHeader {
+  static fromPersistence(root: Object, guid: string, notify: () => void): CellHeader {
 
     const t = (root as any).th;
 
@@ -62,16 +62,20 @@ export class CellHeader extends Immutable.Record(defaultContent) {
     }
 
     if (t['#text'] !== undefined) {
-      model = model.with({ content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS) });
+      model = model.with({
+        content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS, null, notify),
+      });
     } else {
-      model = model.with({ content: ContentElements
-        .fromPersistence(getChildren(t), '', INLINE_ELEMENTS) });
+      model = model.with({
+        content: ContentElements
+          .fromPersistence(getChildren(t), '', INLINE_ELEMENTS, null, notify),
+      });
     }
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       th: {
         '@colspan': this.colspan,

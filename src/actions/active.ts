@@ -4,6 +4,7 @@ import { ActiveContextState } from 'reducers/active';
 import { ParsedContent } from 'data/parsers/common/types';
 import * as contentTypes from 'data/contentTypes';
 import { resolveWithProgressUI } from './progress';
+import { ContentElement } from 'data/content/common/interfaces';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -11,12 +12,12 @@ export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export type UpdateContentAction = {
   type: UPDATE_CONTENT,
   documentId: string,
-  content: Object,
+  content: ContentElement,
 };
 
 export const updateContent = (
   documentId: string,
-  content: Object): UpdateContentAction => ({
+  content: ContentElement): UpdateContentAction => ({
     type: UPDATE_CONTENT,
     documentId,
     content,
@@ -29,14 +30,14 @@ export const UPDATE_CONTEXT: UPDATE_CONTEXT = 'active/UPDATE_CONTEXT';
 export type UpdateContextAction = {
   type: UPDATE_CONTEXT,
   documentId: string,
-  content: Object,
+  content: ContentElement,
   container: ParentContainer,
   textSelection: Maybe<TextSelection>,
 };
 
 export const updateContext = (
   documentId: string,
-  content: Object, container: ParentContainer,
+  content: ContentElement, container: ParentContainer,
   textSelection: Maybe<TextSelection>): UpdateContextAction => ({
     type: UPDATE_CONTEXT,
     documentId,
@@ -58,7 +59,7 @@ export const resetActive = (): ResetActiveAction => ({
 });
 
 
-export function insert(content: Object) {
+export function insert(content: ContentElement | ContentElement[]) {
   return function (dispatch, getState) {
 
     const { activeContext } = getState();
@@ -103,7 +104,7 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
 }
 
 
-export function edit(content: Object) {
+export function edit(content: ContentElement) {
   return function (dispatch, getState) {
     const { activeContext } = getState();
     activeContext.container.lift((parent : ParentContainer) => {
@@ -112,7 +113,7 @@ export function edit(content: Object) {
   };
 }
 
-export function remove(item: Object) {
+export function remove(item: ContentElement) {
   return function (dispatch, getState) {
     const { activeContext }: { activeContext: ActiveContextState } = getState();
 

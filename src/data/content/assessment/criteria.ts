@@ -36,25 +36,27 @@ export class GradingCriteria extends Immutable.Record(defaultGradingCriteria) {
     return this.merge(values) as this;
   }
 
-  clone() : GradingCriteria {
+  clone(): GradingCriteria {
     return this.with({
       body: this.body.clone(),
     });
   }
 
-  static fromText(text: string, guid: string) : GradingCriteria {
+  static fromText(text: string, guid: string): GradingCriteria {
     return new GradingCriteria().with({
       guid,
       body: ContentElements.fromText(text, '', Immutable.List(MATERIAL_ELEMENTS).toArray()),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : GradingCriteria {
+  static fromPersistence(root: Object, guid: string, notify: () => void): GradingCriteria {
 
     const c = (root as any).grading_criteria;
 
     let model = new GradingCriteria({ guid });
-    model = model.with({ body: ContentElements.fromPersistence(c, '', MATERIAL_ELEMENTS) });
+    model = model.with({
+      body: ContentElements.fromPersistence(c, '', MATERIAL_ELEMENTS, null, notify),
+    });
 
     if (c['@score'] !== undefined) {
       model = model.with({ score: c['@score'] });
@@ -66,7 +68,7 @@ export class GradingCriteria extends Immutable.Record(defaultGradingCriteria) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const body = this.body.toPersistence();
     const criteria = { grading_criteria: { '#array': (body as any) } };

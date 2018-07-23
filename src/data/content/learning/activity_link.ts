@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { LinkTarget } from './common';
 
@@ -38,18 +38,17 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
-
-  clone() : ActivityLink {
-    return this.with({
+  clone(): ActivityLink {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
   with(values: ActivityLinkParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : ActivityLink {
+  static fromPersistence(root: Object, guid: string, notify: () => void): ActivityLink {
 
     const t = (root as any).activity_link;
 
@@ -68,12 +67,14 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
       model = model.with({ purpose: t['@purpose'] });
     }
 
-    model = model.with({ content: ContentElements.fromPersistence(t, '', TEXT_ELEMENTS) });
+    model = model.with({
+      content: ContentElements.fromPersistence(t, '', TEXT_ELEMENTS, null, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       activity_link: {
         '@title': this.title,

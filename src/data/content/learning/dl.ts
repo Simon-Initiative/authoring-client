@@ -3,15 +3,15 @@ import { Maybe } from 'tsmonad';
 import { Title } from './title';
 import { Dt } from './dt';
 import { Dd } from './dd';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from './common';
 import createGuid from 'utils/guid';
 
 export type DlParams = {
+  id?: string,
   title?: Maybe<Title>,
   terms?: Immutable.OrderedMap<string, Dt>,
   guid?: string,
-  id?: string,
 };
 
 const defaultContent = {
@@ -41,13 +41,13 @@ export class Dl extends Immutable.Record(defaultContent) {
   }
 
   clone(): Dl {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       title: this.title.lift(t => t.clone()),
       terms: this.terms.mapEntries(([_, v]) => {
         const clone: Dt = v.clone();
         return [clone.guid, clone];
       }).toOrderedMap() as Immutable.OrderedMap<string, Dt>,
-    });
+    }));
   }
 
   static fromPersistence(root: Object, guid: string, notify: () => void): Dl {
@@ -55,6 +55,8 @@ export class Dl extends Immutable.Record(defaultContent) {
     const t = (root as any).dl;
 
     let model = new Dl().with({ guid });
+
+    model = setId(model, t, notify);
 
     getChildren(t).forEach((item) => {
 
@@ -110,6 +112,7 @@ export class Dl extends Immutable.Record(defaultContent) {
 
     return {
       dl: {
+        '@id': this.id,
         '#array': children,
       },
     };

@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { Image } from './image';
 
 export type AnchorParams = {
@@ -30,14 +30,13 @@ export class Anchor extends Immutable.Record(defaultContent) {
   }
 
 
-  clone() : Anchor {
-    return this.with({
-      content: this.content.caseOf(
-        { just: i => Maybe.just(i.clone()), nothing: () => Maybe.nothing<Image>() }),
-    });
+  clone(): Anchor {
+    return ensureIdGuidPresent(this.with({
+      content: this.content.lift(i => i.clone()),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Anchor {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Anchor {
     const t = (root as any).anchor;
 
     let model = new Anchor({ guid });
@@ -46,13 +45,13 @@ export class Anchor extends Immutable.Record(defaultContent) {
 
     if (children instanceof Array
       && children.length === 1 && (children[0] as any).image !== undefined) {
-      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '')) });
+      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '', notify)) });
     }
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     const anchor = {
       anchor: {
       },

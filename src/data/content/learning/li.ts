@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 import createGuid from 'utils/guid';
 
 export type LiParams = {
@@ -36,12 +36,12 @@ export class Li extends Immutable.Record(defaultContent) {
   }
 
   clone() : Li {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Li {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Li {
 
     const t = (root as any).li;
 
@@ -52,7 +52,7 @@ export class Li extends Immutable.Record(defaultContent) {
     }
 
     model = model.with({ content: ContentElements
-      .fromPersistence(t, createGuid(), FLOW_ELEMENTS) });
+      .fromPersistence(t, createGuid(), FLOW_ELEMENTS, null, notify) });
 
     return model;
   }

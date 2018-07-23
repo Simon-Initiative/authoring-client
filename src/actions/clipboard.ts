@@ -1,60 +1,66 @@
 import { Maybe } from 'tsmonad';
-import { ActiveContextState } from 'reducers/active';
 import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { registeredTypes } from 'data/content/common/parse';
 import guid from 'utils/guid';
 import { ContiguousText } from 'data/content/learning/contiguous';
+import { ContentElement } from 'data/content/common/interfaces';
+import { ParentContainer } from 'types/active';
+import { State } from 'reducers';
+import { Dispatch } from 'redux';
 
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
 
 export type SetItemAction = {
   type: SET_ITEM;
-  item: Maybe<Object>;
+  item: Maybe<ContentElement>;
+  page: Maybe<string>;
 };
 
-export const setItem = (item: Object) => ({
+export const setItem = (item: ContentElement, page: string): SetItemAction => ({
   type: SET_ITEM,
-  item,
+  item: Maybe.just(item),
+  page: Maybe.just(page),
 });
 
-export function cut(item: Object) {
-  return function (dispatch, getState) {
-    const { activeContext }: { activeContext: ActiveContextState } = getState();
-    dispatch(copy(item));
+export function cut(item: ContentElement, page: string) {
+  return function (dispatch: Dispatch<State>, getState: () => State) {
+    const { activeContext } = getState();
+    dispatch(copy(item, page));
     activeContext.container.lift(parent => parent.onRemove(item));
   };
 }
-export function copy(item) {
-  return function (dispatch, getState) {
-    const { activeContext }: { activeContext: ActiveContextState } = getState();
 
-    let toSerialize = item.toPersistence();
-    if (item.contentType === 'ContiguousText') {
-      toSerialize = { isContiguousText: true, data: toSerialize };
-    }
-    const serialized = JSON.stringify(toSerialize);
+export function copy(item: ContentElement, page: string) {
+  let toSerialize = item.toPersistence();
+  if (item.contentType === 'ContiguousText') {
+    toSerialize = { isContiguousText: true, data: toSerialize };
+  }
+  const serialized = JSON.stringify(toSerialize);
 
-    activeContext.activeChild.lift(selection => saveToLocalStorage('clipboard', serialized));
+  saveToLocalStorage('clipboard', serialized);
+
+  return function (dispatch: Dispatch<State>, getState: () => State) {
+    dispatch(setItem(item, page));
   };
 }
 
 export function paste() {
-  return function (dispatch, getState) {
+  return function (dispatch: Dispatch<State>, getState: () => State) {
 
-    const { activeContext }: { activeContext: ActiveContextState } = getState();
+    const { activeContext } = getState();
 
     activeContext.container.lift(parent => pasteInside(parent));
 
-    function pasteInside(parent) {
+    function pasteInside(parent: ParentContainer) {
       const savedData: any = loadFromLocalStorage('clipboard');
       if (savedData === null) {
         return;
       }
 
       const { textSelection } = activeContext;
-      let elementToPaste;
-      let elementType;
+      let elementToPaste: ContentElement;
+      let elementType: string;
       // ContiguousText components serialize to lists of inline elements (e.g. 'p' tags),
       // so we handle that case separately
       if (savedData.isContiguousText) {
@@ -63,7 +69,7 @@ export function paste() {
       } else {
         // Otherwise, we look up the fromPersistence method from the data wrapper registry
         elementType = Object.keys(savedData)[0];
-        const factoryFn = registeredTypes[elementType];
+        const factoryFn: (obj, guid) => ContentElement = registeredTypes[elementType];
         elementToPaste = factoryFn(savedData, guid());
       }
 

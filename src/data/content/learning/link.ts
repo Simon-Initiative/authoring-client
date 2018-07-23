@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { Image } from './image';
 import { LinkTarget } from './common';
 
@@ -44,13 +44,12 @@ export class Link extends Immutable.Record(defaultContent) {
 
 
   clone() : Link {
-    return this.with({
-      content: this.content.caseOf(
-        { just: i => Maybe.just(i.clone()), nothing: () => Maybe.nothing<Image>() }),
-    });
+    return ensureIdGuidPresent(this.with({
+      content: this.content.lift(i => i.clone()),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Link {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Link {
     const t = (root as any).link;
 
     let model = new Link({ guid });
@@ -72,7 +71,7 @@ export class Link extends Immutable.Record(defaultContent) {
 
     if (children instanceof Array
       && children.length === 1 && (children[0] as any).image !== undefined) {
-      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '')) });
+      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '', notify)) });
     }
 
     return model;

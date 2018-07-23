@@ -364,7 +364,7 @@ export class InsertToolbar
 
                 const material = contentTypes.Material.fromText('Empty text block', '');
                 const line = new contentTypes.Line({
-                  guid: lineId, id: Maybe.just(lineId), speaker: speakerId, material,
+                  guid: lineId, id: lineId, speaker: speakerId, material,
                 });
                 const lines = Immutable.OrderedMap<string, contentTypes.Line>([[lineId, line]]);
 

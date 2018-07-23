@@ -12,6 +12,7 @@ import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
   activeContext: any;
@@ -58,11 +59,11 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onFetchSkills: (courseId: string) => {
       return dispatch(fetchSkills(courseId));
     },
-    onUpdateContent: (documentId: string, content: Object) => {
+    onUpdateContent: (documentId: string, content: ContentElement) => {
       return dispatch(activeActions.updateContent(documentId, content));
     },
     onUpdateContentSelection: (
-      documentId: string, content: Object,
+      documentId: string, content: ContentElement,
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));

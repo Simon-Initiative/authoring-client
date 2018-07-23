@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 import createGuid from 'utils/guid';
 import { Dd } from 'data/content/learning/dd';
 
@@ -39,13 +39,17 @@ export class Dt extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone(): Dt {
-    return this.with({
+  clone() : Dt {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+      definitions: this.definitions.mapEntries(([_, v]) => {
+        const clone: Dd = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Dd>,
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Dt {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Dt {
 
     const t = (root as any).dt;
 
@@ -55,10 +59,8 @@ export class Dt extends Immutable.Record(defaultContent) {
       model = model.with({ title: Maybe.just(t['@title']) });
     }
 
-    model = model.with({
-      content: ContentElements
-        .fromPersistence(t, createGuid(), INLINE_ELEMENTS),
-    });
+    model = model.with({ content: ContentElements
+      .fromPersistence(t, createGuid(), INLINE_ELEMENTS, null, notify) });
 
     return model;
   }
