@@ -142,7 +142,7 @@ export class InsertToolbar
       }}
       tooltip="Insert Image"
       disabled={!parentSupportsElementType('image')}>
-      {getContentIcon(insertableContentTypes.Image, null)}
+      {getContentIcon(insertableContentTypes.Image)}
     </ToolbarButton>;
 
     const audioButton = <ToolbarButton
@@ -157,7 +157,7 @@ export class InsertToolbar
       }}
       tooltip="Insert Audio"
       disabled={!parentSupportsElementType('audio')}>
-      {getContentIcon(insertableContentTypes.Audio, null)}
+      {getContentIcon(insertableContentTypes.Audio)}
     </ToolbarButton>;
 
     const youtubeButton = <ToolbarButton
@@ -165,7 +165,7 @@ export class InsertToolbar
       onClick={() => onInsert(new contentTypes.YouTube())}
       tooltip="Insert YouTube Video"
       disabled={!parentSupportsElementType('youtube')}>
-      {getContentIcon(insertableContentTypes.YouTube, null)}
+      {getContentIcon(insertableContentTypes.YouTube)}
     </ToolbarButton>;
 
     const iFrameButton = <ToolbarButton
@@ -173,14 +173,14 @@ export class InsertToolbar
       onClick={() => onInsert(new contentTypes.IFrame())}
       tooltip="Insert Webpage"
       disabled={!parentSupportsElementType('iframe')}>
-      {getContentIcon(insertableContentTypes.IFrame, null)}
+      {getContentIcon(insertableContentTypes.IFrame)}
     </ToolbarButton>;
 
     const figureButton = <ToolbarButton
       onClick={() => onInsert(new contentTypes.Figure())}
       tooltip="Insert Figure"
       disabled={!parentSupportsElementType('figure')}>
-      {getContentIcon(insertableContentTypes.Figure, null)}
+      {getContentIcon(insertableContentTypes.Figure)}
     </ToolbarButton>;
 
     const quoteButton = <ToolbarButton
@@ -191,14 +191,14 @@ export class InsertToolbar
         }))}
       tooltip="Insert Quote"
       disabled={!parentSupportsElementType('quote')}>
-      {getContentIcon(insertableContentTypes.BlockQuote, null)}
+      {getContentIcon(insertableContentTypes.BlockQuote)}
     </ToolbarButton>;
 
     const codeBlockButton = <ToolbarButton
       onClick={() => onInsert(new contentTypes.CodeBlock())}
       tooltip="Insert Code Block"
       disabled={!parentSupportsElementType('codeblock')}>
-      {getContentIcon(insertableContentTypes.CodeBlock, null)}
+      {getContentIcon(insertableContentTypes.CodeBlock)}
     </ToolbarButton>;
 
     const formulaButton = <ToolbarButton
@@ -208,7 +208,7 @@ export class InsertToolbar
       }))}
       tooltip="Insert Formula"
       disabled={!parentSupportsElementType('formula')}>
-      {getContentIcon(insertableContentTypes.BlockFormula, null)}
+      {getContentIcon(insertableContentTypes.BlockFormula)}
     </ToolbarButton>;
 
     return (
@@ -220,10 +220,10 @@ export class InsertToolbar
               size={ToolbarButtonSize.Wide}
               onClick={() => onInsert(contentTypes.ContiguousText.fromText('', guid()))}
               disabled={!parentSupportsElementType('p')}>
-              {getContentIcon(insertableContentTypes.ContiguousText, null)}
+              {getContentIcon(insertableContentTypes.ContiguousText)}
             </ToolbarButton>
             <ToolbarWideMenu
-              icon={getContentIcon(insertableContentTypes.Table, null)}
+              icon={getContentIcon(insertableContentTypes.Table)}
               label={'Table'}
               disabled={!parentSupportsElementType('table')}>
               <ToolbarButtonMenuForm>
@@ -385,7 +385,7 @@ export class InsertToolbar
 
           <ToolbarLayout.Column maxWidth="100px">
             <ToolbarWideMenu
-              icon={getContentIcon(insertableContentTypes.Li, null)}
+              icon={getContentIcon(insertableContentTypes.Li)}
               label={'Lists'}
               disabled={!supportsAtLeastOne(
                 'ul', 'ol')}>

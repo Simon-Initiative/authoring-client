@@ -54,7 +54,7 @@ export default class MaterialsEditor
     return (
       <ToolbarGroup label="Horizontal Layout" columns={3} highlightColor={CONTENT_COLORS.Materials}>
         <ToolbarButton onClick={this.addColumn.bind(this)} size={ToolbarButtonSize.Large}>
-          <div>{getContentIcon(insertableContentTypes.Materials, null)}</div>
+          <div>{getContentIcon(insertableContentTypes.Materials)}</div>
           <div>Add Column</div>
         </ToolbarButton>
       </ToolbarGroup>

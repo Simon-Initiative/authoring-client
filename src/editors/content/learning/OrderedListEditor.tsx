@@ -162,7 +162,7 @@ export default class OrderedList
             onShowSidebar();
             onDiscover(DiscoverableId.OrderedListEditorStyle);
           }} size={ToolbarButtonSize.Large}>
-          <div>{getContentIcon(insertableContentTypes.Ol, null)}</div>
+          <div>{getContentIcon(insertableContentTypes.Ol)}</div>
           <div>Style</div>
         </ToolbarButton>
         <ToolbarButton

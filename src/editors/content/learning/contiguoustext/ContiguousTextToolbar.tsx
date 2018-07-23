@@ -172,7 +172,7 @@ export default class ContiguousTextToolbar
             }
             disabled={!supports('code') || noTextSelected || !editMode}
             tooltip="Code">
-            {getContentIcon(insertableContentTypes.BlockCode, null)}
+            {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
@@ -294,7 +294,7 @@ export default class ContiguousTextToolbar
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
             tooltip="MathML or Latex formula">
-            {getContentIcon(insertableContentTypes.Math, null)}
+            {getContentIcon(insertableContentTypes.Math)}
           </ToolbarButton>
           <ToolbarButton
             onClick={
@@ -319,7 +319,7 @@ export default class ContiguousTextToolbar
             }}
             tooltip="Insert Image"
             disabled={!supports('image') || !pointEntitiesEnabled}>
-            {getContentIcon(insertableContentTypes.Image, null)}
+            {getContentIcon(insertableContentTypes.Image)}
           </ToolbarButton>
 
         </ToolbarLayout.Inline>

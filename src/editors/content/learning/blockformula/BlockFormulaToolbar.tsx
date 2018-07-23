@@ -159,7 +159,7 @@ export default class BlockFormulaToolbar
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
             tooltip="MathML or Latex formula">
-            {getContentIcon(insertableContentTypes.Math, null)}
+            {getContentIcon(insertableContentTypes.Math)}
           </ToolbarButton>
         </ToolbarLayout.Inline>
       </ToolbarGroup>

@@ -72,7 +72,7 @@ export class ContentDecorator
               ])}
               onMouseDown={onSelect}>
               <div className={classes.label}>
-                {getContentIcon(insertableContentTypes[contentType], null)}
+                {getContentIcon(insertableContentTypes[contentType])}
               </div>
               <div className={classes.grip} />
             </div>

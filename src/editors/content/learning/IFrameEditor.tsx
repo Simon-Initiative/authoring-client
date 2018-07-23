@@ -90,7 +90,7 @@ export default class IFrameEditor
             onShowSidebar();
             onDiscover(DiscoverableId.IFrameEditorWebpageURL);
           }} size={ToolbarButtonSize.Large}>
-          <div>{getContentIcon(insertableContentTypes.IFrame, null)}</div>
+          <div>{getContentIcon(insertableContentTypes.IFrame)}</div>
           <div>Web Page URL</div>
         </ToolbarButton>
         <ToolbarLayout.Column>

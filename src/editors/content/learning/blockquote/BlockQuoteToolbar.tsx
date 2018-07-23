@@ -161,7 +161,7 @@ export default class BlockQuoteToolbar
             }
             disabled={noTextSelected || !editMode}
             tooltip="Code">
-            {getContentIcon(insertableContentTypes.BlockCode, null)}
+            {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>
           <ToolbarButton
             onClick={
@@ -174,7 +174,7 @@ export default class BlockQuoteToolbar
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
             tooltip="MathML or Latex formula">
-            {getContentIcon(insertableContentTypes.Math, null)}
+            {getContentIcon(insertableContentTypes.Math)}
           </ToolbarButton>
           <ToolbarButton
             onClick={

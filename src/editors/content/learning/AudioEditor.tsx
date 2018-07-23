@@ -123,7 +123,7 @@ export default class AudioEditor
       <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Audio} columns={5}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
-            <div>{getContentIcon(insertableContentTypes.Audio, null)}</div>
+            <div>{getContentIcon(insertableContentTypes.Audio)}</div>
             <div>Change Audio</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

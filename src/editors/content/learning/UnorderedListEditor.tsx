@@ -140,7 +140,7 @@ export default class UnorderedList
             onShowSidebar();
             onDiscover(DiscoverableId.UnorderedListEditorStyle);
           }} size={ToolbarButtonSize.Large}>
-          <div>{getContentIcon(insertableContentTypes.Ul, null)}</div>
+          <div>{getContentIcon(insertableContentTypes.Ul)}</div>
           <div>Style</div>
         </ToolbarButton>
       </ToolbarGroup>

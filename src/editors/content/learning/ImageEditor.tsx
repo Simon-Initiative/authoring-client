@@ -171,7 +171,7 @@ export class ImageSizeSidebar extends
       <div>
         <SidebarGroup label="">
           <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
-            <div>{getContentIcon(insertableContentTypes.Image, null)}</div>
+            <div>{getContentIcon(insertableContentTypes.Image)}</div>
             <div>Change Image</div>
           </ToolbarButton>
         </SidebarGroup>

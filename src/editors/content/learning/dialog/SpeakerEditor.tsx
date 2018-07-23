@@ -120,7 +120,7 @@ export default class SpeakerEditor
               disabled={!this.state.isDisplayedAsImage}
               onClick={this.onSelectImage}
               size={ToolbarButtonSize.Large}>
-              <div>{getContentIcon(insertableContentTypes.Image, null)}</div>
+              <div>{getContentIcon(insertableContentTypes.Image)}</div>
               <div>Change Image</div>
             </ToolbarButton>
           </SidebarRow>
