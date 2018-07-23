@@ -4,7 +4,8 @@ import { AbstractContentEditor, AbstractContentEditorProps }
 import * as contentTypes from 'data/contentTypes';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
 
 // import './SpeakerEditor.scss';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -119,7 +120,7 @@ export default class SpeakerEditor
               disabled={!this.state.isDisplayedAsImage}
               onClick={this.onSelectImage}
               size={ToolbarButtonSize.Large}>
-              <div><i className="fa fa-image" /></div>
+              <div>{getContentIcon(insertableContentTypes.Image)}</div>
               <div>Change Image</div>
             </ToolbarButton>
           </SidebarRow>
