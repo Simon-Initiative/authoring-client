@@ -9,8 +9,8 @@ export type CellParams = {
 };
 
 const defaultContent = {
-  contentType: 'Cell',
-  elementType: 'cell',
+  contentType: 'DndTableCell',
+  elementType: '#cdata',
   guid: '',
   text: '',
   target: Maybe.nothing<string>(),
@@ -18,8 +18,8 @@ const defaultContent = {
 
 export class Cell extends Immutable.Record(defaultContent) {
 
-  contentType: 'Cell';
-  elementType: 'cell';
+  contentType: 'DndTableCell';
+  elementType: '#cdata';
   guid: string;
   text: string;
   target: Maybe<string>;

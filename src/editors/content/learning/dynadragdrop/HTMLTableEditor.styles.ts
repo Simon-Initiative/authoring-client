@@ -22,6 +22,13 @@ export const styles: JSSStyles = {
   showOnRight: {
     float: 'right',
   },
+  headerRow: {
+    '& $cell': {
+      fontWeight: 600,
+      backgroundColor: colors.grayLight,
+      textAlign: 'center',
+    },
+  },
   cell: {
     border: [[1, 'solid', colors.grayLight]],
     minWidth: 50,

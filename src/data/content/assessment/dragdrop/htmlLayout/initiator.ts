@@ -9,7 +9,7 @@ export type InitiatorParams = {
 
 const defaultContent = {
   contentType: 'Initiator',
-  elementType: 'initiator',
+  elementType: '#cdata',
   guid: '',
   inputVal: '',
   text: '',
@@ -18,7 +18,7 @@ const defaultContent = {
 export class Initiator extends Immutable.Record(defaultContent) {
 
   contentType: 'Initiator';
-  elementType: 'initiator';
+  elementType: '#cdata';
   guid: string;
   inputVal: string;
   text: string;

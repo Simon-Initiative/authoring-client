@@ -8,20 +8,25 @@ import { TableTargetArea } from './table/table_targetarea';
 import { UnsupportedTargetArea } from './unsupported/unsupported_targetarea';
 import { domParser } from 'utils/domParser';
 
+/**
+ * MINIFIED_TABLE_STYLES is generated using css in html_layout_styles.css.
+ * See html_layout_styles.css for more details.
+ */
 const MINIFIED_TABLE_STYLES =
-'.oli-dnd-table{display:table;text-align:center;border-top:1px sol\
-id #cacaca;border-right:1px solid #cacaca}.dnd-row{display:table-row}.dnd-cell{display:\
-table-cell;padding:4px;border-bottom:1px solid #cacaca;border-left:1px solid #cacaca}\
-.dnd-target{min-width:50px;min-height:50px;padding:4px;background-color:#e3e3e3}.dnd-\
-target::after{content:"Drop here";color:#999;user-select:none;text-transform:uppercas\
-e}.dnd-initiator{color:#58646c;border:2px solid transparent;padding:6px;display:inlin\
-e-block;font-size:14px;box-shadow:2px 2px 10px 0 rgba(155,165,173,1);border-radius:\
-5px;white-space:nowrap;margin:5px;background-color:#E7F4FE;cursor:grab;cursor:-webk\
-it-grab;user-select:none}.dnd-initiator::before{content:"";display:inline-block;ver\
-tical-align:middle;margin-right:4px;width:12px;height:24px;background-image:-webkit\
--repeating-radial-gradient(center center,rgba(0,0,0,.2),rgba(0,0,0,.3) 1px,transpar\
-ent 1px,transparent 100%);background-repeat:repeat;background-size:4px 4px}.dnd-ini\
-tiator:active{cursor:grabbing;cursor:-webkit-grabbing}';
+'.oli-dnd-table{display:table;text-align:center;border-top:1px solid #cacaca;border-right:\
+1px solid #cacaca}.dnd-row{display:table-row}.dnd-row-header{font-weight:600;background-co\
+lor:#cacaca;text-align:center}.dnd-cell{display:table-cell;padding:4px;border-bottom:1px\
+solid #cacaca;border-left:1px solid #cacaca}.dnd-target{min-width:50px;min-height:50p\
+x;padding:4px;background-color:#e3e3e3}.dnd-target::after{content:"Drop here";color:\
+#999;user-select:none;text-transform:uppercase}.dnd-initiator{color:#58646c;border:2\
+px solid transparent;padding:6px;display:inline-block;font-size:14px;box-shadow:2p\
+x 2px 10px 0 rgba(155,165,173,1);border-radius:5px;white-space:nowrap;margin:5px;b\
+ackground-color:#E7F4FE;cursor:grab;cursor:-webkit-grab;user-select:none}.dnd-init\
+iator::before{content:"";display:inline-block;vertical-align:middle;margin-right:4\
+px;width:12px;height:24px;background-image:-webkit-repeating-radial-gradient(cente\
+r center,rgba(0,0,0,.2),rgba(0,0,0,.3) 1px,transparent 1px,transparent 100%);bac\
+kground-repeat:repeat;background-size:4px 4px}.dnd-initiator:active{cursor:grabb\
+ing;cursor:-webkit-grabbing}';
 
 export type TargetArea = TableTargetArea | UnsupportedTargetArea;
 
@@ -63,8 +68,8 @@ export type HTMLLayoutParams = {
 };
 
 const defaultContent = {
-  contentType: 'HTMLLayout',
-  elementType: 'htmllayout',
+  contentType: 'DndHTMLLayout',
+  elementType: 'dragdrop',
   guid: '',
   layoutStyles: MINIFIED_TABLE_STYLES,
   targetArea: new TableTargetArea(),
@@ -73,8 +78,8 @@ const defaultContent = {
 
 export class HTMLLayout extends Immutable.Record(defaultContent) {
 
-  contentType: 'HTMLLayout';
-  elementType: 'htmllayout';
+  contentType: 'DndHTMLLayout';
+  elementType: 'dragdrop';
   guid: string;
   layoutStyles: string;
   targetArea: TargetArea;
@@ -134,7 +139,7 @@ export class HTMLLayout extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
     return {
-      dragdrop: {
+      [this.elementType]: {
         '#array': [
           {
             layoutStyles: {

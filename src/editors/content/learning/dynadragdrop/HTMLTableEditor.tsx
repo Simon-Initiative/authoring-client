@@ -315,7 +315,7 @@ export class HTMLTableEditor
 
     const renderTableRow = (row: Row, index) => {
       return (
-        <tr key={row.guid}>
+        <tr key={row.guid} className={row.isHeader && classes.headerRow}>
           <td>
             {this.renderDropdown(
               index,

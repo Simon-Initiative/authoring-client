@@ -264,7 +264,7 @@ export class DynaDragDropEditor
       const targetArea = (layout as HTMLLayout).targetArea;
 
       switch (targetArea.contentType) {
-        case 'TableTargetArea':
+        case 'DndTableTargetArea':
           return <HTMLTableEditor
                     table={targetArea as TableTargetArea}
                     initiators={layout.initiators}

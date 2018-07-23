@@ -14,7 +14,7 @@ export const sortTargetsByRowColumn = (
   layout: HTMLLayout,
 ) => {
   switch (layout.targetArea.contentType) {
-    case 'TableTargetArea':
+    case 'DndTableTargetArea':
       return layout.targetArea.rows.reduce(
         (accRow, row: Row) => accRow.concat(
           row.cells.reduce(
@@ -162,7 +162,7 @@ export const setQuestionPartWithInitiatorScore = (
 
 export const getTargetsFromLayout = (layout: HTMLLayout) => {
   switch (layout.targetArea.contentType) {
-    case 'TableTargetArea':
+    case 'DndTableTargetArea':
       return layout.targetArea.rows.reduce(
         (accRows, row) =>
           accRows.concat(row.cells.reduce(
@@ -248,7 +248,7 @@ export const updateHTMLLayoutTargetRefs = (
   layout: HTMLLayout,
   ) => {
   switch (layout.targetArea.contentType) {
-    case 'TableTargetArea':
+    case 'DndTableTargetArea':
       return layout.with({
         targetArea: layout.targetArea.with({
           rows: layout.targetArea.rows.map(row => row.with({

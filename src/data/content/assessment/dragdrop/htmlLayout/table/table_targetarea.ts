@@ -11,16 +11,16 @@ export type TableTargetAreaParams = {
 };
 
 const defaultContent = {
-  contentType: 'TableTargetArea',
-  elementType: 'tabletargetarea',
+  contentType: 'DndTableTargetArea',
+  elementType: 'targetArea',
   guid: '',
   rows: Immutable.List<Row>(),
 };
 
 export class TableTargetArea extends Immutable.Record(defaultContent) {
 
-  contentType: 'TableTargetArea';
-  elementType: 'tabletargetarea';
+  contentType: 'DndTableTargetArea';
+  elementType: 'targetArea';
   guid: string;
   rows: Immutable.List<Row>;
 
@@ -69,7 +69,7 @@ export class TableTargetArea extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
     return {
-      targetArea: ({
+      [this.elementType]: ({
         '#cdata': '<div class="oli-dnd-table">'
           + this.rows.reduce((acc, row) => `${acc} ${row.toPersistence()}`, '')
           + '</div>',

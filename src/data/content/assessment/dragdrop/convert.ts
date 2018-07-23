@@ -18,6 +18,7 @@ export const convertLegacyToHtmlTable = (legacyLayout: LegacyLayout) => {
     targetArea: new TableTargetArea().with({
       rows: legacyLayout.targetGroup.rows.map(row =>
         new Row().with({
+          isHeader: row.contentType === 'HeaderRow',
           cells: Immutable.List<Cell>(row.cols.toArray().map(col =>
             col.contentType === 'Target'
             ? (

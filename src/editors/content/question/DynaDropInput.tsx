@@ -202,6 +202,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
 
       // safeguard - return if selectedInitiator does not exist in model.items
     if (itemIndex < 0) {
+      console.error('Error: selected initiator does not exist in model items');
       return;
     }
 
@@ -211,7 +212,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const initiator = (model.body.content.find(c =>
       c.contentType === 'Custom') as contentTypes.Custom)
       .layoutData
-      .lift(ld => ld.contentType === 'HTMLLayout' ? ld.initiators : undefined)
+      .lift(ld => ld.contentType === 'DndHTMLLayout' ? ld.initiators : undefined)
       .lift(initiators => initiators.find(i => i.inputVal === selectedInitiator))
       .caseOf({
         just: initiator => initiator,
