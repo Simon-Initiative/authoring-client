@@ -186,7 +186,21 @@ export class AddQuestion
         text: 'New Choice',
       })),
       targetArea: new TableTargetArea().with({
-        rows: [new Row(), new Row(), new Row()].reduce(
+        rows: Immutable.List<Row>([new Row().with({
+            isHeader: true,
+            cells: Immutable.List<Cell>([
+              new Cell().with({
+                text: 'Header 1',
+              }),
+              new Cell().with({
+                text: 'Header 2',
+              }),
+              new Cell().with({
+                text: 'Header 3',
+              }),
+            ]),
+          })])
+          .concat([new Row(), new Row(), new Row()].reduce(
           (accRows, newRow) => accRows.push(newRow.with({
             cells: Immutable.List<Cell>([
               new Cell().with({
@@ -201,7 +215,7 @@ export class AddQuestion
             ]),
           })),
           Immutable.List<Row>(),
-        ),
+        )).toList(),
       }),
     });
 
