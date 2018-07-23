@@ -4,7 +4,8 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { TextInput } from '../common/TextInput';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, insertableContentTypes, getContentIcon } from
+'editors/content/utils/content';
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
@@ -89,7 +90,7 @@ export default class IFrameEditor
             onShowSidebar();
             onDiscover(DiscoverableId.IFrameEditorWebpageURL);
           }} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-window-maximize" /></div>
+          <div>{getContentIcon(insertableContentTypes.IFrame)}</div>
           <div>Web Page URL</div>
         </ToolbarButton>
         <ToolbarLayout.Column>

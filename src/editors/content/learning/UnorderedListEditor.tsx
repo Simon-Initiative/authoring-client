@@ -13,7 +13,8 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
 import { Select } from '../common/controls';
 import { Maybe } from 'tsmonad';
 import {
@@ -139,7 +140,7 @@ export default class UnorderedList
             onShowSidebar();
             onDiscover(DiscoverableId.UnorderedListEditorStyle);
           }} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-list-ul"></i></div>
+          <div>{getContentIcon(insertableContentTypes.Ul)}</div>
           <div>Style</div>
         </ToolbarButton>
       </ToolbarGroup>

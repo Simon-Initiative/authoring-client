@@ -8,7 +8,8 @@ import { Select, Button } from 'editors/content/common/controls';
 import { LegacyTypes } from 'data/types';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { CONTENT_COLORS, getContentIcon } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ResourceState } from 'data/content/resource';
@@ -19,6 +20,7 @@ import { Label } from 'editors/content/common/Sidebar';
 import { Either } from 'tsmonad';
 import { MissingTargetId } from 'actions/xref';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
+
 import './XrefEditor.scss';
 
 export interface XrefEditorProps
@@ -200,12 +202,15 @@ const Target = ({ target, editMode, clipboard, onChangeTarget }: TargetProps) =>
         Either.left indicating the linked element was not found (maybe deleted from the page) */}
         {target
           ? target.caseOf({
-            right: element => <Label>
-              <span style={{ color: CONTENT_COLORS[element.contentType] }}>
-                {getContentIcon(element.contentType)}</span> {validXrefTargets[element.elementType]}
-            </Label>,
+            right: element => (
+              <Label>
+                <span style={{ color: CONTENT_COLORS[element.contentType] }}>
+                  {getContentIcon(insertableContentTypes[element.contentType])}
+                </span> {validXrefTargets[element.elementType]}
+              </Label>
+            ),
             left: () => <span className="italic">
-              {getContentIcon('')} Target not found in selected page
+              {getContentIcon(insertableContentTypes[''])} Target not found in selected page
             </span>,
           })
           : <span className="italic">No target element</span>}
