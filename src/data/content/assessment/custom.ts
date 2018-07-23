@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from '../../../utils/guid';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent, setId } from '../common';
 import { DndLayout } from './dragdrop/dnd_layout';
 
 export type CustomParams = {
@@ -58,18 +58,17 @@ export class Custom extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({ id: createGuid() });
+  clone(): Custom {
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(json: Object, guid: string) : Custom {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : Custom {
 
     const q = (json as any).custom;
     let model = new Custom({ guid });
 
-    if (q['@id'] !== undefined) {
-      model = model.with({ id: q['@id'] });
-    }
+    model = setId(model, q, notify);
+
     if (q['@type'] !== undefined) {
       model = model.with({ type: q['@type'] });
     }

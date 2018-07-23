@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
@@ -9,7 +9,7 @@ import { Maybe } from 'tsmonad';
 import { Instructions } from './instructions';
 
 export type CompositeParams = {
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<Title>,
   purpose?: Maybe<string>,
   instructions?: Maybe<Instructions>,
@@ -20,7 +20,7 @@ export type CompositeParams = {
 const defaultContent = {
   contentType: 'Composite',
   elementType: 'composite',
-  id: Maybe.nothing(),
+  id: '',
   title: Maybe.nothing(),
   purpose: Maybe.nothing(),
   instructions: Maybe.nothing(),
@@ -31,7 +31,7 @@ const defaultContent = {
 export class Composite extends Immutable.Record(defaultContent) {
   contentType: 'Composite';
   elementType: 'composite';
-  id: Maybe<string>;
+  id: string;
   title: Maybe<Title>;
   purpose: Maybe<string>;
   instructions: Maybe<Instructions>;
@@ -39,27 +39,28 @@ export class Composite extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: CompositeParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: CompositeParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Composite {
-    return this.with({
+  clone(): Composite {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+      title: this.title.lift(t => t.clone()),
+      instructions: this.instructions.lift(i => i.clone()),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Composite {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Composite {
     const t = (root as any).composite_activity;
 
     let model = new Composite({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
-    }
+    model = setId(model, t, notify);
+
     if (t['@purpose'] !== undefined) {
       model = model.with({ purpose: Maybe.just(t['@purpose']) });
     }
@@ -71,22 +72,27 @@ export class Composite extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'instructions':
-          model = model.with({ instructions: Maybe.just(Instructions.fromPersistence(item, id)) });
+          model = model.with({
+            instructions: Maybe.just(Instructions.fromPersistence(item, id, notify)),
+          });
           break;
         default:
       }
     });
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(except(getChildren(t), 'title', 'instructions'), '', BOX_ELEMENTS) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(
+          except(getChildren(t), 'title', 'instructions'), '', BOX_ELEMENTS, null, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const optional = [];
 
@@ -99,11 +105,10 @@ export class Composite extends Immutable.Record(defaultContent) {
 
     const s = {
       composite_activity: {
+        '@id': this.id ? this.id : createGuid(),
         '#array': [...optional, ...required],
       },
     };
-
-    this.id.lift(p => s.composite_activity['@id'] = p);
     this.purpose.lift(p => s.composite_activity['@purpose'] = p);
 
     return s;

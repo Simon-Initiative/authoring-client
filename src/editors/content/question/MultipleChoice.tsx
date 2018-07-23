@@ -258,7 +258,7 @@ export class MultipleChoice
           && !this.generatedResponsesByMatch.has(choice.value)) {
         this.generatedResponsesByMatch = this.generatedResponsesByMatch.set(
           choice.value,
-          responsesByMatch.get('*').clone().with({ guid: guid(), match: choice.value }));
+          responsesByMatch.get('*').clone().with({ match: choice.value }));
       }
 
       // Get the response associated with the choice by match (either real or generated)

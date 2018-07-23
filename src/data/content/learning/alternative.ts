@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
@@ -38,15 +38,14 @@ export class Alternative extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-
-
-  clone() : Alternative {
-    return this.with({
+  clone(): Alternative {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+      title: this.title.clone(),
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Alternative {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Alternative {
     const t = (root as any).alternative;
 
     let model = new Alternative({ guid });
@@ -62,19 +61,21 @@ export class Alternative extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         default:
       }
     });
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(except(getChildren(t), 'title'), '', MATERIAL_ELEMENTS) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(except(getChildren(t), 'title'), '', MATERIAL_ELEMENTS, null, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     const content = this.content.content.size === 0
       ? [{ p: { '#text': 'Placeholder' } }]
       : this.content.toPersistence();

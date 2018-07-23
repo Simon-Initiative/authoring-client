@@ -121,6 +121,7 @@ export default class EditorManager
     return (
       <div className="waiting-notification scale-in-center">
         <Toast
+          style={{ width: 600 }}
           icon={waitingIcon}
           heading={waitingHeading}
           content={waitingContent}

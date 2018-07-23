@@ -89,7 +89,6 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Conjugation: return <i style={style} className={'fa fa-language'} />;
     case i.ContiguousText: return <i style={style} className="unicode-icon">T</i>;
     case i.Custom: return <i style={style} className={'fa fa-keyboard-o'} />;
-    case i.Definition: return <i style={style} className={'fa fa-book'} />;
     case i.Dd: return <i style={style} className={'fa fa-book'} />;
     case i.Dl: return <i style={style} className={'fa fa-book'} />;
     case i.Dt: return <i style={style} className={'fa fa-book'} />;

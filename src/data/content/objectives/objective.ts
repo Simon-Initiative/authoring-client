@@ -4,7 +4,6 @@ import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { KnowledgeCategory, LearningProcess } from './types';
 
-
 export type LearningObjectiveParams = {
   id?: string,
   guid?: string,

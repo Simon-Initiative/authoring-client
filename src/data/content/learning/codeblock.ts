@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent, setId } from '../common';
 
 export type CodeBlockParams = {
   id?: string,
@@ -41,7 +41,7 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: CodeBlockParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: CodeBlockParams) {
@@ -49,22 +49,17 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
   }
 
   clone() : CodeBlock {
-    return this.with({
-      id: createGuid(),
-    });
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) : CodeBlock {
+  static fromPersistence(root: Object, guid: string, notify) : CodeBlock {
 
     const cb = (root as any).codeblock;
 
     let model = new CodeBlock({ guid });
 
-    if (cb['@id'] !== undefined) {
-      model = model.with({ id: cb['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, cb, notify);
+
     if (cb['@title'] !== undefined) {
       model = model.with({ title: cb['@title'] });
     }
@@ -90,7 +85,7 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       codeblock: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@syntax': this.syntax,
         '@title': this.title,
         '@highlight': this.highlight,

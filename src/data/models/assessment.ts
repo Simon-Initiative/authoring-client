@@ -85,7 +85,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object): AssessmentModel {
+  static fromPersistence(json: Object, notify: () => void): AssessmentModel {
 
     let model = new AssessmentModel();
 
@@ -147,25 +147,32 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       switch (key) {
         case 'page':
           model = model.with(
-            { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id)) });
+            { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id, notify)) });
           break;
         case 'question':
-          model = model.with(
-            { nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id)) });
+          model = model.with({
+            nodes:
+              model.nodes.set(id, contentTypes.Question.fromPersistence(item, id, notify)),
+          });
           break;
         case 'content':
-          model = model.with(
-            { nodes: model.nodes.set(id, contentTypes.Content.fromPersistence(item, id)) });
+          model = model.with({
+            nodes: model.nodes.set(id, contentTypes.Content.fromPersistence(item, id, notify)),
+          });
           break;
         case 'selection':
-          model = model.with(
-            { nodes: model.nodes.set(id, contentTypes.Selection.fromPersistence(item, id)) });
+          model = model.with({
+            nodes:
+              model.nodes.set(id, contentTypes.Selection.fromPersistence(item, id, notify)),
+          });
           break;
         case 'title':
           break;
         default:
-          model = model.with(
-            { nodes: model.nodes.set(id, contentTypes.Unsupported.fromPersistence(item, id)) });
+          model = model.with({
+            nodes:
+              model.nodes.set(id, contentTypes.Unsupported.fromPersistence(item, id, notify)),
+          });
       }
     });
 

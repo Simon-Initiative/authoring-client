@@ -47,7 +47,6 @@ export default class DefinitionEditor
   }
 
   onTitleEdit(text) {
-
     const title = this.props.model.title.caseOf({
       just: t => Maybe.just(t.with({ text })),
       nothing: () => Maybe.just(new contentTypes.Title().with({ text })),

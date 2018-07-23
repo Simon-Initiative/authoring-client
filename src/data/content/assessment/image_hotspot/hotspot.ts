@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../../common';
+import { augment, ensureIdGuidPresent } from '../../common';
 
 export type HotspotParams = {
   guid?: string,
@@ -35,10 +35,10 @@ export class Hotspot extends Immutable.Record(defaultContent) {
   }
 
   clone(): Hotspot {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(json: Object, guid: string): Hotspot {
+  static fromPersistence(json: Object, guid: string, notify: () => void): Hotspot {
     const q = (json as any).hotspot;
     let model = new Hotspot({ guid });
 

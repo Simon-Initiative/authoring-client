@@ -35,7 +35,7 @@ export class Head extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : Head {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Head {
     let model = new Head().with({ guid });
     let objrefs = Immutable.List<string>();
     const head = (root as any).head;
@@ -50,7 +50,7 @@ export class Head extends Immutable.Record(defaultContent) {
           objrefs = objrefs.push(((item as any).objref['@idref']));
           break;
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         default:
       }

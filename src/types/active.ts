@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { SelectionState } from 'draft-js';
+import { ContentElement } from 'data/content/common/interfaces';
 
 export enum Trigger {
   KEYPRESS,
@@ -63,19 +64,20 @@ export class TextSelection {
 
 export interface ParentContainer {
   supportedElements: Immutable.List<string>;
-  onAddNew: (content: Object, textSelection: Maybe<TextSelection>) => void;
-  onEdit: (content: Object, source: Object) => void;
-  onRemove: (content: Object) => void;
-  onPaste: (content: Object, textSelection: Maybe<TextSelection>) => void;
-  onDuplicate: (content: Object) => void;
-  onMoveUp: (content: Object) => void;
-  onMoveDown: (content: Object) => void;
+  onAddNew: (
+    content: ContentElement | ContentElement[], textSelection: Maybe<TextSelection>) => void;
+  onEdit: (content: ContentElement, source: Object) => void;
+  onRemove: (content: ContentElement) => void;
+  onPaste: (content: ContentElement, textSelection: Maybe<TextSelection>) => void;
+  onDuplicate: (content: ContentElement) => void;
+  onMoveUp: (content: ContentElement) => void;
+  onMoveDown: (content: ContentElement) => void;
 }
 
 export type ActiveContextParams = {
-  documentId? : Maybe<string>,
+  documentId?: Maybe<string>,
   container?: Maybe<ParentContainer>,
-  activeChild?: Maybe<Object>,
+  activeChild?: Maybe<ContentElement>,
   textSelection?: Maybe<TextSelection>,
 };
 
@@ -95,7 +97,7 @@ export class ActiveContext extends Immutable.Record(defaultContent) {
   container: Maybe<ParentContainer>;
 
   // The current active child component of the parent container
-  activeChild: Maybe<Object>;
+  activeChild: Maybe<ContentElement>;
 
   // The current text selection
   textSelection: Maybe<TextSelection>;
