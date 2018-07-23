@@ -11,11 +11,12 @@ import { ParentContainer } from 'types/active.ts';
 import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
+import { ContentElement } from 'data/content/common/interfaces';
 import { ContentModel, CourseModel } from 'data/models';
 import { modalActions } from 'actions/modal';
 
 interface StateProps {
-  content: Maybe<Object>;
+  content: Maybe<ContentElement>;
   container: Maybe<ParentContainer>;
   course: CourseModel;
   supportedElements: Immutable.List<string>;
@@ -26,8 +27,8 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onInsert: (content: Object, textSelection) => void;
-  onEdit: (content: Object) => void;
+  onInsert: (content: ContentElement, textSelection) => void;
+  onEdit: (content: ContentElement) => void;
   onHide: () => void;
   onSetCurrentPage: (documentId: string, pageId: string) => void;
   onDisplayModal: (component: any) => void;

@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type WbPathParams = {
   href?: string,
@@ -27,10 +27,10 @@ export class WbPath extends Immutable.Record(defaultContent) {
   }
 
   clone() : WbPath {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) : WbPath {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : WbPath {
 
     const p = (root as any)['wb:path'];
 

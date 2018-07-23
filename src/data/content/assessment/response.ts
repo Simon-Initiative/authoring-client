@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { Feedback } from './feedback';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 
 const encodeMatchOperators = (match: string) => {
   const operatorEncodings = {
@@ -75,9 +75,12 @@ export class Response extends Immutable.Record(defaultContent) {
 
 
   clone() : Response {
-    return this.with({
-      feedback: this.feedback.map(f => f.clone()).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      feedback: this.feedback.mapEntries(([_, v]) => {
+        const clone: Feedback = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Feedback>,
+    }));
   }
 
 
@@ -85,7 +88,7 @@ export class Response extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : Response {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : Response {
 
     const r = (json as any).response;
     let model = new Response({ guid });
@@ -115,7 +118,7 @@ export class Response extends Immutable.Record(defaultContent) {
         case 'feedback':
           model = model.with(
             { feedback: model.feedback.set(
-              id, Feedback.fromPersistence(item, id))});
+              id, Feedback.fromPersistence(item, id, notify))});
           break;
         default:
       }

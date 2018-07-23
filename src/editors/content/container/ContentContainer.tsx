@@ -199,10 +199,8 @@ export class ContentContainer
     }
   }
 
-  onPaste(item, textSelection: Maybe<TextSelection>) {
-    const duplicate = (item.clone() as any).with({
-      guid: guid(),
-    });
+  onPaste(item: ContentElement, textSelection: Maybe<TextSelection>) {
+    const duplicate: ContentElement = item.clone();
     this.onAddNew(duplicate, textSelection);
   }
 
@@ -212,9 +210,7 @@ export class ContentContainer
       const index = indexOf(activeContentGuid, model);
       const active = model.content.get(activeContentGuid);
 
-      const duplicate = (active.clone() as any).with({
-        guid: guid(),
-      });
+      const duplicate = active.clone() as any;
 
       onEdit(this.insertAfter(model, duplicate, index), duplicate);
 

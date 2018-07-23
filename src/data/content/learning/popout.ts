@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type PopoutParams = {
   enable?: boolean,
@@ -32,10 +32,10 @@ export class Popout extends Immutable.Record(defaultContent) {
   }
 
   clone() : Popout {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) : Popout {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Popout {
 
     const cb = (root as any).popout;
 

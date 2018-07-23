@@ -1,8 +1,7 @@
 import * as Immutable from 'immutable';
-import { Maybe } from 'tsmonad';
 import { Meaning } from './meaning';
 import { Anchor } from './anchor';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
 
@@ -16,14 +15,14 @@ export type ExtraParams = {
   translation?: ContiguousText;
   meaning?: Immutable.OrderedMap<string, Meaning>;
   content?: ContentElements,
-  id?: Maybe<string>,
+  id?: string,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Extra',
   elementType: 'extra',
-  id: Maybe.nothing(),
+  id: '',
   anchor: new Anchor(),
   pronunciation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
   translation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
@@ -42,32 +41,39 @@ export class Extra extends Immutable.Record(defaultContent) {
   translation: ContiguousText;
   meaning: Immutable.OrderedMap<string, Meaning>;
   content: ContentElements;
-  id: Maybe<string>;
+  id: string;
   guid: string;
 
   constructor(params?: ExtraParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: ExtraParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
+  clone(): Extra {
+    return ensureIdGuidPresent(this.with({
+      pronunciation: this.pronunciation.clone(),
+      translation: this.translation.clone(),
       anchor: this.anchor.clone(),
-      meaning: this.meaning.map(m => m.clone().with({ guid: createGuid() })).toOrderedMap(),
+      meaning: this.meaning.mapEntries(([_, v]) => {
+        const clone: Meaning = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Meaning>,
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Extra {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Extra {
 
     const m = (root as any).extra;
     let model = new Extra().with({ guid });
 
-    if (m['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(m['@id']) });
+    if (m['@id']) {
+      model = model.with({ id: m['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
 
     getChildren(m).forEach((item) => {
@@ -76,7 +82,7 @@ export class Extra extends Immutable.Record(defaultContent) {
       const id = createGuid();
       switch (key) {
         case 'anchor':
-          model = model.with({ anchor: Anchor.fromPersistence(item, '') });
+          model = model.with({ anchor: Anchor.fromPersistence(item, '', notify) });
           break;
         case 'pronunciation':
           model = model.with({ pronunciation:
@@ -92,7 +98,7 @@ export class Extra extends Immutable.Record(defaultContent) {
           break;
         case 'meaning':
           model = model.with({ meaning:
-            model.meaning.set(id, Meaning.fromPersistence(item, id)) });
+            model.meaning.set(id, Meaning.fromPersistence(item, id, notify)) });
           break;
         default:
       }
@@ -102,12 +108,10 @@ export class Extra extends Immutable.Record(defaultContent) {
       .fromPersistence(
         except(getChildren(m), 'anchor', 'pronunciation', 'translation', 'meaning'),
         '',
-        EXTRA_ELEMENTS) });
+        EXTRA_ELEMENTS, null, notify) });
 
     return model;
   }
-
-
 
   isDefinition() : boolean {
 
@@ -152,11 +156,10 @@ export class Extra extends Immutable.Record(defaultContent) {
 
     const m = {
       extra: {
+        '@id': this.id ? this.id : createGuid(),
         '#array': children,
       },
     };
-
-    this.id.lift(id => m.extra['@id'] = id);
 
     return m;
   }

@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Popout } from './popout';
 import { Alternate } from './alternate';
@@ -56,35 +56,32 @@ export class IFrame extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: IFrameParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: IFrameParams) {
     return this.merge(values) as this;
   }
 
-  clone() : IFrame {
-    return this.with({
-      id: createGuid(),
+  clone(): IFrame {
+    return ensureIdGuidPresent(this.with({
+      popout: this.popout.clone(),
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+    }));
   }
 
 
-  static fromPersistence(root: Object, guid: string) : IFrame {
+  static fromPersistence(root: Object, guid: string, notify: () => void): IFrame {
 
     const t = (root as any).iframe;
 
     let model = new IFrame({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -105,21 +102,23 @@ export class IFrame extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
-          model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+          model = model.with({
+            alternate: Alternate.fromPersistence(item, id, notify),
+          });
           break;
         case 'title':
-          model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+          model = model.with({
+            titleContent: Title.fromPersistence(item, id, notify),
+          });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         default:
 
@@ -129,7 +128,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [
       this.titleContent.toPersistence(),
@@ -141,7 +140,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
 
     return {
       iframe: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@title': this.title,
         '@src': this.src === '' ? 'http://www.google.com' : this.src,
         '@height': this.height,

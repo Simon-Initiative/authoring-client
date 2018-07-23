@@ -46,7 +46,7 @@ export class Selection extends Immutable.Record(defaultSelectionParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: any, guid: string) {
+  static fromPersistence(json: any, guid: string, notify?: () => void) {
 
     let model = new Selection({ guid });
 
@@ -72,10 +72,10 @@ export class Selection extends Immutable.Record(defaultSelectionParams) {
 
       switch (key) {
         case 'pool':
-          model = model.with({ source: Pool.fromPersistence(item, id) });
+          model = model.with({ source: Pool.fromPersistence(item, id, notify) });
           break;
         case 'pool_ref':
-          model = model.with({ source: PoolRef.fromPersistence(item, id) });
+          model = model.with({ source: PoolRef.fromPersistence(item, id, notify) });
           break;
         default:
       }

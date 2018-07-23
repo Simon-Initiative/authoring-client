@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type SymParams = {
   name?: string;
@@ -29,11 +29,11 @@ export class Sym extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this;
+  clone(): Sym {
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) : Sym {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Sym {
 
     const m = (root as any).sym;
     let model = new Sym().with({ guid });

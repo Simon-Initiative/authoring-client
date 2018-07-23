@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Title } from './title';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils/guid';
 import { IFrame } from 'data/content/learning/iframe';
@@ -15,7 +15,7 @@ import { MediaItem } from 'data/contentTypes';
 
 export type DialogParams = {
   guid?: string,
-  id?: Maybe<string>,
+  id?: string,
   title?: Title,
   media?: Maybe<MediaItem>,
   speakers?: Immutable.OrderedMap<string, Speaker>,
@@ -26,7 +26,7 @@ const defaultContent = {
   contentType: 'Dialog',
   elementType: 'dialog',
   guid: '',
-  id: Maybe.nothing<string>(),
+  id: '',
   title: Title.fromText('Dialog Title'),
   media: Maybe.nothing<MediaItem>(),
   speakers: Immutable.OrderedMap<string, Speaker>(),
@@ -66,37 +66,42 @@ export class Dialog extends Immutable.Record(defaultContent) {
   contentType: 'Dialog';
   elementType: 'dialog';
   guid: string;
-  id: Maybe<string>;
+  id: string;
   title: Title;
   media: Maybe<MediaItem>;
   speakers: Immutable.OrderedMap<string, Speaker>;
   lines: Immutable.OrderedMap<string, Line>;
 
   constructor(params?: DialogParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: DialogParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
+  clone(): Dialog {
+    return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
       media: this.media.lift(media => media.clone()),
-      speakers: this.speakers.map(s => s.clone()).toOrderedMap(),
-      lines: this.lines.map(l => l.clone()).toOrderedMap(),
-    });
+      speakers: this.speakers.mapEntries(([_, v]) => {
+        const clone: Speaker = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Speaker>,
+      lines: this.lines.mapEntries(([_, v]) => {
+        const clone: Line = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Line>,
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string): Dialog {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Dialog {
 
     const m = (root as any).dialog;
     let model = new Dialog().with({ guid });
 
-    if (m['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(m['@id']) });
-    }
+    model = setId(model, m, notify);
+
     if (m['@title'] !== undefined) {
       model = model.with({ title: m['@title'] });
     }
@@ -108,43 +113,43 @@ export class Dialog extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'speaker':
           model = model.with({
-            speakers: model.speakers.set(id, Speaker.fromPersistence(item, id)),
+            speakers: model.speakers.set(id, Speaker.fromPersistence(item, id, notify)),
           });
           break;
         case 'line':
           model = model.with({
-            lines: model.lines.set(id, Line.fromPersistence(item, id)),
+            lines: model.lines.set(id, Line.fromPersistence(item, id, notify)),
           });
           break;
         case 'title':
           model = model.with({
-            title: Title.fromPersistence(item, id),
+            title: Title.fromPersistence(item, id, notify),
           });
           break;
         // Switch for each type of MediaItem
         case 'audio':
           model = model.with({
-            media: Maybe.just(Audio.fromPersistence(item, id)),
+            media: Maybe.just(Audio.fromPersistence(item, id, notify)),
           });
           break;
         case 'image':
           model = model.with({
-            media: Maybe.just(Image.fromPersistence(item, id)),
+            media: Maybe.just(Image.fromPersistence(item, id, notify)),
           });
           break;
         case 'video':
           model = model.with({
-            media: Maybe.just(Video.fromPersistence(item, id)),
+            media: Maybe.just(Video.fromPersistence(item, id, notify)),
           });
           break;
         case 'youtube':
           model = model.with({
-            media: Maybe.just(YouTube.fromPersistence(item, id)),
+            media: Maybe.just(YouTube.fromPersistence(item, id, notify)),
           });
           break;
         case 'iframe':
           model = model.with({
-            media: Maybe.just(IFrame.fromPersistence(item, id)),
+            media: Maybe.just(IFrame.fromPersistence(item, id, notify)),
           });
           break;
         default:
@@ -160,6 +165,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
     const m = {
       dialog: {
+        '@id': this.id ? this.id : createGuid(),
         '#array': [
           this.title.toPersistence(),
           ...media,
@@ -168,8 +174,6 @@ export class Dialog extends Immutable.Record(defaultContent) {
         ],
       },
     };
-
-    this.id.lift(id => m.dialog['@id'] = id);
 
     return m;
   }

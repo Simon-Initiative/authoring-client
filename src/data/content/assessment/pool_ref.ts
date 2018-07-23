@@ -28,7 +28,7 @@ export class PoolRef extends Immutable.Record(defaultPoolRefParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: any, guid: string) {
+  static fromPersistence(json: any, guid: string, notify: () => void) {
 
     let model = new PoolRef({ guid });
 
