@@ -26,7 +26,7 @@ import 'brace/mode/text';
 import 'brace/theme/github';
 
 import './markers.scss';
-
+import './CodeBlockEditor.scss';
 
 export interface CodeBlockProps
   extends AbstractContentEditorProps<CodeBlockType> {
@@ -197,7 +197,7 @@ export default class CodeBlock
     };
 
     return (
-      <div>
+      <div className="CodeBlockEditor">
         <AceEditor
           name={this.uniqueName}
           width="initial"
