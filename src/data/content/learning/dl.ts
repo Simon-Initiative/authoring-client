@@ -11,11 +11,13 @@ export type DlParams = {
   title?: Maybe<Title>,
   terms?: Immutable.OrderedMap<string, Dt>,
   guid?: string,
+  id?: string,
 };
 
 const defaultContent = {
   contentType: 'Dl',
   elementType: 'dl',
+  id: '',
   title: Maybe.nothing(),
   terms: Immutable.OrderedMap<string, Dt>(),
   guid: '',
@@ -25,6 +27,7 @@ export class Dl extends Immutable.Record(defaultContent) {
 
   contentType: 'Dl';
   elementType: 'dl';
+  id: string;
   title: Maybe<Title>;
   terms: Immutable.OrderedMap<string, Dt>;
   guid: string;
@@ -39,11 +42,15 @@ export class Dl extends Immutable.Record(defaultContent) {
 
   clone(): Dl {
     return this.with({
-      terms: this.terms.map(t => t.clone()).toOrderedMap(),
+      title: this.title.lift(t => t.clone()),
+      terms: this.terms.mapEntries(([_, v]) => {
+        const clone: Dt = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Dt>,
     });
   }
 
-  static fromPersistence(root: Object, guid: string): Dl {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Dl {
 
     const t = (root as any).dl;
 
@@ -67,10 +74,10 @@ export class Dl extends Immutable.Record(defaultContent) {
        */
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'dt':
-          model = model.with({ terms: model.terms.set(id, Dt.fromPersistence(item, id)) });
+          model = model.with({ terms: model.terms.set(id, Dt.fromPersistence(item, id, notify)) });
           break;
         case 'dd':
           // Attach the dd to the last dt created
@@ -78,7 +85,7 @@ export class Dl extends Immutable.Record(defaultContent) {
             const lastTerm = model.terms.last();
             model = model.with({
               terms: model.terms.set(lastTerm.guid, lastTerm.with({
-                definitions: lastTerm.definitions.set(id, Dd.fromPersistence(item, id)),
+                definitions: lastTerm.definitions.set(id, Dd.fromPersistence(item, id, notify)),
               })),
             });
           }
