@@ -53,14 +53,14 @@ export interface InsertToolbarState {
   isWorkbookPage: boolean;
 }
 
-function collectInlines(model: ContentModel) : Immutable.Map<string, ContentElement> {
+function collectInlines(model: ContentModel): Immutable.Map<string, ContentElement> {
 
   if (model.modelType === 'WorkbookPageModel') {
 
     const found = findNodes(model, (n) => {
       return n.contentType === 'WbInline';
     })
-    .map(e => [e.idref, e]);
+      .map(e => [e.idref, e]);
 
     return Immutable.Map<string, ContentElement>(found);
   }
@@ -84,8 +84,9 @@ export class InsertToolbar
 
   componentDidMount() {
     this.props.requestLatestModel().then((model) => {
-      this.setState({ isWorkbookPage:
-        model.type === LegacyTypes.workbook_page,
+      this.setState({
+        isWorkbookPage:
+          model.type === LegacyTypes.workbook_page,
       });
     });
   }
@@ -300,7 +301,7 @@ export class InsertToolbar
             llComponent={formulaButton}
             lrComponent={figureButton}
             disabled={!supportsAtLeastOne(
-              'definition', 'example')}
+              'definition', 'example', 'dl')}
           >
             <ToolbarButtonMenuForm>
               <small className="text-muted">Curriculum elements</small>
@@ -325,6 +326,30 @@ export class InsertToolbar
               }}
               disabled={!parentSupportsElementType('definition')}>
               <i style={{ width: 22 }} className={'fa fa-book'} /> Definition
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                // Create a hierarchy with a definition attached to a term attached to a
+                // definition list, then insert the definition list
+                // Dl -> Dt -> Dd
+
+                const definition = new contentTypes.Dd().with({ guid: guid() });
+                const term = new contentTypes.Dt().with({
+                  guid: guid(),
+                  definitions: Immutable.OrderedMap<string, contentTypes.Dd>(
+                    [[definition.guid, definition]],
+                  ),
+                });
+                const definitionList = new contentTypes.Dl().with({
+                  terms: Immutable.OrderedMap<string, contentTypes.Dt>(
+                    [[term.guid, term]],
+                  ),
+                });
+
+                onInsert(definitionList);
+              }}
+              disabled={!parentSupportsElementType('dl')}>
+              <i style={{ width: 22 }} className={'fa fa-list-ul'} /> Definition List
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
@@ -422,28 +447,28 @@ export class InsertToolbar
                 onClick={() => {
 
                   requestLatestModel()
-                  .then((model) => {
+                    .then((model) => {
 
-                    const existingInlines = collectInlines(model);
+                      const existingInlines = collectInlines(model);
 
-                    return onDisplayModal(
-                    <ResourceSelection
-                      filterPredicate={(res: Resource): boolean =>
-                        res.type === LegacyTypes.inline
-                          && res.resourceState !== ResourceState.DELETED
-                          && !existingInlines.has(res.id)}
-                      courseId={context.courseId}
-                      onInsert={(resource) => {
-                        onDismissModal();
-                        const resources = context.courseModel.resources.toArray();
-                        const found = resources.find(r => r.id === resource.id);
-                        if (found !== undefined) {
-                          onInsert(new contentTypes.WbInline().with({ idref: found.id }));
-                        }
-                      }}
-                      onCancel={onDismissModal}
-                    />);
-                  });
+                      return onDisplayModal(
+                        <ResourceSelection
+                          filterPredicate={(res: Resource): boolean =>
+                            res.type === LegacyTypes.inline
+                            && res.resourceState !== ResourceState.DELETED
+                            && !existingInlines.has(res.id)}
+                          courseId={context.courseId}
+                          onInsert={(resource) => {
+                            onDismissModal();
+                            const resources = context.courseModel.resources.toArray();
+                            const found = resources.find(r => r.id === resource.id);
+                            if (found !== undefined) {
+                              onInsert(new contentTypes.WbInline().with({ idref: found.id }));
+                            }
+                          }}
+                          onCancel={onDismissModal}
+                        />);
+                    });
                 }}
                 disabled={!parentSupportsElementType('wb:inline')}>
                 <i style={{ width: 22 }} className={'fa fa-check'} /> Insert existing assessment...
@@ -456,23 +481,23 @@ export class InsertToolbar
                   });
 
                   onCreateNew(model)
-                  .then((resource) => {
-                    onInsert(new contentTypes.WbInline().with({ idref: resource.id }));
-                  });
+                    .then((resource) => {
+                      onInsert(new contentTypes.WbInline().with({ idref: resource.id }));
+                    });
 
                 }}
                 disabled={!parentSupportsElementType('wb:inline')}>
                 <i style={{ width: 22 }} className={'fa fa-check'} /> Create new assessment
               </ToolbarButtonMenuItem>
 
-              <ToolbarButtonMenuDivider/>
+              <ToolbarButtonMenuDivider />
 
               <ToolbarButtonMenuItem
                 onClick={() => onDisplayModal(
                   <ResourceSelection
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.assessment2
-                        && res.resourceState !== ResourceState.DELETED}
+                      && res.resourceState !== ResourceState.DELETED}
                     courseId={context.courseId}
                     onInsert={(resource) => {
                       onDismissModal();
