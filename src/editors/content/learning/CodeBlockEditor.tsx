@@ -50,35 +50,30 @@ export default class CodeBlock
   constructor(props) {
     super(props);
 
-    this.onSourceEdit = this.onSourceEdit.bind(this);
-    this.onSyntaxChange = this.onSyntaxChange.bind(this);
-    this.onStartEdit = this.onStartEdit.bind(this);
-    this.onHighlightEdit = this.onHighlightEdit.bind(this);
-
     this.uniqueName = guid();
   }
 
-  onSourceEdit(source, e) {
+  onSourceEdit = (source, e) => {
     const model = this.props.model.with({ source });
     this.props.onEdit(model, model);
   }
 
-  onSyntaxChange(syntax) {
+  onSyntaxChange = (syntax) => {
     const model = this.props.model.with({ syntax });
     this.props.onEdit(model, model);
   }
 
-  onHighlightEdit(highlight) {
+  onHighlightEdit = (highlight) => {
     const model = this.props.model.with({ highlight });
     this.props.onEdit(model, model);
   }
 
-  onStartEdit(start) {
+  onStartEdit = (start) => {
     const model = this.props.model.with({ start });
     this.props.onEdit(model, model);
   }
 
-  onToggleLineNumbers() {
+  onToggleLineNumbers = () => {
     const { model } = this.props;
 
     const updatedModel = model.with({ number: !model.number });
