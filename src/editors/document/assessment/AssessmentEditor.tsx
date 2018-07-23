@@ -23,7 +23,6 @@ import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
-import createGuid from 'utils/guid';
 
 import './AssessmentEditor.scss';
 import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
@@ -448,9 +447,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onDuplicateQuestion() {
 
     if (this.props.currentNode.contentType === 'Question') {
-      const duplicated = this.props.currentNode.clone().with({
-        guid: createGuid(),
-      });
+      const duplicated = this.props.currentNode.clone();
       this.addNode(duplicated);
     }
   }

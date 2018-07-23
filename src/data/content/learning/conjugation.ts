@@ -61,7 +61,10 @@ export class Conjugation extends Immutable.Record(defaultContent) {
         just: p => Maybe.just(p.clone()),
         nothing: () => Maybe.nothing<Pronunciation>(),
       }),
-      rows: this.rows.map(r => r.clone()).toOrderedMap(),
+      rows: this.rows.mapEntries(([_, v]) => {
+        const clone: Cr = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Cr>,
     }));
   }
 

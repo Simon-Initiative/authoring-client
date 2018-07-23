@@ -44,7 +44,10 @@ export class Materials extends Immutable.Record(defaultContent) {
 
   clone(): Materials {
     return ensureIdGuidPresent(this.with({
-      content: this.content.map(c => c.clone()).toOrderedMap(),
+      content: this.content.mapEntries(([_, v]) => {
+        const clone: Material = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Material>,
     }));
   }
 

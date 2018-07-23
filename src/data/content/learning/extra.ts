@@ -57,7 +57,10 @@ export class Extra extends Immutable.Record(defaultContent) {
       pronunciation: this.pronunciation.clone(),
       translation: this.translation.clone(),
       anchor: this.anchor.clone(),
-      meaning: this.meaning.map(m => m.clone()).toOrderedMap(),
+      meaning: this.meaning.mapEntries(([_, v]) => {
+        const clone: Meaning = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Meaning>,
       content: this.content.clone(),
     }));
   }

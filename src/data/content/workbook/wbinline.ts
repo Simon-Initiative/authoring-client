@@ -49,7 +49,10 @@ export class WbInline extends Immutable.Record(defaultContent) {
 
   clone(): WbInline {
     return ensureIdGuidPresent(this.with({
-      params: this.params.map(p => p.clone()).toOrderedMap(),
+      params: this.params.mapEntries(([_, v]) => {
+        const clone: Param = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Param>,
     }));
   }
 

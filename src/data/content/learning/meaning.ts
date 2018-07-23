@@ -42,9 +42,12 @@ export class Meaning extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() {
+  clone(): Meaning {
     return ensureIdGuidPresent(this.with({
-      examples: this.examples.map(c => this.clone()).toOrderedMap(),
+      examples: this.examples.mapEntries(([_, v]) => {
+        const clone: Example = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Example>,
       material: this.material.clone(),
     }));
   }

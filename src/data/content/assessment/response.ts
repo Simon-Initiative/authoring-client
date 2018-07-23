@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { Feedback } from './feedback';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 
 const encodeMatchOperators = (match: string) => {
   const operatorEncodings = {
@@ -75,9 +75,12 @@ export class Response extends Immutable.Record(defaultContent) {
 
 
   clone() : Response {
-    return this.with({
-      feedback: this.feedback.map(f => f.clone()).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      feedback: this.feedback.mapEntries(([_, v]) => {
+        const clone: Feedback = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Feedback>,
+    }));
   }
 
 

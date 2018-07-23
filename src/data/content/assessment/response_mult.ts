@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { Match } from './match';
 
@@ -39,7 +39,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
 
 
   clone() : ResponseMult {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
   with(values: ResponseMultParams) {

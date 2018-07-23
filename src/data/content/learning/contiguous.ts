@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentState, SelectionState, Modifier, Entity, convertFromHTML } from 'draft-js';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
 import { TextSelection } from 'types/active';
@@ -94,9 +94,9 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     const updated = entities.reduce((ct: ContiguousText, e) => ct.cloneEntity(e), this);
 
-    return updated.with({
+    return ensureIdGuidPresent(updated.with({
       content: cloneContent(updated.content),
-    });
+    }));
   }
 
   static fromPersistence(

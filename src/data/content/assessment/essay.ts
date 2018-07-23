@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, setId } from '../common';
-import createGuid from 'utils/guid';
+import { augment, setId, ensureIdGuidPresent } from '../common';
 
 export type EssayParams = {
   id? : string,
@@ -29,9 +28,7 @@ export class Essay extends Immutable.Record(defaultContent) {
   }
 
   clone() : Essay {
-    return this.with({
-      id: createGuid(),
-    });
+    return ensureIdGuidPresent(this);
   }
 
   with(values: EssayParams) {

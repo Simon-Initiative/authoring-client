@@ -43,7 +43,10 @@ export class Param extends Immutable.Record(defaultContent) {
 
   clone() : Param {
     return ensureIdGuidPresent(this.with({
-      content: this.content.map(c => c.clone()).toOrderedMap(),
+      content: this.content.mapEntries(([_, v]) => {
+        const clone: ParamContent = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, ParamContent>,
     }));
   }
 

@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, setId } from '../common';
-import createGuid from 'utils/guid';
+import { augment, setId, ensureIdGuidPresent } from '../common';
 
 export type ShortAnswerParams = {
   id? : string,
@@ -35,9 +34,7 @@ export class ShortAnswer extends Immutable.Record(defaultContent) {
   }
 
   clone() : ShortAnswer {
-    return this.with({
-      id: createGuid(),
-    });
+    return ensureIdGuidPresent(this);
   }
 
   with(values: ShortAnswerParams) {

@@ -78,8 +78,14 @@ export class Audio extends Immutable.Record(defaultContent) {
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-      sources: this.sources.map(s => s.clone()).toOrderedMap(),
-      tracks: this.tracks.map(t => t.clone()).toOrderedMap(),
+      sources: this.sources.mapEntries(([_, v]) => {
+        const clone: Source = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Source>,
+      tracks: this.tracks.mapEntries(([_, v]) => {
+        const clone: Track = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Track>,
     }));
   }
 

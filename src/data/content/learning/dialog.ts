@@ -84,8 +84,14 @@ export class Dialog extends Immutable.Record(defaultContent) {
     return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
       media: this.media.lift(media => media.clone()),
-      speakers: this.speakers.map(s => s.clone()).toOrderedMap(),
-      lines: this.lines.map(l => l.clone()).toOrderedMap(),
+      speakers: this.speakers.mapEntries(([_, v]) => {
+        const clone: Speaker = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Speaker>,
+      lines: this.lines.mapEntries(([_, v]) => {
+        const clone: Line = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Line>,
     }));
   }
 

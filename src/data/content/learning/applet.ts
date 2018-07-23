@@ -84,7 +84,10 @@ export class Applet extends Immutable.Record(defaultContent) {
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-      params: this.params.map(p => p.clone()).toOrderedMap(),
+      params: this.params.mapEntries(([_, v]) => {
+        const clone: Param = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Param>,
     }));
   }
 

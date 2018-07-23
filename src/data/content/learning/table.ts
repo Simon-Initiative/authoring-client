@@ -68,7 +68,10 @@ export class Table extends Immutable.Record(defaultContent) {
       title: this.title.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-      rows: this.rows.map(r => r.clone()).toOrderedMap(),
+      rows: this.rows.mapEntries(([_, v]) => {
+        const clone: Row = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Row>,
     });
   }
 

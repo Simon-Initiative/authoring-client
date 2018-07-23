@@ -56,7 +56,10 @@ export class Alternatives extends Immutable.Record(defaultContent) {
         just: d => Maybe.just(d.clone()),
         nothing: () => Maybe.nothing<Default>(),
       }),
-      content: this.content.map(c => c.clone()).toOrderedMap(),
+      content: this.content.mapEntries(([_, v]) => {
+        const clone: Alternative = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Alternative>,
     }));
   }
 

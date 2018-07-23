@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 
 import { Choice } from './choice';
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, setId } from '../common';
+import { augment, getChildren, setId, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 
 
@@ -39,10 +39,12 @@ export class FillInTheBlank extends Immutable.Record(defaultContent) {
   }
 
   clone(): FillInTheBlank {
-    return this.with({
-      id: createGuid(),
-      choices: this.choices.map(c => c.clone()).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      choices: this.choices.mapEntries(([_, v]) => {
+        const clone: Choice = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Choice>,
+    }));
   }
 
   with(values: FillInTheBlankParams) {

@@ -48,7 +48,10 @@ export class Line extends Immutable.Record(defaultContent) {
   clone(): Line {
     return ensureIdGuidPresent(this.with({
       material: this.material.clone(),
-      translations: this.translations.map(t => t.clone()).toOrderedMap(),
+      translations: this.translations.mapEntries(([_, v]) => {
+        const clone: Translation = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Translation>,
     }));
   }
 

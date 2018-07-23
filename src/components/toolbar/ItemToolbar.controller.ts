@@ -12,8 +12,8 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onCut: (item: ContentElement) => void;
-  onCopy: (item: ContentElement) => void;
+  onCut: (item: ContentElement, page: string) => void;
+  onCopy: (item: ContentElement, page: string) => void;
   onPaste: () => void;
   onRemove: (item: ContentElement) => void;
 }
@@ -31,8 +31,8 @@ const mapStateToProps = (state: State): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
   return {
-    onCut: item => dispatch(cut(item)),
-    onCopy: item => dispatch(copy(item)),
+    onCut: (item, page) => dispatch(cut(item, page)),
+    onCopy: (item, page) => dispatch(copy(item, page)),
     onPaste: () => dispatch(paste()),
     onRemove: item => dispatch(remove(item)),
   };

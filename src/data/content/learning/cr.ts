@@ -37,7 +37,10 @@ export class Cr extends Immutable.Record(defaultContent) {
 
   clone(): Cr {
     return ensureIdGuidPresent(this.with({
-      cells: this.cells.map(c => c.clone()).toOrderedMap(),
+      cells: this.cells.mapEntries(([_, v]) => {
+        const clone: ConjugationCell = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, ConjugationCell>,
     }));
   }
 

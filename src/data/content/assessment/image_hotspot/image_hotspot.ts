@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Hotspot } from './hotspot';
 import createGuid from '../../../../utils/guid';
-import { augment, getChildren, setId } from '../../common';
+import { augment, getChildren, setId, ensureIdGuidPresent } from '../../common';
 import { getKey } from '../../../common';
 
 export type ImageHotspotParams = {
@@ -43,10 +43,12 @@ export class ImageHotspot extends Immutable.Record(defaultContent) {
   }
 
   clone() : ImageHotspot {
-    return this.with({
-      id: createGuid(),
-      hotspots: this.hotspots.map(c => c.clone()).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      hotspots: this.hotspots.mapEntries(([_, v]) => {
+        const clone: Hotspot = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Hotspot>,
+    }));
   }
 
   with(values: ImageHotspotParams) {

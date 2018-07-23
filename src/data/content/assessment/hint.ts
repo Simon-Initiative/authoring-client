@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 
 import { ContentElements } from 'data/content/common//elements';
 import { ALT_FLOW_ELEMENTS } from './types';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type HintParams = {
   targets?: string,
@@ -35,9 +35,9 @@ export class Hint extends Immutable.Record(defaultContent) {
   }
 
   clone(): Hint {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       body: this.body.clone(),
-    });
+    }));
   }
 
   static fromText(text: string, guid: string): Hint {

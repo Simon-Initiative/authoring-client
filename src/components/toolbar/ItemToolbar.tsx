@@ -8,15 +8,17 @@ import { ActiveContextState } from 'reducers/active';
 import { styles } from './ItemToolbar.styles';
 import { loadFromLocalStorage } from 'utils/localstorage';
 import { ContentElement } from 'data/content/common/interfaces';
+import { CourseModel } from 'data/models';
 
 export interface ItemToolbarProps {
   context: AppContext;
   activeContext: ActiveContextState;
-  onCut: (item: ContentElement) => void;
-  onCopy: (item: ContentElement) => void;
+  onCut: (item: ContentElement, page: string) => void;
+  onCopy: (item: ContentElement, page: string) => void;
   onPaste: () => void;
   onRemove: (item: ContentElement) => void;
   parentSupportsElementType: (type: string) => boolean;
+  course: CourseModel;
 }
 
 /**
@@ -57,6 +59,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     });
   }
 
+  getPage() {
+    const { activeContext } = this.props;
+    return activeContext.documentId.caseOf({
+      just: id => id,
+      nothing: () => undefined,
+    });
+  }
+
   getContainer() {
     const { activeContext } = this.props;
     return activeContext.container.caseOf({
@@ -88,14 +98,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
       <React.Fragment>
         <ToolbarLayout.Column>
           <ToolbarButton
-            onClick={() => onCut(this.getItem())}
+            onClick={() => onCut(this.getItem(), this.getPage())}
             tooltip="Cut Item"
             size={ToolbarButtonSize.Wide}
             disabled={!(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-cut" /> Cut
           </ToolbarButton>
           <ToolbarButton
-            onClick={() => onCopy(this.getItem())}
+            onClick={() => onCopy(this.getItem(), this.getPage())}
             tooltip="Copy Item"
             size={ToolbarButtonSize.Wide}
             disabled={!(this.hasSelection() && this.canDuplicate())}>

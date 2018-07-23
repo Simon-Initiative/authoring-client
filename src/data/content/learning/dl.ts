@@ -45,7 +45,10 @@ export class Dl extends Immutable.Record(defaultContent) {
   clone(): Dl {
     return ensureIdGuidPresent(this.with({
       title: this.title.lift(t => t.clone()),
-      content: this.content.map(d => d.clone()).toOrderedMap(),
+      content: this.content.mapEntries(([_, v]) => {
+        const clone: TermOrDefinition = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, TermOrDefinition>,
     }));
   }
 

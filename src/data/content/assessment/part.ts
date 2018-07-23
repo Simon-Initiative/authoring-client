@@ -6,7 +6,7 @@ import { Response } from './response';
 import { ResponseMult } from './response_mult';
 import { GradingCriteria } from './criteria';
 import { Hint } from './hint';
-import { defaultIdGuid, getChildren, setId } from '../common';
+import { defaultIdGuid, getChildren, setId, ensureIdGuidPresent } from '../common';
 
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
@@ -73,14 +73,25 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
 
   clone(): Part {
-    return this.with({
-      id: createGuid(),
-      criteria: this.criteria.map(c => c.clone()).toOrderedMap(),
-      responses: this.responses.map(c => c.clone()).toOrderedMap(),
-      responseMult: this.responseMult.map(c => c.clone()).toOrderedMap(),
-      hints: this.hints.map(c => c.clone()).toOrderedMap(),
+    return ensureIdGuidPresent(this.with({
+      criteria: this.criteria.mapEntries(([_, v]) => {
+        const clone: GradingCriteria = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, GradingCriteria>,
+      responses: this.responses.mapEntries(([_, v]) => {
+        const clone: Response = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Response>,
+      responseMult: this.responseMult.mapEntries(([_, v]) => {
+        const clone: ResponseMult = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, ResponseMult>,
+      hints: this.hints.mapEntries(([_, v]) => {
+        const clone: Hint = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Hint>,
       explanation: this.explanation.clone(),
-    });
+    }));
   }
 
 

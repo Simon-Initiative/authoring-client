@@ -93,7 +93,7 @@ function parseElements(
             parsedObjects.push(parse(e, guid(), notify));
           } else {
             // unsupported element
-            parsedObjects.push(Unsupported.fromPersistence(e, guid()));
+            parsedObjects.push(Unsupported.fromPersistence(e, guid(), notify));
           }
         } else {
           textBuffer.push(e);

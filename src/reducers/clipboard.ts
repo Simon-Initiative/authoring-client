@@ -17,6 +17,7 @@ export const clipboard = (
     case SET_ITEM:
       return state.with({
         item: action.item,
+        page: action.page,
       });
     default:
       return state;

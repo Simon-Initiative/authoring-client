@@ -93,8 +93,10 @@ export default class XrefEditor
       }
 
       if (id) {
-        onEdit(model.with({ idref: id }));
-        updateTarget(id, model.page);
+        clipboard.page.lift((pageId) => {
+          onEdit(model.with({ idref: id, page: pageId }));
+          updateTarget(id, pageId);
+        });
       }
     });
   }

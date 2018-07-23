@@ -14,22 +14,24 @@ export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
 export type SetItemAction = {
   type: SET_ITEM;
   item: Maybe<ContentElement>;
+  page: Maybe<string>;
 };
 
-export const setItem = (item: ContentElement): SetItemAction => ({
+export const setItem = (item: ContentElement, page: string): SetItemAction => ({
   type: SET_ITEM,
   item: Maybe.just(item),
+  page: Maybe.just(page),
 });
 
-export function cut(item: ContentElement) {
+export function cut(item: ContentElement, page: string) {
   return function (dispatch: Dispatch<State>, getState: () => State) {
     const { activeContext } = getState();
-    dispatch(copy(item));
+    dispatch(copy(item, page));
     activeContext.container.lift(parent => parent.onRemove(item));
   };
 }
 
-export function copy(item: ContentElement) {
+export function copy(item: ContentElement, page: string) {
   let toSerialize = item.toPersistence();
   if (item.contentType === 'ContiguousText') {
     toSerialize = { isContiguousText: true, data: toSerialize };
@@ -39,7 +41,7 @@ export function copy(item: ContentElement) {
   saveToLocalStorage('clipboard', serialized);
 
   return function (dispatch: Dispatch<State>, getState: () => State) {
-    dispatch(setItem(item));
+    dispatch(setItem(item, page));
   };
 }
 

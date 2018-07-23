@@ -54,8 +54,14 @@ export class Definition extends Immutable.Record(defaultContent) {
     return ensureIdGuidPresent(this.with({
       pronunciation: this.pronunciation.lift(p => p.clone()),
       title: this.title.lift(t => t.clone()),
-      translation: this.translation.map(t => t.clone()).toOrderedMap(),
-      meaning: this.meaning.map(m => m.clone()).toOrderedMap(),
+      translation: this.translation.mapEntries(([_, v]) => {
+        const clone: Translation = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Translation>,
+      meaning: this.meaning.mapEntries(([_, v]) => {
+        const clone: Meaning = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Meaning>,
     }));
   }
 
