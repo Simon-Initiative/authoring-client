@@ -85,12 +85,17 @@ export class Section extends Immutable.Record(defaultContent) {
 
   toPersistence(): Object {
 
-    const content = this.body.content.size === 0
-      ? [{ p: { '#text': ' ' } }]
-      : this.body.toPersistence();
+    const encoded = this.body.toPersistence();
+    const content = encoded.length === 0 ? [{
+      p: {
+        '#text': ' ',
+        '@id': createGuid(),
+      },
+    }] : encoded;
+
     const s = {
       section: {
-        '@id': this.id ? this.id : createGuid(),
+        '@id': this.id || createGuid(),
         '#array': [
           this.title.toPersistence(),
           {
