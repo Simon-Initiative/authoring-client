@@ -26,7 +26,7 @@ export function augment(params, hasId = false) {
   if (!params.guid) {
     Object.assign(params, { guid });
   }
-  if (params.id === '' || hasId) {
+  if (params.id === '' || (hasId && !params.id)) {
     Object.assign(params, { id: guid });
   }
 
