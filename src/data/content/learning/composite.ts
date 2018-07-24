@@ -108,7 +108,7 @@ export class Composite extends Immutable.Record(defaultContent) {
 
     const s = {
       composite_activity: {
-        '@id': this.id ? this.id : createGuid(),
+        '@id': this.id || createGuid(),
         '#array': [...optional, ...required],
       },
     };
