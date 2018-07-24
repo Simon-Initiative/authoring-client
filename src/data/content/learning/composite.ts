@@ -99,9 +99,13 @@ export class Composite extends Immutable.Record(defaultContent) {
     this.title.lift(title => optional.push(title.toPersistence()));
     this.instructions.lift(i => optional.push(i.toPersistence()));
 
-    const required = this.content.content.size === 0
-      ? [{ p: { '#text': ' ' } }]
-      : this.content.toPersistence();
+    const encoded = this.content.toPersistence();
+    const required = encoded.length === 0 ? [{
+      p: {
+        '#text': ' ',
+        '@id': createGuid(),
+      },
+    }] : encoded;
 
     const s = {
       composite_activity: {
