@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { getEditorByContentType } from './registry';
+import { getEditorByContentType } from 'editors/content/container/registry';
 import { ContentElements } from 'data/content/common/elements';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { ContentDecorator } from './ContentDecorator';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { ContentDecorator } from 'editors/content/container/ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';

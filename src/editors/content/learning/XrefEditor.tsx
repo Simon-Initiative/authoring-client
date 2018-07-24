@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps }
-  from 'editors/content/common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { LinkTarget } from 'data/content/learning/common';
 import { Select, Button } from 'editors/content/common/controls';
 import { LegacyTypes } from 'data/types';

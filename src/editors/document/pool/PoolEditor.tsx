@@ -1,13 +1,15 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import * as models from '../../../data/models';
-import * as contentTypes from '../../../data/contentTypes';
-import { AddQuestion } from '../../content/question/AddQuestion';
-import { Outline } from '../assessment/Outline';
-import { renderAssessmentNode } from '../common/questions';
-import { findNodeByGuid, locateNextOfKin } from '../assessment/utils';
+import {
+  AbstractEditor, AbstractEditorProps, AbstractEditorState,
+} from 'editors/document/common/AbstractEditor';
+import * as models from 'data/models';
+import * as contentTypes from 'data/contentTypes';
+import { AddQuestion } from 'editors/content/question/AddQuestion';
+import { Outline } from 'editors/document/assessment/Outline';
+import { renderAssessmentNode } from 'editors/document/common/questions';
+import { findNodeByGuid, locateNextOfKin } from 'editors/document/assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';

@@ -1,9 +1,8 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
-import { augment, getChildren, except, ensureIdGuidPresent, setId } from '../common';
-import { getKey } from '../../common';
-import { Title } from '../learning/title';
+import createGuid from 'utils/guid';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from 'data/content/common';
+import { getKey } from 'data/common';
+import { Title } from 'data/content/learning/title';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 

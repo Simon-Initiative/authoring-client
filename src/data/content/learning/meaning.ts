@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Material } from './material';
-import { Example } from './example';
-import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
-import { getKey } from '../../common';
-import createGuid from 'utils//guid';
+import { Material } from 'data/content/learning/material';
+import { Example } from 'data/content/learning/example';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
+import { getKey } from 'data/common';
+import createGuid from 'utils/guid';
 
 export type MeaningParams = {
   examples?: Immutable.OrderedMap<string, Example>,

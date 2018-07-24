@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
-import { KnowledgeCategory, LearningProcess } from './types';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
+import { KnowledgeCategory, LearningProcess } from 'data/content/objectives/types';
 
 export type LearningObjectiveParams = {
   id?: string,

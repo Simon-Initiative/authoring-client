@@ -1,9 +1,9 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Title } from './title';
-import { Li } from './li';
-import { augment, getChildren, ensureIdGuidPresent } from '../common';
-import { getKey } from './common';
+import { Title } from 'data/content/learning/title';
+import { Li } from 'data/content/learning/li';
+import { augment, getChildren, ensureIdGuidPresent } from 'data/content/common';
+import { getKey } from 'data/content/learning/common';
 import createGuid from 'utils/guid';
 
 export enum Styles {

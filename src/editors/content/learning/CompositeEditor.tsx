@@ -12,14 +12,14 @@ import { ContentElements } from 'data/content/common/elements';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Select } from '../common/controls';
+import { Select } from 'editors/content/common/controls';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { PurposeTypes } from 'data/content/learning/common';
 
 import { Maybe } from 'tsmonad';
 
-import { styles } from './Composite.styles';
+import { styles } from 'editors/content/learning/Composite.styles';
 
 export interface CompositeEditorProps
   extends AbstractContentEditorProps<contentTypes.Composite> {

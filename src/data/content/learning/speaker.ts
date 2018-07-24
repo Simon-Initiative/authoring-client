@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Image } from './image';
-import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
-import { getKey } from '../../common';
+import { Image } from 'data/content/learning/image';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
+import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 
 export type SpeakerParams = {

@@ -43,19 +43,21 @@ import PulloutEditor from 'editors/content/learning/PulloutEditor';
 import QuoteEditor from 'editors/content/learning/QuoteEditor';
 import SectionEditor from 'editors/content/learning/SectionEditor';
 import SpeakerEditor from 'editors/content/learning/dialog/SpeakerEditor';
-import SymEditor from '../learning/SymEditor';
-import TableEditor from '../learning/table/TableEditor';
-import TranslationEditor from '../learning/TranslationEditor';
-import UnityEditor from '../learning/UnityEditor';
-import UnorderedListEditor from '../learning/UnorderedListEditor';
-import UnsupportedEditor from '../learning/UnsupportedEditor';
-import VideoEditor from '../learning/VideoEditor';
-import WbInlineEditor from '../learning/WbInlineEditor';
-import { XrefEditor } from '../learning/XrefEditor.controller';
-import YouTubeEditor from '../learning/YouTubeEditor';
-import { ContiguousTextEditor } from '../learning/contiguoustext/ContiguousTextEditor.controller';
-import { CustomEditor } from '../learning/CustomEditor';
-import { connectEditor, connectPopupEditor } from './connectEditor';
+import SymEditor from 'editors/content/learning/SymEditor';
+import TableEditor from 'editors/content/learning/table/TableEditor';
+import TranslationEditor from 'editors/content/learning/TranslationEditor';
+import UnityEditor from 'editors/content/learning/UnityEditor';
+import UnorderedListEditor from 'editors/content/learning/UnorderedListEditor';
+import UnsupportedEditor from 'editors/content/learning/UnsupportedEditor';
+import VideoEditor from 'editors/content/learning/VideoEditor';
+import WbInlineEditor from 'editors/content/learning/WbInlineEditor';
+import { XrefEditor } from 'editors/content/learning/XrefEditor.controller';
+import YouTubeEditor from 'editors/content/learning/YouTubeEditor';
+import {
+  ContiguousTextEditor,
+} from 'editors/content/learning/contiguoustext/ContiguousTextEditor.controller';
+import { CustomEditor } from 'editors/content/learning/CustomEditor';
+import { connectEditor, connectPopupEditor } from 'editors/content/container/connectEditor';
 
 let registry = null;
 

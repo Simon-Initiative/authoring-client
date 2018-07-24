@@ -3,11 +3,12 @@ import AssessmentEditor from 'editors/document/assessment/AssessmentEditor.contr
 import CourseEditor from 'editors/document/course/CourseEditor.controller';
 import OrgEditor from 'editors/document/org/OrgEditor.controller';
 import PoolEditor from 'editors/document/pool/PoolEditor.controller';
-
-import { DeferredPersistenceStrategy }
-  from 'editors/manager/persistence/DeferredPersistenceStrategy';
-import { ImmediatePersistenceStrategy }
-  from 'editors/manager/persistence/ImmediatePersistenceStrategy';
+import {
+  DeferredPersistenceStrategy,
+} from 'editors/manager/persistence/DeferredPersistenceStrategy';
+import {
+  ImmediatePersistenceStrategy,
+} from 'editors/manager/persistence/ImmediatePersistenceStrategy';
 import { ListeningApproach } from 'editors/manager/ListeningApproach';
 
 import { ModelTypes } from 'data/models';

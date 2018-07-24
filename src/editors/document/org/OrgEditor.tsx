@@ -1,20 +1,24 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import * as models from '../../../data/models';
-import { viewDocument } from '../../../actions/view';
-import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
-import * as contentTypes from '../../../data/contentTypes';
-import { Command } from './commands/command';
-import { getExpandId, render } from './traversal';
-import { collapseNodes, expandNodes } from '../../../actions/expand';
-import { SourceNodeType } from '../../content/org/drag/utils';
-import { insertNode, removeNode, updateNode } from './utils';
-import { TreeNode } from './TreeNode';
-import { Actions } from './Actions.controller';
-import { Details } from './Details';
-import { LabelsEditor } from '../../content/org/LabelsEditor';
+import {
+  AbstractEditor,
+  AbstractEditorProps,
+  AbstractEditorState,
+} from 'editors/document/common/AbstractEditor';
+import * as models from 'data/models';
+import { viewDocument } from 'actions/view';
+import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
+import * as contentTypes from 'data/contentTypes';
+import { Command } from 'editors/document/org/commands/command';
+import { getExpandId, render } from 'editors/document/org/traversal';
+import { collapseNodes, expandNodes } from 'actions/expand';
+import { SourceNodeType } from 'editors/content/org/drag/utils';
+import { insertNode, removeNode, updateNode } from 'editors/document/org/utils';
+import { TreeNode } from 'editors/document/org/TreeNode';
+import { Actions } from 'editors/document/org/Actions.controller';
+import { Details } from 'editors/document/org/Details';
+import { LabelsEditor } from 'editors/content/org/LabelsEditor';
 import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
 

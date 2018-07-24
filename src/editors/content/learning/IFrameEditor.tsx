@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { IFrame } from '../../../data/content/learning/iframe';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { TextInput } from '../common/TextInput';
+import { IFrame } from 'data/content/learning/iframe';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { TextInput } from 'editors/content/common/TextInput';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, insertableContentTypes, getContentIcon } from

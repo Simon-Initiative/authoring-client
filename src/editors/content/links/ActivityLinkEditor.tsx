@@ -1,11 +1,13 @@
 import * as React from 'react';
-import * as persistence from '../../../data/persistence';
-import { ActivityLink } from '../../../data/content/learning/activity_link';
-import { PurposeTypes } from '../../../data/content/learning/common';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Select } from '../common/Select';
-import { InputLabel } from '../common/InputLabel';
-import { LegacyTypes } from '../../../data/types';
+import * as persistence from 'data/persistence';
+import { ActivityLink } from 'data/content/learning/activity_link';
+import { PurposeTypes } from 'data/content/learning/common';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { Select } from 'editors/content/common/Select';
+import { InputLabel } from 'editors/content/common/InputLabel';
+import { LegacyTypes } from 'data/types';
 
 export interface ActivityLinkEditorProps extends AbstractContentEditorProps<ActivityLink> {
 

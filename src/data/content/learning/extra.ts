@@ -1,10 +1,9 @@
 import * as Immutable from 'immutable';
-import { Meaning } from './meaning';
-import { Anchor } from './anchor';
-import { augment, getChildren, except, ensureIdGuidPresent } from '../common';
-import { getKey } from '../../common';
+import { Meaning } from 'data/content/learning/meaning';
+import { Anchor } from 'data/content/learning/anchor';
+import { augment, getChildren, except, ensureIdGuidPresent } from 'data/content/common';
+import { getKey } from 'data/common';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
-
 import createGuid from 'utils/guid';
 import { ContiguousText } from 'data/contentTypes';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';

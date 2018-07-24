@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { CodeBlock as CodeBlockType } from 'data/content/learning/codeblock';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { Select, TextInput } from '../common/controls';
+import { Select, TextInput } from 'editors/content/common/controls';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';

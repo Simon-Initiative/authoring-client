@@ -12,16 +12,16 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
 'editors/content/utils/content';
-import { Select, TextInput } from '../common/controls';
+import { Select, TextInput } from 'editors/content/common/controls';
 import { TabContainer } from 'editors/content/common/TabContainer';
-import AlternativeEditor from './AlternativeEditor';
+import AlternativeEditor from 'editors/content/learning/AlternativeEditor';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 import {
   Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
-import { styles } from './Alternatives.styles';
+import { styles } from 'editors/content/learning/Alternatives.styles';
 
 export interface AlternativesEditorProps
   extends AbstractContentEditorProps<contentTypes.Alternatives> {

@@ -1,10 +1,12 @@
 import * as React from 'react';
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
+import * as contentTypes from 'data/contentTypes';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import guid from 'utils/guid';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { TextInput } from '../common/controls';
-import { RemovableContent } from '../common/RemovableContent';
+import { TextInput } from 'editors/content/common/controls';
+import { RemovableContent } from 'editors/content/common/RemovableContent';
 
 type IdTypes = {
   score: string,

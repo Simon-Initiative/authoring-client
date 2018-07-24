@@ -1,5 +1,4 @@
 import * as Immutable from 'immutable';
-
 import { ContentElements } from 'data/content/common/elements';
 import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from './types';
 import { Part } from './part';
@@ -22,6 +21,11 @@ import { Changes } from 'data/content/learning/draft/changes';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
 import { EntityTypes } from 'data/content/learning/common';
 import { EntityInfo } from 'data/content/learning/changes';
+import { containsDynaDropCustom } from 'editors/content/utils/common';
+import {
+  updateHTMLLayoutTargetRefs,
+} from 'editors/content/learning/dynadragdrop/utils';
+import { Custom } from 'data/content/assessment/custom';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
@@ -275,30 +279,66 @@ function cloneInputQuestion(question: Question): Question {
   });
 }
 
-// This ensures that existing input-based questions (aka Numeric, Text, FillInTheBlank)
-// have the 'input' attribute specified on all the responses. This input attr is
-// required only when there is more than one item in the question - but we have to
-// add it in all cases (in case someone goes and edits to add a second item)
-function ensureInputAttrsExist(question: Question) : Question {
+function cloneDragDropQuestion(question: Question): Question {
+  // Remap existing value ids to newly assigned ones, storing
+  // the mapping in valueMap for later use.
+  const valueMap = {};
+  const inputMap = {};
 
-  let modifiedQuestion = question;
+  // Clone all the choices using first item as a template,
+  // but assign new values and track the mapping of old choice values to new ones
+  const fitb = question.items.first() as FillInTheBlank;
+  const choices = fitb.choices.map((choice) => {
+    const value = createGuid();
+    valueMap[choice.value] = value;
 
-  question.items.toArray().forEach((item, index) => {
+    return choice.clone().with({
+      value,
+    });
+  }).toOrderedMap();
 
-    if (item.contentType === 'Numeric'
-      || item.contentType === 'Text' || item.contentType === 'FillInTheBlank') {
+  const items = question.items.map((item: FillInTheBlank) => {
+    const id = createGuid();
+    inputMap[item.id] = id;
 
-      const originalPart = question.parts.toArray()[index];
-      const responses = originalPart.responses
-        .map(response => response.with({ input: item.id })).toOrderedMap();
-      const part = originalPart.with({ responses });
+    return (item as FillInTheBlank).with({
+      id,
+      choices,
+    });
+  }).toOrderedMap();
 
-      modifiedQuestion = modifiedQuestion.with(
-        { parts: modifiedQuestion.parts.set(part.guid, part) });
-    }
+  // Now clone parts, but post process to update the match and input attributes
+  // of response objects to use the new choice values
+  const initialPartsClone = question.parts.map(p => p.clone()).toOrderedMap();
+  const parts = initialPartsClone.map((part) => {
+    return part.with({
+      responses: part.responses.map((response) => {
+        return response.with({
+          match: valueMap[response.match],
+          input: inputMap[response.input],
+        });
+      }).toOrderedMap(),
+    });
+  }).toOrderedMap();
+
+  const customContent = (question.body.content.find(ce => ce.contentType === 'Custom') as Custom);
+  let clonedCustomContent = customContent.clone();
+
+  // update targetArea targets to use new values
+  clonedCustomContent = clonedCustomContent.with({
+    layoutData: clonedCustomContent.layoutData.lift(ld =>
+      updateHTMLLayoutTargetRefs(valueMap, inputMap, ld)),
   });
 
-  return modifiedQuestion;
+  return question.with({
+    id: createGuid(),
+    body: question.body.with({
+      content: question.body.content.set(customContent.guid, clonedCustomContent),
+    }).clone(),
+    explanation: question.explanation.clone(),
+    parts,
+    items,
+  });
 }
 
 // Cloning a single select multiple choice question requires that
@@ -347,6 +387,32 @@ function cloneMultipleChoiceQuestion(question: Question): Question {
     parts,
     items,
   });
+}
+
+// This ensures that existing input-based questions (aka Numeric, Text, FillInTheBlank)
+// have the 'input' attribute specified on all the responses. This input attr is
+// required only when there is more than one item in the question - but we have to
+// add it in all cases (in case someone goes and edits to add a second item)
+function ensureInputAttrsExist(question: Question) : Question {
+
+  let modifiedQuestion = question;
+
+  question.items.toArray().forEach((item, index) => {
+
+    if (item.contentType === 'Numeric'
+      || item.contentType === 'Text' || item.contentType === 'FillInTheBlank') {
+
+      const originalPart = question.parts.toArray()[index];
+      const responses = originalPart.responses
+        .map(response => response.with({ input: item.id })).toOrderedMap();
+      const part = originalPart.with({ responses });
+
+      modifiedQuestion = modifiedQuestion.with(
+        { parts: modifiedQuestion.parts.set(part.guid, part) });
+    }
+  });
+
+  return modifiedQuestion;
 }
 
 function parseVariables(item: any, model: Question) {
@@ -402,6 +468,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     // multiple choice questions and any input-based questions specially
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return cloneMultipleChoiceQuestion(this);
+    }
+    if (containsDynaDropCustom(this.body)) {
+      return cloneDragDropQuestion(this);
     }
     if (item.contentType === 'Numeric'
       || item.contentType === 'Text'
@@ -487,7 +556,6 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
             items: model.items.set(id, FillInTheBlank.fromPersistence(item, id, notify)),
           });
           break;
-        // We do not yet support image_hotspot:
         case 'image_hotspot':
           model = model.with({
             items: model.items.set(id, ImageHotspot.fromPersistence(item, id, notify)),

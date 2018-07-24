@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
-import { parseContent } from './parse';
-import { augment, ensureIdGuidPresent } from '../common';
-import { ContentElement } from './interfaces';
-import { ContiguousText } from '../learning/contiguous';
+import { parseContent } from 'data/content/common/parse';
+import { augment, ensureIdGuidPresent } from 'data/content/common';
+import { ContentElement } from 'data/content/common/interfaces';
+import { ContiguousText } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 

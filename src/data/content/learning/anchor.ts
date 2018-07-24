@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren, ensureIdGuidPresent } from '../common';
-import { Image } from './image';
+import { augment, getChildren, ensureIdGuidPresent } from 'data/content/common';
+import { Image } from 'data/content/learning/image';
 
 export type AnchorParams = {
   content?: Maybe<Image>,

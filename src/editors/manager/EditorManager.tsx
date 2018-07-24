@@ -4,12 +4,12 @@ import { UserProfile } from 'types/user';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import { configuration } from 'actions/utils/config';
-import { AbstractEditorProps } from '../document/common/AbstractEditor';
-import { DispatchBasedServices } from '../common/AppServices';
+import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
+import { DispatchBasedServices } from 'editors/common/AppServices';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { lookUpByName } from 'editors/manager/registry';
-import { LearningObjective, Skill } from 'data//contentTypes';
+import { LearningObjective, Skill } from 'data/contentTypes';
 
 import './EditorManager.scss';
 import { Toast, Severity } from 'components/common/Toast';

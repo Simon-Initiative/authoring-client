@@ -1,10 +1,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Select, TextInput } from '../common/controls';
-import { AddQuestion } from '../question/AddQuestion';
-import { PoolRefEditor } from './PoolRefEditor';
+import * as contentTypes from 'data/contentTypes';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { Select, TextInput } from 'editors/content/common/controls';
+import { AddQuestion } from 'editors/content/question/AddQuestion';
+import { PoolRefEditor } from 'editors/content/selection/PoolRefEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';

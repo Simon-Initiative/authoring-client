@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import { Maybe } from 'tsmonad';
-import * as types from './types';
+import * as types from 'data/content/org/types';
 
 export type IncludeParams = {
   organization?: string,

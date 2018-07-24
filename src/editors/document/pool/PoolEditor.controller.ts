@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
-import PoolEditor from './PoolEditor';
+import PoolEditor from 'editors/document/pool/PoolEditor';
 import * as contentTypes from 'data/contentTypes';
 import { fetchSkills } from 'actions/skills';
 import { setCurrentNode } from 'actions/document';
 import { Skill } from 'types/course';
-import { AbstractEditorProps } from '../common/AbstractEditor';
+import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
 import { PoolModel, CourseModel } from 'data/models';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';

@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { augment, getChildren, ensureIdGuidPresent } from '../common';
-
+import { augment, getChildren, ensureIdGuidPresent } from 'data/content/common';
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 
 export type BlockQuoteParams = {

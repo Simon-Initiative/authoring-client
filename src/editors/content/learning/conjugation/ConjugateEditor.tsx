@@ -13,15 +13,15 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { CONJUGATE_ELEMENTS } from 'data/content/learning/conjugate';
-import { TextInput, Button } from '../../common/controls';
+import { TextInput, Button } from 'editors/content/common/controls';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { Maybe } from 'tsmonad';
 import { modalActions } from 'actions/modal';
 import { buildUrl } from 'utils/path';
 import { TextSelection } from 'types/active';
-import { selectAudio } from '../AudioEditor';
+import { selectAudio } from 'editors/content/learning/AudioEditor';
 
-import { styles } from './Conjugation.styles';
+import { styles } from 'editors/content/learning/conjugation/Conjugation.styles';
 
 export interface ConjugateEditorProps
   extends AbstractContentEditorProps<contentTypes.ConjugationCell> {

@@ -1,12 +1,11 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
-import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
-import { getKey } from '../../common';
-import { Title } from '../learning/title';
+import createGuid from 'utils/guid';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
+import { getKey } from 'data/common';
+import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
-import { Default } from './default';
-import { Alternative } from './alternative';
+import { Default } from 'data/content/learning/default';
+import { Alternative } from 'data/content/learning/alternative';
 
 export type AlternativesParams = {
   id?: string,

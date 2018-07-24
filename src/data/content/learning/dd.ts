@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
-import { augment, ensureIdGuidPresent } from '../common';
+import { augment, ensureIdGuidPresent } from 'data/content/common';
 import createGuid from 'utils/guid';
 
 export type DdParams = {

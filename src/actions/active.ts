@@ -3,7 +3,7 @@ import { Maybe } from 'tsmonad';
 import { ActiveContextState } from 'reducers/active';
 import { ParsedContent } from 'data/parsers/common/types';
 import * as contentTypes from 'data/contentTypes';
-import { resolveWithProgressUI } from './progress';
+import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';

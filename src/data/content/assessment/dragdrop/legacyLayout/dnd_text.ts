@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../../common';
+import { augment } from 'data/content/common';
 
 export type DndTextParams = {
   guid?: string;
