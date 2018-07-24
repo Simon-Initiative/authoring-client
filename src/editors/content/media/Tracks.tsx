@@ -1,9 +1,10 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-
 import { Track } from 'data/content/learning/track';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { TrackEditor } from './TrackEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { TrackEditor } from 'editors/content/media/TrackEditor';
 
 export interface TracksProps
   extends AbstractContentEditorProps<Immutable.OrderedMap<string, Track>> {

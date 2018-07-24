@@ -1,15 +1,15 @@
 import * as Immutable from 'immutable';
 
-import { defaultIdGuid, getChildren } from '../common';
-import { getKey } from '../../common';
+import { defaultIdGuid, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import { Maybe } from 'tsmonad';
-import { ResourceRef } from './resourceref';
-import { Preconditions } from './preconditions';
-import { Supplements } from './supplements';
-import { Schedule } from './schedule';
-import createGuid from '../../../utils/guid';
+import { ResourceRef } from 'data/content/org/resourceref';
+import { Preconditions } from 'data/content/org/preconditions';
+import { Supplements } from 'data/content/org/supplements';
+import { Schedule } from 'data/content/org/schedule';
+import createGuid from 'utils/guid';
 
-import * as types from './types';
+import * as types from 'data/content/org/types';
 
 export type ItemParams = {
   id?: string,

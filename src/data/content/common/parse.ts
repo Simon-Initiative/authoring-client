@@ -19,7 +19,8 @@ export const CONTIGUOUS_TEXT_ELEMENTS = [
 export const registeredTypes = {};
 
 
-export function registerType(elementName: string, factoryFn: (obj, guid) => ContentElement) {
+export function registerType(
+  elementName: string, factoryFn: (obj, guid, notify) => ContentElement) {
   if (registeredTypes[elementName] === undefined) {
     registeredTypes[elementName] = factoryFn;
   } else {
@@ -31,7 +32,7 @@ export function registerType(elementName: string, factoryFn: (obj, guid) => Cont
 // different structures. This normalizes these structtures to be
 // consistently just an array of objects whose keys must have an
 // element.
-function normalizeInput(obj: Object, textElements: Object) : Object[] {
+function normalizeInput(obj: Object, textElements: Object): Object[] {
 
   // First ensure we have an array, whether it is an array, embeds
   // an array in the #array syntax, or we wrap it
@@ -54,7 +55,7 @@ function normalizeInput(obj: Object, textElements: Object) : Object[] {
 }
 
 
-export function getKey(item) : Maybe<string> {
+export function getKey(item): Maybe<string> {
   const keys = Object.keys(item).filter(k => !k.startsWith('@'));
 
   if (keys.length === 0) {
@@ -64,9 +65,9 @@ export function getKey(item) : Maybe<string> {
 }
 
 function parseElements(
-  elements: Object[], factories, textElements, backingTextProvider) : ContentElement[] {
+  elements: Object[], factories, textElements, backingTextProvider, notify): ContentElement[] {
 
-  const parsedObjects : ContentElement[] = [];
+  const parsedObjects: ContentElement[] = [];
 
   // Buffer for contiguous text elements
   let textBuffer = [];
@@ -89,10 +90,10 @@ function parseElements(
           const parse = factories[key];
 
           if (parse !== undefined) {
-            parsedObjects.push(parse(e, guid()));
+            parsedObjects.push(parse(e, guid(), notify));
           } else {
             // unsupported element
-            parsedObjects.push(Unsupported.fromPersistence(e, guid()));
+            parsedObjects.push(Unsupported.fromPersistence(e, guid(), notify));
           }
         } else {
           textBuffer.push(e);
@@ -119,7 +120,7 @@ function parseElements(
   return parsedObjects;
 }
 
-function isAllContiguous(arr, textElements) : boolean {
+function isAllContiguous(arr, textElements): boolean {
   return arr
     .reduce(
       (acc: boolean, e) => {
@@ -130,7 +131,10 @@ function isAllContiguous(arr, textElements) : boolean {
 }
 
 export function parseContent(
-  obj: Object, supportedElementKeys: string[], backingTextProvider: Object = null)
+  obj: Object,
+  supportedElementKeys: string[],
+  backingTextProvider: Object = null,
+  notify: () => void)
   : Immutable.OrderedMap<string, ContentElement> {
 
   // Create a lookup table for the registered factory deserialization
@@ -166,8 +170,8 @@ export function parseContent(
   }
 
   // Parse the elements and collect the deserialized content here
-  const parsedObjects : ContentElement[]
-    = parseElements(inputAsArray, factories, textElements, backingTextProvider);
+  const parsedObjects: ContentElement[]
+    = parseElements(inputAsArray, factories, textElements, backingTextProvider, notify);
 
   // Convert to the Immutable representation and return
   const keyValuePairs = parsedObjects.map(h => [h.guid, h]);

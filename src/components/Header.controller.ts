@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Header from './Header';
+import Header from 'components/Header';
 import { Maybe } from 'tsmonad';
 import * as viewActions from 'actions/view';
 

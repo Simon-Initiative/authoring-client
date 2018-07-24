@@ -11,7 +11,8 @@ import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
 
 import { styles } from './BlockFormula.styles';
 
@@ -158,7 +159,7 @@ export default class BlockFormulaToolbar
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
             tooltip="MathML or Latex formula">
-            <i className={'fa fa-etsy'} />
+            {getContentIcon(insertableContentTypes.Math)}
           </ToolbarButton>
         </ToolbarLayout.Inline>
       </ToolbarGroup>

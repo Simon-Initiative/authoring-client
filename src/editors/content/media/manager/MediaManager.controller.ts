@@ -4,10 +4,10 @@ import { State } from 'reducers';
 import { fetchCourseMediaNextPage, resetMedia, fetchMediaItemByPath } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { Media, MediaItem } from 'types/media';
-import { MediaManager, SELECTION_TYPES } from './MediaManager';
+import { MediaManager, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { CourseModel } from 'data/models/course';
 
-export { MIMETYPE_FILTERS, SELECTION_TYPES } from './MediaManager';
+export { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 
 interface StateProps {
   media: Maybe<OrderedMediaLibrary>;

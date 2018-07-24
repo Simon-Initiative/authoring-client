@@ -1,45 +1,44 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../../utils/guid';
-import { augment, getChildren } from '../../common';
-import { getKey } from '../../../common';
+import createGuid from 'utils/guid';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import { TargetGroup } from './target_group';
 import { InitiatorGroup } from './initiator_group';
 
-export type DndLayoutParams = {
+export type LegacyLayoutParams = {
   guid?: string;
   targetGroup?: TargetGroup;
   initiatorGroup?: InitiatorGroup;
 };
 
 const defaultContent = {
-  contentType: 'DndLayout',
-  elementType: 'dragdrop',
+  contentType: 'LegacyLayout',
+  elementType: 'legacylayout',
   guid: '',
   targetGroup: new TargetGroup(),
   initiatorGroup: new InitiatorGroup(),
 };
 
-export class DndLayout extends Immutable.Record(defaultContent) {
+export class LegacyLayout extends Immutable.Record(defaultContent) {
 
-  contentType: 'DndLayout';
-  elementType: 'dragdrop';
+  contentType: 'LegacyLayout';
+  elementType: 'legacylayout';
   guid: string;
   targetGroup: TargetGroup;
   initiatorGroup: InitiatorGroup;
 
-  constructor(params?: DndLayoutParams) {
+  constructor(params?: LegacyLayoutParams) {
     super(augment(params));
   }
 
-  with(values: DndLayoutParams) {
+  with(values: LegacyLayoutParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : DndLayout {
+  static fromPersistence(json: Object, guid: string) : LegacyLayout {
 
     const q = (json as any).dragdrop;
-    let model = new DndLayout({ guid });
+    let model = new LegacyLayout({ guid });
 
     getChildren(q).forEach((item) => {
       const key = getKey(item);

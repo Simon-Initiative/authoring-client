@@ -1,25 +1,26 @@
 import { combineReducers } from 'redux';
 
-import { choices, ChoicesState } from './choices';
-import { course, CourseState } from './course';
-import { discoverable, DiscoverableState } from './discoverable';
-import { dynadragdrop, DynaDragDropState } from './dynadragdrop';
-import { editorSidebar, EditorSidebarState } from './editorSidebar';
-import { expanded, ExpandedState } from './expanded';
-import { hover, HoverState } from './hover';
-import { locks, LocksState } from './locks';
-import { media, MediaState } from './media';
-import { messages, MessageState } from './messages';
-import { modal, ModalState } from './modal';
-import { objectives, ObjectiveState } from './objectives';
-import { requests, RequestsState } from './requests';
-import { server, ServerState } from './server';
-import { skills, SkillsState } from './skills';
-import { user, UserState } from './user';
-import { questionEditor, QuestionEditorState } from './questionEditor';
-import { documents, DocumentsState } from './documents';
-import { activeContext, ActiveContextState } from './active';
-import { clipboard, ClipboardState } from './clipboard';
+import { choices, ChoicesState } from 'reducers/choices';
+import { course, CourseState } from 'reducers/course';
+import { discoverable, DiscoverableState } from 'reducers/discoverable';
+import { dynadragdrop, DynaDragDropState } from 'reducers/dynadragdrop';
+import { editorSidebar, EditorSidebarState } from 'reducers/editorSidebar';
+import { expanded, ExpandedState } from 'reducers/expanded';
+import { hover, HoverState } from 'reducers/hover';
+import { locks, LocksState } from 'reducers/locks';
+import { media, MediaState } from 'reducers/media';
+import { messages, MessageState } from 'reducers/messages';
+import { modal, ModalState } from 'reducers/modal';
+import { objectives, ObjectiveState } from 'reducers/objectives';
+import { requests, RequestsState } from 'reducers/requests';
+import { server, ServerState } from 'reducers/server';
+import { skills, SkillsState } from 'reducers/skills';
+import { user, UserState } from 'reducers/user';
+import { questionEditor, QuestionEditorState } from 'reducers/questionEditor';
+import { documents, DocumentsState } from 'reducers/documents';
+import { activeContext, ActiveContextState } from 'reducers/active';
+import { clipboard, ClipboardState } from 'reducers/clipboard';
+import { XrefState, xref } from 'reducers/xref';
 
 export interface State {
   activeContext: ActiveContextState;
@@ -42,6 +43,7 @@ export interface State {
   user: UserState;
   questionEditor: QuestionEditorState;
   clipboard: ClipboardState;
+  xref: XrefState;
 }
 
 const reducers = combineReducers({
@@ -65,6 +67,7 @@ const reducers = combineReducers({
   user,           // Information about current user, null if not logged in
   questionEditor,
   clipboard,      // Native clipboard state and cut/copy/paste actions
+  xref,           // The target element in a cross reference
 });
 
 export default reducers;

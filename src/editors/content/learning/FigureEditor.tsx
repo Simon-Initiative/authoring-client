@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -12,7 +14,7 @@ import { Maybe } from 'tsmonad';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
-import { ToolbarContentContainer } from '../container/ToolbarContentContainer';
+import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
 
 import './nested.scss';
 

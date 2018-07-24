@@ -1,15 +1,18 @@
-import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor.controller';
-import AssessmentEditor from '../document/assessment/AssessmentEditor.controller';
-import CourseEditor from '../document/course/CourseEditor.controller';
-import OrgEditor from '../document/org/OrgEditor.controller';
-import PoolEditor from '../document/pool/PoolEditor.controller';
+import WorkbookPageEditor from 'editors/document/workbook/WorkbookPageEditor.controller';
+import AssessmentEditor from 'editors/document/assessment/AssessmentEditor.controller';
+import CourseEditor from 'editors/document/course/CourseEditor.controller';
+import OrgEditor from 'editors/document/org/OrgEditor.controller';
+import PoolEditor from 'editors/document/pool/PoolEditor.controller';
+import {
+  DeferredPersistenceStrategy,
+} from 'editors/manager/persistence/DeferredPersistenceStrategy';
+import {
+  ImmediatePersistenceStrategy,
+} from 'editors/manager/persistence/ImmediatePersistenceStrategy';
+import { ListeningApproach } from 'editors/manager/ListeningApproach';
 
-import { DeferredPersistenceStrategy } from './persistence/DeferredPersistenceStrategy';
-import { ImmediatePersistenceStrategy } from './persistence/ImmediatePersistenceStrategy';
-import { ListeningApproach } from './ListeningApproach';
-
-import { ModelTypes } from '../../data/models';
-import { register } from './registry';
+import { ModelTypes } from 'data/models';
+import { register } from 'editors/manager/registry';
 
 export default function initEditorRegistry() {
   register({

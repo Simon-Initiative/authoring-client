@@ -41,18 +41,20 @@ export function isLockable(model: ContentModel) {
   return model.has('lock');
 }
 
-export function createModel(object: any): ContentModel {
+export function createModel(object: any, notify: () => void = () => null): ContentModel {
+  // only enabled this for workbook page, a2, inline, organization, pools
+
   switch (object.type) {
     case types.LegacyTypes.package:
       return CourseModel.fromPersistence(object);
     case types.LegacyTypes.workbook_page:
-      return WorkbookPageModel.fromPersistence(object);
+      return WorkbookPageModel.fromPersistence(object, notify);
     case types.LegacyTypes.assessment2:
-      return AssessmentModel.fromPersistence(object);
+      return AssessmentModel.fromPersistence(object, notify);
     case types.LegacyTypes.inline:
-      return AssessmentModel.fromPersistence(object);
+      return AssessmentModel.fromPersistence(object, notify);
     case types.LegacyTypes.organization:
-      return OrganizationModel.fromPersistence(object);
+      return OrganizationModel.fromPersistence(object, notify);
     case types.LegacyTypes.learning_objectives:
       return LearningObjectivesModel.fromPersistence(object);
     case types.LegacyTypes.skills_model:
@@ -60,7 +62,7 @@ export function createModel(object: any): ContentModel {
     case types.LegacyTypes.webcontent:
       return MediaModel.fromPersistence(object);
     case types.LegacyTypes.assessment2_pool:
-      return PoolModel.fromPersistence(object);
+      return PoolModel.fromPersistence(object, notify);
   }
 }
 

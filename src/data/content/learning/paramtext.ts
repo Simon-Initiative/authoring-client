@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type ParamTextParams = {
   text?: string,
@@ -28,13 +28,11 @@ export class ParamText extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-
-
   clone() : ParamText {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) : ParamText {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : ParamText {
 
     const p = (root as any);
 

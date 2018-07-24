@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
-
+import { augment, ensureIdGuidPresent } from 'data/content/common';
+import createGuid from 'utils/guid';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export type PronunciationParams = {
   content?: ContentElements,
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<string>,
   src?: Maybe<string>,
   srcContentType?: Maybe<string>
@@ -17,7 +17,7 @@ const defaultContent = {
   contentType: 'Pronunciation',
   elementType: 'pronunciation',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
-  id: Maybe.nothing(),
+  id: '',
   title: Maybe.nothing(),
   src: Maybe.nothing(),
   srcContentType: Maybe.nothing(),
@@ -29,33 +29,33 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
   contentType: 'Pronunciation';
   elementType: 'pronunciation';
   content: ContentElements;
-  id: Maybe<string>;
+  id: string;
   title: Maybe<string>;
   src: Maybe<string>;
   srcContentType: Maybe<string>;
   guid: string;
 
   constructor(params?: PronunciationParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: PronunciationParams) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
+  clone(): Pronunciation {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Pronunciation {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Pronunciation {
 
     const t = (root as any).pronunciation;
 
-    const id = t['@id'] !== undefined
-      ? Maybe.just(t['@id'])
-      : Maybe.nothing();
+    const id = t['@id']
+      ? t['@id']
+      : notify() || createGuid();
 
     const title = t['@title'] !== undefined
       ? Maybe.just(t['@title'])
@@ -71,7 +71,7 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
 
     return new Pronunciation({
       guid,
-      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS),
+      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS, null, notify),
       id,
       title,
       src,
@@ -82,11 +82,11 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const t = {
       pronunciation: {
+        '@id': this.id ? this.id : createGuid(),
         '#array': this.content.toPersistence(),
       },
     };
 
-    this.id.lift(id => t.pronunciation['@id'] = id);
     this.title.lift(title => t.pronunciation['@title'] = title);
     this.src.lift(src => t.pronunciation['@src'] = src);
     this.srcContentType.lift(ty => t.pronunciation['@type'] = ty);

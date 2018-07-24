@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { ParamText } from './paramtext';
 import { PrefValue } from './prefvalue';
@@ -42,12 +42,15 @@ export class Param extends Immutable.Record(defaultContent) {
   }
 
   clone() : Param {
-    return this.with({
-      content: this.content.map(c => c.clone()).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      content: this.content.mapEntries(([_, v]) => {
+        const clone: ParamContent = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, ParamContent>,
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Param {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Param {
 
     const param = (root as any).param;
 
@@ -65,22 +68,22 @@ export class Param extends Immutable.Record(defaultContent) {
       switch (key) {
         case '#text':
           model = model.with({
-            content: model.content.set(id, ParamText.fromPersistence(item, id)),
+            content: model.content.set(id, ParamText.fromPersistence(item, id, notify)),
           });
           break;
         case 'pref:label':
           model = model.with({
-            content: model.content.set(id, PrefLabel.fromPersistence(item, id)),
+            content: model.content.set(id, PrefLabel.fromPersistence(item, id, notify)),
           });
           break;
         case 'pref:value':
           model = model.with({
-            content: model.content.set(id, PrefValue.fromPersistence(item, id)),
+            content: model.content.set(id, PrefValue.fromPersistence(item, id, notify)),
           });
           break;
         case 'wb:path':
           model = model.with({
-            content: model.content.set(id, WbPath.fromPersistence(item, id)),
+            content: model.content.set(id, WbPath.fromPersistence(item, id, notify)),
           });
           break;
         default:

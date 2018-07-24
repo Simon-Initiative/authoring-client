@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import * as contentTypes from '../../../data/contentTypes';
+import * as contentTypes from 'data/contentTypes';
 import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { convert } from 'utils/format';
 import { ContentElements } from 'data/content/common/elements';
 import {
@@ -12,7 +14,7 @@ import {
 import {
   AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem,
   getGeneratedResponseBody, getGeneratedResponseScore, modelWithDefaultFeedback,
-} from 'editors/content/part/defaultFeedbackGenerator.ts';
+} from 'editors/content/part/defaultFeedbackGenerator';
 import { CombinationsMap } from 'types/combinations';
 import guid from 'utils/guid';
 

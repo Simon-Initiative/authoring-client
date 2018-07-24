@@ -6,10 +6,10 @@ import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { buildUrl } from 'utils/path';
-import { RectangleEditor } from './RectangleEditor';
-import { CircleEditor } from './CircleEditor';
+import { RectangleEditor } from 'editors/content/question/imagehotspot/RectangleEditor';
+import { CircleEditor } from 'editors/content/question/imagehotspot/CircleEditor';
 
-import { styles } from './ImageHotspotEditor.styles';
+import { styles } from 'editors/content/question/imagehotspot/ImageHotspotEditor.styles';
 import { Hotspot } from 'data/content/assessment/image_hotspot/hotspot';
 import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
@@ -22,7 +22,7 @@ import { AppServices } from 'editors/common/AppServices';
 import { adjustPath } from 'editors/content/media/utils';
 import { fetchImageSize } from 'utils/image';
 import { convert } from 'utils/format';
-import { PolygonEditor } from './PolygonEditor';
+import { PolygonEditor } from 'editors/content/question/imagehotspot/PolygonEditor';
 
 const DEFAULT_IMAGE = require('./hotspot_instructions.png');
 

@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
-import { parseContent } from './parse';
-import { augment } from '../common';
-import { ContentElement } from './interfaces';
-import { ContiguousText } from '../learning/contiguous';
+import { parseContent } from 'data/content/common/parse';
+import { augment, ensureIdGuidPresent } from 'data/content/common';
+import { ContentElement } from 'data/content/common/interfaces';
+import { ContiguousText } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 
@@ -58,16 +58,16 @@ export class ContentElements extends Immutable.Record(defaultContent) {
   clone(): ContentElements {
     // We must change guids inside the cloned objects as well
     // as updating their keys in the cloned content OrderedMap
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       content: this.content.mapEntries((entry) => {
         const value = entry[1];
         const clonedValue = value.clone().with({ guid: createGuid() });
         return [clonedValue.guid, clonedValue];
       }).toOrderedMap() as Immutable.OrderedMap<string, ContentElement>,
-    });
+    }));
   }
 
-  extractPlainText() : Maybe<string> {
+  extractPlainText(): Maybe<string> {
     const t = this.content.toArray().filter(c => c.contentType === 'ContiguousText');
     if (t.length > 0) {
       return (t[0] as ContiguousText).extractPlainText();
@@ -76,31 +76,39 @@ export class ContentElements extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(
-    root: Object, guid: string,
+    root: Object,
+    guid: string,
     supportedElements: string[],
-    backingTextProvider: Object = null) : ContentElements {
+    backingTextProvider: Object = null,
+    notify: () => void): ContentElements {
 
-    const content = parseContent(root, supportedElements, backingTextProvider);
-    return new ContentElements({ guid, content,
-      supportedElements: Immutable.List(supportedElements) });
+    const content = parseContent(root, supportedElements, backingTextProvider, notify);
+    return new ContentElements({
+      guid, content,
+      supportedElements: Immutable.List(supportedElements),
+    });
   }
 
-  static fromText(text: string, guid: string, supportedElements: string[]) : ContentElements {
+  static fromText(text: string, guid: string, supportedElements: string[]): ContentElements {
     const t = ContiguousText.fromText(text, createGuid());
-    return new ContentElements({ guid,
+    return new ContentElements({
+      guid,
       supportedElements: Immutable.List(supportedElements),
-      content: Immutable.OrderedMap<string, ContentElement>().set(t.guid, t) });
+      content: Immutable.OrderedMap<string, ContentElement>().set(t.guid, t),
+    });
   }
 
-  static fromHTML(html: string, guid: string, supportedElements: string[]) : ContentElements {
+  static fromHTML(html: string, guid: string, supportedElements: string[]): ContentElements {
     const t = ContiguousText.fromHTML(html, createGuid());
-    return new ContentElements({ guid,
+    return new ContentElements({
+      guid,
       supportedElements: Immutable.List(supportedElements),
-      content: Immutable.OrderedMap<string, ContentElement>().set(t.guid, t) });
+      content: Immutable.OrderedMap<string, ContentElement>().set(t.guid, t),
+    });
   }
 
-  toPersistence() : Object[] {
-    const initial : Object[] = [];
+  toPersistence(): Object[] {
+    const initial: Object[] = [];
 
     const items = (this.content.toArray()
       .map(e => e.toPersistence())

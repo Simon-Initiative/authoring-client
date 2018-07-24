@@ -1,7 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Audio } from 'data/content/learning/audio';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { adjustPath } from 'editors/content/media/utils';
@@ -9,7 +11,8 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
 import { modalActions } from 'actions/modal';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
@@ -122,7 +125,7 @@ export default class AudioEditor
       <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Audio} columns={5}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-volume-up" /></div>
+            <div>{getContentIcon(insertableContentTypes.Audio)}</div>
             <div>Change Audio</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

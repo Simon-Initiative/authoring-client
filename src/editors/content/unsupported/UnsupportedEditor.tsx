@@ -1,7 +1,9 @@
 import * as React from 'react';
 
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import * as contentTypes from 'data/contentTypes';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 
 export interface UnsupportedEditorProps
   extends AbstractContentEditorProps<contentTypes.Unsupported> {

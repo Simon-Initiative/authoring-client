@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
 import { Resource, ResourceState } from 'data/content/resource';

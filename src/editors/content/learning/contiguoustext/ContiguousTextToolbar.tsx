@@ -13,7 +13,8 @@ import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { Resource } from 'data/content/resource';
 import { CourseModel } from 'data/models/course';
@@ -171,7 +172,7 @@ export default class ContiguousTextToolbar
             }
             disabled={!supports('code') || noTextSelected || !editMode}
             tooltip="Code">
-            <i className={'fa fa-code'} />
+            {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
@@ -293,7 +294,7 @@ export default class ContiguousTextToolbar
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
             tooltip="MathML or Latex formula">
-            <i className={'fa fa-etsy'} />
+            {getContentIcon(insertableContentTypes.Math)}
           </ToolbarButton>
           <ToolbarButton
             onClick={
@@ -318,7 +319,7 @@ export default class ContiguousTextToolbar
             }}
             tooltip="Insert Image"
             disabled={!supports('image') || !pointEntitiesEnabled}>
-            <i className={'fa fa-image'} />
+            {getContentIcon(insertableContentTypes.Image)}
           </ToolbarButton>
 
         </ToolbarLayout.Inline>

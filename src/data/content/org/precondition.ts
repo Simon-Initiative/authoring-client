@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
-
 import * as types from './types';
 
 export type PreconditionParams = {

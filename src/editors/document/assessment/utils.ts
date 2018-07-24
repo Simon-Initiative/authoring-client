@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
-import * as models from '../../../data/models';
-import * as contentTypes from '../../../data/contentTypes';
+import * as models from 'data/models';
+import * as contentTypes from 'data/contentTypes';
 
 
 /**

@@ -43,8 +43,8 @@ export class PoolModel extends Immutable.Record(defaultPoolModel) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object): PoolModel {
-    
+  static fromPersistence(json: Object, notify: () => void): PoolModel {
+
     let model = new PoolModel();
 
     const p = (json as any);
@@ -62,7 +62,7 @@ export class PoolModel extends Immutable.Record(defaultPoolModel) {
       pool = p.doc;
     }
 
-    model = model.with({ pool: contentTypes.Pool.fromPersistence(pool, '') });
+    model = model.with({ pool: contentTypes.Pool.fromPersistence(pool, '', notify) });
 
     return model;
   }

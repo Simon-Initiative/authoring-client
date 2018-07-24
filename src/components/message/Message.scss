@@ -13,6 +13,14 @@
     &:not(:last-child) {
       margin-right: 8px;
     }
+
+    &:hover {
+      border-color: hsla(0,0%,100%,.6);
+    }
+
+    &:active {
+      border-color: white;
+    }
   }
 
   .message__title {

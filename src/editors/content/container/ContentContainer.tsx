@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { getEditorByContentType } from './registry';
+import { getEditorByContentType } from 'editors/content/container/registry';
 import { ContentElements } from 'data/content/common/elements';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { ContentDecorator } from './ContentDecorator';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { ContentDecorator } from 'editors/content/container/ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
@@ -199,10 +201,8 @@ export class ContentContainer
     }
   }
 
-  onPaste(item, textSelection: Maybe<TextSelection>) {
-    const duplicate = (item.clone() as any).with({
-      guid: guid(),
-    });
+  onPaste(item: ContentElement, textSelection: Maybe<TextSelection>) {
+    const duplicate: ContentElement = item.clone();
     this.onAddNew(duplicate, textSelection);
   }
 
@@ -212,9 +212,7 @@ export class ContentContainer
       const index = indexOf(activeContentGuid, model);
       const active = model.content.get(activeContentGuid);
 
-      const duplicate = (active.clone() as any).with({
-        guid: guid(),
-      });
+      const duplicate = active.clone() as any;
 
       onEdit(this.insertAfter(model, duplicate, index), duplicate);
 

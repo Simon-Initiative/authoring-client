@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Maybe } from 'tsmonad';
-import * as Types from './types';
+import * as Types from 'editors/common/tree/types';
 import { DropTarget } from 'react-dnd';
-import { DragTypes } from '../../../utils/drag';
+import { DragTypes } from 'utils/drag';
 
 import './RepositionTarget.scss';
 

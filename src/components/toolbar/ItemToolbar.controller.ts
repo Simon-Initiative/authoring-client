@@ -5,16 +5,17 @@ import { ItemToolbar } from './ItemToolbar';
 import { AppContext } from 'editors/common/AppContext';
 import { remove } from 'actions/active';
 import { cut, copy, paste } from 'actions/clipboard';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
   activeContext: ActiveContextState;
 }
 
 interface DispatchProps {
-  onCut: (item: Object) => void;
-  onCopy: (item: Object) => void;
+  onCut: (item: ContentElement, page: string) => void;
+  onCopy: (item: ContentElement, page: string) => void;
   onPaste: () => void;
-  onRemove: (item: Object) => void;
+  onRemove: (item: ContentElement) => void;
 }
 
 interface OwnProps {
@@ -22,22 +23,22 @@ interface OwnProps {
   parentSupportsElementType: (type: string) => boolean;
 }
 
-const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state: State): StateProps => {
   return {
     activeContext: state.activeContext,
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
+const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
   return {
-    onCut: item => dispatch(cut(item)),
-    onCopy: item => dispatch(copy(item)),
+    onCut: (item, page) => dispatch(cut(item, page)),
+    onCopy: (item, page) => dispatch(copy(item, page)),
     onPaste: () => dispatch(paste()),
     onRemove: item => dispatch(remove(item)),
   };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(ItemToolbar);
+  (mapStateToProps, mapDispatchToProps)(ItemToolbar);
 
 export { controller as ItemToolbar };

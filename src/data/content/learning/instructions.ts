@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
-
+import { augment, ensureIdGuidPresent } from '../common';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 
 export type InstructionsParams = {
@@ -30,19 +29,19 @@ export class Instructions extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
+  clone(): Instructions {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Instructions {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Instructions {
 
     const t = (root as any).instructions;
 
     return new Instructions({
       guid,
-      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS),
+      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS, null, notify),
     });
   }
 

@@ -1,8 +1,7 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../../utils/guid';
-import { augment, getChildren } from '../../common';
-import { getKey } from '../../../common';
+import createGuid from 'utils/guid';
+import { augment, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import { ContentRow } from './content_row';
 import { HeaderRow } from './header_row';
 

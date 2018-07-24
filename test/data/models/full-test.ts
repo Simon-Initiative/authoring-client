@@ -3,7 +3,7 @@
 
 import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
-import { WorkbookPageModel } from 'data/models//workbook';
+import { WorkbookPageModel } from 'data/models/workbook';
 
 import { registerContentTypes } from 'data/registrar';
 import { ContiguousText } from 'data/content/learning/contiguous';
@@ -13,7 +13,7 @@ it('Single, top-level section', () => {
   registerContentTypes();
 
   const workbookPage = require('./single-section.json');
-  const model = WorkbookPageModel.fromPersistence(workbookPage);
+  const model = WorkbookPageModel.fromPersistence(workbookPage, () => null);
 
   const body = model.body.content.toArray();
 

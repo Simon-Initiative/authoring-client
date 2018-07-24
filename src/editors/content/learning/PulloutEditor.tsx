@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
-import { Select } from '../common/controls';
+import { Select } from 'editors/content/common/controls';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { Maybe } from 'tsmonad';

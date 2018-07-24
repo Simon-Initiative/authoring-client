@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Hotspot } from './hotspot';
 import createGuid from '../../../../utils/guid';
-import { augment, getChildren } from '../../common';
+import { augment, getChildren, setId, ensureIdGuidPresent } from '../../common';
 import { getKey } from '../../../common';
 
 export type ImageHotspotParams = {
@@ -43,23 +43,24 @@ export class ImageHotspot extends Immutable.Record(defaultContent) {
   }
 
   clone() : ImageHotspot {
-    return this.with({
-      id: createGuid(),
-      hotspots: this.hotspots.map(c => c.clone()).toOrderedMap(),
-    });
+    return ensureIdGuidPresent(this.with({
+      hotspots: this.hotspots.mapEntries(([_, v]) => {
+        const clone: Hotspot = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Hotspot>,
+    }));
   }
 
   with(values: ImageHotspotParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : ImageHotspot {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : ImageHotspot {
     const q = (json as any).image_hotspot;
     let model = new ImageHotspot({ guid });
 
-    if (q['@id'] !== undefined) {
-      model = model.with({ id: q['@id'] });
-    }
+    model = setId(model, q, notify);
+
     if (q['@src'] !== undefined) {
       model = model.with({ src: q['@src'] });
     }
@@ -80,7 +81,7 @@ export class ImageHotspot extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'hotspot':
           model = model.with({
-            hotspots: model.hotspots.set(id, Hotspot.fromPersistence(item, id)) });
+            hotspots: model.hotspots.set(id, Hotspot.fromPersistence(item, id, notify)) });
           break;
         default:
       }

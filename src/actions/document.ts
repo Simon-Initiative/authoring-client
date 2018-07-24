@@ -2,11 +2,11 @@ import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 import * as contentTypes from 'data/contentTypes';
 import { EditedDocument } from 'types/document';
-import { courseChanged, updateCourseResources } from './course';
+import { courseChanged, updateCourseResources } from 'actions/course';
 import { Resource } from 'data/content/resource';
 import * as models from 'data/models';
 import * as Messages from 'types/messages';
-import { showMessage, dismissScopedMessages, dismissSpecificMessage } from './messages';
+import { showMessage, dismissScopedMessages, dismissSpecificMessage } from 'actions/messages';
 import { lookUpByName } from 'editors/manager/registry';
 import { buildPersistenceFailureMessage } from 'utils/error';
 import { buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
@@ -233,9 +233,12 @@ export function load(courseId: string, documentId: string) {
 
     const userName = getState().user.profile.username;
 
+    const holder = { changeMade: false };
+    const notifyChangeMade = () => holder.changeMade = true;
+
     dispatch(documentRequested(documentId));
 
-    return persistence.retrieveDocument(courseId, documentId)
+    return persistence.retrieveDocument(courseId, documentId, notifyChangeMade)
       .then((document) => {
 
         // Notify that the course has changed when a user views a course
@@ -263,6 +266,9 @@ export function load(courseId: string, documentId: string) {
               execute: () => this.fetchDocument(this.props.course.guid, this.props.documentId)});
             dispatch(showMessage(message));
           } else {
+            if (holder.changeMade) {
+              strategy.save(document);
+            }
             dispatch(dismissScopedMessages(Messages.Scope.Resource));
           }
 

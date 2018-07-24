@@ -1,24 +1,70 @@
 import * as Immutable from 'immutable';
 import { Custom } from 'data/content/assessment/custom';
 import { convert } from 'utils/format';
-import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
+import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { Question, Part, Choice, Response,
   FillInTheBlank } from 'data/contentTypes';
-import { Target } from 'data/content/assessment/dragdrop/target';
-import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { Feedback } from 'data/content/assessment/feedback';
+import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
+import { Cell } from 'data/content/assessment/dragdrop/htmlLayout/table/cell';
+import { Row } from 'data/content/assessment/dragdrop/htmlLayout/table/row';
 
-export const choiceAssessmentIdSort = (a: Choice, b: Choice) =>
-  a.value.localeCompare(b.value);
+export const sortTargetsByRowColumn = (
+  layout: HTMLLayout,
+) => {
+  switch (layout.targetArea.contentType) {
+    case 'DndTableTargetArea':
+      return layout.targetArea.rows.reduce(
+        (accRow, row: Row) => accRow.concat(
+          row.cells.reduce(
+            (accCell, cell) => cell.target.caseOf({
+              just: target => accCell.push(target),
+              nothing: () => accCell,
+            }),
+            Immutable.List<string>(),
+          ),
+        ).toList(),
+        Immutable.List<string>(),
+      );
+    default:
+      throw Error(`layout type ${layout.targetArea.contentType} not supported`);
+  }
+};
 
-export const responseAssessmentIdSort = (a: Response, b: Response) =>
-  a.match.localeCompare(b.match);
+export const sortChoicesByLayout = (
+  choices: Immutable.OrderedMap<string, Choice>,
+  layout: HTMLLayout,
+) => {
+  const sortedTargets = sortTargetsByRowColumn(layout);
 
-export const targetAssessmentIdSort = (a: Target, b: Target) =>
-  a.assessmentId.localeCompare(b.assessmentId);
+  const choiceValueMap = choices.reduce(
+    (acc, choice) => acc.set(choice.value, choice),
+    Immutable.OrderedMap<string, Choice>(),
+  );
 
-export const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => {
+  return sortedTargets.map(target => choiceValueMap.get(target)).toArray();
+};
+
+export const sortResponsesByChoice = (
+  responses: Immutable.OrderedMap<string, Response>,
+  choices: Choice[],
+) => {
+  const responseMatchMap = responses.reduce(
+    (acc, response) => acc.set(response.match, response),
+    Immutable.OrderedMap<string, Response>(),
+  );
+
+  return choices.map(choice => responseMatchMap.get(choice.value));
+};
+
+
+export const targetAssessmentIdSort = (a: Cell, b: Cell) =>
+  // parameters must always be targets. If they arent, just throw an error
+  a.target.valueOrThrow().localeCompare(b.target.valueOrThrow());
+
+export const buildTargetLabelsMap = (
+  question: Question, selectedInitiator: string, layout: HTMLLayout) => {
   const currentItem = question.items.toArray().find(
     (item: FillInTheBlank) => item.id === selectedInitiator) as FillInTheBlank;
 
@@ -26,7 +72,7 @@ export const buildTargetLabelsMap = (question: Question, selectedInitiator: stri
     return {};
   }
 
-  return currentItem.choices.sort(choiceAssessmentIdSort).toArray().reduce(
+  return sortChoicesByLayout(currentItem.choices, layout).reduce(
     (acc, choice: Choice, index) => ({
       ...acc,
       [choice.value]:
@@ -40,9 +86,9 @@ export const buildInitiatorPartMap =
   (question: Question, initiators: Immutable.List<InitiatorModel>) => {
     return initiators.reduce(
       (acc, val) =>
-        acc.set(val.assessmentId, question.parts.find(part =>
+        acc.set(val.inputVal, question.parts.find(part =>
           part.responses.first() &&
-          part.responses.first().input === val.assessmentId,
+          part.responses.first().input === val.inputVal,
         )),
       Immutable.Map<string, Part>(),
     );
@@ -56,7 +102,7 @@ export const buildTargetInitiatorsMap =
       (acc, initiator) => {
         return {
           ...acc,
-          [initiator.assessmentId]: initiator,
+          [initiator.inputVal]: initiator,
         };
       },
       {},
@@ -69,7 +115,7 @@ export const buildTargetInitiatorsMap =
       (accParts, part) => ({
         ...accParts,
         ...part.responses.reduce(
-          (accResponses, response) => (+response.score > 0)
+          (accResponses, response) => (+response.score > 0) && initiatorsMap[response.input]
             ? ({
               ...accResponses,
               [response.match]:
@@ -88,7 +134,7 @@ export const setQuestionPartWithInitiatorScore = (
   model: Custom, question: Question) => {
 
   const initiators = model.layoutData.caseOf({
-    just: ld => ld.initiatorGroup.initiators,
+    just: ld => (ld as HTMLLayout).initiators,
     nothing: () => Immutable.List<InitiatorModel>(),
   });
 
@@ -97,13 +143,13 @@ export const setQuestionPartWithInitiatorScore = (
 
   const initiatorParts = buildInitiatorPartMap(question, initiators);
 
-  const updatedResponse = initiatorParts.get(initiator.assessmentId).responses.find(response =>
+  const updatedResponse = initiatorParts.get(initiator.inputVal).responses.find(response =>
     response.match === targetAssessmentId)
     .with({
       score: `${score}`,
     });
 
-  const updatedPart = initiatorParts.get(initiator.assessmentId).withMutations((part: Part) =>
+  const updatedPart = initiatorParts.get(initiator.inputVal).withMutations((part: Part) =>
     part.with({
       responses: part.responses.set(updatedResponse.guid, updatedResponse),
     }),
@@ -114,38 +160,52 @@ export const setQuestionPartWithInitiatorScore = (
   });
 };
 
-export const getTargetsFromLayout = (dndLayout: DndLayout) => {
-  return dndLayout.targetGroup.rows.reduce(
-    (accRows, row) =>
-      accRows.concat(row.cols.toArray().reduce(
-        (accCols, col) => col.contentType === 'Target' ? accCols.push(col) : accCols,
-        Immutable.List<Target>(),
-      )) as Immutable.List<Target>,
-    Immutable.List<Target>(),
-  );
+export const getTargetsFromLayout = (layout: HTMLLayout) => {
+  switch (layout.targetArea.contentType) {
+    case 'DndTableTargetArea':
+      return layout.targetArea.rows.reduce(
+        (accRows, row) =>
+          accRows.concat(row.cells.reduce(
+            (accCells, cell) => cell.target.caseOf({
+              just: () => accCells.push(cell),
+              nothing: () => accCells,
+            }),
+            Immutable.List<Cell>(),
+          ),
+        ).toList(),
+        Immutable.List<Cell>(),
+      );
+    default:
+      throw Error(`Layout targetArea "${layout.targetArea.contentType}" is not supported`);
+  }
 };
 
+/**
+ * This function expects targetCells to be a list of targets.
+ * If there are any cells that are not targets, this function will
+ * throw an error.
+ */
 export const updateItemPartsFromTargets = (
   items: Immutable.OrderedMap<string, FillInTheBlank>,
   parts: Immutable.OrderedMap<string, Part>,
-  targets: Immutable.List<Target>,
+  targetCells: Immutable.List<Cell>,
   ) => {
   // sort targets to ensure consistent ordering
-  const sortedTargets = targets.sort(targetAssessmentIdSort);
+  const sortedTargetCells = targetCells.sort(targetAssessmentIdSort);
 
   // compute updated parts based on targets
   const updatedParts = parts.reduce(
     (accParts, part) => accParts.set(part.guid, part.with({
-      responses: sortedTargets.reduce(
-        (accResponses, target) => {
+      responses: sortedTargetCells.reduce(
+        (accResponses, targetCell) => {
           const input = part.responses.first() && part.responses.first().input;
           const f = new Feedback();
 
           // find existing response with assessmentId or create a new one
           const response = part.responses.find(r =>
-            r.match === target.assessmentId) || new Response().with({
+            r.match === targetCell.target.valueOrThrow()) || new Response().with({
               input,
-              match: target.assessmentId,
+              match: targetCell.target.valueOrThrow(),
               feedback: Immutable.OrderedMap<string, Feedback>().set(f.guid, f),
             });
 
@@ -159,11 +219,11 @@ export const updateItemPartsFromTargets = (
 
   const updatedItems = items.reduce(
     (accItems, item) => accItems.set(item.guid, item.with({
-      choices: sortedTargets.reduce(
-        (accChoices, target) => {
+      choices: sortedTargetCells.reduce(
+        (accChoices, targetCell) => {
           const choice = item.choices.find(c =>
-            c.value === target.assessmentId) || new Choice().with({
-              value: target.assessmentId,
+            c.value === targetCell.target.valueOrThrow()) || new Choice().with({
+              value: targetCell.target.valueOrThrow(),
               body: new ContentElements().with({
                 supportedElements: Immutable.List(FLOW_ELEMENTS) }),
             });
@@ -180,4 +240,28 @@ export const updateItemPartsFromTargets = (
     items: updatedItems,
     parts: updatedParts,
   };
+};
+
+export const updateHTMLLayoutTargetRefs = (
+  targetValMap: { [oldValue: string]: string },
+  initiatorInputMap: { [oldValue: string]: string },
+  layout: HTMLLayout,
+  ) => {
+  switch (layout.targetArea.contentType) {
+    case 'DndTableTargetArea':
+      return layout.with({
+        targetArea: layout.targetArea.with({
+          rows: layout.targetArea.rows.map(row => row.with({
+            cells: row.cells.map(cell => cell.with({
+              target: cell.target.lift(target => targetValMap[target]),
+            })).toList(),
+          })).toList(),
+        }),
+        initiators: layout.initiators.map(initiator =>
+          initiator.with({ inputVal: initiatorInputMap[initiator.inputVal] }),
+        ).toList(),
+      });
+    default:
+      throw Error(`Layout targetArea "${layout.targetArea.contentType}" is not supported`);
+  }
 };

@@ -1,20 +1,20 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import guid from '../../../utils/guid';
+import * as contentTypes from 'data/contentTypes';
+import guid from 'utils/guid';
 import { ContentElements } from 'data/content/common/elements';
 import { QUESTION_BODY_ELEMENTS, ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
-import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
-import { InitiatorGroup } from 'data/content/assessment/dragdrop/initiator_group';
-import { TargetGroup } from 'data/content/assessment/dragdrop/target_group';
 import { Maybe } from 'tsmonad';
-import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
-import { DndText } from 'data/content/assessment/dragdrop/dnd_text';
-import { Target } from 'data/content/assessment/dragdrop/target';
-import { Initiator } from 'data/content/assessment/dragdrop/initiator';
+import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import {
   getTargetsFromLayout, updateItemPartsFromTargets,
 } from 'editors/content/learning/dynadragdrop/utils';
+import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
+import {
+  TableTargetArea,
+} from 'data/content/assessment/dragdrop/htmlLayout/table/table_targetarea';
+import { Row } from 'data/content/assessment/dragdrop/htmlLayout/table/row';
+import { Cell } from 'data/content/assessment/dragdrop/htmlLayout/table/cell';
 
 const defaultInputBody = () => ContentElements.fromText
   ('Add numeric, text, or dropdown components', '', QUESTION_BODY_ELEMENTS);
@@ -190,39 +190,51 @@ export class AddQuestion
   }
 
   onAddDragDrop() {
-    const inputAssessmentId = guid();
+    const inputVal = guid();
 
-    const newDndLayout = new DndLayout().with({
-      initiatorGroup: new InitiatorGroup().with({
-        initiators: Immutable.List<Initiator>().push(new Initiator().with({
-          assessmentId: inputAssessmentId,
-          text: 'New Choice',
-        })),
-      }),
-      targetGroup: new TargetGroup().with({
-        rows: [new ContentRow(), new ContentRow(), new ContentRow()].reduce(
+    const newDndLayout = new HTMLLayout().with({
+      initiators: Immutable.List<Initiator>().push(new Initiator().with({
+        inputVal,
+        text: 'New Choice',
+      })),
+      targetArea: new TableTargetArea().with({
+        rows: Immutable.List<Row>([new Row().with({
+            isHeader: true,
+            cells: Immutable.List<Cell>([
+              new Cell().with({
+                text: 'Header 1',
+              }),
+              new Cell().with({
+                text: 'Header 2',
+              }),
+              new Cell().with({
+                text: 'Header 3',
+              }),
+            ]),
+          })])
+          .concat([new Row(), new Row(), new Row()].reduce(
           (accRows, newRow) => accRows.push(newRow.with({
-            cols: [new Target(), new DndText(), new DndText()].reduce(
-              (accCol, newCol) => accCol.push(
-                newCol.contentType === 'DndText'
-                  ? newCol.with({
-                    text: 'Enter text or set as drop target',
-                  })
-                  : newCol.with({
-                    assessmentId: guid(),
-                  })),
-              Immutable.List<DndText | Target>(),
-            ),
+            cells: Immutable.List<Cell>([
+              new Cell().with({
+                target: Maybe.just(guid()),
+              }),
+              new Cell().with({
+                text: 'Enter text or set as drop target',
+              }),
+              new Cell().with({
+                text: 'Enter text or set as drop target',
+              }),
+            ]),
           })),
-          Immutable.List<ContentRow>(),
-        ),
+          Immutable.List<Row>(),
+        )).toList(),
       }),
     });
 
     const newCustom = new contentTypes.Custom().with({
       id: guid(),
       layout: '',
-      layoutData: Maybe.just<DndLayout>(newDndLayout),
+      layoutData: Maybe.just<HTMLLayout>(newDndLayout),
       src: 'DynaDrop.js',
     });
 
@@ -242,7 +254,7 @@ export class AddQuestion
     const newChoices = Immutable.OrderedMap<string, contentTypes.Choice>()
       .set(newChoice.guid, newChoice);
     const newFillInTheBlank = new contentTypes.FillInTheBlank().with({
-      id: inputAssessmentId,
+      id: inputVal,
       choices: newChoices,
     });
     const newItems = Immutable.OrderedMap<string, contentTypes.FillInTheBlank>()
@@ -256,7 +268,7 @@ export class AddQuestion
       .set(newFeedback.guid, newFeedback);
     const newResponse = new contentTypes.Response({
       match: matchValue,
-      input: inputAssessmentId,
+      input: inputVal,
       score: '0',
       feedback: newFeedbacks,
     });

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ViewActions } from '../actions/view';
+import { ViewActions } from 'actions/view';
 import { CourseModel } from 'data/models';
 import { UserState } from 'reducers/user';
 import { Maybe } from 'tsmonad';

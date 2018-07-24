@@ -2,13 +2,13 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { insertNode, removeNode } from 'data/utils/tree';
-import { isSameNode } from './utils';
+import { isSameNode } from 'editors/common/tree/utils';
 
-import { buildRenderer as buildDivRenderer } from './types/div';
+import { buildRenderer as buildDivRenderer } from 'editors/common/tree/types/div';
 
-import * as Types from './types';
+import * as Types from 'editors/common/tree/types';
 
-import { renderVisibleNodes } from './render';
+import { renderVisibleNodes } from 'editors/common/tree/render';
 
 
 export interface TreeProps<NodeType extends Types.HasGuid> {
