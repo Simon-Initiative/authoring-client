@@ -233,7 +233,6 @@ const validXrefTargets = {
   conjugate: 'Conjugate',
   conjugation: 'Conjugation',
   definition: 'Definition',
-  dialog: 'Dialog',
   director: 'Director',
   example: 'Example',
   extra: 'Extra',

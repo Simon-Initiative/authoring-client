@@ -15,7 +15,6 @@ import { MediaItem } from 'data/contentTypes';
 
 export type DialogParams = {
   guid?: string,
-  id?: string,
   title?: Title,
   media?: Maybe<MediaItem>,
   speakers?: Immutable.OrderedMap<string, Speaker>,
@@ -26,7 +25,6 @@ const defaultContent = {
   contentType: 'Dialog',
   elementType: 'dialog',
   guid: '',
-  id: '',
   title: Title.fromText('Dialog Title'),
   media: Maybe.nothing<MediaItem>(),
   speakers: Immutable.OrderedMap<string, Speaker>(),
@@ -66,14 +64,13 @@ export class Dialog extends Immutable.Record(defaultContent) {
   contentType: 'Dialog';
   elementType: 'dialog';
   guid: string;
-  id: string;
   title: Title;
   media: Maybe<MediaItem>;
   speakers: Immutable.OrderedMap<string, Speaker>;
   lines: Immutable.OrderedMap<string, Line>;
 
   constructor(params?: DialogParams) {
-    super(augment(params, true));
+    super(augment(params));
   }
 
   with(values: DialogParams) {
@@ -99,8 +96,6 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
     const m = (root as any).dialog;
     let model = new Dialog().with({ guid });
-
-    model = setId(model, m, notify);
 
     if (m['@title'] !== undefined) {
       model = model.with({ title: m['@title'] });
@@ -165,7 +160,6 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
     const m = {
       dialog: {
-        '@id': this.id ? this.id : createGuid(),
         '#array': [
           this.title.toPersistence(),
           ...media,
