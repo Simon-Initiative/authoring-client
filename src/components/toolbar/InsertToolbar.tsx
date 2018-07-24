@@ -221,7 +221,7 @@ export class InsertToolbar
               size={ToolbarButtonSize.Wide}
               onClick={() => onInsert(contentTypes.ContiguousText.fromText('', guid()))}
               disabled={!parentSupportsElementType('p')}>
-              {getContentIcon(insertableContentTypes.ContiguousText)}
+              {getContentIcon(insertableContentTypes.ContiguousText)} Text
             </ToolbarButton>
             <ToolbarWideMenu
               icon={getContentIcon(insertableContentTypes.Table)}

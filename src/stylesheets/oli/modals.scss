@@ -1,5 +1,17 @@
+@import 'oli/colors';
+
 .modal-dialog {
   &.modal-xlg {
     max-width: 1000px;
+  }
+
+  button.close {
+    &:focus {
+      outline: none;
+    }
+
+    &:active {
+      color: $remove;
+    }
   }
 }
