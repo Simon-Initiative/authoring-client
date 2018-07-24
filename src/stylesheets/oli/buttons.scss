@@ -46,11 +46,18 @@
 	}
 
 	&.btn-secondary.dropdown-toggle, .btn-secondary.active, .btn-secondary:active, .show > .btn-secondary.dropdown-toggle {
-		color: $blue;
+		color: $primary;
 		font-weight: 500;
 		font-size: 0.9rem;
 		background-color: transparent;
 		border: none;
+		text-decoration: unset;
+
+		&:hover, &:hover:not([disabled]) {
+			background-color: transparent;
+			color: $primary;
+		}
+
 	}
 
 	&.btn-cancel, &.btn-danger, &.btn-remove {
