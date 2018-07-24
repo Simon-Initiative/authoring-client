@@ -1,2 +1,2 @@
 /** useful for creating strings */
-let strEl = ReasonReact.stringToElement;
+let strEl = ReasonReact.string;

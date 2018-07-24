@@ -68,7 +68,7 @@
     "xml-beautifier": "^0.3.0"
   },
   "devDependencies": {
-    "bs-platform": "^3.1.4",
+    "bs-platform": "^4.0.1",
     "chokidar-cli": "^1.2.0",
     "del-cli": "^1.1.0",
     "jasmine": "^2.5.3",
