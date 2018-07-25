@@ -75,7 +75,7 @@ export class Choice extends Immutable.Record(defaultContent) {
     });
   }
 
-  static fromPersistence(root: Object, guid: string) {
+  static fromPersistence(root: Object, guid: string, notify: () => void) {
 
     const choice = (root as any).choice;
     let model = new Choice({ guid });
@@ -84,7 +84,7 @@ export class Choice extends Immutable.Record(defaultContent) {
       choice['#text'] = choice['@value'];
     }
 
-    const body = ContentElements.fromPersistence(choice, '', FLOW_ELEMENTS);
+    const body = ContentElements.fromPersistence(choice, '', FLOW_ELEMENTS, null, notify);
     model = model.with({ body });
 
     if (choice['@value'] !== undefined) {

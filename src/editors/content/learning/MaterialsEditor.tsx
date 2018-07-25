@@ -9,7 +9,8 @@ import {
 import MaterialEditor from './MaterialEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
 import { MATERIAL_ELEMENTS } from 'data/content/common/elements';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 
@@ -53,7 +54,7 @@ export default class MaterialsEditor
     return (
       <ToolbarGroup label="Horizontal Layout" columns={3} highlightColor={CONTENT_COLORS.Materials}>
         <ToolbarButton onClick={this.addColumn.bind(this)} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-columns"></i></div>
+          <div>{getContentIcon(insertableContentTypes.Materials)}</div>
           <div>Add Column</div>
         </ToolbarButton>
       </ToolbarGroup>

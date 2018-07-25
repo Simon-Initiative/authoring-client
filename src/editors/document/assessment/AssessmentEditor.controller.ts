@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
-import AssessmentEditor from './AssessmentEditor';
+import AssessmentEditor from 'editors/document/assessment/AssessmentEditor';
 import * as contentTypes from 'data/contentTypes';
 import { State } from 'reducers';
 import { fetchSkills } from 'actions/skills';
 import { setCurrentNode } from 'actions/document';
-import { AbstractEditorProps } from '../common/AbstractEditor';
+import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
 import { AssessmentModel, CourseModel } from 'data/models';
 import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';
@@ -12,6 +12,7 @@ import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
   activeContext: any;
@@ -58,11 +59,11 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onFetchSkills: (courseId: string) => {
       return dispatch(fetchSkills(courseId));
     },
-    onUpdateContent: (documentId: string, content: Object) => {
+    onUpdateContent: (documentId: string, content: ContentElement) => {
       return dispatch(activeActions.updateContent(documentId, content));
     },
     onUpdateContentSelection: (
-      documentId: string, content: Object,
+      documentId: string, content: ContentElement,
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));

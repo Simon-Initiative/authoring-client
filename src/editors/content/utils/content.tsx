@@ -22,6 +22,9 @@ export const CONTENT_COLORS = {
   ContiguousText: flatui.orange,
   Custom: colors.pureApple,
   Definition: flatui.orange,
+  Dd: flatui.orange,
+  Dl: flatui.orange,
+  Dt: flatui.orange,
   Dialog: distinct.distinctTeal,
   Director: flatui.greenSea,
   Example: flatui.turquoise,
@@ -55,56 +58,70 @@ export const CONTENT_COLORS = {
   YouTube: colors.youtubeRed,
 };
 
-export const CONTENT_ICONS = {
-  Activity: <i className={'fa fa-flask'} />,
-  Alternative: <i className={'fa fa-cog'} />,
-  Alternatives: <i className={'fa fa-cogs'} />,
-  Applet: <i className={'fa fa-coffee'} />,
-  Audio: <i className={'fa fa-volume-up'} />,
-  BlockCode: <i className={'fa fa-code'} />,
-  BlockFormula: <i className="unicode-icon">∑</i>,
-  BlockQuote: <i className={'fa fa-quote-right'} />,
-  CellData: <i className={'fa fa-table'} />,
-  CellHeader: <i className={'fa fa-table'} />,
-  CodeBlock: <i className={'fa fa-code'} />,
-  Composite: <i className={'fa fa-clone'} />,
-  Conjugate: <i className={'fa fa-language'} />,
-  Conjugation: <i className={'fa fa-language'} />,
-  ContiguousText: <i className="unicode-icon">T</i>,
-  Custom: <i className={'fa fa-keyboard-o'} />,
-  Definition: <i className={'fa fa-book'} />,
-  Dialog: <i className={'fa fa-comments'} />,
-  Director: <i className={'fa fa-compass'} />,
-  Example: <i className={'fa fa-bar-chart'} />,
-  Figure: <i className={'fa fa-address-card'} />,
-  Flash: <i className={'fa fa-bolt'} />,
-  Hint: <i className={'fa fa-hand-o-left'} />,
-  IFrame: <i className={'fa fa-window-maximize'} />,
-  Image: <i className={'fa fa-image'} />,
-  Instructions: <i className={'fa fa-file-text'} />,
-  Li: <i className={'fa fa-list'} />,
-  Line: <i className={'fa fa-comments'} />,
-  Materials: <i className={'fa fa-columns'} />,
-  Mathematica: <i className="unicode-icon">∫</i>,
-  Meaning: <i className={'fa fa-comment'} />,
-  Ol: <i className={'fa fa-list-ol'} />,
-  Panopto: <i className={'fa fa-video-camera'} />,
-  Param: <i className={'fa fa-sticky-note-o'} />,
-  Pronunciation: <i className={'fa fa-headphones'} />,
-  Pullout: <i className={'fa fa-external-link-square'} />,
-  Section: <i className={'fa fa-list-alt'} />,
-  Speaker: <i className={'fa fa-comments'} />,
-  Sym: <i className={'fa fa-sun-o'} />,
-  Table: <i className={'fa fa-table'} />,
-  Translation: <i className={'fa fa-globe'} />,
-  Ul: <i className={'fa fa-list-ul'} />,
-  Unity: <i className={'fa fa-gamepad'} />,
-  Video: <i className={'fa fa-film'} />,
-  WbInline: <i className={'fa fa-check'} />,
-  YouTube: <i className={'fa fa-youtube'} />,
-};
-
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
 
-export const getContentIcon = (type: string) => CONTENT_ICONS[type]
-  || <i className={'fa fa-question'} />;
+export enum insertableContentTypes {
+  Activity, Alternative, Alternatives, Applet, Audio, BlockCode, BlockFormula,
+  BlockQuote, CellData, CellHeader, CodeBlock, Composite, Conjugate, Conjugation,
+  ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, Figure,
+  Flash, Hint, IFrame, Image, Instructions, Li, Line, Materials, Math, Mathematica, Meaning,
+  Ol, Panopto, Param, Pronunciation, Pullout, Section, Speaker, Sym, Table, Translation,
+  Ul, Unity, Video, WbInline, YouTube,
+}
+
+const i = insertableContentTypes;
+
+export const getContentIcon = (type: insertableContentTypes, style?: React.CSSProperties) => {
+  switch (type) {
+    case i.Activity: return <i style={style} className={'fa fa-check'} />;
+    case i.Alternative: return <i style={style} className={'fa fa-plus-square-o'} />;
+    case i.Alternatives: return <i style={style} className={'fa fa-plus-square'} />;
+    case i.Applet: return <i style={style} className={'fa fa-coffee'} />;
+    case i.Audio: return <i style={style} className={'fa fa-volume-up'} />;
+    case i.BlockCode: return <i style={style} className={'fa fa-code'} />;
+    case i.BlockFormula: return <i style={style} className="unicode-icon">∑</i>;
+    case i.BlockQuote: return <i style={style} className={'fa fa-quote-right'} />;
+    case i.CellData: return <i style={style} className={'fa fa-table'} />;
+    case i.CellHeader: return <i style={style} className={'fa fa-table'} />;
+    case i.CodeBlock: return <i style={style} className={'fa fa-code'} />;
+    case i.Composite: return <i style={style} className={'fa fa-clone'} />;
+    case i.Conjugate: return <i style={style} className={'fa fa-language'} />;
+    case i.Conjugation: return <i style={style} className={'fa fa-language'} />;
+    case i.ContiguousText: return <i style={style} className="unicode-icon">T</i>;
+    case i.Custom: return <i style={style} className={'fa fa-keyboard-o'} />;
+    case i.Dd: return <i style={style} className={'fa fa-book'} />;
+    case i.Dl: return <i style={style} className={'fa fa-book'} />;
+    case i.Dt: return <i style={style} className={'fa fa-book'} />;
+    case i.Dialog: return <i style={style} className={'fa fa-comments'} />;
+    case i.Director: return <i style={style} className={'fa fa-compass'} />;
+    case i.Example: return <i style={style} className={'fa fa-bar-chart'} />;
+    case i.Figure: return <i style={style} className={'fa fa-address-card'} />;
+    case i.Flash: return <i style={style} className={'fa fa-bolt'} />;
+    case i.Hint: return <i style={style} className={'fa fa-hand-o-right'} />;
+    case i.IFrame: return <i style={style} className={'fa fa-window-maximize'} />;
+    case i.Image: return <i style={style} className={'fa fa-image'} />;
+    case i.Instructions: return <i style={style} className={'fa fa-file-text'} />;
+    case i.Li: return <i style={style} className={'fa fa-list'} />;
+    case i.Line: return <i style={style} className={'fa fa-comments'} />;
+    case i.Materials: return <i style={style} className={'fa fa-columns'} />;
+    case i.Math: return <i style={style} className={'fa fa-etsy'} />;
+    case i.Mathematica: return <i style={style} className="unicode-icon">∫</i>;
+    case i.Meaning: return <i style={style} className={'fa fa-comment'} />;
+    case i.Ol: return <i style={style} className={'fa fa-list-ol'} />;
+    case i.Panopto: return <i style={style} className={'fa fa-video-camera'} />;
+    case i.Param: return <i style={style} className={'fa fa-sticky-note-o'} />;
+    case i.Pronunciation: return <i style={style} className={'fa fa-headphones'} />;
+    case i.Pullout: return <i style={style} className={'fa fa-external-link-square'} />;
+    case i.Section: return <i style={style} className={'fa fa-list-alt'} />;
+    case i.Speaker: return <i style={style} className={'fa fa-comments'} />;
+    case i.Sym: return <i style={style} className={'fa fa-sun-o'} />;
+    case i.Table: return <i style={style} className={'fa fa-table'} />;
+    case i.Translation: return <i style={style} className={'fa fa-globe'} />;
+    case i.Ul: return <i style={style} className={'fa fa-list-ul'} />;
+    case i.Unity: return <i style={style} className={'fa fa-gamepad'} />;
+    case i.Video: return <i style={style} className={'fa fa-film'} />;
+    case i.WbInline: return <i style={style} className={'fa fa-flask'} />;
+    case i.YouTube: return <i style={style} className={'fa fa-youtube'} />;
+    default: return <i style={style} className={'fa fa-question'} />;
+  }
+};

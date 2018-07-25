@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { Select } from '../common/Select';
+import { Select } from 'editors/content/common/Select';
 import { PurposeTypes } from 'data/content/learning/common';
 import { LegacyTypes } from 'data/types';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -12,7 +14,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { injectSheet } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 
-import { styles } from './Activity.styles';
+import { styles } from 'editors/content/learning/Activity.styles';
 import { ResourceState } from 'data/content/resource';
 
 export interface ActivityEditorProps extends AbstractContentEditorProps<contentTypes.Activity> {

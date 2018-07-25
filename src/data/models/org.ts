@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable';
-import * as contentTypes from '../contentTypes';
-import guid from '../../utils/guid';
+import * as contentTypes from 'data/contentTypes';
+import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
-import { getKey } from '../common';
-
-import { LegacyTypes } from '../types';
+import { getKey } from 'data/common';
+import { LegacyTypes } from 'data/types';
+import { setId } from 'data/content/common';
 
 export type OrganizationModelParams = {
   resource?: contentTypes.Resource,
@@ -70,7 +70,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object): OrganizationModel {
+  static fromPersistence(json: Object, notify: () => void): OrganizationModel {
 
     let model = new OrganizationModel();
 
@@ -92,9 +92,8 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       org = a.doc.organization;
     }
 
-    if (org['@id'] !== undefined) {
-      model = model.with({ id: org['@id'] });
-    }
+    model = setId(model, a, notify);
+
     if (org['@version'] !== undefined) {
       model = model.with({ version: org['@version'] });
     }
@@ -142,7 +141,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   }
 
   toPersistence(): Object {
-    const children : Object[] = [
+    const children: Object[] = [
       { title: { '#text': this.title } },
       { description: { '#text': this.description } }];
 

@@ -1,9 +1,9 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Title } from './title';
-import { Li } from './li';
-import { augment, getChildren } from '../common';
-import { getKey } from './common';
+import { Title } from 'data/content/learning/title';
+import { Li } from 'data/content/learning/li';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
+import { getKey } from 'data/content/learning/common';
 import createGuid from 'utils/guid';
 
 export enum Styles {
@@ -43,24 +43,30 @@ export class Ul extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: UlParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: UlParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Ul {
-    return this.with({
-      listItems: this.listItems.map(d => d.clone().with({ guid: createGuid() })).toOrderedMap(),
-    });
+  clone(): Ul {
+    return ensureIdGuidPresent(this.with({
+      title: this.title.lift(t => t.clone()),
+      listItems: this.listItems.mapEntries(([_, v]) => {
+        const clone: Li = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Li>,
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Ul {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Ul {
 
     const t = (root as any).ul;
 
     let model = new Ul().with({ guid });
+
+    model = setId(model, t, notify);
 
     if (t['@style'] !== undefined) {
       model = model.with({ style: Maybe.just(t['@style']) });
@@ -73,10 +79,12 @@ export class Ul extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'li':
-          model = model.with({ listItems: model.listItems.set(id, Li.fromPersistence(item, id)) });
+          model = model.with({
+            listItems: model.listItems.set(id, Li.fromPersistence(item, id, notify)),
+          });
           break;
 
         default:
@@ -87,7 +95,7 @@ export class Ul extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [];
     this.title.lift(title => children.push(title.toPersistence()));
@@ -95,7 +103,7 @@ export class Ul extends Immutable.Record(defaultContent) {
 
     const ul = {
       ul: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '#array': children,
       },
     };

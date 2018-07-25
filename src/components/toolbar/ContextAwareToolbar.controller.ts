@@ -1,17 +1,18 @@
 import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
-import { ContextAwareToolbar } from './ContextAwareToolbar';
+import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
 import { createNew } from 'actions/document';
 import { showSidebar } from 'actions/editorSidebar';
-import { ParentContainer } from 'types/active.ts';
+import { ParentContainer } from 'types/active';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
 import { modalActions } from 'actions/modal';
 import { ContentModel } from 'data/models';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
   supportedElements: Immutable.List<string>;
@@ -22,8 +23,8 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onInsert: (content: Object) => void;
-  onEdit: (content: Object) => void;
+  onInsert: (content: ContentElement | ContentElement[]) => void;
+  onEdit: (content: ContentElement) => void;
   onShowSidebar: () => void;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;

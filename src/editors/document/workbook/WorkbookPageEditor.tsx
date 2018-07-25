@@ -1,13 +1,15 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
+import {
+  AbstractEditor, AbstractEditorProps, AbstractEditorState,
+} from 'editors/document/common/AbstractEditor';
 import { Resource } from 'data/content/resource';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
-import { Objectives } from './Objectives';
+import { Objectives } from 'editors/document/workbook/Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';

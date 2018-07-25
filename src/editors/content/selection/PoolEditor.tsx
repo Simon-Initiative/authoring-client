@@ -1,8 +1,10 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { QuestionEditor } from '../question/QuestionEditor';
+import * as contentTypes from 'data/contentTypes';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { QuestionEditor } from 'editors/content/question/QuestionEditor';
 import { Skill } from 'types/course';
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
@@ -104,6 +106,7 @@ export class PoolEditor
     return <QuestionEditor
              key={question.guid}
              {...this.props}
+             isQuestionPool={false}
              model={question}
              onEdit={this.onEditQuestion}
              canRemove={true}

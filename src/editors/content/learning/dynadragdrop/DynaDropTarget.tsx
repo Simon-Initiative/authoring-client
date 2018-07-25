@@ -3,15 +3,15 @@ import { DropTarget } from 'react-dnd';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
 import { DragTypes } from 'utils/drag';
-import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
-import { TargetToggle } from './TargetToggle';
+import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
+import { TargetToggle } from 'editors/content/learning/dynadragdrop/TargetToggle';
 
-import { styles } from './DynaDropTarget.styles';
+import { styles } from 'editors/content/learning/dynadragdrop/DynaDropTarget.styles';
 import { Initiator } from 'editors/content/learning/dynadragdrop/Initiator';
 
 export interface DynaDropTargetProps {
   id: string;
-  assessmentId: string;
+  inputVal: string;
   selectedInitiator: string;
   label: string;
   isHeader?: boolean;
@@ -32,8 +32,8 @@ export interface DynaDropTargetState {
 
 const target = {
   drop(props, monitor) {
-    const { assessmentId, onDrop } = props;
-    onDrop(monitor.getItem().initiator, assessmentId, monitor.getItem().originalTargetId);
+    const { inputVal, onDrop } = props;
+    onDrop(monitor.getItem().initiator, inputVal, monitor.getItem().originalTargetId);
   },
   canDrop(props, monitor) {
     return true;
@@ -61,7 +61,7 @@ export class DynaDropTarget
   }
 
   render() {
-    const { className, classes, id, assessmentId, connectDropTarget, isHeader,
+    const { className, classes, id, inputVal, connectDropTarget, isHeader,
       isHovered, label, initiators, editMode, onRemoveInitiator, selectedInitiator,
       canToggleType, onToggleType } = this.props;
 
@@ -78,10 +78,10 @@ export class DynaDropTarget
             {initiators && initiators.map(initiator => (
               <Initiator
                 key={initiator.guid}
-                targetId={assessmentId}
+                targetId={inputVal}
                 model={initiator} editMode={editMode}
-                selected={initiator.assessmentId === selectedInitiator}
-                onRemove={guid => onRemoveInitiator(guid, assessmentId)} />
+                selected={initiator.inputVal === selectedInitiator}
+                onRemove={guid => onRemoveInitiator(guid, inputVal)} />
             ))}
           </div>
         </div>

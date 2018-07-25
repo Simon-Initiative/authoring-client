@@ -1,17 +1,19 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import { TextInput } from '../../content/common/TextInput';
-import * as models from '../../../data/models';
-import * as contentTypes from '../../../data/contentTypes';
-import { LegacyTypes } from '../../../data/types';
-import guid from '../../../utils/guid';
-import { locateNextOfKin, findNodeByGuid } from './utils';
-import { Collapse } from '../../content/common/Collapse';
-import { AddQuestion } from '../../content/question/AddQuestion';
-import { renderAssessmentNode } from '../common/questions';
-import { getChildren, Outline, setChildren } from './Outline';
+import {
+  AbstractEditor, AbstractEditorProps, AbstractEditorState,
+} from 'editors/document/common/AbstractEditor';
+import { TextInput } from 'editors/content/common/TextInput';
+import * as models from 'data/models';
+import * as contentTypes from 'data/contentTypes';
+import { LegacyTypes } from 'data/types';
+import guid from 'utils/guid';
+import { locateNextOfKin, findNodeByGuid } from 'editors/document/assessment/utils';
+import { Collapse } from 'editors/content/common/Collapse';
+import { AddQuestion } from 'editors/content/question/AddQuestion';
+import { renderAssessmentNode } from 'editors/document/common/questions';
+import { getChildren, Outline, setChildren } from 'editors/document/assessment/Outline';
 import { updateNode, removeNode } from 'data/utils/tree';
 import { hasUnknownSkill } from 'utils/skills';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
@@ -23,7 +25,6 @@ import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
-import createGuid from 'utils/guid';
 
 import './AssessmentEditor.scss';
 import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
@@ -367,7 +368,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <label className="col-3 col-form-label">Recommended attempts:</label>
               <TextInput
                 editMode={this.props.editMode}
-                width="50px"
+                width="100px"
                 label=""
                 type="number"
                 value={this.props.model.recommendedAttempts}
@@ -381,7 +382,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <label className="col-3 col-form-label">Maximum attempts:</label>
               <TextInput
                 editMode={this.props.editMode}
-                width="50px"
+                width="100px"
                 label=""
                 type="number"
                 value={this.props.model.maxAttempts}
@@ -448,9 +449,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onDuplicateQuestion() {
 
     if (this.props.currentNode.contentType === 'Question') {
-      const duplicated = this.props.currentNode.clone().with({
-        guid: createGuid(),
-      });
+      const duplicated = this.props.currentNode.clone();
       this.addNode(duplicated);
     }
   }
@@ -514,7 +513,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                 {renderAssessmentNode(
                   currentNode, assessmentNodeProps, this.onEditNode,
                   this.onNodeRemove, this.onFocus, this.canRemoveNode(),
-                  this.onDuplicateQuestion, this)}
+                  this.onDuplicateQuestion, this, false)}
               </div>
             </div>
           </div>

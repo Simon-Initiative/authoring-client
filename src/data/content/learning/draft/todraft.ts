@@ -413,15 +413,16 @@ function paragraph(item: Object, context: ParsingContext, backingTextProvider: O
 
 }
 
-function extractIdTitle(item: Object) : Object {
+function extractIdTitle(item: any) : Object {
   const data = { id: '', title: '', type: '' };
-  if (item !== undefined && item !== null && item['@id'] !== undefined) {
-    data.id = item['@id'];
+
+  if (item !== undefined && item !== null && item.p && item.p['@id'] !== undefined) {
+    data.id = item.p['@id'];
   } else {
     data.id = guid();
   }
-  if (item !== undefined && item !== null && item['@title'] !== undefined) {
-    data.title = item['@title'];
+  if (item !== undefined && item !== null && item.p && item.p['@title'] !== undefined) {
+    data.title = item.p['@title'];
   }
   return data;
 }

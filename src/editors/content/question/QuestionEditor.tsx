@@ -1,35 +1,31 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
+import * as contentTypes from 'data/contentTypes';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import guid from 'utils/guid';
 import { ContentElements } from 'data/content/common/elements';
-import { MultipleChoice } from './MultipleChoice.controller';
-import { Essay } from './Essay';
-import { CheckAllThatApply } from './CheckAllThatApply.controller';
-import { ImageHotspot } from './ImageHotspot.controller';
-import { ShortAnswer } from './ShortAnswer';
-import { Ordering } from './Ordering.controller';
-import { DynaDropInput } from './DynaDropInput.controller';
-import { MultipartInput } from './MultipartInput.controller';
+import { MultipleChoice } from 'editors/content/question/MultipleChoice.controller';
+import { Essay } from 'editors/content/question/Essay';
+import { CheckAllThatApply } from 'editors/content/question/CheckAllThatApply.controller';
+import { ImageHotspot } from 'editors/content/question/ImageHotspot.controller';
+import { ShortAnswer } from 'editors/content/question/ShortAnswer';
+import { Ordering } from 'editors/content/question/Ordering.controller';
+import { DynaDropInput } from 'editors/content/question/DynaDropInput.controller';
+import { MultipartInput } from 'editors/content/question/MultipartInput.controller';
 import { Skill } from 'types/course';
-import { InsertInputRefCommand } from './commands';
+import { InsertInputRefCommand } from 'editors/content/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
+import { containsDynaDropCustom } from 'editors/content/utils/common';
 
 import './QuestionEditor.scss';
-
-export const containsDynaDropCustom = (modelBody: ContentElements) => modelBody.content.reduce(
-  (acc, val) => {
-    return acc || val.contentType === 'Custom'
-      && val.src.substr(val.src.length - 11) === 'DynaDrop.js';
-  },
-  false,
-);
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   onDuplicate?: () => void;
   isParentAssessmentGraded?: boolean;
+  isQuestionPool: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   canRemove: boolean;
   activeContentGuid: string;
@@ -285,7 +281,7 @@ export class QuestionEditor
       onDuplicate: this.props.onDuplicate,
       onBodyEdit: this.onBodyEdit,
       hideGradingCriteria: !this.props.isParentAssessmentGraded,
-      hideVariables: !this.props.isParentAssessmentGraded,
+      hideVariables: !this.props.isQuestionPool,
       canRemoveQuestion: canRemove,
       onRemoveQuestion: this.props.onRemove.bind(this, this.props.model.guid),
       onEdit: (c, p, src) => this.onItemPartEdit(c, p, src),

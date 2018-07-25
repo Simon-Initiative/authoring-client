@@ -1,16 +1,16 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentState, SelectionState, Modifier, Entity, convertFromHTML } from 'draft-js';
-import { augment } from '../common';
-import { cloneContent } from '../common/clone';
-import { toDraft } from './draft/todraft';
+import { augment, ensureIdGuidPresent } from 'data/content/common';
+import { cloneContent } from 'data/content/common/clone';
+import { toDraft } from 'data/content/learning/draft/todraft';
 import { TextSelection } from 'types/active';
 import {
   getEntities, getAllEntities, removeInputRef as removeInputRefDraft, EntityInfo,
   Changes, detectChanges, removeEntity as internalRemoveEntity,
-} from './draft/changes';
-import { EntityTypes } from '../learning/common';
-import { fromDraft } from './draft/topersistence';
+} from 'data/content/learning/draft/changes';
+import { EntityTypes } from 'data/content/learning/common';
+import { fromDraft } from 'data/content/learning/draft/topersistence';
 import createGuid from 'utils/guid';
 
 const emptyContent = ContentState.createFromText(' ');
@@ -71,8 +71,6 @@ function appendText(contentBlock, contentState, text) {
     text);
 }
 
-
-
 export class ContiguousText extends Immutable.Record(defaultContent) {
 
   contentType: 'ContiguousText';
@@ -96,23 +94,26 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     const updated = entities.reduce((ct: ContiguousText, e) => ct.cloneEntity(e), this);
 
-    return updated.with({
+    return ensureIdGuidPresent(updated.with({
       content: cloneContent(updated.content),
-    });
+    }));
   }
 
   static fromPersistence(
     root: Object[], guid: string, mode = ContiguousTextMode.Regular,
-    backingTextProvider: Object = null) : ContiguousText {
-    return new ContiguousText({ guid, mode,
-      content: toDraft(root, mode === ContiguousTextMode.SimpleText, backingTextProvider) });
+    backingTextProvider: Object = null): ContiguousText {
+    return new ContiguousText({
+      guid,
+      mode,
+      content: toDraft(root, mode === ContiguousTextMode.SimpleText, backingTextProvider),
+    });
   }
 
   static fromText(text: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
     return new ContiguousText({ guid, mode, content: ContentState.createFromText(text) });
   }
 
-  static fromHTML(html: string, guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
+  static fromHTML(html: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
 
     const blocksFromHTML = convertFromHTML(html);
     const content = ContentState.createFromBlockArray(
@@ -125,6 +126,20 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   toPersistence(): Object {
     return fromDraft(this.content, this.mode === ContiguousTextMode.SimpleText);
+  }
+
+  // Return the OLI ID of the first paragraph in the text block
+  getFirstReferenceId(): string | undefined {
+    const firstBlock = this.content.getFirstBlock();
+    if (firstBlock) {
+      return (firstBlock.data as Immutable.Map<string, string>).get('id');
+    }
+    return undefined;
+  }
+
+  getAllReferenceIds(): string[] {
+    return this.content.getBlocksAsArray()
+      .map(block => (block.data as Immutable.Map<string, string>).get('id'));
   }
 
   selectionOverlapsEntity(selection: TextSelection): boolean {
@@ -322,7 +337,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   insertEntity(
     type: string, isMutable: boolean, data: Object,
-    selection: TextSelection, backingText: string) : ContiguousText {
+    selection: TextSelection, backingText: string): ContiguousText {
 
     const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
     const selectionState = selection.getRawSelectionState();

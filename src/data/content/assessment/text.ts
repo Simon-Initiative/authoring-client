@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
-import createGuid from 'utils/guid';
+import { augment, setId, ensureIdGuidPresent } from '../common';
 
 export type TextParams = {
   id? : string,
@@ -38,23 +37,20 @@ export class Text extends Immutable.Record(defaultContent) {
   }
 
   clone() : Text {
-    return this.with({
-      id: createGuid(),
-    });
+    return ensureIdGuidPresent(this);
   }
 
   with(values: TextParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : Text {
+  static fromPersistence(json: Object, guid: string, notify: () => void) : Text {
 
     const n = (json as any).text;
     let model = new Text({ guid });
 
-    if (n['@id'] !== undefined) {
-      model = model.with({ id: n['@id'] });
-    }
+    model = setId(model, n, notify);
+
     if (n['@name'] !== undefined) {
       model = model.with({ name: n['@name'] });
     }

@@ -2,13 +2,13 @@ import * as React from 'react';
 import { DragSource } from 'react-dnd';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
-import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
+import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { DragHandle } from 'components/common/DragHandle';
 import { DragTypes } from 'utils/drag';
 import { Remove } from 'components/common/Remove';
 import { Tooltip } from 'utils/tooltip';
 
-import { styles } from './Initiator.styles';
+import { styles } from 'editors/content/learning/dynadragdrop/Initiator.styles';
 
 export interface InitiatorProps {
   className?: string;
@@ -82,13 +82,7 @@ export class Initiator
         className={classNames(['Initiator', classes.initiator,
           onSelect && classes.selectable,
           selected && classes.selected])}
-        style={{
-          fontWeight: model.fontWeight as any,
-          fontSize: model.fontWeight,
-          fontStyle: model.fontStyle as any,
-          textDecoration: model.textDecoration,
-        }}
-        onClick={() => onSelect && onSelect(model.assessmentId)}>
+        onClick={() => onSelect && onSelect(model.inputVal)}>
         <DragHandle />
 
         {model.text}

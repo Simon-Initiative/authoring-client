@@ -1,5 +1,4 @@
 import * as Immutable from 'immutable';
-
 import { ContentElements } from 'data/content/common/elements';
 import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from './types';
 import { Part } from './part';
@@ -16,12 +15,17 @@ import { Unsupported } from '../unsupported';
 import { Variable } from './variable';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, setId, ensureIdGuidPresent } from '../common';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Changes } from 'data/content/learning/draft/changes';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
 import { EntityTypes } from 'data/content/learning/common';
 import { EntityInfo } from 'data/content/learning/changes';
+import { containsDynaDropCustom } from 'editors/content/utils/common';
+import {
+  updateHTMLLayoutTargetRefs,
+} from 'editors/content/learning/dynadragdrop/utils';
+import { Custom } from 'data/content/assessment/custom';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
@@ -226,13 +230,18 @@ function cloneInputQuestion(question: Question): Question {
   // The approach here is to gust clone the whole thing first, then
   // go back and post-process to make the updates that we need:
 
-  const cloned = question.with({
-    id: createGuid(),
+  const cloned: Question = ensureIdGuidPresent(question.with({
     body: question.body.clone(),
     explanation: question.explanation.clone(),
-    parts: question.parts.map(p => p.clone()).toOrderedMap(),
-    items: question.items.map(i => i.clone()).toOrderedMap(),
-  });
+    parts: question.parts.mapEntries(([_, v]) => {
+      const clone: Part = v.clone();
+      return [clone.guid, clone];
+    }).toOrderedMap() as Immutable.OrderedMap<string, Part>,
+    items: question.items.mapEntries(([_, v]) => {
+      const clone: Item = v.clone();
+      return [clone.guid, clone];
+    }).toOrderedMap() as Immutable.OrderedMap<string, Item>,
+  }));
 
   // Calculate the mapping of old item ids to new item ids
   const itemMap = {};
@@ -270,30 +279,66 @@ function cloneInputQuestion(question: Question): Question {
   });
 }
 
-// This ensures that existing input-based questions (aka Numeric, Text, FillInTheBlank)
-// have the 'input' attribute specified on all the responses. This input attr is
-// required only when there is more than one item in the question - but we have to
-// add it in all cases (in case someone goes and edits to add a second item)
-function ensureInputAttrsExist(question: Question) : Question {
+function cloneDragDropQuestion(question: Question): Question {
+  // Remap existing value ids to newly assigned ones, storing
+  // the mapping in valueMap for later use.
+  const valueMap = {};
+  const inputMap = {};
 
-  let modifiedQuestion = question;
+  // Clone all the choices using first item as a template,
+  // but assign new values and track the mapping of old choice values to new ones
+  const fitb = question.items.first() as FillInTheBlank;
+  const choices = fitb.choices.map((choice) => {
+    const value = createGuid();
+    valueMap[choice.value] = value;
 
-  question.items.toArray().forEach((item, index) => {
+    return choice.clone().with({
+      value,
+    });
+  }).toOrderedMap();
 
-    if (item.contentType === 'Numeric'
-      || item.contentType === 'Text' || item.contentType === 'FillInTheBlank') {
+  const items = question.items.map((item: FillInTheBlank) => {
+    const id = createGuid();
+    inputMap[item.id] = id;
 
-      const originalPart = question.parts.toArray()[index];
-      const responses = originalPart.responses
-        .map(response => response.with({ input: item.id })).toOrderedMap();
-      const part = originalPart.with({ responses });
+    return (item as FillInTheBlank).with({
+      id,
+      choices,
+    });
+  }).toOrderedMap();
 
-      modifiedQuestion = modifiedQuestion.with(
-        { parts: modifiedQuestion.parts.set(part.guid, part) });
-    }
+  // Now clone parts, but post process to update the match and input attributes
+  // of response objects to use the new choice values
+  const initialPartsClone = question.parts.map(p => p.clone()).toOrderedMap();
+  const parts = initialPartsClone.map((part) => {
+    return part.with({
+      responses: part.responses.map((response) => {
+        return response.with({
+          match: valueMap[response.match],
+          input: inputMap[response.input],
+        });
+      }).toOrderedMap(),
+    });
+  }).toOrderedMap();
+
+  const customContent = (question.body.content.find(ce => ce.contentType === 'Custom') as Custom);
+  let clonedCustomContent = customContent.clone();
+
+  // update targetArea targets to use new values
+  clonedCustomContent = clonedCustomContent.with({
+    layoutData: clonedCustomContent.layoutData.lift(ld =>
+      updateHTMLLayoutTargetRefs(valueMap, inputMap, ld)),
   });
 
-  return modifiedQuestion;
+  return question.with({
+    id: createGuid(),
+    body: question.body.with({
+      content: question.body.content.set(customContent.guid, clonedCustomContent),
+    }).clone(),
+    explanation: question.explanation.clone(),
+    parts,
+    items,
+  });
 }
 
 // Cloning a single select multiple choice question requires that
@@ -344,6 +389,32 @@ function cloneMultipleChoiceQuestion(question: Question): Question {
   });
 }
 
+// This ensures that existing input-based questions (aka Numeric, Text, FillInTheBlank)
+// have the 'input' attribute specified on all the responses. This input attr is
+// required only when there is more than one item in the question - but we have to
+// add it in all cases (in case someone goes and edits to add a second item)
+function ensureInputAttrsExist(question: Question) : Question {
+
+  let modifiedQuestion = question;
+
+  question.items.toArray().forEach((item, index) => {
+
+    if (item.contentType === 'Numeric'
+      || item.contentType === 'Text' || item.contentType === 'FillInTheBlank') {
+
+      const originalPart = question.parts.toArray()[index];
+      const responses = originalPart.responses
+        .map(response => response.with({ input: item.id })).toOrderedMap();
+      const part = originalPart.with({ responses });
+
+      modifiedQuestion = modifiedQuestion.with(
+        { parts: modifiedQuestion.parts.set(part.guid, part) });
+    }
+  });
+
+  return modifiedQuestion;
+}
+
 function parseVariables(item: any, model: Question) {
 
   const vars = [];
@@ -351,7 +422,7 @@ function parseVariables(item: any, model: Question) {
   getChildren(item.variables).forEach((root) => {
 
     const id = createGuid();
-    vars.push([id, Variable.fromPersistence(root, id)]);
+    vars.push([id, Variable.fromPersistence(root, id, () => undefined)]);
   });
 
   return model.with({
@@ -386,11 +457,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     // If there isn't a single item, there isn't much
     // to do here at all:
     if (item === undefined) {
-      return this.with({
-        id: createGuid(),
+      return ensureIdGuidPresent(this.with({
         body: this.body.clone(),
         explanation: this.explanation.clone(),
-      });
+      }));
     }
 
     // Otherwise, use first item to determine the
@@ -399,6 +469,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return cloneMultipleChoiceQuestion(this);
     }
+    if (containsDynaDropCustom(this.body)) {
+      return cloneDragDropQuestion(this);
+    }
     if (item.contentType === 'Numeric'
       || item.contentType === 'Text'
       || item.contentType === 'FillInTheBlank') {
@@ -406,13 +479,18 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     }
 
     // All other question types can get by with just a top-down clone:
-    return this.with({
-      id: createGuid(),
+    return ensureIdGuidPresent(this.with({
       body: this.body.clone(),
       explanation: this.explanation.clone(),
-      items: this.items.map(i => i.clone()).toOrderedMap(),
-      parts: this.parts.map(p => p.clone()).toOrderedMap(),
-    });
+      items: this.items.mapEntries(([_, v]) => {
+        const clone: Item = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Item>,
+      parts: this.parts.mapEntries(([_, v]) => {
+        const clone: Part = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Part>,
+    }));
   }
 
   with(values: QuestionParams) {
@@ -438,15 +516,14 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     return ContentElements.fromText('', '', QUESTION_BODY_ELEMENTS);
   }
 
-  static fromPersistence(json: any, guid: string) {
+  static fromPersistence(json: any, guid: string, notify?: () => void) {
 
     let model = new Question({ guid });
 
     const question = json.question;
 
-    if (question['@id'] !== undefined) {
-      model = model.with({ id: question['@id'] });
-    }
+    model = setId(model, question, notify);
+
     if (question['@grading'] !== undefined) {
       model = model.with({ grading: question['@grading'] });
     }
@@ -470,52 +547,68 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           body = item;
           break;
         case 'essay':
-          model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, Essay.fromPersistence(item, id, notify)),
+          });
           break;
         case 'fill_in_the_blank':
-          model = model.with(
-            { items: model.items.set(id, FillInTheBlank.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, FillInTheBlank.fromPersistence(item, id, notify)),
+          });
           break;
-        // We do not yet support image_hotspot:
         case 'image_hotspot':
           model = model.with({
-            items: model.items.set(id, ImageHotspot.fromPersistence(item, id)),
+            items: model.items.set(id, ImageHotspot.fromPersistence(item, id, notify)),
           });
           break;
         case 'multiple_choice':
-          model = model.with(
-            { items: model.items.set(id, MultipleChoice.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, MultipleChoice.fromPersistence(item, id, notify)),
+          });
           break;
         case 'numeric':
-          model = model.with({ items: model.items.set(id, Numeric.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, Numeric.fromPersistence(item, id, notify)),
+          });
           break;
         case 'ordering':
-          model = model.with({ items: model.items.set(id, Ordering.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, Ordering.fromPersistence(item, id, notify)),
+          });
           break;
         case 'part':
-          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });
+          model = model.with({
+            parts: model.parts.set(id, Part.fromPersistence(item, id, notify)),
+          });
           break;
         case 'responses':
           // read weird legacy format where individual response elements are under a
           // 'responses' element instead of a 'part'
           const copy = Object.assign({}, item);
           copy['part'] = copy['responses'];
-          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(copy, id)) });
+          model = model.with({
+            parts: model.parts.set(id, Part.fromPersistence(copy, id, notify)),
+          });
           break;
         case 'explanation':
           model = model.with({
             explanation:
-              ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS),
+              ContentElements.fromPersistence(
+                (item as any).explanation, id, ALT_FLOW_ELEMENTS, null, notify),
           });
           break;
         case 'skillref':
           model = model.with({ skills: model.skills.add((item as any).skillref['@idref']) });
           break;
         case 'short_answer':
-          model = model.with({ items: model.items.set(id, ShortAnswer.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, ShortAnswer.fromPersistence(item, id, notify)),
+          });
           break;
         case 'text':
-          model = model.with({ items: model.items.set(id, Text.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, Text.fromPersistence(item, id, notify)),
+          });
           break;
         default:
 
@@ -527,7 +620,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       const backingTextProvider = buildItemMap(model);
       model = model.with({
         body: ContentElements.fromPersistence(
-          body['body'], createGuid(), QUESTION_BODY_ELEMENTS, backingTextProvider),
+          body['body'], createGuid(), QUESTION_BODY_ELEMENTS, backingTextProvider, notify),
       });
     }
 

@@ -16,7 +16,7 @@
 
 	&.btn-primary, &.btn-ok {
 		background-color: $primary;
-		border: 2px solid $primary;
+		border: 1px solid $primary;
 		color: $white;
 
 		&:hover:not([disabled]) {
@@ -31,30 +31,38 @@
 	}
 
 	&.btn-secondary {
-		background-color: $white;
-		border: 2px solid $primary;
+		border: 1px solid $primary;
 		color: $primary;
 
 		&:hover:not([disabled]) {
-			background-color: lighten($primary, 40%);
+			background-color: $primary;
+			color: white;
 		}
 
 		&:active {
-			background-color: lighten($primary, 35%);
+			background-color: darken($primary, 35%);
+			color: white;
 		}
 	}
 
 	&.btn-secondary.dropdown-toggle, .btn-secondary.active, .btn-secondary:active, .show > .btn-secondary.dropdown-toggle {
-		color: $blue;
+		color: $primary;
 		font-weight: 500;
 		font-size: 0.9rem;
 		background-color: transparent;
 		border: none;
+		text-decoration: unset;
+
+		&:hover, &:hover:not([disabled]) {
+			background-color: transparent;
+			color: $primary;
+		}
+
 	}
 
 	&.btn-cancel, &.btn-danger, &.btn-remove {
 		background-color: $remove;
-		border: 2px solid $remove;
+		border: 1px solid $remove;
 		color: $white;
 
 		&:hover:not([disabled]) {
@@ -70,7 +78,7 @@
 
 	&.outline {
 		background-color: transparent;
-		border: 2px solid $white;
+		border: 1px solid $white;
 		color: $white;
 	}
 

@@ -1,18 +1,18 @@
 import * as Immutable from 'immutable';
 
-import { defaultIdGuid, getChildren } from '../common';
-import { getKey } from '../../common';
+import { defaultIdGuid, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import { Maybe } from 'tsmonad';
-import { Preconditions } from './preconditions';
-import { Supplements } from './supplements';
-import { Dependencies } from './dependencies';
-import { Unit } from './unit';
-import { Unordered } from './unordered';
-import { Module } from './module';
-import { Include } from './include';
-import createGuid from '../../../utils/guid';
+import { Preconditions } from 'data/content/org/preconditions';
+import { Supplements } from 'data/content/org/supplements';
+import { Dependencies } from 'data/content/org/dependencies';
+import { Unit } from 'data/content/org/unit';
+import { Unordered } from 'data/content/org/unordered';
+import { Module } from 'data/content/org/module';
+import { Include } from 'data/content/org/include';
+import createGuid from 'utils/guid';
 
-import * as types from './types';
+import * as types from 'data/content/org/types';
 
 export type SequenceParams = {
   id?: string,

@@ -10,18 +10,18 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Select, TextInput } from '../common/controls';
+import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
+'editors/content/utils/content';
+import { Select, TextInput } from 'editors/content/common/controls';
 import { TabContainer } from 'editors/content/common/TabContainer';
-import AlternativeEditor from './AlternativeEditor';
+import AlternativeEditor from 'editors/content/learning/AlternativeEditor';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
-import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
 import {
   Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
-import { styles } from './Alternatives.styles';
+import { styles } from 'editors/content/learning/Alternatives.styles';
 
 export interface AlternativesEditorProps
   extends AbstractContentEditorProps<contentTypes.Alternatives> {
@@ -124,7 +124,7 @@ export default class AlternativesEditor
       <ToolbarGroup label="Variable Content" columns={6}
         highlightColor={CONTENT_COLORS.Alternatives}>
         <ToolbarButton onClick={this.onAlternativeAdd.bind(this)} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-plus-square-o"></i></div>
+          <div>{getContentIcon(insertableContentTypes.Alternative)}</div>
           <div>Add New</div>
         </ToolbarButton>
         <ToolbarLayout.Column>
@@ -253,7 +253,6 @@ export default class AlternativesEditor
       onPaste: (e) => {
         const clone = e.clone().with({
           value: 'Duplicate of ' + e.value,
-          guid: guid(),
         });
         const model = this.props.model.with({
           content: this.props.model.content.set(clone.guid, clone),
@@ -263,7 +262,6 @@ export default class AlternativesEditor
       onDuplicate: (e) => {
         const clone = e.clone().with({
           value: 'Duplicate of ' + e.value,
-          guid: guid(),
         });
         const model = this.props.model.with({
           content: this.props.model.content.set(clone.guid, clone),

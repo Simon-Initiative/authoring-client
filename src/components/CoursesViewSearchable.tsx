@@ -99,7 +99,6 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
     });
   }
 
-
   componentDidMount() {
     persistence.getEditablePackages()
       .then((docs) => {
@@ -131,7 +130,11 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
           <h2 style={{ display: 'inline' }}>My Courses</h2>
           {
             this.state.courses.caseOf({
-              just: courses => courses.length === 0 ? <NoCourses/> :
+              just: courses => courses.length === 0 ?
+                <NoCourses
+                createCourse={this.props.createCourse}
+                importCourse={this.props.importCourse}
+                /> :
                 <CoursesViewSearchableTable
                 searchText={this.state.searchText}
                 textChange={this.textChange}
@@ -158,21 +161,42 @@ const Waiting = (): JSX.Element => {
   );
 };
 
-const NoCourses = (): JSX.Element => {
+const CreateImport = ({ createCourse, importCourse }) : JSX.Element => {
+  return (<div className="input-group">
+    <div className="flex-spacer" />
+    <form className="form-inline">
+      <div style={{ display: 'inline', float: 'right' }}>
+        <button
+          type="button" className="btn btn-primary" key="createNew"
+          onClick={createCourse}>
+          <b>Create new</b>
+        </button>
+        &nbsp;&nbsp;
+        <button
+          type="button" className="btn btn-primary" key="import"
+          onClick={importCourse}>
+          <b>Import existing</b>
+        </button>
+      </div>
+    </form>
+  </div>);
+};
+
+const NoCourses = ({ createCourse, importCourse }): JSX.Element => {
   return (
     <div>
-      <p className="lead">
-        <b>You have no course packages available.</b>
-      </p>
-
-      Try:
-
-    <ul>
-        <li>Creating a new course package</li>
-        <li>Importing an existing OLI course package directly from a Subversion repository</li>
-        <li>Contacting another user to have them grant you access to their course package</li>
-      </ul>
-
+      <CreateImport createCourse={createCourse} importCourse={importCourse}/>
+      <div>
+        <p className="lead">
+          <b>You have no course packages available.</b>
+        </p>
+        Try:
+      <ul>
+          <li>Creating a new course package</li>
+          <li>Importing an existing OLI course package directly from a Subversion repository</li>
+          <li>Contacting another user to have them grant you access to their course package</li>
+        </ul>
+      </div>
     </div>
   );
 };
@@ -185,24 +209,7 @@ const TableToolbar = ({ textChange, createCourse, importCourse }): JSX.Element =
           placeholder="Search by Title, Version or Unique ID"
           onChange={textChange}
         />
-        <div className="input-group">
-          <div className="flex-spacer" />
-          <form className="form-inline">
-            <div style={{ display: 'inline', float: 'right' }}>
-              <button
-                type="button" className="btn btn-primary" key="createNew"
-                onClick={createCourse}>
-                <b>Create new</b>
-              </button>
-              &nbsp;&nbsp;
-              <button
-                type="button" className="btn btn-primary" key="import"
-                onClick={importCourse}>
-                <b>Import existing</b>
-              </button>
-            </div>
-          </form>
-        </div>
+        <CreateImport createCourse={createCourse} importCourse={importCourse}/>
       </div>
   );
 };

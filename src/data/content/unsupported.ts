@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from './common';
+import { augment, ensureIdGuidPresent } from './common';
 
 export type UnsupportedParams = {
   contentType?: 'Unsupported',
@@ -23,15 +23,15 @@ export class Unsupported extends Immutable.Record(
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this;
+  clone(): Unsupported {
+    return ensureIdGuidPresent(this);
   }
 
   toPersistence() : Object {
     return this.data;
   }
 
-  static fromPersistence(data: Object, guid: string) : Unsupported {
+  static fromPersistence(data: Object, guid: string, notify?: () => void) : Unsupported {
     return new Unsupported().with({ data, guid });
   }
 }

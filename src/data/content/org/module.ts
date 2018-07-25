@@ -1,20 +1,20 @@
 import * as Immutable from 'immutable';
 
-import { defaultIdGuid, getChildren } from '../common';
-import { getKey } from '../../common';
+import { defaultIdGuid, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import { Maybe } from 'tsmonad';
-import { Preconditions } from './preconditions';
-import { Supplements } from './supplements';
-import { Dependencies } from './dependencies';
-import { Unordered } from './unordered';
-import { Item } from './item';
-import { Section } from './section';
-import { Include } from './include';
-import { createPlaceholderItem } from './common';
+import { Preconditions } from 'data/content/org/preconditions';
+import { Supplements } from 'data/content/org/supplements';
+import { Dependencies } from 'data/content/org/dependencies';
+import { Unordered } from 'data/content/org/unordered';
+import { Item } from 'data/content/org/item';
+import { Section } from 'data/content/org/section';
+import { Include } from 'data/content/org/include';
+import { createPlaceholderItem } from 'data/content/org/common';
 
-import createGuid from '../../../utils/guid';
+import createGuid from 'utils/guid';
 
-import * as types from './types';
+import * as types from 'data/content/org/types';
 
 export type ModuleParams = {
   id?: string,

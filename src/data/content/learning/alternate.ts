@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren, except } from '../common';
+import { augment, getChildren, except, ensureIdGuidPresent } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 
@@ -38,12 +38,12 @@ export class Alternate extends Immutable.Record(defaultContent) {
 
 
   clone() : Alternate {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Alternate {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Alternate {
 
     const t = (root as any).alternate;
 
@@ -57,7 +57,7 @@ export class Alternate extends Immutable.Record(defaultContent) {
     }
 
     model = model.with({ content: ContentElements
-      .fromPersistence(except(getChildren(t), 'title'), '', TEXT_ELEMENTS) });
+      .fromPersistence(except(getChildren(t), 'title'), '', TEXT_ELEMENTS, null, notify) });
 
     return model;
   }

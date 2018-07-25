@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
-import { TargetToggle } from './TargetToggle';
+import { TargetToggle } from 'editors/content/learning/dynadragdrop/TargetToggle';
 
-import { styles } from './DynaDropLabel.styles';
+import { styles } from 'editors/content/learning/dynadragdrop/DynaDropLabel.styles';
 
 export interface DynaDropLabelProps {
   id: string;
   editMode: boolean;
   text: string;
   isHeader?: boolean;
-  style: any;
+  style?: any;
   canToggleType: boolean;
   onEdit: (text: string) => void;
   onToggleType: (id: string) => void;

@@ -4,8 +4,8 @@ import { Maybe } from 'tsmonad';
 
 import * as Tree from 'editors/common/tree';
 import { Node as AssessmentNode } from 'data/contentTypes';
-import { renderTab } from './tabs';
-import { findNodeByGuid } from './utils';
+import { renderTab } from 'editors/document/assessment/tabs';
+import { findNodeByGuid } from 'editors/document/assessment/utils';
 import { CourseModel } from 'data/models';
 
 export interface OutlineProps {
