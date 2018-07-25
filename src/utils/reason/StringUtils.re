@@ -50,7 +50,7 @@ let removeAll = (str: string, find: char) => {
 
 let substr = (str: string, start: int, count: int) => {
   let i = ref(0);
-  let newList = List.filter(c => {
+  let newList = List.filter(_c => {
     if (i^ >= start && i^ < start + count) {
       i := i^ + 1;
       true;

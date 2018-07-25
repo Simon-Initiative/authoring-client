@@ -97,7 +97,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Example: return <i style={style} className={'fa fa-bar-chart'} />;
     case i.Figure: return <i style={style} className={'fa fa-address-card'} />;
     case i.Flash: return <i style={style} className={'fa fa-bolt'} />;
-    case i.Hint: return <i style={style} className={'fa fa-hand-o-left'} />;
+    case i.Hint: return <i style={style} className={'fa fa-hand-o-right'} />;
     case i.IFrame: return <i style={style} className={'fa fa-window-maximize'} />;
     case i.Image: return <i style={style} className={'fa fa-image'} />;
     case i.Instructions: return <i style={style} className={'fa fa-file-text'} />;

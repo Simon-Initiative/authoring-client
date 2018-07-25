@@ -179,7 +179,7 @@ let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
       <input
         _type="number"
         className="form-control input-sm form-control-sm"
-        disabled={Js.Boolean.to_js_boolean(!editMode)}
+        disabled={!editMode}
         value
         onChange={event => {
           let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
@@ -210,7 +210,7 @@ let renderPrecision = (jssClass, editMode, matchPattern, responseId, onEditMatch
     <input
       _type="number"
       className={classNames([jssClass("precisionValue"), "form-control input-sm form-control-sm"])}
-      disabled={Js.Boolean.to_js_boolean(!editMode) || !isPrecision(matchPattern)}
+      disabled={!editMode || !isPrecision(matchPattern)}
       value=precisionValue
       onChange={event => {
         let newPrecisionValue = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
@@ -258,7 +258,7 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
       <input
         _type="number"
         className={classNames([jssClass("rangeInput"), "form-control", "input-sm", "form-control-sm"])}
-        disabled={Js.Boolean.to_js_boolean(!editMode)}
+        disabled={!editMode}
         value=rangeStart
         onChange={event => {
           let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
@@ -268,7 +268,7 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
       <input
         _type="number"
         className={classNames([jssClass("rangeInput"), "form-control", "input-sm", "form-control-sm"])}
-        disabled={Js.Boolean.to_js_boolean(!editMode)}
+        disabled={!editMode}
         value=rangeEnd
         onChange={event => {
           let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
