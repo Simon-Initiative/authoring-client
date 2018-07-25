@@ -64,7 +64,6 @@ export default class ListItemEditor
             {...this.props}
             model={this.props.model.content}
             onEdit={this.onEdit.bind(this)}
-            hideAllDecorators={false}
           />
         </div>
       </div>);

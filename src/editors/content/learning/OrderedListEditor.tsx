@@ -261,7 +261,6 @@ export default class OrderedList
           model={elements}
           bindProperties={bindLabel}
           onEdit={this.onListItemsEdit.bind(this)}
-          hideAllDecorators
         />
         <button type="button" onClick={this.onListItemAdd.bind(this)}
           className="btn btn-link">+ Add item</button>
