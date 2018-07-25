@@ -84,7 +84,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
     return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
       media: this.media.lift(media => media.clone()),
-      speakers: this.speakers.mapEntries(([k, v]) => {
+      speakers: this.speakers.mapEntries(([_, v]) => {
         const clone: Speaker = v.clone();
         speakerMap = speakerMap.set(v.id, clone.id);
         return [clone.guid, clone];
