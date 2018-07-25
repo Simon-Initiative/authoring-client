@@ -5,6 +5,7 @@ import { augment, ensureIdGuidPresent, setId } from '../common';
 import { LegacyLayout } from './dragdrop/legacyLayout/legacy_layout';
 import { HTMLLayout } from './dragdrop/htmlLayout/html_layout';
 import { convertLegacyToHtmlTable } from 'data/content/assessment/dragdrop/convert';
+import { DYNA_DROP_SRC_FILENAME } from 'editors/content/utils/common';
 
 export type CustomParams = {
   id?: string;
@@ -65,7 +66,7 @@ export class Custom extends Immutable.Record(defaultContent) {
       id: createGuid(),
       layout: '',
       layoutData: this.layoutData.lift(ld => ld.clone()),
-      src: 'DynaDrop.js',
+      src: DYNA_DROP_SRC_FILENAME,
     })) as Custom;
   }
 
@@ -114,6 +115,7 @@ export class Custom extends Immutable.Record(defaultContent) {
           convertLegacyToHtmlTable(LegacyLayout.fromPersistence(q['layoutData'], createGuid()));
         model = model.with({
           layoutData: Maybe.just(convertedLayout),
+          src: DYNA_DROP_SRC_FILENAME,
         });
       }
     }
