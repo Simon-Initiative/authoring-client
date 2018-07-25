@@ -111,13 +111,17 @@ export class Figure extends Immutable.Record(defaultContent) {
     this.cite.lift(cite => children.push(cite.toPersistence()));
     this.caption.lift(caption => children.push(caption.toPersistence()));
 
-    const content = this.content.content.size === 0
-      ? [{ p: { '#text': ' ' } }]
-      : this.content.toPersistence();
+    const encoded = this.content.toPersistence();
+    const content = encoded.length === 0 ? [{
+      p: {
+        '#text': ' ',
+        '@id': createGuid(),
+      },
+    }] : encoded;
 
     const s = {
       figure: {
-        '@id': this.id ? this.id : createGuid(),
+        '@id': this.id || createGuid(),
         '#array': [
           ...children,
           ...content,
