@@ -185,9 +185,10 @@ export class ContentContainer
       const indexOf = model.content.toArray().map(c => c.guid).indexOf(childModel.guid);
       let newSelection: ContentElement = null;
       if (model.content.size > 1) {
-        newSelection = indexOf === 0
-          ? updated.content.first()
-          : model.content.toArray()[indexOf + 1];
+        // Select the next item in the list if available, otherwise select the previous item
+        newSelection = indexOf < model.content.size - 1
+          ? model.content.toArray()[indexOf + 1]
+          : model.content.toArray()[indexOf - 1];
       }
 
       if (this.disableContentSelection(newSelection)) {
