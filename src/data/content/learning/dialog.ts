@@ -78,15 +78,21 @@ export class Dialog extends Immutable.Record(defaultContent) {
   }
 
   clone(): Dialog {
+    // A map from old speaker ids to cloned speaker ids
+    let speakerMap = Immutable.Map<string, string>();
+
     return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
       media: this.media.lift(media => media.clone()),
-      speakers: this.speakers.mapEntries(([_, v]) => {
+      speakers: this.speakers.mapEntries(([k, v]) => {
         const clone: Speaker = v.clone();
+        speakerMap = speakerMap.set(v.id, clone.id);
         return [clone.guid, clone];
       }).toOrderedMap() as Immutable.OrderedMap<string, Speaker>,
       lines: this.lines.mapEntries(([_, v]) => {
-        const clone: Line = v.clone();
+        // Line will not change the `speaker` idref attribute.
+        // We need to set it to the cloned speaker id stored in the map.
+        const clone: Line = v.clone().with({ speaker: speakerMap.get(v.speaker) });
         return [clone.guid, clone];
       }).toOrderedMap() as Immutable.OrderedMap<string, Line>,
     }));
