@@ -31,6 +31,7 @@ export interface ContentContainerProps
   bindProperties?: (element: ContentElement) => BoundProperty[];
   activeContentGuid: string;
   hideSingleDecorator?: boolean;
+  hideAllDecorators?: boolean;
   layout?: Layout;
   overrideRemove?: (model: ContentElements, childModel: Object) => boolean;
 }
@@ -186,7 +187,7 @@ export class ContentContainer
       if (model.content.size > 1) {
         newSelection = indexOf === 0
           ? updated.content.first()
-          : model.content.toArray()[indexOf - 1];
+          : model.content.toArray()[indexOf + 1];
       }
 
       if (this.disableContentSelection(newSelection)) {
@@ -285,6 +286,7 @@ export class ContentContainer
   renderMain() : JSX.Element {
     const { hideContentLabel, disableContentSelection, hover,
       hideSingleDecorator = false,
+      hideAllDecorators = false,
       onUpdateHover, layout = Layout.Vertical } = this.props;
 
     const bindProperties = this.props.bindProperties === undefined
@@ -303,6 +305,7 @@ export class ContentContainer
       .toArray()
       .map((model) => {
         const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1
+          || hideAllDecorators
           || this.disableContentSelection(model);
 
         const props = {
