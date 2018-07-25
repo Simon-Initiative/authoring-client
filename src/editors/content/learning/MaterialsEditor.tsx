@@ -113,7 +113,8 @@ export default class MaterialsEditor
       };
 
       return (
-        <div style={{ width }} className={classNames([classes.materialsContents])}>
+        <div key={material.guid} style={{ width }}
+        className={classNames([classes.materialsContents])}>
           <MaterialEditor
             {...this.props}
             model={material}
