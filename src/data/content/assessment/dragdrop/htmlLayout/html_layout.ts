@@ -13,20 +13,17 @@ import { domParser } from 'utils/domParser';
  * See html_layout_styles.css for more details.
  */
 const MINIFIED_TABLE_STYLES = `<style type="text/css">
-.oli-dnd-table{display:table;text-align:center;border-top:1px solid #cacaca;border-right:\
-1px solid #cacaca}.dnd-row{display:table-row}.dnd-row-header{font-weight:600;background-co\
-lor:#cacaca;text-align:center}.dnd-cell{display:table-cell;padding:4px;border-bottom:1px\
-solid #cacaca;border-left:1px solid #cacaca}.target{min-width:50px;min-height:50p\
-x;padding:4px;background-color:#e3e3e3}.target::after{content:"Drop here";color:\
-#999;user-select:none;text-transform:uppercase}.initiator{color:#58646c;border:2\
-px solid transparent;padding:6px;display:inline-block;font-size:14px;box-shadow:2p\
-x 2px 10px 0 rgba(155,165,173,1);border-radius:5px;white-space:nowrap;margin:5px;b\
-ackground-color:#E7F4FE;cursor:grab;cursor:-webkit-grab;user-select:none}.dnd-init\
-iator::before{content:"";display:inline-block;vertical-align:middle;margin-right:4\
-px;width:12px;height:24px;background-image:-webkit-repeating-radial-gradient(cente\
-r center,rgba(0,0,0,.2),rgba(0,0,0,.3) 1px,transparent 1px,transparent 100%);bac\
-kground-repeat:repeat;background-size:4px 4px}.initiator:active{cursor:grabb\
-ing;cursor:-webkit-grabbing}
+.oli-dnd-table{display:table;text-align:center}.dnd-row{display:table-row}.dnd-\
+row-header{font-weight:600;background-color:#cacaca;text-align:center}.dnd-cell{\
+display:table-cell;padding:4px}.target{min-width:50px;min-height:50px;padding:4p\
+x;border:1px dashed #999}.initiator{color:#58646c;border:2px solid transparent;p\
+adding:6px;display:inline-block;font-size:14px;box-shadow:2px 2px 10px 0 rgba(15\
+5,165,173,1);border-radius:5px;white-space:nowrap;margin:5px;background-color:#E7\
+F4FE;cursor:grab;cursor:-webkit-grab;user-select:none}.initiator::before{content\
+:"";display:inline-block;vertical-align:middle;margin-right:4px;width:12px;height\
+:24px;background-image:-webkit-repeating-radial-gradient(center center,rgba(0,0,0\
+,.2),rgba(0,0,0,.3) 1px,transparent 1px,transparent 100%);background-repeat:repeat;\
+background-size:4px 4px}.initiator:active{cursor:grabbing;cursor:-webkit-grabbing}
 </style>`;
 
 export type TargetArea = TableTargetArea | UnsupportedTargetArea;
