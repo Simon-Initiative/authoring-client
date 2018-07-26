@@ -7,8 +7,6 @@
 .oli-dnd-table {
   display: table;
   text-align: center;
-  border-top: 1px solid #cacaca;
-  border-right: 1px solid #cacaca;
 }
 
 .dnd-row {
@@ -24,27 +22,16 @@
 .dnd-cell {
   display: table-cell;
   padding: 4px;
-  border-bottom: 1px solid #cacaca;
-  border-left: 1px solid #cacaca;
 }
 
-.dnd-target {
+.target {
   min-width: 50px;
   min-height: 50px;
-
   padding: 4px;
-  background-color: #e3e3e3;
+  border: 1px dashed #999999;
 }
 
-
-.dnd-target::after {
-  content: "Drop here";
-  color: #999999;
-  user-select: none;
-  text-transform: uppercase;
-}
-
-.dnd-initiator {
+.initiator {
   color: #58646c;
   border: 2px solid transparent;
   padding: 6px;
@@ -60,7 +47,7 @@
   user-select: none;
 }
 
-.dnd-initiator::before {
+.initiator::before {
   content: "";
   display: inline-block;
   vertical-align: middle;
@@ -72,7 +59,7 @@
   background-size: 4px 4px;
 }
 
-.dnd-initiator:active {
+.initiator:active {
   cursor: grabbing;
   cursor: -webkit-grabbing;
 }

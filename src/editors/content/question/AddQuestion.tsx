@@ -15,6 +15,7 @@ import {
 } from 'data/content/assessment/dragdrop/htmlLayout/table/table_targetarea';
 import { Row } from 'data/content/assessment/dragdrop/htmlLayout/table/row';
 import { Cell } from 'data/content/assessment/dragdrop/htmlLayout/table/cell';
+import { DYNA_DROP_SRC_FILENAME } from 'editors/content/utils/common';
 
 const defaultInputBody = () => ContentElements.fromText
   ('Add numeric, text, or dropdown components', '', QUESTION_BODY_ELEMENTS);
@@ -223,7 +224,7 @@ export class AddQuestion
       id: guid(),
       layout: '',
       layoutData: Maybe.just<HTMLLayout>(newDndLayout),
-      src: 'DynaDrop.js',
+      src: DYNA_DROP_SRC_FILENAME,
     });
 
     // create question body

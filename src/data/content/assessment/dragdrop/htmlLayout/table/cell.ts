@@ -47,7 +47,7 @@ export class Cell extends Immutable.Record(defaultContent) {
   toPersistence(): string {
     return '<div'
       + this.target.caseOf({ just: inputVal => ` input_ref="${inputVal}"`, nothing: () => '' })
-      + ` class="dnd-cell${this.target.caseOf({ just: () => ' dnd-target', nothing: () => '' })}"`
+      + ` class="dnd-cell${this.target.caseOf({ just: () => ' target', nothing: () => '' })}"`
       + `>${this.text}</div>`;
   }
 }
