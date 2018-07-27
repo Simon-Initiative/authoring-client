@@ -9,6 +9,7 @@ import { Button } from 'editors/content/common/Button';
 import { Select } from 'editors/content/common/Select';
 
 import './CourseEditor.scss';
+import ModalPrompt from 'utils/selection/ModalPrompt';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -17,6 +18,8 @@ export interface CourseEditorProps {
   courseChanged: (m: models.CourseModel) => any;
   viewAllCourses: () => any;
   editMode: boolean;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
 }
 
 type ThemeSelection = {
@@ -41,6 +44,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
     this.renderMenuItemChildren = this.renderMenuItemChildren.bind(this);
     this.onEditTheme = this.onEditTheme.bind(this);
+    this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
   }
 
   componentDidMount() {
@@ -198,6 +202,18 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       .catch(err => console.log(err));
   }
 
+  displayRemovePackageModal() {
+    this.props.onDisplayModal(<ModalPrompt
+      text={'Are you sure you want to permanently delete this course package? \
+          This action cannot be undone.'}
+      onInsert={() => { this.removePackage; this.props.onDismissModal(); }}
+      onCancel={() => this.props.onDismissModal()}
+      okLabel="Yes"
+      okClassName="danger"
+      cancelLabel="No"
+    />);
+  }
+
   render() {
     const { model } = this.props;
 
@@ -218,8 +234,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <Button
             editMode
             type="outline-danger"
-            onClick={this.removePackage.bind(this)}>
-            Remove Package
+            onClick={this.displayRemovePackageModal}>
+            Delete Course Package
           </Button>
         </div>
         <div className="col-3"></div>
