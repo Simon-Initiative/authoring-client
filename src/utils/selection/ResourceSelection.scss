@@ -1,12 +1,10 @@
-.modal-dialog, .modal-content {
-  max-height: calc(100vh - 60px);
-}
-
-.modal-body {
-  max-height: calc(100vh - 143px);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+.modal-dialog {
+  .modal-body {
+    min-height: 530px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .searchMatch {

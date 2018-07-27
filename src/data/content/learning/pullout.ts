@@ -114,13 +114,17 @@ export class Pullout extends Immutable.Record(defaultContent) {
 
   toPersistence(): Object {
 
-    const content = this.content.content.size === 0
-      ? [{ p: { '#text': ' ' } }]
-      : this.content.toPersistence();
+    const encoded = this.content.toPersistence();
+    const content = encoded.length === 0 ? [{
+      p: {
+        '#text': ' ',
+        '@id': createGuid(),
+      },
+    }] : encoded;
 
     const s = {
       pullout: {
-        '@id': this.id ? this.id : createGuid(),
+        '@id': this.id || createGuid(),
         '@orient': this.orient,
         '#array': [
           this.title.toPersistence(),

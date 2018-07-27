@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Title } from 'data/content/learning/title';
-import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
+import { augment, getChildren, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { IFrame } from 'data/content/learning/iframe';
@@ -15,7 +15,6 @@ import { MediaItem } from 'data/contentTypes';
 
 export type DialogParams = {
   guid?: string,
-  id?: string,
   title?: Title,
   media?: Maybe<MediaItem>,
   speakers?: Immutable.OrderedMap<string, Speaker>,
@@ -26,7 +25,6 @@ const defaultContent = {
   contentType: 'Dialog',
   elementType: 'dialog',
   guid: '',
-  id: '',
   title: Title.fromText('Dialog Title'),
   media: Maybe.nothing<MediaItem>(),
   speakers: Immutable.OrderedMap<string, Speaker>(),
@@ -66,14 +64,13 @@ export class Dialog extends Immutable.Record(defaultContent) {
   contentType: 'Dialog';
   elementType: 'dialog';
   guid: string;
-  id: string;
   title: Title;
   media: Maybe<MediaItem>;
   speakers: Immutable.OrderedMap<string, Speaker>;
   lines: Immutable.OrderedMap<string, Line>;
 
   constructor(params?: DialogParams) {
-    super(augment(params, true));
+    super(augment(params));
   }
 
   with(values: DialogParams) {
@@ -81,15 +78,21 @@ export class Dialog extends Immutable.Record(defaultContent) {
   }
 
   clone(): Dialog {
+    // A map from old speaker ids to cloned speaker ids
+    let speakerMap = Immutable.Map<string, string>();
+
     return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
       media: this.media.lift(media => media.clone()),
       speakers: this.speakers.mapEntries(([_, v]) => {
         const clone: Speaker = v.clone();
+        speakerMap = speakerMap.set(v.id, clone.id);
         return [clone.guid, clone];
       }).toOrderedMap() as Immutable.OrderedMap<string, Speaker>,
       lines: this.lines.mapEntries(([_, v]) => {
-        const clone: Line = v.clone();
+        // Line will not change the `speaker` idref attribute.
+        // We need to set it to the cloned speaker id stored in the map.
+        const clone: Line = v.clone().with({ speaker: speakerMap.get(v.speaker) });
         return [clone.guid, clone];
       }).toOrderedMap() as Immutable.OrderedMap<string, Line>,
     }));
@@ -99,8 +102,6 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
     const m = (root as any).dialog;
     let model = new Dialog().with({ guid });
-
-    model = setId(model, m, notify);
 
     if (m['@title'] !== undefined) {
       model = model.with({ title: m['@title'] });
@@ -165,7 +166,6 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
     const m = {
       dialog: {
-        '@id': this.id ? this.id : createGuid(),
         '#array': [
           this.title.toPersistence(),
           ...media,

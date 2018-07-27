@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, setId } from '../common';
+import { augment, getChildren, setId, ensureIdGuidPresent } from '../common';
 import { Row } from './row';
 import { CellData } from './celldata';
 import { getKey } from '../../common';
@@ -64,7 +64,7 @@ export class Table extends Immutable.Record(defaultContent) {
   }
 
   clone() : Table {
-    return this.with({
+    return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
@@ -72,7 +72,7 @@ export class Table extends Immutable.Record(defaultContent) {
         const clone: Row = v.clone();
         return [clone.guid, clone];
       }).toOrderedMap() as Immutable.OrderedMap<string, Row>,
-    });
+    }));
   }
 
 

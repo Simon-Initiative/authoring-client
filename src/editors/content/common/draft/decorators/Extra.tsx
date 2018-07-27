@@ -76,6 +76,7 @@ class Extra extends React.PureComponent<ExtraProps, ExtraState> {
 
     return (
       <Tooltip useContext={true}
+        theme="light"
         interactive
         open={this.state.tooltipShown}
         trigger="click"

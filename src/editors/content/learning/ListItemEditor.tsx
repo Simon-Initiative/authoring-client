@@ -35,6 +35,11 @@ export default class ListItemEditor
     super(props);
   }
 
+  shouldComponentUpdate(nextProps: ListItemEditorProps, nextState: ListItemEditorState) {
+    return super.shouldComponentUpdate(nextProps, nextState)
+      || this.props.label !== nextProps.label;
+  }
+
   renderSidebar() {
     return <SidebarContent title="List Item" />;
   }

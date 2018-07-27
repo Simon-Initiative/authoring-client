@@ -235,17 +235,15 @@ export class ContextAwareSidebar
           <SidebarContent title="Workbook Page" onHide={this.props.onHide}>
             <SidebarGroup label="General">
               <SidebarRow>
-                <span>Created </span>
-                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateCreated))}
+                <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}
                   delay={150} distance={5} size="small" arrowSize="small">
-                  {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                  Created {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
                 </Tooltip>
               </SidebarRow>
               <SidebarRow>
-                <span>Updated </span>
-                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateUpdated))}
+                <Tooltip title={dateFormatted(adjusted(resource.dateUpdated))}
                   delay={150} distance={5} size="small" arrowSize="small">
-                  {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                  Updated {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
@@ -267,17 +265,15 @@ export class ContextAwareSidebar
           <SidebarContent title="Assessment" onHide={this.props.onHide}>
             <SidebarGroup label="General">
               <SidebarRow>
-                <span>Created </span>
-                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateCreated))}
+                <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}
                   delay={150} distance={5} size="small" arrowSize="small">
-                  {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                  Created {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
                 </Tooltip>
               </SidebarRow>
               <SidebarRow>
-                <span>Updated </span>
-                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateUpdated))}
+                <Tooltip title={dateFormatted(adjusted(resource.dateUpdated))}
                   delay={150} distance={5} size="small" arrowSize="small">
-                  {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                  Updated {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
@@ -375,17 +371,15 @@ export class ContextAwareSidebar
           <SidebarContent title="Question Pool" onHide={this.props.onHide}>
             <SidebarGroup label="General">
               <SidebarRow>
-                <span>Created </span>
-                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateCreated))}
+                <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}
                   delay={150} distance={5} size="small" arrowSize="small">
-                  {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                  Created {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
                 </Tooltip>
               </SidebarRow>
               <SidebarRow>
-                <span>Updated </span>
-                <Tooltip theme="dark" title={dateFormatted(adjusted(resource.dateUpdated))}
+                <Tooltip title={dateFormatted(adjusted(resource.dateUpdated))}
                   delay={150} distance={5} size="small" arrowSize="small">
-                  {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                  Updated {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
