@@ -29,6 +29,11 @@ let isRangeOp = (c: char) => switch (c) {
   | _ => false
 };
 
+let isValidInput = (s: string) => switch (String.length(s) - 1) {
+| -1 => true
+| n => !isInequalityOp(String.get(s, n)) && !isRangeOp(String.get(s, n))
+};
+
 let getInequalityOperator = (matchPattern: string) => {
   let operatorIndex = StringUtils.findIndex(matchPattern, c => isInequalityOp(c));
 
@@ -182,7 +187,10 @@ let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
         value
         onChange={event => {
           let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
-          onEditMatch(. responseId, operator ++ value ++ (precisionValue !== "" ? "#" ++ precisionValue : ""));
+
+          if (isValidInput(value)) {
+            onEditMatch(. responseId, operator ++ value ++ (precisionValue !== "" ? "#" ++ precisionValue : ""));
+          }
         }} />
     </div>
   </div>
@@ -260,7 +268,10 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
         value=rangeStart
         onChange={event => {
           let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
-          onEditMatch(. responseId, "[" ++ value ++ "," ++ rangeEnd ++ "]");
+
+          if (isValidInput(value)) {
+            onEditMatch(. responseId, "[" ++ value ++ "," ++ rangeEnd ++ "]");
+          }
         }} />
       <div className={jssClass("rangeLabel")}>{strEl("to")}</div>
       <input
@@ -269,7 +280,10 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
         value=rangeEnd
         onChange={event => {
           let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
-          onEditMatch(. responseId, "[" ++ rangeStart ++ "," ++ value ++ "]");
+
+          if (isValidInput(value)) {
+            onEditMatch(. responseId, "[" ++ rangeStart ++ "," ++ value ++ "]");
+          }
         }} />
     </div>
   </div>

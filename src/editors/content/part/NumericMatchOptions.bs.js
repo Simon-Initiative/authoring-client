@@ -32,6 +32,19 @@ function isRangeOp(c) {
   }
 }
 
+function isValidInput(s) {
+  var n = s.length - 1 | 0;
+  if (n !== -1) {
+    if (isInequalityOp(Caml_string.get(s, n))) {
+      return false;
+    } else {
+      return !isRangeOp(Caml_string.get(s, n));
+    }
+  } else {
+    return true;
+  }
+}
+
 function getInequalityOperator(matchPattern) {
   var operatorIndex = StringUtils$CourseEditor.findIndex(undefined, matchPattern, isInequalityOp);
   if (operatorIndex !== undefined) {
@@ -295,10 +308,14 @@ function renderValue(jssClass, editMode, matchPattern, responseId, onEditMatch) 
                       value: value,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
-                          var match = precisionValue !== "";
-                          return onEditMatch(responseId, operator + (value + (
-                                        match ? "#" + precisionValue : ""
-                                      )));
+                          if (isValidInput(value)) {
+                            var match = precisionValue !== "";
+                            return onEditMatch(responseId, operator + (value + (
+                                          match ? "#" + precisionValue : ""
+                                        )));
+                          } else {
+                            return 0;
+                          }
                         })
                     })));
 }
@@ -429,7 +446,11 @@ function renderRange(jssClass, editMode, matchPattern, responseId, onEditMatch) 
                       value: rangeStart,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
-                          return onEditMatch(responseId, "[" + (value + ("," + (rangeEnd + "]"))));
+                          if (isValidInput(value)) {
+                            return onEditMatch(responseId, "[" + (value + ("," + (rangeEnd + "]"))));
+                          } else {
+                            return 0;
+                          }
                         })
                     }), React.createElement("div", {
                       className: Curry._1(jssClass, "rangeLabel")
@@ -451,7 +472,11 @@ function renderRange(jssClass, editMode, matchPattern, responseId, onEditMatch) 
                       value: rangeEnd,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
-                          return onEditMatch(responseId, "[" + (rangeStart + ("," + (value + "]"))));
+                          if (isValidInput(value)) {
+                            return onEditMatch(responseId, "[" + (rangeStart + ("," + (value + "]"))));
+                          } else {
+                            return 0;
+                          }
                         })
                     })));
 }
@@ -526,6 +551,7 @@ var jsComponent = StyleUtils$CourseEditor.injectSheet(NumericMatchOptionsStyle.s
 
 exports.isInequalityOp = isInequalityOp;
 exports.isRangeOp = isRangeOp;
+exports.isValidInput = isValidInput;
 exports.getInequalityOperator = getInequalityOperator;
 exports.isPrecision = isPrecision;
 exports.isRange = isRange;
