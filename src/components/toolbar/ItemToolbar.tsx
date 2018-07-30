@@ -7,15 +7,18 @@ import { ActiveContextState } from 'reducers/active';
 
 import { styles } from './ItemToolbar.styles';
 import { loadFromLocalStorage } from 'utils/localstorage';
+import { ContentElement } from 'data/content/common/interfaces';
+import { CourseModel } from 'data/models';
 
 export interface ItemToolbarProps {
   context: AppContext;
   activeContext: ActiveContextState;
-  onCut: (item) => void;
-  onCopy: (item) => void;
+  onCut: (item: ContentElement, page: string) => void;
+  onCopy: (item: ContentElement, page: string) => void;
   onPaste: () => void;
-  onRemove: (item) => void;
+  onRemove: (item: ContentElement) => void;
   parentSupportsElementType: (type: string) => boolean;
+  course: CourseModel;
 }
 
 /**
@@ -24,13 +27,16 @@ export interface ItemToolbarProps {
 @injectSheet(styles)
 export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps> {
 
-  constructor(props) {
+  constructor(props: ItemToolbarProps) {
     super(props);
   }
 
   hasSelection() {
     const { activeContext } = this.props;
-    return !!activeContext.activeChild.valueOr(false);
+    return activeContext.activeChild.caseOf({
+      just: _ => true,
+      nothing: () => false,
+    });
   }
 
   canDuplicate() {
@@ -40,7 +46,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
 
     return activeContext.activeChild.caseOf({
       just: activeChild => activeChild &&
-        (disallowDuplicates.indexOf((activeChild as any).contentType) === -1),
+        disallowDuplicates.indexOf(activeChild.contentType) === -1,
       nothing: () => false,
     });
   }
@@ -49,6 +55,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     const { activeContext } = this.props;
     return activeContext.activeChild.caseOf({
       just: activeChild => activeChild,
+      nothing: () => undefined,
+    });
+  }
+
+  getPage() {
+    const { activeContext } = this.props;
+    return activeContext.documentId.caseOf({
+      just: id => id,
       nothing: () => undefined,
     });
   }
@@ -72,7 +86,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     const clipboardItem: any = loadFromLocalStorage('clipboard');
     // saveToLocalStorage handles saving contiguous text as a special
     // case, so we handle that here
-    let clipboardElementType = null;
+    let clipboardElementType: string = null;
 
     if (clipboardItem !== null) {
       clipboardElementType = clipboardItem.isContiguousText
@@ -84,14 +98,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
       <React.Fragment>
         <ToolbarLayout.Column>
           <ToolbarButton
-            onClick={() => onCut(this.getItem())}
+            onClick={() => onCut(this.getItem(), this.getPage())}
             tooltip="Cut Item"
             size={ToolbarButtonSize.Wide}
             disabled={!(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-cut" /> Cut
           </ToolbarButton>
           <ToolbarButton
-            onClick={() => onCopy(this.getItem())}
+            onClick={() => onCopy(this.getItem(), this.getPage())}
             tooltip="Copy Item"
             size={ToolbarButtonSize.Wide}
             disabled={!(this.hasSelection() && this.canDuplicate())}>

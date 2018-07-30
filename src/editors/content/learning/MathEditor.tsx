@@ -2,7 +2,9 @@ import * as React from 'react';
 import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { MathEditor as SourceBasedMathEditor } from 'utils/math/MathEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';

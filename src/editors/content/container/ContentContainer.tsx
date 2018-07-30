@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { getEditorByContentType } from './registry';
+import { getEditorByContentType } from 'editors/content/container/registry';
 import { ContentElements } from 'data/content/common/elements';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { ContentDecorator } from './ContentDecorator';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { ContentDecorator } from 'editors/content/container/ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
@@ -29,6 +31,7 @@ export interface ContentContainerProps
   bindProperties?: (element: ContentElement) => BoundProperty[];
   activeContentGuid: string;
   hideSingleDecorator?: boolean;
+  hideAllDecorators?: boolean;
   layout?: Layout;
   overrideRemove?: (model: ContentElements, childModel: Object) => boolean;
 }
@@ -182,8 +185,9 @@ export class ContentContainer
       const indexOf = model.content.toArray().map(c => c.guid).indexOf(childModel.guid);
       let newSelection: ContentElement = null;
       if (model.content.size > 1) {
-        newSelection = indexOf === 0
-          ? updated.content.first()
+        // Select the next item in the list if available, otherwise select the previous item
+        newSelection = indexOf < model.content.size - 1
+          ? model.content.toArray()[indexOf + 1]
           : model.content.toArray()[indexOf - 1];
       }
 
@@ -199,10 +203,8 @@ export class ContentContainer
     }
   }
 
-  onPaste(item, textSelection: Maybe<TextSelection>) {
-    const duplicate = (item.clone() as any).with({
-      guid: guid(),
-    });
+  onPaste(item: ContentElement, textSelection: Maybe<TextSelection>) {
+    const duplicate: ContentElement = item.clone();
     this.onAddNew(duplicate, textSelection);
   }
 
@@ -212,9 +214,7 @@ export class ContentContainer
       const index = indexOf(activeContentGuid, model);
       const active = model.content.get(activeContentGuid);
 
-      const duplicate = (active.clone() as any).with({
-        guid: guid(),
-      });
+      const duplicate = active.clone() as any;
 
       onEdit(this.insertAfter(model, duplicate, index), duplicate);
 
@@ -287,6 +287,7 @@ export class ContentContainer
   renderMain() : JSX.Element {
     const { hideContentLabel, disableContentSelection, hover,
       hideSingleDecorator = false,
+      hideAllDecorators = false,
       onUpdateHover, layout = Layout.Vertical } = this.props;
 
     const bindProperties = this.props.bindProperties === undefined
@@ -305,6 +306,7 @@ export class ContentContainer
       .toArray()
       .map((model) => {
         const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1
+          || hideAllDecorators
           || this.disableContentSelection(model);
 
         const props = {

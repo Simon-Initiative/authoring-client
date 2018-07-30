@@ -1,14 +1,14 @@
 import * as Immutable from 'immutable';
 
-import { defaultIdGuid, getChildren } from '../common';
-import { getKey } from '../../common';
+import { defaultIdGuid, getChildren } from 'data/content/common';
+import { getKey } from 'data/common';
 import { Maybe } from 'tsmonad';
-import { ProgressConstraints } from './progress_constraints';
-import { Sequence } from './sequence';
-import { Include } from './include';
-import createGuid from '../../../utils/guid';
+import { ProgressConstraints } from 'data/content/org/progress_constraints';
+import { Sequence } from 'data/content/org/sequence';
+import { Include } from 'data/content/org/include';
+import createGuid from 'utils/guid';
 
-import * as types from './types';
+import * as types from 'data/content/org/types';
 
 export type SequencesParams = {
   progressConstraints?: Maybe<ProgressConstraints>

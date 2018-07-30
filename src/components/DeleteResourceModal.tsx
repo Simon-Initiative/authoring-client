@@ -9,6 +9,7 @@ import { CourseModel } from 'data/models';
 import './DeleteResourceModal.scss';
 import { LegacyTypes } from 'data/types';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
+import { Severity, Toast } from 'components/common/Toast';
 
 export interface DeleteResourceModalProps {
   resource: Resource;
@@ -155,13 +156,23 @@ export default class DeleteResourceModal extends
         {`Checking if this ${resourceTypeLowercase} can be safely deleted`} />;
 
     const deletionConfirmation =
-      <p>Are you sure you want to delete this {resourceTypeLowercase}?&nbsp;
-      This action cannot be undone.</p>;
+      <p>
+        Are you sure you want to delete '{resource.title}'?
+        <Toast
+          icon={<i className="fa fa-exclamation-triangle"/>}
+          heading="Warning"
+          content={<p>This action cannot be undone</p>}
+          severity={Severity.Warning} />
+      </p>;
 
     const edgeTable =
       <React.Fragment>
-        {/* tslint:disable-next-line:max-line-length */}
-        <p>The following {edges.size === 1 ? 'resource' : edges.size.toString() + ' resources'} use{edges.size === 1 ? 's' : ''} this {resourceTypeLowercase}. All references must be removed before the {resourceTypeLowercase} can be deleted.</p>
+        <p><b>Cannot delete assessment '{resource.title}'</b></p>
+        <p>
+          {`The following ${edges.size === 1 ? 'resource' : edges.size.toString() + ' resources'} `}
+          {`use${edges.size === 1 ? 's' : ''} this ${resourceTypeLowercase}. `}
+          {`Please remove all references before deleting this ${resourceTypeLowercase}.`}
+        </p>
         <SortableTable
           model={rows}
           columnComparators={comparators}
@@ -172,7 +183,7 @@ export default class DeleteResourceModal extends
 
     return (
       <ModalSelection
-        title={`Delete ${resourceTypeUppercase} '${resource.title}'?`}
+        title={`Delete ${resourceTypeUppercase}`}
         onCancel={onDismissModal}
         onInsert={this.onDelete}
         okClassName="danger"

@@ -3,8 +3,8 @@
 
 import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
-import { WorkbookPageModel } from 'data/models//workbook';
-import { ContiguousText } from 'data/content/learning//contiguous';
+import { WorkbookPageModel } from 'data/models/workbook';
+import { ContiguousText } from 'data/content/learning/contiguous';
 import { registerContentTypes } from 'data/registrar';
 import { convertToRaw } from 'draft-js';
 
@@ -23,7 +23,7 @@ it('Contiguous text parsing', () => {
   registerContentTypes();
 
   const workbookPage = require('./simple.json');
-  const model = WorkbookPageModel.fromPersistence(workbookPage);
+  const model = WorkbookPageModel.fromPersistence(workbookPage, () => null);
 
   const body = model.body.content.toArray();
 
@@ -44,7 +44,7 @@ it('Contiguous text parsing', () => {
 it('Non-overlapping markup text parsing', () => {
 
   const workbookPage = require('./nonoverlap.json');
-  const model = WorkbookPageModel.fromPersistence(workbookPage);
+  const model = WorkbookPageModel.fromPersistence(workbookPage, () => null);
 
   const body = model.body.content.toArray();
 
@@ -74,7 +74,7 @@ it('Non-overlapping markup text parsing', () => {
 it('overlapping markup text parsing', () => {
 
   const workbookPage = require('./overlap.json');
-  const model = WorkbookPageModel.fromPersistence(workbookPage);
+  const model = WorkbookPageModel.fromPersistence(workbookPage, () => null);
 
   const body = model.body.content.toArray();
 
@@ -103,7 +103,7 @@ it('overlapping markup text parsing', () => {
 it('only contiguous text', () => {
 
   const workbookPage = require('./only-contig.json');
-  const model = WorkbookPageModel.fromPersistence(workbookPage);
+  const model = WorkbookPageModel.fromPersistence(workbookPage, () => null);
 
   const body = model.body.content.toArray();
 
@@ -128,7 +128,7 @@ it('only contiguous text', () => {
 it('inline entities', () => {
 
   const workbookPage = require('./inline-entities.json');
-  const model = WorkbookPageModel.fromPersistence(workbookPage);
+  const model = WorkbookPageModel.fromPersistence(workbookPage, () => null);
 
   const body = model.body.content.toArray();
 

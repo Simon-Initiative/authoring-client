@@ -1,9 +1,8 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
-import { augment, getChildren, except } from '../common';
-import { getKey } from '../../common';
-import { Title } from '../learning/title';
+import createGuid from 'utils/guid';
+import { augment, getChildren, except, ensureIdGuidPresent, setId } from 'data/content/common';
+import { getKey } from 'data/common';
+import { Title } from 'data/content/learning/title';
 import { Orientation } from 'data/content/learning/common';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
@@ -17,7 +16,7 @@ export enum PulloutType {
   ToSumUp = 'tosumup',
 }
 
-function fromStr(value: string) : Maybe<PulloutType> {
+function fromStr(value: string): Maybe<PulloutType> {
   switch (value) {
     case 'note': return Maybe.just(PulloutType.Note);
     case 'notation': return Maybe.just(PulloutType.Notation);
@@ -30,7 +29,7 @@ function fromStr(value: string) : Maybe<PulloutType> {
 }
 
 export type PulloutParams = {
-  id?: Maybe<string>,
+  id?: string,
   title?: Title,
   orient?: Orientation,
   content?: ContentElements,
@@ -41,7 +40,7 @@ export type PulloutParams = {
 const defaultContent = {
   contentType: 'Pullout',
   elementType: 'pullout',
-  id: Maybe.nothing(),
+  id: '',
   title: Title.fromText('Title'),
   orient: Orientation.Horizontal,
   pulloutType: Maybe.nothing(),
@@ -52,7 +51,7 @@ const defaultContent = {
 export class Pullout extends Immutable.Record(defaultContent) {
   contentType: 'Pullout';
   elementType: 'pullout';
-  id: Maybe<string>;
+  id: string;
   title: Title;
   orient: Orientation;
   content: ContentElements;
@@ -60,28 +59,27 @@ export class Pullout extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: PulloutParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: PulloutParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Pullout {
-    return this.with({
+  clone(): Pullout {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
       title: this.title.clone(),
-    });
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Pullout {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Pullout {
     const t = (root as any).pullout;
 
     let model = new Pullout({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
-    }
+    model = setId(model, t, notify);
+
     if (t['@orient'] !== undefined) {
       model = model.with({
         orient: t['@orient'] === 'vertical'
@@ -100,26 +98,33 @@ export class Pullout extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         default:
       }
     });
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS, null, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
-    const content = this.content.content.size === 0
-       ? [{ p: { '#text': ' ' } }]
-       : this.content.toPersistence();
+    const encoded = this.content.toPersistence();
+    const content = encoded.length === 0 ? [{
+      p: {
+        '#text': ' ',
+        '@id': createGuid(),
+      },
+    }] : encoded;
 
     const s = {
       pullout: {
+        '@id': this.id || createGuid(),
         '@orient': this.orient,
         '#array': [
           this.title.toPersistence(),
@@ -128,7 +133,6 @@ export class Pullout extends Immutable.Record(defaultContent) {
       },
     };
 
-    this.id.lift(p => s.pullout['@id'] = p);
     this.pulloutType.lift(p => s.pullout['@type'] = p);
 
     return s;

@@ -1,5 +1,7 @@
-import * as persistence from '../../../data/persistence';
-import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
+import * as persistence from 'data/persistence';
+import {
+  AbstractPersistenceStrategy,
+} from 'editors/manager/persistence/AbstractPersistenceStrategy';
 
 /**
  * A persistence strategy that applies changes immediately, and will auto

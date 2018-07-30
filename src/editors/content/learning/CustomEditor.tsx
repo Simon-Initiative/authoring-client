@@ -2,21 +2,25 @@ import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
 import { Custom } from 'data/content/assessment/custom';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { DYNA_DROP_SRC_FILENAME } from 'editors/content/utils/common';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { DynaDragDropEditor } from './dynadragdrop/DynaDragDropEditor.controller';
+import { DynaDragDropEditor }
+  from 'editors/content/learning/dynadragdrop/DynaDragDropEditor.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
-import { TextInput } from '../common/TextInput';
+import { TextInput } from 'editors/content/common/TextInput';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { Select } from '../common/Select';
+import { Select } from 'editors/content/common/Select';
 import {
   Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
-import { styles } from './CustomEditor.styles';
+import { styles } from 'editors/content/learning/CustomEditor.styles';
 
 export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
   onShowSidebar: () => void;
@@ -122,7 +126,8 @@ export class CustomEditor
 
     return (
       <div className={classNames([classes.customEditor, className])}>
-        {model.src.substr(model.src.length - 11) === 'DynaDrop.js'
+        {model.src.substr(
+          model.src.length - DYNA_DROP_SRC_FILENAME.length) === DYNA_DROP_SRC_FILENAME
           ? <DynaDragDropEditor {...this.props} />
           : (
             <div className={classes.customEditorOther}>

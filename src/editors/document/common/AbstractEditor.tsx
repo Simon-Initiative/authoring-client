@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { AppServices } from '../../common/AppServices';
-import { AppContext } from '../../common/AppContext';
-import { handleKey, unhandleKey } from './keyhandlers';
+import { AppServices } from 'editors/common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
+import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 import { Maybe } from 'tsmonad';
 import { undo, redo } from 'actions/document';
 

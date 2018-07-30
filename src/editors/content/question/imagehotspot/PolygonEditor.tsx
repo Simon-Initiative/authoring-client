@@ -6,7 +6,7 @@ import { throttle } from 'utils/timing';
 import { Maybe } from 'tsmonad';
 import { BoundingClientRect, Point } from 'types/common';
 
-import { styles } from './PolygonEditor.styles';
+import { styles } from 'editors/content/question/imagehotspot/PolygonEditor.styles';
 
 const mapCoordsToPolygonProps = (coords: Immutable.List<number>) => {
   return {

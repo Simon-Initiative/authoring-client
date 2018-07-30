@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent, setId } from '../common';
 
 export type VariableParams = {
   expression?: string,
@@ -36,13 +36,15 @@ export class Variable extends Immutable.Record(defaultContent) {
   }
 
   clone() : Variable {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) {
+  static fromPersistence(root: Object, guid: string, notify: () => void) {
 
     const v = (root as any).variable;
     let model = new Variable({ guid });
+
+    model = setId(model, v, notify);
 
     if (v['#text'] !== undefined) {
       model = model.with({ expression: v['#text'] });
@@ -52,9 +54,6 @@ export class Variable extends Immutable.Record(defaultContent) {
     }
     if (v['@name'] !== undefined) {
       model = model.with({ name: v['@name'] });
-    }
-    if (v['@id'] !== undefined) {
-      model = model.with({ id: v['@id'] });
     }
 
     return model;

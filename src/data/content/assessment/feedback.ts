@@ -30,7 +30,7 @@ export class Feedback extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
-  clone() : Feedback {
+  clone(): Feedback {
     return this.with({
       body: this.body.clone(),
     });
@@ -40,19 +40,21 @@ export class Feedback extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromText(text: string, guid: string) : Feedback {
+  static fromText(text: string, guid: string): Feedback {
     return new Feedback().with({
       guid,
       body: ContentElements.fromText(text, '', Immutable.List(ALT_FLOW_ELEMENTS).toArray()),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Feedback {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Feedback {
 
     const feedback = (root as any).feedback;
 
     let model = new Feedback({ guid });
-    model = model.with({ body: ContentElements.fromPersistence(feedback, '', ALT_FLOW_ELEMENTS) });
+    model = model.with({
+      body: ContentElements.fromPersistence(feedback, '', ALT_FLOW_ELEMENTS, null, notify),
+    });
 
     if (feedback['@targets'] !== undefined) {
       model = model.with({ targets: feedback['@targets'] });
@@ -61,7 +63,7 @@ export class Feedback extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const body = this.body.toPersistence();
     const feedback = { feedback: { '#array': (body as any) } };

@@ -1,7 +1,7 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
-import { DynaDropTarget } from './DynaDropTarget';
-import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
+import { DynaDropTarget } from 'editors/content/learning/dynadragdrop/DynaDropTarget';
+import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 
 interface StateProps {
 
@@ -13,7 +13,7 @@ interface DispatchProps {
 
 interface OwnProps {
   id: string;
-  assessmentId: string;
+  inputVal: string;
   selectedInitiator: string;
   label: string;
   isHeader?: boolean;

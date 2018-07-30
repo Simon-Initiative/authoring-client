@@ -199,7 +199,7 @@ FillInTheBlank
           && !this.generatedResponsesByMatch.has(choice.value)) {
         this.generatedResponsesByMatch = this.generatedResponsesByMatch.set(
           choice.value,
-          responsesByMatch.get('*').clone().with({ guid: guid(), match: choice.value }));
+          responsesByMatch.get('*').clone().with({ match: choice.value }));
       }
       const response = responsesByMatch.get(choice.value)
         || this.generatedResponsesByMatch.get(choice.value);

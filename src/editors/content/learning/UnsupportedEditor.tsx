@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import PreformattedTextEditor from './PreformattedTextEditor';
+import PreformattedTextEditor from 'editors/content/learning/PreformattedTextEditor';
 import './Unsupported.scss';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';

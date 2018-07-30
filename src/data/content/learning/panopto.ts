@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from 'utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, ensureIdGuidPresent, setId } from '../common';
 import { getKey } from '../../common';
 import { Popout } from './popout';
 import { Alternate } from './alternate';
@@ -53,7 +53,7 @@ export class Panopto extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: PanoptoParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: PanoptoParams) {
@@ -61,27 +61,24 @@ export class Panopto extends Immutable.Record(defaultContent) {
   }
 
   clone() : Panopto {
-    return this.with({
-      id: createGuid(),
+    return ensureIdGuidPresent(this.with({
+      popout: this.popout.clone(),
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+    }));
   }
 
 
-  static fromPersistence(root: Object, guid: string) : Panopto {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Panopto {
 
     const t = (root as any).panopto;
 
     let model = new Panopto({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@height'] !== undefined) {
       model = model.with({ height: t['@height'] });
     }
@@ -99,21 +96,21 @@ export class Panopto extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+            { alternate: Alternate.fromPersistence(item, id, notify) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         default:
 
@@ -135,7 +132,7 @@ export class Panopto extends Immutable.Record(defaultContent) {
 
     return {
       panopto: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@src': this.src,

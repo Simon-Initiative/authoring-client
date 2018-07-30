@@ -1,15 +1,14 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
-import { Title } from '../learning/title';
+import createGuid from 'utils/guid';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
+import { getKey } from 'data/common';
+import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
-import { Default } from './default';
-import { Alternative } from './alternative';
+import { Default } from 'data/content/learning/default';
+import { Alternative } from 'data/content/learning/alternative';
 
 export type AlternativesParams = {
-  id?: Maybe<string>,
+  id?: string,
   title?: Maybe<Title>,
   default?: Maybe<Default>,
   content?: Immutable.OrderedMap<string, Alternative>,
@@ -20,7 +19,7 @@ export type AlternativesParams = {
 const defaultContent = {
   contentType: 'Alternatives',
   elementType: 'alternatives',
-  id: Maybe.nothing(),
+  id: '',
   title: Maybe.nothing(),
   group: Maybe.nothing(),
   content: Immutable.OrderedMap<string, Alternative>(),
@@ -31,7 +30,7 @@ const defaultContent = {
 export class Alternatives extends Immutable.Record(defaultContent) {
   contentType: 'Alternatives';
   elementType: 'alternatives';
-  id: Maybe<string>;
+  id: string;
   title: Maybe<Title>;
   default: Maybe<Default>;
   content: Immutable.OrderedMap<string, Alternative>;
@@ -39,32 +38,40 @@ export class Alternatives extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: AlternativesParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: AlternativesParams) {
     return this.merge(values) as this;
   }
 
-
-
-  clone() : Alternatives {
-    return this.with({
-      content: this.content.map(c => c.clone()).toOrderedMap(),
-    });
+  clone(): Alternatives {
+    return ensureIdGuidPresent(this.with({
+      title: this.title.caseOf({
+        just: t => Maybe.just(t.clone()),
+        nothing: () => Maybe.nothing<Title>(),
+      }),
+      default: this.default.caseOf({
+        just: d => Maybe.just(d.clone()),
+        nothing: () => Maybe.nothing<Default>(),
+      }),
+      content: this.content.mapEntries(([_, v]) => {
+        const clone: Alternative = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Alternative>,
+    }));
   }
 
-  static fromPersistence(root: Object, guid: string) : Alternatives {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Alternatives {
     const t = (root as any).alternatives;
 
     let model = new Alternatives({ guid });
 
-    if (t['@group'] !== undefined) {
+    if (t['@group']) {
       model = model.with({ group: Maybe.just(t['@group']) });
     }
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: Maybe.just(t['@id']) });
-    }
+
+    model = setId(model, t, notify);
 
     getChildren(t).forEach((item) => {
 
@@ -73,14 +80,16 @@ export class Alternatives extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'default':
-          model = model.with({ default: Maybe.just(Default.fromPersistence(item, id)) });
+          model = model.with({ default: Maybe.just(Default.fromPersistence(item, id, notify)) });
           break;
         case 'alternative':
-          model = model.with({ content:
-            model.content.set(id, Alternative.fromPersistence(item, id)) });
+          model = model.with({
+            content:
+              model.content.set(id, Alternative.fromPersistence(item, id, notify)),
+          });
           break;
         default:
       }
@@ -89,7 +98,7 @@ export class Alternatives extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [];
     this.title.lift(title => children.push(title.toPersistence()));
@@ -98,11 +107,11 @@ export class Alternatives extends Immutable.Record(defaultContent) {
 
     const s = {
       alternatives: {
+        '@id': this.id ? this.id : createGuid(),
         '#array': children,
       },
     };
 
-    this.id.lift(g => s.alternatives['@id'] = g);
     this.group.lift(g => s.alternatives['@group'] = g);
 
     return s;

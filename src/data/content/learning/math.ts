@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
-
+import { augment, ensureIdGuidPresent } from '../common';
 import { logger, LogTag } from 'utils/logger';
 
 export type MathParams = {
@@ -30,12 +29,11 @@ export class Math extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-
   clone() : Math {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) : Math {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Math {
 
     if ((root as any)['m:math'] !== undefined) {
       return new Math({ guid, data: (root as any)['m:math']['#cdata'] });

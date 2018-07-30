@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
-import PoolEditor from './PoolEditor';
+import PoolEditor from 'editors/document/pool/PoolEditor';
 import * as contentTypes from 'data/contentTypes';
 import { fetchSkills } from 'actions/skills';
 import { setCurrentNode } from 'actions/document';
 import { Skill } from 'types/course';
-import { AbstractEditorProps } from '../common/AbstractEditor';
+import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
 import { PoolModel, CourseModel } from 'data/models';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
@@ -13,6 +13,7 @@ import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
+import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
   skills: OrderedMap<string, Skill>;
@@ -56,11 +57,11 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onFetchSkills: (courseId: string) => {
       return dispatch(fetchSkills(courseId));
     },
-    onUpdateContent: (documentId: string, content: Object) => {
+    onUpdateContent: (documentId: string, content: ContentElement) => {
       return dispatch(activeActions.updateContent(documentId, content));
     },
     onUpdateContentSelection: (
-      documentId: string, content: Object,
+      documentId: string, content: ContentElement,
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));

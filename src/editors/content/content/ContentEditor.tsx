@@ -1,8 +1,10 @@
 import * as React from 'react';
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { ContentContainer } from '../container/ContentContainer';
-import guid from '../../../utils/guid';
+import * as contentTypes from 'data/contentTypes';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import guid from 'utils/guid';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 
 import './ContentEditor.scss';

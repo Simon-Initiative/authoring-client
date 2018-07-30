@@ -1,11 +1,10 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
-import { Cr, ConjugationCell } from './cr';
-import { CellHeader } from './cellheader';
-import { getKey } from '../../common';
-import { Title } from '../learning/title';
+import createGuid from 'utils/guid';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
+import { Cr, ConjugationCell } from 'data/content/learning/cr';
+import { CellHeader } from 'data/content/learning/cellheader';
+import { getKey } from 'data/common';
+import { Title } from 'data/content/learning/title';
 import { Pronunciation, ContiguousText } from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 
@@ -29,14 +28,12 @@ const defaultContent = {
   guid: '',
 };
 
-
 function createDefaultRows() {
   const cell = new CellHeader().with({ guid: createGuid() });
   const cells = Immutable.OrderedMap<string, ConjugationCell>().set(cell.guid, cell);
   const row = new Cr().with({ cells, guid: createGuid() });
   return Immutable.OrderedMap<string, Cr>().set(row.guid, row);
 }
-
 
 export class Conjugation extends Immutable.Record(defaultContent) {
   contentType: 'Conjugation';
@@ -49,32 +46,35 @@ export class Conjugation extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: ConjugationParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: ConjugationParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Conjugation {
-    return this.with({
-      id: createGuid(),
-      rows: this.rows.map(r => r.clone().with({ guid: createGuid() })).toOrderedMap(),
-    });
+  clone(): Conjugation {
+    return ensureIdGuidPresent(this.with({
+      title: this.title.clone(),
+      pronunciation: this.pronunciation.caseOf({
+        just: p => Maybe.just(p.clone()),
+        nothing: () => Maybe.nothing<Pronunciation>(),
+      }),
+      rows: this.rows.mapEntries(([_, v]) => {
+        const clone: Cr = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Cr>,
+    }));
   }
 
-
-  static fromPersistence(root: Object, guid: string) : Conjugation {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Conjugation {
 
     const t = (root as any).conjugation;
 
     let model = new Conjugation({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@verb'] !== undefined) {
       model = model.with({ verb: t['@verb'] });
     }
@@ -86,25 +86,24 @@ export class Conjugation extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'cr':
-          model = model.with({ rows: model.rows.set(id, Cr.fromPersistence(item, id)) });
+          model = model.with({ rows: model.rows.set(id, Cr.fromPersistence(item, id, notify)) });
           break;
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         case 'pronunciation':
           model = model.with(
-            { pronunciation: Maybe.just(Pronunciation.fromPersistence(item, id)) });
+            { pronunciation: Maybe.just(Pronunciation.fromPersistence(item, id, notify)) });
           break;
         default:
 
       }
     });
 
-
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [];
 
@@ -122,7 +121,7 @@ export class Conjugation extends Immutable.Record(defaultContent) {
 
     return {
       conjugation: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@verb': this.verb,
         '#array': children,
       },

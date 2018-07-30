@@ -13,18 +13,18 @@ import { ContentElements } from 'data/content/common/elements';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { TextInput } from '../../common/controls';
+import { TextInput } from 'editors/content/common/controls';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 
-import ConjugateEditor from './ConjugateEditor';
+import ConjugateEditor from 'editors/content/learning/conjugation/ConjugateEditor';
 import { Maybe } from 'tsmonad';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
 import {
   DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
-import { styles } from './Conjugation.styles';
+import { styles } from 'editors/content/learning/conjugation/Conjugation.styles';
 
 export interface ConjugationEditorProps
   extends AbstractContentEditorProps<contentTypes.Conjugation> {

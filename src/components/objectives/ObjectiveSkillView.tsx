@@ -2,26 +2,26 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { bindActionCreators } from 'redux';
-import * as persistence from '../../data/persistence';
-import * as models from '../../data/models';
-import * as contentTypes from '../../data/contentTypes';
-import { collapseNodes, expandNodes } from '../../actions/expand';
-import { AppServices, DispatchBasedServices } from '../../editors/common/AppServices';
-import * as viewActions from '../../actions/view';
-import { DuplicateListingInput } from './DuplicateListingInput';
-import guid from '../../utils/guid';
-import { RowType } from './types';
+import * as persistence from 'data/persistence';
+import * as models from 'data/models';
+import * as contentTypes from 'data/contentTypes';
+import { collapseNodes, expandNodes } from 'actions/expand';
+import { AppServices, DispatchBasedServices } from 'editors/common/AppServices';
+import * as viewActions from 'actions/view';
+import { DuplicateListingInput } from 'components/objectives/DuplicateListingInput';
+import guid from 'utils/guid';
+import { RowType } from 'components/objectives/types';
 import { buildReadOnlyMessage } from 'utils/lock';
 import { buildPersistenceFailureMessage } from 'utils/error';
 
-import { ExistingSkillSelection } from './ExistingSkillSelection';
+import { ExistingSkillSelection } from 'components/objectives/ExistingSkillSelection';
 import {
   AggregateModel, buildAggregateModel, UnifiedObjectivesModel,
   UnifiedSkillsModel, unifyObjectives, unifySkills,
-} from './persistence';
+} from 'components/objectives/persistence';
 import * as Messages from 'types/messages';
 import { UserState } from 'reducers/user';
-import { Row } from './Row';
+import { Row } from 'components/objectives/Row';
 
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
 import { LearningObjectivesModel } from 'data/models/objective';

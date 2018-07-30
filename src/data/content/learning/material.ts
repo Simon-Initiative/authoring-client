@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
-
+import { augment, ensureIdGuidPresent } from '../common';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 
 export type MaterialParams = {
@@ -31,10 +30,10 @@ export class Material extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() {
-    return this.with({
+  clone(): Material {
+    return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
-    });
+    }));
   }
 
   static fromText(text: string, guid: string) : Material {
@@ -44,12 +43,12 @@ export class Material extends Immutable.Record(defaultContent) {
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Material {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Material {
 
     const cb = (root as any).material;
 
     return new Material({ guid, content: ContentElements
-      .fromPersistence(cb, '', MATERIAL_ELEMENTS) });
+      .fromPersistence(cb, '', MATERIAL_ELEMENTS, null, notify) });
   }
 
   toPersistence() : Object {

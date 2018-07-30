@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type TrackParams = {
   src?: string,
@@ -41,10 +41,10 @@ export class Track extends Immutable.Record(defaultContent) {
   }
 
   clone() : Track {
-    return this;
+    return ensureIdGuidPresent(this);
   }
 
-  static fromPersistence(root: Object, guid: string) : Track {
+  static fromPersistence(root: Object, guid: string, notify: () => void) : Track {
 
     const t = (root as any).track;
 

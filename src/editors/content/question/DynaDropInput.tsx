@@ -13,13 +13,12 @@ import { ActiveContext } from 'types/active';
 import guid from 'utils/guid';
 import './DynaDropInput.scss';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import { Initiator } from 'data/content/assessment/dragdrop/initiator';
-import { Maybe } from 'tsmonad';
-import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
+import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
 import { Badge } from '../common/Badge';
-
+import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
+import { Maybe } from 'tsmonad';
 export const isComplexScoring = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
 
@@ -114,11 +113,11 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const { model, selectedInitiator, onBodyEdit } = this.props;
 
     const customElement = (model.body.content.find(c =>
-      c.contentType === 'Custom') as contentTypes.Custom);
+      c.contentType === 'Custom') as any as contentTypes.Custom);
 
     customElement.layoutData
-      .lift(ld => ld.initiatorGroup.initiators)
-      .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
+      .lift(ld => ld.initiators)
+      .lift(initiators => initiators.find(i => i.inputVal === selectedInitiator))
       .lift((initiator) => {
         const updatedInitiator = initiator.with({
           text,
@@ -128,21 +127,20 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
         const newCustomElement = customElement.withMutations(
             (custom: contentTypes.Custom) => custom.with({
               layoutData: custom.layoutData.caseOf({
-                just: ld => Maybe.just<DndLayout>(ld.with({
-                  initiatorGroup: ld.initiatorGroup.with({
-                    initiators: ld.initiatorGroup.initiators.map(i =>
-                      i.guid === updatedInitiator.guid ? updatedInitiator : i,
-                    ) as Immutable.List<Initiator>,
-                  }),
+                just: ld => Maybe.just<HTMLLayout>(ld.with({
+                  initiators: ld.initiators.map(i =>
+                    i.guid === updatedInitiator.guid ? updatedInitiator : i,
+                  ).toList(),
                 })),
-                nothing: () => Maybe.nothing<DndLayout>(),
+                nothing: () => Maybe.nothing<HTMLLayout>(),
               }),
             }),
           ) as contentTypes.Custom;
 
         // save updates
         onBodyEdit(model.body.with({
-          content: model.body.content.set(newCustomElement.guid, newCustomElement),
+          content: model.body.content.set(
+            newCustomElement.guid, newCustomElement),
         }));
       });
   }
@@ -205,6 +203,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
 
       // safeguard - return if selectedInitiator does not exist in model.items
     if (itemIndex < 0) {
+      console.error('Error: selected initiator does not exist in model items');
       return;
     }
 
@@ -214,12 +213,16 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const initiator = (model.body.content.find(c =>
       c.contentType === 'Custom') as contentTypes.Custom)
       .layoutData
-      .lift(ld => ld.initiatorGroup.initiators)
-      .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
+      .lift(ld => ld.contentType === 'DndHTMLLayout' ? ld.initiators : undefined)
+      .lift(initiators => initiators.find(i => i.inputVal === selectedInitiator))
       .caseOf({
         just: initiator => initiator,
         nothing: () => undefined,
       });
+
+    // we always expect layoutData to be defined here
+    const layout = (model.body.content.find(c => c.contentType === 'Custom') as contentTypes.Custom)
+      .layoutData.valueOrThrow();
 
     if (!initiator) {
       return;
@@ -259,6 +262,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
               onToggleAdvanced={this.onToggleAdvanced}
               itemModel={item}
               partModel={part}
+              layout={layout}
               onEdit={this.props.onEdit} />
 
           {this.renderSkillsTab(item, part)}

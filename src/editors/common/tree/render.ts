@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import {
   ChildrenAccessor, Handlers, HasGuid, NodeId, NodeRenderer, Nodes, RenderedNode,
-} from './types';
+} from 'editors/common/tree/types';
 
 // Given a collection of root nodes (nodes) and a way to navigate
 // through their tree structure (getChildren) render only

@@ -6,7 +6,7 @@ import { Response } from './response';
 import { ResponseMult } from './response_mult';
 import { GradingCriteria } from './criteria';
 import { Hint } from './hint';
-import { defaultIdGuid, getChildren } from '../common';
+import { defaultIdGuid, getChildren, setId, ensureIdGuidPresent } from '../common';
 
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
@@ -72,27 +72,37 @@ export class Part extends Immutable.Record(defaultPartParams) {
   }
 
 
-  clone() : Part {
-    return this.with({
-      id: createGuid(),
-      criteria: this.criteria.map(c => c.clone()).toOrderedMap(),
-      responses: this.responses.map(c => c.clone()).toOrderedMap(),
-      responseMult: this.responseMult.map(c => c.clone()).toOrderedMap(),
-      hints: this.hints.map(c => c.clone()).toOrderedMap(),
+  clone(): Part {
+    return ensureIdGuidPresent(this.with({
+      criteria: this.criteria.mapEntries(([_, v]) => {
+        const clone: GradingCriteria = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, GradingCriteria>,
+      responses: this.responses.mapEntries(([_, v]) => {
+        const clone: Response = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Response>,
+      responseMult: this.responseMult.mapEntries(([_, v]) => {
+        const clone: ResponseMult = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, ResponseMult>,
+      hints: this.hints.mapEntries(([_, v]) => {
+        const clone: Hint = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Hint>,
       explanation: this.explanation.clone(),
-    });
+    }));
   }
 
 
-  static fromPersistence(json: any, guid: string) {
+  static fromPersistence(json: any, guid: string, notify: () => void) {
 
     let model = new Part({ guid });
 
     const part = json.part;
 
-    if (part['@id'] !== undefined) {
-      model = model.with({ id: part['@id'] });
-    }
+    model = setId(model, part, notify);
+
     if (part['@correct'] !== undefined) {
       model = model.with({ correct: part['@correct'] });
     }
@@ -110,34 +120,47 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
       switch (key) {
         case 'cmd:concept':
-          model = model.with({ concepts: model.concepts.push((item as any)
-            ['cmd:concept']['#text']) });
+          model = model.with({
+            concepts: model.concepts.push((item as any)
+            ['cmd:concept']['#text']),
+          });
           break;
         case 'grading_criteria':
-          model = model.with(
-            { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
+          model = model.with({
+            criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id, notify)),
+          });
           break;
         case 'hint':
-          model = model.with({ hints: model.hints.set(id, Hint.fromPersistence(item, id)) });
+          model = model.with({
+            hints: model.hints.set(id, Hint.fromPersistence(item, id, notify)),
+          });
           break;
         case 'response':
-          model = model.with(
-            { responses: model.responses.set(id, Response.fromPersistence(item, id)) });
+          model = model.with({
+            responses: model.responses.set(id, Response.fromPersistence(item, id, notify)),
+          });
           break;
         case 'response_mult':
-          model = model.with(
-            { responseMult: model.responseMult.set(id, ResponseMult.fromPersistence(item, id)) });
+          model = model.with({
+            responseMult: model.responseMult.set(
+              id, ResponseMult.fromPersistence(item, id, notify)),
+          });
           break;
         case 'skillref':
-          model = model.with({ skills: model.skills.add((item as any)
-            ['skillref']['@idref']) });
+          model = model.with({
+            skills: model.skills.add((item as any)
+            ['skillref']['@idref']),
+          });
           break;
         case 'explanation':
-          model = model.with({ explanation:
-            ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
+          model = model.with({
+            explanation:
+              ContentElements.fromPersistence(
+                (item as any).explanation, id, ALT_FLOW_ELEMENTS, null, notify),
+          });
           break;
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Title.fromPersistence(item, id, notify) });
           break;
         default:
 
@@ -147,7 +170,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [
 
@@ -179,7 +202,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .toArray()
         .map(hint => hint.toPersistence()),
 
-        { explanation: { '#array': this.explanation.toPersistence() } },
+      { explanation: { '#array': this.explanation.toPersistence() } },
     ];
 
     const part = {

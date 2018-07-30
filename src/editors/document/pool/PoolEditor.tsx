@@ -1,13 +1,15 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import * as models from '../../../data/models';
-import * as contentTypes from '../../../data/contentTypes';
-import { AddQuestion } from '../../content/question/AddQuestion';
-import { Outline } from '../assessment/Outline';
-import { renderAssessmentNode } from '../common/questions';
-import { findNodeByGuid, locateNextOfKin } from '../assessment/utils';
+import {
+  AbstractEditor, AbstractEditorProps, AbstractEditorState,
+} from 'editors/document/common/AbstractEditor';
+import * as models from 'data/models';
+import * as contentTypes from 'data/contentTypes';
+import { AddQuestion } from 'editors/content/question/AddQuestion';
+import { Outline } from 'editors/document/assessment/Outline';
+import { renderAssessmentNode } from 'editors/document/common/questions';
+import { findNodeByGuid, locateNextOfKin } from 'editors/document/assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
@@ -17,7 +19,6 @@ import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTe
 import { ContiguousText } from 'data/content/learning/contiguous';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
-import createGuid from 'utils/guid';
 
 import './PoolEditor.scss';
 
@@ -226,9 +227,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     currentNode.lift((node) => {
       if (node.contentType === 'Question') {
-        const duplicated = node.clone().with({
-          guid: createGuid(),
-        });
+        const duplicated = node.clone();
         this.addQuestion(duplicated);
       }
     });
@@ -308,7 +307,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                   just: node => renderAssessmentNode(
                     node, assesmentNodeProps, this.onEdit,
                     this.onRemove, this.onFocus,
-                    this.canRemoveNode(), this.onDuplicateNode, null),
+                    this.canRemoveNode(), this.onDuplicateNode, null, true),
                   nothing: () => null,
                 })}
               </div>

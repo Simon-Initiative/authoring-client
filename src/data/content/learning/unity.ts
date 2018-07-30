@@ -1,14 +1,13 @@
 import * as Immutable from 'immutable';
-
 import createGuid from 'utils/guid';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
-import { Popout } from './popout';
-import { Alternate } from './alternate';
-import { Title } from './title';
-import { Caption } from './caption';
-import { Cite } from './cite';
-import { Param } from './param';
+import { augment, getChildren, ensureIdGuidPresent, setId } from 'data/content/common';
+import { getKey } from 'data/common';
+import { Popout } from 'data/content/learning/popout';
+import { Alternate } from 'data/content/learning/alternate';
+import { Title } from 'data/content/learning/title';
+import { Caption } from 'data/content/learning/caption';
+import { Cite } from 'data/content/learning/cite';
+import { Param } from 'data/content/learning/param';
 import { Maybe } from 'tsmonad';
 
 export type UnityParams = {
@@ -61,35 +60,36 @@ export class Unity extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: UnityParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: UnityParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Unity {
-    return this.with({
-      id: createGuid(),
+  clone(): Unity {
+    return ensureIdGuidPresent(this.with({
+      popout: this.popout.clone(),
       alternate: this.alternate.clone(),
       titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
-    });
+      params: this.params.mapEntries(([_, v]) => {
+        const clone: Param = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, Param>,
+    }));
   }
 
 
-  static fromPersistence(root: Object, guid: string) : Unity {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Unity {
 
     const t = (root as any).unity;
 
     let model = new Unity({ guid });
 
-    if (t['@id'] !== undefined) {
-      model = model.with({ id: t['@id'] });
-    } else {
-      model = model.with({ id: createGuid() });
-    }
+    model = setId(model, t, notify);
+
     if (t['@height'] !== undefined) {
       model = model.with({ height: t['@height'] });
     }
@@ -110,24 +110,26 @@ export class Unity extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'popout':
-          model = model.with({ popout: Popout.fromPersistence(item, id) });
+          model = model.with({ popout: Popout.fromPersistence(item, id, notify) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: Alternate.fromPersistence(item, id) });
+            { alternate: Alternate.fromPersistence(item, id, notify) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id, notify) });
           break;
         case 'caption':
-          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          model = model.with({ caption: Caption.fromPersistence(item, id, notify) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, notify) });
           break;
         case 'param':
-          model = model.with({ params: model.params.set(id, Param.fromPersistence(item, id)) });
+          model = model.with({
+            params: model.params.set(id, Param.fromPersistence(item, id, notify)),
+          });
           break;
         default:
 
@@ -137,7 +139,7 @@ export class Unity extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [
       this.titleContent.toPersistence(),
@@ -151,7 +153,7 @@ export class Unity extends Immutable.Record(defaultContent) {
 
     return {
       unity: {
-        '@id': this.id,
+        '@id': this.id ? this.id : createGuid(),
         '@height': this.height,
         '@width': this.width,
         '@src': this.src,

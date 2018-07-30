@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 
 import { ContentElements } from 'data/content/common//elements';
 import { ALT_FLOW_ELEMENTS } from './types';
-import { augment } from '../common';
+import { augment, ensureIdGuidPresent } from '../common';
 
 export type HintParams = {
   targets?: string,
@@ -34,25 +34,27 @@ export class Hint extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Hint {
-    return this.with({
+  clone(): Hint {
+    return ensureIdGuidPresent(this.with({
       body: this.body.clone(),
-    });
+    }));
   }
 
-  static fromText(text: string, guid: string) : Hint {
+  static fromText(text: string, guid: string): Hint {
     return new Hint().with({
       guid,
       body: ContentElements.fromText(text, '', Immutable.List(ALT_FLOW_ELEMENTS).toArray()),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Hint {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Hint {
 
     const hint = (root as any).hint;
 
     let model = new Hint({ guid });
-    model = model.with({ body: ContentElements.fromPersistence(hint, '', ALT_FLOW_ELEMENTS) });
+    model = model.with({
+      body: ContentElements.fromPersistence(hint, '', ALT_FLOW_ELEMENTS, null, notify),
+    });
 
     if (hint['@targets'] !== undefined) {
       model = model.with({ targets: hint['@targets'] });
@@ -61,7 +63,7 @@ export class Hint extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const body = this.body.toPersistence();
     const hint = { hint: { '#array': (body as any) } };

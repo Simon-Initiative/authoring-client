@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, setId } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common//elements';
 import { Title } from '../learning/title';
 import { Question } from './question';
@@ -45,15 +45,13 @@ export class Page extends Immutable.Record(defaultPageParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: any, guid: string) {
+  static fromPersistence(json: any, guid: string, notify: () => void) {
 
     let model = new Page({ guid });
 
     const s = json.page;
 
-    if (s['@id'] !== undefined) {
-      model = model.with({ id: s['@id'] });
-    }
+    model = setId(model, s, notify);
 
     getChildren(s).forEach((item) => {
 
@@ -63,27 +61,33 @@ export class Page extends Immutable.Record(defaultPageParams) {
       switch (key) {
         case 'title':
           model = model.with(
-            { title: Title.fromPersistence(item, id) });
+            { title: Title.fromPersistence(item, id, notify) });
           break;
         case 'question':
           model = model.with(
-            { nodes: model.nodes.set(id, Question.fromPersistence(item, id)) });
+            { nodes: model.nodes.set(id, Question.fromPersistence(item, id, notify)) });
           break;
         case 'content':
-          model = model.with({ nodes: model.nodes.set(id, Content.fromPersistence(item, id)) });
+          model = model.with({
+            nodes: model.nodes.set(id, Content.fromPersistence(item, id, notify)),
+          });
           break;
         case 'selection':
-          model = model.with({ nodes: model.nodes.set(id, Selection.fromPersistence(item, id)) });
+          model = model.with({
+            nodes: model.nodes.set(id, Selection.fromPersistence(item, id, notify)),
+          });
           break;
         default:
-          model = model.with({ nodes: model.nodes.set(id, Unsupported.fromPersistence(item, id)) });
+          model = model.with({
+            nodes: model.nodes.set(id, Unsupported.fromPersistence(item, id, notify)),
+          });
       }
     });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     // If no nodes exist, serialize with an empty content
     // just so as to satisfy DTD constraints
