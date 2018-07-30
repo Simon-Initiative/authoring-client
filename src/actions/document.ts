@@ -53,6 +53,22 @@ export const documentLoaded = (
   editingAllowed,
 });
 
+export type DOCUMENT_EDITING_ENABLE = 'document/DOCUMENT_EDITING_ENABLE';
+export const DOCUMENT_EDITING_ENABLE = 'document/DOCUMENT_EDITING_ENABLE';
+
+export type DocumentEditingEnableAction = {
+  type: DOCUMENT_EDITING_ENABLE,
+  documentId: string,
+  editable: boolean,
+};
+
+export function documentEditingEnable(editable : boolean, documentId : string) {
+  return {
+    type: DOCUMENT_EDITING_ENABLE,
+    editable,
+    documentId,
+  };
+}
 
 export type DOCUMENT_FAILED = 'document/DOCUMENT_FAILED';
 export const DOCUMENT_FAILED: DOCUMENT_FAILED = 'document/DOCUMENT_FAILED';
