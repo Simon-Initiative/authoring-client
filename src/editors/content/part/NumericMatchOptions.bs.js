@@ -292,7 +292,6 @@ function renderValue(jssClass, editMode, matchPattern, responseId, onEditMatch) 
                 }, React.createElement("input", {
                       className: "form-control input-sm form-control-sm",
                       disabled: !editMode,
-                      type: "number",
                       value: value,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
@@ -427,7 +426,6 @@ function renderRange(jssClass, editMode, matchPattern, responseId, onEditMatch) 
                             ]
                           ]),
                       disabled: !editMode,
-                      type: "number",
                       value: rangeStart,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
@@ -450,7 +448,6 @@ function renderRange(jssClass, editMode, matchPattern, responseId, onEditMatch) 
                             ]
                           ]),
                       disabled: !editMode,
-                      type: "number",
                       value: rangeEnd,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;

@@ -177,7 +177,6 @@ let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
   <div className={jssClass("optionItem")}>
     <div className={jssClass("value")}>
       <input
-        _type="number"
         className="form-control input-sm form-control-sm"
         disabled={!editMode}
         value
@@ -256,7 +255,6 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
     <div className={jssClass("range")}>
       <div className={jssClass("rangeLabel")}>{strEl("from")}</div>
       <input
-        _type="number"
         className={classNames([jssClass("rangeInput"), "form-control", "input-sm", "form-control-sm"])}
         disabled={!editMode}
         value=rangeStart
@@ -266,7 +264,6 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
         }} />
       <div className={jssClass("rangeLabel")}>{strEl("to")}</div>
       <input
-        _type="number"
         className={classNames([jssClass("rangeInput"), "form-control", "input-sm", "form-control-sm"])}
         disabled={!editMode}
         value=rangeEnd
