@@ -330,15 +330,14 @@ function cloneDragDropQuestion(question: Question): Question {
       updateHTMLLayoutTargetRefs(valueMap, inputMap, ld)),
   });
 
-  return question.with({
-    id: createGuid(),
+  return ensureIdGuidPresent(question.with({
     body: question.body.with({
       content: question.body.content.set(customContent.guid, clonedCustomContent),
     }).clone(),
     explanation: question.explanation.clone(),
     parts,
     items,
-  });
+  }));
 }
 
 // Cloning a single select multiple choice question requires that
@@ -380,13 +379,12 @@ function cloneMultipleChoiceQuestion(question: Question): Question {
     });
   }).toOrderedMap();
 
-  return question.with({
-    id: createGuid(),
+  return ensureIdGuidPresent(question.with({
     body: question.body.clone(),
     explanation: question.explanation.clone(),
     parts,
     items,
-  });
+  }));
 }
 
 // This ensures that existing input-based questions (aka Numeric, Text, FillInTheBlank)
