@@ -22,6 +22,7 @@ interface DispatchProps {
 }
 
 interface OwnProps {
+  editMode: boolean;
   documentResource: Resource;
   documentId: string;
   canPreview: boolean;

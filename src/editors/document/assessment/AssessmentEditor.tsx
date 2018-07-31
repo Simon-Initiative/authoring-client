@@ -482,7 +482,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <div className="assessment-editor">
-        <ContextAwareToolbar context={this.props.context} model={model} />
+        <ContextAwareToolbar editMode={editMode} context={this.props.context} model={model} />
         <div className="assessment-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
 

@@ -12,6 +12,7 @@ import { CourseModel } from 'data/models';
 
 export interface ItemToolbarProps {
   context: AppContext;
+  editMode: boolean;
   activeContext: ActiveContextState;
   onCut: (item: ContentElement, page: string) => void;
   onCopy: (item: ContentElement, page: string) => void;
@@ -77,7 +78,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
 
   render() {
     const {
-      classes, onCut, onCopy, onPaste, onRemove, parentSupportsElementType,
+      classes, editMode, onCut, onCopy, onPaste, onRemove, parentSupportsElementType,
     } = this.props;
 
     const canMoveUp = true;
@@ -101,7 +102,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             onClick={() => onCut(this.getItem(), this.getPage())}
             tooltip="Cut Item"
             size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection() && this.canDuplicate())}>
+            disabled={!editMode || !(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-cut" /> Cut
           </ToolbarButton>
           <ToolbarButton
@@ -117,7 +118,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             onClick={() => onPaste()}
             tooltip="Paste Item"
             size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection() &&
+            disabled={!editMode || !(this.hasSelection() &&
               clipboardItem !== null &&
               parentSupportsElementType(clipboardElementType))}>
             <i className="fa fa-paste" /> Paste
@@ -127,7 +128,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             onClick={() => onRemove(this.getItem())}
             tooltip="Remove Item"
             size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection())}>
+            disabled={!editMode || !(this.hasSelection())}>
             <i className="fa fa-close" /> Remove
           </ToolbarButton>
         </ToolbarLayout.Column>
@@ -136,14 +137,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             onClick={() => this.getContainer().onMoveUp(this.getItem())}
             tooltip="Move Item Up"
             size={ToolbarButtonSize.Small}
-            disabled={!(this.hasSelection() && canMoveUp)}>
+            disabled={!editMode || !(this.hasSelection() && canMoveUp)}>
             <i className="fa fa-long-arrow-up" />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => this.getContainer().onMoveDown(this.getItem())}
             tooltip="Move Item Down"
             size={ToolbarButtonSize.Small}
-            disabled={!(this.hasSelection() && canMoveDown)}>
+            disabled={!editMode || !(this.hasSelection() && canMoveDown)}>
             <i className="fa fa-long-arrow-down" />
           </ToolbarButton>
         </ToolbarLayout.Column>

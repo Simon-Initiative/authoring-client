@@ -21,6 +21,7 @@ const getReadableResourceType = (documentResource: Resource) => {
 
 export interface ActionsToolbarProps {
   course: CourseModel;
+  editMode: boolean;
   documentResource: Resource;
   documentId: string;
   canUndo: boolean;
@@ -70,7 +71,7 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
   }
 
   render() {
-    const { documentResource, canUndo, canRedo, canPreview } = this.props;
+    const { documentResource, editMode, canUndo, canRedo, canPreview } = this.props;
 
     const { previewing } = this.state;
 
@@ -81,13 +82,13 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
         <ToolbarLayout.Column>
           <ToolbarButton
             onClick={this.undo}
-            disabled={!canUndo}
+            disabled={!editMode || !canUndo}
             size={ToolbarButtonSize.Full}>
             <i className={'fa fa-undo'} /> Undo
         </ToolbarButton>
           <ToolbarButton
             onClick={this.redo}
-            disabled={!canRedo}
+            disabled={!editMode || !canRedo}
             size={ToolbarButtonSize.Full}>
             <i className={'fa fa-repeat'} /> Redo
         </ToolbarButton>

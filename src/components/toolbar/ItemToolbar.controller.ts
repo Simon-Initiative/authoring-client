@@ -19,6 +19,7 @@ interface DispatchProps {
 }
 
 interface OwnProps {
+  editMode: boolean;
   context: AppContext;
   parentSupportsElementType: (type: string) => boolean;
 }
