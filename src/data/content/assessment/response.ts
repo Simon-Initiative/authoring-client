@@ -143,9 +143,10 @@ export class Response extends Immutable.Record(defaultContent) {
         .toArray()
         .map(concept => ({ concept: { '#text': concept } }));
 
-    const feedback = this.feedback
-        .toArray()
-        .map(f => f.toPersistence());
+    
+    const feedback = this.feedback.size === 0 ?
+      [Feedback.fromText('', createGuid()).toPersistence()] :
+      this.feedback.toArray().map(f => f.toPersistence());
 
     const o = {
       response: {
