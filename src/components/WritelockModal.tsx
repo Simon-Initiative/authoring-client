@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
-import colors from 'styles/colors';
+import { injectSheet, classNames } from 'styles/jss';
 
 import { styles } from './WritelockModal.styles';
 
