@@ -88,9 +88,7 @@ export class FillInTheBlank extends Immutable.Record(defaultContent) {
 
     const arr = this.choices.toArray();
 
-    const choices = arr.length > 0
-      ? this.choices.toArray().map(c => c.toPersistence())
-      : [Choice.fromText('', '').toPersistence()];
+    const choices = this.choices.toArray().map(c => c.toPersistence());
 
     return {
       fill_in_the_blank: {

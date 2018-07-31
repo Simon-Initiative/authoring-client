@@ -147,6 +147,17 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       const item = new contentTypes.FillInTheBlank().with({ id: result[1] });
       const part = new contentTypes.Part();
       this.props.onAddItemPart(item, part, result[0]);
+
+      const value = guid().replace('-', '');
+      const choice = contentTypes.Choice.fromText('', guid()).with({ value });
+      const feedback = contentTypes.Feedback.fromText('', guid());
+      let response = new contentTypes.Response().with({ match: value, input: result[1] });
+      response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
+
+      const newItem = item.with({ choices: item.choices.set(choice.guid, choice) });
+      const newPart = part.with({ responses: part.responses.set(response.guid, response) });
+
+      this.props.onAddItemPart(newItem, newPart, result[0]);
     }
   }
 
