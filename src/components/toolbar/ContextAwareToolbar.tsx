@@ -264,7 +264,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
         <ToolbarGroup
           className={classes.toolbarActionsGroup}
           label={actionsToolbarLabel()}
-          columns={7.5}>
+          columns={7.6}>
           <ActionsToolbar
             documentResource={resource}
             documentId={context.documentId}
