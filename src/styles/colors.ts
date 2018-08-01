@@ -26,7 +26,7 @@ export default {
   secondary: '#a3b8cc',
   success: '#3FB618',
   info: '#9954BB',
-  warning: '#FF7518',
+  warning: '#FFC118',
   danger: '#da3232',
 
   // Action Colors
