@@ -186,7 +186,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
       ...this.responses
         // filter out responses with empty matches
-        // .filter(r => r.match !== '')
+        .filter(r => r.match !== '')
         .toArray()
         .map(response => response.toPersistence()),
 
