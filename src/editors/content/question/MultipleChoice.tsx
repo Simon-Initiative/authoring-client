@@ -196,6 +196,11 @@ export class MultipleChoice
   }
 
   onRemoveChoice(choiceId: string, response: contentTypes.Response) {
+    // need at least one choice
+    if (this.props.itemModel.choices.size <= 1) {
+      return;
+    }
+
     const { partModel, itemModel, onEdit } = this.props;
 
     const updatedItemModel = itemModel.with(
@@ -290,7 +295,10 @@ export class MultipleChoice
             onEditChoice={this.onChoiceEdit}
             onEditFeedback={this.onFeedbackEdit}
             onEditScore={this.onScoreEdit}
-            onRemove={choiceId => this.onRemoveChoice(choiceId, response)} />
+            onRemove={this.props.itemModel.choices.size > 1 ?
+              choiceId => this.onRemoveChoice(choiceId, response) :
+              undefined
+            } />
         );
       }
 
