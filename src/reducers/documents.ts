@@ -6,6 +6,7 @@ import { ModelTypes, AssessmentModel } from 'data/models';
 import { Maybe } from 'tsmonad';
 
 export type ActionTypes =
+  documentActions.DocumentEditingEnableAction |
   documentActions.IsSavingUpdatedAction |
   documentActions.LastSaveSucceededAction |
   documentActions.ChangeRedoneAction |
@@ -17,7 +18,6 @@ export type ActionTypes =
   documentActions.ModelUpdatedAction |
   documentActions.SetCurrentPageAction |
   documentActions.SetCurrentNodeAction;
-
 
 export type DocumentsState = Immutable.Map<string, EditedDocument>;
 
@@ -106,6 +106,10 @@ export const documents = (
       return state.set(action.documentId, state.get(action.documentId).with({
         error: action.error,
         hasFailed: true,
+      }));
+    case documentActions.DOCUMENT_EDITING_ENABLE:
+      return state.set(action.documentId, state.get(action.documentId).with({
+        editingAllowed: action.editable,
       }));
 
     case documentActions.DOCUMENT_RELEASED:

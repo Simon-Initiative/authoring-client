@@ -119,6 +119,7 @@ export const ToolbarLayout = {
 export interface ToolbarProps {
   courseModel: CourseModel;
   resource: Resource;
+  editMode: boolean;
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
@@ -172,7 +173,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
     const {
       onInsert, onEdit, content, container, supportedElements, model,
-      classes, onDisplayModal, onDismissModal, context, resource,
+      classes, onDisplayModal, onDismissModal, context, resource, editMode,
       onCreateNew,
     } = this.props;
 
@@ -235,6 +236,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
           <InsertToolbar
+            editMode={editMode}
             onCreateNew={onCreateNew}
             requestLatestModel={requestModel}
             context={context}
@@ -248,6 +250,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
         <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={7.4}>
           <ItemToolbar
+            editMode={editMode}
             context={context}
             parentSupportsElementType={parentSupportsElementType} />
         </ToolbarGroup>
@@ -266,6 +269,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
           label={actionsToolbarLabel()}
           columns={7.6}>
           <ActionsToolbar
+            editMode={editMode}
             documentResource={resource}
             documentId={context.documentId}
             canPreview={canPreview} />

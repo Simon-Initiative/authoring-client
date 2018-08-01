@@ -169,7 +169,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     return (
       <div className="workbookpage-editor">
-        <ContextAwareToolbar context={context} model={model} />
+        <ContextAwareToolbar editMode={editMode} context={context} model={model} />
         <div className="wb-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
 

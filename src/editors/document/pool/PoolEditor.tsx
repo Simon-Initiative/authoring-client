@@ -275,7 +275,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     return (
       <div className="pool-editor">
-        <ContextAwareToolbar context={context} model={model} />
+        <ContextAwareToolbar editMode={editMode} context={context} model={model} />
         <div className="pool-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
 
