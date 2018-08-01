@@ -23,7 +23,7 @@ const defaultContent = {
   src: '',
   width: '',
   height: '',
-  purpose: Maybe.nothing<string>(),
+  purpose: Maybe.just('learnbydoing'),
   params: Immutable.OrderedMap<string, Param>(),
   guid: '',
 };

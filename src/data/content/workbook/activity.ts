@@ -16,7 +16,7 @@ const defaultContent = {
   contentType: 'Activity',
   elementType: 'activity',
   idref: '',
-  purpose: Maybe.nothing<string>(),
+  purpose: Maybe.just('quiz'),
   image: Maybe.nothing<Image>(),
   guid: '',
 };
