@@ -55,7 +55,7 @@ function getInequalityOperator(matchPattern) {
         return /* Unknown */7;
       } else {
         switch (match - 60 | 0) {
-          case 0 :
+          case 0 : 
               var exit = 0;
               var val;
               try {
@@ -77,9 +77,9 @@ function getInequalityOperator(matchPattern) {
                 }
               }
               break;
-          case 1 :
+          case 1 : 
               return /* EQ */0;
-          case 2 :
+          case 2 : 
               var exit$1 = 0;
               var val$1;
               try {
@@ -101,7 +101,7 @@ function getInequalityOperator(matchPattern) {
                 }
               }
               break;
-
+          
         }
       }
     } else if (match !== 33) {
@@ -127,7 +127,7 @@ function getInequalityOperator(matchPattern) {
           return /* NE */1;
         }
       }
-
+      
     }
   } else {
     return /* EQ */0;
@@ -173,29 +173,29 @@ function renderConditionSelect(editMode, responseId, matchPattern, onEditMatch) 
   var match = getConditionFromMatch(matchPattern);
   var tmp;
   switch (match) {
-    case 1 :
+    case 1 : 
         tmp = "ne";
         break;
-    case 2 :
+    case 2 : 
         tmp = "gt";
         break;
-    case 3 :
+    case 3 : 
         tmp = "lt";
         break;
-    case 4 :
+    case 4 : 
         tmp = "gte";
         break;
-    case 5 :
+    case 5 : 
         tmp = "lte";
         break;
-    case 6 :
+    case 6 : 
         tmp = "range";
         break;
-    case 0 :
-    case 7 :
+    case 0 : 
+    case 7 : 
         tmp = "eq";
         break;
-
+    
   }
   return React.createElement("select", {
               className: StyleUtils$CourseEditor.classNames(/* :: */[
@@ -237,25 +237,25 @@ function renderConditionSelect(editMode, responseId, matchPattern, onEditMatch) 
                   }
                   var matchPattern$2;
                   switch (value) {
-                    case "eq" :
+                    case "eq" : 
                         matchPattern$2 = "=" + matchPattern$1;
                         break;
-                    case "gt" :
+                    case "gt" : 
                         matchPattern$2 = ">" + matchPattern$1;
                         break;
-                    case "gte" :
+                    case "gte" : 
                         matchPattern$2 = ">=" + matchPattern$1;
                         break;
-                    case "lt" :
+                    case "lt" : 
                         matchPattern$2 = "<" + matchPattern$1;
                         break;
-                    case "lte" :
+                    case "lte" : 
                         matchPattern$2 = "<=" + matchPattern$1;
                         break;
-                    case "ne" :
+                    case "ne" : 
                         matchPattern$2 = "!=" + matchPattern$1;
                         break;
-                    case "range" :
+                    case "range" : 
                         matchPattern$2 = "[" + (matchPattern$1 + ("," + (matchPattern$1 + "]")));
                         break;
                     default:
