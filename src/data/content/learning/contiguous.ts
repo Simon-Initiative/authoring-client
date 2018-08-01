@@ -203,38 +203,60 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toggleStyle(style: InlineStyles, selection: TextSelection): ContiguousText {
+    type ContentBlock = any;
+    console.log('HERER\n\n\n\n\n\n', selection);
+
+    const rev = selection.getIsBackward(); // !rev if and only if anchor is before focus
+    const anchorKey = selection.getAnchorKey(); // key of starting ContentBlock
+    const anchorOffset = selection.getAnchorOffset();
+    const focusKey = selection.getFocusKey(); // key of ending ContentBlock
+    const focusOffset = selection.getFocusOffset();
+    const blocks : Immutable.OrderedMap<string, ContentBlock> = this.content.getBlockMap();
+    let temp = false; // hack to get an inclusive upper bound on takeUntil
+    const selectedBlocks = blocks.skipUntil((_, x) => x === (rev ? focusKey : anchorKey))
+    .takeUntil((_, x) => {
+      if (x === (rev ? anchorKey : focusKey)) {
+        temp = true;
+        return false;
+      }
+      return temp;
+    });
 
     // Determine whether we need to apply or remove the style based
-    // on the presence of the style at the first character of the
-    // selection
-    const anchorKey = selection.getAnchorKey();
-    const currentContentBlock = this.content.getBlockForKey(anchorKey);
-    const start = selection.getAnchorOffset();
+    // If the current selection is entirely styled, unstyle it.
+    // If the current selection is partially styled, style it entirely.
+    let entirelyStyled = true;
+    selectedBlocks.forEach((block, key) => {
+      const text = block.text;
+      let chars = block.characterList.toArray();
+      const len = chars.length;
+      chars = chars.map(x => x.style);
+      const start = key === anchorKey ? anchorOffset : 0;
+      const end = key === focusKey ? len - focusOffset : len;
+      console.log(text, start, end, len, chars);
+      for (let i = start; i < end; i += 1) {
+        if (!chars[i].has(style) && text[i].trim() !== '') {
+          entirelyStyled = false;
+          return false; // break out of the foreach
+        }
+      }
+    });
 
-    const currentStyles = currentContentBlock.getInlineStyleAt(start);
-
-    let content = currentStyles.has(style)
-      ? Modifier.removeInlineStyle(this.content, selection.getRawSelectionState(), style)
-      : Modifier.applyInlineStyle(this.content, selection.getRawSelectionState(), style);
-
-    // Handle removing complementary styles when the complement is toggled
-    if (style === InlineStyles.Subscript) {
+    let content = entirelyStyled
+        ? Modifier.removeInlineStyle(this.content, selection.getRawSelectionState(), style)
+        : Modifier.applyInlineStyle(this.content, selection.getRawSelectionState(), style);
+  
+    // Handle removing contradictory styles
+    if (!entirelyStyled &&
+      (style === InlineStyles.Subscript || style === InlineStyles.Superscript)) {
       content = Modifier.removeInlineStyle(
-        content,
-        selection.getRawSelectionState(),
-        InlineStyles.Superscript);
+        content, selection.getRawSelectionState(),
+        style === InlineStyles.Subscript ? InlineStyles.Superscript : InlineStyles.Subscript);
     }
-    if (style === InlineStyles.Superscript) {
-      content = Modifier.removeInlineStyle(
-        content,
-        selection.getRawSelectionState(),
-        InlineStyles.Subscript);
-    }
-
+  
     return this.with({
       content,
     });
-
   }
 
   updateEntity(key: string, data: Object) {
