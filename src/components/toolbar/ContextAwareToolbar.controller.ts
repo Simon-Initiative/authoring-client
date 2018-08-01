@@ -32,6 +32,7 @@ interface DispatchProps {
 }
 
 interface OwnProps {
+  editMode: boolean;
   context: AppContext;
   model: ContentModel;
 }
