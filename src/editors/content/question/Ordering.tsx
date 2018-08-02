@@ -445,7 +445,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   }
 
   renderOrderSelection = (response: contentTypes.Response) => {
-    const { itemModel, partModel, context, services } = this.props;
+    const { itemModel, context, services } = this.props;
 
     const choiceValMap = itemModel.choices.reduce(
       (acc, choice) => acc.set(choice.value, choice),
@@ -477,14 +477,10 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   }
 
   renderResponses = () => {
-    const { itemModel, partModel, context, services, advancedScoring, editMode } = this.props;
-
-    const choices = itemModel.choices.toArray();
-
-    const model = partModel;
+    const { partModel, context, services, advancedScoring, editMode } = this.props;
 
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
-    const userResponses = model.responses.toArray().filter(autogenResponseFilter);
+    const userResponses = partModel.responses.toArray().filter(autogenResponseFilter);
 
     const responsesOrPlaceholder = userResponses.length === 0
       ? [this.placeholderResponse]
@@ -672,12 +668,6 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             }
           </TabSectionHeader>
           <TabSectionContent>
-            {/* <ChoiceFeedback
-              {...this.props}
-              model={partModel}
-              choices={itemModel.choices.toArray()}
-              onGetChoiceCombinations={onGetChoicePermutations}
-              onEdit={this.onPartEdit} /> */}
             {this.renderResponseFeedback()}
           </TabSectionContent>
         </TabSection>
