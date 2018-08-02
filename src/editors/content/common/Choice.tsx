@@ -13,6 +13,7 @@ import { Button } from 'editors/content/common/Button';
 
 import './Choice.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { classNames } from 'styles/jss';
 
 export const ChoiceList = InputList;
 
@@ -60,6 +61,7 @@ export const updateChoiceValuesAndRefs =
   };
 
 export interface ChoiceProps  {
+  className?: string;
   index: number;
   choice: contentTypes.Choice;
   response?: contentTypes.Response;
@@ -101,8 +103,8 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
 
   render() {
     const {
-      choice, context, editMode, index, response, services, onReorderChoice, onEditChoice,
-      onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
+      className, choice, context, editMode, index, response, services, onReorderChoice,
+      onEditChoice, onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
       simpleSelectProps, hideChoiceBody,
     } = this.props;
 
@@ -141,7 +143,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
 
     return (
       <InputListItem
-        className="choice"
+        className={classNames(['choice', className])}
         id={choice.guid}
         activeContentGuid={this.props.activeContentGuid}
         hover={this.props.hover}

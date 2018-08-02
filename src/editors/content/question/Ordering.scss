@@ -15,4 +15,24 @@
     padding: 6px 10px;
     flex: 1;
   }
+
+  .order-selection {
+    border-radius: 4px;
+    background-color: #E7F4FE;
+    box-shadow: 2px 2px 10px 0px rgba(155,165,173,1);
+    padding: 10px;
+
+    .input-list-item-content {
+      padding-left: 0px;
+
+      .contiguousTextEditor {
+        background-color: transparent;
+        border: none;
+      }
+    }
+
+    .remove-btn {
+      width: 0px;
+    }
+  }
 }
