@@ -203,60 +203,54 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toggleStyle(style: InlineStyles, selection: TextSelection): ContiguousText {
-    type ContentBlock = any;
-    console.log('HERER\n\n\n\n\n\n', selection);
+    type ContentBlock = any; // so much for type safety
 
-    const rev = selection.getIsBackward(); // !rev if and only if anchor is before focus
+    const rev = selection.getIsBackward(); // its reversed if anchor is after focus
     const anchorKey = selection.getAnchorKey(); // key of starting ContentBlock
     const anchorOffset = selection.getAnchorOffset();
     const focusKey = selection.getFocusKey(); // key of ending ContentBlock
     const focusOffset = selection.getFocusOffset();
     const blocks : Immutable.OrderedMap<string, ContentBlock> = this.content.getBlockMap();
-    let temp = false; // hack to get an inclusive upper bound on takeUntil
-    const selectedBlocks = blocks.skipUntil((_, x) => x === (rev ? focusKey : anchorKey))
-    .takeUntil((_, x) => {
-      if (x === (rev ? anchorKey : focusKey)) {
-        temp = true;
-        return false;
-      }
-      return temp;
-    });
+    console.log(rev, anchorOffset, focusOffset, '\n\n\n\n\n\n\n\n\n');
 
-    // Determine whether we need to apply or remove the style based
-    // If the current selection is entirely styled, unstyle it.
+    // want blocks from anchorKey to focusKey, or focusKey to anchorKey if rev
+    const skipUntil = rev ? focusKey : anchorKey;
+    const takeUntil = rev ? anchorKey : focusKey;
+    let selectedBlocks = blocks.skipUntil((_, x) => x === skipUntil);
+    let saw = false; // saw used as a hack to get an inclusive upper bound on takeUntil
+    selectedBlocks = selectedBlocks.takeUntil((_, x) => saw || (x === takeUntil && !(saw = true)));
+
+    // Determine whether we need to apply or remove the style based on the selection
+    // If the current selection is all styled, unstyle it.
     // If the current selection is partially styled, style it entirely.
-    let entirelyStyled = true;
+    let allStyled = true;
     selectedBlocks.forEach((block, key) => {
+      const chars = block.characterList.toArray().map(x => x.style);
       const text = block.text;
-      let chars = block.characterList.toArray();
       const len = chars.length;
-      chars = chars.map(x => x.style);
       const start = key === anchorKey ? anchorOffset : 0;
       const end = key === focusKey ? len - focusOffset : len;
       console.log(text, start, end, len, chars);
       for (let i = start; i < end; i += 1) {
+        // if the styling isn't the entire section
         if (!chars[i].has(style) && text[i].trim() !== '') {
-          entirelyStyled = false;
-          return false; // break out of the foreach
+          return allStyled = false; // break out of the forEach
         }
       }
+      return true; // maybe not neccessary
     });
 
-    let content = entirelyStyled
+    let content = allStyled
         ? Modifier.removeInlineStyle(this.content, selection.getRawSelectionState(), style)
         : Modifier.applyInlineStyle(this.content, selection.getRawSelectionState(), style);
-  
-    // Handle removing contradictory styles
-    if (!entirelyStyled &&
-      (style === InlineStyles.Subscript || style === InlineStyles.Superscript)) {
+
+    // handle contradictory styling
+    if (!allStyled && (style === InlineStyles.Subscript || style === InlineStyles.Superscript)) {
       content = Modifier.removeInlineStyle(
         content, selection.getRawSelectionState(),
         style === InlineStyles.Subscript ? InlineStyles.Superscript : InlineStyles.Subscript);
     }
-  
-    return this.with({
-      content,
-    });
+    return this.with({ content });
   }
 
   updateEntity(key: string, data: Object) {
@@ -501,5 +495,3 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
 
 }
-
-
