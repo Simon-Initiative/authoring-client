@@ -7,8 +7,8 @@ import {
 import {
   TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { Feedback } from '../part/Feedback';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 
@@ -59,7 +59,7 @@ export class ShortAnswer
     return (
       <React.Fragment>
         <TabSection key="choices" className="choices">
-          <TabSectionHeader title="Details"/>
+          <TabSectionHeader title="Details" />
           <TabSectionContent>
             <div style={{ display: 'inline' }}>
               <Select
@@ -79,12 +79,15 @@ export class ShortAnswer
                 onClick={this.onToggleCaseSensitive} />
             </div>
           </TabSectionContent>
-          <TabSectionHeader title="Feedback"/>
-          <TabSectionContent key="feedback" className="feedback">
-            <Feedback
+          <TabSectionHeader title="How would an expert answer this question?">
+          </TabSectionHeader>
+          <TabSectionContent key="explanation" className="feedback">
+            <ExplanationEditor
               {...this.props}
-              model={partModel}
-              onEdit={this.onPartEdit} />
+              model={partModel.explanation}
+              onEdit={(explanation, src) => this.onPartEdit(
+                partModel.with({ explanation }),
+                src)} />
           </TabSectionContent>
         </TabSection>
       </React.Fragment>
