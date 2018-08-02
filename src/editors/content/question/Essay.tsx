@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Button } from '../common/controls';
 import {
   Question, QuestionProps, QuestionState,
-} from './Question';
+} from 'editors/content/question/Question';
 import {
-  TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
+  TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { Feedback } from '../part/Feedback';
 import guid from 'utils/guid';
+import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
 
 export interface EssayProps extends QuestionProps<contentTypes.Essay> {
 
@@ -63,26 +62,22 @@ export class Essay
   renderDetails() {
     const {
       partModel,
-      editMode,
     } = this.props;
+
+    // All question types except short answers and essays use feedback.
+    // Short answers and essays use the explanation instead
 
     return (
       <TabSection key="choices" className="choices">
-        <TabSectionHeader title="Feedback">
-          <TabOptionControl name="add-feedback">
-            <Button
-              editMode={editMode}
-              type="link"
-              onClick={this.onResponseAdd}>
-              Add Feedback
-            </Button>
-          </TabOptionControl>
+        <TabSectionHeader title="How would an expert answer this question?">
         </TabSectionHeader>
-        <TabSectionContent key="feedback" className="feedback">
-          <Feedback
+        <TabSectionContent key="explanation" className="feedback">
+          <ExplanationEditor
             {...this.props}
-            model={partModel}
-            onEdit={this.onPartEdit} />
+            model={partModel.explanation}
+            onEdit={(explanation, src) => this.onPartEdit(
+              partModel.with({ explanation }),
+              src)} />
         </TabSectionContent>
       </TabSection>
     );
