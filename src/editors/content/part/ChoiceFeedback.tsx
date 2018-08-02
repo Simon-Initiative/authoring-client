@@ -230,8 +230,8 @@ export abstract class ChoiceFeedback
           editMode={editMode}
           body={response.feedback.first().body}
           onEdit={(body, source) => this.onBodyEdit(body, response, source)}
-          onRemove={userResponses.length === 1
-            ? null
+          onRemove={userResponses.length <= 1
+            ? undefined
             : () => this.onResponseRemove(response)
           }
           options={[

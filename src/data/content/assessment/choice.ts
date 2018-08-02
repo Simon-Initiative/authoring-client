@@ -1,5 +1,4 @@
 import * as Immutable from 'immutable';
-
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 
 import { augment } from '../common';

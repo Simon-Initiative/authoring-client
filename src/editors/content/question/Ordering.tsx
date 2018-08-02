@@ -100,6 +100,10 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   }
 
   onRemoveChoice(choice: contentTypes.Choice) {
+    // need at least 1 choice
+    if (this.props.itemModel.choices.size <= 1) {
+      return;
+    }
     const { partModel } = this.props;
 
     const updatedItemModel = this.props.itemModel.with(
@@ -169,7 +173,9 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             editMode={editMode}
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
-            onRemove={choiceId => this.onRemoveChoice(choice)} />
+            onRemove={this.props.itemModel.choices.size > 1 ?
+              choiceId => this.onRemoveChoice(choice) :
+              undefined} />
         );
       });
   }
@@ -233,4 +239,3 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     return false;
   }
 }
-

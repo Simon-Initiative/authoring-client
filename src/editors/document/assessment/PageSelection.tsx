@@ -73,7 +73,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
         <td key="remove" style={{ border: 'none' }}>
           <span>
             <Remove
-              editMode={this.props.editMode}
+              editMode={this.props.editMode && this.props.pages.size > 1}
               onRemove={this.props.onRemove.bind(this, page)} />
           </span>
         </td>
