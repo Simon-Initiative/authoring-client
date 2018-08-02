@@ -16,6 +16,7 @@ import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Badge } from '../common/Badge';
+import { isArray } from 'util';
 
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
@@ -143,11 +144,12 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   onInsertFillInTheBlank(canInsertAnotherPart: PartAddPredicate) {
     const result = this.onInsertInputRef(canInsertAnotherPart, 'FillInTheBlank');
 
-    if (result !== null) {
+    if (isArray(result) && result.length >= 2) {
       const item = new contentTypes.FillInTheBlank().with({ id: result[1] });
       const part = new contentTypes.Part();
       this.props.onAddItemPart(item, part, result[0]);
 
+      // values are formatted like guids without dashes in the DTD
       const value = guid().replace('-', '');
       const choice = contentTypes.Choice.fromText('', guid()).with({ value });
       const feedback = contentTypes.Feedback.fromText('', guid());
