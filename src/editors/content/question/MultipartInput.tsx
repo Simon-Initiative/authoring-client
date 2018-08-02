@@ -16,7 +16,6 @@ import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Badge } from '../common/Badge';
-import { isArray } from 'util';
 
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
@@ -122,7 +121,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   onInsertNumeric(canInsertAnotherPart: PartAddPredicate) {
     const result = this.onInsertInputRef(canInsertAnotherPart, 'Numeric');
 
-    if (result !== null) {
+    if (Array.isArray(result) && result.length >= 2) {
       const item = new contentTypes.Numeric().with({ id: result[1] });
       const part = this.buildPartWithInitialResponse('0', result[1]);
 
@@ -133,7 +132,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   onInsertText(canInsertAnotherPart: PartAddPredicate) {
     const result = this.onInsertInputRef(canInsertAnotherPart, 'Text');
 
-    if (result !== null) {
+    if (Array.isArray(result) && result.length >= 2) {
       const item = new contentTypes.Text().with({ id: result[1] });
       const part = this.buildPartWithInitialResponse('answer', result[1]);
 
@@ -144,10 +143,9 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   onInsertFillInTheBlank(canInsertAnotherPart: PartAddPredicate) {
     const result = this.onInsertInputRef(canInsertAnotherPart, 'FillInTheBlank');
 
-    if (isArray(result) && result.length >= 2) {
+    if (Array.isArray(result) && result.length >= 2) {
       const item = new contentTypes.FillInTheBlank().with({ id: result[1] });
       const part = new contentTypes.Part();
-      this.props.onAddItemPart(item, part, result[0]);
 
       // values are formatted like guids without dashes in the DTD
       const value = guid().replace('-', '');
