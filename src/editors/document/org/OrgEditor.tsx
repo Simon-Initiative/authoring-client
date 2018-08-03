@@ -213,7 +213,9 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     this.props.onEditingEnable(false, this.props.context.documentId);
     const delay = () =>
       command.execute(this.props.model, model, this.props.context, this.props.services)
-        .then(org => this.handleEdit(org)).then(reEnable, reEnable);
+        .then(org => this.handleEdit(org))
+        .then(reEnable)
+        .catch(reEnable);
 
     setImmediate(delay);
   }

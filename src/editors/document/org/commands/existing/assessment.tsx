@@ -9,7 +9,7 @@ import { LegacyTypes } from 'data/types';
 
 export class AddExistingAssessmentCommand extends AbstractCommand {
 
-  onInsert(org, parent, context, services, resolve, reject, assessment: Resource) {
+  onInsert(org, parent, services, resolve, assessment: Resource) {
 
     services.dismissModal();
 
@@ -20,8 +20,9 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
     resolve(insertNode(org, parent.guid, item, parent.children.size));
   }
 
-  onCancel(services) {
+  onCancel(services, reject) {
     services.dismissModal();
+    reject();
   }
 
   description() : string {
@@ -42,8 +43,8 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
         <ResourceSelection
           filterPredicate={predicate}
           courseId={context.courseId}
-          onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)}
-          onCancel={this.onCancel.bind(this, services)}/>);
+          onInsert={assessment => this.onInsert(org, parent, services, resolve, assessment)}
+          onCancel={() => this.onCancel(services, reject)}/>);
     });
   }
 }
