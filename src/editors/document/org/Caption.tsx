@@ -59,14 +59,15 @@ export class Caption
   render(): JSX.Element {
 
     const { model } = this.props;
+    console.log(this.props.context.courseModel.resourcesById.get(model.id))
+    console.log(this.props.context.courseModel.resourcesById.get(model.guid))
+    console.log(this.props.context.courseModel.resources.get(model.guid))
+    console.log(this.props.context.courseModel.resources.get(model.id))
+    console.log(model)
 
     const buttons = this.props.isHoveredOver
-      ? [(
-        <span key="flex-spacer" className="flex-spacer" />
-      ), (
-        <Remove key="remove" editMode={this.props.editMode}
-          processCommand={this.props.processCommand} />
-      )]
+      ? [<Remove key="remove" editMode={this.props.editMode}
+          processCommand={this.props.processCommand} />]
       : null;
     return (
       <div className="caption">

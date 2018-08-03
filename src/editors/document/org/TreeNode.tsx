@@ -41,7 +41,7 @@ export interface TreeNodeState {
 const Title = (props) => {
   return (
     <button onClick={() => props.toggleExpanded()}
-        type="button" className="btn btn-link">{props.children}</button>
+      type="button" className="btn btn-link">{props.children}</button>
   );
 };
 
@@ -95,7 +95,7 @@ export class TreeNode
     return '';
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const { model, parentModel, indexWithinParent,
       depth, editMode, onReposition, isExpanded } = this.props;
@@ -164,11 +164,11 @@ export class TreeNode
     }
 
     const finalDropTarget =
-     (indexWithinParent === parentModel.children.size - 1)
-     ? renderDropTarget(
-         indexWithinParent + 1, parentModel,
-         canHandleDrop, onReposition, '')
-     : null;
+      (indexWithinParent === parentModel.children.size - 1)
+        ? renderDropTarget(
+          indexWithinParent + 1, parentModel,
+          canHandleDrop, onReposition, '')
+        : null;
 
     return (
       <tr
@@ -178,8 +178,8 @@ export class TreeNode
         <td className="content">
           <div className="top-drop">
             {renderDropTarget(
-            indexWithinParent, parentModel,
-            canHandleDrop, onReposition, model.guid)}
+              indexWithinParent, parentModel,
+              canHandleDrop, onReposition, model.guid)}
           </div>
 
           <div className="node">
@@ -189,8 +189,8 @@ export class TreeNode
               index={indexWithinParent}
               source={model}
               parentModel={parentModel}>
-              <span style={ { marginLeft: (depth * 30) } }/>
-              <DragHandle/>
+              <span style={{ marginLeft: (depth * 30) }} />
+              <DragHandle hidden={!this.state.mouseOver} />
               {title}
             </DraggableNode>
           </div>

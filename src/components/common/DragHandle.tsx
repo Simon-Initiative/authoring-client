@@ -4,6 +4,7 @@ import './DragHandle.scss';
 
 export interface DragHandleProps {
   connectDragSource?: any;
+  hidden?: boolean;
 }
 
 export interface DragHandleState {
@@ -15,9 +16,10 @@ export class DragHandle
 
   render() {
     const { connectDragSource } = this.props;
+    console.log('this.props', this.props);
 
     const dragHandle = (
-      <div className="dragHandleGrab">
+      <div className={`dragHandleGrab ${this.props.hidden ? 'invisible' : ''}`}>
         <div className="grip" />
       </div>
     );

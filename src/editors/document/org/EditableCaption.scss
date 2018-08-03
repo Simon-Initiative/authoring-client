@@ -11,6 +11,12 @@
     margin-right: 20px;
   }
 
+  .btn.btn-link:hover:not([disabled]),
+  .btn.btn-link:active:not([disabled]),
+  .btn.btn-link:focus:not([disabled]) {
+    text-decoration: none;
+  }
+
   .label {
     font-family: $sans-font;
     font-size: 10pt;

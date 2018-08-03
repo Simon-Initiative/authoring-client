@@ -107,7 +107,7 @@ export class ObjectiveSkillView
   }
 
   componentDidMount() {
-    this.buildModels();
+    this.buildModels().then(_ => this.expandAllObjectives());
   }
 
   componentWillUnmount() {
@@ -143,7 +143,7 @@ export class ObjectiveSkillView
     const courseId = this.props.course.guid;
     const userName = this.props.userName;
 
-    buildAggregateModel(courseId, userName)
+    return buildAggregateModel(courseId, userName)
       .then((aggregateModel) => {
 
         // We need to check to see if the component has unmounted
@@ -183,6 +183,14 @@ export class ObjectiveSkillView
           });
         }
       });
+  }
+
+  expandAllObjectives() {
+    if (!this.state.objectives) {
+      return;
+    }
+    const objectiveIds = this.state.objectives.objectives.toArray().map(o => o.id);
+    this.props.dispatch(expandNodes('objectives', objectiveIds));
   }
 
   logObjectivesAndSkills(aggregateModel: AggregateModel) {
@@ -711,7 +719,7 @@ export class ObjectiveSkillView
         return set.includes(guid);
       }
 
-      return true;
+      return false;
     };
 
     this.state.objectives.objectives
