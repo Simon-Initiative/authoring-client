@@ -230,7 +230,6 @@ export class QuestionEditor
   }
 
   onGradingChange(grading) {
-
     this.props.onEdit(this.props.model.with({ grading }));
   }
 
