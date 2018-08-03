@@ -299,6 +299,11 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   onRemoveChoice = (choiceId: string) => {
     const { itemModel, partModel, onGetChoicePermutations } = this.props;
 
+    // need at least 1 choice
+    if (this.props.itemModel.choices.size <= 1) {
+      return;
+    }
+
     const removedChoiceVal = itemModel.choices.get(choiceId).value;
 
     const updatedItemModel = itemModel.with(
@@ -436,10 +441,9 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             editMode={editMode}
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
-            onRemove={itemModel.choices.size > 1
-              ? choiceId => this.onRemoveChoice(choiceId)
-              : undefined
-            } />
+            onRemove={this.props.itemModel.choices.size > 1 ?
+              choiceId => this.onRemoveChoice(choiceId) :
+              undefined} />
         );
       });
   }
@@ -695,4 +699,3 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     return false;
   }
 }
-

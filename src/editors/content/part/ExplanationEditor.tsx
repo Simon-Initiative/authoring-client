@@ -6,7 +6,7 @@ import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 export interface ExplanationEditorProps extends AbstractContentEditorProps<ContentElements> {
-  onEdit: (model: ContentElements) => void;
+  onEdit: (model: ContentElements, src) => void;
 }
 
 export interface ExplanationEditorState {
@@ -15,7 +15,7 @@ export interface ExplanationEditorState {
 /**
  * The content editor for HtmlContent.
  */
-export class ExplanationEditor
+export abstract class ExplanationEditor
   extends AbstractContentEditor<ContentElements,
   ExplanationEditorProps, ExplanationEditorState> {
 
@@ -23,14 +23,7 @@ export class ExplanationEditor
     super(props);
   }
 
-  renderSidebar() {
-    return null;
-  }
-  renderToolbar() {
-    return null;
-  }
-
-  renderMain() : JSX.Element {
+  render(): JSX.Element {
     return (
       <div className="explanation-editor">
         <ContentContainer

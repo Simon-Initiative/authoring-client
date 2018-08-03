@@ -143,7 +143,6 @@ export abstract class ChoiceFeedback
   }
 
   onEditMatchSelections(responseId, choices, selected) {
-
     const { model, onGetChoiceCombinations, onEdit } = this.props;
 
     const updatedPart = model.with({
@@ -166,11 +165,12 @@ export abstract class ChoiceFeedback
       AUTOGEN_MAX_CHOICES,
       onGetChoiceCombinations,
     );
+
     onEdit(updatedModel, null);
   }
 
   getSelectedMatches(response, choices) {
-    return response.match.split(',').map((m) => {
+    return response.match.split(',').filter(m => m).map((m) => {
       const choice = choices.find(c => c.value === m);
       return choice && choice.guid;
     }).filter(s => s);
@@ -230,8 +230,8 @@ export abstract class ChoiceFeedback
           editMode={editMode}
           body={response.feedback.first().body}
           onEdit={(body, source) => this.onBodyEdit(body, response, source)}
-          onRemove={responsesOrPlaceholder.length <= 1
-            ? null
+          onRemove={userResponses.length <= 1
+            ? undefined
             : () => this.onResponseRemove(response)
           }
           options={[
