@@ -174,15 +174,12 @@ function migrateSkillsToParts(model: Question): Question {
 
 }
 
-
-
 // In the past, we incorrectly mapped short answer explanations to feedback because
 // we thought that all questions used feedback instead of explanation. We later found
 // that this was not the case, and OLI displays the explanation rather than the feedback
 // to the student both short answer and essay questions.
 // This function migrates the feedback back to explanation.
 function migrateFeedbackToExplanation(model: Question): Question {
-  // explanation is on the model Question, feedback is
 
   const itemsArray = model.items.toArray();
   const partsArray = model.parts.toArray();
@@ -229,53 +226,6 @@ function migrateFeedbackToExplanation(model: Question): Question {
 
   return updated;
 }
-
-  // const hasFeedback = originalResponses.size > 0
-  //   && originalResponses.first().feedback.size > 0;
-
-  // if short answer or essay and has feedback:
-  // check if the feedback has already been migrated to explanation
-  // if not migrated:
-  // get the plaintext of the feedback
-  // create a new explanation with the feedback text
-  // set the feedback to a 'fromText' with text 'migrated'
-  // create a new feedback map with the new Feedback
-  // create a new response with the feedback map, set the responses
-  // update the part with the responses and explanation
-  // update the parts with the part
-  // set updated with the parts
-
-    // if (!migratedAlready) {
-
-    // }
-
-  //   const originalExplanation = partsArray[0].explanation;
-  //   const originalResponses = partsArray[0].responses;
-
-  //   const migratedAlready = originalExplanation.extractPlainText().caseOf({
-  //     just: text => text === 'migrated',
-  //     nothing: () => false,
-  //   });
-
-  //   if (!migratedAlready) {
-  //     const explanation
-  //       = ContentElements.fromText('migrated', '', ALT_FLOW_ELEMENTS);
-
-  //     const f = new Feedback().with({ body: originalExplanation });
-  //     const feedback = Immutable.OrderedMap<string, Feedback>()
-  //       .set(f.guid, f);
-
-  //     const res = originalResponses.size === 0
-  //       ? new Response().with({ match: '*', feedback })
-  //       : originalResponses.first().with({ match: '*', feedback });
-
-  //     const responses = originalResponses.set(res.guid, res);
-
-  //     const part = partsArray[0].with({ responses, explanation });
-  //     const parts = updated.parts.set(part.guid, part);
-  //     updated = updated.with({ parts });
-  //   }
-  // }
 
 // Cloning an input question requires that we:
 // 1. update the input attribute of all input_ref entities found in the
