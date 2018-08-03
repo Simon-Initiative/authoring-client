@@ -64,14 +64,13 @@ export class Essay
       partModel,
     } = this.props;
 
-    // All question types except short answers and essays use feedback.
-    // Short answers and essays use the explanation instead
-
     return (
       <TabSection key="choices" className="choices">
         <TabSectionHeader title="How would an expert answer this question?">
         </TabSectionHeader>
         <TabSectionContent key="explanation" className="feedback">
+          {/* All question types except short answers and essays use feedback.
+          Short answers and essays use the explanation instead */}
           <ExplanationEditor
             {...this.props}
             model={partModel.explanation}
