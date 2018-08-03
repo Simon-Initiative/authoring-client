@@ -346,8 +346,6 @@ export class HTMLTableEditor
                 key={cell.guid}
                 id={cell.guid}
                 className={classNames([classes.cell])}
-                // TODO
-                // style={cell.style}
                 canToggleType={true}
                 onToggleType={this.toggleCellType}
                 editMode={editMode}
