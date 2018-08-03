@@ -178,7 +178,7 @@ export default class UnorderedList
 
   renderMain(): JSX.Element {
 
-    const { className, classes, model } = this.props;
+    const { className, classes, editMode, model } = this.props;
     const { style } = model;
 
     const actualStyle = style.caseOf({ just: s => s, nothing: () => 'disc' });
@@ -215,7 +215,7 @@ export default class UnorderedList
           bindProperties={bindLabel}
           onEdit={this.onListItemsEdit.bind(this)}
         />
-        <button type="button" onClick={this.onListItemAdd.bind(this)}
+        <button type="button" disabled={!editMode} onClick={this.onListItemAdd.bind(this)}
           className="btn btn-link">+ Add item</button>
       </div>
     );
