@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
 
-
 import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';

@@ -47,6 +47,10 @@ export abstract class NumericFeedback
   }
 
   onResponseRemove(response) {
+    // need at least 1 right and 1 wrong
+    if (this.props.model.responses.size <= 2) {
+      return;
+    }
     const { model, onEdit } = this.props;
 
     const updatedModel = model.with({
@@ -119,7 +123,9 @@ export abstract class NumericFeedback
             editMode={editMode}
             body={response.feedback.first().body}
             onEdit={(body, source) => this.onBodyEdit(body, response, source)}
-            onRemove={() => this.onResponseRemove(response)}
+            onRemove={this.props.model.responses.size > 2 ?
+              () => this.onResponseRemove(response) :
+              undefined}
             options={
               <ItemOptions>
                 <ItemOption className="matches" label="Matching Condition" flex>

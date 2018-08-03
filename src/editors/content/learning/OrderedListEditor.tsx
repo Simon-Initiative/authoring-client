@@ -208,7 +208,7 @@ export default class OrderedList
 
   renderMain(): JSX.Element {
 
-    const { className, classes, model } = this.props;
+    const { className, classes, editMode, model } = this.props;
     const { style } = model;
 
     const totalItems = model.listItems.size;
@@ -262,7 +262,7 @@ export default class OrderedList
           bindProperties={bindLabel}
           onEdit={this.onListItemsEdit.bind(this)}
         />
-        <button type="button" onClick={this.onListItemAdd.bind(this)}
+        <button type="button" disabled={!editMode} onClick={this.onListItemAdd.bind(this)}
           className="btn btn-link">+ Add item</button>
       </div>
     );
