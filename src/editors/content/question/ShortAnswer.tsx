@@ -81,6 +81,8 @@ export class ShortAnswer
           </TabSectionContent>
           <TabSectionHeader title="How would an expert answer this question?">
           </TabSectionHeader>
+          {/* All question types except short answers and essays use feedback.
+          Short answers and essays use the explanation instead */}
           <TabSectionContent key="explanation" className="feedback">
             <ExplanationEditor
               {...this.props}
