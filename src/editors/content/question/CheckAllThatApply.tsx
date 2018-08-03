@@ -190,7 +190,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
         responses: updatedPartModel.responses.set(
           response.guid,
           response.with({
-            match: response.match.split(',').concat([choice.value]).join(','),
+            match: response.match.split(',').filter(m => m)
+              .concat([choice.value]).join(','),
           })
           // set response score to 1 if score is less than 1
           .with({ score: +response.score < 1 ? '1' : response.score }),
