@@ -149,6 +149,7 @@ export class Text
           <Feedback
             {...this.props}
             model={partModel}
+            disableRemove
             onEdit={this.onPartEdit} />
         </TabSectionContent>
       </TabSection>

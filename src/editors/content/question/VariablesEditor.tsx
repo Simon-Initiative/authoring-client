@@ -121,6 +121,7 @@ export class VariablesEditor
           <span className="remove-btn">
             <button
               disabled={!editMode}
+              tabIndex={-1}
               onClick={this.onRemoveVariable.bind(this, variable.guid)}
               type="button"
               className="btn btn-sm">

@@ -84,6 +84,10 @@ FillInTheBlank
   }
 
   onRemoveChoice(choiceId: string, response: contentTypes.Response) {
+    // need at least 1 choice
+    if (this.props.itemModel.choices.size <= 1) {
+      return;
+    }
     const {
       itemModel,
       partModel,
@@ -224,7 +228,9 @@ FillInTheBlank
           onEditChoice={this.onChoiceEdit}
           onEditFeedback={this.onFeedbackEdit}
           onEditScore={this.onScoreEdit}
-          onRemove={choiceId => this.onRemoveChoice(choiceId, response)} />
+          onRemove={this.props.itemModel.choices.size > 1 ?
+            choiceId => this.onRemoveChoice(choiceId, response) :
+            undefined} />
       );
     });
   }

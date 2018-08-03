@@ -5,6 +5,7 @@
 .media-manager {
   display: flex;
   flex-direction: column;
+  height: 500px;
   @include disable-select;
 
   .media-toolbar {

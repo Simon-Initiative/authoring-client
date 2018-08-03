@@ -42,6 +42,7 @@ export interface InputListItemProps {
   onRemove?: (id: string) => void;
 
   // required props if draggable
+  alwaysAllowDragging?: boolean;
   isDraggable?: boolean;
   index?: number;
   connectDragSource?: any;
@@ -60,7 +61,7 @@ export interface InputListItemProps {
 
 const source = {
   canDrag(props) {
-    return props.editMode;
+    return props.editMode || props.alwaysAllowDragging;
   },
   beginDrag(props) {
     return {

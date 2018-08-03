@@ -11,7 +11,7 @@ import './Feedback.scss';
 import guid from 'utils/guid';
 
 export interface FeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
-
+  disableRemove?: boolean;
 }
 
 export interface FeedbackState {
@@ -46,6 +46,9 @@ export abstract class Feedback
 
   onResponseRemove(response) {
     const { model, onEdit } = this.props;
+    if (model.responses.size <= 2) {
+      return;
+    }
 
     const updatedModel = model.with({
       responses: model.responses.delete(response.guid),
@@ -117,7 +120,8 @@ export abstract class Feedback
             editMode={editMode}
             body={response.feedback.first().body}
             onEdit={(body, source) => this.onBodyEdit(body, response, source)}
-            onRemove={() => this.onResponseRemove(response)}
+            onRemove={this.props.disableRemove && model.responses.size <= 2 ? undefined :
+              () => this.onResponseRemove(response)}
             options={
               <ItemOptions>
                 <ItemOption className="matches" label="Matching Pattern" flex>

@@ -8,6 +8,7 @@ export const Remove = (props) => {
     <span className={`remove-btn ${props.className || ''}`}>
       <button
         disabled={!props.editMode}
+        tabIndex={-1}
         onClick={e => props.editMode && props.onRemove(e)}
         type="button"
         className="btn btn-sm">
