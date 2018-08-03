@@ -452,28 +452,43 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       Immutable.Map<string, contentTypes.Choice>(),
     );
 
-    return response.match.split(',').map((choiceVal, index) => {
-      const choice = choiceValMap.get(choiceVal);
+    // if match is empty, initialize it to the default choice order
+    const match = response.match === ''
+      ? itemModel.choices.map(c => c.value).join(',')
+      : response.match;
 
-      // create a "viewOnly" choice using the clone() method. This is necessary to prevent focus
-      // from being stolen by this component from the actual choice when editing it's content.
-      // It is used for rendering purposes only here
-      const viewOnlyChoice = choice.clone();
+    try {
+      return match.split(',').map((choiceVal, index) => {
+        const choice = choiceValMap.get(choiceVal);
 
+        // create a "viewOnly" choice using the clone() method. This is necessary to prevent focus
+        // from being stolen by this component from the actual choice when editing it's content.
+        // It is used for rendering purposes only here
+        const viewOnlyChoice = choice.clone();
+
+        return (
+            <OrderingChoice
+              className="order-selection"
+              onUpdateHover={() => {}}
+              label={getLabelFromChoice(itemModel, choice)}
+              key={viewOnlyChoice.guid}
+              index={index}
+              choice={viewOnlyChoice}
+              context={context}
+              services={services}
+              onReorderChoice={(originalIndex, newIndex) =>
+                this.onReorderSelection(response, originalIndex, newIndex)} />
+        );
+      });
+    } catch (err) {
+      // it is possible that not all values in match are valid choice values.
+      // if that is the case, the xml data is invalid. Just display an error message.
       return (
-          <OrderingChoice
-            className="order-selection"
-            onUpdateHover={() => {}}
-            label={getLabelFromChoice(itemModel, choice)}
-            key={viewOnlyChoice.guid}
-            index={index}
-            choice={viewOnlyChoice}
-            context={context}
-            services={services}
-            onReorderChoice={(originalIndex, newIndex) =>
-              this.onReorderSelection(response, originalIndex, newIndex)} />
+        <div className="alert alert-danger" role="alert">
+          Could not match choice and response. Please check the original XML.
+        </div>
       );
-    });
+    }
   }
 
   renderResponses = () => {
