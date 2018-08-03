@@ -23,6 +23,7 @@ import './ChoiceFeedback.scss';
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
   simpleFeedback?: boolean;
   choices: contentTypes.Choice[];
+  onInvalidFeedback?: (responseGuid : string) => void;
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
@@ -253,6 +254,9 @@ export abstract class ChoiceFeedback
                           this.setState({
                             invalidFeedback: invalidFeedback.set(response.guid, true),
                           });
+                          if (this.props.onInvalidFeedback) {
+                            this.props.onInvalidFeedback(response.guid);
+                          }
                         }
                       }}
                       options={choices.map(c => c.guid)}
