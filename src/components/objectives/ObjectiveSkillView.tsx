@@ -107,6 +107,7 @@ export class ObjectiveSkillView
   }
 
   componentDidMount() {
+    // If node expansion state has not been set by the user, expand all nodes as a default state
     this.buildModels().then((_) => {
       this.props.expanded.caseOf({
         just: expandedNodes => null,
