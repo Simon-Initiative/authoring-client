@@ -73,11 +73,7 @@ export class TreeNode
 
 
   onEnter() {
-    if (this.timer !== null) {
-      clearTimeout(this.timer);
-    }
-    this.timer = setTimeout(() => this.setState({ mouseOver: true }), 250);
-
+    this.setState({ mouseOver: true });
   }
 
   onLeave() {
