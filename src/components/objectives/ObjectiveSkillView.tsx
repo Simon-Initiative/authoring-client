@@ -687,7 +687,6 @@ export class ObjectiveSkillView
   }
 
   onToggleExpanded(guid) {
-
     let action = null;
     if (this.props.expanded.has('objectives')) {
       action = this.props.expanded.get('objectives').has(guid)

@@ -322,13 +322,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   componentDidMount() {
     super.componentDidMount();
 
-    this.props.expanded.caseOf({
-      just: v => false,
-      nothing: () => this.props.dispatch(
-        expandNodes(
-          this.props.context.documentId,
-          this.props.model.sequences.children.toArray().map(s => getExpandId(s)))),
-    });
+    this.onExpand();
   }
 
   renderDetails() {

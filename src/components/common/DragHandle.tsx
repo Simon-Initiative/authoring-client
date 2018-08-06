@@ -16,7 +16,6 @@ export class DragHandle
 
   render() {
     const { connectDragSource } = this.props;
-    console.log('this.props', this.props);
 
     const dragHandle = (
       <div className={`dragHandleGrab ${this.props.hidden ? 'invisible' : ''}`}>
