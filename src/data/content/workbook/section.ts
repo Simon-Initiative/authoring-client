@@ -8,6 +8,8 @@ import { Maybe } from 'tsmonad';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 import { PurposeType } from 'data/content/learning/common';
 
+export const SECTION_ELEMENTS = [...BODY_ELEMENTS, 'section'];
+
 export type SectionParams = {
   id?: string,
   title?: Title,
@@ -22,7 +24,7 @@ const defaultContent = {
   id:'',
   title: Title.fromText('New Section Title'),
   purpose: Maybe.nothing(),
-  body: new ContentElements().with({ supportedElements: Immutable.List<string>(BODY_ELEMENTS) }),
+  body: new ContentElements().with({ supportedElements: Immutable.List<string>(SECTION_ELEMENTS) }),
   guid: '',
 };
 
