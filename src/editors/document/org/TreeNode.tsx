@@ -130,13 +130,14 @@ export class TreeNode
             return <i className="fa fa-check" />;
           case LegacyTypes.workbook_page:
             return <i className="fa fa-file" />;
+          default:
+            return <i className={'fa fa-question'} />;
         }
       };
 
       title = (
         <Caption
           onViewEdit={() => this.props.onViewEdit(resource.id)}
-          resource={resource}
           labels={this.props.labels}
           depth={0}
           org={this.props.org} context={this.props.context}

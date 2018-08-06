@@ -16,7 +16,6 @@ export interface Caption {
 export interface CaptionProps {
   labels: t.Labels;
   model: t.Item;
-  resource: t.Resource;
   org: models.OrganizationModel;
   context: AppContext;
   depth: number;
