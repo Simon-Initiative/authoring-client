@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from '../../data/contentTypes';
 import { Title } from './Title';
-import { Remove } from 'components/common/Remove';
 
 import './Skill.scss';
 
