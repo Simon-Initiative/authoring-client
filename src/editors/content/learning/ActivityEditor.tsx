@@ -16,6 +16,7 @@ import { StyledComponentProps } from 'types/component';
 
 import { styles } from 'editors/content/learning/Activity.styles';
 import { ResourceState } from 'data/content/resource';
+import { Maybe } from 'tsmonad';
 
 export interface ActivityEditorProps extends AbstractContentEditorProps<contentTypes.Activity> {
   onShowSidebar: () => void;
@@ -41,21 +42,23 @@ export default class ActivityEditor
     this.onClick = this.onClick.bind(this);
   }
 
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps: ActivityEditorProps): boolean {
     return this.props.model !== nextProps.model;
   }
 
-  onPurposeEdit(purpose) {
-    const model = this.props.model.with({ purpose });
+  onPurposeEdit(purpose: string): void {
+    const model = this.props.model.with({
+      purpose: purpose === '' ? Maybe.nothing() : Maybe.just(purpose),
+    });
     this.props.onEdit(model, model);
   }
 
-  onAssessmentChange(idref) {
+  onAssessmentChange(idref): void {
     const model = this.props.model.with({ idref });
     this.props.onEdit(model, model);
   }
 
-  onClick() {
+  onClick(): void {
     const guid = this.props.context.courseModel.resourcesById
       .get(this.props.model.idref).guid;
 
@@ -67,6 +70,10 @@ export default class ActivityEditor
       .toArray()
       .filter(r => r.type === LegacyTypes.assessment2 && r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+
+    // A purpose is not required, so we need to add an option for an empty type
+    const purposeTypesWithEmpty = PurposeTypes.slice();
+    purposeTypesWithEmpty.unshift({ value: '', label: '' });
 
     return (
       <SidebarContent title="Activity">
@@ -82,9 +89,9 @@ export default class ActivityEditor
         <SidebarGroup label="Purpose">
           <Select
             editMode={this.props.editMode}
-            value={this.props.model.purpose}
+            value={this.props.model.purpose.valueOr('')}
             onChange={this.onPurposeEdit}>
-            {PurposeTypes.map(p =>
+            {purposeTypesWithEmpty.map(p =>
               <option
                 key={p.value}
                 value={p.value}>
