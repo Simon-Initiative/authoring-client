@@ -12,6 +12,7 @@ import { Caption } from './Caption';
 import { Command } from './commands/command';
 
 import './TreeNode.scss';
+import { LegacyTypes } from 'data/types';
 
 export interface TreeNodeProps {
   numberAtLevel: number;      // 1-based position of this node at this level of the tree
@@ -123,9 +124,19 @@ export class TreeNode
         ? resource.title
         : 'Loading...';
 
+      const resourceIcon = (type: LegacyTypes) => {
+        switch (type) {
+          case LegacyTypes.assessment2:
+            return <i className="fa fa-check" />;
+          case LegacyTypes.workbook_page:
+            return <i className="fa fa-file" />;
+        }
+      };
+
       title = (
         <Caption
           onViewEdit={() => this.props.onViewEdit(resource.id)}
+          resource={resource}
           labels={this.props.labels}
           depth={0}
           org={this.props.org} context={this.props.context}
@@ -135,7 +146,7 @@ export class TreeNode
           onEdit={this.props.onEdit}
           model={this.props.model}
           toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-          {titleString}
+          {resourceIcon(resource.type as LegacyTypes)}{titleString}
         </Caption>
       );
     } else if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {

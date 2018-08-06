@@ -107,7 +107,12 @@ export class ObjectiveSkillView
   }
 
   componentDidMount() {
-    this.buildModels().then(_ => this.expandAllObjectives());
+    this.buildModels().then((_) => {
+      this.props.expanded.caseOf({
+        just: expandedNodes => null,
+        nothing: () => this.expandAllObjectives(),
+      });
+    });
   }
 
   componentWillUnmount() {

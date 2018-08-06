@@ -16,6 +16,7 @@ export interface Caption {
 export interface CaptionProps {
   labels: t.Labels;
   model: t.Item;
+  resource: t.Resource;
   org: models.OrganizationModel;
   context: AppContext;
   depth: number;
@@ -59,11 +60,6 @@ export class Caption
   render(): JSX.Element {
 
     const { model } = this.props;
-    console.log(this.props.context.courseModel.resourcesById.get(model.id));
-    console.log(this.props.context.courseModel.resourcesById.get(model.guid));
-    console.log(this.props.context.courseModel.resources.get(model.guid));
-    console.log(this.props.context.courseModel.resources.get(model.id));
-    console.log(model);
 
     const buttons = this.props.isHoveredOver
       ? [<Remove key="remove" editMode={this.props.editMode}
