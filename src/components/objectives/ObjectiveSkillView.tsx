@@ -33,13 +33,14 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
 import { LegacyTypes } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
+import { ExpandedState } from 'reducers/expanded';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
   user: UserState;
   course: models.CourseModel;
   dispatch: any;
-  expanded: any;
+  expanded: ExpandedState;
   skills: Immutable.OrderedMap<string, contentTypes.Skill>;
   onSetSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
   onUpdateSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
@@ -109,10 +110,9 @@ export class ObjectiveSkillView
   componentDidMount() {
     // If node expansion state has not been set by the user, expand all nodes as a default state
     this.buildModels().then((_) => {
-      this.props.expanded.caseOf({
-        just: expandedNodes => null,
-        nothing: () => this.expandAllObjectives(),
-      });
+      this.props.expanded.has('objectives')
+        ? null
+        : this.expandAllObjectives();
     });
   }
 

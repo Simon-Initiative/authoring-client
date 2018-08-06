@@ -42,36 +42,36 @@ export class Objective
     this.props.onEdit(model);
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const { model, title, editMode, mouseOver, isExpanded } = this.props;
 
     let titleBlock = null;
 
     if (this.props.model.skills.size === 0) {
-      titleBlock = <div style={ { marginLeft: '10px' } }>
-            <span>
-              <i className="icon"></i>
-            </span>
-          <b>Objective:</b> {title}
-          </div>;
+      titleBlock = <div style={{ marginLeft: '10px' }}>
+        <span>
+          <i className="icon"></i>
+        </span>
+        <b>Objective:</b> {title}
+      </div>;
     } else if (isExpanded) {
       titleBlock = <div>
-                <span className="objective">
-                <i className="fa fa-caret-down"></i>
-                </span>
-                <b>Objective:</b> {title}
-              </div>;
+        <span className="objective">
+          <i className="fa fa-caret-down"></i>
+        </span>
+        <b>Objective:</b> {title}
+      </div>;
     } else {
       titleBlock = <div>
-                <span className="objective">
-                <i className="fa fa-caret-right"></i>
-                </span>
-                <b>Objective:</b> {title}
-              </div>;
+        <span className="objective">
+          <i className="fa fa-caret-right"></i>
+        </span>
+        <b>Objective:</b> {title}
+      </div>;
     }
 
-    const label : any = {
+    const label: any = {
       fontFamily: 'sans-serif',
       lineHeight: 1.25,
       fontSize: '12',
@@ -81,28 +81,25 @@ export class Objective
     };
 
     const skillButtons = this.props.mouseOver && this.props.editMode
-          ? <div style={ { display: 'inline', marginLeft: '50px' } }>
-              <span style={label}>Add Skill:</span>
-              <button
-              key="new"
-              onClick={this.props.onAddNewSkill}
-              type="button"
-              className="btn btn-link btn-sm">
-              New
+      ? <div style={{ display: 'inline-block', marginLeft: '50px' }}>
+        <span style={label}>Add Skill:</span>
+        <button
+          key="new"
+          onClick={this.props.onAddNewSkill}
+          type="button"
+          className="btn btn-link btn-sm">
+          New
             </button>
-            /
+        /
             <button
-              key="existing"
-              onClick={this.props.onAddExistingSkill}
-              type="button"
-              className="btn btn-link btn-sm">
-              Existing
+          key="existing"
+          onClick={this.props.onAddExistingSkill}
+          type="button"
+          className="btn btn-link btn-sm">
+          Existing
             </button>
-            <Remove editMode={this.props.editMode}
-              loading={this.props.loading}
-              onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
-          </div>
-          : null;
+      </div>
+      : null;
 
     return (
       <div className={mouseOver ? 'objective-mouseover-highlight' : ''}>
@@ -110,7 +107,10 @@ export class Objective
           editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
           isHoveredOver={mouseOver}
-          onEdit={this.onTitleEdit}>{titleBlock}</Title>
+          onEdit={this.onTitleEdit}
+          loading={this.props.loading}
+          onRemove={this.props.onRemove.bind(undefined, this.props.model)}
+          >{titleBlock}</Title>
         {skillButtons}
       </div>
     );
