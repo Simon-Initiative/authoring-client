@@ -1,3 +1,4 @@
+import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 import * as contentTypes from 'data/contentTypes';
@@ -7,14 +8,17 @@ import { Resource } from 'data/content/resource';
 import * as models from 'data/models';
 import * as Messages from 'types/messages';
 import { showMessage, dismissScopedMessages, dismissSpecificMessage } from 'actions/messages';
+import { modalActions } from 'actions/modal';
 import { lookUpByName } from 'editors/manager/registry';
 import { buildPersistenceFailureMessage } from 'utils/error';
-import { buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
+import { buildReadOnlyMessage } from 'utils/lock';
 import { Maybe } from 'tsmonad';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
 import { PersistenceStrategy,
   PersistenceState } from 'editors/manager/persistence/PersistenceStrategy';
+import { WritelockModal } from 'components/WritelockModal.controller';
+import { State } from 'reducers';
 
 export type DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
 export const DOCUMENT_REQUESTED: DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
@@ -53,6 +57,22 @@ export const documentLoaded = (
   editingAllowed,
 });
 
+export type DOCUMENT_EDITING_ENABLE = 'document/DOCUMENT_EDITING_ENABLE';
+export const DOCUMENT_EDITING_ENABLE = 'document/DOCUMENT_EDITING_ENABLE';
+
+export type DocumentEditingEnableAction = {
+  type: DOCUMENT_EDITING_ENABLE,
+  documentId: string,
+  editable: boolean,
+};
+
+export function documentEditingEnable(editable : boolean, documentId : string) {
+  return {
+    type: DOCUMENT_EDITING_ENABLE,
+    editable,
+    documentId,
+  };
+}
 
 export type DOCUMENT_FAILED = 'document/DOCUMENT_FAILED';
 export const DOCUMENT_FAILED: DOCUMENT_FAILED = 'document/DOCUMENT_FAILED';
@@ -161,7 +181,7 @@ export const changeRedone = (documentId: string): ChangeRedoneAction => ({
   documentId,
 });
 
-function saveCompleted(dispatch, getState, documentId, document) {
+function saveCompleted(dispatch, getState: () => State, documentId, document) {
 
   dispatch(lastSaveSucceeded(documentId, Maybe.just(true)));
 
@@ -173,13 +193,15 @@ function saveFailed(dispatch, getState, courseId, documentId, error) {
 
   dispatch(lastSaveSucceeded(documentId, Maybe.just(false)));
 
-  const message = error === 'Forbidden'
-    ? buildLockExpiredMessage({
-      label: 'Reload',
-      execute: () => dispatch(load(courseId, documentId)) })
-    : buildPersistenceFailureMessage(error, getState().user.profile);
-
-  dispatch(showMessage(message.with({ guid: documentId + '_PERSISTENCE' })));
+  if (error === 'Forbidden') {
+    // if it is a write-lock failure, disable editing and show write-lock modal
+    dispatch(documentEditingEnable(false, documentId));
+    dispatch(modalActions.display(React.createElement(WritelockModal, { courseId, documentId })));
+  } else {
+    // some other failure, show persistence error message
+    const message = buildPersistenceFailureMessage(error, getState().user.profile);
+    dispatch(showMessage(message.with({ guid: documentId + '_PERSISTENCE' })));
+  }
 }
 
 function stateChangeListener(

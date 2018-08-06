@@ -13,7 +13,7 @@ import { Resource, ResourceState } from 'data/content/resource';
 
 export class AddExistingWorkbookPageCommand extends AbstractCommand {
 
-  onInsert(org, parent, context, services, resolve, reject, page: Resource) {
+  onInsert(org, parent, context, services, resolve, page: Resource) {
 
     services.dismissModal();
 
@@ -27,8 +27,9 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
     resolve(insertNode(org, parent.guid, item, parent.children.size));
   }
 
-  onCancel(services) {
+  onCancel(services, reject) {
     services.dismissModal();
+    reject();
   }
 
   description() : string {
@@ -65,8 +66,8 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
           <ResourceSelection
             filterPredicate={predicate}
             courseId={context.courseId}
-            onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)}
-            onCancel={this.onCancel.bind(this, services)}/>);
+            onInsert={page => this.onInsert(org, parent, context, services, resolve, page)}
+            onCancel={() => this.onCancel(services, reject)}/>);
       });
     }
 

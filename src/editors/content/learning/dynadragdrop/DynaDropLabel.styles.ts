@@ -5,6 +5,6 @@ export const styles: JSSStyles = {
     position: 'relative',
   },
   labelEditor: {
-
+    minHeight: 24,
   },
 };

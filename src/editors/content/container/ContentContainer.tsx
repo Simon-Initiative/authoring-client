@@ -154,10 +154,12 @@ export class ContentContainer
       }
 
     } else {
-      // If somehow the active selected item isn't in this ContentElements, we
-      // still want to support addition of the new element.  Just insert it at the end
+      // If the active selected item isn't in this ContentElements (this happens when
+      // all content in a ContentContainer is deleted and we insert something into the remaining
+      // empty ContiguousTextEditor, we still want to support addition of the new element.
+      // Just insert it at the end.
       const mapToAdd = Immutable.OrderedMap<string, ContentElement>(
-        [arrToAdd.map(i => [(i as any).guid, i])]);
+        arrToAdd.map((i: ContentElement) => [i.guid, i]));
       onEdit(model.with({ content: model.content.merge(mapToAdd) }), firstItem);
     }
 
