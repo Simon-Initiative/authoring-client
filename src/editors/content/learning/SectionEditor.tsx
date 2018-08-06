@@ -12,7 +12,7 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { injectSheet, classNames } from 'styles/jss';
+import { injectSheet } from 'styles/jss';
 import { styles } from './SectionEditor.styles';
 import { StyledComponentProps } from 'types/component';
 
