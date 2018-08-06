@@ -57,7 +57,9 @@ export const modelWithDefaultFeedback =
     const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
 
     let generatedResponses: contentTypes.Response[];
-    if (choices.length <= 1 || choices.length > maxGenChoices) {
+    if (choices.length <= 1) {
+      generatedResponses = [];
+    } else if (choices.length > maxGenChoices) {
       const feedback = new contentTypes.Feedback({
         body,
       });

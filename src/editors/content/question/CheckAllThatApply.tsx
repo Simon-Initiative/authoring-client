@@ -76,7 +76,7 @@ export const findChoiceResponse = (
   responses: OrderedMap<string, contentTypes.Response>,
   choice: contentTypes.Choice,
 ) => {
-  const best = getCorrectResponse(responses).val;
+  const best = getCorrectResponse(responses);
   if (best.match.includes(choice.value)) {
     return best;
   }
@@ -87,31 +87,21 @@ export const findChoiceResponse = (
   );
 };
 
-type correctResponse = {
-  val: contentTypes.Response,
-  key: string,
-};
-
 export function getCorrectResponse(responses : OrderedMap<string, contentTypes.Response>)
-: correctResponse {
+: contentTypes.Response {
   let highestScore = 0;
   let correctResponse = undefined;
-  let correctKey = undefined;
-  responses.forEach((response, key) => {
+  responses.forEach((response) => {
     if (response.score) {
       const score = +response.score;
       if (score > highestScore) {
         correctResponse = response;
-        correctKey = key;
         highestScore = score;
       }
     }
   });
 
-  return {
-    val: correctResponse || responses.first(),
-    key: correctKey || responses.keySeq().first(),
-  };
+  return correctResponse || responses.first();
 }
 
 export const getChoiceValue = (model : contentTypes.MultipleChoice, key : string) => {
@@ -220,16 +210,16 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     const correct = getCorrectResponse(partModel.responses);
 
     return partModel.with({
-      responses: partModel.responses.set(correct.key, correct.val.with({
-        match: correct.val.match.split(',').filter(x => x !== invalidChoiceValue).join(','),
+      responses: partModel.responses.set(correct.guid, correct.with({
+        match: correct.match.split(',').filter(x => x !== invalidChoiceValue).join(','),
       })),
     });
   }
 
 
-  onToggleSimpleSelect(response: contentTypes.Response, choice: contentTypes.Choice) {
+  onToggleSimpleSelect(r: contentTypes.Response, choice: contentTypes.Choice) {
     const { itemModel, partModel, onEdit } = this.props;
-    const correct = getCorrectResponse(partModel.responses).val;
+    const correct = getCorrectResponse(partModel.responses);
     let updatedPartModel = partModel;
 
     // this choice was the last correct choice and was unchecked but is now rechecked
@@ -305,12 +295,11 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
   onPartEdit(partModel: contentTypes.Part, src) {
     // the state is currently being hidden because there were no correct answers
     if (this.state.invalidChoice) {
-      const correct = getCorrectResponse(partModel.responses).val;
-      const invalidValue = getChoiceValue(this.props.itemModel, this.state.invalidChoice);
+      const correct = getCorrectResponse(partModel.responses);
       // there is a new correct answer or an additional correct answer was added
       // by the advanced view, stop hiding state
       const len = correct.match.split(',').length;
-      if (len > 1 || (len === 1 && !correct.match.includes(invalidValue))) {
+      if (len >= 1) {
         this.setState({ invalidChoice: '' });
       }
     }
@@ -398,11 +387,26 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
         onGetChoiceCombinations,
       );
 
+      const correct = getCorrectResponse(updatedPartModel.responses);
+      let mustForce = false;
+      if (correct.match === '') {
+        const firstChoice = updatedItemModel.choices.first();
+        updatedPartModel = updatedPartModel.with({
+          responses: updatedPartModel.responses.set(correct.guid, correct.with({
+            match: firstChoice.value,
+          })),
+        });
+        console.log(updatedPartModel);
+        mustForce = true;
+      }
+
       onEdit(
         updatedItemModel,
         updatedPartModel,
         null,
       );
+
+      if (mustForce) this.forceUpdate();
     }
   }
 
@@ -475,8 +479,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     const { context, services, editMode, itemModel, partModel } = this.props;
 
     // the highest scored response is used for simple selection (or the first response)
-    const response : contentTypes.Response = getCorrectResponse(partModel.responses).val;
-
+    const response : contentTypes.Response = getCorrectResponse(partModel.responses);
+    const correctMatches = getCorrectResponse(partModel.responses).match;
     return itemModel.choices
       .toArray()
       .map((choice, index) => {
@@ -491,7 +495,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             choice={choice}
             allowReorder={!itemModel.shuffle}
             simpleSelectProps={{
-              selected: getCorrectResponse(partModel.responses).val.match.includes(choice.value) &&
+              selected: correctMatches.includes(choice.value) &&
               choice.guid !== this.state.invalidChoice,
               onToggleSimpleSelect: this.onToggleSimpleSelect,
             }}
@@ -571,12 +575,12 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
               choices={itemModel.choices.toArray()}
               onGetChoiceCombinations={onGetChoiceCombinations}
               onInvalidFeedback={(responseGuid) => {
-                const responses = this.props.partModel.responses;
-                if (getCorrectResponse(responses).val.guid === responseGuid) {
+                const responses = partModel.responses;
+                if (getCorrectResponse(responses).guid === responseGuid) {
                   const choiceValues = responses.get(responseGuid).match.split(',');
                   if (choiceValues.length > 0) {
                     const val = choiceValues[0];
-                    this.props.itemModel.choices.forEach((choice) => {
+                    itemModel.choices.forEach((choice) => {
                       if (choice.value === val) {
                         this.setState({
                           invalidChoice: choice.guid,
@@ -587,6 +591,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
                   }
                 }
               }}
+              hideOther={itemModel.choices.size <= 1}
               onEdit={this.onPartEdit} />
           </TabSectionContent>
         </TabSection>
