@@ -206,7 +206,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.props.onDisplayModal(<ModalPrompt
       text={'Are you sure you want to permanently delete this course package? \
           This action cannot be undone.'}
-      onInsert={() => { this.removePackage; this.props.onDismissModal(); }}
+      onInsert={() => { this.removePackage(); this.props.onDismissModal(); }}
       onCancel={() => this.props.onDismissModal()}
       okLabel="Yes"
       okClassName="danger"
