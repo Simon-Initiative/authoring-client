@@ -22,7 +22,7 @@ export class TextSelection {
   }
 
   getAnchorKey() {
-    return this.ss.getStartKey();
+    return this.ss.getAnchorKey();
   }
 
   getFocusKey() {

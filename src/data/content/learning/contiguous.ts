@@ -207,37 +207,36 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     const rev = selection.getIsBackward(); // its reversed if anchor is after focus
     const anchorKey = selection.getAnchorKey(); // key of starting ContentBlock
-    const anchorOffset = selection.getAnchorOffset();
+    const anchorOffset = selection.getAnchorOffset(); // anchor offset from beginning
     const focusKey = selection.getFocusKey(); // key of ending ContentBlock
-    const focusOffset = selection.getFocusOffset();
+    const focusOffset = selection.getFocusOffset(); // focus offset from beginning
     const blocks : Immutable.OrderedMap<string, ContentBlock> = this.content.getBlockMap();
-    console.log(rev, anchorOffset, focusOffset, '\n\n\n\n\n\n\n\n\n');
 
     // want blocks from anchorKey to focusKey, or focusKey to anchorKey if rev
-    const skipUntil = rev ? focusKey : anchorKey;
-    const takeUntil = rev ? anchorKey : focusKey;
-    let selectedBlocks = blocks.skipUntil((_, x) => x === skipUntil);
+    const startKey = rev ? focusKey : anchorKey;
+    const endKey = rev ? anchorKey : focusKey;
+    let selectedBlocks = blocks.skipUntil((_, x) => x === startKey);
     let saw = false; // saw used as a hack to get an inclusive upper bound on takeUntil
-    selectedBlocks = selectedBlocks.takeUntil((_, x) => saw || (x === takeUntil && !(saw = true)));
+    selectedBlocks = selectedBlocks.takeUntil((_, x) => saw || (x === endKey && !(saw = true)));
 
     // Determine whether we need to apply or remove the style based on the selection
     // If the current selection is all styled, unstyle it.
     // If the current selection is partially styled, style it entirely.
+    const startOffset = rev ? focusOffset : anchorOffset;
+    const endOffset = rev ? anchorOffset : focusOffset;
     let allStyled = true;
     selectedBlocks.forEach((block, key) => {
       const chars = block.characterList.toArray().map(x => x.style);
       const text = block.text;
       const len = chars.length;
-      const start = key === anchorKey ? anchorOffset : 0;
-      const end = key === focusKey ? len - focusOffset : len;
-      console.log(text, start, end, len, chars);
+      const start = key === startKey ? startOffset : 0;
+      const end = key === endKey ? endOffset : len;
       for (let i = start; i < end; i += 1) {
         // if the styling isn't the entire section
         if (!chars[i].has(style) && text[i].trim() !== '') {
           return allStyled = false; // break out of the forEach
         }
       }
-      return true; // maybe not neccessary
     });
 
     let content = allStyled
