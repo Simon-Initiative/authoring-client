@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from '../../data/contentTypes';
 import { Title } from './Title';
-import { Remove } from 'components/common/Remove';
 
 import './Skill.scss';
 
@@ -40,27 +39,23 @@ export class Skill
     this.props.onEdit(model);
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const { model, title, editMode, mouseOver } = this.props;
-
-    const remove = mouseOver && editMode
-      ? <Remove editMode={this.props.editMode}
-              loading={this.props.loading}
-              onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
-      : null;
 
     const titleBlock = <span><b>Skill: </b>{title}</span>;
 
     return (
       <div className={mouseOver ? 'skill-mouseover-highlight' : ''}
-        style={ { marginLeft: '45px' } }>
+        style={{ marginLeft: '45px' }}>
         <Title title={model.title}
           editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
           isHoveredOver={mouseOver}
-          onEdit={this.onTitleEdit}>{titleBlock}</Title>
-        {remove}
+          onEdit={this.onTitleEdit}
+          loading={this.props.loading}
+          onRemove={this.props.onRemove.bind(undefined, this.props.model)}
+          >{titleBlock}</Title>
       </div>
     );
   }

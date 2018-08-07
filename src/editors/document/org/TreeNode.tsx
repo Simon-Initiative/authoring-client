@@ -12,6 +12,7 @@ import { Caption } from './Caption';
 import { Command } from './commands/command';
 
 import './TreeNode.scss';
+import { LegacyTypes } from 'data/types';
 
 export interface TreeNodeProps {
   numberAtLevel: number;      // 1-based position of this node at this level of the tree
@@ -41,7 +42,7 @@ export interface TreeNodeState {
 const Title = (props) => {
   return (
     <button onClick={() => props.toggleExpanded()}
-        type="button" className="btn btn-link">{props.children}</button>
+      type="button" className="btn btn-link">{props.children}</button>
   );
 };
 
@@ -72,11 +73,7 @@ export class TreeNode
 
 
   onEnter() {
-    if (this.timer !== null) {
-      clearTimeout(this.timer);
-    }
-    this.timer = setTimeout(() => this.setState({ mouseOver: true }), 250);
-
+    this.setState({ mouseOver: true });
   }
 
   onLeave() {
@@ -95,7 +92,7 @@ export class TreeNode
     return '';
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const { model, parentModel, indexWithinParent,
       depth, editMode, onReposition, isExpanded } = this.props;
@@ -123,6 +120,17 @@ export class TreeNode
         ? resource.title
         : 'Loading...';
 
+      const resourceIcon = (type: LegacyTypes) => {
+        switch (type) {
+          case LegacyTypes.assessment2:
+            return <i className="fa fa-check" />;
+          case LegacyTypes.workbook_page:
+            return <i className="fa fa-file" />;
+          default:
+            return <i className={'fa fa-question'} />;
+        }
+      };
+
       title = (
         <Caption
           onViewEdit={() => this.props.onViewEdit(resource.id)}
@@ -135,7 +143,7 @@ export class TreeNode
           onEdit={this.props.onEdit}
           model={this.props.model}
           toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-          {titleString}
+          {resourceIcon(resource.type as LegacyTypes)}{titleString}
         </Caption>
       );
     } else if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
@@ -164,11 +172,11 @@ export class TreeNode
     }
 
     const finalDropTarget =
-     (indexWithinParent === parentModel.children.size - 1)
-     ? renderDropTarget(
-         indexWithinParent + 1, parentModel,
-         canHandleDrop, onReposition, '')
-     : null;
+      (indexWithinParent === parentModel.children.size - 1)
+        ? renderDropTarget(
+          indexWithinParent + 1, parentModel,
+          canHandleDrop, onReposition, '')
+        : null;
 
     return (
       <tr
@@ -178,8 +186,8 @@ export class TreeNode
         <td className="content">
           <div className="top-drop">
             {renderDropTarget(
-            indexWithinParent, parentModel,
-            canHandleDrop, onReposition, model.guid)}
+              indexWithinParent, parentModel,
+              canHandleDrop, onReposition, model.guid)}
           </div>
 
           <div className="node">
@@ -189,8 +197,8 @@ export class TreeNode
               index={indexWithinParent}
               source={model}
               parentModel={parentModel}>
-              <span style={ { marginLeft: (depth * 30) } }/>
-              <DragHandle/>
+              <span style={{ marginLeft: (depth * 30) }} />
+              <DragHandle hidden={!this.state.mouseOver} />
               {title}
             </DraggableNode>
           </div>
