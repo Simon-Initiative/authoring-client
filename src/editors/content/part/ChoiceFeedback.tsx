@@ -367,7 +367,7 @@ export abstract class ChoiceFeedback
                     <input
                       type="number"
                       className="form-control input-sm form-control-sm"
-                      disabled={!this.props.editMode}
+                      disabled={this.props.hideOther || !editMode}
                       value={defaultResponse.score}
                       onChange={({ target: { value } }) =>
                       this.onScoreEdit(defaultResponse, value)}
