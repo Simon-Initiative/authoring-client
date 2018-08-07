@@ -53,6 +53,7 @@ export function createMultipleChoiceQuestion(select: string) {
   const feedback = contentTypes.Feedback.fromText('', guid());
   let response = new contentTypes.Response({ match });
   response = response.with({
+    score: '1',
     guid: guid(),
     feedback: response.feedback.set(feedback.guid, feedback),
   });

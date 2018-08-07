@@ -12,11 +12,13 @@ import { Button } from '../common/controls';
 import { CombinationsMap } from 'types/combinations';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 import {
-  AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseBody,
-  getGeneratedResponseScore, modelWithDefaultFeedback,
+  AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem,
+  modelWithDefaultFeedback,
 } from 'editors/content/part/defaultFeedbackGenerator.ts';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import createGuid from 'utils/guid';
+import { ContentElements } from 'data/content/common/elements';
+import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 
 export interface CheckAllThatApplyProps extends QuestionProps<contentTypes.MultipleChoice> {
   advancedScoringInitialized: boolean;
@@ -92,7 +94,7 @@ export function getCorrectResponse(responses : OrderedMap<string, contentTypes.R
   let highestScore = 0;
   let correctResponse = undefined;
   responses.forEach((response) => {
-    if (response.score) {
+    if (!response.name.match(/^AUTOGEN.*/) && response.score) {
       const score = +response.score;
       if (score > highestScore) {
         correctResponse = response;
@@ -117,6 +119,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
   constructor(props) {
     super(props);
+
+    console.log('initialized with these bad boys: ', props.partModel.responses);
 
     this.state = {};
 
@@ -182,12 +186,16 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     if (advancedScoring && isComplexFeedback(partModel)) {
       let updatedPartModel = resetAllFeedback(partModel);
 
+      const generated = getGeneratedResponseItem(updatedPartModel);
+      const body = generated ? generated.feedback.first().body
+      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+
       // update part model with default feedback
       updatedPartModel = modelWithDefaultFeedback(
         updatedPartModel,
         itemModel.choices.toArray(),
-        getGeneratedResponseBody(updatedPartModel),
-        getGeneratedResponseScore(updatedPartModel),
+        body,
+        generated ? generated.score : '0',
         AUTOGEN_MAX_CHOICES,
         onGetChoiceCombinations,
       );
@@ -197,7 +205,6 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
     onToggleAdvancedScoring(model.guid);
   }
-
 
   // pass the child choicefeedback (choice responses) a state consisten with the
   // on seen by the user, in the event the user has no correct choice (this.state.invalidChoice)
@@ -215,7 +222,6 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       })),
     });
   }
-
 
   onToggleSimpleSelect(r: contentTypes.Response, choice: contentTypes.Choice) {
     const { itemModel, partModel, onEdit } = this.props;
@@ -247,7 +253,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
         ),
       });
     } else {
-      // choice does not exist any responses, so add it to the correct response
+      // choice does not have any responses, so add it to the correct response
 
       // there were no correct responses but now there are
       let invalidChoiceValue = undefined;
@@ -280,11 +286,15 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     // because we changed response match values, we must update choice refs
     // const updatedModels = updateChoiceValuesAndRefs(itemModel, updatedPartModel);
 
+    const generated = getGeneratedResponseItem(updatedPartModel);
+    const body = generated ? generated.feedback.first().body
+      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+
     updatedPartModel = modelWithDefaultFeedback(
       updatedPartModel,
       itemModel.choices.toArray(),
-      getGeneratedResponseBody(updatedPartModel),
-      getGeneratedResponseScore(updatedPartModel),
+      body,
+      generated ? generated.score : '0',
       AUTOGEN_MAX_CHOICES,
       this.props.onGetChoiceCombinations,
     );
@@ -296,9 +306,13 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     // the state is currently being hidden because there were no correct answers
     if (this.state.invalidChoice) {
       const correct = getCorrectResponse(partModel.responses);
+      const len = correct.match.split(',').length;
+      const invalidChoiceVal = getChoiceValue(this.props.itemModel, this.state.invalidChoice);
+
+      // state of correct match is hidden from child, dont propagate this change
+      if (correct.match === '') return;
       // there is a new correct answer or an additional correct answer was added
       // by the advanced view, stop hiding state
-      const len = correct.match.split(',').length;
       if (len >= 1) {
         this.setState({ invalidChoice: '' });
       }
@@ -341,12 +355,16 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     updatedItemModel = itemModel.with(
       { choices: itemModel.choices.set(choice.guid, choice) });
 
+    const generated = getGeneratedResponseItem(updatedPartModel);
+    const body = generated ? generated.feedback.first().body
+    : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+
     // update part model with default feedback
     updatedPartModel = modelWithDefaultFeedback(
       updatedPartModel,
       updatedItemModel.choices.toArray(),
-      getGeneratedResponseBody(updatedPartModel),
-      getGeneratedResponseScore(updatedPartModel),
+      body,
+      generated ? generated.score : '0',
       AUTOGEN_MAX_CHOICES,
       onGetChoiceCombinations,
     );
@@ -368,45 +386,48 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
     // prevent removal of last choice
     if (itemModel.choices.size > 1) {
+      const choiceVal = getChoiceValue(itemModel, choiceId);
+
       updatedItemModel = itemModel.with({
         choices: itemModel.choices.delete(choiceId),
       });
 
-      // update models with new choices and references
-      const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
-      updatedItemModel = updatedModels.itemModel;
-      updatedPartModel = updatedModels.partModel;
-
-      // update part model with default feedback
-      updatedPartModel = modelWithDefaultFeedback(
-        updatedPartModel,
-        updatedItemModel.choices.toArray(),
-        getGeneratedResponseBody(updatedPartModel),
-        getGeneratedResponseScore(updatedPartModel),
-        AUTOGEN_MAX_CHOICES,
-        onGetChoiceCombinations,
-      );
-
+      // choose another correct choice if the only one was removed
       const correct = getCorrectResponse(updatedPartModel.responses);
-      let mustForce = false;
-      if (correct.match === '') {
+      if (correct.match === choiceVal) {
         const firstChoice = updatedItemModel.choices.first();
+
         updatedPartModel = updatedPartModel.with({
           responses: updatedPartModel.responses.set(correct.guid, correct.with({
             match: firstChoice.value,
           })),
         });
-        console.log(updatedPartModel);
-        mustForce = true;
       }
+
+      // update models with new choices and references
+      const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, updatedPartModel);
+      updatedItemModel = updatedModels.itemModel;
+      updatedPartModel = updatedModels.partModel;
+
+      const generated = getGeneratedResponseItem(updatedPartModel);
+      const body = generated ? generated.feedback.first().body
+      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+
+      // update part model with default feedback
+      updatedPartModel = modelWithDefaultFeedback(
+        updatedPartModel,
+        updatedItemModel.choices.toArray(),
+        body,
+        generated ? generated.score : '0',
+        AUTOGEN_MAX_CHOICES,
+        onGetChoiceCombinations,
+      );
 
       onEdit(
         updatedItemModel,
         updatedPartModel,
         null,
       );
-
-      if (mustForce) this.forceUpdate();
     }
   }
 
@@ -457,12 +478,16 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       choices: this.props.itemModel.choices.set(c.guid, c),
     });
 
+    const generated = getGeneratedResponseItem(updatedPartModel);
+    const body = generated ? generated.feedback.first().body
+    : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+
     // update part model with default feedback
     updatedPartModel = modelWithDefaultFeedback(
       updatedPartModel,
       updatedItemModel.choices.toArray(),
-      getGeneratedResponseBody(updatedPartModel),
-      getGeneratedResponseScore(updatedPartModel),
+      body,
+      generated ? generated.score : '0',
       AUTOGEN_MAX_CHOICES,
       onGetChoiceCombinations,
     );
