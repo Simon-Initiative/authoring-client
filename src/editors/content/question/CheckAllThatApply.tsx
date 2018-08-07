@@ -307,7 +307,6 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     if (this.state.invalidChoice) {
       const correct = getCorrectResponse(partModel.responses);
       const len = correct.match.split(',').length;
-      const invalidChoiceVal = getChoiceValue(this.props.itemModel, this.state.invalidChoice);
 
       // state of correct match is hidden from child, dont propagate this change
       if (correct.match === '') return;
