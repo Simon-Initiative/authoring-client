@@ -6,9 +6,21 @@
   flex-direction: row;
 
   .caption-btn {
-    color: black;
     font-weight: normal;
     margin-right: 20px;
+
+    &.btn.btn-link,
+    &.btn.btn-link:hover:not([disabled]),
+    &.btn.btn-link:active:not([disabled]),
+    &.btn.btn-link:focus:not([disabled]) {
+      color: #2c3e50;
+    }
+  }
+
+  .btn.btn-link:hover:not([disabled]),
+  .btn.btn-link:active:not([disabled]),
+  .btn.btn-link:focus:not([disabled]) {
+    text-decoration: none;
   }
 
   .label {

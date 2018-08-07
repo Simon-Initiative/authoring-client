@@ -1,21 +1,21 @@
 import * as Immutable from 'immutable';
 import { ContentElements } from 'data/content/common/elements';
-import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from './types';
-import { Part } from './part';
-import { MultipleChoice } from './multiple_choice';
-import { FillInTheBlank } from './fill_in_the_blank';
-import { Ordering } from './ordering';
-import { Text } from './text';
-import { ShortAnswer } from './short_answer';
-import { Essay } from './essay';
-import { Numeric } from './numeric';
-import { Feedback } from './feedback';
-import { Response } from './response';
-import { Unsupported } from '../unsupported';
-import { Variable } from './variable';
-import createGuid from '../../../utils/guid';
-import { getKey } from '../../common';
-import { augment, getChildren, setId, ensureIdGuidPresent } from '../common';
+import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from 'data/content/assessment/types';
+import { Part } from 'data/content/assessment/part';
+import { MultipleChoice } from 'data/content/assessment/multiple_choice';
+import { FillInTheBlank } from 'data/content/assessment/fill_in_the_blank';
+import { Ordering } from 'data/content/assessment/ordering';
+import { Text } from 'data/content/assessment/text';
+import { ShortAnswer } from 'data/content/assessment/short_answer';
+import { Essay } from 'data/content/assessment/essay';
+import { Numeric } from 'data/content/assessment/numeric';
+import { Feedback } from 'data/content/assessment/feedback';
+import { Response } from 'data/content/assessment/response';
+import { Unsupported } from 'data/content/unsupported';
+import { Variable } from 'data/content/assessment/variable';
+import createGuid from 'utils/guid';
+import { getKey } from 'data/common';
+import { augment, getChildren, setId, ensureIdGuidPresent } from 'data/content/common';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Changes } from 'data/content/learning/draft/changes';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
@@ -195,50 +195,57 @@ function migrateSkillsToParts(model: Question): Question {
 
 }
 
-
-// If an explanation is found for a question that has just a short answer,
-// migrate that explanation content into a feedback
-function migrateExplanationToFeedback(model: Question): Question {
+// In the past, we incorrectly mapped short answer explanations to feedback because
+// we thought that all questions used feedback instead of explanation. We later found
+// that this was not the case, and OLI displays the explanation rather than the feedback
+// to the student both short answer and essay questions.
+// This function migrates the feedback back to explanation.
+function migrateFeedbackToExplanation(model: Question): Question {
 
   const itemsArray = model.items.toArray();
   const partsArray = model.parts.toArray();
 
   let updated = model;
 
-  const justShortAnswer = itemsArray.length === 1 && itemsArray[0].contentType === 'ShortAnswer';
+  const isShortAnswerOrEssay = itemsArray.length === 1
+    && itemsArray[0].contentType === 'ShortAnswer' || itemsArray[0].contentType === 'Essay';
   const hasPart = partsArray.length === 1;
 
-  if (justShortAnswer && hasPart) {
-    const originalExplanation = partsArray[0].explanation;
-    const originalReponses = partsArray[0].responses;
+  if (isShortAnswerOrEssay && hasPart) {
+    const originalResponses = partsArray[0].responses;
 
-    const migratedAlready = originalExplanation.extractPlainText().caseOf({
-      just: text => text === 'migrated',
-      nothing: () => false,
-    });
-
-    if (!migratedAlready) {
-      const explanation
-        = ContentElements.fromText('migrated', '', ALT_FLOW_ELEMENTS);
-
-      const f = new Feedback().with({ body: originalExplanation });
-      const feedback = Immutable.OrderedMap<string, Feedback>()
-        .set(f.guid, f);
-
-      const res = originalReponses.size === 0
-        ? new Response().with({ match: '*', feedback })
-        : originalReponses.first().with({ match: '*', feedback });
-
-      const responses = originalReponses.set(res.guid, res);
-
-      const part = partsArray[0].with({ responses, explanation });
-      const parts = updated.parts.set(part.guid, part);
-      updated = updated.with({ parts });
+    // If we have no feedback to migrate, return
+    const originalFeedback = originalResponses.first()
+      && originalResponses.first().feedback.first();
+    if (!originalFeedback) {
+      return updated;
     }
+
+    const feedbackText = originalFeedback.body.extractPlainText().valueOr('');
+    const migratedAlready = feedbackText ===  'migrated';
+
+    if (migratedAlready) {
+      return updated;
+    }
+
+    const explanation = ContentElements.fromText(feedbackText, '', ALT_FLOW_ELEMENTS);
+
+    const f = new Feedback().with({
+      body: ContentElements.fromText('migrated', '', ALT_FLOW_ELEMENTS),
+    });
+    const feedback = Immutable.OrderedMap<string, Feedback>()
+      .set(f.guid, f);
+
+    const res = originalResponses.first().with({ match: '*', feedback });
+
+    const responses = originalResponses.set(res.guid, res);
+
+    const part = partsArray[0].with({ responses, explanation });
+    const parts = updated.parts.set(part.guid, part);
+    updated = updated.with({ parts });
   }
 
   return updated;
-
 }
 
 // Cloning an input question requires that we:
@@ -351,15 +358,14 @@ function cloneDragDropQuestion(question: Question): Question {
       updateHTMLLayoutTargetRefs(valueMap, inputMap, ld)),
   });
 
-  return question.with({
-    id: createGuid(),
+  return ensureIdGuidPresent(question.with({
     body: question.body.with({
       content: question.body.content.set(customContent.guid, clonedCustomContent),
     }).clone(),
     explanation: question.explanation.clone(),
     parts,
     items,
-  });
+  }));
 }
 
 // Cloning a single select multiple choice question requires that
@@ -401,20 +407,19 @@ function cloneMultipleChoiceQuestion(question: Question): Question {
     });
   }).toOrderedMap();
 
-  return question.with({
-    id: createGuid(),
+  return ensureIdGuidPresent(question.with({
     body: question.body.clone(),
     explanation: question.explanation.clone(),
     parts,
     items,
-  });
+  }));
 }
 
 // This ensures that existing input-based questions (aka Numeric, Text, FillInTheBlank)
 // have the 'input' attribute specified on all the responses. This input attr is
 // required only when there is more than one item in the question - but we have to
 // add it in all cases (in case someone goes and edits to add a second item)
-function ensureInputAttrsExist(question: Question) : Question {
+function ensureInputAttrsExist(question: Question): Question {
 
   let modifiedQuestion = question;
 
@@ -645,9 +650,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       });
     }
 
-
-
-    return ensureInputAttrsExist(migrateExplanationToFeedback(
+    return ensureInputAttrsExist(migrateFeedbackToExplanation(
       ensureResponsesExist(migrateSkillsToParts(model))));
   }
 

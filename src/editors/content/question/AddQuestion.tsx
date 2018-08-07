@@ -53,8 +53,8 @@ export function createMultipleChoiceQuestion(select: string) {
   const feedback = contentTypes.Feedback.fromText('', guid());
   let response = new contentTypes.Response({ match });
   response = response.with({
-    score: '1',
     guid: guid(),
+    score: '1',
     feedback: response.feedback.set(feedback.guid, feedback),
   });
 
@@ -98,7 +98,6 @@ export class AddQuestion
   }
 
   onAddOrdering() {
-
     const value = 'A';
 
     let question = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
@@ -108,7 +107,19 @@ export class AddQuestion
     const item = new contentTypes.Ordering().with({ choices });
     question = question.with({ items: question.items.set(item.guid, item) });
 
-    const part = new contentTypes.Part();
+
+    const feedback = contentTypes.Feedback.fromText('', guid());
+    let response = new contentTypes.Response({ match: value });
+    response = response.with({
+      guid: guid(),
+      score: '1',
+      feedback: response.feedback.set(feedback.guid, feedback),
+    });
+
+    const responses = Immutable.OrderedMap<string, contentTypes.Response>()
+      .set(response.guid, response);
+
+    const part = new contentTypes.Part().with({ responses });
     question = question.with({ parts: question.parts.set(part.guid, part) });
 
     this.props.onQuestionAdd(question);

@@ -33,9 +33,9 @@ const ENTER_KEYCODE = 13;
 
 function buildCommandButtons(
   prefix, commands, org, model,
-  labels, processCommand, context, editMode) : Object[] {
+  labels, processCommand, context, editMode): Object[] {
 
-  const slash : any = {
+  const slash: any = {
     fontFamily: 'sans-serif',
     position: 'relative',
     color: '#606060',
@@ -46,7 +46,7 @@ function buildCommandButtons(
       className="btn btn-link btn-sm" key={prefix + command.description(labels)}
       disabled={!command.precondition(org, model, context) || !editMode}
       onClick={() => processCommand(command)}>{command.description(labels)}</button>,
-      <span key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
+    <span key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
     .reduce((p, c) => p.concat(c), []);
 
   buttons.pop();
@@ -142,7 +142,7 @@ export class EditableCaption
   }
 
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const { model } = this.props;
 
@@ -182,6 +182,9 @@ export class EditableCaption
 
       buttons = [];
 
+      buttons.push(<Remove key="remove" editMode={this.props.editMode}
+        processCommand={this.props.processCommand} />);
+
       buttons.push(
         <button
           key="rename"
@@ -195,11 +198,6 @@ export class EditableCaption
 
       this.renderInsertNew().forEach(e => buttons.push(e));
       this.renderInsertExisting().forEach(e => buttons.push(e));
-
-      buttons.push(<span key="flex-spacer" className="flex-spacer"/>);
-
-      buttons.push(<Remove key="remove" editMode={this.props.editMode}
-        processCommand={this.props.processCommand}/>);
     }
 
     return (

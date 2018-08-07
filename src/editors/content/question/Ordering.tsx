@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { ChoiceList, Choice, updateChoiceValuesAndRefs } from '../common/Choice';
+import { Choice, ChoiceList, updateChoiceValuesAndRefs } from '../common/Choice';
+import { OrderingChoice, OrderingChoiceList } from './OrderingChoice';
 import { Button } from '../common/controls';
 import guid from '../../../utils/guid';
 import {
@@ -11,33 +12,117 @@ import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
 import { PermutationsMap } from 'types/combinations';
-import { ChoiceFeedback } from '../part/ChoiceFeedback';
 import { convert } from 'utils/format';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import {
+  InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
+} from 'editors/content/common/InputList';
+import {
+  AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem,
+  getGeneratedResponseBody, getGeneratedResponseScore, modelWithDefaultFeedback,
+} from 'editors/content/part/defaultFeedbackGenerator.ts';
+import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
+import { ContentElements } from 'data/content/common/elements';
+
+import './Ordering.scss';
+
+export const isComplexFeedback = (partModel: contentTypes.Part) => {
+  const responses = partModel.responses.filter(autogenResponseFilter).toArray();
+
+  // scoring is complex (advanced mode) if there is more than 1
+  // response OR score is not 0 or 1
+  let prevEncounteredScore = false;
+  const isAdvancedScoringMode = responses.length > 1 || responses.reduce(
+    (acc, val, i) => {
+      const score = +val.score;
+      if (prevEncounteredScore && score !== 0) {
+        return true;
+      }
+      if (score !== 0) {
+        prevEncounteredScore = true;
+      }
+
+      return acc || (score !== 0 && score !== 1);
+    },
+    false,
+  );
+
+  return isAdvancedScoringMode;
+};
+
+export const resetAllFeedback = (partModel: contentTypes.Part) => {
+  // remove all responses except the first (correct)
+  let updateResponses = partModel.responses
+    .filter(autogenResponseFilter)
+    .slice(0, 1);
+
+  // reset score of correct response
+  updateResponses = updateResponses.map(r => r.with({ score: '1' }));
+
+  const updatedPartModel = partModel.with({
+    responses: updateResponses.toOrderedMap(),
+  });
+
+  return updatedPartModel;
+};
+
+const getLabelFromChoice = (itemModel: contentTypes.Ordering, choice: contentTypes.Choice) => {
+  const choiceLabelMap = itemModel.choices.toArray().reduce(
+    (acc, c, index) => acc.set(c.guid, convert.toAlphaNotation(index)),
+    Immutable.Map<string, string>(),
+  );
+
+  return choiceLabelMap.get(choice.guid);
+};
 
 export interface OrderingProps extends QuestionProps<contentTypes.Ordering> {
   onGetChoicePermutations: (comboNum: number) => PermutationsMap;
+  advancedScoringInitialized: boolean;
+  advancedScoring: boolean;
+  onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
 export interface OrderingState extends QuestionState {
 
 }
 
+
+const renderMaxChoicesMessage = () => {
+  return (
+    <div className="message alert alert-warning">
+      <i className="fa fa-info-circle"/>
+      {` Providing more than ${AUTOGEN_MAX_CHOICES} choices \
+      (Choice ${convert.toAlphaNotation(AUTOGEN_MAX_CHOICES - 1)}) for this question will \
+      prevent you from determining exact selections for other choices.`}
+    </div>
+  );
+};
+
+const buildResponsePlaceholder = (): contentTypes.Response => {
+  const feedback = new contentTypes.Feedback({
+    body: ContentElements.fromText('', '', ALT_FLOW_ELEMENTS),
+  });
+  const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
+
+  return new contentTypes.Response({
+    guid: guid(),
+    score: '1',
+    feedback: feedbacks.set(feedback.guid, feedback),
+  });
+};
+
+
 /**
  * The content editor for HtmlContent.
  */
 export class Ordering extends Question<OrderingProps, OrderingState> {
+  defaultFeedbackResponse: contentTypes.Response;
+  placeholderResponse: contentTypes.Response;
 
   constructor(props) {
     super(props);
 
-    this.onToggleShuffle = this.onToggleShuffle.bind(this);
-    this.onAddChoice = this.onAddChoice.bind(this);
-    this.onChoiceEdit = this.onChoiceEdit.bind(this);
-    this.onPartEdit = this.onPartEdit.bind(this);
-    this.onResponseAdd = this.onResponseAdd.bind(this);
-    this.onRemoveChoice = this.onRemoveChoice.bind(this);
-    this.onReorderChoices = this.onReorderChoices.bind(this);
+    this.placeholderResponse = buildResponsePlaceholder();
   }
 
   /** Implement required abstract method to set className */
@@ -45,7 +130,18 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     return 'ordering';
   }
 
-  onToggleShuffle() {
+  componentDidMount() {
+    const {
+      partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
+    } = this.props;
+
+    // initialize advanced scoring if its not already
+    if (!advancedScoringInitialized) {
+      onToggleAdvancedScoring(model.guid, isComplexFeedback(partModel));
+    }
+  }
+
+  onToggleShuffle = () => {
     const {
       itemModel,
       partModel,
@@ -55,40 +151,96 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel, null);
   }
 
-  onAddChoice() {
-    const count = this.props.itemModel.choices.size;
+  onToggleAdvanced = () => {
+    const {
+      itemModel, partModel, model, onToggleAdvancedScoring, advancedScoring, onEdit,
+      onGetChoicePermutations,
+    } = this.props;
+
+    // if switching from advanced mode and feedback is complex, reset all feedback
+    // so they are valid in simple mode. Otherwise, we can leave the feedback as-is
+    if (advancedScoring && isComplexFeedback(partModel)) {
+      let updatedPartModel = resetAllFeedback(partModel);
+
+      // update part model with default feedback
+      updatedPartModel = modelWithDefaultFeedback(
+        updatedPartModel,
+        itemModel.choices.toArray(),
+        getGeneratedResponseBody(updatedPartModel),
+        getGeneratedResponseScore(updatedPartModel),
+        AUTOGEN_MAX_CHOICES,
+        onGetChoicePermutations,
+      );
+
+      onEdit(itemModel, updatedPartModel, updatedPartModel);
+    }
+
+    onToggleAdvancedScoring(model.guid);
+  }
+
+  onAddChoice = () => {
+    const { itemModel, partModel, onGetChoicePermutations, onEdit } = this.props;
+
+    const count = itemModel.choices.size;
     const value = convert.toAlphaNotation(count);
 
     const choice = contentTypes.Choice.fromText('', guid()).with({ value });
 
-    const itemModel = this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(choice.guid, choice) });
+    const updatedItemModel = itemModel.with(
+      { choices: itemModel.choices.set(choice.guid, choice) });
 
-    this.props.onEdit(itemModel, this.props.partModel, choice);
+    // add new choice to responses and regenerate default responses
+    let updatedPartModel = partModel.with({
+      responses: partModel.responses.map(r => r.with({
+        match: r.match + `,${value}`,
+      }),
+      ).toOrderedMap(),
+    });
+
+    // update autogenerated responses
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      updatedItemModel.choices,
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoicePermutations,
+    );
+
+    onEdit(updatedItemModel, updatedPartModel, choice);
   }
 
-  onChoiceEdit(choice: contentTypes.Choice, src) {
-
+  onChoiceEdit = (choice: contentTypes.Choice, src) => {
     this.props.onEdit(
       this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
       this.props.partModel, src);
   }
 
-  onPartEdit(partModel: contentTypes.Part, src) {
-
+  onPartEdit = (partModel: contentTypes.Part, src) => {
     this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
-  onResponseAdd() {
-    const { partModel } = this.props;
+  onResponseBodyEdit = (body, response, source) => {
+    let feedback = response.feedback.first();
+    feedback = feedback.with({ body });
+
+    const updatedResponse = response.with({
+      feedback: response.feedback.set(feedback.guid, feedback),
+    });
+
+    this.onResponseEdit(updatedResponse, source);
+  }
+
+  onResponseAdd = () => {
+    const { itemModel, partModel } = this.props;
 
     const feedback = contentTypes.Feedback.fromText('', guid());
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
       score: '0',
-      match: '',
+      match: itemModel.choices.map(c => c.value).join(','),
       feedback: feedbacks.set(feedback.guid, feedback),
     });
 
@@ -96,24 +248,102 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       responses: partModel.responses.set(response.guid, response),
     });
 
-    this.onPartEdit(updatedPartModel, feedback);
+    this.onPartEdit(updatedPartModel, null);
   }
 
-  onRemoveChoice(choice: contentTypes.Choice) {
+  onResponseEdit = (response, src) => {
+    const { partModel, itemModel, onGetChoicePermutations } = this.props;
+
+    const choices = itemModel.choices.toArray();
+
+    let updatedModel = partModel.with({
+      responses: partModel.responses.set(response.guid, response),
+    });
+
+    updatedModel = modelWithDefaultFeedback(
+      updatedModel,
+      choices,
+      getGeneratedResponseBody(updatedModel),
+      getGeneratedResponseScore(updatedModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoicePermutations,
+    );
+
+    this.onPartEdit(updatedModel, null);
+  }
+
+  onResponseRemove = (response) => {
+    const { partModel, itemModel, onGetChoicePermutations } = this.props;
+
+    const choices = itemModel.choices.toArray();
+
+    let updatedModel = partModel.with({
+      responses: partModel.responses.delete(response.guid),
+    });
+
+    updatedModel = modelWithDefaultFeedback(
+      updatedModel,
+      choices,
+      getGeneratedResponseBody(updatedModel),
+      getGeneratedResponseScore(updatedModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoicePermutations,
+    );
+
+    this.onPartEdit(updatedModel, null);
+  }
+
+  onScoreEdit = (response, score) => {
     const { partModel } = this.props;
 
-    const updatedItemModel = this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.delete(choice.guid) });
+    this.onPartEdit(
+      partModel.with({
+        responses: partModel.responses.set(
+          response.guid,
+          response.with({ score }),
+        ),
+      }),
+      null,
+    );
+  }
 
-    // itemModel = this.updateChoiceValues(itemModel);
-    // const partModel = this.updateChoiceReferences(choice.value, this.props.partModel);
+  onRemoveChoice = (choiceId: string) => {
+    const { itemModel, partModel, onGetChoicePermutations } = this.props;
 
-    const newModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
+    // need at least 1 choice
+    if (this.props.itemModel.choices.size <= 1) {
+      return;
+    }
+
+    const removedChoiceVal = itemModel.choices.get(choiceId).value;
+
+    const updatedItemModel = itemModel.with(
+      { choices: itemModel.choices.delete(choiceId) });
+
+    // add new choice to responses and regenerate default responses
+    let updatedPartModel = partModel.with({
+      responses: partModel.responses.map(r => r.with({
+        match: r.match.split(',').filter(m => m !== removedChoiceVal).join(','),
+      }),
+      ).toOrderedMap(),
+    });
+
+    // update autogenerated responses
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      updatedItemModel.choices,
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoicePermutations,
+    );
+
+    const newModels = updateChoiceValuesAndRefs(updatedItemModel, updatedPartModel);
 
     this.props.onEdit(newModels.itemModel, newModels.partModel, null);
   }
 
-  onReorderChoices(originalIndex: number, newIndex: number) {
+  onReorderChoices = (originalIndex: number, newIndex: number) => {
     const { onEdit, itemModel, partModel } = this.props;
 
     // convert OrderedMap to shallow javascript array
@@ -148,7 +378,60 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     );
   }
 
-  renderChoices() {
+  onReorderSelection = (
+    response: contentTypes.Response,
+    originalIndex: number,
+    newIndex: number,
+  ) => {
+    const { itemModel, partModel, onEdit, onGetChoicePermutations } = this.props;
+
+    const matches = response.match.split(',');
+
+    // remove selected choice from array and insert it into new position
+    const match = matches.splice(originalIndex, 1)[0];
+    matches.splice(newIndex, 0, match);
+
+    let updatedPartModel = partModel.with({
+      responses: partModel.responses.set(response.guid, response.with({
+        match: matches.join(','),
+      })),
+    });
+
+    // update autogenerated responses
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      itemModel.choices,
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoicePermutations,
+    );
+
+    onEdit(
+      itemModel,
+      updatedPartModel,
+      response,
+    );
+  }
+
+  onDefaultFeedbackEdit = (body: ContentElements, score: string, src) => {
+    const { partModel, itemModel, onGetChoicePermutations } = this.props;
+
+    const choices = itemModel.choices.toArray();
+
+    const updatedModel = modelWithDefaultFeedback(
+      partModel,
+      choices,
+      body,
+      score,
+      AUTOGEN_MAX_CHOICES,
+      onGetChoicePermutations,
+    );
+
+    this.onPartEdit(updatedModel, src);
+  }
+
+  renderChoices = () => {
     const { itemModel, context, services, editMode } = this.props;
 
     return this.props.itemModel.choices
@@ -169,15 +452,206 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             editMode={editMode}
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
-            onRemove={choiceId => this.onRemoveChoice(choice)} />
+            onRemove={this.props.itemModel.choices.size > 1 ?
+              choiceId => this.onRemoveChoice(choiceId) :
+              undefined} />
         );
       });
   }
 
+  renderOrderSelection = (response: contentTypes.Response) => {
+    const { itemModel, context, services } = this.props;
+
+    const choiceValMap = itemModel.choices.reduce(
+      (acc, choice) => acc.set(choice.value, choice),
+      Immutable.Map<string, contentTypes.Choice>(),
+    );
+
+    // if match is empty, initialize it to the default choice order
+    const match = response.match === ''
+      ? itemModel.choices.map(c => c.value).join(',')
+      : response.match;
+
+    try {
+      return match.split(',').map((choiceVal, index) => {
+        const choice = choiceValMap.get(choiceVal);
+
+        // create a "viewOnly" choice using the clone() method. This is necessary to prevent focus
+        // from being stolen by this component from the actual choice when editing it's content.
+        // It is used for rendering purposes only here
+        const viewOnlyChoice = choice.clone();
+
+        return (
+            <OrderingChoice
+              className="order-selection"
+              onUpdateHover={() => {}}
+              label={getLabelFromChoice(itemModel, choice)}
+              key={viewOnlyChoice.guid}
+              index={index}
+              choice={viewOnlyChoice}
+              context={context}
+              services={services}
+              onReorderChoice={(originalIndex, newIndex) =>
+                this.onReorderSelection(response, originalIndex, newIndex)} />
+        );
+      });
+    } catch (err) {
+      // it is possible that not all values in match are valid choice values.
+      // if that is the case, the xml data is invalid. Just display an error message.
+      return (
+        <div className="alert alert-danger" role="alert">
+          Could not match choice and response. Please check the original XML.
+        </div>
+      );
+    }
+  }
+
+  renderResponses = () => {
+    const { partModel, context, services, advancedScoring, editMode } = this.props;
+
+    // filter out all auto generated responses (identified by AUTOGEN string in name field)
+    const userResponses = partModel.responses.toArray().filter(autogenResponseFilter);
+
+    const responsesOrPlaceholder = userResponses.length === 0
+      ? [this.placeholderResponse]
+      : userResponses;
+
+    return responsesOrPlaceholder
+      .map((response, i) => {
+        return (
+        <InputListItem
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
+          onFocus={this.props.onFocus}
+          key={response.guid}
+          className="response"
+          id={response.guid}
+          label={!advancedScoring ? '' : `${i + 1}`}
+          contentTitle={!advancedScoring ? 'Correct' : ''}
+          context={context}
+          services={services}
+          editMode={editMode}
+          body={response.feedback.first().body}
+          onEdit={(body, source) => this.onResponseBodyEdit(body, response, source)}
+          onRemove={responsesOrPlaceholder.length <= 1
+            ? null
+            : () => this.onResponseRemove(response)
+          }
+          options={[
+            <ItemOptions key="feedback-options">
+              <ItemOption className="matches"
+                label="Drag choices to set ordering for this feedback" flex>
+                <OrderingChoiceList>
+                  {this.renderOrderSelection(response)}
+                </OrderingChoiceList>
+              </ItemOption>
+              {advancedScoring
+                ? (
+                  <ItemOption className="score" label="Score">
+                    <div className="input-group">
+                      <input
+                        type="number"
+                        className="form-control input-sm form-control-sm"
+                        disabled={!this.props.editMode}
+                        value={response.score}
+                        onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
+                        />
+                    </div>
+                  </ItemOption>
+                )
+                : (null)
+              }
+            </ItemOptions>,
+          ]} />
+        );
+      });
+  }
+
+  renderDefaultResponse = () => {
+    const { partModel, itemModel, context, services, advancedScoring, editMode } = this.props;
+
+    const choices = itemModel.choices.toArray();
+
+    if (!this.defaultFeedbackResponse) {
+      const newGuid = guid();
+
+      this.defaultFeedbackResponse = new contentTypes.Response({
+        feedback: Immutable.OrderedMap({
+          [newGuid]: contentTypes.Feedback.fromText('', newGuid),
+        }),
+      });
+    }
+
+    const defaultResponseItem = getGeneratedResponseItem(partModel);
+    const defaultFeedbackScore = getGeneratedResponseScore(partModel);
+
+    let defaultResponse = this.defaultFeedbackResponse;
+    if (defaultResponseItem) {
+      defaultResponse = defaultResponse.with({
+        feedback: defaultResponseItem.feedback,
+      });
+    }
+
+    return (
+      <InputListItem
+        activeContentGuid={this.props.activeContentGuid}
+        hover={this.props.hover}
+        onUpdateHover={this.props.onUpdateHover}
+        onFocus={this.props.onFocus}
+        key={defaultResponse.guid}
+        className="response"
+        id={defaultResponse.guid}
+        label=""
+        contentTitle="Incorrect"
+        context={context}
+        services={services}
+        editMode={editMode}
+        body={defaultResponse.feedback.first().body}
+        onEdit={(body, source) => this.onDefaultFeedbackEdit(body, defaultFeedbackScore, source)}
+        options={[
+          <ItemOptions key="feedback-options">
+            {choices.length > AUTOGEN_MAX_CHOICES
+              ? (
+                renderMaxChoicesMessage()
+              ) : (
+                <ItemOptionFlex />
+              )
+            }
+            {advancedScoring
+              ? (
+                <ItemOption className="score" label="Score">
+                  <div className="input-group">
+                    <input
+                      type="number"
+                      className="form-control input-sm form-control-sm"
+                      disabled={!this.props.editMode}
+                      value={defaultResponse.score}
+                      onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
+                      />
+                  </div>
+                </ItemOption>
+              )
+              : (null)
+            }
+          </ItemOptions>,
+        ]} />
+    );
+  }
+
+  renderResponseFeedback = () => {
+    return (
+      <div className="ordering-feedback">
+        <InputList className="feedback-items">
+          {this.renderResponses()}
+          {this.renderDefaultResponse()}
+        </InputList>
+      </div>
+    );
+  }
+
   renderDetails() {
-    const {
-      editMode, itemModel, partModel, onGetChoicePermutations,
-    } = this.props;
+    const { editMode, itemModel, advancedScoring } = this.props;
 
     return (
       <React.Fragment>
@@ -197,6 +671,12 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                 label="Shuffle"
                 onClick={this.onToggleShuffle} />
             </TabOptionControl>
+            <TabOptionControl name="advanced">
+              <ToggleSwitch
+                checked={advancedScoring}
+                label="Advanced"
+                onClick={this.onToggleAdvanced} />
+            </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>
             <ChoiceList className="ordering-question-choices">
@@ -206,22 +686,19 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         </TabSection>
         <TabSection key="feedback" className="feedback">
           <TabSectionHeader title="Feedback">
-            <TabOptionControl name="add-feedback">
-              <Button
-                editMode={editMode}
-                type="link"
-                onClick={this.onResponseAdd}>
-                Add Feedback
-              </Button>
-            </TabOptionControl>
+            {advancedScoring &&
+              <TabOptionControl name="add-feedback">
+                <Button
+                  editMode={editMode}
+                  type="link"
+                  onClick={this.onResponseAdd}>
+                  Add Feedback
+                </Button>
+              </TabOptionControl>
+            }
           </TabSectionHeader>
           <TabSectionContent>
-            <ChoiceFeedback
-              {...this.props}
-              model={partModel}
-              choices={itemModel.choices.toArray()}
-              onGetChoiceCombinations={onGetChoicePermutations}
-              onEdit={this.onPartEdit} />
+            {this.renderResponseFeedback()}
           </TabSectionContent>
         </TabSection>
       </React.Fragment>
@@ -233,4 +710,3 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     return false;
   }
 }
-

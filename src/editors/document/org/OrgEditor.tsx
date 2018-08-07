@@ -205,6 +205,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       just: set => set.has(guid) ? collapseNodes : expandNodes,
       nothing: () => expandNodes,
     });
+
     this.props.dispatch(action(this.props.context.documentId, [guid]));
   }
 
@@ -213,7 +214,9 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     this.props.onEditingEnable(false, this.props.context.documentId);
     const delay = () =>
       command.execute(this.props.model, model, this.props.context, this.props.services)
-        .then(org => this.handleEdit(org)).then(reEnable, reEnable);
+        .then(org => this.handleEdit(org))
+        .then(reEnable)
+        .catch(reEnable);
 
     setImmediate(delay);
   }
@@ -322,12 +325,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   componentDidMount() {
     super.componentDidMount();
 
+    // If the page has not been viewed yet or custom expand/collapse state has not been set by the
+    // user, expand all of the nodes as a default state
     this.props.expanded.caseOf({
-      just: v => false,
-      nothing: () => this.props.dispatch(
-        expandNodes(
-          this.props.context.documentId,
-          this.props.model.sequences.children.toArray().map(s => getExpandId(s)))),
+      just: expandedNodes => null,
+      nothing: () => this.onExpand(),
     });
   }
 

@@ -12,6 +12,9 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { injectSheet } from 'styles/jss';
+import { styles } from './SectionEditor.styles';
+import { StyledComponentProps } from 'types/component';
 
 import './nested.scss';
 
@@ -24,8 +27,9 @@ export interface SectionEditorState {
 
 }
 
+@injectSheet(styles)
 export default class SectionEditor extends AbstractContentEditor
-  <contentTypes.WorkbookSection, SectionEditorProps, SectionEditorState> {
+  <contentTypes.WorkbookSection, StyledComponentProps<SectionEditorProps>, SectionEditorState> {
   constructor(props) {
     super(props);
 
@@ -92,8 +96,10 @@ export default class SectionEditor extends AbstractContentEditor
   }
 
   renderMain(): JSX.Element {
+    const { classes } = this.props;
+
     return (
-      <div>
+      <div className={classes.SectionEditor}>
         <TitleTextEditor
           context={this.props.context}
           services={this.props.services}
@@ -101,7 +107,7 @@ export default class SectionEditor extends AbstractContentEditor
           model={(this.props.model.title.text.content.first() as ContiguousText)}
           editMode={this.props.editMode}
           onEdit={this.onTitleEdit}
-          editorStyles={{ fontSize: 20 }} />
+          editorStyles={{ fontSize: 20, fontWeight: 600 }} />
 
         <div className="nested-container">
           <ContentContainer

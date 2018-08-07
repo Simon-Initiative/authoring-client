@@ -6,6 +6,7 @@ interface ModalPrompt {
 
 export interface ModalPromptProps {
   okLabel?: string;
+  okClassName?: string;
   cancelLabel?: string;
   text: string;
   onInsert: () => void;
@@ -26,6 +27,7 @@ class ModalPrompt extends React.PureComponent<ModalPromptProps, {}> {
 
     const okLabel = this.props.okLabel !== undefined ? this.props.okLabel : 'Insert';
     const cancelLabel = this.props.cancelLabel !== undefined ? this.props.cancelLabel : 'Cancel';
+    const okClassName = this.props.okClassName !== undefined ? this.props.okClassName : 'primary';
 
     return (
       <div ref={(modal) => { this.modal = modal; }}
@@ -43,7 +45,7 @@ class ModalPrompt extends React.PureComponent<ModalPromptProps, {}> {
             <div className="modal-footer">
               <button type="button"
                 onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }
-                className="btn btn-primary">{okLabel}</button>
+                className={`btn btn-${okClassName}`}>{okLabel}</button>
               <button type="button" className="btn btn-link"
                 onClick={(e) => { e.preventDefault(); this.props.onCancel(); } }
                 data-dismiss="modal">{cancelLabel}</button>

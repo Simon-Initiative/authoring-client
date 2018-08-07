@@ -264,8 +264,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
         responses: updatedPartModel.responses.set(
           correct.guid,
           correct.with({
-            match: correct.match.split(',').filter(invalidChoiceValue ?
-            x => x !== invalidChoiceValue : () => true).concat([choice.value]).join(','),
+            match: correct.match.split(',').filter(m => m !== invalidChoiceValue)
+              .concat([choice.value]).join(','),
           })
           // set response score to 1 if score is less than 1
           .with({ score: +correct.score < 1 ? '1' : correct.score }),

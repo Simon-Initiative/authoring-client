@@ -61,12 +61,8 @@ export class Caption
     const { model } = this.props;
 
     const buttons = this.props.isHoveredOver
-      ? [(
-        <span key="flex-spacer" className="flex-spacer" />
-      ), (
-        <Remove key="remove" editMode={this.props.editMode}
-          processCommand={this.props.processCommand} />
-      )]
+      ? [<Remove key="remove" editMode={this.props.editMode}
+          processCommand={this.props.processCommand} />]
       : null;
     return (
       <div className="caption">

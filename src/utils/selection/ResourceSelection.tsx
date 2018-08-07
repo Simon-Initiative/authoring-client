@@ -55,8 +55,8 @@ export default class ResourceSelection
       const idLower = id.toLowerCase();
 
       return text === '' ||
-             titleLower.indexOf(text) > -1 ||
-             idLower.indexOf(text) > -1;
+        titleLower.indexOf(text) > -1 ||
+        idLower.indexOf(text) > -1;
     };
 
     // one row in table for each resource in state
@@ -73,26 +73,26 @@ export default class ResourceSelection
     ];
 
     const safeCompare =
-    (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
-      if (a[primaryKey] === null && b[primaryKey] === null) {
-        return 0;
-      }
-      if (a[primaryKey] === null) {
-        return direction === SortDirection.Ascending ? 1 : -1;
-      }
-      if (b[primaryKey] === null) {
-        return direction === SortDirection.Ascending ? -1 : 1;
-      }
-      if (a[primaryKey] === b[primaryKey]) {
-        if (a[secondaryKey] === b[secondaryKey]) {
+      (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
+        if (a[primaryKey] === null && b[primaryKey] === null) {
           return 0;
         }
-        return safeCompare(secondaryKey, primaryKey, direction, a, b);
-      }
-      return direction === SortDirection.Ascending
-        ? a[primaryKey].localeCompare(b[primaryKey])
-        : b[primaryKey].localeCompare(a[primaryKey]);
-    };
+        if (a[primaryKey] === null) {
+          return direction === SortDirection.Ascending ? 1 : -1;
+        }
+        if (b[primaryKey] === null) {
+          return direction === SortDirection.Ascending ? -1 : 1;
+        }
+        if (a[primaryKey] === b[primaryKey]) {
+          if (a[secondaryKey] === b[secondaryKey]) {
+            return 0;
+          }
+          return safeCompare(secondaryKey, primaryKey, direction, a, b);
+        }
+        return direction === SortDirection.Ascending
+          ? a[primaryKey].localeCompare(b[primaryKey])
+          : b[primaryKey].localeCompare(a[primaryKey]);
+      };
 
     const comparators = [
       (direction, a, b) => safeCompare('title', 'id', direction, a, b),
@@ -134,24 +134,26 @@ export default class ResourceSelection
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
 
     return (
-      <ModalSelection
-        title="Select Resource"
-        onCancel={this.props.onCancel}
-        onInsert={() => this.props.onInsert(this.state.selected)}
-        disableInsert={this.state.selected === undefined}>
-        <div className="searchBarContainer">
-          <SearchBar
-            placeholder="Search by Title or Unique ID"
-            onChange={searchText => this.filterBySearchText(searchText)}
-          />
-        </div>
-        <SortableTable
-          rowRenderer={rowRenderer}
-          model={rows}
-          columnComparators={comparators}
-          columnRenderers={columnRenderers}
-          columnLabels={labels}/>
-      </ModalSelection>
+      <div className="resourceSelection">
+        <ModalSelection
+          title="Select Resource"
+          onCancel={this.props.onCancel}
+          onInsert={() => this.props.onInsert(this.state.selected)}
+          disableInsert={this.state.selected === undefined}>
+          <div className="searchBarContainer">
+            <SearchBar
+              placeholder="Search by Title or Unique ID"
+              onChange={searchText => this.filterBySearchText(searchText)}
+            />
+          </div>
+          <SortableTable
+            rowRenderer={rowRenderer}
+            model={rows}
+            columnComparators={comparators}
+            columnRenderers={columnRenderers}
+            columnLabels={labels} />
+        </ModalSelection>
+      </div>
     );
   }
 }
