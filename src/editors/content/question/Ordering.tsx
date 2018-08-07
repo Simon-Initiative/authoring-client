@@ -29,8 +29,8 @@ import './Ordering.scss';
 export const isComplexFeedback = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.filter(autogenResponseFilter).toArray();
 
-  // scoring is complex (advanced mode) if scores exist for multiple
-  // responses OR score is not 0 or 1
+  // scoring is complex (advanced mode) if there is more than 1
+  // response OR score is not 0 or 1
   let prevEncounteredScore = false;
   const isAdvancedScoringMode = responses.length > 1 || responses.reduce(
     (acc, val, i) => {
@@ -128,6 +128,17 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   /** Implement required abstract method to set className */
   getClassName() {
     return 'ordering';
+  }
+
+  componentDidMount() {
+    const {
+      partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
+    } = this.props;
+
+    // initialize advanced scoring if its not already
+    if (!advancedScoringInitialized) {
+      onToggleAdvancedScoring(model.guid, isComplexFeedback(partModel));
+    }
   }
 
   onToggleShuffle = () => {
