@@ -67,7 +67,7 @@ export const modelWithDefaultFeedback =
 
       generatedResponses = [
         new contentTypes.Response({
-          name: 'AUTOGEN',
+          name: 'AUTOGEN_*',
           score,
           match: '*',
           feedback: feedbacks.set(feedback.guid, feedback),
@@ -114,7 +114,7 @@ export const modelWithDefaultFeedback =
             .join(',');
 
           return new contentTypes.Response({
-            name: 'AUTOGEN',
+            name: `AUTOGEN_{${match}}`,
             score,
             match,
             feedback: feedbacks.set(feedback.guid, feedback),
