@@ -14,6 +14,7 @@ export interface RawContentEditorProps {
 
 export interface RawContentEditorState {
   content: string;
+  isValid: boolean;
 }
 
 export class RawContentEditor
@@ -22,26 +23,41 @@ export class RawContentEditor
   constructor(props) {
     super(props);
 
-    this.state = { content: beautify(props.rawContent, null, 2, 100) };
+    this.state = { isValid: true, content: beautify(props.rawContent, null, 2, 100) };
 
     this.onEdit = this.onEdit.bind(this);
   }
 
   onEdit(obj) {
     this.setState({ content: obj.src });
+
+    try {
+      JSON.parse(obj.src);
+      this.setState({ isValid: true });
+    } catch (err) {
+      this.setState({ isValid: false });
+    }
   }
 
   render() : JSX.Element {
+
+    const styles = 'RawContent-style '
+      + (this.state.isValid ? 'RawContent-valid' : 'RawContent-invalid');
+
     return (
       <ModalSelection title="Reword Learning Objective"
         onCancel={this.props.onCancel}
-        onInsert={() => this.props.onEdit(JSON.parse(this.state.content))}>
+        onInsert={() => {
+          if (this.state.isValid) {
+            this.props.onEdit(JSON.parse(this.state.content));
+          }
+        }}>
 
         <PreformattedTextEditor
           editMode={true}
           onEdit={this.onEdit}
           src={this.state.content}
-          styleName="RawContent-style"/>
+          styleName={styles}/>
       </ModalSelection>
     );
   }

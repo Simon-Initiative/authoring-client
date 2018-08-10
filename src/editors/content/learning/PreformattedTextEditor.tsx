@@ -58,7 +58,14 @@ class PreformattedTextEditor
 
     this.setState(
       { src: currentText },
-      () => setCaretPosition(target, this.caretPosition + this.direction));
+      () => {
+        try {
+          setCaretPosition(target, this.caretPosition + this.direction);
+        } catch (err) {
+          // We swallow this exception to handle gracefully a myriad
+          // of ways that the caret position cannot be set as requested
+        }
+      });
 
     // Persist this change
     this.props.onEdit({ src: currentText });
