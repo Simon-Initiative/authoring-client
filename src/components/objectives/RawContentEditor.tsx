@@ -13,7 +13,6 @@ export interface RawContentEditorProps {
 }
 
 export interface RawContentEditorState {
-  isValid: boolean;
   content: string;
 }
 
@@ -23,7 +22,7 @@ export class RawContentEditor
   constructor(props) {
     super(props);
 
-    this.state = { isValid: true, content: beautify(props.rawContent, null, 2, 100) };
+    this.state = { content: beautify(props.rawContent, null, 2, 100) };
 
     this.onEdit = this.onEdit.bind(this);
   }
