@@ -120,8 +120,6 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
   constructor(props) {
     super(props);
 
-    console.log('initialized with these bad boys: ', props.partModel.responses);
-
     this.state = {};
 
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
