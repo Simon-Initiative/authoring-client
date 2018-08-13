@@ -19,6 +19,8 @@ import { VariablesEditor } from './VariablesEditor';
 
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
+import { VariableModuleEditor } from 'editors/content/question/VariableModuleEditor.controller';
+import { MODULE_IDENTIFIER } from 'editors/content/question/VariableModuleEditor';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
@@ -171,22 +173,29 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
   renderVariables() {
 
-    const { hideVariables, model, editMode, services, context, onVariablesChange } = this.props;
+    const { hideVariables, onFocus, model, editMode, services, context, onVariablesChange,
+      onUpdateHover, hover, activeContentGuid } = this.props;
 
     // add variables
     if (!hideVariables) {
-      return (
-        <VariablesEditor
-          activeContentGuid={this.props.activeContentGuid}
-          hover={this.props.hover}
-          onUpdateHover={this.props.onUpdateHover}
-          onFocus={this.props.onFocus}
-          editMode={editMode}
-          services={services}
-          context={context}
-          model={model.variables}
-          onEdit={onVariablesChange} />
-      );
+
+      const variableProps = {
+        activeContentGuid,
+        hover,
+        onUpdateHover,
+        onFocus,
+        editMode,
+        services,
+        context,
+        model: model.variables,
+        onEdit: onVariablesChange,
+      };
+
+      // Decide whether to show the new or old variable UI. The new UI (VariableModuleEditor)
+      // creates a single variable with the name of the constant MODULE_IDENTIFIER
+      return model.variables.size > 0 && model.variables.first().name !== MODULE_IDENTIFIER
+        ? <VariablesEditor {...variableProps} />
+        : <VariableModuleEditor {...variableProps} />;
     }
     return null;
   }
@@ -366,8 +375,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
     const renderSkillsLabel = (part: contentTypes.Part) => (
       <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
-          {part.skills.size}
-        </Badge>
+        {part.skills.size}
+      </Badge>
       </span>
     );
 

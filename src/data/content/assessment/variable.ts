@@ -18,6 +18,10 @@ const defaultContent = {
   guid: '',
 };
 
+export type Variables =
+  // code: string;
+  Immutable.OrderedMap<string, Variable>;
+
 export class Variable extends Immutable.Record(defaultContent) {
 
   contentType: 'Variable';
@@ -35,7 +39,7 @@ export class Variable extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Variable {
+  clone(): Variable {
     return ensureIdGuidPresent(this);
   }
 
@@ -59,7 +63,7 @@ export class Variable extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const root = { variable: {} };
 

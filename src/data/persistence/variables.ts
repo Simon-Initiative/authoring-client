@@ -1,21 +1,29 @@
 import { OrderedMap, List } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { configuration } from 'actions/utils/config';
+import { Variables } from 'data/content/assessment/variable';
 
 const fetch = (window as any).fetch;
 
+// export type Evaluation = {
+//   variable: string;
+//   result: string;
+//   errored: boolean;
+// };
 export type Evaluation = {
   variable: string;
   result: string;
   errored: boolean;
 };
 
-export function evaluate(variables: OrderedMap<string, contentTypes.Variable>)
+export function evaluate(variables: Variables)
   : Promise<List<Evaluation>> {
 
   // Issue a POST at the sandboxed expression-eval service
   const body = {
-    vars: variables.toArray().map(v => ({ variable: v.name, expression: v.expression })),
+    // code: variables.code,
+    vars: variables.toArray()
+    .map(v => ({ variable: v.name, expression: v.expression })),
   };
 
   const headers = {
