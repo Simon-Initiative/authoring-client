@@ -98,6 +98,10 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
 
       // Otherwise, we have content that we are not supporting the direct edit
       // of (e.g. lists, images, formatting)
+
+      // Strip out the id attr if it has been absorbed from the objective
+      children.forEach((c) => { if (c['@id'] === model.id) { delete c['@id']; }});
+
       model = model.with({ rawContent: Maybe.just(children) });
     }
 
