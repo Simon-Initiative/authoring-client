@@ -20,7 +20,7 @@ import { VariablesEditor } from './VariablesEditor';
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { VariableModuleEditor } from 'editors/content/question/VariableModuleEditor.controller';
-import { MODULE_IDENTIFIER } from 'editors/content/question/VariableModuleEditor';
+import { MODULE_IDENTIFIER } from 'data/content/assessment/variable';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '

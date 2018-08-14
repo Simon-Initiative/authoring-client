@@ -142,11 +142,9 @@ export class VariablesEditor
       { results: Immutable.Map<string, Evaluation>() },
       () => evaluate(model).then((results) => {
         this.setState({
-          results: Immutable.Map<string, Evaluation>(results.map(r => [r.variable, r])),
+          results: Immutable.Map<string, Evaluation>(results.get(0).map(r => [r.variable, r])),
         });
       }));
-
-
   }
 
   onRemoveVariable(guid: string) {

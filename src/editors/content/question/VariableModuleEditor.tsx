@@ -12,102 +12,115 @@ import AceEditor from 'react-ace';
 import 'brace/theme/tomorrow_night_bright';
 import 'brace/theme/github';
 
-import { styles } from 'editors/content/question/VariableModuleEditor.styles';
-import { Variables } from 'data/content/assessment/variable';
+import 'editors/content/question/VariableModuleEditor.scss';
+import { Variables, MODULE_IDENTIFIER } from 'data/content/assessment/variable';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { ModalMessage } from 'utils/ModalMessage';
 
-export interface VariablesEditorProps extends AbstractContentEditorProps<Variables> {
-  displayModal: (component: any) => void;
-  dismissModal: () => void;
-}
-
-export interface VariablesEditorState {
-  results: Immutable.Map<string, Evaluation>;
-  // editorThemeIsDark: boolean;
-}
-
-export const MODULE_IDENTIFIER = 'module';
-
-interface ModuleEditorProps {
+interface EditorPanelProps {
   editMode: boolean;
   model: contentTypes.Variable;
   onExpressionEdit: (expression: string) => void;
+  onTestExpressions: () => void;
 }
-@injectSheet(styles)
-class ModuleEditor extends React.Component
-<StyledComponentProps<ModuleEditorProps>, {}> {
-  constructor(props) {
+
+class EditorPanel extends React.Component<EditorPanelProps, {}> {
+  constructor(props: EditorPanelProps) {
     super(props);
   }
   reactAceComponent: any;
 
+  componentDidMount() {
+    // this.reactAceComponent.editor.commands.addCommand();
+  }
+
   render() {
-    const { classes, className, editMode, model, onExpressionEdit } = this.props;
+    const { editMode, model, onExpressionEdit, onTestExpressions } = this.props;
 
     if (!(model.size > 0)) {
       return null;
     }
-
     return (
-      <AceEditor
-        ref={ref => this.reactAceComponent = ref}
-        className={classes.source}
-        name="source"
-        width="500px"
-        mode="javascript"
-        theme="tomorrow_night_bright"
-        readOnly={!editMode}
-        minLines={3}
-        maxLines={20}
-        value={model.expression}
-        onChange={onExpressionEdit}
-        setOptions={{
-          enableBasicAutocompletion: true,
-          enableLiveAutocompletion: true,
-          enableSnippets: true,
-          showLineNumbers: true,
-          tabSize: 2,
-          showPrintMargin: true,
-          useWorker: false,
-          showGutter: true,
-          highlightActiveLine: false,
-        }}
-      />
+      <div className="sourcePanel">
+        <span className="panelTitle">JavaScript</span>
+        <AceEditor
+          ref={ref => this.reactAceComponent = ref}
+          className="source"
+          name="source"
+          width="100%"
+          height="100%"
+          mode="javascript"
+          theme="tomorrow_night_bright"
+          readOnly={!editMode}
+          minLines={3}
+          value={model.expression}
+          onChange={onExpressionEdit}
+          commands={
+            [
+              {
+                name: 'evaluate',
+                bindKey: { win: 'Ctrl-enter', mac: 'Command-enter' },
+                exec: () => console.log('hey') || onTestExpressions,
+              },
+            ]
+          }
+          setOptions={{
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            enableSnippets: true,
+            showLineNumbers: true,
+            tabSize: 2,
+            showPrintMargin: true,
+            useWorker: false,
+            showGutter: true,
+            highlightActiveLine: true,
+
+            wrap: true,
+          }}
+        />
+      </div>
     );
   }
 }
 
-interface ModuleEvaluationProps {
+interface EvaluatedPanelProps {
   editMode: boolean;
   model: contentTypes.Variable;
   results: Immutable.Map<string, Evaluation>;
 }
-@injectSheet(styles)
-class ModuleEvaluation extends React.Component
-<StyledComponentProps<ModuleEvaluationProps>, {}> {
+
+class EvaluatedPanel extends React.Component<EvaluatedPanelProps, {}> {
   constructor(props) {
     super(props);
   }
 
   render() {
-    const { model, results, classes, className } = this.props;
+    const { model, results } = this.props;
 
-    if (!(results.size > 0)) {
-      return null;
-    }
-
-    const evaluation = results.has(model.name)
-      ? results.get(model.name).errored
-        ? <span className={classNames([classes.error, className])}>Error</span>
-        : <span className={classNames([classes.evaluated, className])}>
-          {results.get(model.name).result}
-        </span>
-      : null;
+    const resultLines = results.toArray()
+      .map(r => r.variable + ': ' + JSON.stringify(r.result))
+      .join('\n');
 
     return (
       <div className="evaluatedPanel">
-        {evaluation}
+        <span className="panelTitle">Results</span>
+        <AceEditor
+          className="evaluated"
+          name="source"
+          width="100%"
+          height="100%"
+          mode="javascript"
+          theme="github"
+          readOnly={true}
+          minLines={3}
+          value={resultLines}
+          setOptions={{
+            showLineNumbers: false,
+            useWorker: false,
+            tabSize: 2,
+            wrap: true,
+          }}
+        />
       </div>
     );
   }
@@ -119,25 +132,28 @@ interface ModalModuleEditorProps {
   model: contentTypes.Variable;
   results: Immutable.Map<string, Evaluation>;
   onExpressionEdit: (expression: string) => void;
+  onTestExpressions: () => void;
 }
-@injectSheet(styles)
-class ModalModuleEditor extends React.Component
-<StyledComponentProps<ModalModuleEditorProps>, {}> {
+
+class ModalModuleEditor extends React.Component<ModalModuleEditorProps, {}> {
   constructor(props) {
     super(props);
   }
 
   render() {
-    const { classes, className, model, results, onExpressionEdit } = this.props;
+    const { model, results, onExpressionEdit, onTestExpressions } = this.props;
+    console.log('results in modal', results);
 
     return (
-      <div className={classNames([classes.VariableModuleEditor, className])}>
-        <div className={classes.splitPane}>
-          <ModuleEditor
+      <div className="variableModuleEditor modalEditor">
+        <div className="splitPane">
+          <EditorPanel
             {...this.props}
             model={model}
-            onExpressionEdit={onExpressionEdit} />
-          <ModuleEvaluation
+            onExpressionEdit={onExpressionEdit}
+            onTestExpressions={onTestExpressions}
+          />
+          <EvaluatedPanel
             {...this.props}
             model={model}
             results={results} />
@@ -147,12 +163,33 @@ class ModalModuleEditor extends React.Component
   }
 }
 
-@injectSheet(styles)
+interface TestSuiteProps {
+
+}
+export class TestSuite extends React.Component<{}, {}> {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      null
+    );
+  }
+}
+
+export interface VariableModuleEditorProps extends AbstractContentEditorProps<Variables> {
+  displayModal: (component: any) => void;
+  dismissModal: () => void;
+}
+
+export interface VariableModuleEditorState {
+  results: Immutable.Map<string, Evaluation>;
+  // editorThemeIsDark: boolean;
+}
+
 export class VariableModuleEditor
-  extends AbstractContentEditor<Variables,
-  StyledComponentProps<VariablesEditorProps>, VariablesEditorState> {
-
-
+  extends AbstractContentEditor<Variables, VariableModuleEditorProps, VariableModuleEditorState> {
 
   constructor(props) {
     super(props);
@@ -169,16 +206,27 @@ export class VariableModuleEditor
     };
   }
 
-  shouldComponentUpdate(nextProps, nextState: VariablesEditorState) {
-    return super.shouldComponentUpdate(nextProps, nextState)
-      || this.state.results !== nextState.results;
+  shouldComponentUpdate(
+    nextProps: VariableModuleEditorProps,
+    nextState: VariableModuleEditorState) {
+    // return super.shouldComponentUpdate(nextProps, nextState)
+    //   || this.state.results !== nextState.results;
+    return true;
   }
 
   componentDidMount() {
+    this.evaluateVariablesIfPresent();
     // this.setState({
     //   editorThemeIsDark: loadFromLocalStorage('editorTheme') as boolean
     //     || this.state.editorThemeIsDark,
     // });
+  }
+
+  evaluateVariablesIfPresent() {
+    const { model } = this.props;
+    if (model.size > 0) {
+      this.onTestExpressions();
+    }
   }
 
   onExpressionEdit(expression) {
@@ -192,7 +240,7 @@ export class VariableModuleEditor
   }
 
   onOpenEditorPopup() {
-    const { model, displayModal, dismissModal } = this.props;
+    const { editMode, model, displayModal, dismissModal } = this.props;
 
     const variable = model.first();
 
@@ -203,7 +251,19 @@ export class VariableModuleEditor
         {...this.props}
         model={variable}
         onExpressionEdit={this.onExpressionEdit}
-        results={this.state.results} />
+        results={this.state.results}
+        onTestExpressions={this.onTestExpressions} />
+      <button className="btn btn-sm btn-primary" type="button"
+        disabled={!editMode}
+        onClick={() => this.onTestExpressions()}>
+        Run Once
+      </button>
+      <button className="btn btn-sm btn-outline-primary" type="button"
+        disabled={!editMode}
+        onClick={() => this.onDetermineErrorCount()
+          .then(count => console.log('errorCount', count))}>
+        Test 1,000 Times
+      </button>
     </ModalMessage>;
 
     displayModal(modal);
@@ -219,16 +279,51 @@ export class VariableModuleEditor
   onTestExpressions() {
 
     const { model } = this.props;
-
+    console.log('model', model);
     // Clear the current results and re-evaluate
     this.setState(
       { results: Immutable.Map<string, Evaluation>() },
       () => evaluate(model).then((results) => {
         console.log('results', results);
         this.setState({
-          results: Immutable.Map<string, Evaluation>(results.map(r => [r.variable, r])),
+          results: Immutable.Map<string, Evaluation>(results.get(0).map(r => [r.variable, r])),
         });
       }));
+  }
+
+  onTestMultipleTimes(attempts = 1000): Promise<Immutable.List<Evaluation[]>> {
+    const { model } = this.props;
+
+    return evaluate(model, attempts);
+  }
+
+  // Return the error count. `evaluate` returns a list of evaluations,
+  // one for each attempt. We iterate through each attempt to see if
+  // any of the variables in that evaluation failed. If so, we consider
+  // the whole attempt as a failure and increment the error count.
+  onDetermineErrorCount(attempts = 1000): Promise<number> {
+
+    // We count as variable evaluation as 'errored' if the evaluator throws an error,
+    // or if the variable evaluates to null or undefined (which occurs from array indexing
+    // or by other logic errors)
+    const hasError = (hasError, evaluation: Evaluation): boolean =>
+      hasError ||
+      evaluation.errored ||
+      evaluation.result === null ||
+      evaluation.result === undefined;
+
+    const attemptHasError = (evaluations: Evaluation[]): boolean =>
+      evaluations.reduce(hasError, false);
+
+    const countAttemptErrors = (results: Immutable.List<Evaluation[]>): number =>
+      results.reduce(
+        (errorCount, evaluations) =>
+          attemptHasError(evaluations)
+            ? errorCount + 1
+            : errorCount,
+        0);
+
+    return this.onTestMultipleTimes(attempts).then(results => countAttemptErrors(results));
   }
 
   onEnableVariables() {
@@ -241,6 +336,8 @@ export class VariableModuleEditor
     });
 
     onEdit(model.set(variable.guid, variable), null);
+    // onTestExpressions does not have the updated model since the component has not been
+    // rerendered with new props
   }
 
   onDisableVariables() {
@@ -254,7 +351,7 @@ export class VariableModuleEditor
     };
 
     const modal = <ModalSelection
-      title={`Remove all variables?`}
+      title="Remove all variables?"
       onCancel={dismissModal}
       onInsert={deleteAndDismiss}
       okClassName="danger"
@@ -267,7 +364,7 @@ export class VariableModuleEditor
   }
 
   renderButtonPanel() {
-    const { classes, className, model, editMode } = this.props;
+    const { model, editMode } = this.props;
 
     const testButton = <button className="btn btn-sm btn-link" type="button"
       disabled={!editMode}
@@ -296,7 +393,7 @@ export class VariableModuleEditor
       </button>;
 
     return (
-      <div className={classNames([classes.buttonPanel, className])}>
+      <div className="buttonPanel">
         {createOrRemove}
         {openButton}
         {testButton}
@@ -318,10 +415,9 @@ export class VariableModuleEditor
   }
 
   renderHelpPopup() {
-    const { classes, className } = this.props;
 
     return (
-      <div className={classNames([classes.header, className])}>
+      <div className="variableHeader">
         Variables
 
         <HelpPopover activateOnClick>
@@ -348,20 +444,21 @@ export class VariableModuleEditor
   }
 
   renderMain() {
-    const { classes, className, model } = this.props;
+    const { model } = this.props;
 
     const variable = model.first();
 
     return (
-      <div className={classNames([classes.VariableModuleEditor, className])}>
+      <div className="variableModuleEditor">
         {this.renderHelpPopup()}
         {variable &&
-          <div className={classes.splitPane}>
-            <ModuleEditor
+          <div className="splitPane">
+            <EditorPanel
               {...this.props}
               model={variable}
-              onExpressionEdit={this.onExpressionEdit} />
-            <ModuleEvaluation
+              onExpressionEdit={this.onExpressionEdit}
+              onTestExpressions={this.onTestExpressions} />
+            <EvaluatedPanel
               {...this.props}
               model={variable}
               results={this.state.results} />
