@@ -4,10 +4,39 @@ import { augment, getChildren } from 'data/content/common';
 import { getKey } from 'data/common';
 import { KnowledgeCategory, LearningProcess } from 'data/content/objectives/types';
 
+export function extractFullText(obj: Object[]) : string {
+  const str = '';
+  return extractFullTextHelper(obj, str);
+}
+
+function extractFullTextHelper(obj: Object[], str: string) : string {
+
+  // Find all #text nodes in the tree, in order, and return them concatenated together
+  const reducer = (accum: Object, o: Object) => {
+    if (o['#text'] !== undefined) {
+      const text : string = o['#text'];
+      return accum + ' ' + text;
+    }
+    const key = getKey(o);
+    if (o[key]['#text'] !== undefined) {
+      const text : string = o[key]['#text'];
+      return accum + ' ' + text;
+    }
+    if (o[key]['#array'] !== undefined) {
+      return extractFullTextHelper(o[key]['#array'] as Object[], accum as string);
+    }
+    return accum;
+  };
+
+  const result = obj.reduce(reducer, str) as string;
+  return result;
+}
+
 export type LearningObjectiveParams = {
   id?: string,
   guid?: string,
   title?: string,
+  rawContent?: Maybe<Object[]>,
   category?: Maybe<KnowledgeCategory>,
   process?: Maybe<LearningProcess>,
   skills?: Immutable.List<string>,
@@ -19,6 +48,7 @@ const defaultContent = {
   id: '',
   guid: '',
   title: '',
+  rawContent: Maybe.nothing<Object[]>(),
   category: Maybe.nothing<KnowledgeCategory>(),
   process: Maybe.nothing<LearningProcess>(),
   skills: Immutable.List<string>(),
@@ -31,6 +61,7 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
   id: string;
   guid: string;
   title: string;
+  rawContent: Maybe<Object[]>;
   category: Maybe<KnowledgeCategory>;
   process: Maybe<LearningProcess>;
   skills: Immutable.List<string>;
@@ -58,27 +89,34 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
       model = model.with({ category: Maybe.just<KnowledgeCategory>(o['@category']) });
     }
 
-    getChildren(o).forEach((item) => {
+    const children = getChildren(o);
 
-      const key = getKey(item);
+    // Set the title when we have only a '#text' child
+    if (children.length === 1 && getKey(children[0]) === '#text') {
+      model = model.with({ title: children[0]['#text'] });
+    } else {
 
-      switch (key) {
-        case '#text':
-          model = model.with({ title: item['#text'] });
-          break;
-        default:
+      // Otherwise, we have content that we are not supporting the direct edit
+      // of (e.g. lists, images, formatting)
 
-      }
-    });
+      // Strip out the id attr if it has been absorbed from the objective
+      children.forEach((c) => { if (c['@id'] === model.id) { delete c['@id']; }});
+
+      model = model.with({ rawContent: Maybe.just(children) });
+    }
 
     return model;
   }
 
   toPersistence() : Object {
+
     const o = {
       objective: {
         '@id': this.id,
-        '#array': [{ '#text': this.title }],
+        '#array': this.rawContent.caseOf({
+          just: raw => raw,
+          nothing: () => [{ '#text': this.title }],
+        }),
       },
     };
 
