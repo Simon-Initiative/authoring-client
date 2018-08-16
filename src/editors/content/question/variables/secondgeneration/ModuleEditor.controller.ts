@@ -1,6 +1,6 @@
 import { connect, Dispatch } from 'react-redux';
-import { VariableModuleEditor } from './VariableModuleEditor';
-import { modalActions } from 'actions/modal';
+import { ModuleEditor } from
+  'editors/content/question/variables/secondgeneration/ModuleEditor';
 import { State } from 'reducers';
 
 interface StateProps {
@@ -8,8 +8,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  displayModal: (component: any) => void;
-  dismissModal: () => void;
 }
 
 interface OwnProps {
@@ -24,12 +22,10 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    displayModal: (component: any) => dispatch(modalActions.display(component)),
-    dismissModal: () => dispatch(modalActions.dismiss()),
   };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(VariableModuleEditor);
+    (mapStateToProps, mapDispatchToProps)(ModuleEditor);
 
-export { controller as VariableModuleEditor };
+export { controller as ModuleEditor };

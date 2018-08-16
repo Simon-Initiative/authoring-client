@@ -1,26 +1,32 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
-import { Button, Select } from '../common/controls';
+import { AbstractItemPartEditorProps } from 'editors/content/common/AbstractItemPartEditor';
+import { Button, Select } from 'editors/content/common/controls';
 import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
 } from 'editors/content/common/TabContainer';
-import { Hints } from '../part/Hints';
-import SkillsEditor from '../skills/SkillsEditor';
-import { CriteriaEditor } from '../question/CriteriaEditor';
+import { Hints } from 'editors/content/part/Hints';
+import SkillsEditor from 'editors/content/skills/SkillsEditor';
+import { CriteriaEditor } from 'editors/content/question/CriteriaEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import guid from 'utils/guid';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
-import { Badge } from '../common/Badge';
-import { VariablesEditor } from './VariablesEditor';
+import { Badge } from 'editors/content/common/Badge';
+import { VariablesEditor } from
+  'editors/content/question/variables/firstgeneration/VariablesEditor';
 
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
-import { VariableModuleEditor } from 'editors/content/question/VariableModuleEditor.controller';
+import { ModuleEditor } from
+  'editors/content/question/variables/secondgeneration/ModuleEditor';
 import { MODULE_IDENTIFIER } from 'data/content/assessment/variable';
+import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
+import { modalActions } from 'actions/modal';
+import ModalSelection from 'utils/selection/ModalSelection';
+import { ModuleModal } from 'editors/content/question/variables/secondgeneration/ModuleModal';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
@@ -48,7 +54,7 @@ export interface QuestionProps<ModelType>
 }
 
 export interface QuestionState {
-
+  oldVariablesEnabled: boolean;
 }
 
 export const getLabelForQuestion = (question: contentTypes.Question): string => {
@@ -95,7 +101,6 @@ export const OptionControl = TabOptionControl;
 export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem>,
   S extends QuestionState> extends React.PureComponent<P, S> {
 
-
   className: string;
 
   constructor(props) {
@@ -107,6 +112,48 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
     this.onSkillsEdit = this.onSkillsEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
+    this.onOpenEditorPopup = this.onOpenEditorPopup.bind(this);
+    this.onEnableVariables = this.onEnableVariables.bind(this);
+    this.onDisableVariables = this.onDisableVariables.bind(this);
+
+    this.state = {
+      oldVariablesEnabled: false,
+    } as Readonly<S>;
+  }
+
+  componentDidMount() {
+    // Hotkey for Georgia State to enable the first generation variable editor.
+    handleKey(
+      '⌘+0, ctrl+0',
+      () => true,
+      () => {
+        this.setState(
+          { oldVariablesEnabled: true }),
+          () => this.renameFirstVariable();
+        // Immutable.OrderedMap<string, contentTypes.Variable>())
+      });
+  }
+
+  // Rename the first variable from the new format 'module' to the old format 'V1' so the
+  // question editor detects that the old variable editor should be used.
+  renameFirstVariable() {
+    const { onVariablesChange, model } = this.props;
+
+    const name = 'V1';
+
+    if (model.variables.size === 0) {
+      return;
+    }
+
+    const renamedVariables = model.variables
+      .set(model.variables.first().guid,
+           model.variables.first().with({ name }));
+
+    onVariablesChange(renamedVariables);
+  }
+
+  componentWillUnmount() {
+    unhandleKey('⌘+0, ctrl+0');
   }
 
   abstract renderDetails(): JSX.Element | boolean;
@@ -171,33 +218,153 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return [];
   }
 
+  onEnableVariables() {
+    const { onVariablesChange } = this.props;
+
+    const name = MODULE_IDENTIFIER;
+
+    const variable = new contentTypes.Variable().with({
+      name,
+    });
+
+    onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>(
+      [[variable.guid, variable]]));
+  }
+
+  onDisableVariables() {
+    const { editMode, onVariablesChange, services } = this.props;
+
+    const deleteAndDismiss = () => {
+      // this.setState(
+      //   { results: Immutable.Map<string, Evaluation>() },
+      //   () =>
+      onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>());
+      services.dismissModal();
+    };
+
+    const modal = <ModalSelection
+      title="Remove all variables?"
+      onCancel={modalActions.dismiss}
+      onInsert={deleteAndDismiss}
+      okClassName="danger"
+      okLabel="Remove Variables"
+      disableInsert={!editMode}>
+      Are you sure you want to remove all variables from this question?
+    </ModalSelection>;
+
+    services.displayModal(modal);
+  }
+
   renderVariables() {
 
     const { hideVariables, onFocus, model, editMode, services, context, onVariablesChange,
       onUpdateHover, hover, activeContentGuid } = this.props;
 
+    const { oldVariablesEnabled } = this.state;
+
     // add variables
-    if (!hideVariables) {
-
-      const variableProps = {
-        activeContentGuid,
-        hover,
-        onUpdateHover,
-        onFocus,
-        editMode,
-        services,
-        context,
-        model: model.variables,
-        onEdit: onVariablesChange,
-      };
-
-      // Decide whether to show the new or old variable UI. The new UI (VariableModuleEditor)
-      // creates a single variable with the name of the constant MODULE_IDENTIFIER
-      return model.variables.size > 0 && model.variables.first().name !== MODULE_IDENTIFIER
-        ? <VariablesEditor {...variableProps} />
-        : <VariableModuleEditor {...variableProps} />;
+    if (hideVariables) {
+      console.log(1);
+      return null;
     }
-    return null;
+
+    const enableVariablesButton =
+      <button className="btn btn-sm btn-outline-primary" type="button"
+        disabled={!editMode}
+        onClick={() => this.onEnableVariables()}>
+        Create Variables
+      </button>;
+
+    const disableVariablesButton =
+      <button className="btn btn-sm btn-outline-danger" type="button"
+        disabled={!editMode}
+        onClick={() => this.onDisableVariables()}>
+        Remove Variables
+      </button>;
+
+    const openModalEditorButton =
+      <button className="btn btn-sm btn-link" type="button"
+        disabled={!editMode}
+        onClick={() => this.onOpenEditorPopup()}>
+        Open Full Editor
+      </button>;
+
+    const variableProps = {
+      activeContentGuid,
+      hover,
+      onUpdateHover,
+      onFocus,
+      editMode,
+      services,
+      context,
+      model: model.variables,
+      onEdit: onVariablesChange,
+    };
+
+    const helpPopup =
+      <div className="variableHeader">
+        Variables
+
+        <HelpPopover activateOnClick>
+          <div>
+            <p>Use <b>variables</b> to create <b>templated</b> questions.
+            A templated, or parameterized, question allows the creation
+            of a question that can vary parts of the question.</p>
+
+            <p>Once you have defined your variables, use them in your
+              question by typing the variable name surrounded by &quot;@@&quot;</p>
+
+            <p>For example, a question using two variables:</p>
+
+            <blockquote>
+              <code>
+                What is the value @@V1@@ divided by @@V2@@ equal to?
+              </code>
+            </blockquote>
+
+          </div>
+        </HelpPopover>
+      </div>;
+
+    const results = [
+      helpPopup,
+    ];
+
+    if (model.variables.size === 0) {
+      console.log(2);
+      results.push(enableVariablesButton);
+      return results;
+    }
+
+    // Decide whether to show the new or old variable UI. The new UI (VariableModuleEditor)
+    // creates a single variable with the name of the constant MODULE_IDENTIFIER
+    if (model.variables.first().name !== MODULE_IDENTIFIER || oldVariablesEnabled) {
+      console.log(3);
+      results.push(
+        <VariablesEditor {...variableProps} />,
+        disableVariablesButton,
+      );
+    }
+
+    if (model.variables.first().name === MODULE_IDENTIFIER) {
+      console.log(4);
+      results.push(
+        <ModuleEditor {...variableProps} />,
+        disableVariablesButton,
+        openModalEditorButton,
+      );
+    }
+
+    return results;
+  }
+
+  onOpenEditorPopup() {
+    const { model, onVariablesChange, services } = this.props;
+
+    services.displayModal(<ModuleModal
+      {...this.props}
+      model={model.variables}
+      onEdit={onVariablesChange} />);
   }
 
   renderOptions() {

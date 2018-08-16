@@ -83,6 +83,8 @@ export class ImageHotspot
       partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
     } = this.props;
 
+    super.componentDidMount();
+
     // initialize advanced scoring if its not already
     if (!advancedScoringInitialized) {
       onToggleAdvancedScoring(model.guid, isComplexScoring(partModel));

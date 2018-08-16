@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Button } from '../common/controls';
+import { Button } from 'editors/content/common/controls';
 import guid from 'utils/guid';
 import {
     Question, QuestionProps, QuestionState,
-} from './Question';
+} from 'editors/content/question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
@@ -92,6 +92,8 @@ export class MultipleChoice
     const {
       partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
     } = this.props;
+
+    super.componentDidMount();
 
     // initialize advanced scoring if its not already
     if (!advancedScoringInitialized) {

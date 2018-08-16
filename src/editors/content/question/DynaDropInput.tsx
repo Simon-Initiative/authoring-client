@@ -88,6 +88,8 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
       partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
     } = this.props;
 
+    super.componentDidMount();
+
     // initialize advanced scoring if its not already
     if (!advancedScoringInitialized) {
       onToggleAdvancedScoring(model.guid, isComplexScoring(partModel));
