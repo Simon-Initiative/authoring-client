@@ -3,6 +3,7 @@ import CourseEditor from './CourseEditor';
 import { CourseModel } from 'data/models';
 import { courseChanged } from 'actions/course';
 import * as viewActions from 'actions/view';
+import { modalActions } from 'actions/modal';
 
 interface StateProps {
 
@@ -11,6 +12,8 @@ interface StateProps {
 interface DispatchProps {
   courseChanged: (model: CourseModel) => void;
   viewAllCourses: () => void;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
 }
 
 interface OwnProps {
@@ -28,6 +31,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(courseChanged(model)),
     viewAllCourses: () =>
       dispatch(viewActions.viewAllCourses()),
+    onDisplayModal: component => dispatch(modalActions.display(component)),
+    onDismissModal: () => dispatch(modalActions.dismiss()),
   };
 };
 

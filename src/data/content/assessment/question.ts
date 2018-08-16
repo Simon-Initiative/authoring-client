@@ -137,6 +137,27 @@ function ensureResponsesExist(model: Question) {
         if (choiceCount - responseCount > 0) {
           updated = updated.with({ parts: updated.parts.set(part.guid, part) });
         }
+      } else if (item.select === 'multiple') {
+        const removeWildcards = item.choices.size <= 1;
+        part.responses.forEach((res) => {
+          // remove responses with a wildcard
+          if (removeWildcards && res.match === '*') {
+            updated = updated.with({
+              parts: updated.parts.set(part.guid, part.with({
+                responses: part.responses.delete(res.guid),
+              })),
+            });
+            // fix matches with leading comma
+          } else if (res.match.length && res.match.substring(0, 1) === ',') {
+            updated = updated.with({
+              parts: updated.parts.set(part.guid, part.with({
+                responses: part.responses.set(res.guid, res.with({
+                  match: res.match.substring(1),
+                })),
+              })),
+            });
+          }
+        });
       }
     }
   }
@@ -337,15 +358,14 @@ function cloneDragDropQuestion(question: Question): Question {
       updateHTMLLayoutTargetRefs(valueMap, inputMap, ld)),
   });
 
-  return question.with({
-    id: createGuid(),
+  return ensureIdGuidPresent(question.with({
     body: question.body.with({
       content: question.body.content.set(customContent.guid, clonedCustomContent),
     }).clone(),
     explanation: question.explanation.clone(),
     parts,
     items,
-  });
+  }));
 }
 
 // Cloning a single select multiple choice question requires that
@@ -387,13 +407,12 @@ function cloneMultipleChoiceQuestion(question: Question): Question {
     });
   }).toOrderedMap();
 
-  return question.with({
-    id: createGuid(),
+  return ensureIdGuidPresent(question.with({
     body: question.body.clone(),
     explanation: question.explanation.clone(),
     parts,
     items,
-  });
+  }));
 }
 
 // This ensures that existing input-based questions (aka Numeric, Text, FillInTheBlank)

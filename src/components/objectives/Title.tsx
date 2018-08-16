@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Remove } from 'components/common/Remove';
 
 export interface TitleProps {
   title: string;
@@ -6,6 +7,8 @@ export interface TitleProps {
   isHoveredOver: boolean;
   onEdit: (string) => void;
   onToggleExpanded: () => void;
+  loading: boolean;
+  onRemove: () => void;
 }
 
 export interface TitleState {
@@ -93,21 +96,26 @@ export class Title
       fontWeight: 'normal',
     };
 
-    const rewordButton = this.props.isHoveredOver && this.props.editMode
-        ? <button
+    const actionButtons = this.props.isHoveredOver && this.props.editMode
+        ? <span>
+          <Remove editMode={this.props.editMode}
+          loading={this.props.loading}
+          onRemove={this.props.onRemove} />
+          <button
             key="reword"
             onClick={this.onBeginEdit}
             type="button"
             className="btn btn-link btn-sm">
             Reword
           </button>
+          </span>
         : null;
 
     return (
       <React.Fragment>
         <button key="itemClick" onClick={() => this.props.onToggleExpanded()}
         type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
-        {rewordButton}
+        {actionButtons}
       </React.Fragment>
     );
   }

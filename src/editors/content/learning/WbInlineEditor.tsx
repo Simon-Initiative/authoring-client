@@ -14,6 +14,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import './WbInline.scss';
 import { ResourceState } from 'data/content/resource';
+import { Maybe } from 'tsmonad';
 
 export interface WbInlineEditorProps extends AbstractContentEditorProps<contentTypes.WbInline> {
   onShowSidebar: () => void;
@@ -38,21 +39,23 @@ export default class WbInlineEditor
     this.onClick = this.onClick.bind(this);
   }
 
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps: WbInlineEditorProps): boolean {
     return this.props.model !== nextProps.model;
   }
 
-  onPurposeEdit(purpose) {
-    const model = this.props.model.with({ purpose });
+  onPurposeEdit(purpose: string): void {
+    const model = this.props.model.with({
+      purpose: purpose === '' ? Maybe.nothing() : Maybe.just(purpose),
+    });
     this.props.onEdit(model, model);
   }
 
-  onAssessmentChange(idref) {
+  onAssessmentChange(idref: string): void {
     const model = this.props.model.with({ idref });
     this.props.onEdit(model, model);
   }
 
-  onClick() {
+  onClick(): void {
     const guid = this.props.context.courseModel.resourcesById
       .get(this.props.model.idref).guid;
 
@@ -64,6 +67,10 @@ export default class WbInlineEditor
       .toArray()
       .filter(r => r.type === LegacyTypes.inline && r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+
+    // A purpose is not required, so we need to add an option for an empty type
+    const purposeTypesWithEmpty = PurposeTypes.slice();
+    purposeTypesWithEmpty.unshift({ value: '', label: '' });
 
     return (
       <SidebarContent title="Inline Assessment">
@@ -78,9 +85,9 @@ export default class WbInlineEditor
         <SidebarGroup label="Purpose">
           <Select
             editMode={this.props.editMode}
-            value={this.props.model.purpose}
+            value={this.props.model.purpose.valueOr('')}
             onChange={this.onPurposeEdit}>
-            {PurposeTypes.map(p =>
+            {purposeTypesWithEmpty.map(p =>
               <option
                 key={p.value}
                 value={p.value}>

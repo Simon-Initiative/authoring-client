@@ -4,13 +4,14 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { Param } from '../learning/param';
+import { Maybe } from 'tsmonad';
 
 export type WbInlineParams = {
   idref?: string,
   src?: string,
   width?: string,
   height?: string,
-  purpose?: string,
+  purpose?: Maybe<string>,
   params?: Immutable.OrderedMap<string, Param>,
   guid?: string,
 };
@@ -22,7 +23,7 @@ const defaultContent = {
   src: '',
   width: '',
   height: '',
-  purpose: 'learnbydoing',
+  purpose: Maybe.just('learnbydoing'),
   params: Immutable.OrderedMap<string, Param>(),
   guid: '',
 };
@@ -35,7 +36,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
   src: string;
   width: string;
   height: string;
-  purpose: string;
+  purpose: Maybe<string>;
   params: Immutable.OrderedMap<string, Param>;
   guid: string;
 
@@ -75,7 +76,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
       model = model.with({ width: wb['@width'] });
     }
     if (wb['@purpose'] !== undefined) {
-      model = model.with({ purpose: wb['@purpose'] });
+      model = model.with({ purpose: Maybe.just(wb['@purpose']) });
     }
 
     getChildren(wb).forEach((item) => {
@@ -98,15 +99,16 @@ export class WbInline extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
-    return {
+    const wbinline = {
       'wb:inline': {
         '@idref': this.idref,
         '@src': this.src,
         '@height': this.height,
         '@width': this.width,
-        '@purpose': this.purpose,
         '#array': this.params.toArray().map(p => p.toPersistence()),
       },
     };
+    this.purpose.lift(p => wbinline['wb:inline']['@purpose'] = p);
+    return wbinline;
   }
 }

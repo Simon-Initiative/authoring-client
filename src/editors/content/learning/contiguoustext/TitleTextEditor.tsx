@@ -4,7 +4,7 @@ import { injectSheetSFC, classNames } from 'styles/jss';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
-import { ContiguousText } from 'data/content/learning/contiguous';
+import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import { ParentContainer, TextSelection } from 'types/active';
 
@@ -27,22 +27,23 @@ export interface TitleTextEditorProps {
  */
 export const TitleTextEditor
   = injectSheetSFC<StyledComponentProps<TitleTextEditorProps>>(styles)((({
-  className, classes, children, context, services, model,
-  editMode, onEdit, onFocus, editorStyles,
-}) => {
+    className, classes, children, context, services, model,
+    editMode, onEdit, onFocus, editorStyles,
+  }) => {
     return (
       <div className={classNames(['TitleTextEditor', classes.titleTextEditor, className])}>
         <ContiguousTextEditor
-          onInsertParsedContent={() => {}}
+
+          onInsertParsedContent={() => { }}
           className={classes.contiguousTextEditor}
           activeContentGuid={null}
           hover={null}
-          onUpdateHover={() => {}}
+          onUpdateHover={() => { }}
           onFocus={onFocus}
           context={context}
           services={services}
           editMode={editMode}
-          model={model}
+          model={model.with({ mode: ContiguousTextMode.SimpleText })}
           editorStyles={editorStyles}
           hideBorder={true}
           onEdit={onEdit} />

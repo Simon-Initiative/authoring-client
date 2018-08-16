@@ -33,13 +33,14 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
 import { LegacyTypes } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
+import { ExpandedState } from 'reducers/expanded';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
   user: UserState;
   course: models.CourseModel;
   dispatch: any;
-  expanded: any;
+  expanded: ExpandedState;
   skills: Immutable.OrderedMap<string, contentTypes.Skill>;
   onSetSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
   onUpdateSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
@@ -107,7 +108,12 @@ export class ObjectiveSkillView
   }
 
   componentDidMount() {
-    this.buildModels();
+    // If node expansion state has not been set by the user, expand all nodes as a default state
+    this.buildModels().then((_) => {
+      this.props.expanded.has('objectives')
+        ? null
+        : this.expandAllObjectives();
+    });
   }
 
   componentWillUnmount() {
@@ -143,7 +149,7 @@ export class ObjectiveSkillView
     const courseId = this.props.course.guid;
     const userName = this.props.userName;
 
-    buildAggregateModel(courseId, userName)
+    return buildAggregateModel(courseId, userName)
       .then((aggregateModel) => {
 
         // We need to check to see if the component has unmounted
@@ -183,6 +189,14 @@ export class ObjectiveSkillView
           });
         }
       });
+  }
+
+  expandAllObjectives() {
+    if (!this.state.objectives) {
+      return;
+    }
+    const objectiveIds = this.state.objectives.objectives.toArray().map(o => o.id);
+    this.props.dispatch(expandNodes('objectives', objectiveIds));
   }
 
   logObjectivesAndSkills(aggregateModel: AggregateModel) {
@@ -679,7 +693,6 @@ export class ObjectiveSkillView
   }
 
   onToggleExpanded(guid) {
-
     let action = null;
     if (this.props.expanded.has('objectives')) {
       action = this.props.expanded.get('objectives').has(guid)
@@ -711,7 +724,7 @@ export class ObjectiveSkillView
         return set.includes(guid);
       }
 
-      return true;
+      return false;
     };
 
     this.state.objectives.objectives

@@ -120,6 +120,7 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
   onRedo: (documentId: string) => void;
   onPreview: (courseId: CourseId, organization: models.OrganizationModel) => Promise<any>;
   course: models.CourseModel;
+  onEditingEnable: (editable : boolean, documentId : string) => void;
 }
 
 const enum TABS {
@@ -204,16 +205,20 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       just: set => set.has(guid) ? collapseNodes : expandNodes,
       nothing: () => expandNodes,
     });
+
     this.props.dispatch(action(this.props.context.documentId, [guid]));
   }
 
   processCommand(model, command: Command) {
-
+    const reEnable = () => this.props.onEditingEnable(true, this.props.context.documentId);
+    this.props.onEditingEnable(false, this.props.context.documentId);
     const delay = () =>
       command.execute(this.props.model, model, this.props.context, this.props.services)
-        .then(org => this.handleEdit(org));
+        .then(org => this.handleEdit(org))
+        .then(reEnable)
+        .catch(reEnable);
 
-    setTimeout(delay, 0);
+    setImmediate(delay);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -320,12 +325,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   componentDidMount() {
     super.componentDidMount();
 
+    // If the page has not been viewed yet or custom expand/collapse state has not been set by the
+    // user, expand all of the nodes as a default state
     this.props.expanded.caseOf({
-      just: v => false,
-      nothing: () => this.props.dispatch(
-        expandNodes(
-          this.props.context.documentId,
-          this.props.model.sequences.children.toArray().map(s => getExpandId(s)))),
+      just: expandedNodes => null,
+      nothing: () => this.onExpand(),
     });
   }
 
@@ -491,4 +495,3 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 }
 
 export default OrgEditor;
-

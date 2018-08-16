@@ -63,7 +63,6 @@ export class Custom extends Immutable.Record(defaultContent) {
 
   clone() {
     return ensureIdGuidPresent(this.with({
-      id: createGuid(),
       layout: '',
       layoutData: this.layoutData.lift(ld => ld.clone()),
       src: DYNA_DROP_SRC_FILENAME,

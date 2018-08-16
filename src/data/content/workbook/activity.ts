@@ -7,7 +7,7 @@ import { Maybe } from 'tsmonad';
 
 export type ActivityParams = {
   idref?: string,
-  purpose?: string,
+  purpose?: Maybe<string>,
   image?: Maybe<Image>,
   guid?: string,
 };
@@ -16,7 +16,7 @@ const defaultContent = {
   contentType: 'Activity',
   elementType: 'activity',
   idref: '',
-  purpose: 'checkpoint',
+  purpose: Maybe.just('quiz'),
   image: Maybe.nothing<Image>(),
   guid: '',
 };
@@ -25,7 +25,7 @@ export class Activity extends Immutable.Record(defaultContent) {
   contentType: 'Activity';
   elementType: 'activity';
   idref: string;
-  purpose: string;
+  purpose: Maybe<string>;
   image: Maybe<Image>;
   guid: string;
 
@@ -52,7 +52,7 @@ export class Activity extends Immutable.Record(defaultContent) {
       model = model.with({ idref: t['@idref'] });
     }
     if (t['@purpose'] !== undefined) {
-      model = model.with({ purpose: t['@purpose'] });
+      model = model.with({ purpose: Maybe.just(t['@purpose']) });
     }
 
     getChildren(t).forEach((item) => {
@@ -72,15 +72,16 @@ export class Activity extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
-    return {
+    const activity = {
       activity: {
         '@idref': this.idref,
-        '@purpose': this.purpose,
         '#array': this.image.caseOf({
           just: i => [i.toPersistence],
           nothing: () => [],
         }),
       },
     };
+    this.purpose.lift(p => activity.activity['@purpose'] = p);
+    return activity;
   }
 }
