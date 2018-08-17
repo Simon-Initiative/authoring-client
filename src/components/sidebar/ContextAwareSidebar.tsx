@@ -126,6 +126,7 @@ export interface ContextAwareSidebarProps {
   onEditModel: (model: ContentModel) => void;
   supportedElements: Immutable.List<string>;
   show: boolean;
+  sidebarContent: JSX.Element;
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
@@ -411,7 +412,7 @@ export class ContextAwareSidebar
 
   render() {
     const {
-      classes, className, content, container, show, onEdit } = this.props;
+      classes, className, content, container, show, sidebarContent, onEdit } = this.props;
 
     const contentModel = content.caseOf({
       just: c => c,
@@ -457,9 +458,11 @@ export class ContextAwareSidebar
         {show ?
           <div className={classNames([classes.contextAwareSidebar, className])}>
             <div className={classes.content}>
-              {!contentRenderer
-                ? this.renderPageDetails()
-                : this.renderSidebarContent(contentRenderer, contentModel)
+              {sidebarContent
+                ? sidebarContent
+                : contentRenderer
+                  ? this.renderSidebarContent(contentRenderer, contentModel)
+                  : this.renderPageDetails()
               }
             </div>
           </div>
