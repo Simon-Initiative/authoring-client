@@ -25,8 +25,8 @@ import { ModuleEditor } from
 import { MODULE_IDENTIFIER } from 'data/content/assessment/variable';
 import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 import { modalActions } from 'actions/modal';
-import ModalSelection from 'utils/selection/ModalSelection';
-import { ModuleModal } from 'editors/content/question/variables/secondgeneration/ModuleModal';
+import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
+import { Remove } from 'components/common/Remove';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
@@ -54,7 +54,7 @@ export interface QuestionProps<ModelType>
 }
 
 export interface QuestionState {
-  oldVariablesEnabled: boolean;
+
 }
 
 export const getLabelForQuestion = (question: contentTypes.Question): string => {
@@ -112,44 +112,48 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
     this.onSkillsEdit = this.onSkillsEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
-    this.onOpenEditorPopup = this.onOpenEditorPopup.bind(this);
     this.onEnableVariables = this.onEnableVariables.bind(this);
     this.onDisableVariables = this.onDisableVariables.bind(this);
-
-    this.state = {
-      oldVariablesEnabled: false,
-    } as Readonly<S>;
+    this.switchToOldVariableEditor = this.switchToOldVariableEditor.bind(this);
   }
 
   componentDidMount() {
     // Hotkey for Georgia State to enable the first generation variable editor.
     handleKey(
-      '⌘+0, ctrl+0',
+      '⌘+shift+0, ctrl+shift+0',
       () => true,
-      () => {
-        this.setState(
-          { oldVariablesEnabled: true }),
-          () => this.renameFirstVariable();
-        // Immutable.OrderedMap<string, contentTypes.Variable>())
-      });
+      this.switchToOldVariableEditor);
   }
 
-  // Rename the first variable from the new format 'module' to the old format 'V1' so the
-  // question editor detects that the old variable editor should be used.
-  renameFirstVariable() {
-    const { onVariablesChange, model } = this.props;
+  switchToOldVariableEditor() {
+    const { editMode, onVariablesChange, services } = this.props;
 
-    const name = 'V1';
+    const resetVariablesAndDismiss = () => {
+      const name = 'V1';
+      const expression = 'const x = 1';
 
-    if (model.variables.size === 0) {
-      return;
-    }
+      const variable = new contentTypes.Variable().with({
+        name,
+        expression,
+      });
+      onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>(
+        [[variable.guid, variable]]));
+      services.dismissModal();
+    };
 
-    const renamedVariables = model.variables
-      .set(model.variables.first().guid,
-           model.variables.first().with({ name }));
+    const modal = <ModalSelection
+      title="Use old dynamic question editor?"
+      onCancel={modalActions.dismiss}
+      onInsert={resetVariablesAndDismiss}
+      okClassName="danger"
+      okLabel="Use old editor"
+      disableInsert={!editMode}
+      size={sizes.medium}>
+      Are you sure you want to remove all of your variables and switch to the old
+       dynamic question editor?
+    </ModalSelection>;
 
-    onVariablesChange(renamedVariables);
+    services.displayModal(modal);
   }
 
   componentWillUnmount() {
@@ -235,9 +239,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     const { editMode, onVariablesChange, services } = this.props;
 
     const deleteAndDismiss = () => {
-      // this.setState(
-      //   { results: Immutable.Map<string, Evaluation>() },
-      //   () =>
       onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>());
       services.dismissModal();
     };
@@ -248,7 +249,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       onInsert={deleteAndDismiss}
       okClassName="danger"
       okLabel="Remove Variables"
-      disableInsert={!editMode}>
+      disableInsert={!editMode}
+      size={sizes.small}>
       Are you sure you want to remove all variables from this question?
     </ModalSelection>;
 
@@ -260,11 +262,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     const { hideVariables, onFocus, model, editMode, services, context, onVariablesChange,
       onUpdateHover, hover, activeContentGuid } = this.props;
 
-    const { oldVariablesEnabled } = this.state;
-
-    // add variables
     if (hideVariables) {
-      console.log(1);
       return null;
     }
 
@@ -273,20 +271,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
         disabled={!editMode}
         onClick={() => this.onEnableVariables()}>
         Create Variables
-      </button>;
-
-    const disableVariablesButton =
-      <button className="btn btn-sm btn-outline-danger" type="button"
-        disabled={!editMode}
-        onClick={() => this.onDisableVariables()}>
-        Remove Variables
-      </button>;
-
-    const openModalEditorButton =
-      <button className="btn btn-sm btn-link" type="button"
-        disabled={!editMode}
-        onClick={() => this.onOpenEditorPopup()}>
-        Open Full Editor
       </button>;
 
     const variableProps = {
@@ -307,9 +291,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
         <HelpPopover activateOnClick>
           <div>
-            <p>Use <b>variables</b> to create <b>templated</b> questions.
-            A templated, or parameterized, question allows the creation
-            of a question that can vary parts of the question.</p>
+            <p>Use <b>JavaScript</b> to create <b>dynamic</b> questions.
+            A dynamic question allows you to vary parts of the question.</p>
 
             <p>Once you have defined your variables, use them in your
               question by typing the variable name surrounded by &quot;@@&quot;</p>
@@ -326,45 +309,25 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
         </HelpPopover>
       </div>;
 
-    const results = [
-      helpPopup,
-    ];
-
     if (model.variables.size === 0) {
-      console.log(2);
-      results.push(enableVariablesButton);
-      return results;
-    }
-
-    // Decide whether to show the new or old variable UI. The new UI (VariableModuleEditor)
-    // creates a single variable with the name of the constant MODULE_IDENTIFIER
-    if (model.variables.first().name !== MODULE_IDENTIFIER || oldVariablesEnabled) {
-      console.log(3);
-      results.push(
-        <VariablesEditor {...variableProps} />,
-        disableVariablesButton,
+      return (
+        <div className="variable-wrapper">
+          {helpPopup}
+          {enableVariablesButton}
+        </div>
       );
     }
 
-    if (model.variables.first().name === MODULE_IDENTIFIER) {
-      console.log(4);
-      results.push(
-        <ModuleEditor {...variableProps} />,
-        disableVariablesButton,
-        openModalEditorButton,
-      );
-    }
-
-    return results;
-  }
-
-  onOpenEditorPopup() {
-    const { model, onVariablesChange, services } = this.props;
-
-    services.displayModal(<ModuleModal
-      {...this.props}
-      model={model.variables}
-      onEdit={onVariablesChange} />);
+    return (
+      <div className="variable-wrapper">
+        {helpPopup} <Remove editMode={editMode} onRemove={this.onDisableVariables} />
+        {/* Decide whether to show the new or old variable UI. The new UI (VariableModuleEditor)
+        creates a single variable with the name of the constant MODULE_IDENTIFIER */}
+        {model.variables.first().name === MODULE_IDENTIFIER
+          ? <ModuleEditor {...variableProps} />
+          : <VariablesEditor {...variableProps} />}
+      </div>
+    );
   }
 
   renderOptions() {

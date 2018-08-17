@@ -6,7 +6,6 @@ import { AbstractContentEditor, AbstractContentEditorProps } from
   'editors/content/common/AbstractContentEditor';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
-import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 import AceEditor from 'react-ace';
 
@@ -197,37 +196,6 @@ export class VariablesEditor
     );
   }
 
-  renderHeader() {
-    const { classes, className } = this.props;
-
-    return (
-      <div className={classNames([classes.header, className])}>
-        Variables
-
-        <HelpPopover activateOnClick>
-          <div>
-            <p>Use <b>variables</b> to create <b>templated</b> questions.
-            A templated, or parameterized, question allows the creation
-            of a question that can vary parts of the question.</p>
-
-            <p>Once you have defined your variables, use them in your
-              question by typing the variable name surrounded by &quot;@@&quot;</p>
-
-            <p>For example, a question using two variables:</p>
-
-            <blockquote>
-              <code>
-              What is the value @@V1@@ divided by @@V2@@ equal to?
-              </code>
-            </blockquote>
-
-          </div>
-        </HelpPopover>
-      </div>
-    );
-
-  }
-
   renderMain() {
     const { classes, className, model } = this.props;
 
@@ -249,7 +217,6 @@ export class VariablesEditor
 
     return (
       <div className={classNames([classes.VariablesEditor, className])}>
-        {this.renderHeader()}
         {tableOrNot}
         {this.renderButtonPanel()}
       </div>

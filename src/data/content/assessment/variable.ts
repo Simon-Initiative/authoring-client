@@ -13,7 +13,7 @@ const defaultContent = {
   contentType: 'Variable',
   elementType: 'variable',
   // tslint:disable-next-line:max-line-length
-  expression: 'const x = 1\nconst y = "I love variables"\n\n// Add variables here to use them in questions\nmodule.exports = {\n  x,\n  y\n}',
+  expression: 'const x = 1\nconst y = "I love OLI"\n\n// Export variables here to use them in questions\nmodule.exports = {\n  x,\n  y\n}',
   name: '',
   id: '',
   guid: '',

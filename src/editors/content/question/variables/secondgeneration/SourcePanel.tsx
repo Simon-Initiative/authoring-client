@@ -10,6 +10,7 @@ interface SourcePanelProps {
   model: contentTypes.Variable;
   onExpressionEdit: (expression: string) => void;
   evaluateVariables: () => void;
+  testMultipleTimes: () => void;
 }
 
 export class SourcePanel extends React.Component<SourcePanelProps, {}> {
@@ -21,16 +22,10 @@ export class SourcePanel extends React.Component<SourcePanelProps, {}> {
   componentDidMount() {
     // Fixes an issue where editor was not being focused on load
     document.activeElement && (document.activeElement as any).blur();
-
-    // Focus the end of the last line in the editor
-    // const editor = this.reactAceComponent.editor;
-    // editor.focus();
-    // const n = editor.getSession().getValue().split('\n').length;
-    // editor.gotoLine(n, editor.getSession().getLine(n - 1).length);
   }
 
   render() {
-    const { editMode, model, onExpressionEdit, evaluateVariables } = this.props;
+    const { editMode, model, onExpressionEdit, evaluateVariables, testMultipleTimes } = this.props;
 
     return (
       <div className="sourcePanel">
@@ -55,6 +50,11 @@ export class SourcePanel extends React.Component<SourcePanelProps, {}> {
                 bindKey: { win: 'Ctrl-enter', mac: 'Command-enter' },
                 exec: () => evaluateVariables(),
               },
+              {
+                name: 'test',
+                bindKey: { win: 'Ctrl-shift-enter', mac: 'Command-shift-enter' },
+                exec: () => testMultipleTimes(),
+              },
             ]
           }
           annotations={[{ row: 0, column: 2, type: 'error', text: 'Some error.' }]}
@@ -72,7 +72,6 @@ export class SourcePanel extends React.Component<SourcePanelProps, {}> {
             useWorker: false,
             showGutter: true,
             highlightActiveLine: true,
-            // autoScrollEditorIntoView: true,
             wrap: true,
           }}
         />

@@ -1,41 +1,12 @@
-.variablesEditor {
-    display: flex;
-    flex-direction: column;
-    min-width: 500;
-    font-size: 14;
-}
-
-.modalEditor {
-    // min-height: 500px;
-
-    .sourcePanel {
-        // min-height: 100%;
-        // position: relative;
-        width: 70%;
-    }
-
-    .evaluatedPanel {
-        // min-height: 100%;
-        width: 30%;
-
-        &.ace-editor {
-            // min-height: 500px;
-            margin: auto;
-        }
-    }
+.moduleEditor {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
 }
 
 .splitPane {
-    // min-height: 500px;
     width: 100%;
     display: flex;
 }
-
-// .error-marker {
-//   position: absolute;
-//   width: 100px;
-//   height: 100px;
-// }
 
 #source {
     box-shadow: inset 0px 0px 10px 0px #ABABAB;
@@ -53,12 +24,58 @@
     font-weight: 600;
 }
 
-.buttonPanel {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+.key-wrapper {
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    padding: 0.1em 0.3em;
+    box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1);
+    color: black;
+    background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee);
 }
 
-.variableHeader {
-    flex: 1;
+.button-panel {
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #1a1a1a;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    padding-left: 41px;
+
+    .vertical-center {
+        vertical-align: middle;
+        color: white;
+        display: inline-block;
+        line-height: 70px;
+        height: 70px;
+    }
+
+    .module-button {
+        border: 3px solid #36383F;
+        border-radius: 2px;
+        font-size: 1.0rem;
+        padding: 10px 15px;
+        margin: 10px 10px 10px 0px;
+
+        &:active {
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        &.btn.btn-link,
+        &.btn.btn-link:active,
+        &.btn.btn-link:hover, {
+            color: white;
+            text-decoration: none;
+        }
+
+        &.run-button {
+            i {
+                color: #ADAFBC;
+            }
+        }
+
+        &.test-button {
+            background-color: #36383F;
+        }
+    }
 }

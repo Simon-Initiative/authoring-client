@@ -239,9 +239,9 @@ export class QuestionEditor
     this.props.onEdit(this.props.model.with({ variables }));
   }
 
-  handleOnFocus() {
-    // Do nothing for questions
-  }
+  // handleOnFocus() {
+  //   // Do nothing for questions
+  // }
 
   onAddItemPart(item, part, body) {
 
@@ -336,7 +336,7 @@ export class QuestionEditor
   }
 
   renderSidebar() {
-    return null;
+    return <span>Hey</span>;
   }
   renderToolbar() {
     return null;
