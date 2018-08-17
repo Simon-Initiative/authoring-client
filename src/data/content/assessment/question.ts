@@ -54,7 +54,6 @@ const defaultQuestionParams = {
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
   explanation: new ContentElements(),
-  // handle parsing variables
   variables: Immutable.OrderedMap<string, Variable>(),
   guid: '',
 };
