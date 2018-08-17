@@ -157,7 +157,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   }
 
   componentWillUnmount() {
-    unhandleKey('⌘+0, ctrl+0');
+    unhandleKey('⌘+shift+0, ctrl+shift+0');
   }
 
   abstract renderDetails(): JSX.Element | boolean;
