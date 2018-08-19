@@ -455,9 +455,11 @@ export class ContextAwareSidebar
         }}
         transitionEnterTimeout={SIDEBAR_CLOSE_ANIMATION_DURATION_MS}
         transitionLeaveTimeout={SIDEBAR_CLOSE_ANIMATION_DURATION_MS}>
+        {console.log('show', show)}
         {show ?
           <div className={classNames([classes.contextAwareSidebar, className])}>
             <div className={classes.content}>
+            {console.log('sidebarContent in CAS', sidebarContent)}
               {sidebarContent
                 ? sidebarContent
                 : contentRenderer

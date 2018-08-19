@@ -21,10 +21,12 @@ export type SetSidebarContentAction = {
   sidebarContent: JSX.Element,
 };
 
-export const setSidebarContent = (sidebarContent: JSX.Element): SetSidebarContentAction => ({
-  type: SET_SIDEBAR_CONTENT,
-  sidebarContent,
-});
+export const setSidebarContent = (sidebarContent: JSX.Element): SetSidebarContentAction => {
+  return {
+    type: SET_SIDEBAR_CONTENT,
+    sidebarContent,
+  };
+};
 
 // Reset Sidebar Content
 export type RESET_SIDEBAR_CONTENT = 'editorSidebar/RESET_SIDEBAR_CONTENT';

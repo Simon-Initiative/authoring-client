@@ -15,7 +15,8 @@ import 'brace/ext/language_tools';
 import 'brace/snippets/javascript';
 
 export interface ModuleEditorProps extends AbstractContentEditorProps<Variables> {
-
+  setSidebarContent: (content: JSX.Element) => void;
+  resetSidebarContent: () => void;
 }
 
 export interface ModuleEditorState {
@@ -46,6 +47,10 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
 
   componentDidMount() {
     this.onEvaluateVariables();
+  }
+
+  componentWillUnmount() {
+    this.props.resetSidebarContent();
   }
 
   shouldComponentUpdate() {
@@ -202,7 +207,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
 
     return (
       <div className="moduleEditor"
-        onClick={() => this.props.onFocus(model, this.props.parent, Maybe.nothing())}>
+        onFocus={() => this.props.setSidebarContent(<span>hey</span>)}>
         {variable &&
           <div className="splitPane">
             <SourcePanel

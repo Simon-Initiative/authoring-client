@@ -22,6 +22,8 @@ export class SourcePanel extends React.Component<SourcePanelProps, {}> {
   componentDidMount() {
     // Fixes an issue where editor was not being focused on load
     document.activeElement && (document.activeElement as any).blur();
+    // Disabled a console warning shown by AceEditor
+    this.reactAceComponent.editor.$blockScrolling = Infinity;
   }
 
   render() {

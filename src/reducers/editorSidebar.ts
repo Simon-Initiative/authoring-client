@@ -16,8 +16,8 @@ export type ActionTypes =
   OtherAction;
 
 interface EditorSidebarStateParams {
-  show: boolean;
-  sidebarContent: JSX.Element;
+  show?: boolean;
+  sidebarContent?: JSX.Element;
 }
 
 const initialState = {
@@ -44,11 +44,17 @@ export const editorSidebar = (
 ): EditorSidebarState => {
   switch (action.type) {
     case SHOW_SIDEBAR:
+      // return state.with({ show: action.show });
       return Object.assign({}, state, { show: action.show });
     case SET_SIDEBAR_CONTENT:
+      // console.log('state', state.with({ sidebarContent: action.sidebarContent }));
       return Object.assign({}, state, { sidebarContent: action.sidebarContent });
+    // return state.with({ sidebarContent: action.sidebarContent });
     case RESET_SIDEBAR_CONTENT:
+    console.log('resetting sidebar');
+      // console.log('state', state.with({ sidebarContent: undefined }));
       return Object.assign({}, state, { sidebarContent: undefined });
+    // return state.with({ sidebarContent: undefined });
     default:
       return state;
   }
