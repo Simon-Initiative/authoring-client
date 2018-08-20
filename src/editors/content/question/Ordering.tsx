@@ -20,7 +20,8 @@ import {
 import {
   AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem,
   getGeneratedResponseBody, getGeneratedResponseScore, modelWithDefaultFeedback,
-} from 'editors/content/part/defaultFeedbackGenerator.ts';
+  renderMaxChoicesWarning,
+} from 'editors/content/part/defaultFeedbackGenerator';
 import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { ContentElements } from 'data/content/common/elements';
 
@@ -85,18 +86,6 @@ export interface OrderingProps extends QuestionProps<contentTypes.Ordering> {
 export interface OrderingState extends QuestionState {
 
 }
-
-
-const renderMaxChoicesMessage = () => {
-  return (
-    <div className="message alert alert-warning">
-      <i className="fa fa-info-circle"/>
-      {` Providing more than ${AUTOGEN_MAX_CHOICES} choices \
-      (Choice ${convert.toAlphaNotation(AUTOGEN_MAX_CHOICES - 1)}) for this question will \
-      prevent you from determining exact selections for other choices.`}
-    </div>
-  );
-};
 
 const buildResponsePlaceholder = (): contentTypes.Response => {
   const feedback = new contentTypes.Feedback({
@@ -613,7 +602,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
           <ItemOptions key="feedback-options">
             {choices.length > AUTOGEN_MAX_CHOICES
               ? (
-                renderMaxChoicesMessage()
+                renderMaxChoicesWarning()
               ) : (
                 <ItemOptionFlex />
               )

@@ -14,7 +14,7 @@ import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/c
 import {
   AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem,
   modelWithDefaultFeedback,
-} from 'editors/content/part/defaultFeedbackGenerator.ts';
+} from 'editors/content/part/defaultFeedbackGenerator';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import createGuid from 'utils/guid';
 import { ContentElements } from 'data/content/common/elements';
