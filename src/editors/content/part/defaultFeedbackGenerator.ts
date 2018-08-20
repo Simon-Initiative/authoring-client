@@ -50,88 +50,88 @@ const getFeedbackCombinations =
  * @param maxGenChoices max choices to generate feedback for. if exceeded, feedback will simply
  *                      be a single feedback item with match set to the match-all 'glob'
  */
-export const modelWithDefaultFeedback =
-  (model, choices, body: ContentElements, score: string, maxGenChoices: number,
-   onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap) => {
-    // remove all existing default responses
-    const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
+export const modelWithDefaultFeedback = (
+  model: contentTypes.Part, choices: contentTypes.Choice[], body: ContentElements, score: string,
+  maxGenChoices: number, onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap) => {
+  // remove all existing default responses
+  const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
 
-    let generatedResponses: contentTypes.Response[];
-    if (choices.length <= 1) {
-      generatedResponses = [];
-    } else if (choices.length > maxGenChoices) {
-      const feedback = new contentTypes.Feedback({
-        body,
-      });
-      const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
+  let generatedResponses: contentTypes.Response[];
+  if (choices.length <= 1) {
+    generatedResponses = [];
+  } else if (choices.length > maxGenChoices) {
+    const feedback = new contentTypes.Feedback({
+      body,
+    });
+    const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
-      generatedResponses = [
-        new contentTypes.Response({
-          name: 'AUTOGEN_*',
-          score,
-          match: '*',
-          feedback: feedbacks.set(feedback.guid, feedback),
-        }),
-      ];
-    } else {
-      // update available choice combinations before proceeding
-      const allCombinations = onUpdateChoiceCombinations(choices.length);
+    generatedResponses = [
+      new contentTypes.Response({
+        name: 'AUTOGEN_*',
+        score,
+        match: '*',
+        feedback: feedbacks.set(feedback.guid, feedback),
+      }),
+    ];
+  } else {
+    // update available choice combinations before proceeding
+    const allCombinations = onUpdateChoiceCombinations(choices.length);
 
-      // A map of the actual choice values to A, B, C, D, in order
-      const normalizerMap = choices.reduce(
-        (o, choice, index) => {
-          o[choice.value] = String.fromCharCode(65 + index);
+    // A map of the actual choice values to A, B, C, D, in order
+    const normalizerMap = choices.reduce(
+      (o, choice, index) => {
+        o[choice.value] = String.fromCharCode(65 + index);
+        return o;
+      },
+      {});
+
+    // A reverse map to retrieve the original choice value given A, B, C, etc
+    const reverseMap = Object.keys(normalizerMap)
+      .reduce(
+        (o, c) => {
+          o[normalizerMap[c]] = c;
           return o;
         },
-        {});
+        {},
+      );
 
-      // A reverse map to retrieve the original choice value given A, B, C, etc
-      const reverseMap = Object.keys(normalizerMap)
-        .reduce(
-          (o, c) => {
-            o[normalizerMap[c]] = c;
-            return o;
-          },
-          {},
-        );
-
-      // generate new default responses
-      generatedResponses = getFeedbackCombinations(
-        userResponses, choices, allCombinations, normalizerMap)
-        .toArray()
-        .map((combo, i) => {
-          const feedback = new contentTypes.Feedback({
-            // We only want to clone elements other than the first one, otherwise
-            // we will be replacing the model out from underneath the UI,
-            // which results in loss of focus
-            body: i === 0 ? body : body.clone(),
-          });
-          const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
-
-          // Convert the letters in the combo back to the original choice values
-          const match = combo.split(',')
-            .map(letter => reverseMap[letter])
-            .join(',');
-
-          return new contentTypes.Response({
-            name: `AUTOGEN_{${match}}`,
-            score,
-            match,
-            feedback: feedbacks.set(feedback.guid, feedback),
-          });
+    // generate new default responses
+    generatedResponses = getFeedbackCombinations(
+      userResponses, choices, allCombinations, normalizerMap)
+      .toArray()
+      .map((combo, i) => {
+        const feedback = new contentTypes.Feedback({
+          // We only want to clone elements other than the first one, otherwise
+          // we will be replacing the model out from underneath the UI,
+          // which results in loss of focus
+          body: i === 0 ? body : body.clone(),
         });
-    }
+        const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
-    const updatedModel = model.with({
-      responses: Immutable.OrderedMap(
-        userResponses.concat(
-          generatedResponses.reduce((acc, i) => { acc[i.guid] = i; return acc; }, {}),
-        ),
+        // Convert the letters in the combo back to the original choice values
+        const match = combo.split(',')
+          .map(letter => reverseMap[letter])
+          .join(',');
+
+        return new contentTypes.Response({
+          name: `AUTOGEN_{${match}}`,
+          score,
+          match,
+          feedback: feedbacks.set(feedback.guid, feedback),
+        });
+      });
+  }
+
+  const updatedModel = model.with({
+    responses: Immutable.OrderedMap(
+      userResponses.concat(
+        generatedResponses.reduce((acc, i) => { acc[i.guid] = i; return acc; }, {}),
       ),
-    });
+    ),
+  });
 
-    return updatedModel;
-  };
+  return updatedModel;
+};
 
 export const getGeneratedResponseItem = (partModel): contentTypes.Response => {
   return partModel &&
