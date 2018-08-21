@@ -7,7 +7,7 @@ import { Variables } from 'data/content/assessment/variable';
 import { SourcePanel } from 'editors/content/question/variables/secondgeneration/SourcePanel';
 import { ResultsPanel } from 'editors/content/question/variables/secondgeneration/ResultsPanel';
 import { Tooltip } from 'utils/tooltip';
-import { Maybe } from 'tsmonad';
+import { Maybe, Either } from 'tsmonad';
 import { TestResults } from 'editors/content/question/variables/secondgeneration/TestResults';
 import { ContentElement } from 'data/content/common/interfaces';
 
@@ -25,10 +25,11 @@ export interface ModuleEditorProps extends AbstractContentEditorProps<Variables>
 }
 
 export interface ModuleEditorState {
-  results: Immutable.Map<string, Evaluation>;
-  errorCount: number;
+  results: Evaluation[];
+  // errorCount: number;
   testing: boolean;
   testingCompleted: boolean;
+  failed: boolean;
 }
 
 export class ModuleEditor extends AbstractContentEditor<Variables,
@@ -47,10 +48,11 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
     this.onSidebarInsert = this.onSidebarInsert.bind(this);
 
     this.state = {
-      results: Immutable.Map<string, Evaluation>(),
-      errorCount: undefined,
+      results: [],
+      // errorCount: undefined,
       testing: false,
       testingCompleted: false,
+      failed: false,
     };
   }
 
@@ -110,10 +112,10 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
     const { model } = this.props;
     // Clear the current results and re-evaluate
     this.setState(
-      { results: Immutable.Map<string, Evaluation>() },
+      { results: [] },
       () => evaluate(model).then((results) => {
         this.setState({
-          results: Immutable.Map<string, Evaluation>(results.first().map(r => [r.variable, r])),
+          results: results.first(),
         });
       }));
   }
@@ -122,7 +124,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
   // one for each attempt. We iterate through each attempt to see if
   // any of the variables in that evaluation failed. If so, we consider
   // the whole attempt as a failure and increment the error count.
-  onTestMultipleTimes(attempts = NUMBER_OF_ATTEMPTS): Promise<number> {
+  onTestMultipleTimes(attempts = NUMBER_OF_ATTEMPTS): Promise<Evaluation[]> {
 
     // We count as variable evaluation as 'errored' if the evaluator throws an error,
     // or if the variable evaluates to null or undefined (which occurs from array indexing
@@ -144,8 +146,49 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
             : errorCount,
         0);
 
-    return this.runTests(attempts).then(results =>
-      countAttemptErrors(results));
+    const didFail = evaluation =>
+      evaluation.result === null ||
+      evaluation.result === undefined;
+
+    // const test = (results: Immutable.List<Evaluation[]>) =>
+    //   results.reduce(
+    //     (either, evals) => either.bind(
+    //       evals.some(evaluation => evaluation.errored)
+    //         ? Either.left(evals[0].result)
+    //         : Either.right(evals.map(eval => didFail(eval)
+    //           ? Object.assign(eval, result: )
+    //           :
+    //         ))),
+    //     // Either<error, eval[]>
+    //     Either.right<string, Evaluation[]>([]));
+
+    return this.runTests(attempts).then((results) => {
+      const map: any = { errored: false, error: '', results: {} };
+      results.forEach((attempt) => {
+        attempt.forEach((evaluation) => {
+          console.log('evaluation', evaluation);
+          if (evaluation.errored) {
+            map.errored = true;
+            map.error = evaluation.result;
+          } else if (didFail(eval)) {
+            map.results[evaluation.variable] = 'Failed';
+          } else if (!map[evaluation.variable]) {
+            map.results[evaluation.variable] = evaluation.result;
+          }
+        });
+        console.log('map', map);
+      });
+      if (map.errored) {
+        console.log(
+          'results',
+          [{ variable: 'module', result: map.error, errored: true } as Evaluation]);
+        return [{ variable: 'module', result: map.error, errored: true } as Evaluation];
+      }
+      console.log(
+        'results',
+        map.results.values());
+      return map.results.values();
+    });
   }
 
   runTests(attempts = NUMBER_OF_ATTEMPTS): Promise<Immutable.List<Evaluation[]>> {
@@ -161,7 +204,6 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
 
   renderBottomPanel() {
     const { editMode } = this.props;
-    const { errorCount } = this.state;
 
     const wrap = key => <span className="key-wrapper">{key}</span>;
 
@@ -173,28 +215,26 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
       position="top" style={{ display: 'inline-block' }} size="small" arrowSize="small">
       <button className="btn btn-sm btn-link module-button run-button" type="button"
         disabled={!editMode}
-        onClick={() => this.onEvaluateVariables()}>
-        <i className="fa fa-play"></i> Run
-      </button>
-    </Tooltip>;
-
-    const testHotkeys = <React.Fragment>
-      {wrap('⌘')} {wrap('Shift')} {wrap('Enter')} / {wrap('Ctrl')} {wrap('Shift')} {wrap('Enter')}
-    </React.Fragment>;
-
-    const testButton = <Tooltip html={testHotkeys} delay={100} distance={5}
-      position="top" style={{ display: 'inline-block' }} size="small" arrowSize="small">
-      <button className="btn btn-sm btn-link module-button test-button" type="button"
-        disabled={!editMode}
         onClick={() => {
-          this.setState({ testing: true, testingCompleted: false, errorCount: undefined });
-          this.onTestMultipleTimes()
-            .then(errorCount => this.setState({
-              errorCount, testing: false, testingCompleted: true,
-            }))
-            .catch(_ => this.setState({ testing: false, testingCompleted: true }));
+          // this.setState({
+          //   testing: true,
+          //   testingCompleted: false,
+          // });
+          // this.onTestMultipleTimes()
+          //   .then(results => this.setState({
+          //     testing: false,
+          //     testingCompleted: true,
+          //     results,
+          //     failed: false,
+          //   }))
+          //   .catch(_ => this.setState({
+          //     failed: true,
+          //     testing: false,
+          //     testingCompleted: true,
+          //   }));
+          this.onEvaluateVariables();
         }}>
-        Test
+        <i className="fa fa-play"></i> Run
       </button>
     </Tooltip>;
 
@@ -204,19 +244,18 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
           <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> Testing...
         </span>
         : this.state.testingCompleted
-          ? this.state.errorCount === undefined
+          ? this.state.failed
             ? <span className="vertical-center">
               <i className="fa fa-ban fa-2x" style={{ color: '#f39c12' }}></i> Try again
             </span>
-            : <TestResults percentTestsPassed={!isNaN(errorCount)
-              ? (NUMBER_OF_ATTEMPTS - errorCount) / NUMBER_OF_ATTEMPTS
-              : errorCount} />
+            : null
+          // : <TestResults />
           : null;
 
     return (
       <div className="button-panel">
         {runButton}
-        {testButton}
+        {/* {testButton} */}
         {testResults}
       </div>
     );

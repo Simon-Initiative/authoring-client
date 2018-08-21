@@ -7,7 +7,7 @@ import './ResultsPanel.scss';
 import 'brace/theme/github';
 
 interface ResultsPanelProps {
-  evalResults: Immutable.Map<string, Evaluation>;
+  evalResults: Evaluation[];
 }
 
 export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
@@ -27,7 +27,7 @@ export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
   render() {
     const { evalResults } = this.props;
 
-    const resultLines = evalResults.toArray()
+    const resultLines = evalResults
       .map(r => r.variable + ': ' + JSON.stringify(r.result))
       .join('\n');
 
