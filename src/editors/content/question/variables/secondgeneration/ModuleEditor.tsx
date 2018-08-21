@@ -14,6 +14,8 @@ import './ModuleEditor.scss';
 import 'brace/ext/language_tools';
 import 'brace/snippets/javascript';
 
+const NUMBER_OF_ATTEMPTS = 10;
+
 export interface ModuleEditorProps extends AbstractContentEditorProps<Variables> {
 
 }
@@ -91,7 +93,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
   // one for each attempt. We iterate through each attempt to see if
   // any of the variables in that evaluation failed. If so, we consider
   // the whole attempt as a failure and increment the error count.
-  onTestMultipleTimes(attempts = 1000): Promise<number> {
+  onTestMultipleTimes(attempts = NUMBER_OF_ATTEMPTS): Promise<number> {
 
     // We count as variable evaluation as 'errored' if the evaluator throws an error,
     // or if the variable evaluates to null or undefined (which occurs from array indexing
@@ -117,7 +119,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
       countAttemptErrors(results));
   }
 
-  runTests(attempts = 1000): Promise<Immutable.List<Evaluation[]>> {
+  runTests(attempts = NUMBER_OF_ATTEMPTS): Promise<Immutable.List<Evaluation[]>> {
     const { model } = this.props;
 
     return evaluate(model, attempts);
@@ -159,16 +161,9 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
             }))
             .catch(_ => this.setState({ testing: false, testingCompleted: true }));
         }}>
-        Test
+        Test 10x
       </button>
     </Tooltip>;
-
-    // const templateButton = <button className="btn btn-sm btn-link module-button test-button"
-    //   type="button"
-    //   disabled={!editMode}
-    //   onClick={() => this.props.onFocus(this.props.model, this.props.parent, Maybe.nothing())}>
-    //   Insert Template
-    //   </button>;
 
     const testResults =
       this.state.testing
@@ -181,14 +176,13 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
               <i className="fa fa-ban fa-2x" style={{ color: '#f39c12' }}></i> Try again
             </span>
             : <TestResults percentTestsPassed={!isNaN(errorCount)
-              ? (1000 - errorCount) / 1000
+              ? (NUMBER_OF_ATTEMPTS - errorCount) / NUMBER_OF_ATTEMPTS
               : errorCount} />
           : null;
 
     return (
       <div className="button-panel">
         {runButton}
-        {/* {templateButton} */}
         {testButton}
         {testResults}
       </div>
