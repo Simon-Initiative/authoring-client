@@ -4,9 +4,11 @@ import { ModuleEditor } from './ModuleEditor';
 import { AbstractContentEditorProps } from 'editors/content/common/AbstractContentEditor';
 import { Variables } from 'data/content/assessment/variable';
 import { setSidebarContent, resetSidebarContent } from 'actions/editorSidebar';
+import { ContentElement } from 'data/content/common/interfaces';
+import { Maybe } from 'tsmonad';
 
 interface StateProps {
-
+  activeChild: Maybe<ContentElement>;
 }
 
 interface DispatchProps {
@@ -20,7 +22,7 @@ interface OwnProps extends AbstractContentEditorProps<Variables> {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
-
+    activeChild: state.activeContext.activeChild,
   };
 };
 

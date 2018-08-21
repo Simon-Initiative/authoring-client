@@ -20,7 +20,7 @@ export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
   componentDidMount() {
     // Hide the cursor
     this.reactAceComponent.editor.renderer.$cursorLayer.element.style.display = 'none';
-    // Disabled a console warning shown by AceEditor
+    // Disables a console warning shown by AceEditor
     this.reactAceComponent.editor.$blockScrolling = Infinity;
   }
 

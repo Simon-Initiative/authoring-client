@@ -9,14 +9,19 @@ import { ResultsPanel } from 'editors/content/question/variables/secondgeneratio
 import { Tooltip } from 'utils/tooltip';
 import { Maybe } from 'tsmonad';
 import { TestResults } from 'editors/content/question/variables/secondgeneration/TestResults';
+import { ContentElement } from 'data/content/common/interfaces';
 
 import './ModuleEditor.scss';
 import 'brace/ext/language_tools';
 import 'brace/snippets/javascript';
+import { SidebarHelp } from 'editors/content/question/variables/secondgeneration/SidebarHelp';
+
+const NUMBER_OF_ATTEMPTS = 10;
 
 export interface ModuleEditorProps extends AbstractContentEditorProps<Variables> {
   setSidebarContent: (content: JSX.Element) => void;
   resetSidebarContent: () => void;
+  activeChild: Maybe<ContentElement>;
 }
 
 export interface ModuleEditorState {
@@ -29,6 +34,9 @@ export interface ModuleEditorState {
 export class ModuleEditor extends AbstractContentEditor<Variables,
   ModuleEditorProps, ModuleEditorState> {
 
+  activeContent: any;
+  source: any;
+
   constructor(props) {
     super(props);
 
@@ -36,6 +44,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
     this.onExpressionEdit = this.onExpressionEdit.bind(this);
     this.onTestMultipleTimes = this.onTestMultipleTimes.bind(this);
     this.onSetActiveContent = this.onSetActiveContent.bind(this);
+    this.onSidebarInsert = this.onSidebarInsert.bind(this);
 
     this.state = {
       results: Immutable.Map<string, Evaluation>(),
@@ -43,6 +52,21 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
       testing: false,
       testingCompleted: false,
     };
+  }
+
+  componentWillReceiveProps(nextProps: ModuleEditorProps) {
+    const { resetSidebarContent } = this.props;
+
+    // This component extends AbstractContentEditor, so it hooks
+    // into the `active` reducer. Focusing the editor will trigger the
+    // updateContext action with the model as the activeChild, so we can
+    // reset the sidebar content if the activeChild is anything other than the
+    // model.
+    nextProps.activeChild.lift((activeChild) => {
+      if (activeChild !== this.props.model as any) {
+        resetSidebarContent();
+      }
+    });
   }
 
   componentDidMount() {
@@ -68,7 +92,9 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
   }
 
   renderSidebar() {
-    return null;
+    return (
+      <div>this is a sidebar</div>
+    );
   }
 
   renderToolbar() {
@@ -96,7 +122,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
   // one for each attempt. We iterate through each attempt to see if
   // any of the variables in that evaluation failed. If so, we consider
   // the whole attempt as a failure and increment the error count.
-  onTestMultipleTimes(attempts = 1000): Promise<number> {
+  onTestMultipleTimes(attempts = NUMBER_OF_ATTEMPTS): Promise<number> {
 
     // We count as variable evaluation as 'errored' if the evaluator throws an error,
     // or if the variable evaluates to null or undefined (which occurs from array indexing
@@ -122,12 +148,16 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
       countAttemptErrors(results));
   }
 
-  runTests(attempts = 1000): Promise<Immutable.List<Evaluation[]>> {
+  runTests(attempts = NUMBER_OF_ATTEMPTS): Promise<Immutable.List<Evaluation[]>> {
     const { model } = this.props;
 
     return evaluate(model, attempts);
   }
 
+  onSidebarInsert(content: string) {
+    const { editor } = this.source.reactAceComponent;
+    editor.insert(content);
+  }
 
   renderBottomPanel() {
     const { editMode } = this.props;
@@ -168,13 +198,6 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
       </button>
     </Tooltip>;
 
-    // const templateButton = <button className="btn btn-sm btn-link module-button test-button"
-    //   type="button"
-    //   disabled={!editMode}
-    //   onClick={() => this.props.onFocus(this.props.model, this.props.parent, Maybe.nothing())}>
-    //   Insert Template
-    //   </button>;
-
     const testResults =
       this.state.testing
         ? <span className="vertical-center">
@@ -186,14 +209,13 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
               <i className="fa fa-ban fa-2x" style={{ color: '#f39c12' }}></i> Try again
             </span>
             : <TestResults percentTestsPassed={!isNaN(errorCount)
-              ? (1000 - errorCount) / 1000
+              ? (NUMBER_OF_ATTEMPTS - errorCount) / NUMBER_OF_ATTEMPTS
               : errorCount} />
           : null;
 
     return (
       <div className="button-panel">
         {runButton}
-        {/* {templateButton} */}
         {testButton}
         {testResults}
       </div>
@@ -201,16 +223,21 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
   }
 
   renderMain() {
-    const { model } = this.props;
+    const { model, setSidebarContent } = this.props;
 
     const variable = model.first();
 
     return (
-      <div className="moduleEditor"
-        onFocus={() => this.props.setSidebarContent(<span>hey</span>)}>
-        {variable &&
+      <div
+        className="moduleEditor"
+        onFocus={() => setSidebarContent(
+          <SidebarHelp onInsert={this.onSidebarInsert} />,
+        )}>
+        {
+          variable &&
           <div className="splitPane">
             <SourcePanel
+              ref={ref => this.source = ref}
               {...this.props}
               model={variable}
               onExpressionEdit={this.onExpressionEdit}
@@ -221,7 +248,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
           </div>
         }
         {this.renderBottomPanel()}
-      </div>
+      </div >
     );
   }
 }

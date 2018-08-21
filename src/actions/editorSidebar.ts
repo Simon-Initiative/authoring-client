@@ -21,7 +21,8 @@ export type SetSidebarContentAction = {
   sidebarContent: JSX.Element,
 };
 
-export const setSidebarContent = (sidebarContent: JSX.Element): SetSidebarContentAction => {
+export const setSidebarContent = (sidebarContent: JSX.Element):
+  SetSidebarContentAction => {
   return {
     type: SET_SIDEBAR_CONTENT,
     sidebarContent,
