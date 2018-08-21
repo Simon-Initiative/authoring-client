@@ -19,8 +19,6 @@ export function modal(
     case modalActions.DISMISS_MODAL:
       return state.pop();
     case modalActions.DISPLAY_MODAL:
-      console.log('Modal Component', action.component);
-      console.log('State with component', state.push(action.component));
       return state.push(action.component);
     default:
       return state;

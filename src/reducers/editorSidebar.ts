@@ -47,8 +47,6 @@ export const editorSidebar = (
       return state.with({ show: action.show });
     case SET_SIDEBAR_CONTENT:
       return state.set('sidebarContent', action.sidebarContent) as EditorSidebarState;
-    // case activeActions.UPDATE_CONTEXT:
-    //   console.log('container', action.container, 'content', action.content);
     case RESET_SIDEBAR_CONTENT:
       return state.set('sidebarContent', undefined) as EditorSidebarState;
     default:
