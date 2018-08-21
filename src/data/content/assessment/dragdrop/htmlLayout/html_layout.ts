@@ -2,10 +2,12 @@ import * as Immutable from 'immutable';
 import createGuid from 'utils/guid';
 import { augment, getChildren } from 'data/content/common';
 import { getKey } from 'data/common';
-import { Initiator } from './initiator';
+import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { Maybe } from 'tsmonad';
-import { TableTargetArea } from './table/table_targetarea';
-import { UnsupportedTargetArea } from './unsupported/unsupported_targetarea';
+import { TableTargetArea } from
+  'data/content/assessment/dragdrop/htmlLayout/table/table_targetarea';
+import { UnsupportedTargetArea } from
+  'data/content/assessment/dragdrop/htmlLayout/unsupported/unsupported_targetarea';
 import { domParser } from 'utils/domParser';
 
 /**

@@ -143,6 +143,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
     } = this.props;
 
+    super.componentDidMount();
+
     this.updateChoiceCombinations();
 
     // initialize advanced scoring if its not already

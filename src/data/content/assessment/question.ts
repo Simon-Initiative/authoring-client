@@ -12,7 +12,7 @@ import { Numeric } from 'data/content/assessment/numeric';
 import { Feedback } from 'data/content/assessment/feedback';
 import { Response } from 'data/content/assessment/response';
 import { Unsupported } from 'data/content/unsupported';
-import { Variable } from 'data/content/assessment/variable';
+import { Variable, Variables } from 'data/content/assessment/variable';
 import createGuid from 'utils/guid';
 import { getKey } from 'data/common';
 import { augment, getChildren, setId, ensureIdGuidPresent } from 'data/content/common';
@@ -195,8 +195,8 @@ function migrateSkillsToParts(model: Question): Question {
 
 }
 
-// In the past, we incorrectly mapped short answer explanations to feedback because
-// we thought that all questions used feedback instead of explanation. We later found
+// In the past, we incorrectly mapped short answer/essay explanations to feedback
+// because we thought that all questions used feedback instead of explanation. We later found
 // that this was not the case, and OLI displays the explanation rather than the feedback
 // to the student both short answer and essay questions.
 // This function migrates the feedback back to explanation.
@@ -468,7 +468,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
   explanation: ContentElements;
-  variables: Immutable.OrderedMap<string, Variable>;
+  variables: Variables;
   guid: string;
 
   constructor(params?: QuestionParams) {

@@ -12,11 +12,15 @@ export type VariableParams = {
 const defaultContent = {
   contentType: 'Variable',
   elementType: 'variable',
-  expression: '',
+  // tslint:disable-next-line:max-line-length
+  expression: 'const x = 1\nconst y = "I love OLI"\n\n// Export variables here to use them in questions\nmodule.exports = {\n  x,\n  y\n}',
   name: '',
   id: '',
   guid: '',
 };
+
+export const MODULE_IDENTIFIER = 'module';
+export type Variables = Immutable.OrderedMap<string, Variable>;
 
 export class Variable extends Immutable.Record(defaultContent) {
 
@@ -35,7 +39,7 @@ export class Variable extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Variable {
+  clone(): Variable {
     return ensureIdGuidPresent(this);
   }
 
@@ -59,7 +63,7 @@ export class Variable extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const root = { variable: {} };
 

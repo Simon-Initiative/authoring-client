@@ -12,6 +12,9 @@ export const styles: JSSStyles = {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  '.ace_editor': {
+    fontSize: 14,
+  },
   error: {
     color: colors.danger,
   },
@@ -19,12 +22,12 @@ export const styles: JSSStyles = {
     color: colors.black,
   },
   variableLabel: {
-    fontFamily: 'monospace',
-    fontSize: '9pt',
+    fontFamily: 'Inconsolata, monospace',
+    fontSize: '14px',
   },
   variableResult: {
-    fontFamily: 'monospace',
-    fontSize: '9pt',
+    fontFamily: 'Inconsolata, monospace',
+    fontSize: '14px',
   },
   header: {
     flex: 1,
