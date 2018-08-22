@@ -21,7 +21,7 @@ import { VariablesEditor } from
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { ModuleEditor } from
-  'editors/content/question/variables/secondgeneration/ModuleEditor';
+  'editors/content/question/variables/secondgeneration/ModuleEditor.controller';
 import { MODULE_IDENTIFIER } from 'data/content/assessment/variable';
 import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 import { modalActions } from 'actions/modal';

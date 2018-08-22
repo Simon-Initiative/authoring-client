@@ -1,0 +1,45 @@
+.sidebar-help-links {
+  a {
+    margin-right: 10px;
+  }
+  .btn-outline-primary {
+    border: 1px solid #2780E3;
+  }
+}
+
+.sidebar-help-cards {
+    .card {
+        margin-bottom: 10px;
+        position: relative;
+
+        h5, h6 {
+            font-size: 1rem;
+        }
+
+        .card-subtitle {
+            margin-top: 0;
+            font-size: 80%;
+        }
+
+        p {
+            font-size: 80%;
+            margin-bottom: 0;
+        }
+
+        a.btn-link {
+            padding: 0;
+            color: #2780E3;
+        }
+
+        .open-docs {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            background-color: #222;
+            color: white;
+            padding: 5px;
+            font-size: 50%;
+            border-bottom-right-radius: 4px;
+        }
+    }
+}

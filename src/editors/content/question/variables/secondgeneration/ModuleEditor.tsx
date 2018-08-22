@@ -7,8 +7,9 @@ import { Variables } from 'data/content/assessment/variable';
 import { SourcePanel } from 'editors/content/question/variables/secondgeneration/SourcePanel';
 import { ResultsPanel } from 'editors/content/question/variables/secondgeneration/ResultsPanel';
 import { Tooltip } from 'utils/tooltip';
-import { Maybe } from 'tsmonad';
-import { TestResults } from 'editors/content/question/variables/secondgeneration/TestResults';
+import { Maybe, Either } from 'tsmonad';
+import { ContentElement } from 'data/content/common/interfaces';
+import { SidebarHelp } from 'editors/content/question/variables/secondgeneration/SidebarHelp';
 
 import './ModuleEditor.scss';
 import 'brace/ext/language_tools';
@@ -17,37 +18,61 @@ import 'brace/snippets/javascript';
 const NUMBER_OF_ATTEMPTS = 10;
 
 export interface ModuleEditorProps extends AbstractContentEditorProps<Variables> {
-
+  setSidebarContent: (content: JSX.Element) => void;
+  resetSidebarContent: () => void;
+  activeChild: Maybe<ContentElement>;
 }
 
 export interface ModuleEditorState {
-  results: Immutable.Map<string, Evaluation>;
-  errorCount: number;
+  results: Evaluation[];
   testing: boolean;
   testingCompleted: boolean;
+  failed: boolean;
 }
 
 export class ModuleEditor extends AbstractContentEditor<Variables,
   ModuleEditorProps, ModuleEditorState> {
 
+  activeContent: any;
+  source: any;
+
   constructor(props) {
     super(props);
 
-    this.onEvaluateVariables = this.onEvaluateVariables.bind(this);
+    this.onEvaluate = this.onEvaluate.bind(this);
     this.onExpressionEdit = this.onExpressionEdit.bind(this);
-    this.onTestMultipleTimes = this.onTestMultipleTimes.bind(this);
-    this.onSetActiveContent = this.onSetActiveContent.bind(this);
+    this.onRun = this.onRun.bind(this);
+    this.onSidebarInsert = this.onSidebarInsert.bind(this);
 
     this.state = {
-      results: Immutable.Map<string, Evaluation>(),
-      errorCount: undefined,
+      results: [],
       testing: false,
       testingCompleted: false,
+      failed: false,
     };
   }
 
+  componentWillReceiveProps(nextProps: ModuleEditorProps) {
+    const { resetSidebarContent } = this.props;
+
+    // This component extends AbstractContentEditor, so it hooks
+    // into the `active` reducer. Focusing the editor will trigger the
+    // updateContext action with the model as the activeChild, so we can
+    // reset the sidebar content if the activeChild is anything other than the
+    // model.
+    nextProps.activeChild.lift((activeChild) => {
+      if (activeChild !== this.props.model as any) {
+        resetSidebarContent();
+      }
+    });
+  }
+
   componentDidMount() {
-    this.onEvaluateVariables();
+    this.evaluateOnce();
+  }
+
+  componentWillUnmount() {
+    this.props.resetSidebarContent();
   }
 
   shouldComponentUpdate() {
@@ -72,63 +97,86 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
     return null;
   }
 
-  onSetActiveContent() {
-
-  }
-
-  onEvaluateVariables() {
-
-    const { model } = this.props;
-    // Clear the current results and re-evaluate
+  evaluateOnce() {
+    // Reset results and evaluate
     this.setState(
-      { results: Immutable.Map<string, Evaluation>() },
-      () => evaluate(model).then((results) => {
-        this.setState({
-          results: Immutable.Map<string, Evaluation>(results.first().map(r => [r.variable, r])),
-        });
-      }));
+      { results: [] },
+      () => evaluate(this.props.model).then(results =>
+        this.setState({ results: results.first() })),
+    );
   }
 
-  // Return the error count. `evaluate` returns a list of evaluations,
-  // one for each attempt. We iterate through each attempt to see if
-  // any of the variables in that evaluation failed. If so, we consider
-  // the whole attempt as a failure and increment the error count.
-  onTestMultipleTimes(attempts = NUMBER_OF_ATTEMPTS): Promise<number> {
+  onEvaluate(attempts = NUMBER_OF_ATTEMPTS): Promise<void> {
 
-    // We count as variable evaluation as 'errored' if the evaluator throws an error,
-    // or if the variable evaluates to null or undefined (which occurs from array indexing
-    // or by other logic errors)
-    const hasError = (hasError, evaluation: Evaluation): boolean =>
-      hasError ||
-      evaluation.errored ||
+    const didFail = evaluation =>
       evaluation.result === null ||
       evaluation.result === undefined;
 
-    const attemptHasError = (evaluations: Evaluation[]): boolean =>
-      evaluations.reduce(hasError, false);
+    // Iterate through each evaluation, setting the variable in the map if it hasn't
+    // been set yet and overwriting the variable with an error if any evaluation fails
+    const makeEvaluationsMap = (evaluations: Evaluation[], map: {}) =>
+      evaluations.reduce(
+        (acc, evaluation) =>
+          didFail(evaluation)
+            ? (acc[evaluation.variable] = 'Error - check this variable\'s code', acc)
+            : acc[evaluation.variable]
+              ? acc
+              : (acc[evaluation.variable] = evaluation.result, acc),
+        map);
 
-    const countAttemptErrors = (results: Immutable.List<Evaluation[]>): number =>
+    const eitherErrorOrEvaluationsMap = (evaluations: Evaluation[]) =>
+      // If the evaluation fails, the first variable will be `errored` and the `result`
+      // will be the error message
+      map => evaluations[0].errored
+        ? Either.left(evaluations[0].result)
+        : Either.right(makeEvaluationsMap(evaluations, map));
+
+    const reduceResultsToEither = (results: Immutable.List<Evaluation[]>) =>
       results.reduce(
-        (errorCount, evaluations) =>
-          attemptHasError(evaluations)
-            ? errorCount + 1
-            : errorCount,
-        0);
+        (either, evals) => either.bind(eitherErrorOrEvaluationsMap(evals)),
+        Either.right<string, {}>({}));
 
-    return this.runTests(attempts).then(results =>
-      countAttemptErrors(results));
+    const evaluationsFromMap = map =>
+      Object.keys(map).map(key => ({ variable: key, result: map[key], errored: false }));
+
+    const updateState = eitherErrorOrResults => this.setState({
+      results: eitherErrorOrResults.caseOf({
+        left: err => [{ variable: 'Error', result: err, errored: true }],
+        right: map => evaluationsFromMap(map),
+      }),
+    });
+
+    return evaluate(this.props.model, attempts)
+      .then(results => updateState(reduceResultsToEither(results)));
   }
 
-  runTests(attempts = NUMBER_OF_ATTEMPTS): Promise<Immutable.List<Evaluation[]>> {
-    const { model } = this.props;
-
-    return evaluate(model, attempts);
+  onRun() {
+    this.setState(
+      {
+        testing: true,
+        testingCompleted: false,
+        results: [],
+      },
+      () => this.onEvaluate()
+        .then(_ => this.setState({
+          failed: false,
+          testing: false,
+          testingCompleted: true,
+        }))
+        .catch(_ => this.setState({
+          failed: true,
+          testing: false,
+          testingCompleted: true,
+        })));
   }
 
+  onSidebarInsert(content: string) {
+    const { editor } = this.source.reactAceComponent;
+    editor.insert(content);
+  }
 
   renderBottomPanel() {
     const { editMode } = this.props;
-    const { errorCount } = this.state;
 
     const wrap = key => <span className="key-wrapper">{key}</span>;
 
@@ -140,30 +188,10 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
       position="top" style={{ display: 'inline-block' }} size="small" arrowSize="small">
       <button className="btn btn-sm btn-link module-button run-button" type="button"
         disabled={!editMode}
-        onClick={() => this.onEvaluateVariables()}>
+        onClick={this.onRun}>
         <i className="fa fa-play"></i> Run
       </button>
-    </Tooltip>;
-
-    const testHotkeys = <React.Fragment>
-      {wrap('⌘')} {wrap('Shift')} {wrap('Enter')} / {wrap('Ctrl')} {wrap('Shift')} {wrap('Enter')}
-    </React.Fragment>;
-
-    const testButton = <Tooltip html={testHotkeys} delay={100} distance={5}
-      position="top" style={{ display: 'inline-block' }} size="small" arrowSize="small">
-      <button className="btn btn-sm btn-link module-button test-button" type="button"
-        disabled={!editMode}
-        onClick={() => {
-          this.setState({ testing: true, testingCompleted: false, errorCount: undefined });
-          this.onTestMultipleTimes()
-            .then(errorCount => this.setState({
-              errorCount, testing: false, testingCompleted: true,
-            }))
-            .catch(_ => this.setState({ testing: false, testingCompleted: true }));
-        }}>
-        Test 10x
-      </button>
-    </Tooltip>;
+    </Tooltip >;
 
     const testResults =
       this.state.testing
@@ -171,46 +199,47 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
           <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> Testing...
         </span>
         : this.state.testingCompleted
-          ? this.state.errorCount === undefined
+          ? this.state.failed
             ? <span className="vertical-center">
               <i className="fa fa-ban fa-2x" style={{ color: '#f39c12' }}></i> Try again
             </span>
-            : <TestResults percentTestsPassed={!isNaN(errorCount)
-              ? (NUMBER_OF_ATTEMPTS - errorCount) / NUMBER_OF_ATTEMPTS
-              : errorCount} />
+            : null
           : null;
 
     return (
       <div className="button-panel">
         {runButton}
-        {testButton}
         {testResults}
       </div>
     );
   }
 
   renderMain() {
-    const { model } = this.props;
+    const { model, setSidebarContent } = this.props;
 
     const variable = model.first();
 
     return (
-      <div className="moduleEditor"
-        onClick={() => this.props.onFocus(model, this.props.parent, Maybe.nothing())}>
-        {variable &&
+      <div
+        className="moduleEditor"
+        onFocus={() => setSidebarContent(
+          <SidebarHelp onInsert={this.onSidebarInsert} />,
+        )}>
+        {
+          variable &&
           <div className="splitPane">
             <SourcePanel
+              ref={ref => this.source = ref}
               {...this.props}
               model={variable}
               onExpressionEdit={this.onExpressionEdit}
-              evaluateVariables={this.onEvaluateVariables}
-              testMultipleTimes={this.onTestMultipleTimes} />
+              evaluate={this.onEvaluate} />
             <ResultsPanel
               evalResults={this.state.results} />
           </div>
         }
         {this.renderBottomPanel()}
-      </div>
+      </div >
     );
   }
 }

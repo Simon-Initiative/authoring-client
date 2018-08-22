@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { Evaluation } from 'data/persistence/variables';
 import AceEditor from 'react-ace';
 import './ResultsPanel.scss';
@@ -7,7 +6,7 @@ import './ResultsPanel.scss';
 import 'brace/theme/github';
 
 interface ResultsPanelProps {
-  evalResults: Immutable.Map<string, Evaluation>;
+  evalResults: Evaluation[];
 }
 
 export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
@@ -20,12 +19,14 @@ export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
   componentDidMount() {
     // Hide the cursor
     this.reactAceComponent.editor.renderer.$cursorLayer.element.style.display = 'none';
+    // Disables a console warning shown by AceEditor
+    this.reactAceComponent.editor.$blockScrolling = Infinity;
   }
 
   render() {
     const { evalResults } = this.props;
 
-    const resultLines = evalResults.toArray()
+    const resultLines = evalResults
       .map(r => r.variable + ': ' + JSON.stringify(r.result))
       .join('\n');
 

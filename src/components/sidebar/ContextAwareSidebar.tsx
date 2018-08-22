@@ -126,6 +126,7 @@ export interface ContextAwareSidebarProps {
   onEditModel: (model: ContentModel) => void;
   supportedElements: Immutable.List<string>;
   show: boolean;
+  sidebarContent: JSX.Element;
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
@@ -225,8 +226,8 @@ export class ContextAwareSidebar
       const maxMilliseconds = days * 24 * 60 * 60 * 1000;
       return (adjusted(new Date()).getMilliseconds()
         - adjusted(date).getMilliseconds() < maxMilliseconds)
-      ? relativeToNow(date)
-      : dateFormatted(date);
+        ? relativeToNow(date)
+        : dateFormatted(date);
     };
 
     switch (model.modelType) {
@@ -294,7 +295,7 @@ export class ContextAwareSidebar
                   editMode={editMode}
                   type="secondary" className="btn-sm"
                   onClick={this.onAddPage}>
-                    Add Page
+                  Add Page
                 </Button>
               </SidebarRow>
             </SidebarGroup>
@@ -411,7 +412,7 @@ export class ContextAwareSidebar
 
   render() {
     const {
-      classes, className, content, container, show, onEdit } = this.props;
+      classes, className, content, container, show, sidebarContent, onEdit } = this.props;
 
     const contentModel = content.caseOf({
       just: c => c,
@@ -423,7 +424,7 @@ export class ContextAwareSidebar
       nothing: () => undefined,
     });
 
-    let contentRenderer;
+    let contentRenderer: JSX.Element;
     if (contentParent && contentModel) {
       const props: AbstractContentEditorProps<any> = {
         renderContext: RenderContext.Sidebar,
@@ -457,10 +458,11 @@ export class ContextAwareSidebar
         {show ?
           <div className={classNames([classes.contextAwareSidebar, className])}>
             <div className={classes.content}>
-              {!contentRenderer
-                ? this.renderPageDetails()
-                : this.renderSidebarContent(contentRenderer, contentModel)
-              }
+              {sidebarContent
+                ? sidebarContent
+                : contentRenderer
+                  ? this.renderSidebarContent(contentRenderer, contentModel)
+                  : this.renderPageDetails()}
             </div>
           </div>
           : null
