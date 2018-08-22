@@ -17,7 +17,6 @@ import { containsDynaDropCustom } from 'editors/content/utils/common';
 import { Badge } from 'editors/content/common/Badge';
 import { VariablesEditor } from
   'editors/content/question/variables/firstgeneration/VariablesEditor';
-
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { ModuleEditor } from

@@ -16,6 +16,8 @@ import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Badge } from '../common/Badge';
+import { ContentElement } from 'data/content/common/interfaces';
+
 
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
@@ -186,6 +188,20 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       onBodyEdit,
     } = this.props;
 
+
+    const onEntitySelected = (key: string, data: Object) => {
+      console.log('entity selected');
+      console.log(key);
+      console.log(data);
+    };
+
+    const bindSelections = (model: ContentElement) => {
+      if (model.contentType === 'ContiguousText') {
+        return [{ propertyName: 'onEntitySelected', value: onEntitySelected }];
+      }
+      return [];
+    };
+
     return (
       <div className="question-body" key="question">
         <div className="control insert-item">
@@ -208,6 +224,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
         </div>
         <ContentContainer
+          bindProperties={bindSelections}
           activeContentGuid={this.props.activeContentGuid}
           hover={this.props.hover}
           onUpdateHover={this.props.onUpdateHover}

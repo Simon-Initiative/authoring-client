@@ -9,16 +9,27 @@ const InputRef = (props) => {
 
   // const selected = props.activeItemId === data['@input'] ? 'InputRefSelected' : '';
 
+  const onClick = (e) => {
+    e.stopPropagation();
+    props.onDecoratorClick(props.entityKey);
+  };
+
   if (data.$type === 'FillInTheBlank') {
     return (
-      <span className="dropdownSpan" data-offset-key={props.offsetKey}>
+      <span
+        onClick={onClick}
+        className="dropdownSpan"
+        data-offset-key={props.offsetKey}>
         {props.children}
       </span>
     );
   }
   if (data.$type === 'Numeric') {
     return (
-      <span className="numericSpan" data-offset-key={props.offsetKey}>
+      <span
+        onClick={onClick}
+        className="numericSpan"
+        data-offset-key={props.offsetKey}>
         {props.children}
       </span>
     );
@@ -26,7 +37,10 @@ const InputRef = (props) => {
   }
   if (data.$type === 'Text') {
     return (
-      <span className="textSpan" data-offset-key={props.offsetKey}>
+      <span
+        onClick={onClick}
+        className="textSpan"
+        data-offset-key={props.offsetKey}>
         {props.children}
       </span>
     );
@@ -34,7 +48,10 @@ const InputRef = (props) => {
   }
 
   return (
-    <span className="textSpan" data-offset-key={props.offsetKey}>
+    <span
+      onClick={onClick}
+      className="textSpan"
+      data-offset-key={props.offsetKey}>
       {props.children}
     </span>
   );

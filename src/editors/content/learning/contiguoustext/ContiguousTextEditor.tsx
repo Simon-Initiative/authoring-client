@@ -14,6 +14,7 @@ import { getEditorByContentType } from 'editors/content/container/registry';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import { styles } from 'editors/content/learning/contiguoustext/ContiguousText.styles';
 
+
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
   viewOnly?: boolean;
@@ -21,6 +22,10 @@ export interface ContiguousTextEditorProps
   hideBorder?: boolean;
   onTextSelectionChange?: (selection: any) => void;
   onInsertParsedContent: (resourcePath: string, o) => void;
+
+  // Optional callback for tracking entity selections. It is up to the
+  // entity impl to determine how it interprets 'selection'
+  onEntitySelected?: (key: string, data: Object) => void;
 }
 
 export interface ContiguousTextEditorState {
@@ -111,6 +116,7 @@ export default class ContiguousTextEditor
           viewOnly && classes.viewOnly, className])}>
 
           <DraftWrapper
+            onEntitySelected={this.props.onEntitySelected}
             onInsertParsedContent={o =>
               this.props.onInsertParsedContent(this.props.context.resourcePath, o)}
             singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
