@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { Evaluation } from 'data/persistence/variables';
 import AceEditor from 'react-ace';
 import './ResultsPanel.scss';

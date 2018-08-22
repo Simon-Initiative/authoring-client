@@ -4,6 +4,12 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import SIDEBAR_ITEMS from './SidebarHelpItems';
 import './SidebarHelp.scss';
 
+const baseUrl = 'http://localhost:3000';
+const directory = 'docs';
+export function createUrl(anchor: string) {
+  return [baseUrl, directory, anchor].join('/');
+}
+
 interface SidebarHelpProps {
   onInsert: (content: string) => void;
 }
@@ -31,11 +37,10 @@ export class SidebarHelp extends React.Component<SidebarHelpProps, {}> {
         <SidebarGroup label="Links">
           <div className="sidebar-help-links">
             <a className="btn btn-outline-primary" target="_blank"
-              href="http://localhost:3000/docs/overview.html">Docs</a>
+              href={createUrl('overview.html')}>Docs</a>
             <a className="btn btn-outline-primary" target="_blank"
-              href="http://localhost:3000/docs/examples.html">Examples</a>
+              href={createUrl('examples.html')}>Examples</a>
           </div>
-
         </SidebarGroup>
         <SidebarGroup label="Built-in Functions">
           <div className="sidebar-help-cards">
@@ -49,9 +54,7 @@ export class SidebarHelp extends React.Component<SidebarHelpProps, {}> {
             )}
           </div>
         </SidebarGroup>
-
-      </SidebarContent >
+      </SidebarContent>
     );
   }
 }
-

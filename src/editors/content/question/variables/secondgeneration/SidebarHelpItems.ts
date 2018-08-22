@@ -1,8 +1,7 @@
+import { createUrl } from 'editors/content/question/variables/secondgeneration/SidebarHelp';
+
 // tslint:disable:max-line-length
-const baseUrl = 'http://localhost:3000';
-const directory = 'docs';
-const createUrl = (anchor: string) =>
-  [baseUrl, directory, anchor].join('/');
+// tslint:disable:quotemark
 
 export default [
   {
@@ -27,7 +26,6 @@ export default [
     name: 'randomArrayItem',
     description: 'Returns a randomly selected value from an array',
     link: createUrl('oliapi.html#olirandomarrayitemarr-any'),
-    // tslint:disable-next-line:quotemark
     content: "const items = ['apple', 'orange', 'tomato']\nconst randomItem = OLI.randomArrayItem(items);",
   },
   {
