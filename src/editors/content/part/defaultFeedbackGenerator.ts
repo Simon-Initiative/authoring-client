@@ -57,7 +57,9 @@ export const modelWithDefaultFeedback =
     const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
 
     let generatedResponses: contentTypes.Response[];
-    if (choices.length <= 1 || choices.length > maxGenChoices) {
+    if (choices.length <= 1) {
+      generatedResponses = [];
+    } else if (choices.length > maxGenChoices) {
       const feedback = new contentTypes.Feedback({
         body,
       });
@@ -65,7 +67,7 @@ export const modelWithDefaultFeedback =
 
       generatedResponses = [
         new contentTypes.Response({
-          name: 'AUTOGEN',
+          name: 'AUTOGEN_*',
           score,
           match: '*',
           feedback: feedbacks.set(feedback.guid, feedback),
@@ -112,7 +114,7 @@ export const modelWithDefaultFeedback =
             .join(',');
 
           return new contentTypes.Response({
-            name: 'AUTOGEN',
+            name: `AUTOGEN_{${match}}`,
             score,
             match,
             feedback: feedbacks.set(feedback.guid, feedback),
@@ -131,9 +133,15 @@ export const modelWithDefaultFeedback =
     return updatedModel;
   };
 
-export const getGeneratedResponseItem = (partModel) => {
+export const getGeneratedResponseItem = (partModel): contentTypes.Response => {
   return partModel &&
     partModel.responses.toArray().find(r => r.name && !!r.name.match(/^AUTOGEN.*/));
+};
+
+export const getGeneratedResponseScore = (partModel) => {
+  const item = getGeneratedResponseItem(partModel);
+
+  return item ? item.score : '0';
 };
 
 export const getGeneratedResponseBody = (partModel) => {
@@ -141,10 +149,4 @@ export const getGeneratedResponseBody = (partModel) => {
 
   return defaultResponseItem ? defaultResponseItem.feedback.first().body
     : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
-};
-
-export const getGeneratedResponseScore = (partModel) => {
-  const defaultResponseItem = getGeneratedResponseItem(partModel);
-
-  return defaultResponseItem ? defaultResponseItem.score : '0';
 };

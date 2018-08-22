@@ -12,8 +12,7 @@ import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList';
 import {
-  AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem,
-  getGeneratedResponseBody, getGeneratedResponseScore, modelWithDefaultFeedback,
+  AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem, modelWithDefaultFeedback,
 } from 'editors/content/part/defaultFeedbackGenerator';
 import { CombinationsMap } from 'types/combinations';
 import guid from 'utils/guid';
@@ -21,8 +20,10 @@ import guid from 'utils/guid';
 import './ChoiceFeedback.scss';
 
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
+  hideOther?: boolean;
   simpleFeedback?: boolean;
   choices: contentTypes.Choice[];
+  onInvalidFeedback?: (responseGuid : string) => void;
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
@@ -53,8 +54,8 @@ export abstract class ChoiceFeedback
     this.onDefaultFeedbackEdit = this.onDefaultFeedbackEdit.bind(this);
     this.onEditMatchSelections = this.onEditMatchSelections.bind(this);
     this.getSelectedMatches = this.getSelectedMatches.bind(this);
-
     this.placeholderResponse = this.buildResponsePlaceholder();
+    this.defaultFeedbackResponse = this.buildResponsePlaceholder(true);
   }
 
   shouldComponentUpdate(nextProps: ChoiceFeedbackProps, nextState: ChoiceFeedbackState) {
@@ -71,18 +72,27 @@ export abstract class ChoiceFeedback
   onResponseEdit(response, src) {
     const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
+    const oldMatch = model.responses.get(response.guid).match;
+
     let updatedModel = model.with({
       responses: model.responses.set(response.guid, response),
     });
 
-    updatedModel = modelWithDefaultFeedback(
-      updatedModel,
-      choices,
-      getGeneratedResponseBody(updatedModel),
-      getGeneratedResponseScore(updatedModel),
-      AUTOGEN_MAX_CHOICES,
-      onGetChoiceCombinations,
-    );
+    // don't update model when just score or text changes
+    if (oldMatch !== response.match) {
+      const generated = getGeneratedResponseItem(updatedModel);
+      const body =  generated ? generated.feedback.first().body
+      : this.placeholderResponse.feedback.first().body;
+
+      updatedModel = modelWithDefaultFeedback(
+        updatedModel,
+        choices,
+        body,
+        generated ? generated.score : '0',
+        AUTOGEN_MAX_CHOICES,
+        onGetChoiceCombinations,
+      );
+    }
 
     onEdit(updatedModel, src);
   }
@@ -94,11 +104,15 @@ export abstract class ChoiceFeedback
       responses: model.responses.delete(response.guid),
     });
 
+    const generated = getGeneratedResponseItem(updatedModel);
+    const body =  generated ? generated.feedback.first().body
+    : this.placeholderResponse.feedback.first().body;
+
     updatedModel = modelWithDefaultFeedback(
       updatedModel,
       choices,
-      getGeneratedResponseBody(updatedModel),
-      getGeneratedResponseScore(updatedModel),
+      body,
+      generated ? generated.score : '0',
       AUTOGEN_MAX_CHOICES,
       onGetChoiceCombinations,
     );
@@ -109,12 +123,14 @@ export abstract class ChoiceFeedback
   onScoreEdit(response, score) {
     const { model, onEdit } = this.props;
 
-    onEdit(model.with({
-      responses: model.responses.set(
-        response.guid,
-        response.with({ score }),
+    const updatedModel = model.with({
+      responses: response.match.match(/^AUTOGEN.*/) ? model.responses.map(
+        x => x.match.match(/^AUTOGEN.*/) ? x.with({ score }) : x).toOrderedMap()
+        : model.responses.set(response.guid, response.with({ score }),
       ),
-    }));
+    });
+
+    onEdit(updatedModel);
   }
 
   onBodyEdit(body, response, source) {
@@ -128,17 +144,25 @@ export abstract class ChoiceFeedback
     this.onResponseEdit(updatedResponse, source);
   }
 
-  onDefaultFeedbackEdit(body: ContentElements, score: string, src) {
-    const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
+  onDefaultFeedbackEdit(body: ContentElements, score: string, src, responseGuid: string) {
+    const { model, onEdit } = this.props;
 
-    const updatedModel = modelWithDefaultFeedback(
-      model,
-      choices,
-      body,
-      score,
-      AUTOGEN_MAX_CHOICES,
-      onGetChoiceCombinations,
-    );
+    const updatedModel = model.with({
+      responses: model.responses.map((x) => {
+        if (!x.name.match(/^AUTOGEN.*/)) return x;
+
+        const map = x.feedback || Immutable.OrderedMap<string, contentTypes.Feedback>();
+        const feedback = (x.feedback && x.feedback.first())
+        || new contentTypes.Feedback({ guid: guid() });
+        return x.with({
+          score,
+          feedback: map.set(feedback.guid, feedback.with({
+            body: x.guid === responseGuid ? body : body.clone(),
+          })),
+        });
+      }).toOrderedMap(),
+    });
+
     onEdit(updatedModel, src);
   }
 
@@ -150,18 +174,23 @@ export abstract class ChoiceFeedback
         responseId,
         model.responses.get(responseId).with({
           match: selected.map(id =>
-            choices.find(c => c.guid === id).value,
+            (choices.find(c => c.guid === id) || { value: '' }).value,
           )
+          .filter(x => x !== '')
           .join(','),
         }),
       ),
     });
 
+    const generated = getGeneratedResponseItem(updatedPart);
+    const body =  generated ? generated.feedback.first().body
+    : this.placeholderResponse.feedback.first().body;
+
     const updatedModel = modelWithDefaultFeedback(
       updatedPart,
       choices,
-      getGeneratedResponseBody(updatedPart),
-      getGeneratedResponseScore(updatedPart),
+      body,
+      generated ? generated.score : '0',
       AUTOGEN_MAX_CHOICES,
       onGetChoiceCombinations,
     );
@@ -187,7 +216,7 @@ export abstract class ChoiceFeedback
     );
   }
 
-  buildResponsePlaceholder() : contentTypes.Response {
+  buildResponsePlaceholder(scoreZero?: boolean) : contentTypes.Response {
 
     const feedback = new contentTypes.Feedback({
       body: ContentElements.fromText('', '', ALT_FLOW_ELEMENTS),
@@ -196,7 +225,7 @@ export abstract class ChoiceFeedback
 
     return new contentTypes.Response({
       guid: guid(),
-      score: '1',
+      score: scoreZero ? '0' : '1',
       feedback: feedbacks.set(feedback.guid, feedback),
     });
   }
@@ -244,7 +273,7 @@ export abstract class ChoiceFeedback
                       bsSize="small"
                       onChange={(selected) => {
                         if (selected.length > 0) {
-                          this.onEditMatchSelections(response.guid, choices, selected);
+                          this.onEditMatchSelections(response.guid, this.props.choices, selected);
 
                           this.setState({
                             invalidFeedback: invalidFeedback.set(response.guid, false),
@@ -253,11 +282,14 @@ export abstract class ChoiceFeedback
                           this.setState({
                             invalidFeedback: invalidFeedback.set(response.guid, true),
                           });
+                          if (this.props.onInvalidFeedback) {
+                            this.props.onInvalidFeedback(response.guid);
+                          }
                         }
                       }}
                       options={choices.map(c => c.guid)}
                       labelKey={id => choices.find(c => c.guid === id).value}
-                      selected={this.getSelectedMatches(response, choices)} />
+                      selected={this.getSelectedMatches(response, this.props.choices)} />
                   </ItemOption>
                 )
                 : (<ItemOptionFlex />)
@@ -298,26 +330,8 @@ export abstract class ChoiceFeedback
 
   renderDefaultResponse() {
     const { choices, model, context, services, editMode, simpleFeedback } = this.props;
-
-    if (!this.defaultFeedbackResponse) {
-      const newGuid = guid();
-
-      this.defaultFeedbackResponse = new contentTypes.Response({
-        feedback: Immutable.OrderedMap({
-          [newGuid]: contentTypes.Feedback.fromText('', newGuid),
-        }),
-      });
-    }
-
-    const defaultResponseItem = getGeneratedResponseItem(model);
-    const defaultFeedbackScore = getGeneratedResponseScore(model);
-
-    let defaultResponse = this.defaultFeedbackResponse;
-    if (defaultResponseItem) {
-      defaultResponse = defaultResponse.with({
-        feedback: defaultResponseItem.feedback,
-      });
-    }
+    const defaultResponse = getGeneratedResponseItem(model) || this.defaultFeedbackResponse;
+    const defaultResponseGuid = defaultResponse.guid;
 
     return (
       <InputListItem
@@ -332,9 +346,11 @@ export abstract class ChoiceFeedback
         contentTitle="Other"
         context={context}
         services={services}
-        editMode={editMode}
+        editMode={!this.props.hideOther && editMode}
         body={defaultResponse.feedback.first().body}
-        onEdit={(body, source) => this.onDefaultFeedbackEdit(body, defaultFeedbackScore, source)}
+        onEdit={(body, source) =>
+          this.onDefaultFeedbackEdit(body, defaultResponse ? defaultResponse.score : '0',
+                                     source, defaultResponseGuid)}
         options={[
           <ItemOptions key="feedback-options">
             {choices.length > AUTOGEN_MAX_CHOICES
@@ -351,9 +367,10 @@ export abstract class ChoiceFeedback
                     <input
                       type="number"
                       className="form-control input-sm form-control-sm"
-                      disabled={!this.props.editMode}
+                      disabled={this.props.hideOther || !editMode}
                       value={defaultResponse.score}
-                      onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
+                      onChange={({ target: { value } }) =>
+                      this.onScoreEdit(defaultResponse, value)}
                       />
                   </div>
                 </ItemOption>

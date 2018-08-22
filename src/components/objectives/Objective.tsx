@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from '../../data/contentTypes';
 import { Title } from './Title';
+import { extractFullText } from 'data/content/objectives/objective';
 
 import './objective.scss';
 
@@ -14,6 +15,7 @@ export interface ObjectiveProps {
   onRemove: (model: contentTypes.LearningObjective) => void;
   onAddNewSkill: () => void;
   onAddExistingSkill: () => void;
+  onBeginExternalEdit: (model: contentTypes.LearningObjective) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;
   model: contentTypes.LearningObjective;
@@ -30,15 +32,25 @@ export interface ObjectiveState {
 export class Objective
   extends React.PureComponent<ObjectiveProps, ObjectiveState> {
 
+  onBeginExternalEdit: () => void;
+
   constructor(props) {
     super(props);
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onBeginExternalEdit = props.onBeginExternalEdit.bind(this, props.model);
   }
 
   onTitleEdit(title: string) {
     const model = this.props.model.with({ title });
     this.props.onEdit(model);
+  }
+
+  // Rebinding here is necessary because React re-uses this component after
+  // an edit - so we need to make sure we are bound to the latest version
+  // of the model.
+  componentWillReceiveProps(nextProps) {
+    this.onBeginExternalEdit = nextProps.onBeginExternalEdit.bind(this, nextProps.model);
   }
 
   render(): JSX.Element {
@@ -47,26 +59,33 @@ export class Objective
 
     let titleBlock = null;
 
-    if (this.props.model.skills.size === 0) {
+    const requiresExternalEdit = model
+      .rawContent.caseOf({ just: c => true, nothing: () => false });
+
+    const displayedTitle = model
+      .rawContent.caseOf({ just: c => extractFullText(c), nothing: () => title });
+
+
+    if (model.skills.size === 0) {
       titleBlock = <div style={{ marginLeft: '10px' }}>
         <span>
           <i className="icon"></i>
         </span>
-        <b>Objective:</b> {title}
+        <b>Objective:</b> {displayedTitle}
       </div>;
     } else if (isExpanded) {
       titleBlock = <div>
         <span className="objective">
           <i className="fa fa-caret-down"></i>
         </span>
-        <b>Objective:</b> {title}
+        <b>Objective:</b> {displayedTitle}
       </div>;
     } else {
       titleBlock = <div>
         <span className="objective">
           <i className="fa fa-caret-right"></i>
         </span>
-        <b>Objective:</b> {title}
+        <b>Objective:</b> {displayedTitle}
       </div>;
     }
 
@@ -100,12 +119,16 @@ export class Objective
       </div>
       : null;
 
+
+
     return (
       <div className={mouseOver ? 'objective-mouseover-highlight' : ''}>
-        <Title title={model.title}
+        <Title title={displayedTitle}
           editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
           isHoveredOver={mouseOver}
+          onBeginExternallEdit={this.onBeginExternalEdit}
+          requiresExternalEdit={requiresExternalEdit}
           onEdit={this.onTitleEdit}
           loading={this.props.loading}
           onRemove={this.props.onRemove.bind(undefined, this.props.model)}

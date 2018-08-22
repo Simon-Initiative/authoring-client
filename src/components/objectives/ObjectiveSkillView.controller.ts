@@ -8,6 +8,7 @@ import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as lockActions from 'actions/locks';
 import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
+import { modalActions } from 'actions/modal';
 
 interface StateProps {
   skills: any;
@@ -21,6 +22,8 @@ interface DispatchProps {
   onUpdateObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  displayModal: (component: any) => void;
+  dismissModal: () => void;
   registerLocks: RegisterLocks;
   unregisterLocks: UnregisterLocks;
 }
@@ -66,6 +69,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     unregisterLocks: (locks: AcquiredLock[]) => {
       dispatch(lockActions.unregisterLocks(locks));
+    },
+    displayModal: (comp: any) => {
+      dispatch(modalActions.display(comp));
+    },
+    dismissModal: () => {
+      dispatch(modalActions.dismiss());
     },
   };
 };

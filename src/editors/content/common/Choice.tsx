@@ -68,6 +68,7 @@ export interface ChoiceProps  {
   allowFeedback?: boolean;
   allowScore?: boolean;
   allowReorder?: boolean;
+  wasLastCorrectChoice?: boolean; // true if this was the last correct choice and was just unchecked
   editMode: boolean;
   hideChoiceBody?: boolean;
   context: AppContext;
@@ -105,7 +106,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
     const {
       className, choice, context, editMode, index, response, services, onReorderChoice,
       onEditChoice, onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
-      simpleSelectProps, hideChoiceBody,
+      simpleSelectProps, hideChoiceBody, wasLastCorrectChoice,
     } = this.props;
 
     let feedbackEditor;
@@ -160,7 +161,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
         body={choice.body}
         hideBody={hideChoiceBody}
         onEdit={(body, src) => onEditChoice(choice.with({ body }), src)}
-        onRemove={onRemove ? id => onRemove(id) : undefined}
+        onRemove={onRemove || undefined}
         controls={
           <ItemControls>
             {simpleSelectProps
@@ -181,7 +182,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
             }
           </ItemControls>
         }
-        options={
+        options={[
           <ItemOptions>
             {allowFeedback
               ? (
@@ -199,8 +200,18 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
               )
               : (null)
             }
-          </ItemOptions>
-        } />
+          </ItemOptions>,
+          <ItemOptions key="feedback-message">
+          {wasLastCorrectChoice ? (
+              <div className="message alert alert-warning">
+                <i className="fa fa-exclamation-circle"/>
+                {' Correct choices not updated. \
+                  There must be at least one choice'}
+              </div>
+            )
+            : null }
+          </ItemOptions>,
+        ]} />
     );
   }
 }

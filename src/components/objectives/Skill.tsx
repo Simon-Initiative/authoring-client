@@ -50,6 +50,8 @@ export class Skill
         style={{ marginLeft: '45px' }}>
         <Title title={model.title}
           editMode={editMode}
+          onBeginExternallEdit={() => true}
+          requiresExternalEdit={false}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
           isHoveredOver={mouseOver}
           onEdit={this.onTitleEdit}
