@@ -30,7 +30,6 @@ export interface DraftWrapperProps {
   locked: boolean;
   context: AppContext;
   services: AppServices;
-  activeItemId: string;
   editorStyles?: Object;
   singleBlockOnly: boolean;
   parentProps: Object;
@@ -343,7 +342,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       this.props.onSelectionChange(ss, true);
     };
     const compositeDecorator = buildCompositeDecorator({
-      activeItemId: this.props.activeItemId, services: this.props.services,
+      services: this.props.services,
       context: this.props.context, onEdit: onDecoratorEdit,
       onDecoratorClick: onSelect.bind(this),
       parentProps: this.props.parentProps,

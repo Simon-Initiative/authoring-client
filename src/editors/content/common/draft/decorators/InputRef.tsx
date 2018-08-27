@@ -1,13 +1,15 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/learning/common';
+import { connect, Dispatch } from 'react-redux';
+import { State } from 'reducers';
 
 import './InputRef.scss';
 
 const InputRef = (props) => {
   const data = props.contentState.getEntity(props.entityKey).getData();
 
-  // const selected = props.activeItemId === data['@input'] ? 'InputRefSelected' : '';
+  const selected = props.activeItemId === data['@input'] ? 'input-ref-selected' : '';
 
   const onClick = (e) => {
     e.stopPropagation();
@@ -18,7 +20,7 @@ const InputRef = (props) => {
     return (
       <span
         onClick={onClick}
-        className="dropdownSpan"
+        className={`dropdownSpan ${selected}`}
         data-offset-key={props.offsetKey}>
         {props.children}
       </span>
@@ -28,7 +30,7 @@ const InputRef = (props) => {
     return (
       <span
         onClick={onClick}
-        className="numericSpan"
+        className={`numericSpan ${selected}`}
         data-offset-key={props.offsetKey}>
         {props.children}
       </span>
@@ -39,7 +41,7 @@ const InputRef = (props) => {
     return (
       <span
         onClick={onClick}
-        className="textSpan"
+        className={`textSpan ${selected}`}
         data-offset-key={props.offsetKey}>
         {props.children}
       </span>
@@ -50,17 +52,44 @@ const InputRef = (props) => {
   return (
     <span
       onClick={onClick}
-      className="textSpan"
+      className={`textSpan ${selected}`}
       data-offset-key={props.offsetKey}>
       {props.children}
     </span>
   );
 };
 
+interface StateProps {
+  activeItemId: string;
+}
+
+interface DispatchProps {
+
+}
+
+interface OwnProps {
+
+}
+
+const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
+  return {
+    activeItemId: state.inputRef.valueOr(''),
+  };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
+  return {
+
+  };
+};
+
+const ConnectedInputRef = connect<StateProps, DispatchProps, OwnProps>
+(mapStateToProps, mapDispatchToProps)(InputRef);
+
 export default function (props: Object) : Decorator {
   return {
     strategy: byType.bind(undefined, EntityTypes.input_ref),
-    component: InputRef,
+    component: ConnectedInputRef,
     props,
   };
 }

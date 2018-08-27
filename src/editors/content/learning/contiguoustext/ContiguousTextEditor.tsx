@@ -120,7 +120,6 @@ export default class ContiguousTextEditor
             onInsertParsedContent={o =>
               this.props.onInsertParsedContent(this.props.context.resourcePath, o)}
             singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
-            activeItemId=""
             parentProps={this.props}
             parent={this}
             editorStyles={Object.assign({}, editorStyles)}
