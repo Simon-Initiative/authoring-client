@@ -16,6 +16,9 @@ import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Badge } from '../common/Badge';
+import { ContentElement } from 'data/content/common/interfaces';
+import { Maybe } from 'tsmonad';
+
 
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
@@ -23,6 +26,8 @@ export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
   activeContext: ActiveContext;
   canInsertAnotherPart: PartAddPredicate;
+  selectedInput: Maybe<string>;
+  setActiveItemIdActionAction: (activeItemId: string) => void;
   onAddItemPart: (item, part, body) => void;
 }
 
@@ -36,6 +41,10 @@ export interface MultipartInputState extends QuestionState {
 export class MultipartInput extends Question<MultipartInputProps, MultipartInputState> {
   constructor(props: MultipartInputProps) {
     super(props);
+  }
+
+  componentDidMount() {
+    this.setFirstItemActive();
   }
 
   /** Implement required abstract method to set className */
@@ -81,8 +90,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               this.props.model.body.content.set(updated.guid, updated),
             }), input];
 
+            this.props.setActiveItemIdActionAction(input);
           }
-
         });
       });
     }
@@ -161,6 +170,25 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     }
   }
 
+  setFirstItemActive = () => {
+    const { model, setActiveItemIdActionAction } = this.props;
+
+    const firstItem  = model.items.first();
+    if (firstItem && firstItem.contentType !== 'Unsupported') {
+      setActiveItemIdActionAction(firstItem.id);
+    } else {
+      setActiveItemIdActionAction(null);
+    }
+  }
+
+  onRemove = (item: contentTypes.QuestionItem, part: contentTypes.Part) => {
+    const { onRemove } = this.props;
+
+    onRemove(item, part);
+
+    this.setFirstItemActive();
+  }
+
   /** Implement parent absract methods */
   renderDetails() {
     // we are rendering our own details tabs,
@@ -184,7 +212,23 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       body,
       canInsertAnotherPart,
       onBodyEdit,
+      setActiveItemIdActionAction,
     } = this.props;
+
+
+    const onEntitySelected = (key: string, data: Object) => {
+      setActiveItemIdActionAction(data['@input']);
+    };
+
+    const bindSelections = (model: ContentElement) => {
+      if (model.contentType === 'ContiguousText') {
+        return [{
+          propertyName: 'onEntitySelected',
+          value: onEntitySelected,
+        }];
+      }
+      return [];
+    };
 
     return (
       <div className="question-body" key="question">
@@ -208,6 +252,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
         </div>
         <ContentContainer
+          bindProperties={bindSelections}
           activeContentGuid={this.props.activeContentGuid}
           hover={this.props.hover}
           onUpdateHover={this.props.onUpdateHover}
@@ -222,19 +267,19 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model, hideGradingCriteria, editMode, onRemove } = this.props;
+    const { model, selectedInput, hideGradingCriteria, editMode } = this.props;
     const items = model.items.toArray();
     const parts = model.parts.toArray();
 
-    const getTabNameFromContentType = (item: contentTypes.QuestionItem, index) => {
+    const getTabNameFromContentType = (item: contentTypes.QuestionItem) => {
       switch (item.contentType) {
         case 'FillInTheBlank':
-          return `Dropdown Item ${index}`;
+          return 'Dropdown';
         case 'Numeric':
-          return `Numeric Item ${index}`;
+          return 'Numeric';
         case 'Text':
         default:
-          return `Text Item ${index}`;
+          return 'Text';
       }
     };
 
@@ -252,7 +297,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               context={props.context}
               services={props.services}
               editMode={props.editMode}
-              onRemove={props.onRemove}
+              onRemove={this.onRemove}
               onItemFocus={props.onItemFocus}
               onFocus={props.onFocus}
               onBlur={props.onBlur}
@@ -269,7 +314,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               context={props.context}
               services={props.services}
               editMode={props.editMode}
-              onRemove={props.onRemove}
+              onRemove={this.onRemove}
               onFocus={props.onFocus}
               onItemFocus={props.onItemFocus}
               onBlur={props.onBlur}
@@ -286,7 +331,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               context={props.context}
               services={props.services}
               editMode={props.editMode}
-              onRemove={props.onRemove}
+              onRemove={this.onRemove}
               onFocus={props.onFocus}
               onItemFocus={props.onItemFocus}
               onBlur={props.onBlur}
@@ -304,32 +349,42 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       </span>
     );
 
-    return items.map((item, index) => (
-      <div key={item.guid} className="item-part-editor">
-        <TabContainer
-          labels={[
-            getTabNameFromContentType(item, index + 1),
-            renderSkillsLabel(parts[index]),
-            'Hints',
-            ...(!hideGradingCriteria ? ['Criteria'] : []),
-          ]}
-          controls={[
-            <Button
-                type="link"
-                className="btn-remove"
-                editMode={editMode}
-                onClick={() => onRemove(item, parts[index])}>
-              <i className="fa fa-trash" /> Remove Item
-            </Button>,
-          ]}>
+    return selectedInput.caseOf({
+      just: selectedInput => items
+        .filter(i => i.contentType !== 'Unsupported' && i.id === selectedInput)
+        .map((item) => {
+          const index = items.findIndex(i => i.contentType !== 'Unsupported'
+            && i.id === selectedInput);
 
-          {getTabFromContentType(item, parts[index], this.props)}
-          {this.renderSkillsTab(item, parts[index])}
-          {this.renderHintsTab(item, parts[index])}
-          {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
-        </TabContainer>
-      </div>
-    ));
+          return (
+            <div key={item.guid} className="item-part-editor">
+              <TabContainer
+                labels={[
+                  getTabNameFromContentType(item),
+                  renderSkillsLabel(parts[index]),
+                  'Hints',
+                  ...(!hideGradingCriteria ? ['Criteria'] : []),
+                ]}
+                controls={[
+                  <Button
+                      type="link"
+                      className="btn-remove"
+                      editMode={editMode}
+                      onClick={() => this.onRemove(item, parts[index])}>
+                    <i className="fa fa-trash" /> Remove Item
+                  </Button>,
+                ]}>
+
+                {getTabFromContentType(item, parts[index], this.props)}
+                {this.renderSkillsTab(item, parts[index])}
+                {this.renderHintsTab(item, parts[index])}
+                {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
+              </TabContainer>
+            </div>
+          );
+        }),
+      nothing: () => [],
+    });
   }
 
 }

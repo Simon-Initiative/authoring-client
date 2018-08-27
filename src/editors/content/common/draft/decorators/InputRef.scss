@@ -1,21 +1,27 @@
-.InputRefSelected {
-  outline: #b75963 solid thin;
+@import 'oli/colors';
+
+.input-ref-selected {
+  border: 2px solid $selection !important;
+  background-color: lighten($selection, 30) !important;
 }
 
 .textSpan {
   border: 1px solid #808080;
   border-radius: 3px;
   background-color: lightgrey;
+  cursor: pointer;
 }
 
 .numericSpan {
   border: 1px solid #808080;
   border-radius: 3px;
   background-color: lightgrey;
+  cursor: pointer;
 }
 
 .dropdownSpan {
   border: 1px solid #808080;
   border-radius: 3px;
   background-color: lightgrey;
+  cursor: pointer;
 }
