@@ -267,7 +267,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model, selectedInput, hideGradingCriteria, editMode, onRemove } = this.props;
+    const { model, selectedInput, hideGradingCriteria, editMode } = this.props;
     const items = model.items.toArray();
     const parts = model.parts.toArray();
 
