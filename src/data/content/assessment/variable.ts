@@ -13,7 +13,7 @@ const defaultContent = {
   contentType: 'Variable',
   elementType: 'variable',
   // tslint:disable-next-line:max-line-length
-  expression: 'const x = 1\nconst y = "I love OLI"\n\n// Export variables here to use them in questions\nmodule.exports = {\n  x,\n  y\n}',
+  expression: '// Two variable definitions\nconst correct = OLI.random(1, 11);\nconst distractor = correct + 1;\n\n// Expose variables to OLI\nmodule.exports = {\n  correct,\n  distractor,\n};',
   name: '',
   id: '',
   guid: '',
