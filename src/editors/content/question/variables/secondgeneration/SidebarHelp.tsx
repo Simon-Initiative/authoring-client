@@ -4,8 +4,8 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import SIDEBAR_ITEMS from './SidebarHelpItems';
 import './SidebarHelp.scss';
 
-const baseUrl = 'http://localhost:3000';
-const directory = 'docs';
+const baseUrl = 'https://docs.oli.cmu.edu';
+const directory = 'dynamic-questions/docs';
 export function createUrl(anchor: string) {
   return [baseUrl, directory, anchor].join('/');
 }
