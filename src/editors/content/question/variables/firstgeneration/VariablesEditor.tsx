@@ -142,7 +142,7 @@ export class VariablesEditor
       { results: Immutable.Map<string, Evaluation>() },
       () => evaluate(model).then((results) => {
         this.setState({
-          results: Immutable.Map<string, Evaluation>(results.first().map(r => [r.variable, r])),
+          results: Immutable.Map<string, Evaluation>(results.map(r => [r.variable, r])),
         });
       }));
   }
