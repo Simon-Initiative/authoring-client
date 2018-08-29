@@ -170,7 +170,12 @@ export class Part extends Immutable.Record(defaultPartParams) {
     return model;
   }
 
-  toPersistence(): Object {
+  toPersistence(config = { } as { saveExplanationToFeedback: boolean}):
+    Object {
+
+    // Short answers and essays in formative assessments show both the feedback and the
+    // explanation to the student, so we need to keep them in sync
+    const { saveExplanationToFeedback } = config;
 
     const children = [
 
@@ -188,7 +193,9 @@ export class Part extends Immutable.Record(defaultPartParams) {
         // filter out responses with empty matches
         .filter(r => r.match !== '')
         .toArray()
-        .map(response => response.toPersistence()),
+        .map(response => saveExplanationToFeedback
+          ? response.toPersistence({ explanation: this.explanation })
+          : response.toPersistence()),
 
       ...this.responseMult
         .toArray()
