@@ -1,4 +1,3 @@
-import { List } from 'immutable';
 import { configuration } from 'actions/utils/config';
 import { Variables } from 'data/content/assessment/variable';
 
@@ -10,7 +9,7 @@ export type Evaluation = {
   errored: boolean;
 };
 
-export function evaluate(variables: Variables, count: number = 1): Promise<List<Evaluation[]>> {
+export function evaluate(variables: Variables, count: number = 1): Promise<Evaluation[]> {
 
   // Issue a POST at the sandboxed expression-eval service
   const body = {
@@ -30,7 +29,6 @@ export function evaluate(variables: Variables, count: number = 1): Promise<List<
     method: 'POST',
     headers,
     body: JSON.stringify(body),
-  }).then(result => result.json())
-    .then(json => List(json));
+  }).then(result => result.json());
 }
 

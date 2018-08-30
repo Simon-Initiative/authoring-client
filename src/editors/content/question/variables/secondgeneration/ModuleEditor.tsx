@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { Evaluation, evaluate } from 'data/persistence/variables';
 import { AbstractContentEditorProps, AbstractContentEditor }
   from 'editors/content/common/AbstractContentEditor';
@@ -7,7 +6,7 @@ import { Variables } from 'data/content/assessment/variable';
 import { SourcePanel } from 'editors/content/question/variables/secondgeneration/SourcePanel';
 import { ResultsPanel } from 'editors/content/question/variables/secondgeneration/ResultsPanel';
 import { Tooltip } from 'utils/tooltip';
-import { Maybe, Either } from 'tsmonad';
+import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
 import { SidebarHelp } from 'editors/content/question/variables/secondgeneration/SidebarHelp';
 
@@ -102,52 +101,13 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
     this.setState(
       { results: [] },
       () => evaluate(this.props.model).then(results =>
-        this.setState({ results: results.first() })),
+        this.setState({ results })),
     );
   }
 
   onEvaluate(attempts = NUMBER_OF_ATTEMPTS): Promise<void> {
-
-    const didFail = evaluation =>
-      evaluation.result === null ||
-      evaluation.result === undefined;
-
-    // Iterate through each evaluation, setting the variable in the map if it hasn't
-    // been set yet and overwriting the variable with an error if any evaluation fails
-    const makeEvaluationsMap = (evaluations: Evaluation[], map: {}) =>
-      evaluations.reduce(
-        (acc, evaluation) =>
-          didFail(evaluation)
-            ? (acc[evaluation.variable] = 'Error - check this variable\'s code', acc)
-            : acc[evaluation.variable]
-              ? acc
-              : (acc[evaluation.variable] = evaluation.result, acc),
-        map);
-
-    const eitherErrorOrEvaluationsMap = (evaluations: Evaluation[]) =>
-      // If the evaluation fails, the first variable will be `errored` and the `result`
-      // will be the error message
-      map => evaluations[0].errored
-        ? Either.left(evaluations[0].result)
-        : Either.right(makeEvaluationsMap(evaluations, map));
-
-    const reduceResultsToEither = (results: Immutable.List<Evaluation[]>) =>
-      results.reduce(
-        (either, evals) => either.bind(eitherErrorOrEvaluationsMap(evals)),
-        Either.right<string, {}>({}));
-
-    const evaluationsFromMap = map =>
-      Object.keys(map).map(key => ({ variable: key, result: map[key], errored: false }));
-
-    const updateState = eitherErrorOrResults => this.setState({
-      results: eitherErrorOrResults.caseOf({
-        left: err => [{ variable: 'Error', result: err, errored: true }],
-        right: map => evaluationsFromMap(map),
-      }),
-    });
-
     return evaluate(this.props.model, attempts)
-      .then(results => updateState(reduceResultsToEither(results)));
+      .then(results => this.setState({ results }));
   }
 
   onRun() {
