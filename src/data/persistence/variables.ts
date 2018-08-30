@@ -1,4 +1,3 @@
-import { List } from 'immutable';
 import { configuration } from 'actions/utils/config';
 import { Variables } from 'data/content/assessment/variable';
 
