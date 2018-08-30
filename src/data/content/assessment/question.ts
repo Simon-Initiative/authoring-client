@@ -26,6 +26,7 @@ import {
   updateHTMLLayoutTargetRefs,
 } from 'editors/content/learning/dynadragdrop/utils';
 import { Custom } from 'data/content/assessment/custom';
+import { pipe } from 'utils/utils';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
@@ -90,7 +91,7 @@ export function detectInputRefChanges(
               .reduce(
                 (tempMap, ref) => tempMap.set(ref.entity.data['@input'], ref),
                 Immutable.Map(),
-            )).toMap(),
+              )).toMap(),
         Immutable.Map());
 
   const currentRefMap = inputRefMap(current);
@@ -195,57 +196,107 @@ function migrateSkillsToParts(model: Question): Question {
 
 }
 
-// In the past, we incorrectly mapped short answer/essay explanations to feedback
-// because we thought that all questions used feedback instead of explanation. We later found
-// that this was not the case, and OLI displays the explanation rather than the feedback
-// to the student both short answer and essay questions.
-// This function migrates the feedback back to explanation.
-function migrateFeedbackToExplanation(model: Question): Question {
-
+function migrateThenSyncFeedbackAndExplanation(model: Question): Question {
   const itemsArray = model.items.toArray();
-  const partsArray = model.parts.toArray();
-
-  let updated = model;
 
   const isShortAnswerOrEssay = itemsArray.length === 1
-    && itemsArray[0].contentType === 'ShortAnswer' || itemsArray[0].contentType === 'Essay';
-  const hasPart = partsArray.length === 1;
+    && (itemsArray[0].contentType === 'ShortAnswer'
+      || itemsArray[0].contentType === 'Essay');
 
-  if (isShortAnswerOrEssay && hasPart) {
-    const originalResponses = partsArray[0].responses;
-
-    // If we have no feedback to migrate, return
-    const originalFeedback = originalResponses.first()
-      && originalResponses.first().feedback.first();
-    if (!originalFeedback) {
-      return updated;
-    }
-
-    const feedbackText = originalFeedback.body.extractPlainText().valueOr('');
-    const migratedAlready = feedbackText ===  'migrated';
-
-    if (migratedAlready) {
-      return updated;
-    }
-
-    const explanation = ContentElements.fromText(feedbackText, '', ALT_FLOW_ELEMENTS);
-
-    const f = new Feedback().with({
-      body: ContentElements.fromText('migrated', '', ALT_FLOW_ELEMENTS),
-    });
-    const feedback = Immutable.OrderedMap<string, Feedback>()
-      .set(f.guid, f);
-
-    const res = originalResponses.first().with({ match: '*', feedback });
-
-    const responses = originalResponses.set(res.guid, res);
-
-    const part = partsArray[0].with({ responses, explanation });
-    const parts = updated.parts.set(part.guid, part);
-    updated = updated.with({ parts });
+  // We only want to target short answer and essay questions.
+  if (!isShortAnswerOrEssay) {
+    return model;
   }
 
-  return updated;
+  return pipe(
+    migrateFeedbackToExplanation,
+    syncExplanationWithFeedback)
+    (model);
+}
+
+/* In the past, we incorrectly mapped short answer/essay explanations to feedback
+  because we thought that all questions used feedback instead of explanation. We later found
+  that this was not the case.
+
+  For short answer and essay questions, OLI displays both feedback and explanation to the
+  student in formative assessments and only the explanation in summative assessments.
+
+  We now only expose the explanation in the editor. If we detect that there is feedback present but
+  no explanation, that means we must have migrated it in the past, so this function migrates the
+  feedback back to explanation.
+
+  Long story short, if feedback exists && feedback != 'migrated' && explanation does not exist,
+  then migrate feedback to explanation.
+*/
+function migrateFeedbackToExplanation(model: Question): Question {
+
+  const partsArray = model.parts.toArray();
+
+  // Feedback is stored on the part, so if there's no part then there's nothing to do.
+  if (!partsArray[0]) {
+    return model;
+  }
+
+  const responses = partsArray[0].responses;
+
+  // If we have no feedback to migrate, there's nothing to do.
+  const feedback = responses.first() && responses.first().feedback.first();
+  if (!feedback) {
+    return model;
+  }
+
+  const feedbackText = feedback.body.extractPlainText();
+  return feedbackText.caseOf({
+    nothing: () => model,
+    // If the feedback text reads 'migrated', then we previously set the explanation
+    // to the actual feedback text, so we don't need to do anything here.
+    just: (feedbackText) => {
+      if (feedbackText === 'migrated' || feedbackText === '') {
+        return model;
+      }
+
+      const part = partsArray[0].with({ explanation: feedback.body.clone() });
+
+      return model.with({
+        parts: model.parts.set(part.guid, part),
+      });
+    },
+  });
+}
+
+/* Short answers and essays in formative assessments show both the feedback and the explanation
+  to the student, so we need this function to keep them in sync because we only expose the
+  explanation to the author in the editor.
+
+  This function assumes feedback has already been migrated to explanation so no data will be lost.
+*/
+function syncExplanationWithFeedback(model: Question): Question {
+
+  const partsArray = model.parts.toArray();
+
+  const responses = partsArray[0].responses;
+  const explanation = partsArray[0].explanation;
+
+  // If we have no explanation to sync or no part, there's nothing to do.
+  if (!explanation) {
+    return model;
+  }
+
+  const feedback = responses.first() && responses.first().feedback.first().with({
+    body: explanation.clone(),
+  });
+
+  const response = responses.first();
+  const part = partsArray[0].with({
+    responses: responses.set(
+      response.guid,
+      response.with({ feedback: Immutable.OrderedMap([[feedback.guid, feedback]]) }),
+    ),
+  });
+
+  return model.with({
+    parts: model.parts.set(part.guid, part),
+  });
 }
 
 // Cloning an input question requires that we:
@@ -650,21 +701,33 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       });
     }
 
-    return ensureInputAttrsExist(migrateFeedbackToExplanation(
-      ensureResponsesExist(migrateSkillsToParts(model))));
+    return pipe(
+      migrateSkillsToParts,
+      ensureResponsesExist,
+      migrateThenSyncFeedbackAndExplanation,
+      ensureInputAttrsExist)
+      (model);
   }
 
   toPersistence(): Object {
 
+    const isShortAnswerOrEssay = this.items.size === 1
+      && (this.items.first().contentType === 'ShortAnswer'
+        || this.items.first().contentType === 'Essay');
+
     // For a question with no items, serialize with a default one
     const itemsAndParts = this.items.size === 0
       ? [defaultItem, defaultPart]
-      : [...this.items
-        .toArray()
-        .map(item => item.toPersistence()),
+      : [
+        ...this.items
+          .toArray()
+          .map(item => item.toPersistence()),
         ...this.parts
-        .toArray()
-        .map(part => part.toPersistence())];
+          .toArray()
+          // Short answers and essays in formative assessments show both the feedback and the
+          // explanation to the student, so we need to keep them in sync
+          .map(part => part.toPersistence({ saveExplanationToFeedback: isShortAnswerOrEssay })),
+      ];
 
     const children = [
 
@@ -682,6 +745,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
       { explanation: { '#array': this.explanation.toPersistence() } },
     ];
+
 
     if (this.variables.size > 0) {
       const vars = this.variables.toArray().map(v => v.toPersistence());

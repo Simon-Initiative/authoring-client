@@ -4,6 +4,7 @@ import { Feedback } from './feedback';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren, ensureIdGuidPresent } from '../common';
+import { ContentElements } from 'data/content/common/elements';
 
 const encodeMatchOperators = (match: string) => {
   const operatorEncodings = {
@@ -36,24 +37,24 @@ const sanitizeMatch = (match: string) => {
 
 export type ResponseParams = {
 
-  feedback? : Immutable.OrderedMap<string, Feedback>,
-  concepts? : Immutable.List<string>,
-  input? : string,
-  match? : string,
-  score? : string,
-  name? : string,
+  feedback?: Immutable.OrderedMap<string, Feedback>,
+  concepts?: Immutable.List<string>,
+  input?: string,
+  match?: string,
+  score?: string,
+  name?: string,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Response',
   elementType: 'response',
-  feedback : Immutable.OrderedMap<string, Feedback>(),
-  concepts : Immutable.List<string>(),
-  input : '',
-  match : '',
-  score : '0',
-  name : '',
+  feedback: Immutable.OrderedMap<string, Feedback>(),
+  concepts: Immutable.List<string>(),
+  input: '',
+  match: '',
+  score: '0',
+  name: '',
   guid: '',
 };
 
@@ -61,12 +62,12 @@ export class Response extends Immutable.Record(defaultContent) {
 
   contentType: 'Response';
   elementType: 'response';
-  feedback : Immutable.OrderedMap<string, Feedback>;
-  concepts : Immutable.List<string>;
-  input : string;
-  match : string;
-  score : string;
-  name : string;
+  feedback: Immutable.OrderedMap<string, Feedback>;
+  concepts: Immutable.List<string>;
+  input: string;
+  match: string;
+  score: string;
+  name: string;
   guid: string;
 
   constructor(params?: ResponseParams) {
@@ -74,7 +75,7 @@ export class Response extends Immutable.Record(defaultContent) {
   }
 
 
-  clone() : Response {
+  clone(): Response {
     return ensureIdGuidPresent(this.with({
       feedback: this.feedback.mapEntries(([_, v]) => {
         const clone: Feedback = v.clone();
@@ -88,7 +89,7 @@ export class Response extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string, notify: () => void) : Response {
+  static fromPersistence(json: Object, guid: string, notify: () => void): Response {
 
     const r = (json as any).response;
     let model = new Response({ guid });
@@ -117,8 +118,10 @@ export class Response extends Immutable.Record(defaultContent) {
           break;
         case 'feedback':
           model = model.with(
-            { feedback: model.feedback.set(
-              id, Feedback.fromPersistence(item, id, notify))});
+            {
+              feedback: model.feedback.set(
+                id, Feedback.fromPersistence(item, id, notify)),
+            });
           break;
         default:
       }
@@ -137,17 +140,24 @@ export class Response extends Immutable.Record(defaultContent) {
 
   }
 
-  toPersistence() : Object {
+  toPersistence(config = {} as { explanation: ContentElements }):
+    Object {
+
+    // Short answers and essays save explanation to feedback
+    const { explanation } = config;
 
     const concepts = this.concepts
-        .toArray()
-        .map(concept => ({ concept: { '#text': concept } }));
+      .toArray()
+      .map(concept => ({ concept: { '#text': concept } }));
 
-    
-    const feedback = this.feedback.size === 0 ?
-      [Feedback.fromText('', createGuid()).toPersistence()] :
-      this.feedback.toArray().map(f => f.toPersistence());
+    const feedback = this.feedback.size === 0
+      ? [Feedback.fromText('', createGuid()).toPersistence()]
+      : this.feedback.toArray().map(f =>
+        explanation
+          ? f.with({ body: explanation.clone() }).toPersistence()
+          : f.toPersistence());
 
+    console.log('feedback', feedback);
     const o = {
       response: {
         '@match': encodeMatchOperators(sanitizeMatch(this.match)),
