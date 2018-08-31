@@ -1,6 +1,6 @@
 import { ContentElements } from 'data/content/common/elements';
 
-export const DYNA_DROP_SRC_FILENAME = 'DynaDropHTML-1.0.js';
+export const DYNA_DROP_SRC_FILENAME = 'DynaDropHTML-1.1.js';
 
 export const containsDynaDropCustom = (modelBody: ContentElements) => modelBody.content.reduce(
   (acc, val) => {
