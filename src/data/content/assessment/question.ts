@@ -277,8 +277,8 @@ function syncExplanationWithFeedback(model: Question): Question {
   const responses = partsArray[0].responses;
   const explanation = partsArray[0].explanation;
 
-  // If we have no explanation to sync or no part, there's nothing to do.
-  if (!explanation) {
+  // If we have no explanation to sync or no response, there's nothing to do.
+  if (!explanation || responses.size === 0) {
     return model;
   }
 
