@@ -8,7 +8,7 @@ import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import './CoursesViewSearchable.scss';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
-import { highlightMatches } from 'components/common/SearchBarLogic';
+import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
 
@@ -225,21 +225,25 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
   ];
 
   const link = course => span =>
-      <button onClick={() => onSelect(course.guid)}
+      <button disabled={course.buildStatus !== 'READY'}
+        onClick={() => onSelect(course.guid)}
         className="btn btn-link">{span}</button>;
 
   const columnRenderers = [
-    r => link(r)(highlightedColumnRenderer('title', r)),
+    r => link(r)(highlightedColumnRenderer(
+      'title', r, r.buildStatus === 'READY' ? '' : ' (processing)')),
     r => highlightedColumnRenderer('version', r),
     r => highlightedColumnRenderer('id', r),
     r => <span>{relativeToNow(
       adjustForSkew(r.dateCreated, serverTimeSkewInMs))}</span>,
   ];
 
-  const highlightedColumnRenderer = (prop: string, r: CourseDescription) =>
+  const highlightedColumnRenderer = (
+    prop: string,
+    r: CourseDescription, appendText : string = '') =>
     searchText.length < 3
-      ? <span>{r[prop]}</span>
-      : highlightMatches(prop, r, searchText);
+      ? <span>{r[prop] + appendText}</span>
+      : highlightMatchesStr(r[prop] + appendText, searchText);
 
   const comparators = [
     (direction, a, b) => safeCompare('title', 'id', direction, a, b),
