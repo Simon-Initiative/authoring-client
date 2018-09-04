@@ -22,7 +22,6 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { ModuleEditor } from
   'editors/content/question/variables/secondgeneration/ModuleEditor.controller';
 import { MODULE_IDENTIFIER } from 'data/content/assessment/variable';
-import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 import { modalActions } from 'actions/modal';
 import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
 import { Remove } from 'components/common/Remove';
@@ -113,50 +112,14 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onHintsEdit = this.onHintsEdit.bind(this);
     this.onEnableVariables = this.onEnableVariables.bind(this);
     this.onDisableVariables = this.onDisableVariables.bind(this);
-    this.switchToOldVariableEditor = this.switchToOldVariableEditor.bind(this);
   }
 
   componentDidMount() {
-    // Hotkey for Georgia State to enable the first generation variable editor.
-    handleKey(
-      '⌘+shift+0, ctrl+shift+0',
-      () => true,
-      this.switchToOldVariableEditor);
-  }
 
-  switchToOldVariableEditor() {
-    const { editMode, onVariablesChange, services } = this.props;
-
-    const resetVariablesAndDismiss = () => {
-      const name = 'V1';
-      const expression = 'const x = 1';
-
-      const variable = new contentTypes.Variable().with({
-        name,
-        expression,
-      });
-      onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>(
-        [[variable.guid, variable]]));
-      services.dismissModal();
-    };
-
-    const modal = <ModalSelection
-      title="Use old dynamic question editor?"
-      onCancel={modalActions.dismiss}
-      onInsert={resetVariablesAndDismiss}
-      okClassName="danger"
-      okLabel="Use old editor"
-      disableInsert={!editMode}
-      size={sizes.medium}>
-      Are you sure you want to remove all of your variables and switch to the old
-       dynamic question editor?
-    </ModalSelection>;
-
-    services.displayModal(modal);
   }
 
   componentWillUnmount() {
-    unhandleKey('⌘+shift+0, ctrl+shift+0');
+
   }
 
   abstract renderDetails(): JSX.Element | boolean;
