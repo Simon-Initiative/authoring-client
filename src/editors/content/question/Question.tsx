@@ -134,7 +134,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   }
 
   onSwitchToOldVariableEditor() {
-    const { editMode, onVariablesChange, services, model } = this.props;
+    const { editMode, onVariablesChange, services } = this.props;
 
     if (!this.isNewVariableEditorActive()) {
       return;
