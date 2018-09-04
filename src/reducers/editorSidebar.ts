@@ -2,21 +2,32 @@ import { Record } from 'immutable';
 import {
   ShowSidebarAction,
   SHOW_SIDEBAR,
+  SET_SIDEBAR_CONTENT,
+  RESET_SIDEBAR_CONTENT,
+  SetSidebarContentAction,
+  ResetSidebarContentAction,
 } from 'actions/editorSidebar';
 import { OtherAction } from './utils';
 
-export type ActionTypes = ShowSidebarAction | OtherAction;
+export type ActionTypes =
+  ShowSidebarAction |
+  SetSidebarContentAction |
+  ResetSidebarContentAction |
+  OtherAction;
 
 interface EditorSidebarStateParams {
-  show: boolean;
+  show?: boolean;
+  sidebarContent?: JSX.Element;
 }
 
 const initialState = {
   show: true,
+  sidebarContent: undefined,
 };
 
 export class EditorSidebarState extends Record(initialState) {
   show: boolean;
+  sidebarContent: JSX.Element;
 
   constructor(params?: EditorSidebarStateParams) {
     super(params);
@@ -34,6 +45,10 @@ export const editorSidebar = (
   switch (action.type) {
     case SHOW_SIDEBAR:
       return state.with({ show: action.show });
+    case SET_SIDEBAR_CONTENT:
+      return state.set('sidebarContent', action.sidebarContent) as EditorSidebarState;
+    case RESET_SIDEBAR_CONTENT:
+      return state.set('sidebarContent', undefined) as EditorSidebarState;
     default:
       return state;
   }

@@ -9,6 +9,7 @@ export interface RowProps {
   onEdit: (model: RowType) => void;
   onAddNewSkill: (model: contentTypes.LearningObjective) => void;
   onAddExistingSkill: (model: contentTypes.LearningObjective) => void;
+  onBeginExternalEdit: (model: contentTypes.LearningObjective) => void;
   onRemove: (model: RowType) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;

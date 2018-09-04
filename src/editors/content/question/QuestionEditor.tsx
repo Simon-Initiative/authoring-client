@@ -188,8 +188,10 @@ export class QuestionEditor
           const feedback = contentTypes.Feedback.fromText('', guid());
           let response = new contentTypes.Response({ match: item.choices.first().value });
 
-          response = response.with({ guid: guid(),
-            feedback: response.feedback.set(feedback.guid, feedback) });
+          response = response.with({
+            guid: guid(),
+            feedback: response.feedback.set(feedback.guid, feedback),
+          });
           responses = responses
             .set(response.guid, response);
         }
@@ -234,7 +236,6 @@ export class QuestionEditor
   }
 
   onVariablesChange(variables: Immutable.OrderedMap<string, contentTypes.Variable>) {
-
     this.props.onEdit(this.props.model.with({ variables }));
   }
 
@@ -289,9 +290,9 @@ export class QuestionEditor
     if (isMultipart) {
       if (containsDynaDropCustom(this.props.model.body)) {
         return (
-        <DynaDropInput
-          {...questionProps} itemModel={item}
-          onAddItemPart={this.onAddItemPart} />
+          <DynaDropInput
+            {...questionProps} itemModel={item}
+            onAddItemPart={this.onAddItemPart} />
         );
       }
 
@@ -299,7 +300,7 @@ export class QuestionEditor
         <MultipartInput
           {...questionProps} itemModel={item}
           canInsertAnotherPart={part => this.canInsertAnotherPart(this.props.model, part)}
-          onAddItemPart={this.onAddItemPart}/>
+          onAddItemPart={this.onAddItemPart} />
       );
     }
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {

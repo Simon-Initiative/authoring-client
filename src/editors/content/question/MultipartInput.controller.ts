@@ -4,13 +4,16 @@ import { QuestionProps } from './Question';
 import { MultipartInput, PartAddPredicate } from './MultipartInput';
 import { State } from 'reducers';
 import { ActiveContext } from 'types/active';
+import { setActiveItemIdActionAction } from 'actions/inputRef';
+import { Maybe } from 'tsmonad';
 
 interface StateProps {
   activeContext: ActiveContext;
+  selectedInput: Maybe<string>;
 }
 
 interface DispatchProps {
-
+  setActiveItemIdActionAction: (activeItemId: string) => void;
 }
 
 interface OwnProps extends QuestionProps<contentTypes.QuestionItem> {
@@ -21,11 +24,15 @@ interface OwnProps extends QuestionProps<contentTypes.QuestionItem> {
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
     activeContext: state.activeContext,
+    selectedInput: state.inputRef,
   };
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
-  return {};
+  return {
+    setActiveItemIdActionAction: (activeItemId: string) =>
+      dispatch(setActiveItemIdActionAction(activeItemId)),
+  };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>

@@ -21,6 +21,7 @@ interface StateProps {
   course: CourseModel;
   supportedElements: Immutable.List<string>;
   show: boolean;
+  sidebarContent: JSX.Element;
   resource: Resource;
   currentPage: string;
   timeSkewInMs: number;
@@ -63,6 +64,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     course: state.course,
     supportedElements,
     show: state.editorSidebar.show,
+    sidebarContent: state.editorSidebar.sidebarContent,
     resource,
     timeSkewInMs,
     currentPage: activeContext.documentId.caseOf({

@@ -4,6 +4,13 @@ interface ModalSelection {
   modal: any;
 }
 
+export enum sizes {
+  small = 'sm',
+  medium = 'md',
+  large = 'lg',
+  extraLarge = 'xlg',
+}
+
 export interface ModalSelectionProps {
   okLabel?: string;
   okClassName?: string;
@@ -12,6 +19,7 @@ export interface ModalSelectionProps {
   title: string;
   onInsert: () => void;
   onCancel: () => void;
+  size?: sizes;
 }
 
 class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
@@ -36,11 +44,12 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
       ? this.props.cancelLabel : 'Cancel';
     const okClassName = this.props.okClassName !== undefined
       ? this.props.okClassName : 'primary';
+    const size = this.props.size || 'xlg';
 
     return (
       <div ref={(modal) => { this.modal = modal; }}
         data-backdrop="true" className="modal">
-        <div className="modal-dialog modal-xlg" role="document">
+        <div className={`modal-dialog modal-${size}`} role="document">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">{this.props.title}</h5>
@@ -69,7 +78,6 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
       </div>
     );
   }
-
 }
 
 export default ModalSelection;

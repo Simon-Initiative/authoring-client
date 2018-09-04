@@ -2,11 +2,13 @@ import * as React from 'react';
 import { Remove } from 'components/common/Remove';
 
 export interface TitleProps {
+  requiresExternalEdit: boolean;
   title: string;
   editMode: boolean;
   isHoveredOver: boolean;
   onEdit: (string) => void;
   onToggleExpanded: () => void;
+  onBeginExternallEdit: () => void;
   loading: boolean;
   onRemove: () => void;
 }
@@ -47,7 +49,11 @@ export class Title
   }
 
   onBeginEdit() {
-    this.setState({ isEditing: true });
+    if (this.props.requiresExternalEdit) {
+      this.props.onBeginExternallEdit();
+    } else {
+      this.setState({ isEditing: true });
+    }
   }
 
   onTextChange(e) {

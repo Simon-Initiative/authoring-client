@@ -34,6 +34,7 @@ import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkil
 import { LegacyTypes } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
+import { RawContentEditor } from './RawContentEditor';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
@@ -52,6 +53,8 @@ export interface ObjectiveSkillViewProps {
   registerLocks: RegisterLocks;
   unregisterLocks: UnregisterLocks;
   dismissMessage: (message: Messages.Message) => void;
+  displayModal: (component: any) => void;
+  dismissModal: () => void;
 }
 
 interface ObjectiveSkillViewState {
@@ -100,6 +103,7 @@ export class ObjectiveSkillView
     this.onAddExistingSkill = this.onAddExistingSkill.bind(this);
     this.onToggleExpanded = this.onToggleExpanded.bind(this);
     this.onExistingSkillInsert = this.onExistingSkillInsert.bind(this);
+    this.onBeginExternalEdit = this.onBeginExternalEdit.bind(this);
 
     this.services = new DispatchBasedServices(
       this.props.dispatch,
@@ -705,6 +709,31 @@ export class ObjectiveSkillView
     this.props.dispatch(action('objectives', [guid]));
   }
 
+  onBeginExternalEdit(model: contentTypes.LearningObjective) {
+
+    const onEdit = (content) => {
+      this.props.dismissModal();
+
+      const updated = model.with({ rawContent: Maybe.just(content) });
+      this.onObjectiveEdit(updated);
+    };
+
+    const onCancel = () => {
+      this.props.dismissModal();
+    };
+
+    model.rawContent.lift((r) => {
+      this.props.displayModal(
+        <RawContentEditor
+          rawContent={r}
+          onEdit={onEdit} onCancel={onCancel}/>,
+      );
+    });
+
+  }
+
+
+
   renderObjectives() {
 
     const rows = [];
@@ -737,6 +766,7 @@ export class ObjectiveSkillView
           onRemove={this.onRemove}
           onAddNewSkill={this.onAddNewSkill}
           highlighted={false}
+          onBeginExternalEdit={this.onBeginExternalEdit}
           model={objective}
           title={objective.title}
           isExpanded={isExpanded(objective.id)}
@@ -762,6 +792,7 @@ export class ObjectiveSkillView
                 onAddNewSkill={this.onAddNewSkill}
                 onRemove={this.removeSkill.bind(this, objective)}
                 highlighted={false}
+                onBeginExternalEdit={this.onBeginExternalEdit}
                 model={skill}
                 title={title}
                 isExpanded={false}

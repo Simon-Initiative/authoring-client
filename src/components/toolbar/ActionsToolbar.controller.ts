@@ -2,7 +2,7 @@ import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { ActionsToolbar } from './ActionsToolbar';
 import { resetActive } from 'actions/active';
-import { showSidebar } from 'actions/editorSidebar';
+import { showSidebar, resetSidebarContent } from 'actions/editorSidebar';
 import { quickPreview } from 'actions/preview';
 import { undo, redo } from 'actions/document';
 import { Resource } from 'data/content/resource';
@@ -40,6 +40,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
   return {
     onShowPageDetails: () => {
       dispatch(resetActive());
+      // Sidebar content may be overridden with the editorSidebar actions, so
+      // we reset any sidebar content that might be shown.
+      dispatch(resetSidebarContent());
       dispatch(showSidebar(true));
     },
     onQuickPreview: (courseId: string, resource: Resource) => {

@@ -30,12 +30,12 @@ export interface DraftWrapperProps {
   locked: boolean;
   context: AppContext;
   services: AppServices;
-  activeItemId: string;
   editorStyles?: Object;
   singleBlockOnly: boolean;
   parentProps: Object;
   parent: any;
   onInsertParsedContent: (content: ParsedContent) => void;
+  onEntitySelected?: (key: string, data: Object) => void;
 }
 
 interface DraftWrapperState {
@@ -320,8 +320,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const onContiguousTextEdit = (text: ContiguousText, src) => {
       this.props.onEdit(text, src);
     };
+
     const onSelect = (entityKey) => {
       // Force selection just before the entity
+
+
       const range: EntityRange = findEntity(
         (key, e) => entityKey === key, this.state.editorState.getCurrentContent());
       const ss = SelectionState.createEmpty(range.contentBlock.key).merge({
@@ -330,12 +333,18 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         anchorOffset: range.start,
         focusOffset: range.start,
       });
+
+      if (this.props.onEntitySelected !== undefined) {
+        const data = this.state.editorState.getCurrentContent().getEntity(entityKey).data;
+        this.props.onEntitySelected(entityKey, data);
+      }
+
       this.props.onSelectionChange(ss, true);
     };
     const compositeDecorator = buildCompositeDecorator({
-      activeItemId: this.props.activeItemId, services: this.props.services,
+      services: this.props.services,
       context: this.props.context, onEdit: onDecoratorEdit,
-      onDecoratorClick: onSelect,
+      onDecoratorClick: onSelect.bind(this),
       parentProps: this.props.parentProps,
       parent: this.props.parent,
       getContiguousText: () => this.props.content,

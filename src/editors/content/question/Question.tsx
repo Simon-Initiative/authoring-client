@@ -1,24 +1,31 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
-import { Button, Select } from '../common/controls';
+import { AbstractItemPartEditorProps } from 'editors/content/common/AbstractItemPartEditor';
+import { Button, Select } from 'editors/content/common/controls';
 import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
 } from 'editors/content/common/TabContainer';
-import { Hints } from '../part/Hints';
-import SkillsEditor from '../skills/SkillsEditor';
-import { CriteriaEditor } from '../question/CriteriaEditor';
+import { Hints } from 'editors/content/part/Hints';
+import SkillsEditor from 'editors/content/skills/SkillsEditor';
+import { CriteriaEditor } from 'editors/content/question/CriteriaEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import guid from 'utils/guid';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
-import { Badge } from '../common/Badge';
-import { VariablesEditor } from './VariablesEditor';
-
+import { Badge } from 'editors/content/common/Badge';
+import { VariablesEditor } from
+  'editors/content/question/variables/firstgeneration/VariablesEditor';
 import './Question.scss';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
+import { ModuleEditor } from
+  'editors/content/question/variables/secondgeneration/ModuleEditor.controller';
+import { MODULE_IDENTIFIER } from 'data/content/assessment/variable';
+import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
+import { modalActions } from 'actions/modal';
+import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
+import { Remove } from 'components/common/Remove';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
@@ -93,7 +100,6 @@ export const OptionControl = TabOptionControl;
 export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem>,
   S extends QuestionState> extends React.PureComponent<P, S> {
 
-
   className: string;
 
   constructor(props) {
@@ -105,6 +111,52 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
     this.onSkillsEdit = this.onSkillsEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
+    this.onEnableVariables = this.onEnableVariables.bind(this);
+    this.onDisableVariables = this.onDisableVariables.bind(this);
+    this.switchToOldVariableEditor = this.switchToOldVariableEditor.bind(this);
+  }
+
+  componentDidMount() {
+    // Hotkey for Georgia State to enable the first generation variable editor.
+    handleKey(
+      '⌘+shift+0, ctrl+shift+0',
+      () => true,
+      this.switchToOldVariableEditor);
+  }
+
+  switchToOldVariableEditor() {
+    const { editMode, onVariablesChange, services } = this.props;
+
+    const resetVariablesAndDismiss = () => {
+      const name = 'V1';
+      const expression = 'const x = 1';
+
+      const variable = new contentTypes.Variable().with({
+        name,
+        expression,
+      });
+      onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>(
+        [[variable.guid, variable]]));
+      services.dismissModal();
+    };
+
+    const modal = <ModalSelection
+      title="Use old dynamic question editor?"
+      onCancel={modalActions.dismiss}
+      onInsert={resetVariablesAndDismiss}
+      okClassName="danger"
+      okLabel="Use old editor"
+      disableInsert={!editMode}
+      size={sizes.medium}>
+      Are you sure you want to remove all of your variables and switch to the old
+       dynamic question editor?
+    </ModalSelection>;
+
+    services.displayModal(modal);
+  }
+
+  componentWillUnmount() {
+    unhandleKey('⌘+shift+0, ctrl+shift+0');
   }
 
   abstract renderDetails(): JSX.Element | boolean;
@@ -169,26 +221,112 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return [];
   }
 
+  onEnableVariables() {
+    const { onVariablesChange } = this.props;
+
+    const name = MODULE_IDENTIFIER;
+
+    const variable = new contentTypes.Variable().with({
+      name,
+    });
+
+    onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>(
+      [[variable.guid, variable]]));
+  }
+
+  onDisableVariables() {
+    const { editMode, onVariablesChange, services } = this.props;
+
+    const deleteAndDismiss = () => {
+      onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>());
+      services.dismissModal();
+    };
+
+    const modal = <ModalSelection
+      title="Remove all variables?"
+      onCancel={modalActions.dismiss}
+      onInsert={deleteAndDismiss}
+      okClassName="danger"
+      okLabel="Remove Variables"
+      disableInsert={!editMode}
+      size={sizes.small}>
+      Are you sure you want to remove all variables from this question?
+    </ModalSelection>;
+
+    services.displayModal(modal);
+  }
+
   renderVariables() {
 
-    const { hideVariables, model, editMode, services, context, onVariablesChange } = this.props;
+    const { hideVariables, onFocus, model, editMode, services, context, onVariablesChange,
+      onUpdateHover, hover, activeContentGuid } = this.props;
 
-    // add variables
-    if (!hideVariables) {
+    if (hideVariables) {
+      return null;
+    }
+
+    const enableVariablesButton =
+      <button className="btn btn-sm btn-outline-primary" type="button"
+        disabled={!editMode}
+        onClick={() => this.onEnableVariables()}>
+        Create Variables
+      </button>;
+
+    const variableProps = {
+      activeContentGuid,
+      hover,
+      onUpdateHover,
+      onFocus,
+      editMode,
+      services,
+      context,
+      model: model.variables,
+      onEdit: onVariablesChange,
+    };
+
+    const helpPopup =
+      <div className="variableHeader">
+        Variables
+
+        <HelpPopover activateOnClick>
+          <div>
+            <p>Use <b>JavaScript</b> to create <b>dynamic</b> questions.
+            A dynamic question allows you to vary parts of the question.</p>
+
+            <p>Once you have defined your variables, use them in your
+              question by typing the variable name surrounded by &quot;@@&quot;</p>
+
+            <p>For example, a question using two variables:</p>
+
+            <blockquote>
+              <code>
+                What is the value @@V1@@ divided by @@V2@@ equal to?
+              </code>
+            </blockquote>
+
+          </div>
+        </HelpPopover>
+      </div>;
+
+    if (model.variables.size === 0) {
       return (
-        <VariablesEditor
-          activeContentGuid={this.props.activeContentGuid}
-          hover={this.props.hover}
-          onUpdateHover={this.props.onUpdateHover}
-          onFocus={this.props.onFocus}
-          editMode={editMode}
-          services={services}
-          context={context}
-          model={model.variables}
-          onEdit={onVariablesChange} />
+        <div className="variable-wrapper">
+          {helpPopup}
+          {enableVariablesButton}
+        </div>
       );
     }
-    return null;
+
+    return (
+      <div className="variable-wrapper">
+        {helpPopup} <Remove editMode={editMode} onRemove={this.onDisableVariables} />
+        {/* Decide whether to show the new or old variable UI. The new UI (VariableModuleEditor)
+        creates a single variable with the name of the constant MODULE_IDENTIFIER */}
+        {model.variables.first().name === MODULE_IDENTIFIER
+          ? <ModuleEditor {...variableProps} />
+          : <VariablesEditor {...variableProps} />}
+      </div>
+    );
   }
 
   renderOptions() {
@@ -366,8 +504,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
     const renderSkillsLabel = (part: contentTypes.Part) => (
       <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
-          {part.skills.size}
-        </Badge>
+        {part.skills.size}
+      </Badge>
       </span>
     );
 

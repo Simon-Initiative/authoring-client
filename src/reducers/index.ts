@@ -7,6 +7,7 @@ import { dynadragdrop, DynaDragDropState } from 'reducers/dynadragdrop';
 import { editorSidebar, EditorSidebarState } from 'reducers/editorSidebar';
 import { expanded, ExpandedState } from 'reducers/expanded';
 import { hover, HoverState } from 'reducers/hover';
+import { inputRef, InputRefState } from 'reducers/inputRef';
 import { locks, LocksState } from 'reducers/locks';
 import { media, MediaState } from 'reducers/media';
 import { messages, MessageState } from 'reducers/messages';
@@ -32,6 +33,7 @@ export interface State {
   editorSidebar: EditorSidebarState;
   expanded: ExpandedState;
   hover: HoverState;
+  inputRef: InputRefState;
   locks: LocksState;
   media: MediaState;
   messages: MessageState;
@@ -56,6 +58,7 @@ const reducers = combineReducers({
   editorSidebar,  // Editor sidebar state
   expanded,       // preserves expaned state of tree UIs
   hover,          // content hover state
+  inputRef,       // current input ref selected
   locks,          // The current, registered document locks
   media,          // Course media state
   messages,       // Active application messages

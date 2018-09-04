@@ -2,10 +2,10 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { Evaluation, evaluate } from 'data/persistence/variables';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps } from
+  'editors/content/common/AbstractContentEditor';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
-import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 import AceEditor from 'react-ace';
 
@@ -20,7 +20,7 @@ import 'brace/mode/text';
 
 import 'brace/theme/github';
 
-import { styles } from './VariablesEditor.styles';
+import { styles } from 'editors/content/question/variables/firstgeneration/VariablesEditor.styles';
 
 export interface VariablesEditorProps extends AbstractContentEditorProps<Variables> {
 
@@ -145,8 +145,6 @@ export class VariablesEditor
           results: Immutable.Map<string, Evaluation>(results.map(r => [r.variable, r])),
         });
       }));
-
-
   }
 
   onRemoveVariable(guid: string) {
@@ -163,9 +161,11 @@ export class VariablesEditor
     const { onEdit, model } = this.props;
 
     const name = 'V' + (model.size + 1);
+    const expression = 'const x = 1';
 
     const variable = new contentTypes.Variable().with({
       name,
+      expression,
     });
 
     onEdit(model.set(variable.guid, variable), null);
@@ -196,37 +196,6 @@ export class VariablesEditor
     );
   }
 
-  renderHeader() {
-    const { classes, className } = this.props;
-
-    return (
-      <div className={classNames([classes.header, className])}>
-        Variables
-
-        <HelpPopover activateOnClick>
-          <div>
-            <p>Use <b>variables</b> to create <b>templated</b> questions.
-            A templated, or parameterized, question allows the creation
-            of a question that can vary parts of the question.</p>
-
-            <p>Once you have defined your variables, use them in your
-              question by typing the variable name surrounded by &quot;@@&quot;</p>
-
-            <p>For example, a question using two variables:</p>
-
-            <blockquote>
-              <code>
-              What is the value @@V1@@ divided by @@V2@@ equal to?
-              </code>
-            </blockquote>
-
-          </div>
-        </HelpPopover>
-      </div>
-    );
-
-  }
-
   renderMain() {
     const { classes, className, model } = this.props;
 
@@ -248,7 +217,6 @@ export class VariablesEditor
 
     return (
       <div className={classNames([classes.VariablesEditor, className])}>
-        {this.renderHeader()}
         {tableOrNot}
         {this.renderButtonPanel()}
       </div>

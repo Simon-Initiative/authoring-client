@@ -11,6 +11,11 @@ type RowData= Resource | CourseDescription;
 
 export const highlightMatches = (prop: string, r: RowData, searchText): JSX.Element => {
   const textToSearchIn = r[prop];
+  return highlightMatchesStr(textToSearchIn, searchText);
+};
+
+
+export const highlightMatchesStr = (textToSearchIn: string, searchText): JSX.Element => {
   const lowercasedTextToSearchIn = textToSearchIn.trim().toLowerCase();
   const key = searchText + '|' + lowercasedTextToSearchIn;
   const divWith = value => <div dangerouslySetInnerHTML={ { __html: value } } />;

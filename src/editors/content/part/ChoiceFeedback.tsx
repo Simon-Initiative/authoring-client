@@ -6,13 +6,13 @@ import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-import { convert } from 'utils/format';
 import { ContentElements } from 'data/content/common/elements';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList';
 import {
   AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem, modelWithDefaultFeedback,
+  renderMaxChoicesWarning,
 } from 'editors/content/part/defaultFeedbackGenerator';
 import { CombinationsMap } from 'types/combinations';
 import guid from 'utils/guid';
@@ -205,17 +205,6 @@ export abstract class ChoiceFeedback
     }).filter(s => s);
   }
 
-  renderMaxChoicesMessage() {
-    return (
-      <div className="message alert alert-warning">
-        <i className="fa fa-info-circle"/>
-        {` Providing more than ${AUTOGEN_MAX_CHOICES} choices \
-        (Choice ${convert.toAlphaNotation(AUTOGEN_MAX_CHOICES - 1)}) for this question will \
-        prevent you from determining exact selections for other choices.`}
-      </div>
-    );
-  }
-
   buildResponsePlaceholder(scoreZero?: boolean) : contentTypes.Response {
 
     const feedback = new contentTypes.Feedback({
@@ -355,7 +344,7 @@ export abstract class ChoiceFeedback
           <ItemOptions key="feedback-options">
             {choices.length > AUTOGEN_MAX_CHOICES
               ? (
-                this.renderMaxChoicesMessage()
+                renderMaxChoicesWarning()
               ) : (
                 <ItemOptionFlex />
               )
