@@ -10,6 +10,7 @@ interface SourcePanelProps {
   model: contentTypes.Variable;
   onExpressionEdit: (expression: string) => void;
   evaluate: () => void;
+  onSwitchToOldVariableEditor: () => void;
 }
 
 export class SourcePanel extends React.Component<SourcePanelProps, {}> {
@@ -26,7 +27,8 @@ export class SourcePanel extends React.Component<SourcePanelProps, {}> {
   }
 
   render() {
-    const { editMode, model, onExpressionEdit, evaluate } = this.props;
+    const { editMode, model, onExpressionEdit, evaluate, onSwitchToOldVariableEditor }
+      = this.props;
 
     return (
       <div className="sourcePanel">
@@ -50,6 +52,11 @@ export class SourcePanel extends React.Component<SourcePanelProps, {}> {
                 name: 'evaluate',
                 bindKey: { win: 'Ctrl-enter', mac: 'Command-enter' },
                 exec: () => evaluate(),
+              },
+              {
+                name: 'switchToOldVariableEditor',
+                bindKey: { win: 'Ctrl-Shift-0', mac: 'Command-Shift-0' },
+                exec: () => console.log('hey') || onSwitchToOldVariableEditor(),
               },
             ]
           }

@@ -7,6 +7,7 @@ import 'brace/theme/github';
 
 interface ResultsPanelProps {
   evalResults: Evaluation[];
+  onSwitchToOldVariableEditor: () => void;
 }
 
 export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
@@ -24,7 +25,7 @@ export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
   }
 
   render() {
-    const { evalResults } = this.props;
+    const { evalResults, onSwitchToOldVariableEditor } = this.props;
 
     const resultLines = evalResults
       .map(r => r.variable + ': ' + JSON.stringify(r.result))
@@ -44,6 +45,15 @@ export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
           readOnly={true}
           minLines={3}
           value={resultLines}
+          commands={
+            [
+              {
+                name: 'switchToOldVariableEditor',
+                bindKey: { win: 'Ctrl-Shift-0', mac: 'Command-Shift-0' },
+                exec: () => console.log('hey') || onSwitchToOldVariableEditor(),
+              },
+            ]
+          }
           setOptions={{
             showLineNumbers: false,
             useWorker: false,

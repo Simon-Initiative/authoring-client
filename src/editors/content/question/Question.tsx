@@ -25,6 +25,7 @@ import { MODULE_IDENTIFIER } from 'data/content/assessment/variable';
 import { modalActions } from 'actions/modal';
 import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
 import { Remove } from 'components/common/Remove';
+import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
@@ -112,14 +113,59 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onHintsEdit = this.onHintsEdit.bind(this);
     this.onEnableVariables = this.onEnableVariables.bind(this);
     this.onDisableVariables = this.onDisableVariables.bind(this);
+    this.onSwitchToOldVariableEditor = this.onSwitchToOldVariableEditor.bind(this);
   }
 
   componentDidMount() {
-
+    // Hotkey for Georgia State to enable the first generation variable editor.
+    handleKey(
+      '⌘+shift+0, ctrl+shift+0',
+      () => true,
+      this.onSwitchToOldVariableEditor);
   }
 
   componentWillUnmount() {
+    unhandleKey('⌘+shift+0, ctrl+shift+0');
+  }
 
+  isNewVariableEditorActive() {
+    const { model } = this.props;
+    return model.variables.size === 1 && model.variables.first().name === MODULE_IDENTIFIER;
+  }
+
+  onSwitchToOldVariableEditor() {
+    const { editMode, onVariablesChange, services, model } = this.props;
+
+    if (!this.isNewVariableEditorActive()) {
+      return;
+    }
+
+    const resetVariablesAndDismiss = () => {
+      const name = 'V1';
+      const expression = 'const x = 1';
+
+      const variable = new contentTypes.Variable().with({
+        name,
+        expression,
+      });
+      onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>(
+        [[variable.guid, variable]]));
+      services.dismissModal();
+    };
+
+    const modal = <ModalSelection
+      title="Use old dynamic question editor?"
+      onCancel={modalActions.dismiss}
+      onInsert={resetVariablesAndDismiss}
+      okClassName="danger"
+      okLabel="Use old editor"
+      disableInsert={!editMode}
+      size={sizes.medium}>
+      Are you sure you want to remove all of your variables and switch to the old
+       dynamic question editor?
+    </ModalSelection>;
+
+    services.displayModal(modal);
   }
 
   abstract renderDetails(): JSX.Element | boolean;
@@ -285,8 +331,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
         {helpPopup} <Remove editMode={editMode} onRemove={this.onDisableVariables} />
         {/* Decide whether to show the new or old variable UI. The new UI (VariableModuleEditor)
         creates a single variable with the name of the constant MODULE_IDENTIFIER */}
-        {model.variables.first().name === MODULE_IDENTIFIER
-          ? <ModuleEditor {...variableProps} />
+        {this.isNewVariableEditorActive()
+          ? <ModuleEditor {...variableProps}
+          onSwitchToOldVariableEditor={this.onSwitchToOldVariableEditor} />
           : <VariablesEditor {...variableProps} />}
       </div>
     );

@@ -18,11 +18,8 @@ import { Skill } from 'types/course';
 import { InsertInputRefCommand } from 'editors/content/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
-import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 
 import './QuestionEditor.scss';
-import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
-import { modalActions } from 'actions/modal';
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
@@ -76,7 +73,6 @@ export class QuestionEditor
     this.onGradingChange = this.onGradingChange.bind(this);
     this.onVariablesChange = this.onVariablesChange.bind(this);
     this.onAddItemPart = this.onAddItemPart.bind(this);
-    this.switchToOldVariableEditor = this.switchToOldVariableEditor.bind(this);
 
     this.fillInTheBlankCommand
       = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
@@ -117,50 +113,6 @@ export class QuestionEditor
 
     return false;
   }
-
-  componentDidMount() {
-    // Hotkey for Georgia State to enable the first generation variable editor.
-    handleKey(
-      '⌘+shift+0, ctrl+shift+0',
-      () => true,
-      this.switchToOldVariableEditor);
-  }
-
-  componentWillUnmount() {
-    unhandleKey('⌘+shift+0, ctrl+shift+0');
-  }
-
-  switchToOldVariableEditor() {
-    const { editMode, services } = this.props;
-
-    const resetVariablesAndDismiss = () => {
-      const name = 'V1';
-      const expression = 'const x = 1';
-
-      const variable = new contentTypes.Variable().with({
-        name,
-        expression,
-      });
-      this.onVariablesChange(Immutable.OrderedMap<string, contentTypes.Variable>(
-        [[variable.guid, variable]]));
-      services.dismissModal();
-    };
-
-    const modal = <ModalSelection
-      title="Use old dynamic question editor?"
-      onCancel={modalActions.dismiss}
-      onInsert={resetVariablesAndDismiss}
-      okClassName="danger"
-      okLabel="Use old editor"
-      disableInsert={!editMode}
-      size={sizes.medium}>
-      Are you sure you want to remove all of your variables and switch to the old
-       dynamic question editor?
-    </ModalSelection>;
-
-    services.displayModal(modal);
-  }
-
 
   /** Override Parent Method */
   handleOnClick(e) {
