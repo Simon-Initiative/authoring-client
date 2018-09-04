@@ -56,7 +56,7 @@ export class SourcePanel extends React.Component<SourcePanelProps, {}> {
               {
                 name: 'switchToOldVariableEditor',
                 bindKey: { win: 'Ctrl-Shift-0', mac: 'Command-Shift-0' },
-                exec: () => console.log('hey') || onSwitchToOldVariableEditor(),
+                exec: () => onSwitchToOldVariableEditor(),
               },
             ]
           }

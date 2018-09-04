@@ -50,7 +50,7 @@ export class ResultsPanel extends React.Component<ResultsPanelProps, {}> {
               {
                 name: 'switchToOldVariableEditor',
                 bindKey: { win: 'Ctrl-Shift-0', mac: 'Command-Shift-0' },
-                exec: () => console.log('hey') || onSwitchToOldVariableEditor(),
+                exec: () => onSwitchToOldVariableEditor(),
               },
             ]
           }
