@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
 import { Custom } from 'data/content/assessment/custom';
-import { DYNA_DROP_SRC_FILENAME } from 'editors/content/utils/common';
+import { isSupportedDynaDropSrcFile } from 'editors/content/utils/common';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -126,8 +126,7 @@ export class CustomEditor
 
     return (
       <div className={classNames([classes.customEditor, className])}>
-        {model.src.substr(
-          model.src.length - DYNA_DROP_SRC_FILENAME.length) === DYNA_DROP_SRC_FILENAME
+        {isSupportedDynaDropSrcFile(model.src)
           ? <DynaDragDropEditor {...this.props} />
           : (
             <div className={classes.customEditorOther}>
