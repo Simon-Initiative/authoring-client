@@ -22,10 +22,10 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { ModuleEditor } from
   'editors/content/question/variables/secondgeneration/ModuleEditor.controller';
 import { MODULE_IDENTIFIER } from 'data/content/assessment/variable';
-import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 import { modalActions } from 'actions/modal';
 import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
 import { Remove } from 'components/common/Remove';
+import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
@@ -113,7 +113,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onHintsEdit = this.onHintsEdit.bind(this);
     this.onEnableVariables = this.onEnableVariables.bind(this);
     this.onDisableVariables = this.onDisableVariables.bind(this);
-    this.switchToOldVariableEditor = this.switchToOldVariableEditor.bind(this);
+    this.onSwitchToOldVariableEditor = this.onSwitchToOldVariableEditor.bind(this);
   }
 
   componentDidMount() {
@@ -121,11 +121,24 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     handleKey(
       '⌘+shift+0, ctrl+shift+0',
       () => true,
-      this.switchToOldVariableEditor);
+      this.onSwitchToOldVariableEditor);
   }
 
-  switchToOldVariableEditor() {
+  componentWillUnmount() {
+    unhandleKey('⌘+shift+0, ctrl+shift+0');
+  }
+
+  isNewVariableEditorActive() {
+    const { model } = this.props;
+    return model.variables.size === 1 && model.variables.first().name === MODULE_IDENTIFIER;
+  }
+
+  onSwitchToOldVariableEditor() {
     const { editMode, onVariablesChange, services } = this.props;
+
+    if (!this.isNewVariableEditorActive()) {
+      return;
+    }
 
     const resetVariablesAndDismiss = () => {
       const name = 'V1';
@@ -153,10 +166,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     </ModalSelection>;
 
     services.displayModal(modal);
-  }
-
-  componentWillUnmount() {
-    unhandleKey('⌘+shift+0, ctrl+shift+0');
   }
 
   abstract renderDetails(): JSX.Element | boolean;
@@ -322,8 +331,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
         {helpPopup} <Remove editMode={editMode} onRemove={this.onDisableVariables} />
         {/* Decide whether to show the new or old variable UI. The new UI (VariableModuleEditor)
         creates a single variable with the name of the constant MODULE_IDENTIFIER */}
-        {model.variables.first().name === MODULE_IDENTIFIER
-          ? <ModuleEditor {...variableProps} />
+        {this.isNewVariableEditorActive()
+          ? <ModuleEditor {...variableProps}
+          onSwitchToOldVariableEditor={this.onSwitchToOldVariableEditor} />
           : <VariablesEditor {...variableProps} />}
       </div>
     );

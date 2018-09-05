@@ -20,6 +20,7 @@ export interface ModuleEditorProps extends AbstractContentEditorProps<Variables>
   setSidebarContent: (content: JSX.Element) => void;
   resetSidebarContent: () => void;
   activeChild: Maybe<ContentElement>;
+  onSwitchToOldVariableEditor: () => void;
 }
 
 export interface ModuleEditorState {
@@ -175,7 +176,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
   }
 
   renderMain() {
-    const { model, setSidebarContent } = this.props;
+    const { model, setSidebarContent, onSwitchToOldVariableEditor } = this.props;
 
     const variable = model.first();
 
@@ -193,9 +194,11 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
               {...this.props}
               model={variable}
               onExpressionEdit={this.onExpressionEdit}
-              evaluate={this.onEvaluate} />
+              evaluate={this.onEvaluate}
+              onSwitchToOldVariableEditor={onSwitchToOldVariableEditor} />
             <ResultsPanel
-              evalResults={this.state.results} />
+              evalResults={this.state.results}
+              onSwitchToOldVariableEditor={onSwitchToOldVariableEditor} />
           </div>
         }
         {this.renderBottomPanel()}
