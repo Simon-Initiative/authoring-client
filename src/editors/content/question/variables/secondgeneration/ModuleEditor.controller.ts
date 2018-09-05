@@ -17,7 +17,7 @@ interface DispatchProps {
 }
 
 interface OwnProps extends AbstractContentEditorProps<Variables> {
-
+  onSwitchToOldVariableEditor: () => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
