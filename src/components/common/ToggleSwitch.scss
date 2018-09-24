@@ -8,6 +8,26 @@
 
   &.disabled {
     cursor: initial;
+
+    &:hover {
+      input[type="checkbox"].toggle {
+        + .toggle-btn {
+
+          &:after,
+          &:before {
+            left: 0%;
+          }
+        }
+
+        &:checked + .toggle-btn:after {
+          left: 45%;
+        }
+      }
+    }
+
+    .label {
+      color: $black;
+    }
   }
 
   input[type="checkbox"].toggle {

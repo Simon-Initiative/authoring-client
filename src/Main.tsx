@@ -290,7 +290,7 @@ export default class Main extends React.Component<MainProps, MainState> {
       if (documentId === course.guid) {
         return <CourseEditor
           model={course}
-          editMode={true}
+          editMode={course.editable}
         />;
       }
       if (resources[documentId] !== undefined) {

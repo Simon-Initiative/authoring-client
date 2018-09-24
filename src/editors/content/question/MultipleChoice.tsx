@@ -330,12 +330,14 @@ export class MultipleChoice
             </TabOptionControl>
             <TabOptionControl name="shuffle">
               <ToggleSwitch
+                editMode={editMode}
                 checked={itemModel.shuffle}
                 label="Shuffle"
                 onClick={this.onToggleShuffle} />
             </TabOptionControl>
             <TabOptionControl name="advancedscoring">
               <ToggleSwitch
+                editMode={editMode}
                 checked={advancedScoring}
                 label="Advanced"
                 onClick={this.onToggleAdvanced} />

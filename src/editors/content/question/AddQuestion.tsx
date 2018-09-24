@@ -126,7 +126,6 @@ export class AddQuestion
   }
 
   onAddShortAnswer() {
-
     const item = new contentTypes.ShortAnswer();
 
     const feedback = contentTypes.Feedback.fromText('', guid());
@@ -155,7 +154,6 @@ export class AddQuestion
   }
 
   onAddEssay() {
-
     const item = new contentTypes.Essay();
 
     const feedback = contentTypes.Feedback.fromText('', guid());

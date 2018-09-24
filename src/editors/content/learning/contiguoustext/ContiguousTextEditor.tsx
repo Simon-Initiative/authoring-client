@@ -113,6 +113,7 @@ export default class ContiguousTextEditor
         className={classNames([
           'contiguousTextEditor', classes.contiguousText,
           showBorder && classes.showBorder,
+          !editMode && classes.disabled,
           viewOnly && classes.viewOnly, className])}>
 
           <DraftWrapper

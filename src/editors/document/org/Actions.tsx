@@ -111,7 +111,7 @@ export class Actions
           </dd>
           <dt className="col-sm-2">
             <button
-              disabled={false}
+              disabled={!course.editable}
               className="btn btn-block btn-danger"
               onClick={() => onDisplayModal(
                 <DeleteResourceModal

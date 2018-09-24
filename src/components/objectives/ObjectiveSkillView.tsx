@@ -735,6 +735,7 @@ export class ObjectiveSkillView
 
 
   renderObjectives() {
+    const { course } = this.props;
 
     const rows = [];
 
@@ -771,7 +772,8 @@ export class ObjectiveSkillView
           title={objective.title}
           isExpanded={isExpanded(objective.id)}
           toggleExpanded={this.onToggleExpanded}
-          editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
+          editMode={course.editable && this.state.aggregateModel.isLocked
+            && !this.state.isSavePending}
           onEdit={this.onObjectiveEdit}
           loading={this.state.loading} />);
 
@@ -797,7 +799,8 @@ export class ObjectiveSkillView
                 title={title}
                 isExpanded={false}
                 toggleExpanded={this.onToggleExpanded}
-                editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
+                editMode={course.editable && this.state.aggregateModel.isLocked
+                  && !this.state.isSavePending}
                 onEdit={this.onSkillEdit}
                 loading={this.state.loading} />);
             }
@@ -866,9 +869,12 @@ export class ObjectiveSkillView
   }
 
   renderCreation() {
+    const { course } = this.props;
 
-    const editable = this.state.aggregateModel === null
-      ? false : this.state.aggregateModel.isLocked && !this.state.isSavePending;
+    const editable =
+      this.state.aggregateModel === null
+        ? false
+        : course.editable && this.state.aggregateModel.isLocked && !this.state.isSavePending;
 
     return (
       <div className="table-toolbar input-group">

@@ -9,6 +9,7 @@ export type CourseModelParams = {
   guid?: string,
   id?: string,
   version?: string,
+  editable?: boolean;
   title?: string,
   type?: string,
   description?: string,
@@ -30,6 +31,7 @@ const defaultCourseModel = {
   guid: '',
   id: '',
   version: '',
+  editable: true,
   type: LegacyTypes.package,
   title: '',
   description: '',
@@ -73,6 +75,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   guid: string;
   id: string;
   version: string;
+  editable: boolean;
   title: string;
   type: string;
   description: string;
@@ -131,6 +134,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       guid: c.guid,
       id: c.id,
       version: c.version,
+      editable: c.editable,
       title: c.title,
       type: c.type,
       description: c.description,
