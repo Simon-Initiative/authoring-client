@@ -10,8 +10,10 @@ import { Select } from 'editors/content/common/Select';
 
 import './CourseEditor.scss';
 import ModalPrompt from 'utils/selection/ModalPrompt';
+import { DeploymentStatus } from 'data/models/course';
+import { TextInput } from 'editors/content/common/controls';
 
-// const THUMBNAIL = require('../../../../assets/ph-courseView.png');
+const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
 export interface CourseEditorProps {
   model: models.CourseModel;
@@ -45,6 +47,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.renderMenuItemChildren = this.renderMenuItemChildren.bind(this);
     this.onEditTheme = this.onEditTheme.bind(this);
     this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
+    this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
   }
 
   componentDidMount() {
@@ -176,6 +179,64 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  // Used as a string in renderStatus, and as a boolean in renderActions
+  statusIsActive = (status: DeploymentStatus) => {
+    const { model } = this.props;
+    return model.deploymentStatus === status
+      ? 'active '
+      : ' ';
+  }
+
+  renderStatus() {
+
+    return (
+      <div className="vertical steps">
+        <div className={this.statusIsActive(DeploymentStatus.Development) + 'step'}>
+          {/* <i className="icon">1</i> */}
+          <div className="content">
+            <div className="title">Development</div>
+            <div className="description">This course has not been published yet.</div>
+          </div>
+        </div>
+        <div className={this.statusIsActive(DeploymentStatus.QA) + 'step'}>
+          <div className="content">
+            <div className="title">QA</div>
+            <div className="description">Course can be previewed but is not
+                         available publically to students.</div>
+          </div>
+        </div>
+        <div className={this.statusIsActive(DeploymentStatus.RequestingProduction) + 'step'}>
+          <div className="content">
+            <div className="title">Production Requested</div>
+            <div className="description">The OLI developer team is deploying
+                        the course to production.</div>
+          </div>
+        </div>
+        <div className={this.statusIsActive(DeploymentStatus.Production) + 'step'}>
+          <div className="content">
+            <div className="title">Production</div>
+            <div className="description">The course is live and available to
+                        students. Changes are limited.</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderActions() {
+    if (this.statusIsActive(DeploymentStatus.Development)) {
+
+    } else if (this.statusIsActive(DeploymentStatus.QA)) {
+
+    } else if (this.statusIsActive(DeploymentStatus.RequestingProduction)) {
+
+    } else if (this.statusIsActive(DeploymentStatus.Production)) {
+
+    } else {
+      return null;
+    }
+  }
+
   onEditTheme(themeId: string) {
     const { model, courseChanged } = this.props;
 
@@ -212,6 +273,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       okClassName="danger"
       cancelLabel="No"
     />);
+  }
+
+  onDescriptionEdit(description) {
+    const model = this.props.model.with({ description });
   }
 
   render() {
@@ -254,7 +319,13 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               </div>
               <div className="row">
                 <div className="col-3">Description</div>
-                <div className="col-9">{model.description}</div>
+                <div className="col-9">
+                  <TextInput width="100%" label=""
+                    editMode={this.props.editMode}
+                    value={model.description}
+                    type="text"
+                    onEdit={this.onDescriptionEdit} />
+                </div>
               </div>
               <div className="row">
                 <div className="col-3">Unique ID</div>
@@ -272,14 +343,25 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 <div className="col-3">Version</div>
                 <div className="col-9">{model.version}</div>
               </div>
-              {/* Disabling Thumbnail until it has a real purpose */}
-              {/* <div className="row">
+              <div className="row">
+                <div className="col-3">Status</div>
+                <div className="col-9">
+                  {this.renderStatus()}
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-3">Actions</div>
+                <div className="col-9">
+                  {this.renderActions()}
+                </div>
+              </div>
+              <div className="row">
                 <div className="col-3">Thumbnail<br /><br />
                 </div>
                 <div className="col-9">
                   <img src={THUMBNAIL} className="img-fluid" alt=""></img>
                 </div>
-              </div> */}
+              </div>
               {adminRow}
             </div>
           </div>
@@ -287,7 +369,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       </div>
     );
   }
-
 }
 
 export default CourseEditor;

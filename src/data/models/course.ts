@@ -4,6 +4,13 @@ import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
 import { parseDate } from 'data/content/resource';
 
+export enum DeploymentStatus {
+  Development,
+  QA,
+  Production,
+  RequestingProduction,
+}
+
 export type CourseModelParams = {
   rev?: number,
   guid?: string,
@@ -13,6 +20,7 @@ export type CourseModelParams = {
   type?: string,
   description?: string,
   buildStatus?: string,
+  deploymentStatus?: DeploymentStatus,
   dateCreated?: Date,
   metadata?: contentTypes.MetaData,
   options?: string,
@@ -34,6 +42,7 @@ const defaultCourseModel = {
   title: '',
   description: '',
   buildStatus: '',
+  deploymentStatus: DeploymentStatus.Development,
   dateCreated: Date.now(),
   metadata: new contentTypes.MetaData(),
   options: '',
@@ -57,7 +66,7 @@ function toKV(arr, deserialize) {
   );
 }
 
-function buildResourceMap(params: CourseModelParams) : CourseModelParams {
+function buildResourceMap(params: CourseModelParams): CourseModelParams {
 
   if (params.resources !== undefined) {
     let map = Immutable.OrderedMap<string, contentTypes.Resource>();
@@ -77,6 +86,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   type: string;
   description: string;
   buildStatus: string;
+  deploymentStatus: DeploymentStatus;
   dateCreated: Date;
   metadata: contentTypes.MetaData;
   options: string;
@@ -112,11 +122,11 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         );
 
     const webContents =
-    isNullOrUndefined(c.webContents)
-      ? Immutable.OrderedMap<string, contentTypes.WebContent>()
-      : Immutable.OrderedMap<string, contentTypes.WebContent>(
-        toKV(c.webContents, contentTypes.WebContent.fromPersistence),
-      );
+      isNullOrUndefined(c.webContents)
+        ? Immutable.OrderedMap<string, contentTypes.WebContent>()
+        : Immutable.OrderedMap<string, contentTypes.WebContent>(
+          toKV(c.webContents, contentTypes.WebContent.fromPersistence),
+        );
 
     let developers = Immutable.OrderedMap<string, contentTypes.UserInfo>();
     if (c.developers !== undefined && c.developers !== null) {
@@ -135,6 +145,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       type: c.type,
       description: c.description,
       buildStatus: c.buildStatus,
+      deploymentStatus: c.deploymentStatus,
       dateCreated: parseDate(c.dateCreated),
       options: JSON.stringify(c.options),
       icon: new contentTypes.WebContent(),
