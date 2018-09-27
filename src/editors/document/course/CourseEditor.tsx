@@ -12,6 +12,9 @@ import './CourseEditor.scss';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { DeploymentStatus } from 'data/models/course';
 import { TextInput } from 'editors/content/common/controls';
+import { LegacyTypes, CourseId } from 'data/types';
+import { ResourceState, Resource } from 'data/content/resource';
+import { LoadingSpinner } from 'components/common/LoadingSpinner';
 
 const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -22,6 +25,7 @@ export interface CourseEditorProps {
   editMode: boolean;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
+  onPreview: (courseId: CourseId, organizationId: string) => Promise<any>;
 }
 
 type ThemeSelection = {
@@ -32,15 +36,24 @@ type ThemeSelection = {
 interface CourseEditorState {
   selectedDevelopers: UserInfo[];
   themes: ThemeSelection[];
+  selectedOrganizationId: string;
+  isPublishing: boolean;
+  failedPublish: boolean;
 }
 
 class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState> {
+
+  organizations: Resource[] = [];
+
   constructor(props: CourseEditorProps) {
     super(props);
 
     this.state = {
       selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
       themes: [],
+      selectedOrganizationId: '',
+      isPublishing: false,
+      failedPublish: false,
     };
 
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
@@ -48,10 +61,16 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.onEditTheme = this.onEditTheme.bind(this);
     this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
     this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
+    this.onPublish = this.onPublish.bind(this);
   }
 
   componentDidMount() {
     this.fetchGlobalThemes();
+    this.organizations = this.props.model.resources
+      .filter((resource: Resource) =>
+        resource.type === LegacyTypes.organization &&
+        resource.resourceState !== ResourceState.DELETED)
+      .toArray();
   }
 
   // Fetch all globally available themes, sort alphabetically, and choose one to be selected
@@ -184,7 +203,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const { model } = this.props;
     return model.deploymentStatus === status
       ? 'active '
-      : ' ';
+      : '';
   }
 
   renderStatus() {
@@ -224,17 +243,97 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   renderActions() {
+    const { isPublishing, failedPublish } = this.state;
+
+    const failedPublishButton = <button
+      disabled
+      className="btn btn-block btn-primary"
+      onClick={() => { }}>
+      Failed to publish
+    </button>;
+
+    const isPublishingButton = <button
+      disabled
+      className="btn btn-block btn-primary"
+      onClick={() => { }}>
+      <LoadingSpinner className="u-no-padding text-white" message="Publishing" />
+    </button>;
+
+    const publishButton = <button
+      className="btn btn-block btn-primary"
+      onClick={this.onPublish}>
+      Publish
+    </button>;
+
+    const { model } = this.props;
+
+
     if (this.statusIsActive(DeploymentStatus.Development)) {
+      // dropdown list with organizations
+      // publish button from org actions tab
 
     } else if (this.statusIsActive(DeploymentStatus.QA)) {
 
+
     } else if (this.statusIsActive(DeploymentStatus.RequestingProduction)) {
+
 
     } else if (this.statusIsActive(DeploymentStatus.Production)) {
 
+
     } else {
-      return null;
+      const option = (org: Resource) =>
+        <option
+          key={org.guid}
+          value={org.guid}>
+          {org.title}
+        </option>;
+
+      const options = this.organizations.map(option);
+
+      return (
+        <div>
+          <div><p>Select an organization to publish</p>
+            <Select
+              {...this.props}
+              className="themeSelect"
+              // Use the selected organization if present, or the first in the list as a default
+              value={this.state.selectedOrganizationId}
+              onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
+              {options}
+            </Select>
+          </div>
+          <p>
+            <strong>Publish</strong> the complete course package
+            using this organization to bring the course to the <b>QA</b> status,
+            allowing the course to be previewed publically.
+          <br /><br />
+            This action may take awhile.
+          </p>
+          {failedPublish
+            ? failedPublishButton
+            : isPublishing
+              ? isPublishingButton
+              : publishButton}
+        </div>
+      );
     }
+  }
+
+  onPublish() {
+    const { model, onPreview } = this.props;
+
+    this.setState({
+      isPublishing: true,
+    });
+
+    onPreview(model.guid, this.state.selectedOrganizationId ||
+      (this.organizations[0] && this.organizations[0].guid))
+      .then(_ => this.setState({ isPublishing: false }))
+      .catch((err) => {
+        this.setState({ isPublishing: false, failedPublish: true });
+        console.log('Preview publish error:', err);
+      });
   }
 
   onEditTheme(themeId: string) {
@@ -252,7 +351,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         courseChanged(model.with({ theme: themeId }));
       })
       .catch(err => console.log(`Error setting theme ${themeId}: ${err}`));
-
   }
 
   removePackage() {

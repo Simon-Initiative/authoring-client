@@ -118,9 +118,9 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
   canRedo: boolean;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  onPreview: (courseId: CourseId, organization: models.OrganizationModel) => Promise<any>;
+  onPreview: (courseId: CourseId, organizationId: string) => Promise<any>;
   course: models.CourseModel;
-  onEditingEnable: (editable : boolean, documentId : string) => void;
+  onEditingEnable: (editable: boolean, documentId: string) => void;
 }
 
 const enum TABS {

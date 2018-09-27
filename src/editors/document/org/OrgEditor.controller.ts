@@ -16,8 +16,8 @@ interface StateProps {
 interface DispatchProps {
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  onPreview: (courseId: CourseId, organization: OrganizationModel) => Promise<any>;
-  onEditingEnable: (editable : boolean, documentId : string) => void;
+  onPreview: (courseId: CourseId, organizationId: string) => Promise<any>;
+  onEditingEnable: (editable: boolean, documentId: string) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<OrganizationModel> {
@@ -38,10 +38,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(undo(documentId)),
     onRedo: (documentId: string) =>
       dispatch(redo(documentId)),
-    onPreview: (courseId: CourseId, organization: OrganizationModel) =>
-      dispatch(preview(courseId, organization, false)),
+    onPreview: (courseId: CourseId, organizationId: string) =>
+      dispatch(preview(courseId, organizationId, false)),
     onEditingEnable: (editable, documentId) =>
-    dispatch(documentEditingEnable(editable, documentId)),
+      dispatch(documentEditingEnable(editable, documentId)),
   };
 };
 

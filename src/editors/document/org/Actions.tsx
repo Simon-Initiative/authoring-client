@@ -10,7 +10,7 @@ export interface Actions {
 
 export interface ActionsProps {
   onDuplicate: () => void;
-  onPreview: (courseId: CourseId, organization: OrganizationModel) => Promise<any>;
+  onPreview: (courseId: CourseId, organizationId: string) => Promise<any>;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   org: OrganizationModel;
@@ -43,7 +43,7 @@ export class Actions
       isPublishing: true,
     });
 
-    onPreview(course.guid, org)
+    onPreview(course.guid, org.guid)
       .then(_ => this.setState({ isPublishing: false }))
       .catch((err) => {
         this.setState({ isPublishing: false, failedPublish: true });

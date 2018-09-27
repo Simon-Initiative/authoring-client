@@ -22,11 +22,11 @@ function invokePreview(orgId: string, isRefreshAttempt: boolean) {
 }
 
 export function preview(
-  courseId: string, organization: OrganizationModel, isRefreshAttempt: boolean) {
+  courseId: string, organizationId: string, isRefreshAttempt: boolean) {
 
   return function (dispatch): Promise<any> {
 
-    return dispatch(invokePreview(organization.guid, isRefreshAttempt))
+    return dispatch(invokePreview(organizationId, isRefreshAttempt))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
@@ -37,12 +37,12 @@ export function preview(
         } else if (result.type === 'PreviewSuccess') {
           const refresh = result.message === 'pending';
           window.open(
-            '/#preview' + organization.guid + '-' + courseId
+            '/#preview' + organizationId + '-' + courseId
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
             + (refresh ? '&refresh=true' : ''),
             courseId);
         } else if (result.type === 'PreviewPending') {
-          window.open('/#preview' + organization.guid + '-' + courseId, courseId);
+          window.open('/#preview' + organizationId + '-' + courseId, courseId);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);
