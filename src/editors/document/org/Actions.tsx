@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { OrganizationModel, CourseModel } from 'data/models';
-import { CourseId } from 'data/types';
 import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
-import { LoadingSpinner } from 'components/common/LoadingSpinner';
 
 export interface Actions {
 
@@ -10,7 +8,6 @@ export interface Actions {
 
 export interface ActionsProps {
   onDuplicate: () => void;
-  onPreview: (courseId: CourseId, organizationId: string) => Promise<any>;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   org: OrganizationModel;
@@ -18,8 +15,6 @@ export interface ActionsProps {
 }
 
 export interface ActionsState {
-  isPublishing: boolean;
-  failedPublish: boolean;
 }
 
 export class Actions
@@ -27,72 +22,16 @@ export class Actions
 
   constructor(props) {
     super(props);
-
-    this.state = {
-      isPublishing: false,
-      failedPublish: false,
-    };
-
-    this.publish = this.publish.bind(this);
-  }
-
-  publish() {
-    const { onPreview, course, org } = this.props;
-
-    this.setState({
-      isPublishing: true,
-    });
-
-    onPreview(course.guid, org.guid)
-      .then(_ => this.setState({ isPublishing: false }))
-      .catch((err) => {
-        this.setState({ isPublishing: false, failedPublish: true });
-        console.log('Preview publish error:', err);
-      });
   }
 
   render() {
     const { course, org, onDisplayModal, onDismissModal, onDuplicate }
       = this.props;
 
-    const { isPublishing, failedPublish } = this.state;
-
-    const failedPublishButton = <button
-      disabled
-      className="btn btn-block btn-primary"
-      onClick={() => { }}>
-      Failed to publish
-    </button>;
-
-    const isPublishingButton = <button
-      disabled
-      className="btn btn-block btn-primary"
-      onClick={() => { }}>
-      <LoadingSpinner className="u-no-padding text-white" message="Publishing" />
-    </button>;
-
-    const publishButton = <button
-      className="btn btn-block btn-primary"
-      onClick={this.publish}>
-      Publish
-    </button>;
-
     return (
       <div className="org-tab">
 
         <dl className="row">
-
-          <dd className="col-sm-10"><strong>Publish</strong> the complete course package
-          using this organization to the OLI development server. This may take awhile.</dd>
-          <dt className="col-sm-2 justify-content-right">
-            {failedPublish
-              ? failedPublishButton
-              : isPublishing
-                ? isPublishingButton
-                : publishButton}
-          </dt>
-
-          <br /><br />
 
           <dd className="col-sm-10">Create a <strong>copy</strong> of this organization.
           Changes you make to the structure
@@ -121,12 +60,8 @@ export class Actions
               Delete
             </button>
           </dt>
-
         </dl>
-
       </div>
     );
   }
-
 }
-

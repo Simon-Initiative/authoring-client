@@ -7,7 +7,7 @@ import { applyMiddleware, createStore, Store } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
-import { createLogger } from 'redux-logger';
+import { createLogger, logger } from 'redux-logger';
 import { UserState } from './reducers/user';
 import { getQueryVariable } from './utils/params';
 import history from './utils/history';
@@ -55,7 +55,7 @@ function historyRequiresCourseLoad() {
     && window.location.hash.indexOf('-') !== -1;
 }
 
-function tryLogin() : Promise<UserState> {
+function tryLogin(): Promise<UserState> {
   return new Promise<UserState>((resolve, reject) => {
     initialize(
       (profile, logoutUrl, accountManagementUrl) =>
@@ -65,13 +65,13 @@ function tryLogin() : Promise<UserState> {
   });
 }
 
-function render(store, current) : Promise<boolean> {
+function render(store, current): Promise<boolean> {
 
   // Now do the initial rendering
   return new Promise((resolve, reject) => {
     ReactDOM.render(
       <AppContainer>
-        <CurrentApplicationRoot store={store} location={current}/>
+        <CurrentApplicationRoot store={store} location={current} />
       </AppContainer>,
       document.getElementById('app'), () => resolve(true));
   });
@@ -79,7 +79,7 @@ function render(store, current) : Promise<boolean> {
 }
 
 
-let store : Store<any> = null;
+let store: Store<any> = null;
 let CurrentApplicationRoot = ApplicationRoot;
 
 function main() {

@@ -15,7 +15,6 @@ interface DispatchProps {
 
 interface OwnProps {
   onDuplicate: () => void;
-  onPreview: (courseId: string, organizationId: string) => Promise<any>;
   org: OrganizationModel;
   course: CourseModel;
 }

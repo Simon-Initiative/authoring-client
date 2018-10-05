@@ -118,7 +118,6 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
   canRedo: boolean;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  onPreview: (courseId: CourseId, organizationId: string) => Promise<any>;
   course: models.CourseModel;
   onEditingEnable: (editable: boolean, documentId: string) => void;
 }
@@ -448,7 +447,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         onDuplicate={dupe}
         org={model}
         course={this.props.course}
-        onPreview={this.props.onPreview}
       />);
   }
 

@@ -246,9 +246,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const { isPublishing, failedPublish } = this.state;
 
     const failedPublishButton = <button
-      disabled
       className="btn btn-block btn-primary"
-      onClick={() => { }}>
+      onClick={this.onPublish}>
       Failed to publish
     </button>;
 
@@ -321,7 +320,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   onPublish() {
-    const { model, onPreview } = this.props;
+    const { model, onPreview, courseChanged } = this.props;
 
     this.setState({
       isPublishing: true,
@@ -329,10 +328,17 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     onPreview(model.guid, this.state.selectedOrganizationId ||
       (this.organizations[0] && this.organizations[0].guid))
-      .then(_ => this.setState({ isPublishing: false }))
+      .then((_) => {
+        // preview throws a 500 if the deployment status is Development and cannot be updated to QA
+        // otherwise, we can presume the update was successful in the db and update the model
+        courseChanged(model.with({
+          deploymentStatus: DeploymentStatus.QA,
+        }));
+        this.setState({ isPublishing: false });
+      })
       .catch((err) => {
         this.setState({ isPublishing: false, failedPublish: true });
-        console.log('Preview publish error:', err);
+        console.error('Preview publish error:', err);
       });
   }
 

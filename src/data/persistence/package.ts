@@ -4,7 +4,7 @@ import { CourseId } from '../types';
 import * as models from '../models';
 import { Resource } from '../content/resource';
 
-export function importPackage(repositoryUrl: string) : void {
+export function importPackage(repositoryUrl: string): void {
 
   const url = `${configuration.baseUrl}/packages/import`;
   const body = JSON.stringify({ repositoryUrl });
@@ -18,7 +18,7 @@ export function getEditablePackages(): Promise<models.CourseModel[]> {
   const url = `${configuration.baseUrl}/packages/editable`;
 
   return authenticatedFetch({ url })
-    .then((json : any) => json.map(m => models.createModel(m)));
+    .then((json: any) => json.map(m => models.createModel(m)));
 }
 
 export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
@@ -26,7 +26,7 @@ export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
   const url = `${configuration.baseUrl}/packages/${courseId}/details`;
 
   return authenticatedFetch({ url })
-    .then((json : any) => new Document({
+    .then((json: any) => new Document({
       _courseId: courseId,
       _id: json.guid,
       _rev: json.rev,
@@ -40,9 +40,8 @@ export function deleteCoursePackage(courseId: CourseId): Promise<string> {
   const method = 'DELETE';
 
   return authenticatedFetch({ url, method })
-    .then((json : any) => json.message);
+    .then((json: any) => json.message);
 }
-
 
 export type CourseResource = {
   _id: string,
