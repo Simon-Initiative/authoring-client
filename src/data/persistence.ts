@@ -12,6 +12,7 @@ export {
   retrieveCoursePackage,
   deleteCoursePackage,
   importPackage,
+  transitionDeploymentStatus,
 } from './persistence/package';
 
 export {

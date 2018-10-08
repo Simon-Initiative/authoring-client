@@ -10,23 +10,24 @@ import { EditedDocument } from 'types/document';
 import { DeferredPersistenceStrategy }
   from 'editors/manager/persistence/DeferredPersistenceStrategy';
 import { buildPersistenceFailureMessage } from 'utils/error';
+import { ServerName } from 'data/persistence/document';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(orgId: string, isRefreshAttempt: boolean) {
+function invokePreview(orgId: string, isRefreshAttempt: boolean, server?: ServerName) {
   return function (dispatch, getState): Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
-    return persistence.initiatePreview(course.guid, orgId, isRefreshAttempt);
+    return persistence.initiatePreview(course.guid, orgId, isRefreshAttempt, server);
   };
 }
 
 export function preview(
-  courseId: string, organizationId: string, isRefreshAttempt: boolean) {
+  courseId: string, organizationId: string, isRefreshAttempt: boolean, server?: ServerName) {
 
   return function (dispatch): Promise<any> {
 
-    return dispatch(invokePreview(organizationId, isRefreshAttempt))
+    return dispatch(invokePreview(organizationId, isRefreshAttempt, server))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
@@ -49,8 +50,15 @@ export function preview(
         dispatch(showMessage(message));
       });
   };
-
 }
+
+// export function openPreviewLink(
+//   courseId: string, organizationId: string, isRefreshAttempt: boolean, server?: ServerName): void {
+//   window.open(
+//     '/#preview' + organizationId + '-' + courseId
+//     + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl),
+//     courseId);
+// }
 
 // Invoke a preview for the current resource (ie Workbook Page) from the editor.
 // The full course is not built in OLI. Instead, we just receive an HTML page with

@@ -3,6 +3,7 @@ import { configuration } from '../../actions/utils/config';
 import { CourseId } from '../types';
 import * as models from '../models';
 import { Resource } from '../content/resource';
+import { DeploymentStatus } from 'data/models/course.ts';
 
 export function importPackage(repositoryUrl: string): void {
 
@@ -93,3 +94,12 @@ export function setCourseTheme(course: string, theme: string): Promise<{}> {
   return authenticatedFetch({ url, method, body });
 }
 
+export function transitionDeploymentStatus(course: string, status: DeploymentStatus):
+  Promise<{}> {
+  const url = `${configuration.baseUrl}/packages/${course}/status/${status}`;
+  const method = 'PUT';
+  console.log('status is', status);
+  const body = JSON.stringify(status);
+
+  return authenticatedFetch({ url, method, body });
+}

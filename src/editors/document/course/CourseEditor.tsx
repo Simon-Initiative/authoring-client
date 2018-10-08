@@ -15,6 +15,7 @@ import { TextInput } from 'editors/content/common/controls';
 import { LegacyTypes, CourseId } from 'data/types';
 import { ResourceState, Resource } from 'data/content/resource';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
+import { isNullOrUndefined } from 'util';
 
 const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -62,6 +63,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
     this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
     this.onPublish = this.onPublish.bind(this);
+    this.onRequestProduction = this.onRequestProduction.bind(this);
   }
 
   componentDidMount() {
@@ -201,6 +203,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   // Used as a string in renderStatus, and as a boolean in renderActions
   statusIsActive = (status: DeploymentStatus) => {
     const { model } = this.props;
+    console.log('status is', status, "dep status is", model.deploymentStatus);
     return model.deploymentStatus === status
       ? 'active '
       : '';
@@ -210,7 +213,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     return (
       <div className="vertical steps">
-        <div className={this.statusIsActive(DeploymentStatus.Development) + 'step'}>
+        <div className={this.statusIsActive(DeploymentStatus.DEVELOPMENT) + 'step'}>
           {/* <i className="icon">1</i> */}
           <div className="content">
             <div className="title">Development</div>
@@ -224,14 +227,14 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                          available publically to students.</div>
           </div>
         </div>
-        <div className={this.statusIsActive(DeploymentStatus.RequestingProduction) + 'step'}>
+        <div className={this.statusIsActive(DeploymentStatus.REQUESTING_PRODUCTION) + 'step'}>
           <div className="content">
             <div className="title">Production Requested</div>
             <div className="description">The OLI developer team is deploying
                         the course to production.</div>
           </div>
         </div>
-        <div className={this.statusIsActive(DeploymentStatus.Production) + 'step'}>
+        <div className={this.statusIsActive(DeploymentStatus.PRODUCTION) + 'step'}>
           <div className="content">
             <div className="title">Production</div>
             <div className="description">The course is live and available to
@@ -243,13 +246,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   renderActions() {
-    const { isPublishing, failedPublish } = this.state;
+    const { model } = this.props;
 
-    const failedPublishButton = <button
-      className="btn btn-block btn-primary"
-      onClick={this.onPublish}>
-      Failed to publish
-    </button>;
+    const { isPublishing, failedPublish } = this.state;
 
     const isPublishingButton = <button
       disabled
@@ -264,34 +263,31 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       Publish
     </button>;
 
-    const { model } = this.props;
+    console.log('Course status', model.deploymentStatus);
+    const option = (org: Resource) =>
+      <option
+        key={org.guid}
+        value={org.guid}>
+        {org.title}
+      </option>;
 
+    const options = this.organizations.map(option);
 
-    if (this.statusIsActive(DeploymentStatus.Development)) {
+    const content = [];
+
+    console.log("dev active", this.statusIsActive(DeploymentStatus.DEVELOPMENT));
+    console.log("qa active", this.statusIsActive(DeploymentStatus.QA));
+    console.log("req active", this.statusIsActive(DeploymentStatus.REQUESTING_PRODUCTION));
+    console.log("prod active", this.statusIsActive(DeploymentStatus.PRODUCTION));
+
+    if (!model.deploymentStatus ||
+      this.statusIsActive(DeploymentStatus.DEVELOPMENT) ||
+      this.statusIsActive(DeploymentStatus.QA) ||
+      this.statusIsActive(DeploymentStatus.PRODUCTION)) {
       // dropdown list with organizations
       // publish button from org actions tab
-
-    } else if (this.statusIsActive(DeploymentStatus.QA)) {
-
-
-    } else if (this.statusIsActive(DeploymentStatus.RequestingProduction)) {
-
-
-    } else if (this.statusIsActive(DeploymentStatus.Production)) {
-
-
-    } else {
-      const option = (org: Resource) =>
-        <option
-          key={org.guid}
-          value={org.guid}>
-          {org.title}
-        </option>;
-
-      const options = this.organizations.map(option);
-
-      return (
-        <div>
+      content.push(
+        <div key="publishButton">
           <div><p>Select an organization to publish</p>
             <Select
               {...this.props}
@@ -302,21 +298,76 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               {options}
             </Select>
           </div>
+          <br />
           <p>
             <strong>Publish</strong> the complete course package
-            using this organization to bring the course to the <b>QA</b> status,
-            allowing the course to be previewed publically.
+            using this organization and allow it to be previewed publically.
           <br /><br />
             This action may take awhile.
           </p>
-          {failedPublish
-            ? failedPublishButton
-            : isPublishing
-              ? isPublishingButton
-              : publishButton}
-        </div>
+          {isPublishing
+            ? isPublishingButton
+            : publishButton}
+        </div>,
       );
     }
+    if (this.statusIsActive(DeploymentStatus.QA) ||
+      this.statusIsActive(DeploymentStatus.REQUESTING_PRODUCTION) ||
+      this.statusIsActive(DeploymentStatus.PRODUCTION)) {
+      content.push(
+        <a key="previewButton"
+          onClick={this.props.onDismissModal}
+          href={`/#preview${this.props.model.guid}-${this.state.selectedOrganizationId ||
+            (this.organizations[0] && this.organizations[0].guid)}`}
+          className="btn btn-link"
+          target="_blank">
+          Preview the selected organization
+        </a>,
+      );
+    }
+    if (this.statusIsActive(DeploymentStatus.QA)) {
+      content.push(
+        <div key="requestProdButton">
+          <p>
+            If your course is ready to go to production, you can request for OLI to deploy
+            the course to the production server for public use.
+          </p>
+          <button
+            className="btn btn-block btn-primary"
+            onClick={this.onRequestProduction}>
+            Request Production
+          </button>
+        </div>,
+      );
+    }
+    if (this.statusIsActive(DeploymentStatus.PRODUCTION)) {
+      content.push(
+        <div key="updateProdButton">
+          <div><p>Select an organization to update</p>
+            <Select
+              {...this.props}
+              className="themeSelect"
+              // Use the selected organization if present, or the first in the list as a default
+              value={this.state.selectedOrganizationId}
+              onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
+              {options}
+            </Select>
+          </div>
+          <br />
+          <p>
+            This course is live, but you can make non-structural updates to course content.
+          <br /><br />
+            Updating a course may take awhile.
+          </p>
+          {isPublishing
+            ? isPublishingButton
+            : publishButton}
+        </div>,
+      );
+    }
+    console.log("content", content);
+
+    return content;
   }
 
   onPublish() {
@@ -332,7 +383,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         // preview throws a 500 if the deployment status is Development and cannot be updated to QA
         // otherwise, we can presume the update was successful in the db and update the model
         courseChanged(model.with({
-          deploymentStatus: DeploymentStatus.QA,
+          deploymentStatus: isNullOrUndefined(model.deploymentStatus) ||
+            model.deploymentStatus === DeploymentStatus.DEVELOPMENT
+            ? DeploymentStatus.QA
+            : model.deploymentStatus,
         }));
         this.setState({ isPublishing: false });
       })
@@ -340,6 +394,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         this.setState({ isPublishing: false, failedPublish: true });
         console.error('Preview publish error:', err);
       });
+  }
+
+  onRequestProduction() {
+    const { model, courseChanged } = this.props;
+
+    persistence.transitionDeploymentStatus(model.guid, DeploymentStatus.REQUESTING_PRODUCTION)
+      .then(_ => courseChanged(model.with({
+        deploymentStatus: DeploymentStatus.REQUESTING_PRODUCTION,
+      })));
   }
 
   onEditTheme(themeId: string) {

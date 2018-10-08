@@ -51,8 +51,9 @@ export interface PreviewSuccess {
 }
 
 export enum ServerName {
-  thelsamar,
-  dev01,
+  dev,
+  qa,
+  prod,
 }
 
 // Previewing can result in one of these responses from the server

@@ -5,10 +5,10 @@ import { LegacyTypes } from '../types';
 import { parseDate } from 'data/content/resource';
 
 export enum DeploymentStatus {
-  Development,
-  QA,
-  Production,
-  RequestingProduction,
+  DEVELOPMENT = 'DEVELOPMENT',
+  QA = 'QA',
+  PRODUCTION = 'PRODUCTION',
+  REQUESTING_PRODUCTION = 'REQUESTING_PRODUCTION',
 }
 
 export type CourseModelParams = {
@@ -42,7 +42,7 @@ const defaultCourseModel = {
   title: '',
   description: '',
   buildStatus: '',
-  deploymentStatus: DeploymentStatus.Development,
+  deploymentStatus: DeploymentStatus.DEVELOPMENT,
   dateCreated: Date.now(),
   metadata: new contentTypes.MetaData(),
   options: '',
@@ -180,6 +180,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       title: this.title,
       type: this.type,
       description: this.description,
+      deploymentStatus: this.deploymentStatus,
       doc,
     };
     return Object.assign({}, values);
