@@ -198,7 +198,7 @@ export class TreeNode
               source={model}
               parentModel={parentModel}>
               <span style={{ marginLeft: (depth * 30) }} />
-              <DragHandle hidden={!this.state.mouseOver} />
+              <DragHandle hidden={!editMode || !this.state.mouseOver} />
               {title}
             </DraggableNode>
           </div>

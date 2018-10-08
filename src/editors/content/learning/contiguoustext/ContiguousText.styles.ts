@@ -10,6 +10,9 @@ export const styles: JSSStyles = {
     border: 'none',
     padding: 0,
   },
+  disabled: {
+    backgroundColor: 'transparent',
+  },
   showBorder: {
     border: '1px solid #ced4da',
     borderRadius: 4,

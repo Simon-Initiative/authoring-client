@@ -16,6 +16,15 @@ export const styles: JSSStyles = {
       transition: 'opacity 200ms ease',
     },
   },
+  disabled: {
+    '&:hover $hoverUnderline': {
+      opacity: 0,
+    },
+
+    '&:hover $editIcon': {
+      opacity: 0,
+    },
+  },
   contiguousTextEditor: {
     backgroundColor: 'transparent',
     border: 'none',

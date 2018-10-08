@@ -6,27 +6,30 @@ import './ContentTitle.scss';
 const DEFAULT_REMOVE_DISABLED_MSG = 'Content cannot be removed';
 
 export type RemoveButtonProps = {
-  editMode: boolean;
+  canRemove: boolean;
   removeDisabledMessage: string;
   onClick: (...args) => void;
 };
 
 export const RemoveButton =
-  ({ editMode, removeDisabledMessage, onClick }: RemoveButtonProps) => {
+  ({ canRemove, removeDisabledMessage, onClick }: RemoveButtonProps) => {
     const btn =
       <div
-        className={`action-btn action-btn-remove ${editMode ? '' : 'disabled'}`}
-        onClick={editMode ? onClick : () => { }}>
+        className={`action-btn action-btn-remove ${canRemove ? '' : 'disabled'}`}
+        onClick={canRemove ? onClick : () => { }}>
         <i className="fa fa-trash-o" />
         Delete
     </div>;
 
-    return editMode ? btn : <Tooltip title={removeDisabledMessage}>{btn}</Tooltip>;
+    return !canRemove && removeDisabledMessage
+      ? <Tooltip title={removeDisabledMessage}>{btn}</Tooltip>
+      : btn;
   };
 
 export type ContentTitleProps = {
   title: string;
   canRemove: boolean;
+  editMode: boolean;
   removeDisabledMessage?: string;
   onDuplicate?: (e) => void;
   onRemove?: (e) => void;
@@ -34,7 +37,7 @@ export type ContentTitleProps = {
 };
 
 export const ContentTitle: React.StatelessComponent<ContentTitleProps> = ({
-  title, canRemove, removeDisabledMessage, onDuplicate, onRemove, helpPopover,
+  title, editMode, canRemove, removeDisabledMessage, onDuplicate, onRemove, helpPopover,
 }) => (
     <div className="content-title">
       <div className="title">{title} {helpPopover}</div>
@@ -53,7 +56,8 @@ export const ContentTitle: React.StatelessComponent<ContentTitleProps> = ({
       <span>&nbsp;</span>
 
       <RemoveButton
-        editMode={canRemove} onClick={onRemove}
-        removeDisabledMessage={removeDisabledMessage || DEFAULT_REMOVE_DISABLED_MSG} />
+        canRemove={editMode && canRemove} onClick={onRemove}
+        removeDisabledMessage={editMode
+          && (removeDisabledMessage || DEFAULT_REMOVE_DISABLED_MSG)} />
     </div>
   );

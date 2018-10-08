@@ -217,6 +217,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       <ContentTitle
         title={getLabelForQuestion(model)}
         onDuplicate={editMode ? this.props.onDuplicate : undefined}
+        editMode={editMode}
         canRemove={canRemoveQuestion}
         removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
         onRemove={onRemoveQuestion}
