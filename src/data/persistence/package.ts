@@ -1,4 +1,4 @@
-import { authenticatedFetch, Document } from './common';
+import { authenticatedFetch, Document, PackageMetadata } from './common';
 import { configuration } from '../../actions/utils/config';
 import { CourseId } from '../types';
 import * as models from '../models';

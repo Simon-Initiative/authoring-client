@@ -16,7 +16,7 @@ interface DispatchProps {
   viewAllCourses: () => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
-  onPreview: (courseId: CourseId, organizationId: string) => Promise<any>;
+  onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
 }
 
 interface OwnProps {
@@ -34,8 +34,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(courseChanged(model)),
     viewAllCourses: () =>
       dispatch(viewActions.viewAllCourses()),
-    onPreview: (courseId: CourseId, organizationId: string) =>
-      dispatch(preview(courseId, organizationId, false)),
+    onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) =>
+      dispatch(preview(courseId, organizationId, false, redeploy)),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
   };

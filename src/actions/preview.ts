@@ -23,7 +23,8 @@ function invokePreview(orgId: string, isRefreshAttempt: boolean, server?: Server
 }
 
 export function preview(
-  courseId: string, organizationId: string, isRefreshAttempt: boolean, server?: ServerName) {
+  courseId: string, organizationId: string, isRefreshAttempt: boolean, redeploy: boolean = true,
+  server?: ServerName) {
 
   return function (dispatch): Promise<any> {
 
@@ -40,7 +41,8 @@ export function preview(
           window.open(
             '/#preview' + organizationId + '-' + courseId
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
-            + (refresh ? '&refresh=true' : ''),
+            + (refresh ? '&refresh=true' : '')
+            + (redeploy ? '&redeploy=true' : ''),
             courseId);
         } else if (result.type === 'PreviewPending') {
           window.open('/#preview' + organizationId + '-' + courseId, courseId);
@@ -51,14 +53,6 @@ export function preview(
       });
   };
 }
-
-// export function openPreviewLink(
-//   courseId: string, organizationId: string, isRefreshAttempt: boolean, server?: ServerName): void {
-//   window.open(
-//     '/#preview' + organizationId + '-' + courseId
-//     + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl),
-//     courseId);
-// }
 
 // Invoke a preview for the current resource (ie Workbook Page) from the editor.
 // The full course is not built in OLI. Instead, we just receive an HTML page with

@@ -1,8 +1,9 @@
 import * as Immutable from 'immutable';
-import { CourseId, DocumentId } from '../types';
+import { CourseId, DocumentId, CourseTitle } from '../types';
 import * as models from '../models';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
 import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak';
+import { WebContent } from 'data/content/webcontent';
 
 const fetch = (window as any).fetch;
 
@@ -42,29 +43,29 @@ export function authenticatedFetch(params: HttpRequestParams) {
   return new Promise((resolve, reject) => {
 
     refreshTokenIfInvalid()
-    .then((tokenIsValid) => {
+      .then((tokenIsValid) => {
 
-      if (!tokenIsValid) {
-        forceLogin();
-        return;
-      }
+        if (!tokenIsValid) {
+          forceLogin();
+          return;
+        }
 
-      return fetch(url + queryString, {
-        method,
-        headers,
-        body,
+        return fetch(url + queryString, {
+          method,
+          headers,
+          body,
+        });
+      })
+      .then((response) => {
+        if (!response.ok) {
+          reject(response.statusText);
+        } else {
+          resolve(hasTextResult ? response.text() : response.json());
+        }
+      })
+      .catch((err) => {
+        handleError(err, reject);
       });
-    })
-    .then((response) => {
-      if (!response.ok) {
-        reject(response.statusText);
-      } else {
-        resolve(hasTextResult ? response.text() : response.json());
-      }
-    })
-    .catch((err) => {
-      handleError(err, reject);
-    });
 
   });
 
@@ -101,6 +102,55 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
   }
 
   with(values: DocumentParams) {
+    return this.merge(values) as this;
+  }
+}
+
+// The ContentService can update a Package (or document) with or without the model. Most of the
+// frontend uses the full Package with attached model, but the Course Editor page updates only the
+// metadata. PackageMetadata contains the full editable metadata that can be edited once a course
+// is created.
+export type PackageMetadataParams = {
+  // ID and Version are required to make an update, the rest are optional
+  _courseId?: CourseId,
+  _rev?: RevisionId,
+
+  title?: CourseTitle,
+  description?: string,
+  icon?: WebContent,
+
+  // Not currently available in UI for editing
+  metadata?: Object,
+  preferences?: Object[],
+};
+
+const defaultPackageMetadataParams = {
+  _courseId: '',
+  _rev: '',
+  title: '',
+  description: '',
+  icon: new WebContent(),
+  metadata: undefined,
+  preferences: undefined,
+};
+
+export class PackageMetadata extends Immutable.Record(defaultPackageMetadataParams) {
+  /* tslint:disable */
+  _courseId: CourseId;
+  _rev: RevisionId;
+
+  title?: CourseTitle;
+  description?: string;
+  icon?: WebContent;
+  metadata?: Object;
+  preferences?: Object[];
+  /* tslint:enable */
+
+  constructor(params?: PackageMetadataParams) {
+    params ? super(params) : super();
+  }
+
+  with(values: PackageMetadataParams) {
     return this.merge(values) as this;
   }
 }

@@ -7,7 +7,7 @@ import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
 import { Button } from 'editors/content/common/Button';
 import { Select } from 'editors/content/common/Select';
-
+import { Document } from 'data/persistence/common';
 import './CourseEditor.scss';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { DeploymentStatus } from 'data/models/course';
@@ -16,6 +16,11 @@ import { LegacyTypes, CourseId } from 'data/types';
 import { ResourceState, Resource } from 'data/content/resource';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import { isNullOrUndefined } from 'util';
+import { Title } from 'components/objectives/Title';
+import { ToolbarButton } from 'components/toolbar/ToolbarButton';
+import { selectImage } from 'editors/content/learning/ImageEditor';
+import { insertableContentTypes, getContentIcon } from 'editors/content/utils/content';
+import { courseChanged } from 'actions/course';
 
 const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -26,7 +31,7 @@ export interface CourseEditorProps {
   editMode: boolean;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
-  onPreview: (courseId: CourseId, organizationId: string) => Promise<any>;
+  onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
 }
 
 type ThemeSelection = {
@@ -62,6 +67,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.onEditTheme = this.onEditTheme.bind(this);
     this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
     this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
+    this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onPublish = this.onPublish.bind(this);
     this.onRequestProduction = this.onRequestProduction.bind(this);
   }
@@ -203,7 +209,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   // Used as a string in renderStatus, and as a boolean in renderActions
   statusIsActive = (status: DeploymentStatus) => {
     const { model } = this.props;
-    console.log('status is', status, "dep status is", model.deploymentStatus);
+    console.log('status is', status, 'dep status is', model.deploymentStatus);
     return model.deploymentStatus === status
       ? 'active '
       : '';
@@ -252,18 +258,17 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     const isPublishingButton = <button
       disabled
-      className="btn btn-block btn-primary"
+      className="btn btn-block btn-primary publishButton"
       onClick={() => { }}>
       <LoadingSpinner className="u-no-padding text-white" message="Publishing" />
     </button>;
 
     const publishButton = <button
-      className="btn btn-block btn-primary"
-      onClick={this.onPublish}>
+      className="btn btn-block btn-primary publishButton"
+      onClick={() => this.onPublish()}>
       Publish
     </button>;
 
-    console.log('Course status', model.deploymentStatus);
     const option = (org: Resource) =>
       <option
         key={org.guid}
@@ -275,23 +280,17 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     const content = [];
 
-    console.log("dev active", this.statusIsActive(DeploymentStatus.DEVELOPMENT));
-    console.log("qa active", this.statusIsActive(DeploymentStatus.QA));
-    console.log("req active", this.statusIsActive(DeploymentStatus.REQUESTING_PRODUCTION));
-    console.log("prod active", this.statusIsActive(DeploymentStatus.PRODUCTION));
-
     if (!model.deploymentStatus ||
       this.statusIsActive(DeploymentStatus.DEVELOPMENT) ||
-      this.statusIsActive(DeploymentStatus.QA) ||
-      this.statusIsActive(DeploymentStatus.PRODUCTION)) {
+      this.statusIsActive(DeploymentStatus.QA)) {
       // dropdown list with organizations
       // publish button from org actions tab
       content.push(
-        <div key="publishButton">
-          <div><p>Select an organization to publish</p>
+        <div key="publishSelect">
+          <div><p>Select an organization to publish:</p>
             <Select
               {...this.props}
-              className="themeSelect"
+              className="publishSelect"
               // Use the selected organization if present, or the first in the list as a default
               value={this.state.selectedOrganizationId}
               onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
@@ -300,9 +299,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           </div>
           <br />
           <p>
-            <strong>Publish</strong> the complete course package
-            using this organization and allow it to be previewed publically.
-          <br /><br />
+            You can <strong>publish</strong> the complete course package
+            using this organization to allow it to be previewed publically.
             This action may take awhile.
           </p>
           {isPublishing
@@ -314,26 +312,27 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     if (this.statusIsActive(DeploymentStatus.QA) ||
       this.statusIsActive(DeploymentStatus.REQUESTING_PRODUCTION) ||
       this.statusIsActive(DeploymentStatus.PRODUCTION)) {
-      content.push(
-        <a key="previewButton"
-          onClick={this.props.onDismissModal}
-          href={`/#preview${this.props.model.guid}-${this.state.selectedOrganizationId ||
-            (this.organizations[0] && this.organizations[0].guid)}`}
-          className="btn btn-link"
-          target="_blank">
-          Preview the selected organization
-        </a>,
-      );
+      // Enable when Raphael makes the necessary changes to the legacy system to support a course
+      // preview without deployment
+      // content.push(
+      //   <a key="previewButton"
+      //     onClick={() => this.onPublish(false)}
+      //     className="btn btn-link"
+      //     target="_blank">
+      //     Preview the selected organization
+      //   </a>,
+      // );
     }
     if (this.statusIsActive(DeploymentStatus.QA)) {
       content.push(
         <div key="requestProdButton">
+          <hr />
           <p>
             If your course is ready to go to production, you can request for OLI to deploy
             the course to the production server for public use.
           </p>
           <button
-            className="btn btn-block btn-primary"
+            className="btn btn-block btn-secondary requestProductionButton"
             onClick={this.onRequestProduction}>
             Request Production
           </button>
@@ -343,10 +342,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     if (this.statusIsActive(DeploymentStatus.PRODUCTION)) {
       content.push(
         <div key="updateProdButton">
-          <div><p>Select an organization to update</p>
+          <div><p>Select an organization to update:</p>
             <Select
               {...this.props}
-              className="themeSelect"
+              className="publishSelect"
               // Use the selected organization if present, or the first in the list as a default
               value={this.state.selectedOrganizationId}
               onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
@@ -365,23 +364,31 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         </div>,
       );
     }
-    console.log("content", content);
+
+    if (content.length === 0) {
+      content.push(
+        <div>No actions available in this deployment state.</div>,
+      );
+    }
 
     return content;
   }
 
-  onPublish() {
+  onPublish(redeploy: boolean = true) {
     const { model, onPreview, courseChanged } = this.props;
 
     this.setState({
       isPublishing: true,
     });
 
-    onPreview(model.guid, this.state.selectedOrganizationId ||
-      (this.organizations[0] && this.organizations[0].guid))
+    onPreview(
+      model.guid,
+      this.state.selectedOrganizationId || (this.organizations[0] && this.organizations[0].guid),
+      redeploy)
       .then((_) => {
-        // preview throws a 500 if the deployment status is Development and cannot be updated to QA
-        // otherwise, we can presume the update was successful in the db and update the model
+        // preview action throws a 500 if the deployment status is Development and cannot be
+        // updated to QA. Otherwise, we can presume the update was successful in the db and
+        // update the model
         courseChanged(model.with({
           deploymentStatus: isNullOrUndefined(model.deploymentStatus) ||
             model.deploymentStatus === DeploymentStatus.DEVELOPMENT
@@ -444,12 +451,51 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   onDescriptionEdit(description) {
     const model = this.props.model.with({ description });
+    this.props.courseChanged(model);
+    const doc = new Document().with({
+      _courseId: model.guid,
+      _id: model.id,
+      _rev: model.rev.toString(),
+      model,
+    });
+    persistence.persistDocument(doc);
+  }
+
+  onTitleEdit(title) {
+    const model = this.props.model.with({ title });
+    this.props.courseChanged(model);
+    const doc = new Document().with({
+      _courseId: model.guid,
+      _id: model.id,
+      _rev: model.rev.toString(),
+      model,
+    });
+    persistence.persistDocument(doc);
   }
 
   render() {
     const { model } = this.props;
 
     const isAdmin = hasRole('admin');
+
+    const imageButton = <ToolbarButton
+      className="btnQuad"
+      onClick={() => {
+        selectImage(
+          null, '', this.props.model,
+          this.props.onDisplayModal, this.props.onDismissModal)
+          .then((image) => {
+            if (image !== null) {
+              courseChanged(this.props.model.with({
+                icon: image.with({ rev: 1 }),
+              }));
+            }
+          });
+      }}
+      tooltip="Insert Image"
+      disabled={!this.props.editMode}>
+      {getContentIcon(insertableContentTypes.Image)}
+    </ToolbarButton>;
 
     const adminRow = isAdmin
       ? <div className="row">
@@ -482,16 +528,34 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             <div className="infoContain">
               <div className="row">
                 <div className="col-3">Title</div>
-                <div className="col-9">{model.title}</div>
+                <div className="col-9">
+                  <Title title={model.title}
+                    editMode={this.props.editMode}
+                    onBeginExternallEdit={() => true}
+                    requiresExternalEdit={false}
+                    isHoveredOver={true}
+                    onEdit={this.onTitleEdit}
+                    loading={false}
+                    disableRemoval={true}
+                    editWording="Edit"
+                    onRemove={() => false}
+                  >{model.title}</Title>
+                </div>
               </div>
               <div className="row">
                 <div className="col-3">Description</div>
                 <div className="col-9">
-                  <TextInput width="100%" label=""
+                  <Title title={model.description}
                     editMode={this.props.editMode}
-                    value={model.description}
-                    type="text"
-                    onEdit={this.onDescriptionEdit} />
+                    onBeginExternallEdit={() => true}
+                    requiresExternalEdit={false}
+                    isHoveredOver={true}
+                    onEdit={this.onDescriptionEdit}
+                    loading={false}
+                    disableRemoval={true}
+                    editWording="Edit"
+                    onRemove={() => false}
+                  >{model.description}</Title>
                 </div>
               </div>
               <div className="row">
@@ -527,6 +591,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 </div>
                 <div className="col-9">
                   <img src={THUMBNAIL} className="img-fluid" alt=""></img>
+                  {imageButton}
                 </div>
               </div>
               {adminRow}
