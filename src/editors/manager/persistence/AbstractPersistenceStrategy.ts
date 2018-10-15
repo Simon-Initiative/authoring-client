@@ -49,9 +49,9 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
    * editing.
    */
   initialize(doc: persistence.Document, userName: string,
-             onSuccess: onSaveCompletedCallback,
-             onFailure: onFailureCallback,
-             onStateChange: onStateChangeCallback,
+    onSuccess: onSaveCompletedCallback,
+    onFailure: onFailureCallback,
+    onStateChange: onStateChangeCallback,
   ): Promise<boolean> {
 
     this.successCallback = onSuccess;
@@ -59,7 +59,6 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.stateChangeCallback = onStateChange;
 
     return new Promise((resolve, reject) => {
-      console.log('locking: courseId, id:', doc._courseId, doc._id);
       persistence.acquireLock(doc._courseId, doc._id)
         .then((result) => {
           if ((result as any).lockedBy === userName) {
