@@ -478,25 +478,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     const isAdmin = hasRole('admin');
 
-    const imageButton = <ToolbarButton
-      className="btnQuad"
-      onClick={() => {
-        selectImage(
-          null, '', this.props.model,
-          this.props.onDisplayModal, this.props.onDismissModal)
-          .then((image) => {
-            if (image !== null) {
-              courseChanged(this.props.model.with({
-                icon: image.with({ rev: 1 }),
-              }));
-            }
-          });
-      }}
-      tooltip="Insert Image"
-      disabled={!this.props.editMode}>
-      {getContentIcon(insertableContentTypes.Image)}
-    </ToolbarButton>;
-
     const adminRow = isAdmin
       ? <div className="row">
         <div className="col-3">Administrator</div>
@@ -591,7 +572,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 </div>
                 <div className="col-9">
                   <img src={THUMBNAIL} className="img-fluid" alt=""></img>
-                  {imageButton}
                 </div>
               </div>
               {adminRow}
