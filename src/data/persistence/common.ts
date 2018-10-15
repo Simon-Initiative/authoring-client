@@ -1,9 +1,8 @@
 import * as Immutable from 'immutable';
-import { CourseId, DocumentId, CourseTitle } from '../types';
+import { CourseId, DocumentId } from '../types';
 import * as models from '../models';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
 import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak';
-import { WebContent } from 'data/content/webcontent';
 
 const fetch = (window as any).fetch;
 
