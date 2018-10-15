@@ -7,7 +7,7 @@ import { applyMiddleware, createStore, Store } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
-import { createLogger, logger } from 'redux-logger';
+import { createLogger } from 'redux-logger';
 import { UserState } from './reducers/user';
 import { getQueryVariable } from './utils/params';
 import history from './utils/history';

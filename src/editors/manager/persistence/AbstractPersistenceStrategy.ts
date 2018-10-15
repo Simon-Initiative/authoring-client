@@ -49,9 +49,9 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
    * editing.
    */
   initialize(doc: persistence.Document, userName: string,
-    onSuccess: onSaveCompletedCallback,
-    onFailure: onFailureCallback,
-    onStateChange: onStateChangeCallback,
+             onSuccess: onSaveCompletedCallback,
+             onFailure: onFailureCallback,
+             onStateChange: onStateChangeCallback,
   ): Promise<boolean> {
 
     this.successCallback = onSuccess;

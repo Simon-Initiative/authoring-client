@@ -2,7 +2,6 @@ import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
 import { CourseId, DocumentId, LegacyTypes } from '../types';
 import * as models from '../models';
-import { CourseModel } from 'data/models/course';
 
 /**
  * Retrieve a document, given a course and document id.
@@ -247,18 +246,3 @@ export function persistDocument(doc: Document): Promise<Document> {
     return Promise.reject(err);
   }
 }
-
-// export function persistPackageMetadata(doc: Document): Promise<any> {
-
-//   const url = `${configuration.baseUrl}/packages/${doc._courseId}`;
-
-//   c
-
-//   const method = 'PUT';
-//   const body = JSON.stringify(course);
-//   // try {
-//   return authenticatedFetch({ url, body, method });
-//   // } catch (err) {
-//   // return Promise.reject(err);
-//   // }
-// }

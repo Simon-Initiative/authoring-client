@@ -5,7 +5,6 @@ import * as Messages from 'types/messages';
 import * as viewActions from 'actions/view';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
-import { OrganizationModel } from 'data/models';
 import { EditedDocument } from 'types/document';
 import { DeferredPersistenceStrategy }
   from 'editors/manager/persistence/DeferredPersistenceStrategy';

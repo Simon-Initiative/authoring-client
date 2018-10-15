@@ -23,7 +23,6 @@ import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
 
 import './OrgEditor.scss';
-import { CourseId } from 'data/types';
 
 function isNumberedNodeType(node: any) {
   return (node.contentType === contentTypes.OrganizationContentTypes.Unit

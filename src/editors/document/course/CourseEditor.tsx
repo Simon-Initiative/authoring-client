@@ -11,16 +11,11 @@ import { Document } from 'data/persistence/common';
 import './CourseEditor.scss';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { DeploymentStatus } from 'data/models/course';
-import { TextInput } from 'editors/content/common/controls';
 import { LegacyTypes, CourseId } from 'data/types';
 import { ResourceState, Resource } from 'data/content/resource';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import { isNullOrUndefined } from 'util';
 import { Title } from 'components/objectives/Title';
-import { ToolbarButton } from 'components/toolbar/ToolbarButton';
-import { selectImage } from 'editors/content/learning/ImageEditor';
-import { insertableContentTypes, getContentIcon } from 'editors/content/utils/content';
-import { courseChanged } from 'actions/course';
 
 const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -254,7 +249,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderActions() {
     const { model } = this.props;
 
-    const { isPublishing, failedPublish } = this.state;
+    const { isPublishing } = this.state;
 
     const isPublishingButton = <button
       disabled
