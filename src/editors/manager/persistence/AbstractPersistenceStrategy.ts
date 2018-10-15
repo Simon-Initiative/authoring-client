@@ -48,7 +48,8 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
    * This strategy requires the user to acquire the write lock before
    * editing.
    */
-  initialize(doc: persistence.Document, userName: string,
+  initialize(
+    doc: persistence.Document, userName: string,
     onSuccess: onSaveCompletedCallback,
     onFailure: onFailureCallback,
     onStateChange: onStateChangeCallback,
