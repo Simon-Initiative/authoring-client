@@ -98,7 +98,6 @@ export function transitionDeploymentStatus(course: string, status: DeploymentSta
   Promise<{}> {
   const url = `${configuration.baseUrl}/packages/${course}/status/${status}`;
   const method = 'PUT';
-  console.log('status is', status);
   const body = JSON.stringify(status);
 
   return authenticatedFetch({ url, method, body });

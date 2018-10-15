@@ -204,7 +204,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   // Used as a string in renderStatus, and as a boolean in renderActions
   statusIsActive = (status: DeploymentStatus) => {
     const { model } = this.props;
-    console.log('status is', status, 'dep status is', model.deploymentStatus);
     return model.deploymentStatus === status
       ? 'active '
       : '';
