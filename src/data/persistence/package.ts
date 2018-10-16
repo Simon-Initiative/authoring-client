@@ -94,9 +94,16 @@ export function setCourseTheme(course: string, theme: string): Promise<{}> {
   return authenticatedFetch({ url, method, body });
 }
 
-export function transitionDeploymentStatus(course: string, status: DeploymentStatus):
+export enum ProductionRedeploy {
+  Redeploy = 'REDEPLOY',
+  Update = 'UPDATE',
+}
+
+export function transitionDeploymentStatus(
+  course: string, status: DeploymentStatus, redeploy?: ProductionRedeploy):
   Promise<{}> {
-  const url = `${configuration.baseUrl}/packages/${course}/status/${status}`;
+  const url = `${configuration.baseUrl}/packages/${course}/status/${status}
+    ${redeploy ? `?redeploy=${redeploy}` : ''}`;
   const method = 'PUT';
   const body = JSON.stringify(status);
 

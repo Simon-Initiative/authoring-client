@@ -16,6 +16,7 @@ import { ResourceState, Resource } from 'data/content/resource';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import { isNullOrUndefined } from 'util';
 import { Title } from 'components/objectives/Title';
+import { ProductionRedeploy } from 'data/persistence/package';
 
 const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -38,8 +39,17 @@ interface CourseEditorState {
   selectedDevelopers: UserInfo[];
   themes: ThemeSelection[];
   selectedOrganizationId: string;
+
   isPublishing: boolean;
   failedPublish: boolean;
+
+  isRequestingUpdate: boolean;
+  finishedUpdateRequest: boolean;
+  failedUpdateRequest: boolean;
+
+  isRequestingRedeploy: boolean;
+  finishedRedeployRequest: boolean;
+  failedRedeployRequest: boolean;
 }
 
 class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState> {
@@ -55,6 +65,12 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       selectedOrganizationId: '',
       isPublishing: false,
       failedPublish: false,
+      isRequestingUpdate: false,
+      finishedUpdateRequest: false,
+      failedUpdateRequest: false,
+      isRequestingRedeploy: false,
+      finishedRedeployRequest: false,
+      failedRedeployRequest: false,
     };
 
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
@@ -65,6 +81,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onPublish = this.onPublish.bind(this);
     this.onRequestProduction = this.onRequestProduction.bind(this);
+    this.onRequestUpdate = this.onRequestUpdate.bind(this);
+    this.onRequestRedeploy = this.onRequestRedeploy.bind(this);
   }
 
   componentDidMount() {
@@ -248,7 +266,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderActions() {
     const { model } = this.props;
 
-    const { isPublishing } = this.state;
+    const { isPublishing, isRequestingUpdate, finishedUpdateRequest, failedUpdateRequest,
+      isRequestingRedeploy, finishedRedeployRequest, failedRedeployRequest } = this.state;
 
     const isPublishingButton = <button
       disabled
@@ -261,6 +280,18 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       className="btn btn-block btn-primary publishButton"
       onClick={() => this.onPublish()}>
       Publish
+    </button>;
+
+    const redeployButton = <button
+      className="btn btn-block btn-danger redeployButton"
+      onClick={() => this.onRequestRedeploy()}>
+      Redeploy
+    </button>;
+
+    const updateButton = <button
+      className="btn btn-block btn-primary updateButton"
+      onClick={() => this.onRequestUpdate()}>
+      Update
     </button>;
 
     const option = (org: Resource) =>
@@ -277,8 +308,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     if (!model.deploymentStatus ||
       this.statusIsActive(DeploymentStatus.DEVELOPMENT) ||
       this.statusIsActive(DeploymentStatus.QA)) {
-      // dropdown list with organizations
-      // publish button from org actions tab
       content.push(
         <div key="publishSelect">
           <div><p>Select an organization to publish:</p>
@@ -336,25 +365,24 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     if (this.statusIsActive(DeploymentStatus.PRODUCTION)) {
       content.push(
         <div key="updateProdButton">
-          <div><p>Select an organization to update:</p>
-            <Select
-              {...this.props}
-              className="publishSelect"
-              // Use the selected organization if present, or the first in the list as a default
-              value={this.state.selectedOrganizationId}
-              onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
-              {options}
-            </Select>
-          </div>
-          <br />
           <p>
-            This course is live, but you can make non-structural updates to course content.
-          <br /><br />
-            Updating a course may take awhile.
+            This course is live, but you can notify the OLI team to make non-structural updates to
+            course content.
+            {/* <br /> */}
           </p>
-          {isPublishing
-            ? isPublishingButton
-            : publishButton}
+          {updateButton}&nbsp;
+          {isRequestingUpdate ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
+          {finishedUpdateRequest ? <i className="fa fa-check-circle" /> : ''}
+          {failedUpdateRequest ? <i className="fa fa-times-circle" /> : ''}
+          <br /><br />
+          <p>
+            Alternatively, you can make more substantial updates by redeploying the course.
+            This will reset all students' data.
+          </p>
+          {redeployButton}&nbsp;
+          {isRequestingRedeploy ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
+          {finishedRedeployRequest ? <i className="fa fa-check-circle" /> : ''}
+          {failedRedeployRequest ? <i className="fa fa-times-circle" /> : ''}
         </div>,
       );
     }
@@ -404,6 +432,44 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       .then(_ => courseChanged(model.with({
         deploymentStatus: DeploymentStatus.REQUESTING_PRODUCTION,
       })));
+  }
+
+  onRequestRedeploy() {
+    const { model } = this.props;
+
+    this.props.onDisplayModal(<ModalPrompt
+      text={'Are you sure you want to redeploy this course? \
+        All student data and progress will be reset.'}
+      onInsert={() => {
+        this.setState({ finishedRedeployRequest: false, isRequestingRedeploy: true }, () => {
+          persistence.transitionDeploymentStatus(
+            model.guid, DeploymentStatus.PRODUCTION, ProductionRedeploy.Redeploy)
+            .then(_ => this.setState({
+              isRequestingRedeploy: false,
+              finishedRedeployRequest: true,
+            }))
+            .catch(_ => this.setState({ failedRedeployRequest: true }));
+          this.props.onDismissModal();
+        });
+      }}
+      onCancel={() => this.props.onDismissModal()}
+      okLabel="Yes"
+      okClassName="danger"
+      cancelLabel="No"
+    />);
+  }
+
+  onRequestUpdate() {
+    const { model } = this.props;
+    this.setState({ finishedUpdateRequest: false, isRequestingUpdate: true }, () => {
+      persistence.transitionDeploymentStatus(
+        model.guid, DeploymentStatus.PRODUCTION, ProductionRedeploy.Update)
+        .then(_ => this.setState({
+          isRequestingUpdate: false,
+          finishedUpdateRequest: true,
+        }))
+        .catch(_ => this.setState({ failedUpdateRequest: true }));
+    });
   }
 
   onEditTheme(themeId: string) {

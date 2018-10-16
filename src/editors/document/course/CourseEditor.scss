@@ -28,13 +28,21 @@
         }
 
         &.publishButton {
-            max-width: 220px;
-            height: 50px;
-            font-size: 1.5em;
+            max-width: 150px;
+        }
+
+        &.updateButton {
+            display: inline-block;
+            max-width: 150px;
+        }
+
+        &.redeployButton {
+            display: inline-block;
+            max-width: 150px;
         }
 
         &.requestProductionButton {
-            max-width: 220px;
+            max-width: 150px;
         }
     }
 
