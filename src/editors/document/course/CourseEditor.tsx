@@ -43,6 +43,10 @@ interface CourseEditorState {
   isPublishing: boolean;
   failedPublish: boolean;
 
+  isRequestingProduction: boolean;
+  finishedProductionRequest: boolean;
+  failedProductionRequest: boolean;
+
   isRequestingUpdate: boolean;
   finishedUpdateRequest: boolean;
   failedUpdateRequest: boolean;
@@ -65,6 +69,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       selectedOrganizationId: '',
       isPublishing: false,
       failedPublish: false,
+      isRequestingProduction: false,
+      finishedProductionRequest: false,
+      failedProductionRequest: false,
       isRequestingUpdate: false,
       finishedUpdateRequest: false,
       failedUpdateRequest: false,
@@ -266,7 +273,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderActions() {
     const { model } = this.props;
 
-    const { isPublishing, isRequestingUpdate, finishedUpdateRequest, failedUpdateRequest,
+    const { isPublishing, isRequestingProduction, finishedProductionRequest,
+      failedProductionRequest, isRequestingUpdate, finishedUpdateRequest, failedUpdateRequest,
       isRequestingRedeploy, finishedRedeployRequest, failedRedeployRequest } = this.state;
 
     const isPublishingButton = <button
@@ -358,7 +366,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             className="btn btn-block btn-secondary requestProductionButton"
             onClick={this.onRequestProduction}>
             Request Production
-          </button>
+          </button>&nbsp;
+          {isRequestingProduction ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
+          {finishedProductionRequest ? <i className="fa fa-check-circle" /> : ''}
+          {failedProductionRequest ? <i className="fa fa-times-circle" /> : ''}
         </div>,
       );
     }
@@ -428,10 +439,26 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   onRequestProduction() {
     const { model, courseChanged } = this.props;
 
-    persistence.transitionDeploymentStatus(model.guid, DeploymentStatus.REQUESTING_PRODUCTION)
-      .then(_ => courseChanged(model.with({
-        deploymentStatus: DeploymentStatus.REQUESTING_PRODUCTION,
-      })));
+    this.setState(
+      {
+        finishedProductionRequest: false,
+        isRequestingProduction: true,
+      },
+      () =>
+        persistence.transitionDeploymentStatus(model.guid, DeploymentStatus.REQUESTING_PRODUCTION)
+          .then(_ => this.setState(
+            {
+              isRequestingProduction: false,
+              finishedProductionRequest: true,
+            },
+            () => courseChanged(model.with({
+              deploymentStatus: DeploymentStatus.REQUESTING_PRODUCTION,
+            })),
+          ))
+          .catch(_ => this.setState({
+            isRequestingProduction: false,
+            failedProductionRequest: true,
+          })));
   }
 
   onRequestRedeploy() {
@@ -448,7 +475,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               isRequestingRedeploy: false,
               finishedRedeployRequest: true,
             }))
-            .catch(_ => this.setState({ failedRedeployRequest: true }));
+            .catch(_ => this.setState({
+              isRequestingRedeploy: false,
+              failedRedeployRequest: true,
+            }));
           this.props.onDismissModal();
         });
       }}
@@ -468,7 +498,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           isRequestingUpdate: false,
           finishedUpdateRequest: true,
         }))
-        .catch(_ => this.setState({ failedUpdateRequest: true }));
+        .catch(_ => this.setState({
+          isRequestingUpdate: false,
+          failedUpdateRequest: true,
+        }));
     });
   }
 
@@ -562,7 +595,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       : null;
 
     return (
-      <div className="course-editor">
+      <div className="course-editor" >
         <div className="row info">
           <div className="col-md-9">
             <h2>Course Package</h2>

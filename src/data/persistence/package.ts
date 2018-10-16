@@ -102,8 +102,8 @@ export enum ProductionRedeploy {
 export function transitionDeploymentStatus(
   course: string, status: DeploymentStatus, redeploy?: ProductionRedeploy):
   Promise<{}> {
-  const url = `${configuration.baseUrl}/packages/${course}/status/${status}
-    ${redeploy ? `?redeploy=${redeploy}` : ''}`;
+  // tslint:disable-next-line:max-line-length
+  const url = `${configuration.baseUrl}/packages/${course}/status/${status}${redeploy ? `?redeploy=${redeploy}` : ''}`;
   const method = 'PUT';
   const body = JSON.stringify(status);
 

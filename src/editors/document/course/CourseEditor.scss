@@ -31,17 +31,10 @@
             max-width: 150px;
         }
 
-        &.updateButton {
-            display: inline-block;
-            max-width: 150px;
-        }
-
-        &.redeployButton {
-            display: inline-block;
-            max-width: 150px;
-        }
-
+        &.updateButton,
+        &.redeployButton,
         &.requestProductionButton {
+            display: inline-block;
             max-width: 150px;
         }
     }
