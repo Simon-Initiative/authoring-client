@@ -660,13 +660,13 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                   {this.renderActions()}
                 </div>
               </div>
-              <div className="row">
+              {/* <div className="row">
                 <div className="col-3">Thumbnail<br /><br />
                 </div>
                 <div className="col-9">
                   <img src={THUMBNAIL} className="img-fluid" alt=""></img>
                 </div>
-              </div>
+              </div> */}
               {adminRow}
             </div>
           </div>
