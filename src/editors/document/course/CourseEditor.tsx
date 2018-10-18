@@ -14,11 +14,10 @@ import { DeploymentStatus } from 'data/models/course';
 import { LegacyTypes, CourseId } from 'data/types';
 import { ResourceState, Resource } from 'data/content/resource';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
-import { isNullOrUndefined } from 'util';
 import { Title } from 'components/objectives/Title';
 import { ProductionRedeploy } from 'data/persistence/package';
 
-const THUMBNAIL = require('../../../../assets/ph-courseView.png');
+// const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
 export interface CourseEditorProps {
   model: models.CourseModel;
@@ -452,7 +451,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   onPublish(redeploy: boolean = true) {
-    const { model, onPreview, courseChanged } = this.props;
+    const { model, onPreview } = this.props;
 
     this.setState({
       isPublishing: true,
