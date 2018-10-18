@@ -40,17 +40,26 @@ interface CourseEditorState {
   themes: ThemeSelection[];
   selectedOrganizationId: string;
 
+  // Publish (full preview)
   isPublishing: boolean;
   failedPublish: boolean;
 
+  // Request QA in content-service
+  isRequestingQA: boolean;
+  finishedQARequest: boolean;
+  failedQARequest: boolean;
+
+  // Request Production in content-service
   isRequestingProduction: boolean;
   finishedProductionRequest: boolean;
   failedProductionRequest: boolean;
 
+  // Request Update in content-service for live course
   isRequestingUpdate: boolean;
   finishedUpdateRequest: boolean;
   failedUpdateRequest: boolean;
 
+  // Request Redeploy in content-service for live course
   isRequestingRedeploy: boolean;
   finishedRedeployRequest: boolean;
   failedRedeployRequest: boolean;
@@ -69,6 +78,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       selectedOrganizationId: '',
       isPublishing: false,
       failedPublish: false,
+      isRequestingQA: false,
+      finishedQARequest: false,
+      failedQARequest: false,
       isRequestingProduction: false,
       finishedProductionRequest: false,
       failedProductionRequest: false,
@@ -87,6 +99,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onPublish = this.onPublish.bind(this);
+    this.onRequestQA = this.onRequestQA.bind(this);
     this.onRequestProduction = this.onRequestProduction.bind(this);
     this.onRequestUpdate = this.onRequestUpdate.bind(this);
     this.onRequestRedeploy = this.onRequestRedeploy.bind(this);
@@ -242,27 +255,28 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           {/* <i className="icon">1</i> */}
           <div className="content">
             <div className="title">Development</div>
-            <div className="description">This course has not been published yet.</div>
+            <div className="description">This course package is still under active development
+            and has not been deployed.</div>
           </div>
         </div>
         <div className={this.statusIsActive(DeploymentStatus.QA) + 'step'}>
           <div className="content">
             <div className="title">QA</div>
-            <div className="description">Course can be previewed but is not
-                         available publically to students.</div>
+            <div className="description">This course package is ready to be reviewed before being
+            deployed publically to students.</div>
           </div>
         </div>
         <div className={this.statusIsActive(DeploymentStatus.REQUESTING_PRODUCTION) + 'step'}>
           <div className="content">
             <div className="title">Production Requested</div>
-            <div className="description">The OLI developer team is deploying
-                        the course to production.</div>
+            <div className="description">This course package has been requested to be deployed
+            to production.</div>
           </div>
         </div>
         <div className={this.statusIsActive(DeploymentStatus.PRODUCTION) + 'step'}>
           <div className="content">
             <div className="title">Production</div>
-            <div className="description">The course is live and available to
+            <div className="description">This course package is live and available to
                         students. Changes are limited.</div>
           </div>
         </div>
@@ -273,7 +287,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderActions() {
     const { model } = this.props;
 
-    const { isPublishing, isRequestingProduction, finishedProductionRequest,
+    const { isPublishing, isRequestingQA, finishedQARequest,
+      failedQARequest, isRequestingProduction, finishedProductionRequest,
       failedProductionRequest, isRequestingUpdate, finishedUpdateRequest, failedUpdateRequest,
       isRequestingRedeploy, finishedRedeployRequest, failedRedeployRequest } = this.state;
 
@@ -354,12 +369,32 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       //   </a>,
       // );
     }
+    if (!model.deploymentStatus ||
+      this.statusIsActive(DeploymentStatus.DEVELOPMENT)) {
+      content.push(
+        <div key="requestQAButton">
+          <hr />
+          <p>
+            If your course package is ready to go to QA, you can request for OLI to deploy
+            the course to the QA server for public review.
+          </p>
+          <button
+            className="btn btn-block btn-secondary requestQAButton"
+            onClick={this.onRequestQA}>
+            Request QA
+          </button>&nbsp;
+          {isRequestingQA ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
+          {finishedQARequest ? <i className="fa fa-check-circle" /> : ''}
+          {failedQARequest ? <i className="fa fa-times-circle" /> : ''}
+        </div>,
+      );
+    }
     if (this.statusIsActive(DeploymentStatus.QA)) {
       content.push(
         <div key="requestProdButton">
           <hr />
           <p>
-            If your course is ready to go to production, you can request for OLI to deploy
+            If your course package is ready to go to production, you can request for OLI to deploy
             the course to the production server for public use.
           </p>
           <button
@@ -377,8 +412,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       content.push(
         <div key="updateProdButton">
           <p>
-            This course is live, but you can notify the OLI team to make non-structural updates to
-            course content.
+            This course package is available on the production server,
+            but you can notify the OLI team to make non-structural updates to course content.
             {/* <br /> */}
           </p>
           {updateButton}&nbsp;
@@ -387,7 +422,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           {failedUpdateRequest ? <i className="fa fa-times-circle" /> : ''}
           <br /><br />
           <p>
-            Alternatively, you can make more substantial updates by redeploying the course.
+            Alternatively, you can make more substantial updates by redeploying the course package.
             This will reset all students' data.
           </p>
           {redeployButton}&nbsp;
@@ -419,21 +454,37 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       this.state.selectedOrganizationId || (this.organizations[0] && this.organizations[0].guid),
       redeploy)
       .then((_) => {
-        // preview action throws a 500 if the deployment status is Development and cannot be
-        // updated to QA. Otherwise, we can presume the update was successful in the db and
-        // update the model
-        courseChanged(model.with({
-          deploymentStatus: isNullOrUndefined(model.deploymentStatus) ||
-            model.deploymentStatus === DeploymentStatus.DEVELOPMENT
-            ? DeploymentStatus.QA
-            : model.deploymentStatus,
-        }));
         this.setState({ isPublishing: false });
       })
       .catch((err) => {
         this.setState({ isPublishing: false, failedPublish: true });
         console.error('Preview publish error:', err);
       });
+  }
+
+  onRequestQA() {
+    const { model, courseChanged } = this.props;
+
+    this.setState(
+      {
+        finishedQARequest: false,
+        isRequestingQA: true,
+      },
+      () =>
+        persistence.transitionDeploymentStatus(model.guid, DeploymentStatus.QA)
+          .then(_ => this.setState(
+            {
+              isRequestingQA: false,
+              finishedQARequest: true,
+            },
+            () => courseChanged(model.with({
+              deploymentStatus: DeploymentStatus.QA,
+            })),
+          ))
+          .catch(_ => this.setState({
+            isRequestingQA: false,
+            failedQARequest: true,
+          })));
   }
 
   onRequestProduction() {
