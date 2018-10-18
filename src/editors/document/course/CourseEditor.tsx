@@ -18,8 +18,6 @@ import { isNullOrUndefined } from 'util';
 import { Title } from 'components/objectives/Title';
 import { ProductionRedeploy } from 'data/persistence/package';
 
-const THUMBNAIL = require('../../../../assets/ph-courseView.png');
-
 export interface CourseEditorProps {
   model: models.CourseModel;
   courseChanged: (m: models.CourseModel) => any;
