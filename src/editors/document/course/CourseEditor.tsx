@@ -317,6 +317,27 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       Update
     </button>;
 
+    const requestQAButton = (firstDeployment: boolean) => <div key="requestQAButton">
+      <p>
+        {firstDeployment
+          ? 'If your course package is ready to go to QA, you can request for OLI to deploy \
+          the course to the QA server for public review.'
+          : 'If you\'ve made changes to your course package since your last deployment to QA, \
+          you can request for OLI to redeploy the course to the QA server for further review.'
+        }
+
+      </p>
+      <button
+        className="btn btn-block btn-secondary requestQAButton"
+        onClick={this.onRequestQA}>
+        Request QA
+      </button>&nbsp;
+        {isRequestingQA ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
+      {finishedQARequest ? <i className="fa fa-check-circle" /> : ''}
+      {failedQARequest ? <i className="fa fa-times-circle" /> : ''}
+      <br /><br />
+    </div>;
+
     const option = (org: Resource) =>
       <option
         key={org.guid}
@@ -352,6 +373,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           {isPublishing
             ? isPublishingButton
             : publishButton}
+          <br />
         </div>,
       );
     }
@@ -371,28 +393,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     }
     if (!model.deploymentStatus ||
       this.statusIsActive(DeploymentStatus.DEVELOPMENT)) {
-      content.push(
-        <div key="requestQAButton">
-          <hr />
-          <p>
-            If your course package is ready to go to QA, you can request for OLI to deploy
-            the course to the QA server for public review.
-          </p>
-          <button
-            className="btn btn-block btn-secondary requestQAButton"
-            onClick={this.onRequestQA}>
-            Request QA
-          </button>&nbsp;
-          {isRequestingQA ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
-          {finishedQARequest ? <i className="fa fa-check-circle" /> : ''}
-          {failedQARequest ? <i className="fa fa-times-circle" /> : ''}
-        </div>,
-      );
+      content.push(requestQAButton(true));
+    }
+    if (this.statusIsActive(DeploymentStatus.QA) ||
+      this.statusIsActive(DeploymentStatus.PRODUCTION)) {
+      content.push(requestQAButton(false));
     }
     if (this.statusIsActive(DeploymentStatus.QA)) {
       content.push(
         <div key="requestProdButton">
-          <hr />
           <p>
             If your course package is ready to go to production, you can request for OLI to deploy
             the course to the production server for public use.
@@ -411,10 +420,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     if (this.statusIsActive(DeploymentStatus.PRODUCTION)) {
       content.push(
         <div key="updateProdButton">
+          <br />
           <p>
             This course package is available on the production server,
             but you can notify the OLI team to make non-structural updates to course content.
-            {/* <br /> */}
           </p>
           {updateButton}&nbsp;
           {isRequestingUpdate ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
