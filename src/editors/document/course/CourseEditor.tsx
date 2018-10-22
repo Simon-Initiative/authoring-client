@@ -365,7 +365,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           </div>
           <br />
           <p>
-            You can create a <strong>full preview</strong> for the complete course package
+            You can launch a <strong>full preview</strong> for the complete course package
             using this organization to allow it to be viewed publically.
             It may take a few minutes to create the full preview for larger courses.
           </p>

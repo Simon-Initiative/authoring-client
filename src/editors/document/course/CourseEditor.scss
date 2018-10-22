@@ -85,15 +85,6 @@
                 border-radius: .28571429rem;
                 border: 1px solid rgba(34, 36, 38, 0.15);
 
-                .step:last-child:after {
-                    display: none;
-                }
-
-                .step:first-child {
-                    padding-left: 1em;
-                    border-radius: .28571429rem 0 0 .28571429rem;
-                }
-
                 .step {
                     font-size: 1rem;
                     position: relative;
@@ -123,11 +114,19 @@
                     box-shadow: none;
                     border-radius: .28571429rem .28571429rem 0 0;
                     border-bottom: 1px solid rgba(34, 36, 38, 0.15);
-                    border-right: 1px solid rgba(34, 36, 38, 0.15);
                     -webkit-transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
                     transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
                     transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease;
                     transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease,-webkit-box-shadow .1s ease;
+                }
+
+                .step:first-child {
+                    padding-left: 1em;
+                    border-radius: .28571429rem 0 0 .28571429rem;
+                }
+
+                .step:last-child {
+                    border-bottom: none;
                 }
 
                 .icon {
@@ -157,28 +156,6 @@
                     font-weight: 400;
                     font-size: 0.93rem;
                     color: rgba(0, 0, 0, 0.87);
-                }
-
-                .step:after {
-                    display: block;
-                    position: absolute;
-                    z-index: 2;
-                    content: '';
-                    top: 50%;
-                    right: 0;
-                    border: medium none;
-                    background-color: #fff;
-                    width: 1.14285714em;
-                    height: 1.14285714em;
-                    border-style: solid;
-                    border-color: rgba(34, 36, 38, 0.15);
-                    border-width: 0 1px 1px 0;
-                    -webkit-transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
-                    transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
-                    transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease;
-                    transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease,-webkit-box-shadow .1s ease;
-                    -webkit-transform: translateY(-50%) translateX(50%) rotate(-45deg);
-                    transform: translateY(-50%) translateX(50%) rotate(-45deg);
                 }
 
                 .step.active, .step.active:after {
