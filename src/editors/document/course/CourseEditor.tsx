@@ -39,9 +39,9 @@ interface CourseEditorState {
   themes: ThemeSelection[];
   selectedOrganizationId: string;
 
-  // Publish (full preview)
-  isPublishing: boolean;
-  failedPublish: boolean;
+  // Full preview
+  isPreviewing: boolean;
+  failedPreview: boolean;
 
   // Request QA in content-service
   isRequestingQA: boolean;
@@ -75,8 +75,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
       themes: [],
       selectedOrganizationId: '',
-      isPublishing: false,
-      failedPublish: false,
+      isPreviewing: false,
+      failedPreview: false,
       isRequestingQA: false,
       finishedQARequest: false,
       failedQARequest: false,
@@ -97,7 +97,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
     this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
-    this.onPublish = this.onPublish.bind(this);
+    this.onPreview = this.onPreview.bind(this);
     this.onRequestQA = this.onRequestQA.bind(this);
     this.onRequestProduction = this.onRequestProduction.bind(this);
     this.onRequestUpdate = this.onRequestUpdate.bind(this);
@@ -286,22 +286,22 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderActions() {
     const { model } = this.props;
 
-    const { isPublishing, isRequestingQA, finishedQARequest,
+    const { isPreviewing, isRequestingQA, finishedQARequest,
       failedQARequest, isRequestingProduction, finishedProductionRequest,
       failedProductionRequest, isRequestingUpdate, finishedUpdateRequest, failedUpdateRequest,
       isRequestingRedeploy, finishedRedeployRequest, failedRedeployRequest } = this.state;
 
-    const isPublishingButton = <button
+    const isPreviewingButton = <button
       disabled
-      className="btn btn-block btn-primary publishButton"
+      className="btn btn-block btn-primary previewButton"
       onClick={() => { }}>
-      <LoadingSpinner className="u-no-padding text-white" message="Publishing" />
+      <LoadingSpinner className="u-no-padding text-white" message="Previewing" />
     </button>;
 
-    const publishButton = <button
-      className="btn btn-block btn-primary publishButton"
-      onClick={() => this.onPublish()}>
-      Publish
+    const previewButton = <button
+      className="btn btn-block btn-primary previewButton"
+      onClick={() => this.onPreview()}>
+      Preview
     </button>;
 
     const redeployButton = <button
@@ -352,11 +352,11 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       this.statusIsActive(DeploymentStatus.DEVELOPMENT) ||
       this.statusIsActive(DeploymentStatus.QA)) {
       content.push(
-        <div key="publishSelect">
-          <div><p>Select an organization to publish:</p>
+        <div key="orgSelect">
+          <div><p>Select an organization to preview:</p>
             <Select
               {...this.props}
-              className="publishSelect"
+              className="orgSelect"
               // Use the selected organization if present, or the first in the list as a default
               value={this.state.selectedOrganizationId}
               onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
@@ -365,13 +365,13 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           </div>
           <br />
           <p>
-            You can <strong>publish</strong> the complete course package
-            using this organization to allow it to be previewed publically.
-            This action may take awhile.
+            You can create a <strong>full preview</strong> for the complete course package
+            using this organization to allow it to be viewed publically.
+            It may take a few minutes to create the full preview for larger courses.
           </p>
-          {isPublishing
-            ? isPublishingButton
-            : publishButton}
+          {isPreviewing
+            ? isPreviewingButton
+            : previewButton}
           <br />
         </div>,
       );
@@ -383,7 +383,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       // preview without deployment
       // content.push(
       //   <a key="previewButton"
-      //     onClick={() => this.onPublish(false)}
+      //     onClick={() => this.onPreview(false)}
       //     className="btn btn-link"
       //     target="_blank">
       //     Preview the selected organization
@@ -450,11 +450,11 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     return content;
   }
 
-  onPublish(redeploy: boolean = true) {
+  onPreview(redeploy: boolean = true) {
     const { model, onPreview } = this.props;
 
     this.setState({
-      isPublishing: true,
+      isPreviewing: true,
     });
 
     onPreview(
@@ -462,11 +462,11 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       this.state.selectedOrganizationId || (this.organizations[0] && this.organizations[0].guid),
       redeploy)
       .then((_) => {
-        this.setState({ isPublishing: false });
+        this.setState({ isPreviewing: false });
       })
       .catch((err) => {
-        this.setState({ isPublishing: false, failedPublish: true });
-        console.error('Preview publish error:', err);
+        this.setState({ isPreviewing: false, failedPreview: true });
+        console.error('Full preview error:', err);
       });
   }
 
