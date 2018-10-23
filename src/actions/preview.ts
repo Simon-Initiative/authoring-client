@@ -5,28 +5,29 @@ import * as Messages from 'types/messages';
 import * as viewActions from 'actions/view';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
-import { OrganizationModel } from 'data/models';
 import { EditedDocument } from 'types/document';
 import { DeferredPersistenceStrategy }
   from 'editors/manager/persistence/DeferredPersistenceStrategy';
 import { buildPersistenceFailureMessage } from 'utils/error';
+import { ServerName } from 'data/persistence/document';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(orgId: string, isRefreshAttempt: boolean) {
+function invokePreview(orgId: string, isRefreshAttempt: boolean, server?: ServerName) {
   return function (dispatch, getState): Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
-    return persistence.initiatePreview(course.guid, orgId, isRefreshAttempt);
+    return persistence.initiatePreview(course.guid, orgId, isRefreshAttempt, server);
   };
 }
 
 export function preview(
-  courseId: string, organization: OrganizationModel, isRefreshAttempt: boolean) {
+  courseId: string, organizationId: string, isRefreshAttempt: boolean, redeploy: boolean = true,
+  server?: ServerName) {
 
   return function (dispatch): Promise<any> {
 
-    return dispatch(invokePreview(organization.guid, isRefreshAttempt))
+    return dispatch(invokePreview(organizationId, isRefreshAttempt, server))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
@@ -37,19 +38,19 @@ export function preview(
         } else if (result.type === 'PreviewSuccess') {
           const refresh = result.message === 'pending';
           window.open(
-            '/#preview' + organization.guid + '-' + courseId
+            '/#preview' + organizationId + '-' + courseId
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
-            + (refresh ? '&refresh=true' : ''),
+            + (refresh ? '&refresh=true' : '')
+            + (redeploy ? '&redeploy=true' : ''),
             courseId);
         } else if (result.type === 'PreviewPending') {
-          window.open('/#preview' + organization.guid + '-' + courseId, courseId);
+          window.open('/#preview' + organizationId + '-' + courseId, courseId);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);
         dispatch(showMessage(message));
       });
   };
-
 }
 
 // Invoke a preview for the current resource (ie Workbook Page) from the editor.

@@ -15,7 +15,6 @@ interface DispatchProps {
 
 interface OwnProps {
   onDuplicate: () => void;
-  onPreview: (courseId: string, organization: OrganizationModel) => Promise<any>;
   org: OrganizationModel;
   course: CourseModel;
 }
@@ -34,6 +33,6 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(Actions);
+  (mapStateToProps, mapDispatchToProps)(Actions);
 
 export { controller as Actions };

@@ -23,7 +23,6 @@ import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
 
 import './OrgEditor.scss';
-import { CourseId } from 'data/types';
 
 function isNumberedNodeType(node: any) {
   return (node.contentType === contentTypes.OrganizationContentTypes.Unit
@@ -118,9 +117,8 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
   canRedo: boolean;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  onPreview: (courseId: CourseId, organization: models.OrganizationModel) => Promise<any>;
   course: models.CourseModel;
-  onEditingEnable: (editable : boolean, documentId : string) => void;
+  onEditingEnable: (editable: boolean, documentId: string) => void;
 }
 
 const enum TABS {
@@ -448,7 +446,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         onDuplicate={dupe}
         org={model}
         course={this.props.course}
-        onPreview={this.props.onPreview}
       />);
   }
 

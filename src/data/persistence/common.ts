@@ -42,29 +42,29 @@ export function authenticatedFetch(params: HttpRequestParams) {
   return new Promise((resolve, reject) => {
 
     refreshTokenIfInvalid()
-    .then((tokenIsValid) => {
+      .then((tokenIsValid) => {
 
-      if (!tokenIsValid) {
-        forceLogin();
-        return;
-      }
+        if (!tokenIsValid) {
+          forceLogin();
+          return;
+        }
 
-      return fetch(url + queryString, {
-        method,
-        headers,
-        body,
+        return fetch(url + queryString, {
+          method,
+          headers,
+          body,
+        });
+      })
+      .then((response) => {
+        if (!response.ok) {
+          reject(response.statusText);
+        } else {
+          resolve(hasTextResult ? response.text() : response.json());
+        }
+      })
+      .catch((err) => {
+        handleError(err, reject);
       });
-    })
-    .then((response) => {
-      if (!response.ok) {
-        reject(response.statusText);
-      } else {
-        resolve(hasTextResult ? response.text() : response.json());
-      }
-    })
-    .catch((err) => {
-      handleError(err, reject);
-    });
 
   });
 
