@@ -16,6 +16,8 @@ import { ResourceState, Resource } from 'data/content/resource';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import { Title } from 'components/objectives/Title';
 import { ProductionRedeploy } from 'data/persistence/package';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
+import { TextInput } from 'editors/content/common/controls';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -38,6 +40,10 @@ interface CourseEditorState {
   selectedDevelopers: UserInfo[];
   themes: ThemeSelection[];
   selectedOrganizationId: string;
+
+  newVersionLabel: string;
+  newVersionCreationFailed: boolean;
+  newVersionLabelIsDuplicate: boolean;
 
   // Full preview
   isPreviewing: boolean;
@@ -75,6 +81,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
       themes: [],
       selectedOrganizationId: '',
+      newVersionLabel: '',
+      newVersionCreationFailed: false,
+      newVersionLabelIsDuplicate: false,
       isPreviewing: false,
       failedPreview: false,
       isRequestingQA: false,
@@ -102,6 +111,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.onRequestProduction = this.onRequestProduction.bind(this);
     this.onRequestUpdate = this.onRequestUpdate.bind(this);
     this.onRequestRedeploy = this.onRequestRedeploy.bind(this);
+    this.onCreateNewVersion = this.onCreateNewVersion.bind(this);
   }
 
   componentDidMount() {
@@ -564,6 +574,24 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     });
   }
 
+  onCreateNewVersion() {
+    // how to check if unique? where can we get the list of all package family versions?
+    const isUnique = label => true;
+    const { model } = this.props;
+    const { newVersionLabel } = this.state;
+    if (isUnique(newVersionLabel)) {
+      persistence.createNewVersion(model.guid, newVersionLabel)
+        .then((_) => {
+          this.setState({ newVersionLabel: '', newVersionCreationFailed: false });
+          // redirect to all courses page? automatically open new course version?
+        })
+        .catch(err => this.setState({ newVersionCreationFailed: true }));
+    } else {
+      // if not unique, highlight text area in red and show error message
+      this.setState({ newVersionCreationFailed: true, newVersionLabelIsDuplicate: true });
+    }
+  }
+
   onEditTheme(themeId: string) {
     const { model, courseChanged } = this.props;
 
@@ -627,31 +655,55 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   render() {
     const { model } = this.props;
+    const { newVersionCreationFailed, newVersionLabelIsDuplicate } = this.state;
 
     const isAdmin = hasRole('admin');
 
-    const adminRow = isAdmin
-      ? <div className="row">
-        <div className="col-3">Administrator</div>
-        <div className="col-3">
-          <Button
-            editMode
-            type="outline-primary"
-            onClick={() => persistence.skillsDownload(this.props.model.guid)}>
-            <i className="fa fa-download" />&nbsp;Download Skill Files
-          </Button>
+    let adminRow = null;
+
+    if (isAdmin) {
+      adminRow = <div>
+        <div className="row">
+          <div className="col-3">Administrator</div>
+          <div className="col-9">
+            <Button
+              editMode
+              type="outline-primary"
+              onClick={() => persistence.skillsDownload(this.props.model.guid)}>
+              <i className="fa fa-download" />&nbsp;Download Skill Files
+            </Button>
+            &nbsp;&nbsp;
+            <Button
+              editMode
+              type="outline-danger"
+              onClick={this.displayRemovePackageModal}>
+              Delete Course Package
+            </Button>
+            <br /><br />
+            Create new package version&nbsp;
+            <HelpPopover>
+              This will create a copy of the course package, allowing you to develop
+              course content independently of the original course. This is useful
+              when you want to get started on the next generation of a course without
+              changing an existing course that's already in use.
+            </HelpPopover>
+            <TextInput
+              editMode={this.props.editMode && isAdmin}
+              width="220px"
+              label="Unique Label"
+              type="text"
+              value={this.state.newVersionLabel}
+              onEdit={newVersionLabel => this.setState({ newVersionLabel })}
+            />
+            <button
+              className="btn btn-block btn-primary updateButton"
+              onClick={() => this.onCreateNewVersion()}>
+              Create Version
+            </button>
+          </div>
         </div>
-        <div className="col-3">
-          <Button
-            editMode
-            type="outline-danger"
-            onClick={this.displayRemovePackageModal}>
-            Delete Course Package
-          </Button>
-        </div>
-        <div className="col-3"></div>
-      </div>
-      : null;
+      </div>;
+    }
 
     return (
       <div className="course-editor" >
