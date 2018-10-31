@@ -94,18 +94,27 @@ export function setCourseTheme(course: string, theme: string): Promise<{}> {
   return authenticatedFetch({ url, method, body });
 }
 
-export enum ProductionRedeploy {
+export enum Redeploy {
   Redeploy = 'REDEPLOY',
   Update = 'UPDATE',
 }
 
 export function transitionDeploymentStatus(
-  course: string, status: DeploymentStatus, redeploy?: ProductionRedeploy):
+  course: string, status: DeploymentStatus, redeploy?: Redeploy):
   Promise<{}> {
   // tslint:disable-next-line:max-line-length
   const url = `${configuration.baseUrl}/packages/${course}/status/${status}${redeploy ? `?redeploy=${redeploy}` : ''}`;
   const method = 'PUT';
   const body = JSON.stringify(status);
+
+  return authenticatedFetch({ url, method, body });
+}
+
+export function createNewVersion(course: string, version: string): Promise<{}> {
+  const url = `${configuration.baseUrl}/packages/${course}/new/version`;
+  const method = 'POST';
+
+  const body = JSON.stringify({ version });
 
   return authenticatedFetch({ url, method, body });
 }

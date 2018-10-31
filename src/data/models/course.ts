@@ -20,6 +20,7 @@ export type CourseModelParams = {
   type?: string,
   description?: string,
   buildStatus?: string,
+  svnLocation?: string,
   deploymentStatus?: DeploymentStatus,
   dateCreated?: Date,
   metadata?: contentTypes.MetaData,
@@ -42,6 +43,7 @@ const defaultCourseModel = {
   title: '',
   description: '',
   buildStatus: '',
+  svnLocation: '',
   deploymentStatus: DeploymentStatus.DEVELOPMENT,
   dateCreated: Date.now(),
   metadata: new contentTypes.MetaData(),
@@ -86,6 +88,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   type: string;
   description: string;
   buildStatus: string;
+  svnLocation: string;
   deploymentStatus: DeploymentStatus;
   dateCreated: Date;
   metadata: contentTypes.MetaData;
@@ -145,6 +148,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       type: c.type,
       description: c.description,
       buildStatus: c.buildStatus,
+      svnLocation: c.svnLocation,
       deploymentStatus: c.deploymentStatus,
       dateCreated: parseDate(c.dateCreated),
       options: JSON.stringify(c.options),

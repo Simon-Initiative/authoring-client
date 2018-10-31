@@ -15,7 +15,7 @@ import { LegacyTypes, CourseId } from 'data/types';
 import { ResourceState, Resource } from 'data/content/resource';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import { Title } from 'components/objectives/Title';
-import { ProductionRedeploy } from 'data/persistence/package';
+import { Redeploy } from 'data/persistence/package';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { TextInput } from 'editors/content/common/controls';
 
@@ -41,9 +41,11 @@ interface CourseEditorState {
   themes: ThemeSelection[];
   selectedOrganizationId: string;
 
-  newVersionLabel: string;
-  newVersionCreationFailed: boolean;
-  newVersionLabelIsDuplicate: boolean;
+  newVersionNumber: string;
+  failedNewVersionRequest: boolean;
+  isNewVersionValid: boolean;
+  isRequestingNewVersion: boolean;
+  finishedNewVersionRequest: boolean;
 
   // Full preview
   isPreviewing: boolean;
@@ -63,11 +65,6 @@ interface CourseEditorState {
   isRequestingUpdate: boolean;
   finishedUpdateRequest: boolean;
   failedUpdateRequest: boolean;
-
-  // Request Redeploy in content-service for live course
-  isRequestingRedeploy: boolean;
-  finishedRedeployRequest: boolean;
-  failedRedeployRequest: boolean;
 }
 
 class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState> {
@@ -81,9 +78,11 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
       themes: [],
       selectedOrganizationId: '',
-      newVersionLabel: '',
-      newVersionCreationFailed: false,
-      newVersionLabelIsDuplicate: false,
+      newVersionNumber: '',
+      failedNewVersionRequest: false,
+      isNewVersionValid: false,
+      isRequestingNewVersion: false,
+      finishedNewVersionRequest: false,
       isPreviewing: false,
       failedPreview: false,
       isRequestingQA: false,
@@ -95,9 +94,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       isRequestingUpdate: false,
       finishedUpdateRequest: false,
       failedUpdateRequest: false,
-      isRequestingRedeploy: false,
-      finishedRedeployRequest: false,
-      failedRedeployRequest: false,
     };
 
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
@@ -110,8 +106,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.onRequestQA = this.onRequestQA.bind(this);
     this.onRequestProduction = this.onRequestProduction.bind(this);
     this.onRequestUpdate = this.onRequestUpdate.bind(this);
-    this.onRequestRedeploy = this.onRequestRedeploy.bind(this);
-    this.onCreateNewVersion = this.onCreateNewVersion.bind(this);
+    this.onClickNewVersion = this.onClickNewVersion.bind(this);
+    this.validateVersionNumber = this.validateVersionNumber.bind(this);
   }
 
   componentDidMount() {
@@ -298,8 +294,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     const { isPreviewing, isRequestingQA, finishedQARequest,
       failedQARequest, isRequestingProduction, finishedProductionRequest,
-      failedProductionRequest, isRequestingUpdate, finishedUpdateRequest, failedUpdateRequest,
-      isRequestingRedeploy, finishedRedeployRequest, failedRedeployRequest } = this.state;
+      failedProductionRequest, isRequestingUpdate, finishedUpdateRequest, failedUpdateRequest }
+      = this.state;
 
     const isPreviewingButton = <button
       disabled
@@ -312,12 +308,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       className="btn btn-block btn-primary previewButton"
       onClick={() => this.onPreview()}>
       Preview
-    </button>;
-
-    const redeployButton = <button
-      className="btn btn-block btn-danger redeployButton"
-      onClick={() => this.onRequestRedeploy()}>
-      Redeploy
     </button>;
 
     const updateButton = <button
@@ -438,15 +428,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           {isRequestingUpdate ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
           {finishedUpdateRequest ? <i className="fa fa-check-circle" /> : ''}
           {failedUpdateRequest ? <i className="fa fa-times-circle" /> : ''}
-          <br /><br />
-          <p>
-            Alternatively, you can make more substantial updates by redeploying the course package.
-            This will reset all students' data.
-          </p>
-          {redeployButton}&nbsp;
-          {isRequestingRedeploy ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
-          {finishedRedeployRequest ? <i className="fa fa-check-circle" /> : ''}
-          {failedRedeployRequest ? <i className="fa fa-times-circle" /> : ''}
         </div>,
       );
     }
@@ -530,39 +511,11 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           })));
   }
 
-  onRequestRedeploy() {
-    const { model } = this.props;
-
-    this.props.onDisplayModal(<ModalPrompt
-      text={'Are you sure you want to redeploy this course? \
-        All student data and progress will be reset.'}
-      onInsert={() => {
-        this.setState({ finishedRedeployRequest: false, isRequestingRedeploy: true }, () => {
-          persistence.transitionDeploymentStatus(
-            model.guid, DeploymentStatus.PRODUCTION, ProductionRedeploy.Redeploy)
-            .then(_ => this.setState({
-              isRequestingRedeploy: false,
-              finishedRedeployRequest: true,
-            }))
-            .catch(_ => this.setState({
-              isRequestingRedeploy: false,
-              failedRedeployRequest: true,
-            }));
-          this.props.onDismissModal();
-        });
-      }}
-      onCancel={() => this.props.onDismissModal()}
-      okLabel="Yes"
-      okClassName="danger"
-      cancelLabel="No"
-    />);
-  }
-
   onRequestUpdate() {
     const { model } = this.props;
     this.setState({ finishedUpdateRequest: false, isRequestingUpdate: true }, () => {
       persistence.transitionDeploymentStatus(
-        model.guid, DeploymentStatus.PRODUCTION, ProductionRedeploy.Update)
+        model.guid, DeploymentStatus.PRODUCTION, Redeploy.Update)
         .then(_ => this.setState({
           isRequestingUpdate: false,
           finishedUpdateRequest: true,
@@ -574,21 +527,46 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     });
   }
 
-  onCreateNewVersion() {
-    // how to check if unique? where can we get the list of all package family versions?
-    const isUnique = label => true;
-    const { model } = this.props;
-    const { newVersionLabel } = this.state;
-    if (isUnique(newVersionLabel)) {
-      persistence.createNewVersion(model.guid, newVersionLabel)
-        .then((_) => {
-          this.setState({ newVersionLabel: '', newVersionCreationFailed: false });
-          // redirect to all courses page? automatically open new course version?
-        })
-        .catch(err => this.setState({ newVersionCreationFailed: true }));
-    } else {
-      // if not unique, highlight text area in red and show error message
-      this.setState({ newVersionCreationFailed: true, newVersionLabelIsDuplicate: true });
+  parseVersionNumber(versionNumber: string) {
+    return versionNumber.split('.').map(s => parseInt(s, 10));
+  }
+
+  validateVersionNumber(newVersionNumber: string) {
+    // Validate version number under semantic versioning syntax
+    // Valid version numbers are major minor (1.1) or major minor patch (1.1.0)
+    const isValid = parsed => (parsed.length === 2 || parsed.length === 3)
+      && parsed.find(isNaN) === undefined;
+
+    this.setState({ newVersionNumber }, () => {
+
+      if (isValid(this.parseVersionNumber(newVersionNumber))) {
+        this.setState({ isNewVersionValid: true });
+      } else {
+        this.setState({ isNewVersionValid: false });
+      }
+    });
+  }
+
+  onClickNewVersion() {
+    const { model, viewAllCourses } = this.props;
+    const { newVersionNumber, isNewVersionValid } = this.state;
+
+    if (isNewVersionValid) {
+      this.setState(
+        {
+          isRequestingNewVersion: true,
+          finishedNewVersionRequest: false,
+        },
+        () => {
+          // Reparse version number to remove spaces/other formatting issues in the raw input string
+          persistence.createNewVersion(
+            model.guid, this.parseVersionNumber(newVersionNumber).join('.'))
+            .then(viewAllCourses)
+            .catch(_ => this.setState({
+              isRequestingNewVersion: false,
+              failedNewVersionRequest: true,
+            }));
+        });
     }
   }
 
@@ -655,7 +633,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   render() {
     const { model } = this.props;
-    const { newVersionCreationFailed, newVersionLabelIsDuplicate } = this.state;
 
     const isAdmin = hasRole('admin');
 
@@ -682,24 +659,38 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             <br /><br />
             Create new package version&nbsp;
             <HelpPopover>
-              This will create a copy of the course package, allowing you to develop
-              course content independently of the original course. This is useful
-              when you want to get started on the next generation of a course without
-              changing an existing course that's already in use.
+              You can create a copy of this course package as a new version, allowing you to develop
+              content independently of the original. This is useful when you want to get started
+              on the next generation of a course without changing an existing course that's already
+              in use.
+              <br />
+              <br />
+              New version numbers must adhere to&nbsp;
+              {/* tslint:disable-next-line:max-line-length */}
+              <a href="https://fullstack-developer.academy/what-is-semantic-versioning/#semanticversioninginnodejsnpm" target="_blank">Semantic Versioning</a> rules.
             </HelpPopover>
+            <br />
+            <br />
             <TextInput
               editMode={this.props.editMode && isAdmin}
               width="220px"
-              label="Unique Label"
+              label="New Version Number (e.g. 1.1.0)"
               type="text"
-              value={this.state.newVersionLabel}
-              onEdit={newVersionLabel => this.setState({ newVersionLabel })}
+              value={this.state.newVersionNumber}
+              onEdit={this.validateVersionNumber}
+              hasError={this.state.newVersionNumber !== '' && !this.state.isNewVersionValid}
             />
+            <br />
             <button
+              disabled={!this.state.isNewVersionValid}
               className="btn btn-block btn-primary updateButton"
-              onClick={() => this.onCreateNewVersion()}>
+              onClick={() => this.onClickNewVersion()}>
               Create Version
-            </button>
+            </button>&nbsp;
+            {this.state.isRequestingNewVersion ?
+              <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
+            {this.state.finishedNewVersionRequest ? <i className="fa fa-check-circle" /> : ''}
+            {this.state.failedNewVersionRequest ? <i className="fa fa-times-circle" /> : ''}
           </div>
         </div>
       </div>;
@@ -744,10 +735,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 </div>
               </div>
               <div className="row">
-                <div className="col-3">Unique ID</div>
-                <div className="col-9">{model.id}</div>
-              </div>
-              <div className="row">
                 <div className="col-3">Team members</div>
                 <div className="col-9">{this.renderDevelopers()}</div>
               </div>
@@ -770,6 +757,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 <div className="col-9">
                   {this.renderActions()}
                 </div>
+              </div>
+              <hr />
+              <div className="row">
+                <div className="col-3">Unique ID</div>
+                <div className="col-9">{model.id}</div>
+              </div>
+              <div className="row">
+                <div className="col-3">Package Location</div>
+                <div className="col-9">{model.svnLocation}</div>
               </div>
               {/* <div className="row">
                 <div className="col-3">Thumbnail<br /><br />
