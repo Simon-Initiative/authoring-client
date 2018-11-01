@@ -13,6 +13,7 @@ export {
   deleteCoursePackage,
   importPackage,
   transitionDeploymentStatus,
+  createNewVersion,
 } from './persistence/package';
 
 export {
