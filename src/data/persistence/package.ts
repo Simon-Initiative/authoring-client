@@ -3,7 +3,7 @@ import { configuration } from '../../actions/utils/config';
 import { CourseId } from '../types';
 import * as models from '../models';
 import { Resource } from '../content/resource';
-import { DeploymentStatus } from 'data/models/course.ts';
+import { DeployStage } from 'data/models/course.ts';
 
 export function importPackage(repositoryUrl: string): void {
 
@@ -94,18 +94,11 @@ export function setCourseTheme(course: string, theme: string): Promise<{}> {
   return authenticatedFetch({ url, method, body });
 }
 
-export enum Redeploy {
-  Redeploy = 'REDEPLOY',
-  Update = 'UPDATE',
-}
-
-export function transitionDeploymentStatus(
-  course: string, status: DeploymentStatus, redeploy?: Redeploy):
+export function requestDeployment(course: string, stage: DeployStage, redeploy: boolean):
   Promise<{}> {
-  // tslint:disable-next-line:max-line-length
-  const url = `${configuration.baseUrl}/packages/${course}/status/${status}${redeploy ? `?redeploy=${redeploy}` : ''}`;
-  const method = 'PUT';
-  const body = JSON.stringify(status);
+  const url = `${configuration.baseUrl}/packages/${course}/deploy`;
+  const method = 'POST';
+  const body = JSON.stringify({ stage, redeploy });
 
   return authenticatedFetch({ url, method, body });
 }

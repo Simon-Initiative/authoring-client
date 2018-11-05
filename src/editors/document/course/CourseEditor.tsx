@@ -10,14 +10,13 @@ import { Select } from 'editors/content/common/Select';
 import { Document } from 'data/persistence/common';
 import './CourseEditor.scss';
 import ModalPrompt from 'utils/selection/ModalPrompt';
-import { DeploymentStatus } from 'data/models/course';
+import { DeploymentStatus, DeployStage } from 'data/models/course';
 import { LegacyTypes, CourseId } from 'data/types';
 import { ResourceState, Resource } from 'data/content/resource';
-import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import { Title } from 'components/objectives/Title';
-import { Redeploy } from 'data/persistence/package';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { TextInput } from 'editors/content/common/controls';
+import { isNullOrUndefined } from 'util';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -40,31 +39,52 @@ interface CourseEditorState {
   selectedDevelopers: UserInfo[];
   themes: ThemeSelection[];
   selectedOrganizationId: string;
-
   newVersionNumber: string;
-  failedNewVersionRequest: boolean;
   isNewVersionValid: boolean;
-  isRequestingNewVersion: boolean;
-  finishedNewVersionRequest: boolean;
+}
 
-  // Full preview
-  isPreviewing: boolean;
-  failedPreview: boolean;
+interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
+interface RequestButtonState { pending: boolean; successful: boolean; failed: boolean; }
+class RequestButton extends React.Component<RequestButtonProps, RequestButtonState> {
+  constructor(props: RequestButtonProps) {
+    super(props);
 
-  // Request QA in content-service
-  isRequestingQA: boolean;
-  finishedQARequest: boolean;
-  failedQARequest: boolean;
+    this.state = {
+      pending: false,
+      successful: false,
+      failed: false,
+    };
 
-  // Request Production in content-service
-  isRequestingProduction: boolean;
-  finishedProductionRequest: boolean;
-  failedProductionRequest: boolean;
+    this.onClickWithState = this.onClickWithState.bind(this);
+  }
 
-  // Request Update in content-service for live course
-  isRequestingUpdate: boolean;
-  finishedUpdateRequest: boolean;
-  failedUpdateRequest: boolean;
+  onClickWithState(): () => void {
+    const { onClick } = this.props;
+
+    return () => this.setState(
+      { pending: true, successful: false, failed: false },
+      () => onClick()
+        .then(_ => this.setState({ pending: false, successful: true, failed: false }))
+        .catch(_ => this.setState({ pending: false, successful: false, failed: true })));
+  }
+
+  render() {
+    const { text, className } = this.props;
+    const { pending, successful, failed } = this.state;
+
+    return (
+      <div>
+        <button
+          className={`btn ${className}`}
+          onClick={this.onClickWithState()}>
+          {text}
+        </button>&nbsp;
+        {pending ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : null}
+        {successful ? <i className="fa fa-check-circle" /> : null}
+        {failed ? <i className="fa fa-times-circle" /> : null}
+      </div>
+    );
+  }
 }
 
 class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState> {
@@ -79,21 +99,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       themes: [],
       selectedOrganizationId: '',
       newVersionNumber: '',
-      failedNewVersionRequest: false,
       isNewVersionValid: false,
-      isRequestingNewVersion: false,
-      finishedNewVersionRequest: false,
-      isPreviewing: false,
-      failedPreview: false,
-      isRequestingQA: false,
-      finishedQARequest: false,
-      failedQARequest: false,
-      isRequestingProduction: false,
-      finishedProductionRequest: false,
-      failedProductionRequest: false,
-      isRequestingUpdate: false,
-      finishedUpdateRequest: false,
-      failedUpdateRequest: false,
     };
 
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
@@ -103,9 +109,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onPreview = this.onPreview.bind(this);
-    this.onRequestQA = this.onRequestQA.bind(this);
-    this.onRequestProduction = this.onRequestProduction.bind(this);
-    this.onRequestUpdate = this.onRequestUpdate.bind(this);
+    this.onRequestDeployment = this.onRequestDeployment.bind(this);
     this.onClickNewVersion = this.onClickNewVersion.bind(this);
     this.validateVersionNumber = this.validateVersionNumber.bind(this);
   }
@@ -142,6 +146,30 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.setState({
       selectedDevelopers: nextProps.model.developers.filter(d => d.isDeveloper).toArray(),
     });
+  }
+
+  onTitleEdit(title) {
+    const model = this.props.model.with({ title });
+    this.props.courseChanged(model);
+    const doc = new Document().with({
+      _courseId: model.guid,
+      _id: model.id,
+      _rev: model.rev.toString(),
+      model,
+    });
+    persistence.persistDocument(doc);
+  }
+
+  onDescriptionEdit(description) {
+    const model = this.props.model.with({ description });
+    this.props.courseChanged(model);
+    const doc = new Document().with({
+      _courseId: model.guid,
+      _id: model.id,
+      _rev: model.rev.toString(),
+      model,
+    });
+    persistence.persistDocument(doc);
   }
 
   onEditDevelopers(developers: UserInfo[]) {
@@ -193,18 +221,76 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.props.courseChanged(model);
   }
 
-  renderMenuItemChildren(dev: UserInfo, props, index) {
-    const name = dev.firstName + ' ' + dev.lastName;
-    return [
-      <strong key="name">{name}</strong>,
-      <div key="email">
-        <small>{dev.email}</small>
-      </div>,
-    ];
+  onEditTheme(themeId: string) {
+    const { model, courseChanged } = this.props;
+
+    persistence.setCourseTheme(model.guid, themeId)
+      // Update the dropdown and course model with the newly selected theme
+      .then((_) => {
+        this.setState({
+          themes: this.state.themes.map(
+            theme => theme.id === themeId
+              ? Object.assign(theme, { selected: true })
+              : Object.assign(theme, { selected: false })),
+        });
+        courseChanged(model.with({ theme: themeId }));
+      })
+      .catch(err => console.log(`Error setting theme ${themeId}: ${err}`));
+  }
+
+  onClickNewVersion() {
+    const { model, viewAllCourses } = this.props;
+    const { newVersionNumber, isNewVersionValid } = this.state;
+
+    if (isNewVersionValid) {
+      // Reparse version number to remove spaces/other formatting issues in the raw input string
+      return persistence.createNewVersion(
+        model.guid, this.parseVersionNumber(newVersionNumber).join('.'))
+        .then(viewAllCourses);
+    }
+  }
+
+  parseVersionNumber(versionNumber: string) {
+    return versionNumber.split('.').map(s => parseInt(s, 10));
+  }
+
+  validateVersionNumber(newVersionNumber: string) {
+    // Validate version number under semantic versioning syntax
+    // Valid version numbers are major minor (1.1) or major minor patch (1.1.0)
+    const isValid = parsed => (parsed.length === 2 || parsed.length === 3)
+      && parsed.find(isNaN) === undefined;
+
+    this.setState({ newVersionNumber }, () => {
+
+      if (isValid(this.parseVersionNumber(newVersionNumber))) {
+        this.setState({ isNewVersionValid: true });
+      } else {
+        this.setState({ isNewVersionValid: false });
+      }
+    });
+  }
+
+  removePackage() {
+    persistence.deleteCoursePackage(this.props.model.guid)
+      .then((document) => {
+        this.props.viewAllCourses();
+      })
+      .catch(err => console.log(err));
+  }
+
+  displayRemovePackageModal() {
+    this.props.onDisplayModal(<ModalPrompt
+      text={'Are you sure you want to permanently delete this course package? \
+          This action cannot be undone.'}
+      onInsert={() => { this.removePackage(); this.props.onDismissModal(); }}
+      onCancel={() => this.props.onDismissModal()}
+      okLabel="Yes"
+      okClassName="danger"
+      cancelLabel="No"
+    />);
   }
 
   renderDevelopers() {
-
     const developers = this.props.model.developers.toArray();
 
     return (
@@ -218,6 +304,16 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         selected={this.state.selectedDevelopers}
       />
     );
+  }
+
+  renderMenuItemChildren(dev: UserInfo, props, index) {
+    const name = dev.firstName + ' ' + dev.lastName;
+    return [
+      <strong key="name">{name}</strong>,
+      <div key="email">
+        <small>{dev.email}</small>
+      </div>,
+    ];
   }
 
   renderThemes() {
@@ -244,47 +340,41 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  // Used as a string in renderStatus, and as a boolean in renderActions
-  statusIsActive = (status: DeploymentStatus) => {
-    const { model } = this.props;
-    return model.deploymentStatus === status
-      ? 'active '
-      : '';
-  }
-
   renderStatus() {
+    const { model } = this.props;
+
+    const statusIsActive = (status: DeploymentStatus) =>
+      model.deploymentStatus === status ? 'active ' : '';
+
+    const makeStep = (status: DeploymentStatus, title: string, description: string) =>
+      <div className={statusIsActive(status) + 'step'}>
+        <div className="content">
+          <div className="title">{title}</div>
+          <div className="description">{description}</div>
+        </div>
+      </div>;
 
     return (
       <div className="vertical steps">
-        <div className={this.statusIsActive(DeploymentStatus.DEVELOPMENT) + 'step'}>
-          {/* <i className="icon">1</i> */}
-          <div className="content">
-            <div className="title">Development</div>
-            <div className="description">This course package is still under active development
-            and has not been deployed.</div>
-          </div>
-        </div>
-        <div className={this.statusIsActive(DeploymentStatus.QA) + 'step'}>
-          <div className="content">
-            <div className="title">QA</div>
-            <div className="description">This course package is ready to be reviewed before being
-            deployed publically to students.</div>
-          </div>
-        </div>
-        <div className={this.statusIsActive(DeploymentStatus.REQUESTING_PRODUCTION) + 'step'}>
-          <div className="content">
-            <div className="title">Production Requested</div>
-            <div className="description">This course package has been requested to be deployed
-            to production.</div>
-          </div>
-        </div>
-        <div className={this.statusIsActive(DeploymentStatus.PRODUCTION) + 'step'}>
-          <div className="content">
-            <div className="title">Production</div>
-            <div className="description">This course package is live and available to
-                        students. Changes are limited.</div>
-          </div>
-        </div>
+        {isNullOrUndefined(model.deploymentStatus) ? <p>This course does not have a deployment
+          status set. The 'development' actions will be shown as a default.</p> : null}
+        {makeStep(
+          DeploymentStatus.Development, 'Development',
+          'This course package is still under active development and has not been deployed.')}
+        {makeStep(
+          DeploymentStatus.RequestingQA, 'QA Requested',
+          'This course package has been requested to be deployed \
+          to the QA server for final testing.')}
+        {makeStep(
+          DeploymentStatus.QA, 'QA',
+          'This course package is ready to be reviewed before being \
+          deployed publically to students.')}
+        {makeStep(
+          DeploymentStatus.RequestingProduction, 'Production Requested',
+          'This course package has been requested to be deployed to production.')}
+        {makeStep(
+          DeploymentStatus.Production, 'Production',
+          'This course package is live and available to students. Changes are limited.')}
       </div>
     );
   }
@@ -292,343 +382,117 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderActions() {
     const { model } = this.props;
 
-    const { isPreviewing, isRequestingQA, finishedQARequest,
-      failedQARequest, isRequestingProduction, finishedProductionRequest,
-      failedProductionRequest, isRequestingUpdate, finishedUpdateRequest, failedUpdateRequest }
-      = this.state;
+    const previewButton = <RequestButton text="Preview" className="btn-primary previewButton"
+      onClick={() => this.onPreview()} />;
 
-    const isPreviewingButton = <button
-      disabled
-      className="btn btn-block btn-primary previewButton"
-      onClick={() => { }}>
-      <LoadingSpinner className="u-no-padding text-white" message="Previewing" />
-    </button>;
+    const requestQAButton = (redeploy: boolean) =>
+      <RequestButton text="Request QA" className="btn-secondary actionButton requestQA"
+        onClick={() => this.onRequestDeployment(DeployStage.qa, redeploy)} />;
 
-    const previewButton = <button
-      className="btn btn-block btn-primary previewButton"
-      onClick={() => this.onPreview()}>
-      Preview
-    </button>;
+    const requestProductionButton = (redeploy: boolean) =>
+      <RequestButton text="Request Production" className="btn-secondary actionButton requestProd"
+        onClick={() => this.onRequestDeployment(DeployStage.prod, redeploy)} />;
 
-    const updateButton = <button
-      className="btn btn-block btn-primary updateButton"
-      onClick={() => this.onRequestUpdate()}>
-      Update
-    </button>;
-
-    const requestQAButton = (firstDeployment: boolean) => <div key="requestQAButton">
-      <p>
-        {firstDeployment
-          ? 'If your course package is ready to go to QA, you can request for OLI to deploy \
-          the course to the QA server for public review.'
-          : 'If you\'ve made changes to your course package since your last deployment to QA, \
-          you can request for OLI to redeploy the course to the QA server for further review.'
-        }
-
-      </p>
-      <button
-        className="btn btn-block btn-secondary requestQAButton"
-        onClick={this.onRequestQA}>
-        Request QA
-      </button>&nbsp;
-        {isRequestingQA ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
-      {finishedQARequest ? <i className="fa fa-check-circle" /> : ''}
-      {failedQARequest ? <i className="fa fa-times-circle" /> : ''}
-      <br /><br />
-    </div>;
-
-    const option = (org: Resource) =>
+    const organizationOption = (org: Resource) =>
       <option
         key={org.guid}
         value={org.guid}>
         {org.title}
       </option>;
 
-    const options = this.organizations.map(option);
+    const organizationOptions = this.organizations.map(organizationOption);
 
-    const content = [];
+    const actions = [];
 
-    if (!model.deploymentStatus ||
-      this.statusIsActive(DeploymentStatus.DEVELOPMENT) ||
-      this.statusIsActive(DeploymentStatus.QA)) {
-      content.push(
-        <div key="orgSelect">
-          <div><p>Select an organization to preview:</p>
-            <Select
-              {...this.props}
-              className="orgSelect"
-              // Use the selected organization if present, or the first in the list as a default
-              value={this.state.selectedOrganizationId}
-              onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
-              {options}
-            </Select>
-          </div>
-          <br />
-          <p>
-            You can launch a <strong>full preview</strong> for the complete course package
-            using this organization to allow it to be viewed publically.
-            It may take a few minutes to create the full preview for larger courses.
+    actions.push(
+      <div key="orgSelect">
+        <div><p>Select an organization to preview:</p>
+          <Select
+            {...this.props}
+            className="orgSelect"
+            // Use the selected organization if present, or the first in the list as a default
+            value={this.state.selectedOrganizationId}
+            onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
+            {organizationOptions}
+          </Select>
+        </div>
+        <br />
+        <p>
+          You can launch a <strong>full preview</strong> for the complete course package
+          using this organization to allow it to be viewed publically.
+          It may take a few minutes to create the full preview for larger courses.
           </p>
-          {isPreviewing
-            ? isPreviewingButton
-            : previewButton}
-          <br />
-        </div>,
-      );
-    }
-    if (this.statusIsActive(DeploymentStatus.QA) ||
-      this.statusIsActive(DeploymentStatus.REQUESTING_PRODUCTION) ||
-      this.statusIsActive(DeploymentStatus.PRODUCTION)) {
-      // Enable when Raphael makes the necessary changes to the legacy system to support a course
-      // preview without deployment
-      // content.push(
-      //   <a key="previewButton"
-      //     onClick={() => this.onPreview(false)}
-      //     className="btn btn-link"
-      //     target="_blank">
-      //     Preview the selected organization
-      //   </a>,
-      // );
-    }
-    if (!model.deploymentStatus ||
-      this.statusIsActive(DeploymentStatus.DEVELOPMENT)) {
-      content.push(requestQAButton(true));
-    }
-    if (this.statusIsActive(DeploymentStatus.QA) ||
-      this.statusIsActive(DeploymentStatus.PRODUCTION)) {
-      content.push(requestQAButton(false));
-    }
-    if (this.statusIsActive(DeploymentStatus.QA)) {
-      content.push(
-        <div key="requestProdButton">
-          <p>
-            If your course package is ready to go to production, you can request for OLI to deploy
-            the course to the production server for public use.
-          </p>
-          <button
-            className="btn btn-block btn-secondary requestProductionButton"
-            onClick={this.onRequestProduction}>
-            Request Production
-          </button>&nbsp;
-          {isRequestingProduction ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
-          {finishedProductionRequest ? <i className="fa fa-check-circle" /> : ''}
-          {failedProductionRequest ? <i className="fa fa-times-circle" /> : ''}
-        </div>,
-      );
-    }
-    if (this.statusIsActive(DeploymentStatus.PRODUCTION)) {
-      content.push(
-        <div key="updateProdButton">
-          <br />
-          <p>
-            This course package is available on the production server,
-            but you can notify the OLI team to make non-structural updates to course content.
-          </p>
-          {updateButton}&nbsp;
-          {isRequestingUpdate ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
-          {finishedUpdateRequest ? <i className="fa fa-check-circle" /> : ''}
-          {failedUpdateRequest ? <i className="fa fa-times-circle" /> : ''}
-        </div>,
-      );
+        {previewButton}
+        <br />
+      </div>,
+    );
+
+    switch (model.deploymentStatus) {
+      case DeploymentStatus.Development:
+        actions.push(
+          <p>If your course package is ready to go to QA, you can request for OLI to deploy
+            the course to the QA server for public review.</p>,
+          requestQAButton(false));
+        break;
+
+      case DeploymentStatus.RequestingQA:
+        break;
+
+      case DeploymentStatus.QA:
+        actions.push(
+          <p>If you've made changes to your course package since your last deployment to QA,
+            you can request for OLI to redeploy the course to the QA server for further review.</p>,
+          requestQAButton(true),
+          <br />,
+          <p>If your course package is ready to go to production, you can request for OLI to deploy
+          the course to the production server for public use.</p>,
+          requestProductionButton(false));
+        break;
+
+      case DeploymentStatus.RequestingProduction:
+        break;
+
+      case DeploymentStatus.Production:
+        actions.push(
+          <p>This course package is available on the production server,
+            but you can notify the OLI team to make non-structural updates to course content.</p>,
+          requestProductionButton(true));
+        break;
+
+      // Many courses do not have the deployment status set - default to 'development' actions
+      default:
+        actions.push(requestQAButton(false));
+        break;
     }
 
-    if (content.length === 0) {
-      content.push(
+    if (actions.length === 0) {
+      actions.push(
         <div>No actions available in this deployment state.</div>,
       );
     }
 
-    return content;
+    return actions;
   }
 
-  onPreview(redeploy: boolean = true) {
+  onPreview(redeploy: boolean = true): Promise<void> {
     const { model, onPreview } = this.props;
 
-    this.setState({
-      isPreviewing: true,
-    });
-
-    onPreview(
+    return onPreview(
       model.guid,
       this.state.selectedOrganizationId || (this.organizations[0] && this.organizations[0].guid),
       redeploy)
-      .then((_) => {
-        this.setState({ isPreviewing: false });
-      })
-      .catch((err) => {
-        this.setState({ isPreviewing: false, failedPreview: true });
-        console.error('Full preview error:', err);
+      // More robust error handling needs to be built out
+      .catch(err => console.error('Full preview error:', err));
+  }
+
+  onRequestDeployment(stage: DeployStage, redeploy: boolean) {
+    const { model, courseChanged } = this.props;
+
+    return persistence.requestDeployment(model.guid, stage, redeploy)
+      .then((deployStatusObj) => {
+        const deploymentStatus = (deployStatusObj as any).deployStatus;
+        courseChanged(model.with({ deploymentStatus }));
       });
-  }
-
-  onRequestQA() {
-    const { model, courseChanged } = this.props;
-
-    this.setState(
-      {
-        finishedQARequest: false,
-        isRequestingQA: true,
-      },
-      () =>
-        persistence.transitionDeploymentStatus(model.guid, DeploymentStatus.QA)
-          .then(_ => this.setState(
-            {
-              isRequestingQA: false,
-              finishedQARequest: true,
-            },
-            () => courseChanged(model.with({
-              deploymentStatus: DeploymentStatus.QA,
-            })),
-          ))
-          .catch(_ => this.setState({
-            isRequestingQA: false,
-            failedQARequest: true,
-          })));
-  }
-
-  onRequestProduction() {
-    const { model, courseChanged } = this.props;
-
-    this.setState(
-      {
-        finishedProductionRequest: false,
-        isRequestingProduction: true,
-      },
-      () =>
-        persistence.transitionDeploymentStatus(model.guid, DeploymentStatus.REQUESTING_PRODUCTION)
-          .then(_ => this.setState(
-            {
-              isRequestingProduction: false,
-              finishedProductionRequest: true,
-            },
-            () => courseChanged(model.with({
-              deploymentStatus: DeploymentStatus.REQUESTING_PRODUCTION,
-            })),
-          ))
-          .catch(_ => this.setState({
-            isRequestingProduction: false,
-            failedProductionRequest: true,
-          })));
-  }
-
-  onRequestUpdate() {
-    const { model } = this.props;
-    this.setState({ finishedUpdateRequest: false, isRequestingUpdate: true }, () => {
-      persistence.transitionDeploymentStatus(
-        model.guid, DeploymentStatus.PRODUCTION, Redeploy.Update)
-        .then(_ => this.setState({
-          isRequestingUpdate: false,
-          finishedUpdateRequest: true,
-        }))
-        .catch(_ => this.setState({
-          isRequestingUpdate: false,
-          failedUpdateRequest: true,
-        }));
-    });
-  }
-
-  parseVersionNumber(versionNumber: string) {
-    return versionNumber.split('.').map(s => parseInt(s, 10));
-  }
-
-  validateVersionNumber(newVersionNumber: string) {
-    // Validate version number under semantic versioning syntax
-    // Valid version numbers are major minor (1.1) or major minor patch (1.1.0)
-    const isValid = parsed => (parsed.length === 2 || parsed.length === 3)
-      && parsed.find(isNaN) === undefined;
-
-    this.setState({ newVersionNumber }, () => {
-
-      if (isValid(this.parseVersionNumber(newVersionNumber))) {
-        this.setState({ isNewVersionValid: true });
-      } else {
-        this.setState({ isNewVersionValid: false });
-      }
-    });
-  }
-
-  onClickNewVersion() {
-    const { model, viewAllCourses } = this.props;
-    const { newVersionNumber, isNewVersionValid } = this.state;
-
-    if (isNewVersionValid) {
-      this.setState(
-        {
-          isRequestingNewVersion: true,
-          finishedNewVersionRequest: false,
-        },
-        () => {
-          // Reparse version number to remove spaces/other formatting issues in the raw input string
-          persistence.createNewVersion(
-            model.guid, this.parseVersionNumber(newVersionNumber).join('.'))
-            .then(viewAllCourses)
-            .catch(_ => this.setState({
-              isRequestingNewVersion: false,
-              failedNewVersionRequest: true,
-            }));
-        });
-    }
-  }
-
-  onEditTheme(themeId: string) {
-    const { model, courseChanged } = this.props;
-
-    persistence.setCourseTheme(model.guid, themeId)
-      // Update the dropdown and course model with the newly selected theme
-      .then((_) => {
-        this.setState({
-          themes: this.state.themes.map(
-            theme => theme.id === themeId
-              ? Object.assign(theme, { selected: true })
-              : Object.assign(theme, { selected: false })),
-        });
-        courseChanged(model.with({ theme: themeId }));
-      })
-      .catch(err => console.log(`Error setting theme ${themeId}: ${err}`));
-  }
-
-  removePackage() {
-    persistence.deleteCoursePackage(this.props.model.guid)
-      .then((document) => {
-        this.props.viewAllCourses();
-      })
-      .catch(err => console.log(err));
-  }
-
-  displayRemovePackageModal() {
-    this.props.onDisplayModal(<ModalPrompt
-      text={'Are you sure you want to permanently delete this course package? \
-          This action cannot be undone.'}
-      onInsert={() => { this.removePackage(); this.props.onDismissModal(); }}
-      onCancel={() => this.props.onDismissModal()}
-      okLabel="Yes"
-      okClassName="danger"
-      cancelLabel="No"
-    />);
-  }
-
-  onDescriptionEdit(description) {
-    const model = this.props.model.with({ description });
-    this.props.courseChanged(model);
-    const doc = new Document().with({
-      _courseId: model.guid,
-      _id: model.id,
-      _rev: model.rev.toString(),
-      model,
-    });
-    persistence.persistDocument(doc);
-  }
-
-  onTitleEdit(title) {
-    const model = this.props.model.with({ title });
-    this.props.courseChanged(model);
-    const doc = new Document().with({
-      _courseId: model.guid,
-      _id: model.id,
-      _rev: model.rev.toString(),
-      model,
-    });
-    persistence.persistDocument(doc);
   }
 
   render() {
@@ -647,7 +511,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               editMode
               type="outline-primary"
               onClick={() => persistence.skillsDownload(this.props.model.guid)}>
-              <i className="fa fa-download" />&nbsp;Download Skill Files
+              <i className="fa fa-download" /> Download Skill Files
             </Button>
             &nbsp;&nbsp;
             <Button
@@ -674,23 +538,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             <TextInput
               editMode={this.props.editMode && isAdmin}
               width="220px"
-              label="New Version Number (e.g. 1.1.0)"
+              label="New Version Number (e.g. 1.1)"
               type="text"
               value={this.state.newVersionNumber}
               onEdit={this.validateVersionNumber}
               hasError={this.state.newVersionNumber !== '' && !this.state.isNewVersionValid}
             />
             <br />
-            <button
-              disabled={!this.state.isNewVersionValid}
-              className="btn btn-block btn-primary updateButton"
-              onClick={() => this.onClickNewVersion()}>
-              Create Version
-            </button>&nbsp;
-            {this.state.isRequestingNewVersion ?
-              <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : ''}
-            {this.state.finishedNewVersionRequest ? <i className="fa fa-check-circle" /> : ''}
-            {this.state.failedNewVersionRequest ? <i className="fa fa-times-circle" /> : ''}
+            <RequestButton text="Create Version" className="btn-primary createVersion"
+              onClick={() => this.onClickNewVersion()} />
           </div>
         </div>
       </div>;
