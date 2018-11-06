@@ -18,6 +18,7 @@ import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 import { PersistenceStrategy,
   PersistenceState } from 'editors/manager/persistence/PersistenceStrategy';
 import { WritelockModal } from 'components/WritelockModal.controller';
+import { ConflictModal } from 'components/ConflictModal.controller';
 import { State } from 'reducers';
 
 export type DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
@@ -197,6 +198,10 @@ function saveFailed(dispatch, getState, courseId, documentId, error) {
     // if it is a write-lock failure, disable editing and show write-lock modal
     dispatch(documentEditingEnable(false, documentId));
     dispatch(modalActions.display(React.createElement(WritelockModal, { courseId, documentId })));
+  } else if (error === 'Conflict') {
+    // if it is a conflict failure, disable editing and show conflict modal
+    dispatch(documentEditingEnable(false, documentId));
+    dispatch(modalActions.display(React.createElement(ConflictModal, { courseId, documentId })));
   } else {
     // some other failure, show persistence error message
     const message = buildPersistenceFailureMessage(error, getState().user.profile);
