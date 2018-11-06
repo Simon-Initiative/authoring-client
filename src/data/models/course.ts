@@ -4,11 +4,19 @@ import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
 import { parseDate } from 'data/content/resource';
 
+// Must match DeployStage enum values in ContentService
+export enum DeployStage {
+  qa = 'qa',
+  prod = 'prod',
+}
+
+// Must match DeploymentStatus enum values in ContentService and Admin app
 export enum DeploymentStatus {
-  DEVELOPMENT = 'DEVELOPMENT',
+  Development = 'DEVELOPMENT',
+  RequestingQA = 'REQUESTING_QA',
   QA = 'QA',
-  PRODUCTION = 'PRODUCTION',
-  REQUESTING_PRODUCTION = 'REQUESTING_PRODUCTION',
+  Production = 'PRODUCTION',
+  RequestingProduction = 'REQUESTING_PRODUCTION',
 }
 
 export type CourseModelParams = {
@@ -46,7 +54,7 @@ const defaultCourseModel = {
   description: '',
   buildStatus: '',
   svnLocation: '',
-  deploymentStatus: DeploymentStatus.DEVELOPMENT,
+  deploymentStatus: DeploymentStatus.Development,
   dateCreated: Date.now(),
   metadata: new contentTypes.MetaData(),
   options: '',

@@ -7,6 +7,18 @@
     padding: 30px 15px 0 15px;
     margin: 0 20px;
 
+    .fa.fa-circle-o-notch.fa-spin.fa-1x.fa-fw {
+        color: gray();
+    }
+
+    .fa.fa-check-circle {
+        color: $emerald;
+    }
+
+    .fa.fa-times-circle {
+        color: $alizarin;
+    }
+
     h2 {
         font-size: 20px;
         font-family: $serif-font;
@@ -19,13 +31,7 @@
 
     .btn {
         vertical-align: unset;
-        padding: 0;
-        padding-right: 10px;
-
-        &.btn-outline-primary,
-        &.btn-outline-danger {
-            padding-left: 10px;
-        }
+        padding: 0 10px;
 
         &.btn-sm {
             height: 24px;
@@ -35,12 +41,8 @@
             max-width: 150px;
         }
 
-        &.updateButton,
-        &.redeployButton,
-        &.requestQAButton,
-        &.requestProductionButton {
+        &.actionButton {
             display: inline-block;
-            max-width: 150px;
         }
     }
 
@@ -66,7 +68,6 @@
                 background-color: white;
 
                 .btn-primary {
-                    padding-left: 15px;
                     color: white;
                 }
             }
