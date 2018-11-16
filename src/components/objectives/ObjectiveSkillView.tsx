@@ -10,7 +10,6 @@ import { AppServices, DispatchBasedServices } from 'editors/common/AppServices';
 import * as viewActions from 'actions/view';
 import { DuplicateListingInput } from 'components/objectives/DuplicateListingInput';
 import guid from 'utils/guid';
-import { RowType } from 'components/objectives/types';
 import { buildReadOnlyMessage } from 'utils/lock';
 import { buildPersistenceFailureMessage } from 'utils/error';
 
@@ -21,7 +20,7 @@ import {
 } from 'components/objectives/persistence';
 import * as Messages from 'types/messages';
 import { UserState } from 'reducers/user';
-import { Row } from 'components/objectives/Row';
+import { Objective } from 'components/objectives/Objective';
 
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
 import { LearningObjectivesModel } from 'data/models/objective';
@@ -98,7 +97,6 @@ export class ObjectiveSkillView
     this.createNew = this.createNew.bind(this);
     this.onObjectiveEdit = this.onObjectiveEdit.bind(this);
     this.onSkillEdit = this.onSkillEdit.bind(this);
-    this.onRemove = this.onRemove.bind(this);
     this.onAddNewSkill = this.onAddNewSkill.bind(this);
     this.onAddExistingSkill = this.onAddExistingSkill.bind(this);
     this.onToggleExpanded = this.onToggleExpanded.bind(this);
@@ -113,11 +111,7 @@ export class ObjectiveSkillView
 
   componentDidMount() {
     // If node expansion state has not been set by the user, expand all nodes as a default state
-    this.buildModels().then((_) => {
-      this.props.expanded.has('objectives')
-        ? null
-        : this.expandAllObjectives();
-    });
+    this.buildModels();
   }
 
   componentWillUnmount() {
@@ -472,12 +466,6 @@ export class ObjectiveSkillView
     // Attach the skill ids to the objective and then persist that
   }
 
-  onRemove(model: RowType) {
-    if (model.contentType === 'LearningObjective') {
-      this.removeObjective(model);
-    }
-  }
-
   detachSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
     // Update the parent objective
     const index = objective.skills.indexOf(model.id);
@@ -732,8 +720,6 @@ export class ObjectiveSkillView
 
   }
 
-
-
   renderObjectives() {
     const { course } = this.props;
 
@@ -761,53 +747,26 @@ export class ObjectiveSkillView
       .toArray()
       .forEach((objective: contentTypes.LearningObjective) => {
 
-        rows.push(<Row
-          key={objective.id}
-          onAddExistingSkill={this.onAddExistingSkill}
-          onRemove={this.onRemove}
-          onAddNewSkill={this.onAddNewSkill}
-          highlighted={false}
-          onBeginExternalEdit={this.onBeginExternalEdit}
-          model={objective}
-          title={objective.title}
-          isExpanded={isExpanded(objective.id)}
-          toggleExpanded={this.onToggleExpanded}
-          editMode={course.editable && this.state.aggregateModel.isLocked
-            && !this.state.isSavePending}
-          onEdit={this.onObjectiveEdit}
-          loading={this.state.loading} />);
-
-        if (isExpanded(objective.id)) {
-
-          objective.skills.forEach((skillId) => {
-
-            const skill = skillsById[skillId];
-            if (skill !== undefined) {
-
-              const title = this.props.skills.has(skill.id)
-                ? this.props.skills.get(skill.id).title
-                : 'Loading...';
-
-              rows.push(<Row
-                key={objective.id + '-' + skill.id}
-                onAddExistingSkill={this.onAddExistingSkill}
-                onAddNewSkill={this.onAddNewSkill}
-                onRemove={this.removeSkill.bind(this, objective)}
-                highlighted={false}
-                onBeginExternalEdit={this.onBeginExternalEdit}
-                model={skill}
-                title={title}
-                isExpanded={false}
-                toggleExpanded={this.onToggleExpanded}
-                editMode={course.editable && this.state.aggregateModel.isLocked
-                  && !this.state.isSavePending}
-                onEdit={this.onSkillEdit}
-                loading={this.state.loading} />);
-            }
-          });
-        }
-
-
+        rows.push(
+          <Objective
+            key={objective.id}
+            course={this.props.course}
+            onAddExistingSkill={this.onAddExistingSkill}
+            onRemove={this.removeObjective}
+            onRemoveSkill={skill => this.removeSkill(objective, skill)}
+            onAddNewSkill={this.onAddNewSkill}
+            highlighted={false}
+            onBeginExternalEdit={this.onBeginExternalEdit}
+            objective={objective}
+            skills={objective.skills.filter(skillId => this.props.skills.has(skillId))
+              .map(skillId => this.props.skills.get(skillId)).toList()}
+            isExpanded={isExpanded(objective.id)}
+            onToggleExpanded={this.onToggleExpanded}
+            editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
+            onEdit={this.onObjectiveEdit}
+            onEditSkill={this.onSkillEdit}
+            loading={this.state.loading} />,
+        );
       });
 
     return rows;
@@ -858,13 +817,9 @@ export class ObjectiveSkillView
 
   renderContent() {
     return (
-      <table className="table table-sm">
-        <tbody>
-
-          {this.renderObjectives()}
-
-        </tbody>
-      </table>
+      <div className="objectives-list">
+        {this.renderObjectives()}
+      </div>
     );
   }
 

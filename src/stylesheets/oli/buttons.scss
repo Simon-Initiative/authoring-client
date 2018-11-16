@@ -33,6 +33,23 @@
 	&.btn-secondary {
 		border: 1px solid $primary;
 		color: $primary;
+		background-color: transparent;
+
+		&.btn-cancel, &.btn-danger, &.btn-remove {
+			border: 1px solid $remove;
+			color: $remove;
+			background-color: transparent;
+
+			&:hover:not([disabled]) {
+				background-color: darken($remove, 10%);
+				border-color: darken($remove, 10%);
+			}
+
+			&:active {
+				background-color: darken($remove, 15%);
+				border-color: darken($remove, 15%);
+			}
+		}
 
 		&:hover:not([disabled]) {
 			background-color: $primary;
@@ -100,9 +117,14 @@
 		outline: none;
 	}
 
-	&.btn-link {
+	&.btn-link, &.btn-inline-link {
 		color: $primary;
 		font-weight: 600;
+
+		&.btn-inline-link {
+			margin: 0;
+			vertical-align: baseline;
+		}
 
 		&:hover:not([disabled]) {
 			text-decoration: underline;
