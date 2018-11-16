@@ -60,11 +60,12 @@ export class ContentEditor
   }
 
   renderTitle() {
-    const { model, onRemove } = this.props;
+    const { model, editMode, onRemove } = this.props;
 
     return (
       <ContentTitle
         title="Supporting Content"
+        editMode={editMode}
         onRemove={() => onRemove(model.guid)}
         canRemove={true} />
     );

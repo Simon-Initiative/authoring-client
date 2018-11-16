@@ -1,6 +1,7 @@
 
 export type DocumentId = string;
 export type CourseId = string;
+export type CourseTitle = string;
 export type UserId = string;
 
 // Create an actual type

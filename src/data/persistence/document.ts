@@ -14,7 +14,7 @@ export function retrieveDocument(
   const url = `${configuration.baseUrl}/${courseId}/resources/${documentId}`;
 
   return authenticatedFetch({ url })
-    .then((json : any) => {
+    .then((json: any) => {
       json.courseId = courseId;
       return new Document({
         _courseId: courseId,
@@ -50,6 +50,12 @@ export interface PreviewSuccess {
   activityUrl: string;
 }
 
+export enum ServerName {
+  dev,
+  qa,
+  prod,
+}
+
 // Previewing can result in one of these responses from the server
 export type PreviewResult =
   PreviewSuccess | PreviewNotSetUp | MissingFromOrganization | PreviewPending;
@@ -60,13 +66,16 @@ export type PreviewResult =
  * @param documentId the document guid to preview
  */
 export function initiatePreview(
-  courseId: CourseId, documentId: DocumentId, isRefresh: boolean): Promise<PreviewResult> {
+  courseId: CourseId, documentId: DocumentId,
+  isRefresh: boolean, server?: ServerName): Promise<PreviewResult> {
 
   const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`
-    + '?redeploy=true' + (isRefresh ? '&refresh=true' : '');
+    + '?redeploy=true'
+    + (isRefresh ? '&refresh=true' : '')
+    + (server ? '&server=' + server : '');
 
   return authenticatedFetch({ url })
-    .then((json : any) => {
+    .then((json: any) => {
 
       const message = json.message !== undefined ? json.message : '';
       const admitCode = json.admitCode !== undefined ? json.admitCode : '';
@@ -139,7 +148,7 @@ export function bulkFetchDocuments(
   const method = 'POST';
 
   return authenticatedFetch({ url, body, method })
-    .then((json : any) => {
+    .then((json: any) => {
       const documents = [];
       if (json instanceof Array) {
         json.forEach(item => documents.push(new Document({
@@ -183,8 +192,8 @@ export function listenToDocument(doc: Document): Promise<Document> {
     });
 }
 
-export function createDocument(courseId: CourseId,
-                               content: models.ContentModel): Promise<Document> {
+export function createDocument(courseId: CourseId, content: models.ContentModel):
+  Promise<Document> {
 
   let url = null;
   if (content.type === LegacyTypes.package) {
@@ -234,8 +243,6 @@ export function persistDocument(doc: Document): Promise<Document> {
         return newDocument;
       });
   } catch (err) {
-
     return Promise.reject(err);
   }
-
 }

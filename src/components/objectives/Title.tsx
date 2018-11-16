@@ -7,10 +7,12 @@ export interface TitleProps {
   editMode: boolean;
   isHoveredOver: boolean;
   onEdit: (string) => void;
-  onToggleExpanded: () => void;
   onBeginExternallEdit: () => void;
   loading: boolean;
   onRemove: () => void;
+  onToggleExpanded?: () => void;
+  disableRemoval?: boolean;
+  editWording?: string;
 }
 
 export interface TitleState {
@@ -69,13 +71,13 @@ export class Title
   }
 
 
-  render() : JSX.Element {
+  render(): JSX.Element {
     if (this.state.isEditing) {
       return (
-        <div style={ { display: 'inline', marginLeft: '40px' } }>
+        <div style={{ display: 'inline', marginLeft: this.props.disableRemoval ? '0' : '40px' }}>
           <input ref={a => this.titleInput = a} type="text" onKeyUp={this.onKeyUp}
             onChange={this.onTextChange}
-            value={this.state.title} style={ { width: '50%', paddingTop: '2px' } }/>
+            value={this.state.title} style={{ width: '50%', paddingTop: '2px' }} />
           <button
             key="save"
             onClick={this.onTitleEdit}
@@ -94,7 +96,7 @@ export class Title
       );
     }
 
-    const linkStyle : any = {
+    const linkStyle: any = {
       display: 'inline-block',
       whiteSpace: 'normal',
       textAlign: 'left',
@@ -103,24 +105,28 @@ export class Title
     };
 
     const actionButtons = this.props.isHoveredOver && this.props.editMode
-        ? <span>
-          <Remove editMode={this.props.editMode}
-          loading={this.props.loading}
-          onRemove={this.props.onRemove} />
-          <button
-            key="reword"
-            onClick={this.onBeginEdit}
-            type="button"
-            className="btn btn-link btn-sm">
-            Reword
-          </button>
-          </span>
-        : null;
+      ? <span>
+        {this.props.disableRemoval
+          ? null
+          : <Remove editMode={this.props.editMode}
+            loading={this.props.loading}
+            onRemove={this.props.onRemove} />}
+        <button
+          key="edit"
+          onClick={this.onBeginEdit}
+          type="button"
+          className="btn btn-link btn-sm">
+          {this.props.editWording || 'Reword'}
+        </button>
+      </span>
+      : null;
 
     return (
       <React.Fragment>
-        <button key="itemClick" onClick={() => this.props.onToggleExpanded()}
-        type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
+        <button
+          key="itemClick"
+          onClick={this.props.onToggleExpanded ? this.props.onToggleExpanded : null}
+          type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
         {actionButtons}
       </React.Fragment>
     );

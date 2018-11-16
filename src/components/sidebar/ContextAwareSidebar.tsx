@@ -293,7 +293,7 @@ export class ContextAwareSidebar
                   onEdit={this.onPageEdit} />
                 <Button
                   editMode={editMode}
-                  type="secondary" className="btn-sm"
+                  type="secondary" className="btn btn-sm"
                   onClick={this.onAddPage}>
                   Add Page
                 </Button>

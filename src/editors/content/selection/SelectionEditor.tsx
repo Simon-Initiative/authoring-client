@@ -108,7 +108,7 @@ export class SelectionEditor
   }
 
   renderTitle() {
-    const { model, canRemove, onRemove } = this.props;
+    const { model, canRemove, editMode, onRemove } = this.props;
 
     const title = model.source.contentType === 'Pool'
       ? 'Pool' : 'Shared Pool';
@@ -116,6 +116,7 @@ export class SelectionEditor
     return (
       <ContentTitle
         title={title}
+        editMode={editMode}
         onRemove={() => onRemove(model.guid)}
         canRemove={canRemove}
         removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG} />

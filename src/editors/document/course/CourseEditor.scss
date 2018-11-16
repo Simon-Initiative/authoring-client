@@ -1,88 +1,225 @@
-@import 'oli/colors';
-@import 'oli/typography';
+@import "oli/colors";
+@import "oli/typography";
 
 .course-editor {
-  flex: 1;
-  overflow: auto;
-  padding: 30px 15px 0 15px;
+    flex: 1;
+    overflow: auto;
+    padding: 30px 15px 0 15px;
+    margin: 0 20px;
 
-  margin: 0 20px;
-
-  h2 {
-    font-size: 20px;
-    font-family: $serif-font;
-    padding-bottom: 20px;
-  }
-
-  .infoContain {
-    border-radius: 2px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-
-    .row {
-      margin: 0;
+    .fa.fa-circle-o-notch.fa-spin.fa-1x.fa-fw {
+        color: gray();
     }
-  }
 
-  .info {
-    .row {
-      .col-3 {
-        text-align: right;
-        font-weight: 600;
-      }
-      [class*="col-"] {
-          padding-top: 1rem;
-          padding-bottom: 1rem;
-          background-color: white;
-
-          .btn-primary {
-            padding-left: 15px;
-            color: white;
-          }
-      }
+    .fa.fa-check-circle {
+        color: $emerald;
     }
-  }
 
-  .users {
-    .user {
-      background-color: white;
-      border-bottom: 1px solid rgba(86,61,124,.2);
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-
-      .profile {
-        height: 60px;
-        width: 60px;
-        float: left;
-        margin-right: 25px;
-        background-color: #eaeaea;
-        border-radius: 45px;
-      }
-
-      .name {
-        font-weight: 700;
-        font-size: 1.1em;
-        display: block;
-      }
-
-      .inst {
-        font-size: 0.9em;
-        display: block;
-        line-height: 1.2em;
-      }
-
-      .email {
-        font-size: 0.9em;
-        display: block;
-        line-height: 1.2em;
-      }
-
-      .btn {
-        width: 100%;
-      }
+    .fa.fa-times-circle {
+        color: $alizarin;
     }
-  }
 
-  .themeSelect {
-    max-width: 220px;
-  }
+    h2 {
+        font-size: 20px;
+        font-family: $serif-font;
+        padding-bottom: 20px;
+    }
+
+    hr {
+        margin: 0;
+    }
+
+    .btn {
+        vertical-align: unset;
+        padding: 0 10px;
+
+        &.btn-sm {
+            height: 24px;
+        }
+
+        &.previewButton {
+            max-width: 150px;
+        }
+
+        &.actionButton {
+            display: inline-block;
+        }
+    }
+
+    .infoContain {
+        border-radius: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+
+        .row {
+            margin: 0;
+        }
+    }
+
+    .info {
+        .row {
+            .col-3 {
+                text-align: right;
+                font-weight: 600;
+            }
+
+            [class*="col-"] {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                background-color: white;
+
+                .btn-primary {
+                    color: white;
+                }
+            }
+
+            // Auto-prefixed CSS from https://semantic-ui.com/elements/step.html
+            .steps.vertical {
+                display: -webkit-inline-box;
+                display: -ms-inline-flexbox;
+                display: inline-flex;
+                -webkit-box-orient: horizontal;
+                -webkit-box-direction: normal;
+                -ms-flex-direction: row;
+                flex-direction: column;
+                -webkit-box-align: stretch;
+                -ms-flex-align: stretch;
+                align-items: stretch;
+                -webkit-box-shadow: none;
+                box-shadow: none;
+                line-height: 1.14285714em;
+                border-radius: .28571429rem;
+                border: 1px solid rgba(34, 36, 38, 0.15);
+
+                .step {
+                    font-size: 1rem;
+                    position: relative;
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    -webkit-box-flex: 1;
+                    -ms-flex: 1 0 auto;
+                    flex: 1 0 auto;
+                    -ms-flex-wrap: wrap;
+                    flex-wrap: wrap;
+                    -webkit-box-orient: horizontal;
+                    -webkit-box-direction: normal;
+                    -ms-flex-direction: row;
+                    flex-direction: row;
+                    vertical-align: middle;
+                    -webkit-box-align: center;
+                    -ms-flex-align: center;
+                    align-items: center;
+                    -webkit-box-pack: center;
+                    -ms-flex-pack: center;
+                    margin: 0 0;
+                    padding: 1em;
+                    background: #fff;
+                    color: rgba(0, 0, 0, 0.87);
+                    -webkit-box-shadow: none;
+                    box-shadow: none;
+                    border-radius: .28571429rem .28571429rem 0 0;
+                    border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+                    -webkit-transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
+                    transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
+                    transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease;
+                    transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease,-webkit-box-shadow .1s ease;
+                }
+
+                .step:first-child {
+                    padding-left: 1em;
+                    border-radius: .28571429rem 0 0 .28571429rem;
+                }
+
+                .step:last-child {
+                    border-bottom: none;
+                }
+
+                .icon {
+                    width: auto;
+                    display: block;
+                    -webkit-box-flex: 0;
+                    -ms-flex: 0 1 auto;
+                    flex: 0 1 auto;
+                    -ms-flex-item-align: middle;
+                    align-self: middle;
+                }
+
+                .content {
+                    display: block;
+                    -webkit-box-flex: 0;
+                    flex: 0 1 auto;
+                    align-self: center;
+                }
+
+                .title {
+                    font-size: 1rem;
+                    font-weight: 700;
+                }
+
+                .description {
+                    margin-top: 0.25rem;
+                    font-weight: 400;
+                    font-size: 0.93rem;
+                    color: rgba(0, 0, 0, 0.87);
+                }
+
+                .step.active, .step.active:after {
+                    cursor: auto;
+                    background: #f3f4f5;
+                }
+
+                .step.disabled, .step.disabled:after {
+                    color: rgba(40, 40, 40, 0.3);
+                    cursor: auto;
+                    background: #fff;
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+
+    .users {
+        .user {
+            background-color: white;
+            border-bottom: 1px solid rgba(86, 61, 124, 0.2);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+
+            .profile {
+                height: 60px;
+                width: 60px;
+                float: left;
+                margin-right: 25px;
+                background-color: #eaeaea;
+                border-radius: 45px;
+            }
+
+            .name {
+                font-weight: 700;
+                font-size: 1.1em;
+                display: block;
+            }
+
+            .inst {
+                font-size: 0.9em;
+                display: block;
+                line-height: 1.2em;
+            }
+
+            .email {
+                font-size: 0.9em;
+                display: block;
+                line-height: 1.2em;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    }
+
+    .orgSelect,
+    .themeSelect {
+        max-width: 220px;
+    }
 }

@@ -43,6 +43,10 @@
 			background-color: darken($primary, 35%);
 			color: white;
 		}
+
+		&:disabled {
+			background-color: transparent;
+		}
 	}
 
 	&.btn-secondary.dropdown-toggle, .btn-secondary.active, .btn-secondary:active, .show > .btn-secondary.dropdown-toggle {

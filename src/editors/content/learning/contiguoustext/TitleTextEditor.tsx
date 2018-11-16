@@ -27,11 +27,15 @@ export interface TitleTextEditorProps {
  */
 export const TitleTextEditor
   = injectSheetSFC<StyledComponentProps<TitleTextEditorProps>>(styles)((({
-    className, classes, children, context, services, model,
+    className, classes, context, services, model,
     editMode, onEdit, onFocus, editorStyles,
   }) => {
     return (
-      <div className={classNames(['TitleTextEditor', classes.titleTextEditor, className])}>
+      <div className={classNames([
+        'TitleTextEditor',
+        classes.titleTextEditor,
+        !editMode && classes.disabled,
+        className])}>
         <ContiguousTextEditor
 
           onInsertParsedContent={() => { }}

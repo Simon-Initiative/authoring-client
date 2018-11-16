@@ -28,7 +28,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.lockDetails = null;
   }
 
-  getLockDetails() : LockDetails {
+  getLockDetails(): LockDetails {
     return this.lockDetails;
   }
 
@@ -48,32 +48,32 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
    * This strategy requires the user to acquire the write lock before
    * editing.
    */
-  initialize(doc: persistence.Document, userName: string,
-             onSuccess: onSaveCompletedCallback,
-             onFailure: onFailureCallback,
-             onStateChange: onStateChangeCallback,
-            ): Promise<boolean> {
+  initialize(
+    doc: persistence.Document, userName: string,
+    onSuccess: onSaveCompletedCallback,
+    onFailure: onFailureCallback,
+    onStateChange: onStateChangeCallback,
+  ): Promise<boolean> {
 
     this.successCallback = onSuccess;
     this.failureCallback = onFailure;
     this.stateChangeCallback = onStateChange;
 
     return new Promise((resolve, reject) => {
-
       persistence.acquireLock(doc._courseId, doc._id)
-      .then((result) => {
-        if ((result as any).lockedBy === userName) {
-          this.lockDetails = (result as any);
-          this.writeLockedDocumentId = doc._id;
-          this.courseId = doc._courseId;
+        .then((result) => {
+          if ((result as any).lockedBy === userName) {
+            this.lockDetails = (result as any);
+            this.writeLockedDocumentId = doc._id;
+            this.courseId = doc._courseId;
 
-          resolve(true);
+            resolve(true);
 
-        } else {
-          this.lockDetails = (result as any);
-          resolve(false);
-        }
-      });
+          } else {
+            this.lockDetails = (result as any);
+            resolve(false);
+          }
+        });
     });
 
   }
@@ -93,7 +93,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
   destroy(): Promise<{}> {
     const now = new Date().getTime();
     return this.doDestroy()
-        .then(r => this.releaseLock(now));
+      .then(r => this.releaseLock(now));
 
   }
 }

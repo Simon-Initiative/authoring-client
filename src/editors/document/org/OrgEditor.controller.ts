@@ -4,8 +4,6 @@ import { AbstractEditorProps } from '../common/AbstractEditor';
 import { OrganizationModel, CourseModel } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { undo, redo, documentEditingEnable } from 'actions/document';
-import { CourseId } from 'data/types';
-import { preview } from 'actions/preview';
 
 interface StateProps {
   canUndo: boolean;
@@ -16,8 +14,7 @@ interface StateProps {
 interface DispatchProps {
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  onPreview: (courseId: CourseId, organization: OrganizationModel) => Promise<any>;
-  onEditingEnable: (editable : boolean, documentId : string) => void;
+  onEditingEnable: (editable: boolean, documentId: string) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<OrganizationModel> {
@@ -38,10 +35,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(undo(documentId)),
     onRedo: (documentId: string) =>
       dispatch(redo(documentId)),
-    onPreview: (courseId: CourseId, organization: OrganizationModel) =>
-      dispatch(preview(courseId, organization, false)),
     onEditingEnable: (editable, documentId) =>
-    dispatch(documentEditingEnable(editable, documentId)),
+      dispatch(documentEditingEnable(editable, documentId)),
   };
 };
 

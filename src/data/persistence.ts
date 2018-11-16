@@ -12,6 +12,8 @@ export {
   retrieveCoursePackage,
   deleteCoursePackage,
   importPackage,
+  requestDeployment,
+  createNewVersion,
 } from './persistence/package';
 
 export {

@@ -4,15 +4,33 @@ import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
 import { parseDate } from 'data/content/resource';
 
+// Must match DeployStage enum values in ContentService
+export enum DeployStage {
+  qa = 'qa',
+  prod = 'prod',
+}
+
+// Must match DeploymentStatus enum values in ContentService and Admin app
+export enum DeploymentStatus {
+  Development = 'DEVELOPMENT',
+  RequestingQA = 'REQUESTING_QA',
+  QA = 'QA',
+  Production = 'PRODUCTION',
+  RequestingProduction = 'REQUESTING_PRODUCTION',
+}
+
 export type CourseModelParams = {
   rev?: number,
   guid?: string,
   id?: string,
   version?: string,
+  editable?: boolean;
   title?: string,
   type?: string,
   description?: string,
   buildStatus?: string,
+  svnLocation?: string,
+  deploymentStatus?: DeploymentStatus,
   dateCreated?: Date,
   metadata?: contentTypes.MetaData,
   options?: string,
@@ -30,10 +48,13 @@ const defaultCourseModel = {
   guid: '',
   id: '',
   version: '',
+  editable: true,
   type: LegacyTypes.package,
   title: '',
   description: '',
   buildStatus: '',
+  svnLocation: '',
+  deploymentStatus: DeploymentStatus.Development,
   dateCreated: Date.now(),
   metadata: new contentTypes.MetaData(),
   options: '',
@@ -57,7 +78,7 @@ function toKV(arr, deserialize) {
   );
 }
 
-function buildResourceMap(params: CourseModelParams) : CourseModelParams {
+function buildResourceMap(params: CourseModelParams): CourseModelParams {
 
   if (params.resources !== undefined) {
     let map = Immutable.OrderedMap<string, contentTypes.Resource>();
@@ -73,10 +94,13 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   guid: string;
   id: string;
   version: string;
+  editable: boolean;
   title: string;
   type: string;
   description: string;
   buildStatus: string;
+  svnLocation: string;
+  deploymentStatus: DeploymentStatus;
   dateCreated: Date;
   metadata: contentTypes.MetaData;
   options: string;
@@ -112,11 +136,11 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         );
 
     const webContents =
-    isNullOrUndefined(c.webContents)
-      ? Immutable.OrderedMap<string, contentTypes.WebContent>()
-      : Immutable.OrderedMap<string, contentTypes.WebContent>(
-        toKV(c.webContents, contentTypes.WebContent.fromPersistence),
-      );
+      isNullOrUndefined(c.webContents)
+        ? Immutable.OrderedMap<string, contentTypes.WebContent>()
+        : Immutable.OrderedMap<string, contentTypes.WebContent>(
+          toKV(c.webContents, contentTypes.WebContent.fromPersistence),
+        );
 
     let developers = Immutable.OrderedMap<string, contentTypes.UserInfo>();
     if (c.developers !== undefined && c.developers !== null) {
@@ -131,10 +155,13 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       guid: c.guid,
       id: c.id,
       version: c.version,
+      editable: c.editable,
       title: c.title,
       type: c.type,
       description: c.description,
       buildStatus: c.buildStatus,
+      svnLocation: c.svnLocation,
+      deploymentStatus: c.deploymentStatus,
       dateCreated: parseDate(c.dateCreated),
       options: JSON.stringify(c.options),
       icon: new contentTypes.WebContent(),
@@ -169,6 +196,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       title: this.title,
       type: this.type,
       description: this.description,
+      deploymentStatus: this.deploymentStatus,
       doc,
     };
     return Object.assign({}, values);

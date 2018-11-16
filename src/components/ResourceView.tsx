@@ -169,7 +169,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         : compareDates(b.dateUpdated, a.dateUpdated),
     ];
 
-    const highlightedColumnRenderer = (prop: string, r: Resource) => 
+    const highlightedColumnRenderer = (prop: string, r: Resource) =>
       this.state.searchText.length < 3
         ? <span>{r[prop]}</span>
         : highlightMatches(prop, r, this.state.searchText);
@@ -202,6 +202,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderCreation() {
+    const { course } = this.props;
+
     return (
       <div className="table-toolbar">
         <SearchBar
@@ -213,9 +215,11 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
           <div className="flex-spacer" />
           <form className="form-inline">
             <input type="text" ref="title"
+              disabled={!course.editable}
               className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
               placeholder="New Title"></input>
             <button onClick={this.createResource.bind(this)}
+              disabled={!course.editable}
               className="btn btn-primary">Create
           </button>
           </form>

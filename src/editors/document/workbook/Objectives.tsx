@@ -90,6 +90,7 @@ export class Objectives
 
         <Typeahead
           multiple
+          disabled={!this.props.editMode}
           onChange={(selected: ObjTitle[]) => {
 
             if (selected.length !== this.state.selected.length) {

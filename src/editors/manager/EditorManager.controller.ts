@@ -6,6 +6,7 @@ import { ContentModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
 import { save } from 'actions/document';
+import { State } from 'reducers';
 
 interface StateProps {
   expanded: any;
@@ -30,20 +31,20 @@ interface OwnProps {
   course: any;
 }
 
-const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { expanded, skills, objectives, documents } = state;
+  const { expanded, skills, objectives, documents, course } = state;
   const ed = documents.get(ownProps.documentId);
 
   let document = null;
   let undoRedoGuid = 'Loading';
-  let editingAllowed = false;
+  let editingAllowed = course.editable;
   let hasFailed = false;
 
   if (ed !== undefined) {
     document = ed.document;
     undoRedoGuid = ed.undoRedoGuid;
-    editingAllowed = ed.editingAllowed;
+    editingAllowed = ed.editingAllowed && course.editable;
     hasFailed = ed.hasFailed;
   }
 

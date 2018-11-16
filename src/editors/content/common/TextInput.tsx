@@ -7,6 +7,7 @@ export interface TextInputProps {
   value: string;
   type: string;
   onEdit: (value: string) => void;
+  hasError?: boolean;
 }
 
 export interface TextInputState {
@@ -44,12 +45,12 @@ export class TextInput extends React.PureComponent<TextInputProps, TextInputStat
       <input
         ref={r => this.ref = r}
         disabled={!this.props.editMode}
-        style={ { width: this.props.width } }
+        style={{ width: this.props.width }}
         placeholder={this.props.label}
         onChange={this.onChange}
-        className="form-control form-control-sm"
+        className={`form-control form-control-sm ${this.props.hasError ? 'is-invalid' : ''}`}
         type={this.props.type}
-        value={this.props.value}/>
+        value={this.props.value} />
     );
   }
 }

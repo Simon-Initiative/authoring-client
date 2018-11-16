@@ -256,6 +256,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onAddContent() {
+    if (!this.props.editMode) return;
+
     let content = contentTypes.Content.fromText('', '');
     content = content.with({ guid: guid() });
     this.addNode(content);
@@ -265,6 +267,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   addQuestion(question: contentTypes.Question) {
+    if (!this.props.editMode) return;
+
     const content = question.with({ guid: guid() });
     this.addNode(content);
     this.setState({
@@ -273,6 +277,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onAddPool() {
+    if (!this.props.editMode) return;
+
     const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
     this.addNode(pool);
     this.setState({
@@ -323,6 +329,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onSelectPool() {
+    if (!this.props.editMode) return;
 
     const predicate = (res: Resource): boolean =>
       res.type === LegacyTypes.assessment2_pool
