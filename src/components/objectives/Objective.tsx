@@ -141,6 +141,8 @@ export interface ObjectiveProps {
   skills: List<contentTypes.Skill>;
   highlighted: boolean;
   loading: boolean;
+  skillFormativeRefs: Maybe<Map<skillId, List<formativeId>>>;
+  skillSummativeRefs: Maybe<Map<skillId, List<summativeId>>>;
   onToggleExpanded: (id) => void;
   onEdit: (model: contentTypes.LearningObjective) => void;
   onEditSkill: (model: contentTypes.Skill) => void;
@@ -160,8 +162,6 @@ export interface ObjectiveState {
   mouseOver: boolean;
   skillEdits: Map<string, boolean>;
   workbookPageRefs: Maybe<List<workbookPageId>>;
-  skillFormativeRefs: Maybe<Map<skillId, List<formativeId>>>;
-  skillSummativeRefs: Maybe<Map<skillId, List<summativeId>>>;
   hasRequestedRefs: boolean;
   isEditingTitle: boolean;
 }
@@ -182,8 +182,6 @@ export class Objective
       mouseOver: false,
       skillEdits: Map<string, boolean>(),
       workbookPageRefs: Maybe.nothing<List<workbookPageId>>(),
-      skillFormativeRefs: Maybe.nothing<Map<skillId, List<formativeId>>>(),
-      skillSummativeRefs: Maybe.nothing<Map<skillId, List<summativeId>>>(),
       hasRequestedRefs: false,
       isEditingTitle: false,
     };
@@ -192,9 +190,11 @@ export class Objective
   componentDidMount() {
     const { isExpanded } = this.props;
 
-    if (isExpanded) {
-      this.loadReferences();
-    }
+    // if (isExpanded) {
+    //   this.loadReferences();
+    // }
+
+    this.loadReferences();
   }
 
   componentWillReceiveProps(nextProps: ObjectiveProps) {
@@ -223,42 +223,6 @@ export class Objective
           (acc, edge) => acc.push(edge.sourceId.split(':')[2]),
           List<string>()),
         ),
-      });
-    });
-
-    // fetch all formative assessment edges to build skill-formative refs map
-    persistence.fetchEdges(course.guid, {
-      sourceType: LegacyTypes.inline,
-    }).then((edges) => {
-      this.setState({
-        skillFormativeRefs: Maybe.just(skills.reduce(
-          (acc, skill) => acc.set(
-            skill.id,
-            (acc.get(skill.id) || List<string>()).concat(
-              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
-                .map(edge => edge.sourceId.split(':')[2]),
-            ).toList(),
-          ),
-          Map<string, List<string>>(),
-        )),
-      });
-    });
-
-    // fetch all summative assessment edges to build skill-summative refs map
-    persistence.fetchEdges(course.guid, {
-      sourceType: LegacyTypes.assessment2,
-    }).then((edges) => {
-      this.setState({
-        skillSummativeRefs: Maybe.just(skills.reduce(
-          (acc, skill) => acc.set(
-            skill.id,
-            (acc.get(skill.id) || List<string>()).concat(
-              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
-                .map(edge => edge.sourceId.split(':')[2]),
-            ).toList(),
-          ),
-          Map<string, List<string>>(),
-        )),
       });
     });
   }
@@ -317,8 +281,7 @@ export class Objective
   }
 
   renderSkillBadges(skill: contentTypes.Skill) {
-    const { classes } = this.props;
-    const { skillFormativeRefs, skillSummativeRefs } = this.state;
+    const { classes, skillFormativeRefs, skillSummativeRefs } = this.props;
 
     const formativeCount = skillFormativeRefs.caseOf({
       just: refMap => (
@@ -510,8 +473,8 @@ export class Objective
   }
 
   renderDetailOverview() {
-    const { classes, skills } = this.props;
-    const { workbookPageRefs, skillFormativeRefs, skillSummativeRefs } = this.state;
+    const { classes, skills, skillFormativeRefs, skillSummativeRefs } = this.props;
+    const { workbookPageRefs } = this.state;
 
     const pageCount = workbookPageRefs.caseOf({
       just: refs => (

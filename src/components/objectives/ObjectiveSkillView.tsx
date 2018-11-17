@@ -35,6 +35,10 @@ import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
 
+type skillId = string;
+type formativeId = string;
+type summativeId = string;
+
 export interface ObjectiveSkillViewProps {
   userName: string;
   user: UserState;
@@ -62,6 +66,8 @@ interface ObjectiveSkillViewState {
   objectives: UnifiedObjectivesModel;
   isSavePending: boolean;
   loading: boolean;
+  skillFormativeRefs: Maybe<Immutable.Map<skillId, Immutable.List<formativeId>>>;
+  skillSummativeRefs: Maybe<Immutable.Map<skillId, Immutable.List<summativeId>>>;
 }
 
 // The Learning Objectives and Skills documents require specialized handling
@@ -90,6 +96,8 @@ export class ObjectiveSkillView
       objectives: null,
       isSavePending: false,
       loading: false,
+      skillFormativeRefs: Maybe.nothing<Immutable.Map<skillId, Immutable.List<formativeId>>>(),
+      skillSummativeRefs: Maybe.nothing<Immutable.Map<skillId, Immutable.List<summativeId>>>(),
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
@@ -110,8 +118,46 @@ export class ObjectiveSkillView
   }
 
   componentDidMount() {
+    const { course, skills } = this.props;
+
     // If node expansion state has not been set by the user, expand all nodes as a default state
     this.buildModels();
+
+    // fetch all formative assessment edges to build skill-formative refs map
+    persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.inline,
+    }).then((edges) => {
+      this.setState({
+        skillFormativeRefs: Maybe.just(skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<string>()).concat(
+              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                .map(edge => edge.sourceId.split(':')[2]),
+            ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<string>>(),
+        )),
+      });
+    });
+
+    // fetch all summative assessment edges to build skill-summative refs map
+    persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.assessment2,
+    }).then((edges) => {
+      this.setState({
+        skillSummativeRefs: Maybe.just(skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<string>()).concat(
+              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                .map(edge => edge.sourceId.split(':')[2]),
+            ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<string>>(),
+        )),
+      });
+    });
   }
 
   componentWillUnmount() {
@@ -721,7 +767,7 @@ export class ObjectiveSkillView
   }
 
   renderObjectives() {
-    const { course } = this.props;
+    const { skillFormativeRefs, skillSummativeRefs } = this.state;
 
     const rows = [];
 
@@ -757,6 +803,8 @@ export class ObjectiveSkillView
             onAddNewSkill={this.onAddNewSkill}
             highlighted={false}
             onBeginExternalEdit={this.onBeginExternalEdit}
+            skillFormativeRefs={skillFormativeRefs}
+            skillSummativeRefs={skillSummativeRefs}
             objective={objective}
             skills={objective.skills.filter(skillId => this.props.skills.has(skillId))
               .map(skillId => this.props.skills.get(skillId)).toList()}
