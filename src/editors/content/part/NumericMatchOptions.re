@@ -300,7 +300,6 @@ let renderPrecision =
           let newPrecisionValue = ReactDOMRe.domElementToObj(
                                     ReactEventRe.Form.target(event),
                                   )##value;
-          Js.log(newPrecisionValue);
           if (newPrecisionValue > 0) {
             onEditMatch(. responseId, value ++ "#" ++ newPrecisionValue);
           };

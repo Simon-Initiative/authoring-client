@@ -358,7 +358,6 @@ function renderPrecision(jssClass, editMode, matchPattern, responseId, onEditMat
                   value: precisionValue,
                   onChange: (function ($$event) {
                       var newPrecisionValue = $$event.target.value;
-                      console.log(newPrecisionValue);
                       if (newPrecisionValue > 0) {
                         return onEditMatch(responseId, value + ("#" + newPrecisionValue));
                       } else {
