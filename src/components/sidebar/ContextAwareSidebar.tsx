@@ -28,6 +28,8 @@ import { relativeToNow, adjustForSkew } from 'utils/date';
 import { Tooltip } from 'utils/tooltip';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Button } from 'editors/content/common/Button';
+import { TabOptionControl } from 'editors/content/common/TabContainer';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 interface SidebarRowProps {
   label?: string;
@@ -153,6 +155,7 @@ export class ContextAwareSidebar
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
+    this.onToggleBranching = this.onToggleBranching.bind(this);
   }
 
   onRemovePage(page: contentTypes.Page) {
@@ -195,6 +198,17 @@ export class ContextAwareSidebar
     onEditModel(
       assessmentModel.with({
         pages: assessmentModel.pages.set(page.guid, page),
+      }),
+    );
+  }
+
+  onToggleBranching() {
+    const { model, onEditModel } = this.props;
+    const assessmentModel = model as AssessmentModel;
+
+    onEditModel(
+      assessmentModel.with({
+        branching: !assessmentModel.branching,
       }),
     );
   }
@@ -356,6 +370,12 @@ export class ContextAwareSidebar
             }
             <SidebarGroup label="Advanced">
               <SidebarRow>
+                {/* <TabOptionControl name="branching"> */}
+                <ToggleSwitch
+                  checked={model.branching}
+                  label="Branching Assessment"
+                  onClick={this.onToggleBranching} />
+                {/* </TabOptionControl> */}
                 <Button
                   className={classes.deleteButton}
                   onClick={this.showDeleteModal}

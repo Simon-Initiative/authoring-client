@@ -13,6 +13,7 @@ export type AssessmentModelParams = {
   type?: string;
   recommendedAttempts?: string;
   maxAttempts?: string;
+  branching?: boolean,
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
   nodes?: Immutable.OrderedMap<string, contentTypes.Node>,
@@ -25,6 +26,7 @@ const defaultAssessmentModelParams = {
   guid: '',
   recommendedAttempts: '3',
   maxAttempts: '3',
+  branching: false,
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
   nodes: Immutable.OrderedMap<string, contentTypes.Node>(),
@@ -72,6 +74,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   type: string;
   recommendedAttempts: string;
   maxAttempts: string;
+  branching: boolean;
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   nodes: Immutable.OrderedMap<string, contentTypes.Node>;
@@ -168,6 +171,14 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
           break;
         case 'title':
           break;
+        // Content service looks for a short title with text equal to "reveal"
+        // to display a branching assessment
+        case 'short_title':
+          if (item.short_title === 'reveal') {
+            model = model.with({
+              branching: true,
+            });
+          }
         default:
           model = model.with({
             nodes:
@@ -189,13 +200,20 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       nothing: () => '',
     });
 
-    const shortTitle = titleText.length > 30 ? titleText.substr(0, 30) : titleText;
-
     const children = [
       this.title.toPersistence(),
-      { short_title: { '#text': shortTitle } },
-      ...this.pages.toArray().map(page => page.toPersistence()),
     ];
+    // Content service looks for a short title with text equal to "reveal"
+    // to display a branching assessment
+    if (this.branching) {
+      children.push(
+        { short_title: { '#text': 'reveal' } },
+      );
+    }
+    children.push(
+      ...this.pages.toArray().map(page => page.toPersistence()),
+    );
+
     let resource = this.resource.toPersistence();
     let doc = null;
 
