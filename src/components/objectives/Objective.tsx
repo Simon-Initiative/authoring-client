@@ -19,6 +19,9 @@ import { Tooltip } from 'utils/tooltip';
 
 const SKILL_GRID_HEADER_HEIGHT = 180;
 
+const addPluralS = (string: string, itemCount: number) =>
+  itemCount === 1 ? string : `${string}s`;
+
 export const styles: JSSStyles = {
   Objective: {
     extend: [disableSelect],
@@ -34,7 +37,7 @@ export const styles: JSSStyles = {
     flexDirection: 'row',
     fontSize: '1.2em',
     minHeight: 50,
-    padding: [10, 0, 20, 0],
+    padding: [10, 0],
     cursor: 'pointer',
 
     '&:hover': {
@@ -42,6 +45,8 @@ export const styles: JSSStyles = {
     },
   },
   titleText: {
+    display: 'flex',
+    flexDirection: 'column',
     minWidth: 100,
     flex: 1,
     marginLeft: 10,
@@ -117,7 +122,16 @@ export const styles: JSSStyles = {
     color: flatui.nephritis,
   },
   poolColor: {
-    color: flatui.greenSea,
+    color: flatui.turquoise,
+  },
+  detailsOverviewSeparator: {
+    padding: [0, 6],
+    borderLeft: [1, 'solid', colors.grayLight],
+  },
+  detailsOverviewAssessmentCounts: {
+    borderRadius: 4,
+    marginLeft: 10,
+    fontWeight: 600,
   },
   detailsSectionIcon: {
     marginRight: 5,
@@ -183,6 +197,9 @@ export const styles: JSSStyles = {
     '&:hover $skillActions': {
       display: 'block',
     },
+  },
+  skillBadges: {
+    whiteSpace: 'nowrap',
   },
   skillCountBadgeIcon: {
     width: 12,
@@ -393,7 +410,7 @@ export class Objective
                       className={classes.assessmentLink}
                       transform="translate(10, 2)"
                       onClick={() => history.push(`/${assessment.guid}-${course.guid}`)}>
-                      {stringFormat.ellipsize(assessment.title, 24)}
+                      {stringFormat.ellipsize(assessment.title, 30)}
                     </text>
                     <line
                       x1={10}
@@ -523,47 +540,52 @@ export class Objective
     });
 
     const tooltipTitle = <div style={{ textAlign: 'left' }}>
-      {formativeCount} <i className="fa fa-flask" /> Formative
+      {formativeCount} <i className="fa fa-flask" /> {addPluralS('Formative', formativeCount)}
       <br/>
-      {summativeCount} <i className="fa fa-check" /> Summative
+      {summativeCount} <i className="fa fa-check" /> {addPluralS('Summative', summativeCount)}
       <br/>
-      {poolCount} <i className="fa fa-question" /> Question Pools
+      {poolCount} <i className="fa fa-question" /> {addPluralS('Question Pool', poolCount)}
     </div>;
 
     return (
       <Tooltip html={tooltipTitle} distance={10}
         size="small" arrowSize="small">
-        <span className={classNames(['badge badge-light', classes.skillBadge])}
-          style={{
-            color: flatui.amethyst,
-            borderRight: 'none',
-            marginRight: 0,
-            borderTopRightRadius: 0,
-            borderBottomRightRadius: 0,
-          }}>
-          {formativeCount} <i className={classNames(['fa fa-flask', classes.skillCountBadgeIcon])}/>
-        </span>
-        <span
-          className={classNames(['badge badge-light', classes.skillBadge])}
-          style={{
-            color: flatui.nephritis,
-            borderRight: 'none',
-            marginLeft: 0,
-            marginRight: 0,
-            borderRadius: 0,
-          }}>
-          {summativeCount} <i className={classNames(['fa fa-check', classes.skillCountBadgeIcon])}/>
-        </span>
-        <span
-          className={classNames(['badge badge-light', classes.skillBadge])}
-          style={{
-            color: flatui.greenSea,
-            marginLeft: 0,
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-          }}>
-          {poolCount} <i className={classNames(['fa fa-question', classes.skillCountBadgeIcon])}/>
-        </span>
+        <div className={classes.skillBadges}>
+          <span className={classNames(['badge badge-light', classes.skillBadge])}
+            style={{
+              color: flatui.amethyst,
+              borderRight: 'none',
+              marginRight: 0,
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+            }}>
+            {formativeCount} <i className={classNames([
+              'fa fa-flask', classes.skillCountBadgeIcon])}/>
+          </span>
+          <span
+            className={classNames(['badge badge-light', classes.skillBadge])}
+            style={{
+              color: flatui.nephritis,
+              borderRight: 'none',
+              marginLeft: 0,
+              marginRight: 0,
+              borderRadius: 0,
+            }}>
+            {summativeCount} <i className={classNames([
+              'fa fa-check', classes.skillCountBadgeIcon])}/>
+          </span>
+          <span
+            className={classNames(['badge badge-light', classes.skillBadge])}
+            style={{
+              color: flatui.turquoise,
+              marginLeft: 0,
+              borderTopLeftRadius: 0,
+              borderBottomLeftRadius: 0,
+            }}>
+            {poolCount} <i className={classNames([
+              'fa fa-question', classes.skillCountBadgeIcon])}/>
+          </span>
+        </div>
       </Tooltip>
     );
   }
@@ -577,20 +599,21 @@ export class Objective
     return skills.map(skill => (
       <div key={skill.guid} className={classes.skill}>
         {this.renderSkillBadges(skill)}
-        <InlineEdit
-          isEditing={skillEdits.get(skill.guid)}
-          onEdit={(value) => {
-            this.setState({
+        <div className="flex-spacer">
+          <InlineEdit
+            isEditing={skillEdits.get(skill.guid)}
+            onEdit={(value) => {
+              this.setState({
+                skillEdits: skillEdits.set(skill.guid, false),
+              });
+              onEditSkill(skill.with({ title: value }));
+            }}
+            onCancel={() => this.setState({
               skillEdits: skillEdits.set(skill.guid, false),
-            });
-            onEditSkill(skill.with({ title: value }));
-          }}
-          onCancel={() => this.setState({
-            skillEdits: skillEdits.set(skill.guid, false),
-          })}
-          editMode={editMode && !loading}
-          value={skill.title} />
-        <div className="flex-spacer" />
+            })}
+            editMode={editMode && !loading}
+            value={skill.title} />
+        </div>
         <div className={classes.skillActions}>
           {!skillEdits.get(skill.guid) && this.renderSkillActions(skill)}
         </div>
@@ -616,7 +639,6 @@ export class Objective
         nothing: () => '[Error loading page title]',
       });
 
-    const REF_LIMIT = 10;
     const RIGHT_QUAD_WIDTH = (this.getOrderedObjectiveAssessments().length * 35)
       + (SKILL_GRID_HEADER_HEIGHT);
 
@@ -641,7 +663,7 @@ export class Objective
                 return refs.size > 0
                 ? (
                   <div className={classes.pageList}>
-                    {refs.slice(0, REF_LIMIT).map(refGuid => (
+                    {refs.map(refGuid => (
                       <div key={refGuid}>
                         <a href={`./#${getRefGuidFromRefId(refGuid)}-${course.guid}`}>
                         <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
@@ -649,12 +671,6 @@ export class Objective
                         </a>
                       </div>
                     ))}
-                    {refs.size > REF_LIMIT
-                      ? (
-                        <div>and {refs.size - REF_LIMIT} more...</div>
-                      )
-                      : null
-                    }
                   </div>
                 )
                 : (
@@ -735,49 +751,68 @@ export class Objective
   }
 
   renderDetailOverview() {
-    const { classes, skills, skillFormativeRefs, skillSummativeRefs } = this.props;
+    const { classes, skills, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
     const { workbookPageRefs } = this.state;
 
     const pageCount = workbookPageRefs.caseOf({
-      just: refs => (
-        <span
-          className={classNames(['badge badge-light', classes.detailBadge])}
-          style={{ marginLeft: 20 }}>
-          {refs.size} Pages
-        </span>
-      ),
+      just: refs => refs.size,
       nothing: () => null,
     });
 
+    const skillCount = skills.size;
+
     const formativeCount = skillFormativeRefs.caseOf({
-      just: refMap => (
-        <span className={classNames(['badge badge-light', classes.detailBadge])}>
-          {skills.reduce(
-            (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
-            0,
-          )} Formative
-        </span>
+      just: refMap => skills.reduce(
+        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
+        0,
       ),
       nothing: () => null,
     });
 
     const summativeCount = skillSummativeRefs.caseOf({
-      just: refMap => (
-        <span className={classNames(['badge badge-light', classes.detailBadge])}>
-        {skills.reduce(
-          (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
-          0,
-        )} Summative
-        </span>
+      just: refMap => skills.reduce(
+        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
+        0,
+      ),
+      nothing: () => null,
+    });
+
+    const poolCount = skillPoolRefs.caseOf({
+      just: refMap => skills.reduce(
+        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
+        0,
       ),
       nothing: () => null,
     });
 
     return (
       <React.Fragment>
-        {pageCount}
-        {formativeCount}
-        {summativeCount}
+        <span
+          className={classNames(['badge badge-light', classes.detailBadge])}
+          style={{ marginLeft: 0 }}>
+          {pageCount} {addPluralS('Page', pageCount)}
+        </span>
+        <span className={classNames(['badge badge-light', classes.detailBadge])}>
+          {skillCount} {addPluralS('Skill', skillCount)}
+          <span
+            className={classes.detailsOverviewAssessmentCounts} >
+            <span
+              className={classNames([classes.detailsOverviewSeparator, classes.formativeColor])}>
+              {`${formativeCount} `}
+              <i className="fa fa-flask"/>
+              </span>
+            <span
+              className={classNames([classes.detailsOverviewSeparator, classes.summativeColor])}>
+              {`${summativeCount} `}
+              <i className="fa fa-check"/>
+              </span>
+            <span
+              className={classNames([classes.detailsOverviewSeparator, classes.poolColor])}>
+              {`${poolCount} `}
+              <i className="fa fa-question"/>
+            </span>
+          </span>
+        </span>
       </React.Fragment>
     );
   }
@@ -838,22 +873,26 @@ export class Objective
           onClick={() => this.onToggleDetails()}>
           <div><i className="fa fa-graduation-cap"/></div>
           <div className={classNames([classes.titleText])}>
-            <InlineEdit
-              inputStyle={{ width: '80%' }}
-              isEditing={isEditingTitle}
-              onEdit={(value) => {
+            <div className="flex-spacer">
+              <InlineEdit
+                inputStyle={{ width: '80%' }}
+                isEditing={isEditingTitle}
+                onEdit={(value) => {
+                  this.setState({
+                    isEditingTitle: false,
+                  });
+                  onEdit(objective.with({ title: value }));
+                }}
+                onCancel={() =>
                 this.setState({
                   isEditingTitle: false,
-                });
-                onEdit(objective.with({ title: value }));
-              }}
-              onCancel={() =>
-              this.setState({
-                isEditingTitle: false,
-              })}
-              editMode={editMode && !loading}
-              value={displayedTitle} />
+                })}
+                editMode={editMode && !loading}
+                value={displayedTitle} />
+            </div>
+            <div>
               {!isExpanded && !isEditingTitle && this.renderDetailOverview()}
+            </div>
           </div>
           <div className={classes.actionButtons}>{actionButtons}</div>
         </div>
