@@ -37,10 +37,12 @@ export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
 
 export function deleteCoursePackage(courseId: CourseId): Promise<string> {
 
-  const url = `${configuration.baseUrl}/packages/${courseId}?remove_src=false`;
-  const method = 'DELETE';
+  const url = `${configuration.baseUrl}/packages/set/visible?visible=false`;
+  const method = 'POST';
 
-  return authenticatedFetch({ url, method })
+  const body = JSON.stringify([courseId]);
+
+  return authenticatedFetch({ url, method, body })
     .then((json: any) => json.message);
 }
 
