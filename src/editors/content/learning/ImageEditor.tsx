@@ -15,7 +15,7 @@ import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
-'editors/content/utils/content';
+  'editors/content/utils/content';
 import { buildUrl } from 'utils/path';
 import { fetchImageSize, ImageSize } from 'utils/image';
 import ModalSelection from 'utils/selection/ModalSelection';
@@ -28,6 +28,7 @@ import { AppServices } from 'editors/common/AppServices';
 const IMAGE = require('../../../../assets/400x300.png');
 
 import { styles } from './MediaElement.styles';
+import { ContentContainer } from '../container/ContentContainer';
 
 export interface ImageSizeSidebarProps {
   services: AppServices;
@@ -67,6 +68,7 @@ export class ImageSizeSidebar extends
     this.onEditWidth = this.onEditWidth.bind(this);
     this.onEditHeight = this.onEditHeight.bind(this);
     this.onToggleNativeSizing = this.onToggleNativeSizing.bind(this);
+
   }
 
   componentDidMount() {
@@ -177,38 +179,38 @@ export class ImageSizeSidebar extends
         </SidebarGroup>
         <SidebarGroup label="Size">
           <SidebarRow>
-          <div className="form-check">
-            <label className="form-check-label">
-              <input className="form-check-input"
-                name="sizingOptions"
-                value="native"
-                checked={this.state.isNativeSize}
-                onChange={() => this.onToggleNativeSizing(true)}
-                type="radio" />&nbsp;
-              Default
+            <div className="form-check">
+              <label className="form-check-label">
+                <input className="form-check-input"
+                  name="sizingOptions"
+                  value="native"
+                  checked={this.state.isNativeSize}
+                  onChange={() => this.onToggleNativeSizing(true)}
+                  type="radio" />&nbsp;
+Default
             </label>
-          </div>
-          <div className="form-check">
-            <label className="form-check-label">
-              <input className="form-check-input"
-                name="sizingOptions"
-                onChange={() => this.onToggleNativeSizing(false)}
-                value="custom"
-                checked={!this.state.isNativeSize}
-                type="radio" />&nbsp;
-              Custom
+            </div>
+            <div className="form-check">
+              <label className="form-check-label">
+                <input className="form-check-input"
+                  name="sizingOptions"
+                  onChange={() => this.onToggleNativeSizing(false)}
+                  value="custom"
+                  checked={!this.state.isNativeSize}
+                  type="radio" />&nbsp;
+Custom
             </label>
-          </div>
+            </div>
           </SidebarRow>
           <SidebarRow label="Width">
             <form>
-            <div className="input-group input-group-sm">
-              <TextInput width="100px" label=""
-                editMode={this.props.editMode && !this.state.isNativeSize}
-                value={width.toString()}
-                type="number"
-                onEdit={this.onEditWidth}
-              /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
+              <div className="input-group input-group-sm">
+                <TextInput width="100px" label=""
+                  editMode={this.props.editMode && !this.state.isNativeSize}
+                  value={width.toString()}
+                  type="number"
+                  onEdit={this.onEditWidth}
+                /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
             </form>
           </SidebarRow>
           <SidebarRow label="Height">
@@ -283,7 +285,7 @@ export default class ImageEditor
     this.onEditAlt = this.onEditAlt.bind(this);
     this.onEditValign = this.onEditValign.bind(this);
     this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
-
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
     this.state = {
       failure: false,
     };
@@ -323,6 +325,12 @@ export default class ImageEditor
         { src: adjustPath(selection[0].pathTo, context.resourcePath) });
       onEdit(updated, updated);
     }
+  }
+
+  onCaptionEdit(content, src) {
+    const caption = this.props.model.caption.with({ content });
+    const model = this.props.model.with({ caption });
+    this.props.onEdit(model, src);
   }
 
   renderOther() {
@@ -408,6 +416,13 @@ export default class ImageEditor
     return (
       <div className={classes.mediaElement}>
         <img src={fullSrc} height={height} width={width} />
+        <div className={classes.captionEditor}>
+          <div className={classes.captionHeader}>Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
       </div>
     );
   }

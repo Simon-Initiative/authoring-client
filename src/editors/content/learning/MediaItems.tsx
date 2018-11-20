@@ -102,7 +102,6 @@ export class MediaMetadataEditor
     this.onPopoutEnableToggle = this.onPopoutEnableToggle.bind(this);
     // this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
-    this.onCaptionEdit = this.onCaptionEdit.bind(this);
     // this.onCitationTitleEdit = this.onCitationTitleEdit.bind(this);
     // this.onCitationEntryEdit = this.onCitationEntryEdit.bind(this);
     // this.onCitationContentEdit = this.onCitationContentEdit.bind(this);
@@ -134,12 +133,6 @@ export class MediaMetadataEditor
     this.props.onEdit(model, model);
   }
 
-  onCaptionEdit(content: ContentElements, src) {
-    const caption = this.props.model.caption.with({ content });
-    const model = (this.props.model as MediaType).with({ caption });
-    this.props.onEdit(model, src);
-  }
-
   // onCitationTitleEdit(title: string) {
   //   const cite = this.props.model.cite.with({ title });
   //   const model = (this.props.model as MediaType).with({ cite });
@@ -159,7 +152,7 @@ export class MediaMetadataEditor
   // }
 
   render() {
-    const { popout, titleContent, caption } = this.props.model;
+    const { popout, titleContent } = this.props.model;
 
     return (
       <div>
@@ -195,16 +188,6 @@ export class MediaMetadataEditor
             model={alternate.content}
             onEdit={this.onAlternateEdit} />
         </SidebarGroup> */}
-        <SidebarGroup label="Caption">
-          <ToolbarContentContainer
-              {...this.props}
-              renderContext={undefined}
-              activeContentGuid={null}
-              hover={null}
-              onUpdateHover={() => {}}
-              model={caption.content}
-              onEdit={this.onCaptionEdit} />
-        </SidebarGroup>
         {/* <SidebarGroup label="Citation">
           <TextInput width="100%" label="Title"
             editMode={this.props.editMode}

@@ -43,6 +43,12 @@ export default class AppletEditor
     super(props);
     this.onPurposeChange = this.onPurposeChange.bind(this);
     this.onLoggingToggle = this.onLoggingToggle.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
+  }
+
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
   onLoggingToggle() {
@@ -172,7 +178,6 @@ export default class AppletEditor
     );
   }
 
-
   onAddParam() {
     const c = new contentTypes.ParamText().with({
       text: 'Value',
@@ -204,7 +209,6 @@ export default class AppletEditor
     this.props.onEdit(model, src);
   }
 
-
   renderParameters() {
 
     if (this.props.model.params.size === 0) {
@@ -230,7 +234,13 @@ export default class AppletEditor
       <div className="mediaEditor">
 
         <div className="mediaHeader">Applet</div>
-
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
         <span className="mediaLabel">Parameters:</span>
         {this.renderParameters()}
         <button type="button"

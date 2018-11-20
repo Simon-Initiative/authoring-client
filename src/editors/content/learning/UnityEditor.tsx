@@ -42,8 +42,13 @@ export default class UnityEditor
 
     this.onSelect = this.onSelect.bind(this);
     this.onPurposeChange = this.onPurposeChange.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
   }
 
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }), src);
+  }
 
   onPurposeChange(purpose) {
     const model = this.props.model.with({
@@ -184,7 +189,6 @@ export default class UnityEditor
     this.props.onEdit(model, src);
   }
 
-
   renderParameters() {
 
     if (this.props.model.params.size === 0) {
@@ -217,7 +221,13 @@ export default class UnityEditor
         <div>
           <span className="mediaLabel">Source File:</span> {file}
         </div>
-
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
         <span className="mediaLabel">Parameters:</span>
         {this.renderParameters()}
         <button type="button"

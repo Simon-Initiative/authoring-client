@@ -12,13 +12,17 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
-'editors/content/utils/content';
+  'editors/content/utils/content';
 import { modalActions } from 'actions/modal';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { buildUrl } from 'utils/path';
 import { MediaMetadataEditor } from 'editors/content/learning/MediaItems';
 import { Source } from 'data/content/learning/source';
+import { ContentElements } from 'data/content/common/elements';
+
+import './Media.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
   onShowSidebar: () => void;
@@ -67,6 +71,12 @@ export default class AudioEditor
 
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
+  }
+
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
   onPopoutEdit(content: string) {
@@ -157,6 +167,13 @@ export default class AudioEditor
     return (
       <div className="audioEditor">
         <audio src={fullSrc} controls={controls} />
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
       </div>
     );
   }
