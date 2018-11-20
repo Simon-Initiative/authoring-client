@@ -576,7 +576,7 @@ export class Objective
   }
 
   renderSkillBadges(skill: contentTypes.Skill) {
-    const { classes, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
+    const { classes } = this.props;
 
     const formativeCount = this.getFormativeAssessmentCount();
     const summativeCount = this.getSummativeAssessmentCount();
@@ -811,8 +811,8 @@ export class Objective
     );
   }
 
-  renderDetailOverview() {
-    const { classes, skills, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
+  renderAggregateDetails() {
+    const { classes, skills } = this.props;
     const { workbookPageRefs } = this.state;
 
     const pageCount = workbookPageRefs.caseOf({
@@ -941,7 +941,7 @@ export class Objective
                 value={displayedTitle} />
             </div>
             <div>
-              {!isExpanded && !isEditingTitle && this.renderDetailOverview()}
+              {!isExpanded && !isEditingTitle && this.renderAggregateDetails()}
             </div>
           </div>
           <div className={classes.actionButtons}>{actionButtons}</div>
