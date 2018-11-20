@@ -17,6 +17,23 @@ import flatui from 'styles/palettes/flatui';
 import history from 'utils/history';
 import { Tooltip } from 'utils/tooltip';
 
+const PAGE_COUNT_WARNING_THRESHOLD = 1;
+const SKILL_COUNT_WARNING_THRESHOLD = 3;
+
+const WarningTip = ({ show, children }) =>
+  show ? (
+    <Tooltip
+      html={children}
+      interactive={true}
+      theme="light"
+      size="small"
+      arrowSize="small">
+      <i className={classNames(['fa fa-exclamation-circle'])}
+        style={{ color: colors.danger, margin: '0px 4px' }} />
+    </Tooltip>
+  )
+  : null;
+
 const SKILL_GRID_HEADER_HEIGHT = 180;
 
 const addPluralS = (string: string, itemCount: number) =>
@@ -350,6 +367,43 @@ export class Objective
     this.props.onRemoveSkill(model);
   }
 
+  getFormativeAssessmentCount = () => {
+    const { skills, skillFormativeRefs } = this.props;
+
+    return skillFormativeRefs.caseOf({
+      just: refMap => skills.reduce(
+        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
+        0,
+      ),
+      nothing: () => null,
+    });
+
+  }
+
+  getSummativeAssessmentCount = () => {
+    const { skills, skillSummativeRefs } = this.props;
+
+    return skillSummativeRefs.caseOf({
+      just: refMap => skills.reduce(
+        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
+        0,
+      ),
+      nothing: () => null,
+    });
+  }
+
+  getQuestionPoolAssessmentCount = () => {
+    const { skills, skillPoolRefs } = this.props;
+
+    return skillPoolRefs.caseOf({
+      just: refMap => skills.reduce(
+        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
+        0,
+      ),
+      nothing: () => null,
+    });
+  }
+
   getOrderedObjectiveAssessments = () => {
     const { course, skills, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
 
@@ -524,20 +578,9 @@ export class Objective
   renderSkillBadges(skill: contentTypes.Skill) {
     const { classes, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
 
-    const formativeCount = skillFormativeRefs.caseOf({
-      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
-      nothing: () => null,
-    });
-
-    const summativeCount = skillSummativeRefs.caseOf({
-      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
-      nothing: () => null,
-    });
-
-    const poolCount = skillPoolRefs.caseOf({
-      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
-      nothing: () => null,
-    });
+    const formativeCount = this.getFormativeAssessmentCount();
+    const summativeCount = this.getSummativeAssessmentCount();
+    const poolCount = this.getQuestionPoolAssessmentCount();
 
     const tooltipTitle = <div style={{ textAlign: 'left' }}>
       {formativeCount} <i className="fa fa-flask" /> {addPluralS('Formative', formativeCount)}
@@ -599,8 +642,9 @@ export class Objective
     return skills.map(skill => (
       <div key={skill.guid} className={classes.skill}>
         {this.renderSkillBadges(skill)}
-        <div className="flex-spacer">
+        <div className="flex-spacer" style={{ lineHeight: 1.8 }}>
           <InlineEdit
+            inputStyle={{ width: '80%' }}
             isEditing={skillEdits.get(skill.guid)}
             onEdit={(value) => {
               this.setState({
@@ -614,9 +658,11 @@ export class Objective
             editMode={editMode && !loading}
             value={skill.title} />
         </div>
-        <div className={classes.skillActions}>
-          {!skillEdits.get(skill.guid) && this.renderSkillActions(skill)}
-        </div>
+        {!skillEdits.get(skill.guid) &&
+          <div className={classes.skillActions}>
+            {this.renderSkillActions(skill)}
+          </div>
+        }
       </div>
     ));
   }
@@ -627,6 +673,11 @@ export class Objective
       skills,
     } = this.props;
     const { workbookPageRefs } = this.state;
+
+    const pageCount = workbookPageRefs.caseOf({
+      just: refs => refs.size,
+      nothing: () => null,
+    });
 
     const getRefGuidFromRefId = (id: string) =>
       Maybe.maybe(course.resourcesById.get(id)).caseOf({
@@ -647,6 +698,10 @@ export class Objective
         <div className={classes.quadTop}>
           <div className={classes.quadLeft}>
             <h3>
+            <WarningTip show={pageCount < PAGE_COUNT_WARNING_THRESHOLD}>
+              Objectives should be referenced by at least {PAGE_COUNT_WARNING_THRESHOLD}
+              {' workbook ' + addPluralS('page', PAGE_COUNT_WARNING_THRESHOLD)}.
+            </WarningTip>
             <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
             Pages
             {workbookPageRefs.caseOf({
@@ -686,6 +741,12 @@ export class Objective
               ),
             })}
             <h3>
+              <WarningTip show={skills.size < SKILL_COUNT_WARNING_THRESHOLD}>
+                Objectives should have at least {SKILL_COUNT_WARNING_THRESHOLD}
+                {' ' + addPluralS('skill', SKILL_COUNT_WARNING_THRESHOLD)}.
+                <br/>
+            <a href="#">Learn more about how skills work</a>.
+              </WarningTip>
               <i className={classNames(['fa fa-cubes', classes.detailsSectionIcon])} />
               Skills
               <span className={classNames(['badge badge-light', classes.countBadge])}>
@@ -760,39 +821,28 @@ export class Objective
     });
 
     const skillCount = skills.size;
-
-    const formativeCount = skillFormativeRefs.caseOf({
-      just: refMap => skills.reduce(
-        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
-        0,
-      ),
-      nothing: () => null,
-    });
-
-    const summativeCount = skillSummativeRefs.caseOf({
-      just: refMap => skills.reduce(
-        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
-        0,
-      ),
-      nothing: () => null,
-    });
-
-    const poolCount = skillPoolRefs.caseOf({
-      just: refMap => skills.reduce(
-        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
-        0,
-      ),
-      nothing: () => null,
-    });
+    const formativeCount = this.getFormativeAssessmentCount();
+    const summativeCount = this.getSummativeAssessmentCount();
+    const poolCount = this.getQuestionPoolAssessmentCount();
 
     return (
       <React.Fragment>
         <span
           className={classNames(['badge badge-light', classes.detailBadge])}
           style={{ marginLeft: 0 }}>
+          <WarningTip show={pageCount < PAGE_COUNT_WARNING_THRESHOLD}>
+            Objectives should be referenced by at least {PAGE_COUNT_WARNING_THRESHOLD}
+            {' workbook ' + addPluralS('page', PAGE_COUNT_WARNING_THRESHOLD)}.
+          </WarningTip>
           {pageCount} {addPluralS('Page', pageCount)}
         </span>
         <span className={classNames(['badge badge-light', classes.detailBadge])}>
+          <WarningTip show={skillCount < SKILL_COUNT_WARNING_THRESHOLD}>
+            Objectives should have at least {SKILL_COUNT_WARNING_THRESHOLD}
+            {' ' + addPluralS('skill', SKILL_COUNT_WARNING_THRESHOLD)}.
+            <br/>
+            <a href="#">Learn more about how skills work</a>.
+          </WarningTip>
           {skillCount} {addPluralS('Skill', skillCount)}
           <span
             className={classes.detailsOverviewAssessmentCounts} >
