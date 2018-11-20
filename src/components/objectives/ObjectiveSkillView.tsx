@@ -38,6 +38,7 @@ import { RawContentEditor } from './RawContentEditor';
 type skillId = string;
 type formativeId = string;
 type summativeId = string;
+type poolId = string;
 
 export interface ObjectiveSkillViewProps {
   userName: string;
@@ -68,6 +69,7 @@ interface ObjectiveSkillViewState {
   loading: boolean;
   skillFormativeRefs: Maybe<Immutable.Map<skillId, Immutable.List<formativeId>>>;
   skillSummativeRefs: Maybe<Immutable.Map<skillId, Immutable.List<summativeId>>>;
+  skillPoolRefs: Maybe<Immutable.Map<skillId, Immutable.List<poolId>>>;
 }
 
 // The Learning Objectives and Skills documents require specialized handling
@@ -98,6 +100,7 @@ export class ObjectiveSkillView
       loading: false,
       skillFormativeRefs: Maybe.nothing<Immutable.Map<skillId, Immutable.List<formativeId>>>(),
       skillSummativeRefs: Maybe.nothing<Immutable.Map<skillId, Immutable.List<summativeId>>>(),
+      skillPoolRefs: Maybe.nothing<Immutable.Map<skillId, Immutable.List<poolId>>>(),
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
@@ -147,6 +150,24 @@ export class ObjectiveSkillView
     }).then((edges) => {
       this.setState({
         skillSummativeRefs: Maybe.just(skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<string>()).concat(
+              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                .map(edge => edge.sourceId.split(':')[2]),
+            ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<string>>(),
+        )),
+      });
+    });
+
+    // fetch all question pool assessment edges to build skill-summative refs map
+    persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.assessment2_pool,
+    }).then((edges) => {
+      this.setState({
+        skillPoolRefs: Maybe.just(skills.reduce(
           (acc, skill) => acc.set(
             skill.id,
             (acc.get(skill.id) || Immutable.List<string>()).concat(
@@ -767,7 +788,7 @@ export class ObjectiveSkillView
   }
 
   renderObjectives() {
-    const { skillFormativeRefs, skillSummativeRefs } = this.state;
+    const { skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.state;
 
     const rows = [];
 
@@ -805,6 +826,7 @@ export class ObjectiveSkillView
             onBeginExternalEdit={this.onBeginExternalEdit}
             skillFormativeRefs={skillFormativeRefs}
             skillSummativeRefs={skillSummativeRefs}
+            skillPoolRefs={skillPoolRefs}
             objective={objective}
             skills={objective.skills.filter(skillId => this.props.skills.has(skillId))
               .map(skillId => this.props.skills.get(skillId)).toList()}

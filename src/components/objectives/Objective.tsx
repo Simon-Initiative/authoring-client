@@ -15,6 +15,7 @@ import { CourseModel } from 'data/models';
 import { stringFormat } from 'utils/format';
 import flatui from 'styles/palettes/flatui';
 import history from 'utils/history';
+import { Tooltip } from 'utils/tooltip';
 
 const SKILL_GRID_HEADER_HEIGHT = 180;
 
@@ -115,6 +116,9 @@ export const styles: JSSStyles = {
   summativeColor: {
     color: flatui.nephritis,
   },
+  poolColor: {
+    color: flatui.greenSea,
+  },
   detailsSectionIcon: {
     marginRight: 5,
     width: 26,
@@ -180,6 +184,9 @@ export const styles: JSSStyles = {
       display: 'block',
     },
   },
+  skillCountBadgeIcon: {
+    width: 12,
+  },
   skillActions: {
     display: 'none',
     margin: [0, 20],
@@ -209,6 +216,12 @@ export const styles: JSSStyles = {
   },
 };
 
+type skillId = string;
+type workbookPageId = string;
+type formativeId = string;
+type summativeId = string;
+type poolId = string;
+
 export interface ObjectiveProps {
   course: CourseModel;
   isExpanded: boolean;
@@ -219,6 +232,7 @@ export interface ObjectiveProps {
   loading: boolean;
   skillFormativeRefs: Maybe<Map<skillId, List<formativeId>>>;
   skillSummativeRefs: Maybe<Map<skillId, List<summativeId>>>;
+  skillPoolRefs: Maybe<Map<skillId, List<poolId>>>;
   onToggleExpanded: (id) => void;
   onEdit: (model: contentTypes.LearningObjective) => void;
   onEditSkill: (model: contentTypes.Skill) => void;
@@ -228,11 +242,6 @@ export interface ObjectiveProps {
   onRemove: (model: contentTypes.LearningObjective) => void;
   onRemoveSkill: (model: contentTypes.Skill) => void;
 }
-
-type skillId = string;
-type workbookPageId = string;
-type formativeId = string;
-type summativeId = string;
 
 export interface ObjectiveState {
   mouseOver: boolean;
@@ -325,17 +334,23 @@ export class Objective
   }
 
   getOrderedObjectiveAssessments = () => {
-    const { course, skills, skillFormativeRefs, skillSummativeRefs } = this.props;
+    const { course, skills, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
 
+    // because we are reducing on an ordered list of skills, the result
+    // will automatically be sorted by skill which is what we want
     const assessmentIdRefs: List<string> = skills.reduce(
       (acc, skill) => acc.concat(skillFormativeRefs
-        .valueOr(Map<string, List<string>>())
-        .get(skill.id))
+          .valueOr(Map<string, List<string>>())
+          .get(skill.id))
         .concat(skillSummativeRefs
-        .valueOr(Map<string, List<string>>())
-        .get(skill.id)).toList(),
+          .valueOr(Map<string, List<string>>())
+          .get(skill.id))
+        .concat(skillPoolRefs
+          .valueOr(Map<string, List<string>>())
+          .get(skill.id))
+        .toList(),
       List<string>(),
-    ).filter(ref => !!ref).sort((a, b) => a.localeCompare(b)).toList();
+    ).filter(ref => !!ref).toList();
 
     return assessmentIdRefs.map(ref => course.resourcesById.get(ref)).toArray();
   }
@@ -396,16 +411,23 @@ export class Objective
   }
 
   renderSkillGrid() {
-    const { classes, skills, skillFormativeRefs , skillSummativeRefs} = this.props;
+    const { classes, skills, skillFormativeRefs , skillSummativeRefs, skillPoolRefs } = this.props;
 
     const orderedObjectiveAssessments = this.getOrderedObjectiveAssessments();
+
     const skillContainsFormative = (skill: contentTypes.Skill, formative: contentTypes.Resource) =>
       skillFormativeRefs.valueOr(Map<string, List<string>>()).has(skill.id)
       && skillFormativeRefs.valueOr(Map<string, List<string>>()).get(skill.id)
         .contains(formative.id);
+
     const skillContainsSummative = (skill: contentTypes.Skill, summative: contentTypes.Resource) =>
     skillSummativeRefs.valueOr(Map<string, List<string>>()).has(skill.id)
       && skillSummativeRefs.valueOr(Map<string, List<string>>()).get(skill.id)
+        .contains(summative.id);
+
+    const skillContainsPool = (skill: contentTypes.Skill, summative: contentTypes.Resource) =>
+    skillPoolRefs.valueOr(Map<string, List<string>>()).has(skill.id)
+      && skillPoolRefs.valueOr(Map<string, List<string>>()).get(skill.id)
         .contains(summative.id);
 
     return orderedObjectiveAssessments.length > 0
@@ -414,20 +436,40 @@ export class Objective
           {skills.toArray().map((skill, i) => (
             <div key={skill.guid} className={classes.skillGridRow}>
               {orderedObjectiveAssessments.map((assessment, j) => (
-                <div key={assessment.guid} className={classes.skillGridCell}>
-                  {skillContainsFormative(skill, assessment)
-                    ? (
-                      <i className={classNames(['fa fa-flask',
-                        classes.formativeColor, classes.gridAssessmentIcon])} />
-                    )
-                    : skillContainsSummative(skill, assessment)
-                      ? (
+                skillContainsFormative(skill, assessment)
+                  ? (
+                    <Tooltip title="Formative" distance={15}
+                      size="small" arrowSize="small">
+                      <div key={assessment.guid} className={classes.skillGridCell}>
+                        <i className={classNames(['fa fa-flask',
+                          classes.formativeColor, classes.gridAssessmentIcon])} />
+                      </div>
+                    </Tooltip>
+                  )
+                : skillContainsSummative(skill, assessment)
+                  ? (
+                    <Tooltip title="Summative" distance={15}
+                      size="small" arrowSize="small">
+                      <div key={assessment.guid} className={classes.skillGridCell}>
                         <i className={classNames(['fa fa-check',
                           classes.summativeColor, classes.gridAssessmentIcon])} />
-                      )
-                      : null
-                  }
-                </div>
+                      </div>
+                    </Tooltip>
+                  )
+                : skillContainsPool(skill, assessment)
+                  ? (
+                    <Tooltip title="Question Pool" distance={15}
+                      size="small" arrowSize="small">
+                      <div key={assessment.guid} className={classes.skillGridCell}>
+                        <i className={classNames(['fa fa-question',
+                          classes.poolColor, classes.gridAssessmentIcon])}
+                          style={{ left: 11 }} />
+                      </div>
+                    </Tooltip>
+                  )
+                : (
+                  <div key={assessment.guid} className={classes.skillGridCell}/>
+                )
               ))}
             </div>
           ))}
@@ -463,10 +505,34 @@ export class Objective
   }
 
   renderSkillBadges(skill: contentTypes.Skill) {
-    const { classes, skillFormativeRefs, skillSummativeRefs } = this.props;
+    const { classes, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
 
     const formativeCount = skillFormativeRefs.caseOf({
-      just: refMap => (
+      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
+      nothing: () => null,
+    });
+
+    const summativeCount = skillSummativeRefs.caseOf({
+      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
+      nothing: () => null,
+    });
+
+    const poolCount = skillPoolRefs.caseOf({
+      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
+      nothing: () => null,
+    });
+
+    const tooltipTitle = <div style={{ textAlign: 'left' }}>
+      {formativeCount} <i className="fa fa-flask" /> Formative
+      <br/>
+      {summativeCount} <i className="fa fa-check" /> Summative
+      <br/>
+      {poolCount} <i className="fa fa-question" /> Question Pools
+    </div>;
+
+    return (
+      <Tooltip html={tooltipTitle} distance={10}
+        size="small" arrowSize="small">
         <span className={classNames(['badge badge-light', classes.skillBadge])}
           style={{
             color: flatui.amethyst,
@@ -475,33 +541,30 @@ export class Objective
             borderTopRightRadius: 0,
             borderBottomRightRadius: 0,
           }}>
-          {refMap.has(skill.id) ? refMap.get(skill.id).size : 0} <i className="fa fa-flask"/>
+          {formativeCount} <i className={classNames(['fa fa-flask', classes.skillCountBadgeIcon])}/>
         </span>
-      ),
-      nothing: () => null,
-    });
-
-    const summativeCount = skillSummativeRefs.caseOf({
-      just: refMap => (
         <span
           className={classNames(['badge badge-light', classes.skillBadge])}
           style={{
             color: flatui.nephritis,
+            borderRight: 'none',
+            marginLeft: 0,
+            marginRight: 0,
+            borderRadius: 0,
+          }}>
+          {summativeCount} <i className={classNames(['fa fa-check', classes.skillCountBadgeIcon])}/>
+        </span>
+        <span
+          className={classNames(['badge badge-light', classes.skillBadge])}
+          style={{
+            color: flatui.greenSea,
             marginLeft: 0,
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
           }}>
-          {refMap.has(skill.id) ? refMap.get(skill.id).size : 0} <i className="fa fa-check" />
+          {poolCount} <i className={classNames(['fa fa-question', classes.skillCountBadgeIcon])}/>
         </span>
-      ),
-      nothing: () => null,
-    });
-
-    return (
-      <React.Fragment>
-        {formativeCount}
-        {summativeCount}
-      </React.Fragment>
+      </Tooltip>
     );
   }
 
