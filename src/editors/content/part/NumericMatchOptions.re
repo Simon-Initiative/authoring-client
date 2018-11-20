@@ -32,10 +32,28 @@ let isRangeOp = (c: char) =>
   | _ => false
   };
 
+/* Valid input logic:
+
+   1. If the input contains a variable reference, that is the only thing it can contain
+   2. If there are no variable references, then the input has to be numeric only
+
+   */
+
+let isValidVariableRef = (s: string) =>
+  switch (Js.String.match([%bs.re "/^@@[a-zA-Z0-9_]*@@$/g"], s)) {
+  | Some(_) => true
+  | None => false
+  };
+
+let isNumeric = (s: string) => ! Js.Float.isNaN(Js.Float.fromString(s));
+
 let isValidInput = (s: string) =>
   switch (String.length(s) - 1) {
-  | (-1) => true
-  | n => ! isInequalityOp(s.[n]) && ! isRangeOp(s.[n])
+  | (-1) => false
+  | n =>
+    ! isInequalityOp(s.[n])
+    && ! isRangeOp(s.[n])
+    && (isValidVariableRef(s) || isNumeric(s))
   };
 
 let getInequalityOperator = (matchPattern: string) => {
@@ -94,6 +112,7 @@ let onTogglePrecision =
       matchPattern: string,
       responseId: string,
       onEditMatch: (. string, string) => unit,
+      updateState,
     ) => {
   let newMatchPattern =
     isPrecision(matchPattern) ?
@@ -105,9 +124,12 @@ let onTogglePrecision =
       matchPattern ++ "#";
 
   onEditMatch(. responseId, newMatchPattern);
+  updateState(newMatchPattern);
 };
 
-let renderConditionSelect = (editMode, responseId, matchPattern, onEditMatch) =>
+let renderConditionSelect =
+    (editMode, responseId, matchPattern, onEditMatch, updateState) => {
+
   <select
     className=(
       classNames([
@@ -180,6 +202,7 @@ let renderConditionSelect = (editMode, responseId, matchPattern, onEditMatch) =>
           };
 
         onEditMatch(. responseId, matchPattern);
+        updateState(matchPattern);
       }
     )>
     <option value="eq"> (strEl("Equal to")) </option>
@@ -190,10 +213,14 @@ let renderConditionSelect = (editMode, responseId, matchPattern, onEditMatch) =>
     <option value="lte"> (strEl("Less than Equal to")) </option>
     <option value="range"> (strEl("Range")) </option>
   </select>;
+}
 
-let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) => {
+let renderValue =
+    (jssClass, editMode, matchPattern, isValid, responseId, onEditMatch, updateState, setValid) => {
   /* separate matchPattern into value and precision parts */
+
   let hashIndex = StringUtils.findIndex(matchPattern, c => c === '#');
+
   let valueWithOp =
     switch (hashIndex) {
     | Some(hashIndex) => StringUtils.substr(matchPattern, 0, hashIndex)
@@ -230,10 +257,20 @@ let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
       String.length(matchPattern),
     );
 
+  let inputClasses =
+    "form-control input-sm form-control-sm "
+    ++ (
+      if (!isValid) {
+        "is-invalid";
+      } else {
+        "";
+      }
+    );
+
   <div className=(jssClass("optionItem"))>
     <div className=(jssClass("value"))>
       <input
-        className="form-control input-sm form-control-sm"
+        className=inputClasses
         disabled=(! editMode)
         value
         onChange=(
@@ -242,14 +279,19 @@ let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
                           ReactEventRe.Form.target(event),
                         )##value;
 
+            let matchValue =
+              operator
+              ++ value
+              ++ (precisionValue !== "" ? "#" ++ precisionValue : "");
+
             if (isValidInput(value)) {
-              onEditMatch(.
-                responseId,
-                operator
-                ++ value
-                ++ (precisionValue !== "" ? "#" ++ precisionValue : ""),
-              );
-            };
+              onEditMatch(. responseId, matchValue);
+              setValid(true);
+            } else {
+              setValid(false);
+            }
+
+            updateState(matchValue);
           }
         )
       />
@@ -258,7 +300,8 @@ let renderValue = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
 };
 
 let renderPrecision =
-    (jssClass, editMode, matchPattern, responseId, onEditMatch) => {
+    (jssClass, editMode, matchPattern, isValid, responseId, onEditMatch, updateState, setValid) => {
+
   let hashIndex = StringUtils.findIndex(matchPattern, c => c === '#');
   let value =
     switch (hashIndex) {
@@ -276,6 +319,17 @@ let renderPrecision =
     | None => ""
     };
 
+  let inputClasses =
+    "form-control input-sm form-control-sm "
+    ++ (
+      if (!isValid) {
+        "is-invalid";
+      } else {
+        "";
+      }
+    );
+
+
   <div
     className=(classNames([jssClass("optionsRow"), jssClass("precision")]))>
     <ToggleSwitch
@@ -283,14 +337,14 @@ let renderPrecision =
       editMode
       label="Precision"
       checked=(isPrecision(matchPattern))
-      onClick=(_ => onTogglePrecision(matchPattern, responseId, onEditMatch))
+      onClick=(_ => onTogglePrecision(matchPattern, responseId, onEditMatch, updateState))
     />
     <input
       _type="number"
       className=(
         classNames([
           jssClass("precisionValue"),
-          "form-control input-sm form-control-sm",
+          inputClasses,
         ])
       )
       disabled=(! editMode || ! isPrecision(matchPattern))
@@ -300,9 +354,17 @@ let renderPrecision =
           let newPrecisionValue = ReactDOMRe.domElementToObj(
                                     ReactEventRe.Form.target(event),
                                   )##value;
+
+          let matchValue = value ++ "#" ++ newPrecisionValue;
+
           if (newPrecisionValue > 0) {
-            onEditMatch(. responseId, value ++ "#" ++ newPrecisionValue);
-          };
+            onEditMatch(. responseId, matchValue);
+            setValid(true);
+          } else {
+            setValid(false);
+          }
+
+          updateState(matchValue);
         }
       )
     />
@@ -329,7 +391,9 @@ let renderRangeInstructions = jssClass =>
     <div className=(classNames([jssClass("precisionSpacer")])) />
   </div>;
 
-let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) => {
+let renderRange =
+    (jssClass, editMode, matchPattern, isValid1, isValid2, responseId, onEditMatch, updateState, setValid1, setValid2) => {
+
   let rangeStart =
     try (
       StringUtils.substr(
@@ -362,6 +426,24 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
     | Not_found => "0"
     };
 
+  let inputClass1 =
+     (
+      if (!isValid1) {
+        "is-invalid";
+      } else {
+        "";
+      }
+    );
+    let inputClass2 =
+    (
+     if (!isValid2) {
+       "is-invalid";
+     } else {
+       "";
+     }
+   );
+
+
   <div className=(jssClass("optionItem"))>
     <div className=(jssClass("range"))>
       <div className=(jssClass("rangeLabel"))> (strEl("from")) </div>
@@ -372,6 +454,7 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
             "form-control",
             "input-sm",
             "form-control-sm",
+            inputClass1,
           ])
         )
         disabled=(! editMode)
@@ -382,12 +465,16 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
                           ReactEventRe.Form.target(event),
                         )##value;
 
+            let matchValue = "[" ++ value ++ "," ++ rangeEnd ++ "]";
+
             if (isValidInput(value)) {
-              onEditMatch(.
-                responseId,
-                "[" ++ value ++ "," ++ rangeEnd ++ "]",
-              );
+              onEditMatch(. responseId, matchValue);
+              setValid1(true);
+            } else {
+              setValid1(false);
             };
+
+            updateState(matchValue);
           }
         )
       />
@@ -399,6 +486,7 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
             "form-control",
             "input-sm",
             "form-control-sm",
+            inputClass2,
           ])
         )
         disabled=(! editMode)
@@ -409,12 +497,16 @@ let renderRange = (jssClass, editMode, matchPattern, responseId, onEditMatch) =>
                           ReactEventRe.Form.target(event),
                         )##value;
 
+            let matchValue = "[" ++ rangeStart ++ "," ++ value ++ "]";
+
             if (isValidInput(value)) {
-              onEditMatch(.
-                responseId,
-                "[" ++ rangeStart ++ "," ++ value ++ "]",
-              );
-            };
+              onEditMatch(. responseId, matchValue);
+              setValid2(true);
+            } else {
+              setValid2(false);
+            }
+
+            updateState(matchValue);
           }
         )
       />
@@ -434,7 +526,24 @@ let renderUnknown = jssClass =>
   </div>;
 
 let componentName = "NumericMatchOptions";
-let component = ReasonReact.statelessComponent(componentName);
+
+type state = {
+  input: bool,
+  range1: bool,
+  range2: bool,
+  precision: bool,
+  matchPattern: option(string),
+};
+
+/* Action declaration */
+type action =
+  | EditMatch(string)
+  | SetInput(bool)
+  | SetRange1(bool)
+  | SetRange2(bool)
+  | SetPrecision(bool);
+
+let component = ReasonReact.reducerComponent(componentName);
 
 let make =
     (
@@ -446,8 +555,26 @@ let make =
       ~onEditMatch: (. string, string) => unit,
     ) => {
   ...component,
-  render: _self => {
+  initialState: () => (
+    {input: true, range1: true, range2: true, precision: true, matchPattern}: state
+  ),
+  reducer: (action, current) =>
+    switch (action) {
+    | EditMatch(s) => ReasonReact.Update({...current, matchPattern: Some(s)})
+    | SetInput(v) => ReasonReact.Update({...current, input: v})
+    | SetRange1(v) => ReasonReact.Update({...current, range1: v})
+    | SetRange2(v) => ReasonReact.Update({...current, range2: v})
+    | SetPrecision(v) => ReasonReact.Update({...current, precision: v})
+    },
+  render: self => {
+    let state = self.state;
     let jssClass = jssClass(classes);
+
+    let updateState = s => self.send(EditMatch(s));
+    let setValidValue = v => self.send(SetInput(v));
+    let setValidRange1 = v => self.send(SetRange1(v));
+    let setValidRange2 = v => self.send(SetRange2(v));
+    let setValidPrecision = v => self.send(SetPrecision(v));
 
     <div
       className=(
@@ -458,7 +585,7 @@ let make =
         ])
       )>
       (
-        switch (getConditionFromMatch(Option.valueOr(matchPattern, ""))) {
+        switch (getConditionFromMatch(Option.valueOr(state.matchPattern, ""))) {
         | EQ
         | NE
         | GT
@@ -472,8 +599,9 @@ let make =
                   renderConditionSelect(
                     editMode,
                     responseId,
-                    Option.valueOr(matchPattern, ""),
+                    Option.valueOr(state.matchPattern, ""),
                     onEditMatch,
+                    updateState,
                   )
                 )
               </div>
@@ -481,9 +609,12 @@ let make =
                 renderValue(
                   jssClass,
                   editMode,
-                  Option.valueOr(matchPattern, ""),
+                  Option.valueOr(state.matchPattern, ""),
+                  state.input,
                   responseId,
                   onEditMatch,
+                  updateState,
+                  setValidValue,
                 )
               )
             </div>
@@ -491,9 +622,12 @@ let make =
               renderPrecision(
                 jssClass,
                 editMode,
-                Option.valueOr(matchPattern, ""),
+                Option.valueOr(state.matchPattern, ""),
+                state.precision,
                 responseId,
                 onEditMatch,
+                updateState,
+                setValidPrecision,
               )
             )
           </div>
@@ -505,8 +639,9 @@ let make =
                   renderConditionSelect(
                     editMode,
                     responseId,
-                    Option.valueOr(matchPattern, ""),
+                    Option.valueOr(state.matchPattern, ""),
                     onEditMatch,
+                    updateState,
                   )
                 )
               </div>
@@ -514,9 +649,14 @@ let make =
                 renderRange(
                   jssClass,
                   editMode,
-                  Option.valueOr(matchPattern, ""),
+                  Option.valueOr(state.matchPattern, ""),
+                  state.range1,
+                  state.range2,
                   responseId,
                   onEditMatch,
+                  updateState,
+                  setValidRange1,
+                  setValidRange2,
                 )
               )
             </div>
