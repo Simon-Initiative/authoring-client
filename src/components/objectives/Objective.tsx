@@ -95,6 +95,15 @@ export const styles: JSSStyles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  pageSection: {
+    minHeight: 120,
+  },
+  skillSection: {
+    '& h1': {
+      display: 'flex',
+      flexDirection: 'row',
+    },
+  },
   skillGridHeader: {
     display: 'flex',
     flexDirection: 'column',
@@ -181,7 +190,7 @@ export const styles: JSSStyles = {
     },
   },
   pageList: {
-    margin: [10, 0, 80, 20],
+    margin: [10, 0, 20, 20],
   },
   skillList: {
     margin: [0, 0, 20, 20],
@@ -189,7 +198,7 @@ export const styles: JSSStyles = {
   },
   noPagesMsg: {
     color: colors.grayDark,
-    margin: [20, 0, 80, 20],
+    margin: [20, 0, 20, 20],
   },
   noSkillsMsg: {
     color: colors.grayDark,
@@ -690,83 +699,95 @@ export class Objective
         nothing: () => '[Error loading page title]',
       });
 
-    const RIGHT_QUAD_WIDTH = (this.getOrderedObjectiveAssessments().length * 35)
+    const orderedObjectiveAssessments = this.getOrderedObjectiveAssessments();
+
+    const RIGHT_QUAD_WIDTH = (orderedObjectiveAssessments.length * 35)
       + (SKILL_GRID_HEADER_HEIGHT);
 
     return (
       <div className={classes.detailsQuad}>
         <div className={classes.quadTop}>
           <div className={classes.quadLeft}>
-            <h3>
-            <WarningTip show={pageCount < PAGE_COUNT_WARNING_THRESHOLD}>
-              Objectives should be referenced by at least {PAGE_COUNT_WARNING_THRESHOLD}
-              {' workbook ' + addPluralS('page', PAGE_COUNT_WARNING_THRESHOLD)}.
-            </WarningTip>
-            <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
-            Pages
-            {workbookPageRefs.caseOf({
-              just: refs => (
-                <span className={classNames(['badge badge-light', classes.countBadge])}>
-                  {refs.size}
-                </span>
-              ),
-              nothing: () => null,
-            })}
-            </h3>
-            {workbookPageRefs.caseOf({
-              just: (refs) => {
-                return refs.size > 0
-                ? (
-                  <div className={classes.pageList}>
-                    {refs.map(refGuid => (
-                      <div key={refGuid}>
-                        <a href={`./#${getRefGuidFromRefId(refGuid)}-${course.guid}`}>
-                        <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
-                        {stringFormat.ellipsize(getWBPTitleFromRefId(refGuid), 100, 5)}
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                )
-                : (
-                  <div className={classes.noPagesMsg}>
-                    <span>This objective is not referenced by any workbook pages.</span>
-                  </div>
-                );
-              },
-              nothing: () => (
-              <div className={classes.loading}>
-                <i className="fa fa-circle-o-notch fa-spin fa-fw"/> Loading...
-              </div>
-              ),
-            })}
-            <h3>
-              <WarningTip show={skills.size < SKILL_COUNT_WARNING_THRESHOLD}>
-                Objectives should have at least {SKILL_COUNT_WARNING_THRESHOLD}
-                {' ' + addPluralS('skill', SKILL_COUNT_WARNING_THRESHOLD)}.
-                <br/>
-            <a href="#">Learn more about how skills work</a>.
+            <div className={classes.pageSection}>
+              <h3>
+              <WarningTip show={pageCount < PAGE_COUNT_WARNING_THRESHOLD}>
+                Objectives should be referenced by at least {PAGE_COUNT_WARNING_THRESHOLD}
+                {' workbook ' + addPluralS('page', PAGE_COUNT_WARNING_THRESHOLD)}.
               </WarningTip>
-              <i className={classNames(['fa fa-cubes', classes.detailsSectionIcon])} />
-              Skills
-              <span className={classNames(['badge badge-light', classes.countBadge])}>
-                {skills.size}
-              </span>
-              <Button
-                className={classes.addSkillButton}
-                editMode={editMode && !loading}
-                type="link"
-                onClick={() => onAddExistingSkill(objective)}>
-                Add Existing Skill
-              </Button>
-              <Button
-                className={classes.addSkillButton}
-                editMode={editMode && !loading}
-                type="link"
-                onClick={() => onAddNewSkill(objective)}>
-                Create New Skill
-              </Button>
-            </h3>
+              <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
+              Pages
+              {workbookPageRefs.caseOf({
+                just: refs => (
+                  <span className={classNames(['badge badge-light', classes.countBadge])}>
+                    {refs.size}
+                  </span>
+                ),
+                nothing: () => null,
+              })}
+              </h3>
+              {workbookPageRefs.caseOf({
+                just: (refs) => {
+                  return refs.size > 0
+                  ? (
+                    <div className={classes.pageList}>
+                      {refs.map(refGuid => (
+                        <div key={refGuid}>
+                          <a href={`./#${getRefGuidFromRefId(refGuid)}-${course.guid}`}>
+                          <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
+                          {stringFormat.ellipsize(getWBPTitleFromRefId(refGuid), 100, 5)}
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                  : (
+                    <div className={classes.noPagesMsg}>
+                      <span>This objective is not referenced by any workbook pages.</span>
+                    </div>
+                  );
+                },
+                nothing: () => (
+                <div className={classes.loading}>
+                  <i className="fa fa-circle-o-notch fa-spin fa-fw"/> Loading...
+                </div>
+                ),
+              })}
+            </div>
+            <div className={classes.skillSection}>
+              <h3>
+                <WarningTip show={skills.size < SKILL_COUNT_WARNING_THRESHOLD}>
+                  Objectives should have at least {SKILL_COUNT_WARNING_THRESHOLD}
+                  {' ' + addPluralS('skill', SKILL_COUNT_WARNING_THRESHOLD)}.
+                  <br/>
+                  <a href="#">Learn more about how skills work</a>.
+                </WarningTip>
+                <i className={classNames(['fa fa-cubes', classes.detailsSectionIcon])} />
+                Skills
+                <span className={classNames(['badge badge-light', classes.countBadge])}>
+                  {skills.size}
+                </span>
+                <Button
+                  className={classes.addSkillButton}
+                  editMode={editMode && !loading}
+                  type="link"
+                  onClick={() => onAddExistingSkill(objective)}>
+                  Add Existing Skill
+                </Button>
+                <Button
+                  className={classes.addSkillButton}
+                  editMode={editMode && !loading}
+                  type="link"
+                  onClick={() => onAddNewSkill(objective)}>
+                  Create New Skill
+                </Button>
+                <div className="flex-spacer"/>
+                {orderedObjectiveAssessments.length < 1 &&
+                  <div style={{ color: colors.gray, fontWeight: 400 }}>
+                    No assessments reference these skills
+                  </div>
+                }
+              </h3>
+            </div>
           </div>
           <div className={classes.quadRight} style={{ width: RIGHT_QUAD_WIDTH }}>
             {this.renderSkillGridHeader()}
