@@ -19,6 +19,8 @@ import { Tooltip } from 'utils/tooltip';
 
 const PAGE_COUNT_WARNING_THRESHOLD = 1;
 const SKILL_COUNT_WARNING_THRESHOLD = 3;
+const FORMATIVE_COUNT_WARNING_THRESHOLD = 1;
+const SUMMATIVE_COUNT_WARNING_THRESHOLD = 1;
 
 const WarningTip = ({ show, children }) =>
   show ? (
@@ -585,60 +587,112 @@ export class Objective
   }
 
   renderSkillBadges(skill: contentTypes.Skill) {
-    const { classes } = this.props;
+    const { classes, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
 
-    const formativeCount = this.getFormativeAssessmentCount();
-    const summativeCount = this.getSummativeAssessmentCount();
-    const poolCount = this.getQuestionPoolAssessmentCount();
+    const formativeCount = skillFormativeRefs.caseOf({
+      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
+      nothing: () => null,
+    });
 
-    const tooltipTitle = <div style={{ textAlign: 'left' }}>
-      {formativeCount} <i className="fa fa-flask" /> {addPluralS('Formative', formativeCount)}
+    const summativeCount = skillSummativeRefs.caseOf({
+      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
+      nothing: () => null,
+    });
+
+    const poolCount = skillPoolRefs.caseOf({
+      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
+      nothing: () => null,
+    });
+
+    const formativeTooltip = <div style={{ textAlign: 'left' }}>
+      <b><i className="fa fa-flask" /> Formative Assessments</b>
       <br/>
-      {summativeCount} <i className="fa fa-check" /> {addPluralS('Summative', summativeCount)}
+      This is the number of low stakes, practice assessments that are associated with this skill
+    </div>;
+    const summativeTooltip = <div style={{ textAlign: 'left' }}>
+      <b><i className="fa fa-check" /> Summative Assessments</b>
       <br/>
-      {poolCount} <i className="fa fa-question" /> {addPluralS('Question Pool', poolCount)}
+      This is the number of high stakes assessments that are associated with this skill
+    </div>;
+    const poolTooltip = <div style={{ textAlign: 'left' }}>
+      <b><i className="fa fa-question" /> Question Pools</b>
+      <br/>
+      This is the number of question pools that are associated with this skill
     </div>;
 
+    const notEnoughFormativesWarning = formativeCount < FORMATIVE_COUNT_WARNING_THRESHOLD
+      ? (
+        <span>
+          at least {FORMATIVE_COUNT_WARNING_THRESHOLD} formative
+        </span>
+      )
+      : null;
+
+    const notEnoughSummativesWarning = summativeCount < SUMMATIVE_COUNT_WARNING_THRESHOLD
+      ? (
+        <span>
+          at least {SUMMATIVE_COUNT_WARNING_THRESHOLD} summative
+        </span>
+      )
+      : null;
+
     return (
-      <Tooltip html={tooltipTitle} distance={10}
-        size="small" arrowSize="small">
         <div className={classes.skillBadges}>
-          <span className={classNames(['badge badge-light', classes.skillBadge])}
-            style={{
-              color: flatui.amethyst,
-              borderRight: 'none',
-              marginRight: 0,
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-            }}>
-            {formativeCount} <i className={classNames([
-              'fa fa-flask', classes.skillCountBadgeIcon])}/>
-          </span>
-          <span
-            className={classNames(['badge badge-light', classes.skillBadge])}
-            style={{
-              color: flatui.nephritis,
-              borderRight: 'none',
-              marginLeft: 0,
-              marginRight: 0,
-              borderRadius: 0,
-            }}>
-            {summativeCount} <i className={classNames([
-              'fa fa-check', classes.skillCountBadgeIcon])}/>
-          </span>
-          <span
-            className={classNames(['badge badge-light', classes.skillBadge])}
-            style={{
-              color: flatui.turquoise,
-              marginLeft: 0,
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-            }}>
-            {poolCount} <i className={classNames([
-              'fa fa-question', classes.skillCountBadgeIcon])}/>
-          </span>
+          <WarningTip
+            show={notEnoughFormativesWarning || notEnoughSummativesWarning}>
+            <div>
+              Skills should have {notEnoughFormativesWarning}
+              {notEnoughFormativesWarning && notEnoughSummativesWarning && ' and '}
+              {notEnoughSummativesWarning} {addPluralS('assessment', Math.max(
+                FORMATIVE_COUNT_WARNING_THRESHOLD,
+                SUMMATIVE_COUNT_WARNING_THRESHOLD,
+              ))}
+            </div>
+          </WarningTip>
+          <Tooltip html={formativeTooltip} distance={10}
+            size="small" arrowSize="small">
+            <span className={classNames(['badge badge-light', classes.skillBadge])}
+              style={{
+                color: flatui.amethyst,
+                borderRight: 'none',
+                marginRight: 0,
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+              }}>
+              {formativeCount} <i className={classNames([
+                'fa fa-flask', classes.skillCountBadgeIcon])}/>
+            </span>
+          </Tooltip>
+          <Tooltip html={summativeTooltip} distance={10}
+            size="small" arrowSize="small">
+            <span
+              className={classNames(['badge badge-light', classes.skillBadge])}
+              style={{
+                color: flatui.nephritis,
+                borderRight: 'none',
+                marginLeft: 0,
+                marginRight: 0,
+                borderRadius: 0,
+              }}>
+              {summativeCount} <i className={classNames([
+                'fa fa-check', classes.skillCountBadgeIcon])}/>
+            </span>
+          </Tooltip>
+          <Tooltip html={poolTooltip} distance={10}
+            size="small" arrowSize="small">
+            <span
+              className={classNames(['badge badge-light', classes.skillBadge])}
+              style={{
+                color: flatui.turquoise,
+                marginLeft: 0,
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+              }}>
+              {poolCount} <i className={classNames([
+                'fa fa-question', classes.skillCountBadgeIcon])}/>
+            </span>
+          </Tooltip>
         </div>
-      </Tooltip>
     );
   }
 
@@ -781,9 +835,9 @@ export class Objective
                   Create New Skill
                 </Button>
                 <div className="flex-spacer"/>
-                {orderedObjectiveAssessments.length < 1 &&
+                {skills.size > 0 && orderedObjectiveAssessments.length < 1 &&
                   <div style={{ color: colors.gray, fontWeight: 400 }}>
-                    No assessments reference these skills
+                    These skills are not referenced by any assessments
                   </div>
                 }
               </h3>
