@@ -27,8 +27,8 @@ export interface DiscoverableState {
  */
 @injectSheet(styles)
 export class Discoverable
-    extends React.PureComponent<StyledComponentProps<DiscoverableProps>,
-    DiscoverableState> {
+  extends React.PureComponent<StyledComponentProps<DiscoverableProps>,
+  DiscoverableState> {
 
   constructor(props) {
     super(props);
@@ -72,7 +72,7 @@ export class Discoverable
     return (
       <div
         id={`discoverable-${id}`}
-        className={classNames([classes.discoverable ,className, spotlight && classes.spotlight])}>
+        className={classNames([classes.discoverable, className, spotlight && classes.spotlight])}>
         {children}
       </div>
     );

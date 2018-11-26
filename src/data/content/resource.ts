@@ -36,7 +36,7 @@ const monthsToOrdinal = {
   Dec: 11,
 };
 
-function convertHour(hour: number, isPM: boolean) : number {
+function convertHour(hour: number, isPM: boolean): number {
   if (isPM) {
     return hour === 12 ? 12 : hour + 12;
   }
@@ -44,7 +44,7 @@ function convertHour(hour: number, isPM: boolean) : number {
   return hour === 12 ? 0 : hour;
 }
 
-export function parseDate(value: string) : Date {
+export function parseDate(value: string): Date {
 
   const p = value.split(' ');
   const t = p[3].split(':');
@@ -55,13 +55,15 @@ export function parseDate(value: string) : Date {
     convertHour(parseInt(t[0], 10), p[4] === 'PM'),
     parseInt(t[1], 10),
     parseInt(t[2], 10),
-    ));
+  ));
 }
 
 export class Resource extends Immutable.Record(
-  {contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '',
+  {
+    contentType: 'Resource', rev: 0, guid: '', id: '', type: '', title: '',
     dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode(),
-    resourceState: ResourceState.ACTIVE}) {
+    resourceState: ResourceState.ACTIVE,
+  }) {
 
   contentType: 'Resource';
   rev: number;
@@ -82,7 +84,7 @@ export class Resource extends Immutable.Record(
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object) : Resource {
+  static fromPersistence(root: Object): Resource {
     const a = (root as any);
     const model = new Resource({
       rev: a.rev,
@@ -103,7 +105,7 @@ export class Resource extends Immutable.Record(
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       rev: this.rev,
       guid: this.guid,

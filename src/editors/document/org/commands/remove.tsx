@@ -11,8 +11,8 @@ export class RemoveCommand extends AbstractCommand {
 
   execute(
     org: models.OrganizationModel,
-    node: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
-    context, services : AppServices) : Promise<models.OrganizationModel> {
+    node: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section | t.Item | t.Include,
+    context, services: AppServices): Promise<models.OrganizationModel> {
 
     // Prompt the user to confirm the removal if the node in question has sub components
 
@@ -26,11 +26,11 @@ export class RemoveCommand extends AbstractCommand {
 
         const modal = <ModalPrompt
           text={text}
-          onInsert={() => { services.dismissModal(); resolve(removeNode(org, node.guid));}}
+          onInsert={() => { services.dismissModal(); resolve(removeNode(org, node.guid)); }}
           onCancel={() => services.dismissModal()}
           okLabel="Yes"
           cancelLabel="No"
-          />;
+        />;
 
         services.displayModal(modal);
       });

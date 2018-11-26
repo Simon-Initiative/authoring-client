@@ -31,9 +31,9 @@ const Link: React.StatelessComponent<LinkProps> = ({
   action,
   children,
 }) => (
-  <a className="header-link" href="#"
-    onClick={(e) => { e.preventDefault(); action();}}>{children}</a>
-);
+    <a className="header-link" href="#"
+      onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
+  );
 
 type MenuProps = {
   label: string,
@@ -44,16 +44,16 @@ const Menu: React.StatelessComponent<MenuProps> = ({
   label,
   children,
 }) => (
-  <div className="dropdown show header-dropdown">
-    <a className="header-link dropdown-toggle" href="#"
-      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      {label}
-    </a>
-    <div className="dropdown-menu">
-      {children}
+    <div className="dropdown show header-dropdown">
+      <a className="header-link dropdown-toggle" href="#"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {label}
+      </a>
+      <div className="dropdown-menu">
+        {children}
+      </div>
     </div>
-  </div>
-);
+  );
 
 
 type MenuItemProps = {
@@ -65,9 +65,9 @@ const MenuItem: React.StatelessComponent<MenuItemProps> = ({
   action,
   children,
 }) => (
-  <a className="dropdown-item" href="#"
-    onClick={(e) => { e.preventDefault(); action();}}>{children}</a>
-);
+    <a className="dropdown-item" href="#"
+      onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
+  );
 
 
 class Header extends React.Component<HeaderProps, HeaderState> {
@@ -163,7 +163,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         <div className="header-logo">
           <Link action={this.props.viewActions.viewAllCourses}>
             <img src={OLI_ICON} width="30" height="30"
-                className="d-inline-block align-top" alt=""/>
+              className="d-inline-block align-top" alt="" />
           </Link>
         </div>
         <div className="header-content">

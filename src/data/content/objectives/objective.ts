@@ -4,22 +4,22 @@ import { augment, getChildren } from 'data/content/common';
 import { getKey } from 'data/common';
 import { KnowledgeCategory, LearningProcess } from 'data/content/objectives/types';
 
-export function extractFullText(obj: Object[]) : string {
+export function extractFullText(obj: Object[]): string {
   const str = '';
   return extractFullTextHelper(obj, str);
 }
 
-function extractFullTextHelper(obj: Object[], str: string) : string {
+function extractFullTextHelper(obj: Object[], str: string): string {
 
   // Find all #text nodes in the tree, in order, and return them concatenated together
   const reducer = (accum: Object, o: Object) => {
     if (o['#text'] !== undefined) {
-      const text : string = o['#text'];
+      const text: string = o['#text'];
       return accum + ' ' + text;
     }
     const key = getKey(o);
     if (o[key]['#text'] !== undefined) {
-      const text : string = o[key]['#text'];
+      const text: string = o[key]['#text'];
       return accum + ' ' + text;
     }
     if (o[key]['#array'] !== undefined) {
@@ -100,7 +100,7 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
       // of (e.g. lists, images, formatting)
 
       // Strip out the id attr if it has been absorbed from the objective
-      children.forEach((c) => { if (c['@id'] === model.id) { delete c['@id']; }});
+      children.forEach((c) => { if (c['@id'] === model.id) { delete c['@id']; } });
 
       model = model.with({ rawContent: Maybe.just(children) });
     }
@@ -108,7 +108,7 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const o = {
       objective: {

@@ -18,7 +18,6 @@ import { ContentContainer } from '../container/ContentContainer';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { ToolbarContentContainer } from '../container/ToolbarContentContainer';
 
 export type MediaType = {
   with: (options: ImageParams

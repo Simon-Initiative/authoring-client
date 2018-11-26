@@ -5,11 +5,17 @@
     ],
     "jsRules": {},
     "rules": {
-      "import-name": false,
-      "variable-name": [true, "allow-pascal-case"],
-      "object-shorthand-properties-first": false,
-      "no-unused-variable": true,
-      "strict-boolean-expressions": false
+        "import-name": false,
+        "variable-name": [
+            true,
+            "allow-pascal-case"
+        ],
+        "object-shorthand-properties-first": false,
+        "no-unused-variable": true,
+        "strict-boolean-expressions": false,
+        "no-trailing-whitespace": false,
+        "no-consecutive-blank-lines": false,
+        "ter-func-call-spacing": false
     },
     "rulesDirectory": []
 }
