@@ -21,6 +21,7 @@ import { Details } from 'editors/document/org/Details';
 import { LabelsEditor } from 'editors/content/org/LabelsEditor';
 import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
+import * as Messages from 'types/messages';
 
 import './OrgEditor.scss';
 
@@ -113,6 +114,8 @@ function identifyNewNodes(last: string[], current: string[]): string[] {
 
 export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
   onUpdateTitle: (title: Title) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: (documentId: string) => void;
