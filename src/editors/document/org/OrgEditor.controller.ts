@@ -6,6 +6,7 @@ import { AppContext } from 'editors/common/AppContext';
 import { undo, redo, documentEditingEnable } from 'actions/document';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
+import { modalActions } from 'actions/modal';
 
 interface StateProps {
   canUndo: boolean;
@@ -16,6 +17,8 @@ interface StateProps {
 interface DispatchProps {
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  dismissModal: () => void;
+  displayModal: (c) => void;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
   onEditingEnable: (editable: boolean, documentId: string) => void;
@@ -40,6 +43,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     dismissMessage: (message: Messages.Message) => {
       dispatch(dismissSpecificMessage(message));
+    },
+    dismissModal: () => {
+      return dispatch(modalActions.dismiss());
+    },
+    displayModal: (c) => {
+      dispatch(modalActions.display(c));
     },
     onUndo: (documentId: string) =>
       dispatch(undo(documentId)),
