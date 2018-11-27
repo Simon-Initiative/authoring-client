@@ -3,7 +3,7 @@ import AssessmentEditor from 'editors/document/assessment/AssessmentEditor';
 import * as contentTypes from 'data/contentTypes';
 import { State } from 'reducers';
 import { fetchSkills } from 'actions/skills';
-import { setCurrentNode } from 'actions/document';
+import { setCurrentNode, setCurrentPage } from 'actions/document';
 import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
 import { AssessmentModel, CourseModel } from 'data/models';
 import * as activeActions from 'actions/active';
@@ -30,11 +30,12 @@ interface DispatchProps {
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
   onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
+  onSetCurrentPage: (documentId: string, pageId: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
 }
 
-interface OwnProps extends AbstractEditorProps<AssessmentModel> {}
+interface OwnProps extends AbstractEditorProps<AssessmentModel> { }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const { activeContext, hover, documents, course } = state;
@@ -73,6 +74,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     onSetCurrentNode: (documentId: string, node: contentTypes.Node) => {
       return dispatch(setCurrentNode(documentId, node));
+    },
+    onSetCurrentPage: (documentId: string, pageId: string) => {
+      return dispatch(setCurrentPage(documentId, pageId));
     },
     showMessage: (message: Messages.Message) => {
       return dispatch(showMessage(message));

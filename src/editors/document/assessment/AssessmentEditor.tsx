@@ -223,36 +223,54 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onSelect(currentNode: contentTypes.Node) {
-    const { activeContext, onSetCurrentNode } = this.props;
+    const { model, activeContext, onSetCurrentNode, onSetCurrentPage } = this.props;
 
-    onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
+    const documentId = activeContext.documentId.valueOr(null);
+    const currentPage = model.pages.reduce(
+      (activePage, page) =>
+        page.nodes.contains(currentNode) ? page : activePage,
+      model.pages.first());
+    onSetCurrentNode(documentId, currentNode);
+    if (model.branching) {
+      onSetCurrentPage(documentId, currentPage.guid);
+    }
+  }
+
+  allNodes() {
+    return this.props.model.pages.reduce(
+      (nodes, page) => nodes.concat(page.nodes).toOrderedMap(),
+      Immutable.OrderedMap<string, contentTypes.Node>());
   }
 
   canRemoveNode() {
-    const page = this.getCurrentPage(this.props);
-
     const isQuestionOrPool = node =>
       node.contentType === 'Question' || node.contentType === 'Selection';
 
-    return page.nodes.filter(isQuestionOrPool).size > 1;
+    return this.allNodes().filter(isQuestionOrPool).size > 1;
   }
-
   onNodeRemove(guid: string) {
 
     let page = this.getCurrentPage(this.props);
 
     const removed = removeNode(guid, page.nodes, getChildren, setChildren);
+    console.log('removed', removed);
 
+    locateNextOfKin(removed.size > 0 ? page.nodes : this.allNodes(), guid).lift(node =>
+      this.props.onSetCurrentNode(
+        this.props.activeContext.documentId.valueOr(null), node));
+
+    let pages;
     if (removed.size > 0) {
-      locateNextOfKin(page.nodes, guid).lift(node =>
-        this.props.onSetCurrentNode(
-          this.props.activeContext.documentId.valueOr(null), node));
-
       page = page.with({ nodes: removed });
-      const pages = this.props.model.pages.set(page.guid, page);
-
-      this.handleEdit(this.props.model.with({ pages }));
+      pages = this.props.model.pages.set(page.guid, page);
+    } else {
+      pages = this.props.model.pages.delete(page.guid);
     }
+
+    console.log('pages', pages);
+
+    this.handleEdit(this.props.model.with({ pages }));
+
   }
 
   onAddContent() {
@@ -287,13 +305,20 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   addNode(node) {
-    let page = this.getCurrentPage(this.props);
+    let page;
+    if (this.props.model.branching) {
+      page = new contentTypes.Page();
+    } else {
+      page = this.getCurrentPage(this.props);
+    }
     page = page.with({ nodes: page.nodes.set(node.guid, node) });
 
     const pages = this.props.model.pages.set(page.guid, page);
 
     this.props.onSetCurrentNode(this.props.activeContext.documentId.valueOr(null), node);
     this.handleEdit(this.props.model.with({ pages }));
+
+    console.log('pages size', this.props.model.pages.size);
   }
 
   onRemove() {
@@ -506,7 +531,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <div className="outline-container">
                 <Outline
                   editMode={this.props.editMode}
-                  nodes={page.nodes}
+                  nodes={model.branching
+                    ? this.allNodes()
+                    : page.nodes}
                   expandedNodes={expanded}
                   selected={currentNode.guid}
                   onEdit={this.onEditNodes.bind(this)}

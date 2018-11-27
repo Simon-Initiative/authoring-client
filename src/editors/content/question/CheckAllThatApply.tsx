@@ -89,8 +89,8 @@ export const findChoiceResponse = (
   );
 };
 
-export function getCorrectResponse(responses : OrderedMap<string, contentTypes.Response>)
-: contentTypes.Response {
+export function getCorrectResponse(responses: OrderedMap<string, contentTypes.Response>)
+  : contentTypes.Response {
   let highestScore = 0;
   let correctResponse = undefined;
   responses.forEach((response) => {
@@ -106,7 +106,7 @@ export function getCorrectResponse(responses : OrderedMap<string, contentTypes.R
   return correctResponse || responses.first();
 }
 
-export const getChoiceValue = (model : contentTypes.MultipleChoice, key : string) => {
+export const getChoiceValue = (model: contentTypes.MultipleChoice, key: string) => {
   return model.choices.get(key).value;
 };
 
@@ -188,7 +188,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
       const generated = getGeneratedResponseItem(updatedPartModel);
       const body = generated ? generated.feedback.first().body
-      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+        : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
 
       // update part model with default feedback
       updatedPartModel = modelWithDefaultFeedback(
@@ -208,7 +208,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
   // pass the child choicefeedback (choice responses) a state consisten with the
   // on seen by the user, in the event the user has no correct choice (this.state.invalidChoice)
-  hideStateIfInvalid = (partModel : contentTypes.Part) => {
+  hideStateIfInvalid = (partModel: contentTypes.Part) => {
     if (!this.state.invalidChoice) {
       return partModel;
     }
@@ -267,8 +267,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             match: correct.match.split(',').filter(m => m !== invalidChoiceValue)
               .concat([choice.value]).join(','),
           })
-          // set response score to 1 if score is less than 1
-          .with({ score: +correct.score < 1 ? '1' : correct.score }),
+            // set response score to 1 if score is less than 1
+            .with({ score: +correct.score < 1 ? '1' : correct.score }),
         ),
       });
       if (invalidChoiceValue) {
@@ -356,7 +356,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
     const generated = getGeneratedResponseItem(updatedPartModel);
     const body = generated ? generated.feedback.first().body
-    : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
 
     // update part model with default feedback
     updatedPartModel = modelWithDefaultFeedback(
@@ -410,7 +410,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
       const generated = getGeneratedResponseItem(updatedPartModel);
       const body = generated ? generated.feedback.first().body
-      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+        : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
 
       // update part model with default feedback
       updatedPartModel = modelWithDefaultFeedback(
@@ -479,7 +479,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
     const generated = getGeneratedResponseItem(updatedPartModel);
     const body = generated ? generated.feedback.first().body
-    : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
 
     // update part model with default feedback
     updatedPartModel = modelWithDefaultFeedback(
@@ -503,7 +503,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     const { context, services, editMode, itemModel, partModel } = this.props;
 
     // the highest scored response is used for simple selection (or the first response)
-    const response : contentTypes.Response = getCorrectResponse(partModel.responses);
+    const response: contentTypes.Response = getCorrectResponse(partModel.responses);
     const correctMatches = getCorrectResponse(partModel.responses).match;
     return itemModel.choices
       .toArray()
@@ -520,7 +520,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             allowReorder={!itemModel.shuffle}
             simpleSelectProps={{
               selected: correctMatches.includes(choice.value) &&
-              choice.guid !== this.state.invalidChoice,
+                choice.guid !== this.state.invalidChoice,
               onToggleSimpleSelect: this.onToggleSimpleSelect,
             }}
             wasLastCorrectChoice={this.state.invalidChoice === choice.guid}
@@ -533,7 +533,9 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             onRemove={itemModel.choices.size > 1
               ? choiceId => this.onRemoveChoice(choiceId)
               : undefined
-            } />
+            }
+            branchingQuestions={this.props.branchingQuestions}
+          />
         );
       });
   }
@@ -616,7 +618,9 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
                 }
               }}
               hideOther={itemModel.choices.size <= 1}
-              onEdit={this.onPartEdit} />
+              onEdit={this.onPartEdit}
+              branchingQuestions={this.props.branchingQuestions}
+            />
           </TabSectionContent>
         </TabSection>
       </React.Fragment>

@@ -50,6 +50,7 @@ export interface QuestionProps<ModelType>
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
+  branchingQuestions?: number[];
 }
 
 export interface QuestionState {
@@ -334,7 +335,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
         creates a single variable with the name of the constant MODULE_IDENTIFIER */}
         {this.isNewVariableEditorActive()
           ? <ModuleEditor {...variableProps}
-          onSwitchToOldVariableEditor={this.onSwitchToOldVariableEditor} />
+            onSwitchToOldVariableEditor={this.onSwitchToOldVariableEditor} />
           : <VariablesEditor {...variableProps} />}
       </div>
     );

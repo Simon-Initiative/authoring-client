@@ -31,6 +31,7 @@ export interface QuestionEditorProps extends AbstractContentEditorProps<contentT
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
+  branchingQuestions?: number[];
 }
 
 export interface QuestionEditorState {

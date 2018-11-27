@@ -6,10 +6,12 @@ import { getKey } from '../common';
 import { assessmentTemplate } from '../activity_templates';
 import { isArray, isNullOrUndefined } from 'util';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
+import { ContentElement } from 'data/content/common/interfaces';
 
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
   guid?: string,
+  id?: string,
   type?: string;
   recommendedAttempts?: string;
   maxAttempts?: string;
@@ -24,6 +26,7 @@ const defaultAssessmentModelParams = {
   type: '',
   resource: new contentTypes.Resource(),
   guid: '',
+  id: '',
   recommendedAttempts: '3',
   maxAttempts: '3',
   branching: false,
@@ -32,6 +35,57 @@ const defaultAssessmentModelParams = {
   nodes: Immutable.OrderedMap<string, contentTypes.Node>(),
   pages: Immutable.OrderedMap<string, contentTypes.Page>(),
 };
+
+function splitQuestionsIntoPages(model: AssessmentModel) {
+  const nodes = [];
+  model.pages.forEach((page) => {
+    page.nodes.forEach((node) => {
+      nodes.push(node);
+    });
+  });
+  console.log('pages before', model.pages);
+
+  // Merge supporting content into adjacent questions
+  const nodesToRemove = [];
+  nodes.forEach((node, nodeIndex) => {
+    if (node.contentType === 'Content') {
+      // if the next node is a question, merge the body into the next node
+      const nextNode = nodes[nodeIndex + 1];
+      const prevNode = nodes[nodeIndex - 1];
+      if (nextNode && nextNode.contentType === 'Question' ||
+        nextNode.contentType === 'Content') {
+        nodes[nodeIndex + 1] = nextNode.with({
+          body: node.body.with({
+            content: node.body.content.concat(nextNode.body.content) as
+              Immutable.OrderedMap<string, ContentElement>,
+          }),
+        });
+        nodesToRemove.push(nodeIndex);
+        // if the previous node is a question, merge the body into the previous node
+      } else if (prevNode && prevNode.contentType === 'Question' ||
+        prevNode.contentType === 'Content' && nodesToRemove.indexOf(nodeIndex - 1) === -1) {
+        nodes[nodeIndex - 1] = prevNode.with({
+          body: node.body.with({
+            content: node.body.content.concat(prevNode.body.content) as
+              Immutable.OrderedMap<string, ContentElement>,
+          }),
+        });
+        nodesToRemove.push(nodeIndex);
+      }
+    }
+  });
+  nodesToRemove.forEach(index => nodes.splice(index, 1));
+  const pages = nodes.map((node, index) => new contentTypes.Page().with({
+    id: 'p' + index.toString() + '_' + model.id,
+    nodes: Immutable.OrderedMap<string, contentTypes.Node>([[node.guid, node]]),
+  }));
+  console.log('pages', pages);
+
+  return model.with({
+    pages: Immutable.OrderedMap<string, contentTypes.Page>(
+      pages.map(page => [page.guid, page])),
+  });
+}
 
 function migrateNodesToPage(model: AssessmentModel) {
   let updated = model;
@@ -71,6 +125,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   modelType: 'AssessmentModel';
   resource: contentTypes.Resource;
   guid: string;
+  id: string;
   type: string;
   recommendedAttempts: string;
   maxAttempts: string;
@@ -95,6 +150,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     const a = (json as any);
     model = model.with({ resource: contentTypes.Resource.fromPersistence(a) });
     model = model.with({ guid: a.guid });
+    model = model.with({ id: a.id });
     model = model.with({ type: a.type });
     model = model.with({
       title: new contentTypes.Title({
@@ -174,11 +230,10 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
         // Content service looks for a short title with text equal to "reveal"
         // to display a branching assessment
         case 'short_title':
-          if (item.short_title === 'reveal') {
-            model = model.with({
-              branching: true,
-            });
-          }
+          item.short_title['#text'] === 'reveal'
+            ? model = model.with({ branching: true })
+            : model = model.with({ branching: false });
+          break;
         default:
           model = model.with({
             nodes:
@@ -189,6 +244,9 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
     // Adjust models to ensure that we never have a page-less assessment
     model = migrateNodesToPage(model);
+
+    // Split questions into pages for branching assessments
+    model = splitQuestionsIntoPages(model);
 
     return model;
   }

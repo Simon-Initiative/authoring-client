@@ -4,7 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import { Button } from 'editors/content/common/controls';
 import guid from 'utils/guid';
 import {
-    Question, QuestionProps, QuestionState,
+  Question, QuestionProps, QuestionState,
 } from 'editors/content/question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
@@ -54,14 +54,14 @@ export const resetAllScores = (partModel: contentTypes.Part) => {
 };
 
 export interface MultipleChoiceProps
-    extends QuestionProps<contentTypes.MultipleChoice> {
+  extends QuestionProps<contentTypes.MultipleChoice> {
   advancedScoringInitialized: boolean;
   advancedScoring: boolean;
   onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
 export interface MultipleChoiceState
-    extends QuestionState {
+  extends QuestionState {
 
 }
 
@@ -69,7 +69,7 @@ export interface MultipleChoiceState
  * The content editor for Multiple Choice Question
  */
 export class MultipleChoice
-   extends Question<MultipleChoiceProps, MultipleChoiceState> {
+  extends Question<MultipleChoiceProps, MultipleChoiceState> {
   generatedResponsesByMatch: Immutable.Map<string, contentTypes.Response>;
 
   constructor(props) {
@@ -177,7 +177,7 @@ export class MultipleChoice
       src);
   }
 
-  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback, src) {
+  onFeedbackEdit(response: contentTypes.Response, feedback: contentTypes.Feedback, src) {
     const { partModel, itemModel, onEdit } = this.props;
 
     const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
@@ -262,7 +262,7 @@ export class MultipleChoice
       // a catch-all response with match '*' AND a response has not been generated,
       // generate a response for this choice by cloning the catch-all response
       if (!responsesByMatch.has(choice.value) && responsesByMatch.has('*')
-          && !this.generatedResponsesByMatch.has(choice.value)) {
+        && !this.generatedResponsesByMatch.has(choice.value)) {
         this.generatedResponsesByMatch = this.generatedResponsesByMatch.set(
           choice.value,
           responsesByMatch.get('*').clone().with({ match: choice.value }));
@@ -300,7 +300,9 @@ export class MultipleChoice
             onRemove={this.props.itemModel.choices.size > 1 ?
               choiceId => this.onRemoveChoice(choiceId, response) :
               undefined
-            } />
+            }
+            branchingQuestions={this.props.branchingQuestions}
+          />
         );
       }
 

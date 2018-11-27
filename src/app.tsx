@@ -32,7 +32,7 @@ const nodeEnv = process.env.NODE_ENV;
 
 const middleware = nodeEnv === 'production'
   ? applyMiddleware(thunkMiddleware)
-  : applyMiddleware(thunkMiddleware, loggerMiddleware);
+  : applyMiddleware(thunkMiddleware);
 
 function initStoreWithState(state) {
   const store = createStore(

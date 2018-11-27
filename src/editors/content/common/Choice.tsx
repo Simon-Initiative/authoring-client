@@ -14,6 +14,7 @@ import { Button } from 'editors/content/common/Button';
 import './Choice.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { classNames } from 'styles/jss';
+import { Select } from './Select';
 
 export const ChoiceList = InputList;
 
@@ -60,7 +61,7 @@ export const updateChoiceValuesAndRefs =
     };
   };
 
-export interface ChoiceProps  {
+export interface ChoiceProps {
   className?: string;
   index: number;
   choice: contentTypes.Choice;
@@ -86,6 +87,7 @@ export interface ChoiceProps  {
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
+  branchingQuestions?: number[];
 }
 
 export interface ChoiceState {
@@ -106,28 +108,40 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
     const {
       className, choice, context, editMode, index, response, services, onReorderChoice,
       onEditChoice, onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
-      simpleSelectProps, hideChoiceBody, wasLastCorrectChoice,
+      simpleSelectProps, hideChoiceBody, wasLastCorrectChoice, branchingQuestions,
     } = this.props;
 
     let feedbackEditor;
     let scoreEditor;
     if (response && response.feedback.size > 0) {
       const feedback = response.feedback.first();
+      const branchingQuestionOptions = branchingQuestions.map(
+        q => <option key={q} value={q}>{q}</option>);
 
       feedbackEditor =
-        <ContentContainer
-          activeContentGuid={this.props.activeContentGuid}
-          hover={this.props.hover}
-          onUpdateHover={this.props.onUpdateHover}
-          onFocus={this.props.onFocus}
-          model={feedback.body}
-          editMode={editMode}
-          context={context}
-          services={services}
-          onEdit={(body, src) => onEditFeedback(
-            response,
-            feedback.with({ body: (body as ContentElements) }),
-            src)} />;
+        <div>
+          Branch to question: <Select
+            editMode={this.props.editMode}
+            value={feedback.lang}
+            onChange={lang => onEditFeedback(
+              response, feedback.with({ lang }), null)}>
+            {branchingQuestionOptions}
+          </Select>
+          <ContentContainer
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            onFocus={this.props.onFocus}
+            model={feedback.body}
+            editMode={editMode}
+            context={context}
+            services={services}
+            onEdit={(body, src) => onEditFeedback(
+              response,
+              feedback.with({ body: (body as ContentElements) }),
+              src)} />
+
+        </div>;
 
 
       scoreEditor = (
@@ -137,7 +151,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
             className="form-control"
             disabled={!editMode}
             value={response.score}
-            onChange={({ target: { value } }) => onEditScore(response, value) } />
+            onChange={({ target: { value } }) => onEditScore(response, value)} />
         </div>
       );
     }
@@ -171,10 +185,10 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
                   <Button type="link" editMode={editMode}
                     onClick={() =>
                       response && simpleSelectProps.onToggleSimpleSelect(response, choice)} >
-                  <i
-                    className={`fa ${simpleSelectProps.selected
-                      ? 'fa-check-circle' : 'fa-check-circle-o'}`
-                    } />
+                    <i
+                      className={`fa ${simpleSelectProps.selected
+                        ? 'fa-check-circle' : 'fa-check-circle-o'}`
+                      } />
                   </Button>
                 </ItemControl>
               )
@@ -202,14 +216,14 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
             }
           </ItemOptions>,
           <ItemOptions key="feedback-message">
-          {wasLastCorrectChoice ? (
+            {wasLastCorrectChoice ? (
               <div className="message alert alert-warning">
-                <i className="fa fa-exclamation-circle"/>
+                <i className="fa fa-exclamation-circle" />
                 {' Correct choices not updated. \
                   There must be at least one choice'}
               </div>
             )
-            : null }
+              : null}
           </ItemOptions>,
         ]} />
     );
