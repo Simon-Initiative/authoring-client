@@ -9,7 +9,7 @@ export type UserInfoParams = {
 };
 
 export class UserInfo extends Immutable.Record({
-  contentType: 'UserInfo',userName:'', firstName: '', lastName: '', email: '', isDeveloper: false,
+  contentType: 'UserInfo', userName: '', firstName: '', lastName: '', email: '', isDeveloper: false,
 }) {
 
   contentType: 'UserInfo';
@@ -27,7 +27,7 @@ export class UserInfo extends Immutable.Record({
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object) : UserInfo {
+  static fromPersistence(root: Object): UserInfo {
     const a = (root as any);
     return new UserInfo({
       userName: a.userName, firstName: a.firstName, lastName: a.lastName,
@@ -35,7 +35,7 @@ export class UserInfo extends Immutable.Record({
     });
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       userName: this.userName,
       firstName: this.firstName,

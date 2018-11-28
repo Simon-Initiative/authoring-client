@@ -11,12 +11,14 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { modalActions } from 'actions/modal';
 import { selectFile } from 'editors/content/learning/file';
+import { ContentElements } from 'data/content/common/elements';
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import {
   DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
 import './Media.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 export interface PanoptoProps extends AbstractContentEditorProps<PanoptoType> {
   onShowSidebar: () => void;
@@ -34,6 +36,12 @@ export default class PanoptoEditor
     super(props);
 
     this.onSelect = this.onSelect.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
+  }
+
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
   onSelect() {
@@ -122,6 +130,13 @@ export default class PanoptoEditor
       <div className="mediaEditor">
         <div className="mediaHeader">Panopto</div>
         <span className="mediaLabel">Source File:</span> {file}
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
       </div>
     );
   }
