@@ -32,10 +32,11 @@ export interface AbstractItemPartEditorProps<ItemType> {
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
+
+  branchingQuestions: Maybe<number[]>;
 }
 
 export interface AbstractItemPartEditorState {
-
 
 }
 
@@ -59,4 +60,3 @@ export abstract class
   }
 
 }
-

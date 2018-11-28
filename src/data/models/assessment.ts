@@ -11,7 +11,6 @@ import { ContentElement } from 'data/content/common/interfaces';
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
   guid?: string,
-  id?: string,
   type?: string;
   recommendedAttempts?: string;
   maxAttempts?: string;
@@ -26,7 +25,6 @@ const defaultAssessmentModelParams = {
   type: '',
   resource: new contentTypes.Resource(),
   guid: '',
-  id: '',
   recommendedAttempts: '3',
   maxAttempts: '3',
   branching: false,
@@ -43,7 +41,6 @@ function splitQuestionsIntoPages(model: AssessmentModel) {
       nodes.push(node);
     });
   });
-  console.log('pages before', model.pages);
 
   // Merge supporting content into adjacent questions
   const nodesToRemove = [];
@@ -76,7 +73,7 @@ function splitQuestionsIntoPages(model: AssessmentModel) {
   });
   nodesToRemove.forEach(index => nodes.splice(index, 1));
   const pages = nodes.map((node, index) => new contentTypes.Page().with({
-    id: 'p' + index.toString() + '_' + model.id,
+    id: 'p' + index.toString() + '_' + model.resource.id,
     nodes: Immutable.OrderedMap<string, contentTypes.Node>([[node.guid, node]]),
   }));
   console.log('pages', pages);
@@ -125,7 +122,6 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   modelType: 'AssessmentModel';
   resource: contentTypes.Resource;
   guid: string;
-  id: string;
   type: string;
   recommendedAttempts: string;
   maxAttempts: string;
@@ -150,7 +146,6 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     const a = (json as any);
     model = model.with({ resource: contentTypes.Resource.fromPersistence(a) });
     model = model.with({ guid: a.guid });
-    model = model.with({ id: a.id });
     model = model.with({ type: a.type });
     model = model.with({
       title: new contentTypes.Title({
@@ -230,7 +225,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
         // Content service looks for a short title with text equal to "reveal"
         // to display a branching assessment
         case 'short_title':
-          item.short_title['#text'] === 'reveal'
+          item.short_title['#text'] !== undefined &&
+            item.short_title['#text'] === 'reveal'
             ? model = model.with({ branching: true })
             : model = model.with({ branching: false });
           break;
@@ -246,7 +242,9 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     model = migrateNodesToPage(model);
 
     // Split questions into pages for branching assessments
-    model = splitQuestionsIntoPages(model);
+    if (model.branching) {
+      model = splitQuestionsIntoPages(model);
+    }
 
     return model;
   }

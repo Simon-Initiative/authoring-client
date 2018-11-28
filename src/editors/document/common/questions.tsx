@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-
+import { Maybe } from 'tsmonad';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { Skill } from 'types/course';
@@ -79,8 +79,8 @@ export function renderAssessmentNode(
       onRemove={() => onRemove(n.guid)}
       branchingQuestions={
         props.model instanceof models.AssessmentModel
-          ? getBranchingQuestionNumbers(props)
-          : []}
+          ? Maybe.just(getBranchingQuestionNumbers(props))
+          : Maybe.nothing()}
     />;
   }
   if (n.contentType === 'Content') {

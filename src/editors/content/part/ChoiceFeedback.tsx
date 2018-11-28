@@ -16,9 +16,10 @@ import {
 } from 'editors/content/part/defaultFeedbackGenerator';
 import { CombinationsMap } from 'types/combinations';
 import guid from 'utils/guid';
+import { Maybe } from 'tsmonad';
 
 import './ChoiceFeedback.scss';
-import { Select } from '../common/Select';
+import { BranchSelect } from '../common/BranchSelect';
 
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
   hideOther?: boolean;
@@ -26,7 +27,7 @@ export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentT
   choices: contentTypes.Choice[];
   onInvalidFeedback?: (responseGuid: string) => void;
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
-  branchingQuestions: number[];
+  branchingQuestions: Maybe<number[]>;
 }
 
 export interface ChoiceFeedbackState {
@@ -332,19 +333,21 @@ export abstract class ChoiceFeedback
     const defaultResponse = getGeneratedResponseItem(model) || this.defaultFeedbackResponse;
     const defaultResponseGuid = defaultResponse.guid;
 
-    const branchingQuestionOptions = branchingQuestions.map(
-      q => <option key={q} value={q}>{q}</option>);
-
+    const branchSelect = branchingQuestions.caseOf({
+      just: q => <BranchSelect
+        editMode={this.props.editMode}
+        value={defaultResponse.feedback.first().lang}
+        onChange={lang => this.onDefaultFeedbackEdit(
+          defaultResponse.feedback.first().body,
+          defaultResponse ? defaultResponse.score : '0',
+          null, defaultResponseGuid)}
+        questions={q}
+      />,
+      nothing: () => null,
+    });
     return (
       <div>
-        {/* Branch to question: <Select
-          editMode={this.props.editMode}
-          value={defaultResponse.feedback.first().lang}
-          onChange={lang => this.onDefaultFeedbackEdit(
-            body, defaultResponse ? defaultResponse.score : '0',
-            source, defaultResponseGuid, lang)} >
-          {branchingQuestionOptions}
-        </Select> */}
+        {branchSelect}
 
         <InputListItem
           activeContentGuid={this.props.activeContentGuid}

@@ -6,7 +6,7 @@ import { OrderingChoice, OrderingChoiceList } from './OrderingChoice';
 import { Button } from '../common/controls';
 import guid from '../../../utils/guid';
 import {
-    Question, QuestionProps, QuestionState,
+  Question, QuestionProps, QuestionState,
 } from './Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
@@ -99,7 +99,6 @@ const buildResponsePlaceholder = (): contentTypes.Response => {
     feedback: feedbacks.set(feedback.guid, feedback),
   });
 };
-
 
 /**
  * The content editor for HtmlContent.
@@ -202,7 +201,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   onChoiceEdit = (choice: contentTypes.Choice, src) => {
     this.props.onEdit(
       this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
+        { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
       this.props.partModel, src);
   }
 
@@ -441,6 +440,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             editMode={editMode}
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
+            branchingQuestions={this.props.branchingQuestions}
             onRemove={this.props.itemModel.choices.size > 1 ?
               choiceId => this.onRemoveChoice(choiceId) :
               undefined} />
@@ -471,17 +471,17 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         const viewOnlyChoice = choice.clone();
 
         return (
-            <OrderingChoice
-              className="order-selection"
-              onUpdateHover={() => {}}
-              label={getLabelFromChoice(itemModel, choice)}
-              key={viewOnlyChoice.guid}
-              index={index}
-              choice={viewOnlyChoice}
-              context={context}
-              services={services}
-              onReorderChoice={(originalIndex, newIndex) =>
-                this.onReorderSelection(response, originalIndex, newIndex)} />
+          <OrderingChoice
+            className="order-selection"
+            onUpdateHover={() => { }}
+            label={getLabelFromChoice(itemModel, choice)}
+            key={viewOnlyChoice.guid}
+            index={index}
+            choice={viewOnlyChoice}
+            context={context}
+            services={services}
+            onReorderChoice={(originalIndex, newIndex) =>
+              this.onReorderSelection(response, originalIndex, newIndex)} />
         );
       });
     } catch (err) {
@@ -508,51 +508,51 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     return responsesOrPlaceholder
       .map((response, i) => {
         return (
-        <InputListItem
-          activeContentGuid={this.props.activeContentGuid}
-          hover={this.props.hover}
-          onUpdateHover={this.props.onUpdateHover}
-          onFocus={this.props.onFocus}
-          key={response.guid}
-          className="response"
-          id={response.guid}
-          label={!advancedScoring ? '' : `${i + 1}`}
-          contentTitle={!advancedScoring ? 'Correct' : ''}
-          context={context}
-          services={services}
-          editMode={editMode}
-          body={response.feedback.first().body}
-          onEdit={(body, source) => this.onResponseBodyEdit(body, response, source)}
-          onRemove={responsesOrPlaceholder.length <= 1
-            ? null
-            : () => this.onResponseRemove(response)
-          }
-          options={[
-            <ItemOptions key="feedback-options">
-              <ItemOption className="matches"
-                label="Drag choices to set ordering for this feedback" flex>
-                <OrderingChoiceList>
-                  {this.renderOrderSelection(response)}
-                </OrderingChoiceList>
-              </ItemOption>
-              {advancedScoring
-                ? (
-                  <ItemOption className="score" label="Score">
-                    <div className="input-group">
-                      <input
-                        type="number"
-                        className="form-control input-sm form-control-sm"
-                        disabled={!this.props.editMode}
-                        value={response.score}
-                        onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
+          <InputListItem
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            onFocus={this.props.onFocus}
+            key={response.guid}
+            className="response"
+            id={response.guid}
+            label={!advancedScoring ? '' : `${i + 1}`}
+            contentTitle={!advancedScoring ? 'Correct' : ''}
+            context={context}
+            services={services}
+            editMode={editMode}
+            body={response.feedback.first().body}
+            onEdit={(body, source) => this.onResponseBodyEdit(body, response, source)}
+            onRemove={responsesOrPlaceholder.length <= 1
+              ? null
+              : () => this.onResponseRemove(response)
+            }
+            options={[
+              <ItemOptions key="feedback-options">
+                <ItemOption className="matches"
+                  label="Drag choices to set ordering for this feedback" flex>
+                  <OrderingChoiceList>
+                    {this.renderOrderSelection(response)}
+                  </OrderingChoiceList>
+                </ItemOption>
+                {advancedScoring
+                  ? (
+                    <ItemOption className="score" label="Score">
+                      <div className="input-group">
+                        <input
+                          type="number"
+                          className="form-control input-sm form-control-sm"
+                          disabled={!this.props.editMode}
+                          value={response.score}
+                          onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
                         />
-                    </div>
-                  </ItemOption>
-                )
-                : (null)
-              }
-            </ItemOptions>,
-          ]} />
+                      </div>
+                    </ItemOption>
+                  )
+                  : (null)
+                }
+              </ItemOptions>,
+            ]} />
         );
       });
   }
@@ -617,7 +617,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                       disabled={!this.props.editMode}
                       value={defaultResponse.score}
                       onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
-                      />
+                    />
                   </div>
                 </ItemOption>
               )

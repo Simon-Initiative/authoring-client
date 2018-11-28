@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractItemPartEditorProps } from 'editors/content/common/AbstractItemPartEditor';
 import { Button, Select } from 'editors/content/common/controls';
@@ -50,7 +51,7 @@ export interface QuestionProps<ModelType>
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
-  branchingQuestions?: number[];
+  branchingQuestions: Maybe<number[]>;
 }
 
 export interface QuestionState {

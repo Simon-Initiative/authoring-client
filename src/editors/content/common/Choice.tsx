@@ -14,7 +14,8 @@ import { Button } from 'editors/content/common/Button';
 import './Choice.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { classNames } from 'styles/jss';
-import { Select } from './Select';
+import { Maybe } from 'tsmonad';
+import { BranchSelect } from './BranchSelect';
 
 export const ChoiceList = InputList;
 
@@ -87,7 +88,7 @@ export interface ChoiceProps {
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
-  branchingQuestions?: number[];
+  branchingQuestions: Maybe<number[]>;
 }
 
 export interface ChoiceState {
@@ -113,20 +114,23 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
 
     let feedbackEditor;
     let scoreEditor;
+
     if (response && response.feedback.size > 0) {
       const feedback = response.feedback.first();
-      const branchingQuestionOptions = branchingQuestions.map(
-        q => <option key={q} value={q}>{q}</option>);
+
+      const branchSelect = branchingQuestions.caseOf({
+        just: q => <BranchSelect
+          editMode={this.props.editMode}
+          value={feedback.lang}
+          onChange={lang => onEditFeedback(response, feedback.with({ lang }), null)}
+          questions={q}
+        />,
+        nothing: () => null,
+      });
 
       feedbackEditor =
         <div>
-          Branch to question: <Select
-            editMode={this.props.editMode}
-            value={feedback.lang}
-            onChange={lang => onEditFeedback(
-              response, feedback.with({ lang }), null)}>
-            {branchingQuestionOptions}
-          </Select>
+          {branchSelect}
           <ContentContainer
             activeContentGuid={this.props.activeContentGuid}
             hover={this.props.hover}
@@ -142,7 +146,6 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
               src)} />
 
         </div>;
-
 
       scoreEditor = (
         <div className="input-group">
