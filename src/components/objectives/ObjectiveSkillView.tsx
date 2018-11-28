@@ -12,7 +12,7 @@ import { DuplicateListingInput } from 'components/objectives/DuplicateListingInp
 import guid from 'utils/guid';
 import { buildReadOnlyMessage } from 'utils/lock';
 import { buildPersistenceFailureMessage } from 'utils/error';
-
+import { LoadingSpinner } from 'components/common/LoadingSpinner.tsx';
 import { ExistingSkillSelection } from 'components/objectives/ExistingSkillSelection';
 import {
   AggregateModel, buildAggregateModel, UnifiedObjectivesModel,
@@ -34,6 +34,7 @@ import { LegacyTypes } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
+import SearchBar from 'components/common/SearchBar';
 
 type skillId = string;
 type formativeId = string;
@@ -65,11 +66,14 @@ interface ObjectiveSkillViewState {
   aggregateModel: AggregateModel;
   skills: UnifiedSkillsModel;
   objectives: UnifiedObjectivesModel;
+  filteredObjectives: Maybe<Immutable.OrderedMap<string, contentTypes.LearningObjective>>;
+  overrideExpanded: boolean;
   isSavePending: boolean;
   loading: boolean;
   skillFormativeRefs: Maybe<Immutable.Map<skillId, Immutable.List<formativeId>>>;
   skillSummativeRefs: Maybe<Immutable.Map<skillId, Immutable.List<summativeId>>>;
   skillPoolRefs: Maybe<Immutable.Map<skillId, Immutable.List<poolId>>>;
+  searchText: string;
 }
 
 // The Learning Objectives and Skills documents require specialized handling
@@ -96,11 +100,14 @@ export class ObjectiveSkillView
       aggregateModel: null,
       skills: null,
       objectives: null,
+      filteredObjectives: Maybe.nothing(),
+      overrideExpanded: false,
       isSavePending: false,
       loading: false,
       skillFormativeRefs: Maybe.nothing<Immutable.Map<skillId, Immutable.List<formativeId>>>(),
       skillSummativeRefs: Maybe.nothing<Immutable.Map<skillId, Immutable.List<summativeId>>>(),
       skillPoolRefs: Maybe.nothing<Immutable.Map<skillId, Immutable.List<poolId>>>(),
+      searchText: '',
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
@@ -752,6 +759,11 @@ export class ObjectiveSkillView
   }
 
   onToggleExpanded(guid) {
+    const { overrideExpanded } = this.state;
+
+    // if overrideExpanded is enabled, disable toggle expanded
+    if (overrideExpanded) return;
+
     let action = null;
     if (this.props.expanded.has('objectives')) {
       action = this.props.expanded.get('objectives').has(guid)
@@ -787,8 +799,33 @@ export class ObjectiveSkillView
 
   }
 
+  // Filter resources shown based on title and id
+  filterBySearchText(searchText: string): void {
+    const { skills } = this.props;
+    const text = searchText.trim().toLowerCase();
+
+    const filterFn = (o: contentTypes.LearningObjective): boolean =>
+      o.title.toLowerCase().includes(text)
+      || o.skills.toArray().reduce(
+        (acc, s) => acc || (skills.has(s) && skills.get(s).title.toLowerCase().includes(text)),
+        false,
+      );
+
+    // searchText state is used for highlighting matches, and resources state creates
+    // one row in the table for each resource present
+    this.setState({
+      searchText,
+      filteredObjectives: searchText === ''
+        ? Maybe.nothing<Immutable.OrderedMap<string, contentTypes.LearningObjective>>()
+        : Maybe.just(this.state.objectives.objectives.filter(filterFn).toOrderedMap()),
+      overrideExpanded: searchText === '' ? false : true,
+    });
+  }
+
   renderObjectives() {
-    const { skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.state;
+    const {
+      skillFormativeRefs, skillSummativeRefs, skillPoolRefs, overrideExpanded, searchText,
+    } = this.state;
 
     const rows = [];
 
@@ -802,6 +839,8 @@ export class ObjectiveSkillView
         {});
 
     const isExpanded = (guid) => {
+      if (overrideExpanded) return true;
+
       if (this.props.expanded.has('objectives')) {
         const set = this.props.expanded.get('objectives');
         return set.includes(guid);
@@ -810,7 +849,12 @@ export class ObjectiveSkillView
       return false;
     };
 
-    this.state.objectives.objectives
+    const objectives = this.state.filteredObjectives.caseOf({
+      just: fos => fos,
+      nothing: () => this.state.objectives.objectives,
+    });
+
+    objectives
       .toArray()
       .forEach((objective: contentTypes.LearningObjective) => {
 
@@ -822,12 +866,12 @@ export class ObjectiveSkillView
             onRemove={this.removeObjective}
             onRemoveSkill={skill => this.removeSkill(objective, skill)}
             onAddNewSkill={this.onAddNewSkill}
-            highlighted={false}
             onBeginExternalEdit={this.onBeginExternalEdit}
             skillFormativeRefs={skillFormativeRefs}
             skillSummativeRefs={skillSummativeRefs}
             skillPoolRefs={skillPoolRefs}
             objective={objective}
+            highlightText={searchText}
             skills={objective.skills.filter(skillId => this.props.skills.has(skillId))
               .map(skillId => this.props.skills.get(skillId)).toList()}
             isExpanded={isExpanded(objective.id)}
@@ -902,17 +946,23 @@ export class ObjectiveSkillView
         : course.editable && this.state.aggregateModel.isLocked && !this.state.isSavePending;
 
     return (
-      <div className="table-toolbar input-group">
-        <div className="flex-spacer" />
-        <DuplicateListingInput
-          editMode={editable}
-          buttonLabel="Create"
-          width={600}
-          value=""
-          placeholder="New Learning Objective"
-          existing={this.state.objectives === null ? Immutable.List<string>()
-            : this.state.objectives.objectives.toList().map(o => o.title).toList()}
-          onClick={this.createNew} />
+      <div className="table-toolbar">
+        <SearchBar
+          className="inlineSearch"
+          placeholder="Search by Objective or Skill"
+          onChange={searchText => this.filterBySearchText(searchText)} />
+        <div className="input-group">
+          <div className="flex-spacer" />
+          <DuplicateListingInput
+            editMode={editable}
+            buttonLabel="Create"
+            width={400}
+            value=""
+            placeholder="New Learning Objective"
+            existing={this.state.objectives === null ? Immutable.List<string>()
+              : this.state.objectives.objectives.toList().map(o => o.title).toList()}
+            onClick={this.createNew} />
+        </div>
       </div>
     );
   }
@@ -932,7 +982,11 @@ export class ObjectiveSkillView
   render() {
 
     const content = this.state.aggregateModel === null
-      ? <p>Loading...</p>
+      ? (
+        <p className="page-loading">
+          <LoadingSpinner message="Loading..." />
+        </p>
+      )
       : this.renderContent();
 
     return (

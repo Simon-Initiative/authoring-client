@@ -17,6 +17,8 @@
   .table-toolbar {
     display: flex;
     flex-direction: row;
+    justify-items: center;
+    margin: 10px 0 20px 0;
   }
 
   .rst__node .rst__nodeContent h2 {
@@ -31,5 +33,11 @@
     padding: 0px 20px;
     border: 1px solid #ddd;
     border-radius: 2px;
+  }
+
+  .page-loading {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.3em;
   }
 }

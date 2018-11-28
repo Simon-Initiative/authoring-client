@@ -63,6 +63,13 @@ export const styles: JSSStyles = {
       color: colors.primary,
     },
   },
+  expandDisable: {
+    cursor: 'inherit',
+
+    '&:hover': {
+      color: 'inherit',
+    },
+  },
   titleText: {
     display: 'flex',
     flexDirection: 'column',
@@ -92,6 +99,7 @@ export const styles: JSSStyles = {
   },
   quadLeft: {
     flex: 1,
+    minWidth: 0,
   },
   quadRight: {
     display: 'flex',
@@ -232,6 +240,13 @@ export const styles: JSSStyles = {
   skillCountBadgeIcon: {
     width: 12,
   },
+  skillTitle: {
+    flex: 1,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    flexFlow: 'row nowrap',
+  },
   skillActions: {
     display: 'none',
     margin: [0, 20],
@@ -273,11 +288,11 @@ export interface ObjectiveProps {
   editMode: boolean;
   objective: contentTypes.LearningObjective;
   skills: List<contentTypes.Skill>;
-  highlighted: boolean;
   loading: boolean;
   skillFormativeRefs: Maybe<Map<skillId, List<formativeId>>>;
   skillSummativeRefs: Maybe<Map<skillId, List<summativeId>>>;
   skillPoolRefs: Maybe<Map<skillId, List<poolId>>>;
+  highlightText?: string;
   onToggleExpanded: (id) => void;
   onEdit: (model: contentTypes.LearningObjective) => void;
   onEditSkill: (model: contentTypes.Skill) => void;
@@ -432,7 +447,12 @@ export class Objective
           .get(skill.id))
         .toList(),
       List<string>(),
-    ).filter(ref => !!ref).toList();
+    )
+    // filter out undefined refs
+    .filter(ref => !!ref)
+    // dedupe refs
+    .reduce((acc, ref) => acc.contains(ref) ? acc : acc.push(ref), List<string>())
+    .toList();
 
     return assessmentIdRefs.map(ref => course.resourcesById.get(ref)).toArray();
   }
@@ -647,6 +667,8 @@ export class Objective
                 FORMATIVE_COUNT_WARNING_THRESHOLD,
                 SUMMATIVE_COUNT_WARNING_THRESHOLD,
               ))}
+              <br/>
+              <a href="#">Learn more about skills</a>.
             </div>
           </WarningTip>
           <Tooltip html={formativeTooltip} distance={10}
@@ -698,16 +720,17 @@ export class Objective
 
   renderSkills() {
     const {
-      classes, skills, editMode, loading, onEditSkill,
+      classes, skills, editMode, loading, onEditSkill, highlightText,
     } = this.props;
     const { skillEdits } = this.state;
 
     return skills.map(skill => (
       <div key={skill.guid} className={classes.skill}>
         {this.renderSkillBadges(skill)}
-        <div className="flex-spacer" style={{ lineHeight: 1.8 }}>
+        <div className={classes.skillTitle}>
           <InlineEdit
             inputStyle={{ width: '80%' }}
+            highlightText={highlightText}
             isEditing={skillEdits.get(skill.guid)}
             onEdit={(value) => {
               this.setState({
@@ -813,7 +836,7 @@ export class Objective
                   Objectives should have at least {SKILL_COUNT_WARNING_THRESHOLD}
                   {' ' + addPluralS('skill', SKILL_COUNT_WARNING_THRESHOLD)}.
                   <br/>
-                  <a href="#">Learn more about how skills work</a>.
+                  <a href="#">Learn more about skills</a>.
                 </WarningTip>
                 <i className={classNames(['fa fa-cubes', classes.detailsSectionIcon])} />
                 Skills
@@ -916,7 +939,7 @@ export class Objective
             Objectives should have at least {SKILL_COUNT_WARNING_THRESHOLD}
             {' ' + addPluralS('skill', SKILL_COUNT_WARNING_THRESHOLD)}.
             <br/>
-            <a href="#">Learn more about how skills work</a>.
+            <a href="#">Learn more about skills</a>.
           </WarningTip>
           {skillCount} {addPluralS('Skill', skillCount)}
           <span
@@ -945,7 +968,7 @@ export class Objective
   render() : JSX.Element {
     const {
       className, classes, editMode, objective, isExpanded, onEdit, loading, onRemove,
-      onBeginExternalEdit,
+      onBeginExternalEdit, highlightText,
     } = this.props;
     const { mouseOver, isEditingTitle } = this.state;
 
@@ -994,13 +1017,14 @@ export class Objective
         onMouseEnter={this.onEnter}
         onMouseLeave={this.onLeave}>
         <div
-          className={classNames([classes.title])}
+          className={classNames([classes.title, highlightText !== '' && classes.expandDisable])}
           onClick={() => this.onToggleDetails()}>
           <div><i className="fa fa-graduation-cap"/></div>
           <div className={classNames([classes.titleText])}>
             <div className="flex-spacer">
               <InlineEdit
                 inputStyle={{ width: '80%' }}
+                highlightText={highlightText}
                 isEditing={isEditingTitle}
                 onEdit={(value) => {
                   this.setState({
