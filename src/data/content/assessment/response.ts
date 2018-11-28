@@ -157,7 +157,6 @@ export class Response extends Immutable.Record(defaultContent) {
           ? f.with({ body: explanation.clone() }).toPersistence()
           : f.toPersistence());
 
-    console.log('feedback', feedback);
     const o = {
       response: {
         '@match': encodeMatchOperators(sanitizeMatch(this.match)),
