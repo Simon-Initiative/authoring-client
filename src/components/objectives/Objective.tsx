@@ -469,7 +469,7 @@ export class Objective
         <div className={classes.skillGridHeader}>
           <div className="flex-spacer"/>
           <div style={{ height: SKILL_GRID_HEADER_HEIGHT }}>
-            <svg width="100%" height={SKILL_GRID_HEADER_HEIGHT} viewBox="0 0">
+            <svg width="100%" height={SKILL_GRID_HEADER_HEIGHT}>
               <g transform={`translate(-15, ${SKILL_GRID_HEADER_HEIGHT}) rotate(-45)`}>
                 <line
                   x1={10}

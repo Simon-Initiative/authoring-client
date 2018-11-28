@@ -983,9 +983,9 @@ export class ObjectiveSkillView
 
     const content = this.state.aggregateModel === null
       ? (
-        <p className="page-loading">
+        <div className="page-loading">
           <LoadingSpinner message="Loading..." />
-        </p>
+        </div>
       )
       : this.renderContent();
 
