@@ -9,6 +9,7 @@ import {
 } from 'editors/content/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
+import { BranchSelect } from '../common/BranchSelect';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 
@@ -54,7 +55,27 @@ export class ShortAnswer
   }
 
   renderDetails() {
-    const { partModel, itemModel, editMode } = this.props;
+    const { partModel, itemModel, editMode, branchingQuestions } = this.props;
+
+    const response = partModel.responses.first() || new contentTypes.Response();
+    const feedback = response.feedback.first() || new contentTypes.Feedback();
+
+    const branchSelect = branchingQuestions.caseOf({
+      just: qs => <BranchSelect
+        editMode={editMode}
+        value={feedback.lang}
+        onChange={lang => this.onPartEdit(
+          partModel.with({
+            responses: partModel.responses.set(
+              response.guid, response.with({
+                feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
+              })),
+          }),
+          null)}
+        questions={qs}
+      />,
+      nothing: () => null,
+    });
 
     return (
       <React.Fragment>
@@ -84,6 +105,7 @@ export class ShortAnswer
           {/* All question types except short answers and essays use feedback.
           Short answers and essays use the explanation instead */}
           <TabSectionContent key="explanation" className="feedback">
+            {branchSelect}
             <ExplanationEditor
               {...this.props}
               model={partModel.explanation}
