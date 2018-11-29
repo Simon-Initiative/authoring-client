@@ -76,7 +76,6 @@ function splitQuestionsIntoPages(model: AssessmentModel) {
     id: 'p' + index.toString() + '_' + model.resource.id,
     nodes: Immutable.OrderedMap<string, contentTypes.Node>([[node.guid, node]]),
   }));
-  console.log('pages', pages);
 
   return model.with({
     pages: Immutable.OrderedMap<string, contentTypes.Page>(

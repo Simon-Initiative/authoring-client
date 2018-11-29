@@ -324,8 +324,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     this.props.onSetCurrentNode(this.props.activeContext.documentId.valueOr(null), node);
     this.handleEdit(this.props.model.with({ pages }));
-
-    console.log('pages size', this.props.model.pages.size);
   }
 
   onRemove() {
