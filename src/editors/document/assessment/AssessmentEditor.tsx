@@ -335,18 +335,19 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   addNode(node) {
-    let page;
-    if (this.props.model.branching) {
-      page = new contentTypes.Page();
-    } else {
-      page = this.getCurrentPage(this.props);
-    }
+    const { model, activeContext, onSetCurrentNode } = this.props;
+
+    // Branching assessments place each question on a separate page
+    let page = model.branching
+      ? new contentTypes.Page()
+      : this.getCurrentPage(this.props);
+
     page = page.with({ nodes: page.nodes.set(node.guid, node) });
 
-    const pages = this.props.model.pages.set(page.guid, page);
+    const pages = model.pages.set(page.guid, page);
 
-    this.props.onSetCurrentNode(this.props.activeContext.documentId.valueOr(null), node);
-    this.handleEdit(this.props.model.with({ pages }));
+    onSetCurrentNode(activeContext.documentId.valueOr(null), node);
+    this.handleEdit(model.with({ pages }));
   }
 
   onRemove() {

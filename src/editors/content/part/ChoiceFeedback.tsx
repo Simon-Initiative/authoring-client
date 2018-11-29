@@ -152,23 +152,25 @@ export abstract class ChoiceFeedback
     const { model, onEdit } = this.props;
 
     const updatedModel = model.with({
-      responses: model.responses.map((x) => {
-        if (!x.name.match(/^AUTOGEN.*/)) return x;
+      responses: model.responses.map((response) => {
+        if (!response.name.match(/^AUTOGEN.*/)) return response;
 
-        const map = x.feedback || Immutable.OrderedMap<string, contentTypes.Feedback>();
-        let feedback = (x.feedback && x.feedback.first())
+        const feedbacks = response.feedback ||
+          Immutable.OrderedMap<string, contentTypes.Feedback>();
+
+        let feedback = (response.feedback && response.feedback.first())
           || new contentTypes.Feedback({ guid: guid() });
         feedback = feedback.with({
-          body: x.guid === responseGuid ? body : body.clone(),
+          body: response.guid === responseGuid ? body : body.clone(),
         });
-        if (lang) {
+        if (lang !== undefined) {
           feedback = feedback.with({
             lang,
           });
         }
-        return x.with({
+        return response.with({
           score,
-          feedback: map.set(feedback.guid, feedback),
+          feedback: feedbacks.set(feedback.guid, feedback),
         });
       }).toOrderedMap(),
     });
@@ -229,9 +231,29 @@ export abstract class ChoiceFeedback
     });
   }
 
+  buildBranchSelect(response: contentTypes.Response) {
+    const { editMode, branchingQuestions } = this.props;
+
+    const feedback = response.feedback.first();
+    const branchSelect = branchingQuestions.caseOf({
+      just: q => <BranchSelect
+        editMode={editMode}
+        value={feedback.lang}
+        onChange={lang => this.onResponseEdit(
+          response.with({
+            feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
+          }),
+          null)}
+        questions={q}
+      />,
+      nothing: () => null,
+    });
+
+    return branchSelect;
+  }
+
   renderResponses() {
-    const { choices, model, context, services,
-      editMode, simpleFeedback } = this.props;
+    const { choices, model, context, services, editMode, simpleFeedback } = this.props;
     const { invalidFeedback } = this.state;
 
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
@@ -274,7 +296,8 @@ export abstract class ChoiceFeedback
                         bsSize="small"
                         onChange={(selected) => {
                           if (selected.length > 0) {
-                            this.onEditMatchSelections(response.guid, this.props.choices, selected);
+                            this.onEditMatchSelections(
+                              response.guid, this.props.choices, selected);
 
                             this.setState({
                               invalidFeedback: invalidFeedback.set(response.guid, false),
@@ -324,80 +347,73 @@ export abstract class ChoiceFeedback
                   : null
                 }
               </ItemOptions>,
-            ]} />
+            ]}>
+            {this.buildBranchSelect(response)}
+          </InputListItem>
         );
       });
   }
 
   renderDefaultResponse() {
-    const { choices, model, context, services, editMode, simpleFeedback,
-      branchingQuestions } = this.props;
+    const { choices, model, context, services, editMode, simpleFeedback } = this.props;
+
+    // If there's 1 choice, there can be no incorrect/other feedback
+    if (choices.length <= 1) {
+      return null;
+    }
+
     const defaultResponse = getGeneratedResponseItem(model) || this.defaultFeedbackResponse;
     const defaultResponseGuid = defaultResponse.guid;
 
-    const branchSelect = branchingQuestions.caseOf({
-      just: q => <BranchSelect
-        editMode={this.props.editMode}
-        value={defaultResponse.feedback.first().lang}
-        onChange={lang => this.onDefaultFeedbackEdit(
-          defaultResponse.feedback.first().body,
-          defaultResponse ? defaultResponse.score : '0',
-          null, defaultResponseGuid, lang)}
-        questions={q}
-      />,
-      nothing: () => null,
-    });
     return (
-      <div>
-        {branchSelect}
-
-        <InputListItem
-          activeContentGuid={this.props.activeContentGuid}
-          hover={this.props.hover}
-          onUpdateHover={this.props.onUpdateHover}
-          onFocus={this.props.onFocus}
-          key={defaultResponse.guid}
-          className="response"
-          id={defaultResponse.guid}
-          label=""
-          contentTitle="Other"
-          context={context}
-          services={services}
-          editMode={!this.props.hideOther && editMode}
-          body={defaultResponse.feedback.first().body}
-          onEdit={(body, source) =>
-            this.onDefaultFeedbackEdit(
-              body, defaultResponse ? defaultResponse.score : '0',
-              source, defaultResponseGuid)}
-          options={[
-            <ItemOptions key="feedback-options">
-              {choices.length > AUTOGEN_MAX_CHOICES
-                ? (
-                  renderMaxChoicesWarning()
-                ) : (
-                  <ItemOptionFlex />
-                )
-              }
-              {!simpleFeedback
-                ? (
-                  <ItemOption className="score" label="Score">
-                    <div className="input-group">
-                      <input
-                        type="number"
-                        className="form-control input-sm form-control-sm"
-                        disabled={this.props.hideOther || !editMode}
-                        value={defaultResponse.score}
-                        onChange={({ target: { value } }) =>
-                          this.onScoreEdit(defaultResponse, value)}
-                      />
-                    </div>
-                  </ItemOption>
-                )
-                : (null)
-              }
-            </ItemOptions>,
-          ]} />
-      </div >
+      <InputListItem
+        activeContentGuid={this.props.activeContentGuid}
+        hover={this.props.hover}
+        onUpdateHover={this.props.onUpdateHover}
+        onFocus={this.props.onFocus}
+        key={defaultResponse.guid}
+        className="response"
+        id={defaultResponse.guid}
+        label=""
+        contentTitle="Other"
+        context={context}
+        services={services}
+        editMode={!this.props.hideOther && editMode}
+        body={defaultResponse.feedback.first().body}
+        onEdit={(body, source) =>
+          this.onDefaultFeedbackEdit(
+            body, defaultResponse ? defaultResponse.score : '0',
+            source, defaultResponseGuid)}
+        options={[
+          <ItemOptions key="feedback-options">
+            {choices.length > AUTOGEN_MAX_CHOICES
+              ? (
+                renderMaxChoicesWarning()
+              ) : (
+                <ItemOptionFlex />
+              )
+            }
+            {!simpleFeedback
+              ? (
+                <ItemOption className="score" label="Score">
+                  <div className="input-group">
+                    <input
+                      type="number"
+                      className="form-control input-sm form-control-sm"
+                      disabled={this.props.hideOther || !editMode}
+                      value={defaultResponse.score}
+                      onChange={({ target: { value } }) =>
+                        this.onScoreEdit(defaultResponse, value)}
+                    />
+                  </div>
+                </ItemOption>
+              )
+              : (null)
+            }
+          </ItemOptions>,
+        ]}>
+        {this.buildBranchSelect(defaultResponse)}
+      </InputListItem>
     );
   }
 
