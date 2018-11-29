@@ -60,23 +60,6 @@ export class ShortAnswer
     const response = partModel.responses.first() || new contentTypes.Response();
     const feedback = response.feedback.first() || new contentTypes.Feedback();
 
-    const branchSelect = branchingQuestions.caseOf({
-      just: qs => <BranchSelect
-        editMode={editMode}
-        value={feedback.lang}
-        onChange={lang => this.onPartEdit(
-          partModel.with({
-            responses: partModel.responses.set(
-              response.guid, response.with({
-                feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
-              })),
-          }),
-          null)}
-        questions={qs}
-      />,
-      nothing: () => null,
-    });
-
     return (
       <React.Fragment>
         <TabSection key="choices" className="choices">
@@ -105,7 +88,19 @@ export class ShortAnswer
           {/* All question types except short answers and essays use feedback.
           Short answers and essays use the explanation instead */}
           <TabSectionContent key="explanation" className="feedback">
-            {branchSelect}
+            <BranchSelect
+              editMode={editMode}
+              branch={feedback.lang}
+              onChange={lang => this.onPartEdit(
+                partModel.with({
+                  responses: partModel.responses.set(
+                    response.guid, response.with({
+                      feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
+                    })),
+                }),
+                null)}
+              questions={branchingQuestions}
+            />
             <ExplanationEditor
               {...this.props}
               model={partModel.explanation}

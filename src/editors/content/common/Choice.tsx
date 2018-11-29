@@ -118,19 +118,14 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
     if (response && response.feedback.size > 0) {
       const feedback = response.feedback.first();
 
-      const branchSelect = branchingQuestions.caseOf({
-        just: q => <BranchSelect
-          editMode={this.props.editMode}
-          value={feedback.lang}
-          onChange={lang => onEditFeedback(response, feedback.with({ lang }), null)}
-          questions={q}
-        />,
-        nothing: () => null,
-      });
-
       feedbackEditor =
         <div>
-          {branchSelect}
+          <BranchSelect
+            editMode={editMode}
+            branch={feedback.lang}
+            onChange={lang => onEditFeedback(response, feedback.with({ lang }), null)}
+            questions={branchingQuestions}
+          />
           <ContentContainer
             activeContentGuid={this.props.activeContentGuid}
             hover={this.props.hover}

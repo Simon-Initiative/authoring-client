@@ -231,29 +231,9 @@ export abstract class ChoiceFeedback
     });
   }
 
-  buildBranchSelect(response: contentTypes.Response) {
-    const { editMode, branchingQuestions } = this.props;
-
-    const feedback = response.feedback.first();
-    const branchSelect = branchingQuestions.caseOf({
-      just: q => <BranchSelect
-        editMode={editMode}
-        value={feedback.lang}
-        onChange={lang => this.onResponseEdit(
-          response.with({
-            feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
-          }),
-          null)}
-        questions={q}
-      />,
-      nothing: () => null,
-    });
-
-    return branchSelect;
-  }
-
   renderResponses() {
-    const { choices, model, context, services, editMode, simpleFeedback } = this.props;
+    const { choices, model, context, services, editMode, simpleFeedback,
+      branchingQuestions } = this.props;
     const { invalidFeedback } = this.state;
 
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
@@ -265,6 +245,8 @@ export abstract class ChoiceFeedback
 
     return responsesOrPlaceholder
       .map((response, i) => {
+
+        const feedback = response.feedback.first();
 
         return (
           <InputListItem
@@ -280,7 +262,7 @@ export abstract class ChoiceFeedback
             context={context}
             services={services}
             editMode={editMode}
-            body={response.feedback.first().body}
+            body={feedback.body}
             onEdit={(body, source) => this.onBodyEdit(body, response, source)}
             onRemove={userResponses.length <= 1
               ? undefined
@@ -348,14 +330,24 @@ export abstract class ChoiceFeedback
                 }
               </ItemOptions>,
             ]}>
-            {this.buildBranchSelect(response)}
+            <BranchSelect
+              editMode={editMode}
+              branch={feedback.lang}
+              onChange={lang => this.onResponseEdit(
+                response.with({
+                  feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
+                }),
+                null)}
+              questions={branchingQuestions}
+            />
           </InputListItem>
         );
       });
   }
 
   renderDefaultResponse() {
-    const { choices, model, context, services, editMode, simpleFeedback } = this.props;
+    const { choices, model, context, services, editMode, simpleFeedback,
+      branchingQuestions } = this.props;
 
     // If there's 1 choice, there can be no incorrect/other feedback
     if (choices.length <= 1) {
@@ -364,6 +356,7 @@ export abstract class ChoiceFeedback
 
     const defaultResponse = getGeneratedResponseItem(model) || this.defaultFeedbackResponse;
     const defaultResponseGuid = defaultResponse.guid;
+    const feedback = defaultResponse.feedback.first();
 
     return (
       <InputListItem
@@ -379,7 +372,7 @@ export abstract class ChoiceFeedback
         context={context}
         services={services}
         editMode={!this.props.hideOther && editMode}
-        body={defaultResponse.feedback.first().body}
+        body={feedback.body}
         onEdit={(body, source) =>
           this.onDefaultFeedbackEdit(
             body, defaultResponse ? defaultResponse.score : '0',
@@ -412,7 +405,16 @@ export abstract class ChoiceFeedback
             }
           </ItemOptions>,
         ]}>
-        {this.buildBranchSelect(defaultResponse)}
+        <BranchSelect
+          editMode={editMode}
+          branch={feedback.lang}
+          onChange={lang => this.onResponseEdit(
+            defaultResponse.with({
+              feedback: defaultResponse.feedback.set(feedback.guid, feedback.with({ lang })),
+            }),
+            null)}
+          questions={branchingQuestions}
+        />
       </InputListItem>
     );
   }
