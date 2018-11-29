@@ -394,12 +394,10 @@ export class ContextAwareSidebar
             }
             <SidebarGroup label="Advanced">
               <SidebarRow>
-                {/* <TabOptionControl name="branching"> */}
                 <ToggleSwitch
                   checked={model.branching}
                   label="Branching Assessment"
                   onClick={this.onToggleBranching} />
-                {/* </TabOptionControl> */}
                 <p></p>
                 <Button
                   className={classes.deleteButton}

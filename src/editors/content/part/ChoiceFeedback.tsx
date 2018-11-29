@@ -231,7 +231,7 @@ export abstract class ChoiceFeedback
 
   renderResponses() {
     const { choices, model, context, services,
-      editMode, simpleFeedback, branchingQuestions } = this.props;
+      editMode, simpleFeedback } = this.props;
     const { invalidFeedback } = this.state;
 
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
@@ -342,7 +342,7 @@ export abstract class ChoiceFeedback
         onChange={lang => this.onDefaultFeedbackEdit(
           defaultResponse.feedback.first().body,
           defaultResponse ? defaultResponse.score : '0',
-          null, defaultResponseGuid)}
+          null, defaultResponseGuid, lang)}
         questions={q}
       />,
       nothing: () => null,

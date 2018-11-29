@@ -38,14 +38,10 @@ function getBranchingQuestionNumbers(props: Props): number[] {
     pages.skipUntil(p => p === props.currentPage).toArray().length - 1,
     0);
   const questionNumbers = [];
-  console.log('pages', pages);
-  console.log('pagesAfterCount', pagesAfterCount);
-  console.log('currentpage', props.currentPage);
   for (let i = pages.size; i > pages.size - pagesAfterCount; i -= 1) {
     questionNumbers.push(i);
   }
 
-  console.log('questionnumbers', questionNumbers);
   return questionNumbers.reverse();
 }
 

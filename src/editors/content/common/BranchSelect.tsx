@@ -10,9 +10,11 @@ export type BranchSelectProps = {
 };
 
 export const BranchSelect = (props: BranchSelectProps) => {
+  const toOption = (text, value) => <option key={text} value={value}>{text}</option>;
 
-  const opts = [<option key="empty" value="">
-  </option>, ...props.questions.map(q => <option key={q} value={q}>{q}</option>)];
+  const defaultOption = toOption('None', '');
+
+  const opts = [defaultOption].concat(props.questions.map(q => toOption(q, q)));
 
   return (
     <div className="branchSelect">
