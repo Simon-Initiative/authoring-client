@@ -73,7 +73,7 @@ function splitQuestionsIntoPages(model: AssessmentModel) {
   });
   nodesToRemove.forEach(index => nodes.splice(index, 1));
   const pages = nodes.map((node, index) => new contentTypes.Page().with({
-    id: 'p' + index.toString() + '_' + model.resource.id,
+    id: 'p' + (index + 1).toString() + '_' + model.resource.id,
     nodes: Immutable.OrderedMap<string, contentTypes.Node>([[node.guid, node]]),
   }));
 
