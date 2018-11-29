@@ -11,8 +11,8 @@ export type BranchSelectProps = {
 
 export const BranchSelect = (props: BranchSelectProps) => {
 
-  const opts = props.questions.map(
-    q => <option key={q} value={q}>{q}</option>);
+  const opts = [<option key="empty" value="">
+  </option>, ...props.questions.map(q => <option key={q} value={q}>{q}</option>)];
 
   return (
     <div className="branchSelect">

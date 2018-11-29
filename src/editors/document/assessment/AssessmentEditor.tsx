@@ -9,11 +9,15 @@ import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
 import guid from 'utils/guid';
-import { locateNextOfKin, findNodeByGuid } from 'editors/document/assessment/utils';
+import {
+  locateNextOfKin, findNodeByGuid,
+  handleBranchingReordering,
+} from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
 import { AddQuestion } from 'editors/content/question/AddQuestion';
 import { renderAssessmentNode } from 'editors/document/common/questions';
-import { getChildren, Outline, setChildren } from 'editors/document/assessment/Outline';
+import { getChildren, Outline, setChildren, EditDetails }
+  from 'editors/document/assessment/Outline';
 import { updateNode, removeNode } from 'data/utils/tree';
 import { hasUnknownSkill } from 'utils/skills';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
@@ -25,7 +29,6 @@ import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
-
 import './AssessmentEditor.scss';
 import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 
@@ -204,16 +207,36 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     onSetCurrentNode(activeContext.documentId.valueOr(null), node);
     this.props.onUpdateContent(this.props.context.documentId, src);
 
-    this.onEditNodes(updateNode(guid, node, nodes, getChildren, setChildren));
-  }
-
-  onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
+    const updatedNodes = updateNode(guid, node, nodes, getChildren, setChildren);
 
     let page = this.getCurrentPage(this.props);
-    page = page.with({ nodes });
+    page = page.with({ nodes: updatedNodes });
 
     const pages = this.props.model.pages.set(page.guid, page);
     this.handleEdit(this.props.model.with({ pages }));
+
+  }
+
+  // This handles updates from the outline component, which are only reorders
+  onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>, editDetails: EditDetails) {
+
+    if (this.props.model.branching) {
+      const pages = handleBranchingReordering(
+        this.props.model.resource.id, this.props.model.pages, nodes);
+      this.handleEdit(this.props.model.with({ pages }));
+
+      findNodeByGuid(nodes, editDetails.sourceModel.guid).caseOf({
+        just: node => this.onSelect(node),
+        nothing: () => null,
+      });
+
+    } else {
+      let page = this.getCurrentPage(this.props);
+      page = page.with({ nodes });
+
+      const pages = this.props.model.pages.set(page.guid, page);
+      this.handleEdit(this.props.model.with({ pages }));
+    }
   }
 
   onChangeExpansion(nodes: Immutable.Set<string>) {

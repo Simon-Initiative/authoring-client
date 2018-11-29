@@ -1,15 +1,101 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-
+import { EditDetails } from './Outline';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 
+/**
+ * Handles question reordering in a branch mode assessment.
+ *
+ * @param originalPages the original view of the pages, prior to reorder
+ * @param updatedNodes the updated nodes after the reordering
+ * @param editDetails the details about the reordering
+ */
+export function handleBranchingReordering(
+  assessmentId: string,
+  originalPages: Immutable.OrderedMap<string, contentTypes.Page>,
+  updatedNodes: Immutable.OrderedMap<string, contentTypes.Node>)
+  : Immutable.OrderedMap<string, contentTypes.Page> {
+
+  // Build a mapping for each question as to what index it was located at
+  // prior to the reorder, and what index it is located at now
+  const originalPageArr = originalPages.toArray();
+  const mapping = originalPageArr.reduce(
+    (acc, page, i) => {
+      acc[(page.nodes.first() as contentTypes.Question).id] = [i];
+      return acc;
+    },
+    {});
+  updatedNodes.toArray().forEach((n, index) => {
+    // This captures the index the question is at after the reorder
+    mapping[(n as contentTypes.Question).id].push(index);
+  });
+  // This creates an array whose indices represent the original indices,
+  // and whose values are the values of the new indice
+  const oldToNewIndices = Object.keys(mapping).map((k) => {
+    return mapping[k][1];
+  });
+  const newToOldIndices = [originalPageArr.length];
+  Object.keys(mapping).map((k) => {
+    newToOldIndices[mapping[k][1]] = mapping[k][0];
+  });
+
+  // Now reposition the pages, do this in the most straightforward
+  // manner possible by just creating new pages and placing the
+  // reordered questions into these new pages
+  let pages = Immutable.OrderedMap<string, contentTypes.Page>(
+    updatedNodes.toArray().map((node, index) => {
+      const p = new contentTypes.Page().with({
+        id: 'p' + index.toString() + '_' + assessmentId,
+        guid: originalPageArr[newToOldIndices[index]].guid,
+        nodes: Immutable.OrderedMap<string, contentTypes.Node>([[node.guid, node]]),
+      });
+      return [p.guid, p];
+    }));
+
+  // Now update all feedback.lang attribute values according to the mapping,
+  // being careful to clear out any backward references
+
+  pages = Immutable.OrderedMap<string, contentTypes.Page>(pages.toArray().map((page, index) => {
+    let q = page.nodes.first() as contentTypes.Question;
+    q = updateBranchReferences(q, index, oldToNewIndices);
+    const p = page.with({ nodes: page.nodes.set(q.guid, q) });
+    return [p.guid, p];
+  }));
+
+  return pages;
+}
+
+export function updateBranchReferences(
+  q: contentTypes.Question, thisIndex, oldToNewIndices): contentTypes.Question {
+
+  const updateFeedback = (f: contentTypes.Feedback) => {
+    if (f.lang !== '') {
+      const newIndex = oldToNewIndices[parseInt(f.lang, 10) - 1];
+      if (newIndex > thisIndex) {
+        return f.with({ lang: (newIndex + 1) });
+      }
+      return f.with({ lang: '' });
+    }
+    return f;
+  };
+
+  const updateResponse = (r: contentTypes.Response) => {
+    return r.with({ feedback: r.feedback.map(f => updateFeedback(f)).toOrderedMap() });
+  };
+
+  const updatePart = (p: contentTypes.Part) => {
+    return p.with({ responses: p.responses.map(r => updateResponse(r)).toOrderedMap() });
+  };
+
+  return q.with({ parts: q.parts.map(p => updatePart(p)).toOrderedMap() });
+}
 
 /**
  * Finds a node based on guid in an assessment.
  */
 export function findNodeByGuid(
-  nodes: Immutable.OrderedMap<string, contentTypes.Node>, guid: string) : Maybe<contentTypes.Node> {
+  nodes: Immutable.OrderedMap<string, contentTypes.Node>, guid: string): Maybe<contentTypes.Node> {
 
   // Check top level nodes first
   if (nodes.has(guid)) {
@@ -23,7 +109,7 @@ export function findNodeByGuid(
       (node, p) => {
         if (p.contentType === 'Selection') {
           if (p.source.contentType === 'Pool') {
-            const pool : contentTypes.Pool = p.source;
+            const pool: contentTypes.Pool = p.source;
             return node.caseOf({
               just: n => node,
               nothing: () => {
@@ -41,7 +127,6 @@ export function findNodeByGuid(
 
 }
 
-
 /**
  *
  * Find closest relative.  In an assessment tree, find either the given node's
@@ -49,7 +134,7 @@ export function findNodeByGuid(
  */
 export function locateNextOfKin(
   nodes: Immutable.OrderedMap<string, contentTypes.Node>,
-  guid: string) : Maybe<contentTypes.Node> {
+  guid: string): Maybe<contentTypes.Node> {
 
   // Check top level nodes first
   if (nodes.has(guid)) {
@@ -63,7 +148,7 @@ export function locateNextOfKin(
       (node, p) => {
         if (p.contentType === 'Selection') {
           if (p.source.contentType === 'Pool') {
-            const pool : contentTypes.Pool = p.source;
+            const pool: contentTypes.Pool = p.source;
             return node.caseOf({
               just: n => node,
               nothing: () => {
@@ -85,14 +170,14 @@ export function locateNextOfKin(
 
 export function chooseRelative(
   nodes: Immutable.OrderedMap<string, contentTypes.Node>,
-  guid: string, parent: Maybe<contentTypes.Node>) : Maybe<contentTypes.Node> {
+  guid: string, parent: Maybe<contentTypes.Node>): Maybe<contentTypes.Node> {
 
   const arr = nodes
     .toArray();
 
   const index =
     arr
-    .findIndex(q => q.guid === guid);
+      .findIndex(q => q.guid === guid);
 
   if (nodes.size === 1) {
     return parent;
@@ -109,7 +194,7 @@ export function chooseRelative(
  * of the assessment (aka the model)
  * @param model the assessment model
  */
-export function typeRestrictedByModel(model: models.AssessmentModel) : boolean {
+export function typeRestrictedByModel(model: models.AssessmentModel): boolean {
 
   const pages = model.pages.toArray();
 
@@ -123,9 +208,9 @@ export function typeRestrictedByModel(model: models.AssessmentModel) : boolean {
       },
       false)
 
-        ||
+    ||
 
-     pages.reduce(
+    pages.reduce(
       (prev, page) => {
         if (prev) return true;
         const questions = [];
@@ -134,7 +219,6 @@ export function typeRestrictedByModel(model: models.AssessmentModel) : boolean {
       },
       false)
   );
-
 
 }
 
@@ -162,4 +246,3 @@ function extractFromNodes(
     });
 
 }
-
