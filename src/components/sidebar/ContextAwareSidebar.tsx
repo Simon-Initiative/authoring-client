@@ -400,6 +400,7 @@ export class ContextAwareSidebar
                   label="Branching Assessment"
                   onClick={this.onToggleBranching} />
                 {/* </TabOptionControl> */}
+                <p></p>
                 <Button
                   className={classes.deleteButton}
                   onClick={this.showDeleteModal}

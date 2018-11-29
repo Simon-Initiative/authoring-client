@@ -230,7 +230,8 @@ export abstract class ChoiceFeedback
   }
 
   renderResponses() {
-    const { choices, model, context, services, editMode, simpleFeedback } = this.props;
+    const { choices, model, context, services,
+      editMode, simpleFeedback, branchingQuestions } = this.props;
     const { invalidFeedback } = this.state;
 
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
@@ -242,6 +243,7 @@ export abstract class ChoiceFeedback
 
     return responsesOrPlaceholder
       .map((response, i) => {
+
         return (
           <InputListItem
             activeContentGuid={this.props.activeContentGuid}
