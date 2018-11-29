@@ -9,9 +9,12 @@ import {
 } from 'editors/content/common/InputList';
 import './Feedback.scss';
 import guid from 'utils/guid';
+import { BranchSelect } from '../common/BranchSelect';
+import { Maybe } from 'tsmonad';
 
 export interface FeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
   disableRemove?: boolean;
+  branchingQuestions: Maybe<number[]>;
 }
 
 export interface FeedbackState {
@@ -22,7 +25,7 @@ export interface FeedbackState {
  * The content editor for choice feedback.
  */
 export abstract class Feedback
-    extends AbstractContentEditor<contentTypes.Part, FeedbackProps, FeedbackState> {
+  extends AbstractContentEditor<contentTypes.Part, FeedbackProps, FeedbackState> {
   defaultFeedbackResponse: contentTypes.Response;
 
   constructor(props) {
@@ -100,10 +103,12 @@ export abstract class Feedback
   }
 
   renderResponses() {
-    const { model, context, services, editMode } = this.props;
+    const { model, context, services, editMode, branchingQuestions } = this.props;
 
     return model.responses.toArray().filter(r => r.match !== '*')
       .map((response, i) => {
+        const feedback = response.feedback.first();
+
         return (
           <InputListItem
             activeContentGuid={this.props.activeContentGuid}
@@ -118,7 +123,7 @@ export abstract class Feedback
             context={context}
             services={services}
             editMode={editMode}
-            body={response.feedback.first().body}
+            body={feedback.body}
             onEdit={(body, source) => this.onBodyEdit(body, response, source)}
             onRemove={this.props.disableRemove && model.responses.size <= 2 ? undefined :
               () => this.onResponseRemove(response)}
@@ -140,17 +145,28 @@ export abstract class Feedback
                       disabled={!this.props.editMode}
                       value={response.score}
                       onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
-                      />
+                    />
                   </div>
                 </ItemOption>
               </ItemOptions>
-            } />
+            }>
+            <BranchSelect
+              editMode={editMode}
+              branch={feedback.lang}
+              onChange={lang => this.onResponseEdit(
+                response.with({
+                  feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
+                }),
+                null)}
+              questions={branchingQuestions}
+            />
+          </InputListItem>
         );
       });
   }
 
   renderDefaultResponse() {
-    const { context, services, editMode } = this.props;
+    const { context, services, editMode, branchingQuestions } = this.props;
 
     if (!this.defaultFeedbackResponse) {
       const newGuid = guid();
@@ -169,6 +185,7 @@ export abstract class Feedback
     if (defaultResponseItem) {
       defaultResponse = defaultResponseItem;
     }
+    const feedback = defaultResponse.feedback.first();
 
     return (
       <InputListItem
@@ -184,7 +201,7 @@ export abstract class Feedback
         context={context}
         services={services}
         editMode={editMode}
-        body={defaultResponse.feedback.first().body}
+        body={feedback.body}
         onEdit={(body, source) => this.onBodyEdit(body, defaultResponse, source)}
         options={
           <ItemOptions>
@@ -197,15 +214,26 @@ export abstract class Feedback
                   disabled={!this.props.editMode}
                   value={defaultResponse.score}
                   onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
-                  />
+                />
               </div>
             </ItemOption>
           </ItemOptions>
-        } />
+        }>
+        <BranchSelect
+          editMode={editMode}
+          branch={feedback.lang}
+          onChange={lang => this.onResponseEdit(
+            defaultResponse.with({
+              feedback: defaultResponse.feedback.set(feedback.guid, feedback.with({ lang })),
+            }),
+            null)}
+          questions={branchingQuestions}
+        />
+      </InputListItem>
     );
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
     return (
       <div className="feedback">
         <InputList className="feedback-items">
