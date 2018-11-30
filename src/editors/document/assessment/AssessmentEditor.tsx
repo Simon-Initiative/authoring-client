@@ -11,7 +11,7 @@ import { LegacyTypes } from 'data/types';
 import guid from 'utils/guid';
 import {
   locateNextOfKin, findNodeByGuid,
-  handleBranchingReordering,
+  handleBranchingReordering, handleBranchingDeletion,
 } from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
 import { AddQuestion } from 'editors/content/question/AddQuestion';
@@ -277,12 +277,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const model = this.props.model;
     const page = this.getCurrentPage(this.props);
     const isBranching = this.props.model.branching;
-
+    const documentId = this.props.activeContext.documentId.valueOr(null);
     const removed = removeNode(guid, page.nodes, getChildren, setChildren);
 
     locateNextOfKin(removed.size > 0 ? page.nodes : this.allNodes(), guid).lift((node) => {
 
-      const documentId = this.props.activeContext.documentId.valueOr(null);
       this.props.onSetCurrentNode(
         this.props.activeContext.documentId.valueOr(null), node);
 
@@ -296,9 +295,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       }
     });
 
-    const pages = isBranching
-      ? this.props.model.pages.delete(page.guid)
-      : this.props.model.pages.set(page.guid, page);
+    let pages;
+    if (isBranching) {
+      pages = handleBranchingDeletion(documentId, this.props.model.pages, guid);
+    } else {
+      pages = this.props.model.pages.set(page.guid, page);
+    }
 
     this.handleEdit(this.props.model.with({ pages }));
   }

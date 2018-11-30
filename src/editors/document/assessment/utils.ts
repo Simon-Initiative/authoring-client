@@ -66,6 +66,46 @@ export function handleBranchingReordering(
   return pages;
 }
 
+/**
+ * Handles question deletion in a branch mode assessment.
+ * @param assessmentId the assessment id
+ * @param originalPages the original view of the pages, prior to deletion
+ * @param guid the guid of the deleted question
+ */
+export function handleBranchingDeletion(
+  assessmentId: string,
+  originalPages: Immutable.OrderedMap<string, contentTypes.Page>,
+  guid: string)
+  : Immutable.OrderedMap<string, contentTypes.Page> {
+
+  // Find the index of the removed item
+  const indexOf = originalPages.toArray()
+    .map(p => (p.nodes.first() as contentTypes.Question).guid)
+    .indexOf(guid);
+
+  // Build the mapping for updating references
+  const oldToNewIndices = originalPages.toArray().map((p, index) => {
+    return index > indexOf ? index - 1 : index;
+  });
+
+  // Remove the page at that index, and update ids of the remaining pages,
+  // and apply the references update
+  return Immutable.OrderedMap<string, contentTypes.Page>(originalPages
+    .delete(originalPages.toArray()[indexOf].guid)
+    .toArray().map((page, index) => {
+
+      let q = page.nodes.first() as contentTypes.Question;
+      q = updateBranchReferences(q, index, oldToNewIndices);
+
+      const p = page.with({
+        nodes: page.nodes.set(q.guid, q),
+        id: 'p' + index.toString() + '_' + assessmentId,
+      });
+      return [p.guid, p];
+    }));
+
+}
+
 export function updateBranchReferences(
   q: contentTypes.Question, thisIndex, oldToNewIndices): contentTypes.Question {
 
