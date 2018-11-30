@@ -1,32 +1,34 @@
 import * as React from 'react';
 import { Select } from './Select';
 import './BranchSelect.scss';
+import * as contentTypes from 'data/contentTypes';
+import { Maybe } from 'tsmonad';
 
 export type BranchSelectProps = {
   editMode: boolean;
+  branch: string;
   onChange: (question: string) => void;
-  questions: number[];
-  value: string
+  questions: Maybe<number[]>;
 };
 
 export const BranchSelect = (props: BranchSelectProps) => {
+
   const toOption = (text, value) => <option key={text} value={value}>{text}</option>;
 
   const defaultOption = toOption('None', '');
 
-  const opts = [defaultOption].concat(props.questions.map(q => toOption(q, q)));
-
-  return (
-    <div className="branchSelect">
+  return props.questions.caseOf({
+    just: qs => <div className="branchSelect">
       <div className="label">Branch to question: </div>
       <div className="select">
         <Select
           editMode={props.editMode}
-          value={props.value}
+          value={props.branch}
           onChange={n => props.onChange(n)}>
-          {opts}
+          {[defaultOption].concat(qs.map(q => toOption(q, q)))}
         </Select>
       </div>
-    </div>
-  );
+    </div>,
+    nothing: () => null,
+  });
 };

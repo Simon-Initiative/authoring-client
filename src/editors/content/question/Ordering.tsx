@@ -26,6 +26,7 @@ import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { ContentElements } from 'data/content/common/elements';
 
 import './Ordering.scss';
+import { BranchSelect } from '../common/BranchSelect';
 
 export const isComplexFeedback = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.filter(autogenResponseFilter).toArray();
@@ -496,7 +497,8 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   }
 
   renderResponses = () => {
-    const { partModel, context, services, advancedScoring, editMode } = this.props;
+    const { partModel, context, services, advancedScoring, editMode,
+      branchingQuestions } = this.props;
 
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
     const userResponses = partModel.responses.toArray().filter(autogenResponseFilter);
@@ -507,6 +509,9 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
 
     return responsesOrPlaceholder
       .map((response, i) => {
+
+        const feedback = response.feedback.first();
+
         return (
           <InputListItem
             activeContentGuid={this.props.activeContentGuid}
@@ -521,7 +526,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             context={context}
             services={services}
             editMode={editMode}
-            body={response.feedback.first().body}
+            body={feedback.body}
             onEdit={(body, source) => this.onResponseBodyEdit(body, response, source)}
             onRemove={responsesOrPlaceholder.length <= 1
               ? null
@@ -552,15 +557,32 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                   : (null)
                 }
               </ItemOptions>,
-            ]} />
+            ]}>
+            <BranchSelect
+              editMode={editMode}
+              branch={feedback.lang}
+              onChange={lang => this.onResponseEdit(
+                response.with({
+                  feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
+                }),
+                null)}
+              questions={branchingQuestions}
+            />
+          </InputListItem>
         );
       });
   }
 
   renderDefaultResponse = () => {
-    const { partModel, itemModel, context, services, advancedScoring, editMode } = this.props;
+    const { partModel, itemModel, context, services, advancedScoring, editMode,
+      branchingQuestions } = this.props;
 
     const choices = itemModel.choices.toArray();
+
+    // Questions with 1 choice cannot be incorrect, so don't display an incorrect feedback
+    if (choices.length <= 1) {
+      return null;
+    }
 
     if (!this.defaultFeedbackResponse) {
       const newGuid = guid();
@@ -581,6 +603,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         feedback: defaultResponseItem.feedback,
       });
     }
+    const feedback = defaultResponse.feedback.first();
 
     return (
       <InputListItem
@@ -596,7 +619,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         context={context}
         services={services}
         editMode={editMode}
-        body={defaultResponse.feedback.first().body}
+        body={feedback.body}
         onEdit={(body, source) => this.onDefaultFeedbackEdit(body, defaultFeedbackScore, source)}
         options={[
           <ItemOptions key="feedback-options">
@@ -624,7 +647,20 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
               : (null)
             }
           </ItemOptions>,
-        ]} />
+        ]}>
+        <BranchSelect
+          editMode={editMode}
+          branch={feedback.lang}
+          onChange={lang => this.onPartEdit(
+            partModel.with({
+              responses: partModel.responses.set(defaultResponse.guid, defaultResponse.with({
+                feedback: defaultResponse.feedback.set(feedback.guid, feedback.with({ lang })),
+              })),
+            }),
+            null)}
+          questions={branchingQuestions}
+        />
+      </InputListItem>
     );
   }
 
