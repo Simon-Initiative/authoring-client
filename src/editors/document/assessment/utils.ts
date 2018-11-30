@@ -45,7 +45,7 @@ export function handleBranchingReordering(
   let pages = Immutable.OrderedMap<string, contentTypes.Page>(
     updatedNodes.toArray().map((node, index) => {
       const p = new contentTypes.Page().with({
-        id: 'p' + index.toString() + '_' + assessmentId,
+        id: 'p' + (index + 1).toString() + '_' + assessmentId,
         guid: originalPageArr[newToOldIndices[index]].guid,
         nodes: Immutable.OrderedMap<string, contentTypes.Node>([[node.guid, node]]),
       });
@@ -98,7 +98,7 @@ export function handleBranchingDeletion(
 
       const p = page.with({
         nodes: page.nodes.set(q.guid, q),
-        id: 'p' + index.toString() + '_' + assessmentId,
+        id: 'p' + (index + 1).toString() + '_' + assessmentId,
       });
       return [p.guid, p];
     }));
