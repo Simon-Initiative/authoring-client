@@ -41,6 +41,28 @@ const SKILL_GRID_HEADER_HEIGHT = 180;
 const addPluralS = (string: string, itemCount: number) =>
   itemCount === 1 ? string : `${string}s`;
 
+const getReadableTitleFromType = (type: string) => {
+  switch (type) {
+    case 'essay':
+      return 'Essay';
+    case 'short_answer':
+      return 'Short Answer';
+    case 'fill_in_the_blank':
+      return 'Fill in the Blank';
+    case 'image_hotspot':
+      return 'Image Hotspot';
+    case 'multiple_choice':
+      return 'Multiple Choice';
+    case 'numeric':
+      return 'Numeric';
+    case 'ordering':
+      return 'Ordering';
+    case 'question':
+    default:
+      return 'Question';
+  }
+};
+
 export const styles: JSSStyles = {
   Objective: {
     extend: [disableSelect],
@@ -152,10 +174,10 @@ export const styles: JSSStyles = {
     left: 9,
   },
   formativeColor: {
-    color: flatui.amethyst,
+    color: flatui.nephritis,
   },
   summativeColor: {
-    color: flatui.nephritis,
+    color: flatui.amethyst,
   },
   poolColor: {
     color: flatui.turquoise,
@@ -202,6 +224,12 @@ export const styles: JSSStyles = {
   pageList: {
     margin: [10, 0, 20, 20],
   },
+  pageTitle: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    flexFlow: 'row nowrap',
+  },
   skillList: {
     margin: [0, 0, 20, 20],
     border: [1, 'solid', colors.grayLighter],
@@ -238,7 +266,7 @@ export const styles: JSSStyles = {
     whiteSpace: 'nowrap',
   },
   skillCountBadgeIcon: {
-    width: 12,
+    width: 14,
   },
   skillTitle: {
     flex: 1,
@@ -276,11 +304,13 @@ export const styles: JSSStyles = {
   },
 };
 
-type skillId = string;
-type workbookPageId = string;
-type formativeId = string;
-type summativeId = string;
-type poolId = string;
+export interface QuestionRef {
+  id: string;
+  title: Maybe<string>;
+  type: string;
+  assessmentType: LegacyTypes;
+  assessmentId: string;
+}
 
 export interface ObjectiveProps {
   course: CourseModel;
@@ -289,9 +319,10 @@ export interface ObjectiveProps {
   objective: contentTypes.LearningObjective;
   skills: List<contentTypes.Skill>;
   loading: boolean;
-  skillFormativeRefs: Maybe<Map<skillId, List<formativeId>>>;
-  skillSummativeRefs: Maybe<Map<skillId, List<summativeId>>>;
-  skillPoolRefs: Maybe<Map<skillId, List<poolId>>>;
+  skillFormativeRefs: Maybe<Map<string, List<string>>>;
+  skillSummativeRefs: Maybe<Map<string, List<string>>>;
+  skillPoolRefs: Maybe<Map<string, List<string>>>;
+  skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
   highlightText?: string;
   onToggleExpanded: (id) => void;
   onEdit: (model: contentTypes.LearningObjective) => void;
@@ -306,7 +337,7 @@ export interface ObjectiveProps {
 export interface ObjectiveState {
   mouseOver: boolean;
   skillEdits: Map<string, boolean>;
-  workbookPageRefs: Maybe<List<workbookPageId>>;
+  workbookPageRefs: Maybe<List<string>>;
   hasRequestedRefs: boolean;
   isEditingTitle: boolean;
 }
@@ -326,7 +357,7 @@ export class Objective
     this.state = {
       mouseOver: false,
       skillEdits: Map<string, boolean>(),
-      workbookPageRefs: Maybe.nothing<List<workbookPageId>>(),
+      workbookPageRefs: Maybe.nothing<List<string>>(),
       hasRequestedRefs: false,
       isEditingTitle: false,
     };
@@ -345,7 +376,7 @@ export class Objective
   }
 
   loadReferences = () => {
-    const { course, objective, skills } = this.props;
+    const { course, objective, skillQuestionRefs } = this.props;
 
     this.setState({
       hasRequestedRefs: true,
@@ -430,13 +461,37 @@ export class Objective
     });
   }
 
+  getOrderedObjectiveQuestions = () => {
+    const { course, skills, skillQuestionRefs } = this.props;
+
+    // because we are reducing on an ordered list of skills, the result
+    // will automatically be sorted by skill which is what we want
+    const questionRefs: List<QuestionRef> = skills.reduce(
+      (acc, skill) => acc
+        .concat(skillQuestionRefs
+          .valueOr(Map<string, List<QuestionRef>>())
+          .get(skill.id))
+        .toList(),
+      List<QuestionRef>(),
+    )
+    // filter out undefined refs
+    .filter(ref => !!ref)
+    // dedupe refs
+    .reduce((acc, ref) => acc.find(r => r.id === ref.id) ? acc : acc.push(ref), List<QuestionRef>())
+    // filter out undefined refs
+    .toList();
+
+    return questionRefs.toArray();
+  }
+
   getOrderedObjectiveAssessments = () => {
     const { course, skills, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
 
     // because we are reducing on an ordered list of skills, the result
     // will automatically be sorted by skill which is what we want
     const assessmentIdRefs: List<string> = skills.reduce(
-      (acc, skill) => acc.concat(skillFormativeRefs
+      (acc, skill) => acc
+        .concat(skillFormativeRefs
           .valueOr(Map<string, List<string>>())
           .get(skill.id))
         .concat(skillSummativeRefs
@@ -462,9 +517,9 @@ export class Objective
 
     const LEFT_OFFSET = 20;
     const diagonalDist = (height: number) => Math.sqrt(2 * (height * height));
-    const orderedObjectiveAssessments = this.getOrderedObjectiveAssessments();
+    const orderedObjectiveQuestionRefs = this.getOrderedObjectiveQuestions();
 
-    return orderedObjectiveAssessments.length > 0
+    return orderedObjectiveQuestionRefs.length > 0
       ? (
         <div className={classes.skillGridHeader}>
           <div className="flex-spacer"/>
@@ -482,20 +537,24 @@ export class Objective
                 <line
                   x1={0}
                   y1={0}
-                  x2={35 * orderedObjectiveAssessments.length}
+                  x2={35 * orderedObjectiveQuestionRefs.length}
                   y2={0}
                   stroke={colors.grayLighter} />
               </g>
-              {orderedObjectiveAssessments
-                .map((assessment, i) => (
-                  <g key={assessment.guid}
+              {orderedObjectiveQuestionRefs
+                .map((question, i) => (
+                  <g key={question.id}
                     transform={`translate(${LEFT_OFFSET + (35 * i)}, `
                       + `${SKILL_GRID_HEADER_HEIGHT}) rotate(-45)`}>
                     <text
                       className={classes.assessmentLink}
                       transform="translate(10, 2)"
-                      onClick={() => history.push(`/${assessment.guid}-${course.guid}`)}>
-                      {stringFormat.ellipsize(assessment.title, 30)}
+                      onClick={() => history.push(
+                        `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`)}>
+                      {stringFormat.ellipsizePx(
+                        question.title.valueOr(
+                          getReadableTitleFromType(question.type)),
+                        diagonalDist(SKILL_GRID_HEADER_HEIGHT) - 120, 'Open Sans', 16)}
                     </text>
                     <line
                       x1={10}
@@ -513,64 +572,77 @@ export class Objective
   }
 
   renderSkillGrid() {
-    const { classes, skills, skillFormativeRefs , skillSummativeRefs, skillPoolRefs } = this.props;
+    const {
+      classes, skills, skillQuestionRefs,
+    } = this.props;
 
-    const orderedObjectiveAssessments = this.getOrderedObjectiveAssessments();
+    const orderedObjectiveQuestions = this.getOrderedObjectiveQuestions();
 
-    const skillContainsFormative = (skill: contentTypes.Skill, formative: contentTypes.Resource) =>
-      skillFormativeRefs.valueOr(Map<string, List<string>>()).has(skill.id)
-      && skillFormativeRefs.valueOr(Map<string, List<string>>()).get(skill.id)
-        .contains(formative.id);
+    const skillContainsFormativeQuestion = (
+        skill: contentTypes.Skill, question: QuestionRef) =>
+      skillQuestionRefs.caseOf({
+        just: questionRefs => questionRefs.has(skill.id)
+          && !!questionRefs.get(skill.id)
+            .find(r => r.id === question.id && r.assessmentType === LegacyTypes.inline),
+        nothing: () => false,
+      });
 
-    const skillContainsSummative = (skill: contentTypes.Skill, summative: contentTypes.Resource) =>
-    skillSummativeRefs.valueOr(Map<string, List<string>>()).has(skill.id)
-      && skillSummativeRefs.valueOr(Map<string, List<string>>()).get(skill.id)
-        .contains(summative.id);
+    const skillContainsSummativeQuestion = (
+        skill: contentTypes.Skill, question: QuestionRef) =>
+      skillQuestionRefs.caseOf({
+        just: questionRefs => questionRefs.has(skill.id)
+          && !!questionRefs.get(skill.id)
+            .find(r => r.id === question.id && r.assessmentType === LegacyTypes.assessment2),
+        nothing: () => false,
+      });
 
-    const skillContainsPool = (skill: contentTypes.Skill, summative: contentTypes.Resource) =>
-    skillPoolRefs.valueOr(Map<string, List<string>>()).has(skill.id)
-      && skillPoolRefs.valueOr(Map<string, List<string>>()).get(skill.id)
-        .contains(summative.id);
+    const skillContainsPoolQuestion = (
+        skill: contentTypes.Skill, question: QuestionRef) =>
+      skillQuestionRefs.caseOf({
+        just: questionRefs => questionRefs.has(skill.id)
+          && !!questionRefs.get(skill.id)
+            .find(r => r.id === question.id && r.assessmentType === LegacyTypes.assessment2_pool),
+        nothing: () => false,
+      });
 
-    return orderedObjectiveAssessments.length > 0
+    return orderedObjectiveQuestions.length > 0
       ? (
         <div className={classes.skillGrid}>
           {skills.toArray().map((skill, i) => (
             <div key={skill.guid} className={classes.skillGridRow}>
-              {orderedObjectiveAssessments.map((assessment, j) => (
-                skillContainsFormative(skill, assessment)
+              {orderedObjectiveQuestions.map((question: QuestionRef, j) => (
+                skillContainsFormativeQuestion(skill, question)
                   ? (
                     <Tooltip title="Formative" distance={15}
                       size="small" arrowSize="small">
-                      <div key={assessment.guid} className={classes.skillGridCell}>
+                      <div key={question.id} className={classes.skillGridCell}>
                         <i className={classNames(['fa fa-flask',
                           classes.formativeColor, classes.gridAssessmentIcon])} />
                       </div>
                     </Tooltip>
                   )
-                : skillContainsSummative(skill, assessment)
+                : skillContainsSummativeQuestion(skill, question)
                   ? (
                     <Tooltip title="Summative" distance={15}
                       size="small" arrowSize="small">
-                      <div key={assessment.guid} className={classes.skillGridCell}>
+                      <div key={question.id} className={classes.skillGridCell}>
                         <i className={classNames(['fa fa-check',
                           classes.summativeColor, classes.gridAssessmentIcon])} />
                       </div>
                     </Tooltip>
                   )
-                : skillContainsPool(skill, assessment)
+                : skillContainsPoolQuestion(skill, question)
                   ? (
                     <Tooltip title="Question Pool" distance={15}
                       size="small" arrowSize="small">
-                      <div key={assessment.guid} className={classes.skillGridCell}>
-                        <i className={classNames(['fa fa-question',
-                          classes.poolColor, classes.gridAssessmentIcon])}
-                          style={{ left: 11 }} />
+                      <div key={question.id} className={classes.skillGridCell}>
+                        <i className={classNames(['fa fa-shopping-basket',
+                          classes.poolColor, classes.gridAssessmentIcon])} />
                       </div>
                     </Tooltip>
                   )
                 : (
-                  <div key={assessment.guid} className={classes.skillGridCell}/>
+                  <div key={question.id} className={classes.skillGridCell}/>
                 )
               ))}
             </div>
@@ -625,19 +697,19 @@ export class Objective
     });
 
     const formativeTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-flask" /> Formative Assessments</b>
+      <b><i className="fa fa-flask" /> Formative Questions</b>
       <br/>
-      This is the number of low stakes, practice assessments that are associated with this skill
+      This is the number of low stakes, practice questions that are associated with this skill
     </div>;
     const summativeTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-check" /> Summative Assessments</b>
+      <b><i className="fa fa-check" /> Summative Questions</b>
       <br/>
-      This is the number of high stakes assessments that are associated with this skill
+      This is the number of high stakes questions that are associated with this skill
     </div>;
     const poolTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-question" /> Question Pools</b>
+      <b><i className="fa fa-shopping-basket" /> Pool Questions</b>
       <br/>
-      This is the number of question pools that are associated with this skill
+      This is the number of pool questions that are associated with this skill
     </div>;
 
     const notEnoughFormativesWarning = formativeCount < FORMATIVE_COUNT_WARNING_THRESHOLD
@@ -675,7 +747,7 @@ export class Objective
             size="small" arrowSize="small">
             <span className={classNames(['badge badge-light', classes.skillBadge])}
               style={{
-                color: flatui.amethyst,
+                color: flatui.nephritis,
                 borderRight: 'none',
                 marginRight: 0,
                 borderTopRightRadius: 0,
@@ -690,7 +762,7 @@ export class Objective
             <span
               className={classNames(['badge badge-light', classes.skillBadge])}
               style={{
-                color: flatui.nephritis,
+                color: flatui.amethyst,
                 borderRight: 'none',
                 marginLeft: 0,
                 marginRight: 0,
@@ -711,7 +783,7 @@ export class Objective
                 borderBottomLeftRadius: 0,
               }}>
               {poolCount} <i className={classNames([
-                'fa fa-question', classes.skillCountBadgeIcon])}/>
+                'fa fa-shopping-basket', classes.skillCountBadgeIcon])}/>
             </span>
           </Tooltip>
         </div>
@@ -776,7 +848,7 @@ export class Objective
         nothing: () => '[Error loading page title]',
       });
 
-    const orderedObjectiveAssessments = this.getOrderedObjectiveAssessments();
+    const orderedObjectiveAssessments = this.getOrderedObjectiveQuestions();
 
     const RIGHT_QUAD_WIDTH = (orderedObjectiveAssessments.length * 35)
       + (SKILL_GRID_HEADER_HEIGHT);
@@ -808,10 +880,10 @@ export class Objective
                   ? (
                     <div className={classes.pageList}>
                       {refs.map(refGuid => (
-                        <div key={refGuid}>
+                        <div key={refGuid} className={classes.pageTitle}>
                           <a href={`./#${getRefGuidFromRefId(refGuid)}-${course.guid}`}>
                           <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
-                          {stringFormat.ellipsize(getWBPTitleFromRefId(refGuid), 100, 5)}
+                          {getWBPTitleFromRefId(refGuid)}
                           </a>
                         </div>
                       ))}
@@ -957,7 +1029,7 @@ export class Objective
             <span
               className={classNames([classes.detailsOverviewSeparator, classes.poolColor])}>
               {`${poolCount} `}
-              <i className="fa fa-question"/>
+              <i className="fa fa-shopping-basket"/>
             </span>
           </span>
         </span>
