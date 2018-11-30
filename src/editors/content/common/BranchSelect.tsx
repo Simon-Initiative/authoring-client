@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Select } from './Select';
 import './BranchSelect.scss';
-import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 
 export type BranchSelectProps = {

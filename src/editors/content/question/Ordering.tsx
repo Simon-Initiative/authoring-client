@@ -403,7 +403,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     );
   }
 
-  onDefaultFeedbackEdit = (body: ContentElements, score: string, src) => {
+  onDefaultFeedbackEdit = (body: ContentElements, score: string, lang: string, src) => {
     const { partModel, itemModel, onGetChoicePermutations } = this.props;
 
     const choices = itemModel.choices.toArray();
@@ -415,6 +415,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       score,
       AUTOGEN_MAX_CHOICES,
       onGetChoicePermutations,
+      lang,
     );
 
     this.onPartEdit(updatedModel, src);
@@ -620,7 +621,8 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         services={services}
         editMode={editMode}
         body={feedback.body}
-        onEdit={(body, source) => this.onDefaultFeedbackEdit(body, defaultFeedbackScore, source)}
+        onEdit={(body, source) =>
+          this.onDefaultFeedbackEdit(body, defaultFeedbackScore, feedback.lang, source)}
         options={[
           <ItemOptions key="feedback-options">
             {choices.length > AUTOGEN_MAX_CHOICES
@@ -638,8 +640,9 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                       type="number"
                       className="form-control input-sm form-control-sm"
                       disabled={!this.props.editMode}
-                      value={defaultResponse.score}
-                      onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
+                      value={defaultFeedbackScore}
+                      onChange={({ target: { value } }) =>
+                        this.onDefaultFeedbackEdit(feedback.body, value, feedback.lang, null)}
                     />
                   </div>
                 </ItemOption>
@@ -651,13 +654,8 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         <BranchSelect
           editMode={editMode}
           branch={feedback.lang}
-          onChange={lang => this.onPartEdit(
-            partModel.with({
-              responses: partModel.responses.set(defaultResponse.guid, defaultResponse.with({
-                feedback: defaultResponse.feedback.set(feedback.guid, feedback.with({ lang })),
-              })),
-            }),
-            null)}
+          onChange={lang =>
+            this.onDefaultFeedbackEdit(feedback.body, defaultFeedbackScore, lang, null)}
           questions={branchingQuestions}
         />
       </InputListItem>
