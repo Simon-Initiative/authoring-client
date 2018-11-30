@@ -21,13 +21,13 @@ export function handleBranchingReordering(
   const originalPageArr = originalPages.toArray();
   const mapping = originalPageArr.reduce(
     (acc, page, i) => {
-      acc[(page.nodes.first() as contentTypes.Question).id] = [i];
+      acc[page.nodes.first().guid] = [i];
       return acc;
     },
     {});
   updatedNodes.toArray().forEach((n, index) => {
     // This captures the index the question is at after the reorder
-    mapping[(n as contentTypes.Question).id].push(index);
+    mapping[n.guid].push(index);
   });
   // This creates an array whose indices represent the original indices,
   // and whose values are the values of the new indice
@@ -56,10 +56,15 @@ export function handleBranchingReordering(
   // being careful to clear out any backward references
 
   pages = Immutable.OrderedMap<string, contentTypes.Page>(pages.toArray().map((page, index) => {
-    let q = page.nodes.first() as contentTypes.Question;
-    q = updateBranchReferences(q, index, oldToNewIndices);
-    const p = page.with({ nodes: page.nodes.set(q.guid, q) });
-    return [p.guid, p];
+
+    if (page.nodes.first().contentType === 'Question') {
+      let q = page.nodes.first() as contentTypes.Question;
+      q = updateBranchReferences(q, index, oldToNewIndices);
+      const p = page.with({ nodes: page.nodes.set(q.guid, q) });
+      return [p.guid, p];
+    }
+    return [page.nodes.first().guid, page.nodes.first()];
+
   }));
 
   return pages;
@@ -79,7 +84,7 @@ export function handleBranchingDeletion(
 
   // Find the index of the removed item
   const indexOf = originalPages.toArray()
-    .map(p => (p.nodes.first() as contentTypes.Question).guid)
+    .map(p => p.nodes.first().guid)
     .indexOf(guid);
 
   // Build the mapping for updating references
@@ -93,8 +98,13 @@ export function handleBranchingDeletion(
     .delete(originalPages.toArray()[indexOf].guid)
     .toArray().map((page, index) => {
 
-      let q = page.nodes.first() as contentTypes.Question;
-      q = updateBranchReferences(q, index, oldToNewIndices);
+      let q;
+      if (page.nodes.first().contentType === 'Question') {
+        q = page.nodes.first() as contentTypes.Question;
+        q = updateBranchReferences(q, index, oldToNewIndices);
+      } else {
+        q = page.nodes.first();
+      }
 
       const p = page.with({
         nodes: page.nodes.set(q.guid, q),
