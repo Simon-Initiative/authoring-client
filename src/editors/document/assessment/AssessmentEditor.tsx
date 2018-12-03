@@ -481,8 +481,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             editMode={this.props.editMode}
             onQuestionAdd={this.addQuestion.bind(this)}
             isSummative={this.props.model.type === LegacyTypes.assessment2} />
-          <ToolbarButtonMenuDivider />
-          <a className="dropdown-item" onClick={this.onAddContent}>Supporting Content</a>
+          {/* Branching assessments must have supporting content inline */}
+          {this.props.model.branching
+            ? null
+            : <div><ToolbarButtonMenuDivider />
+              <a className="dropdown-item" onClick={this.onAddContent}>Supporting Content</a></div>}
           {questionPoolOrNothing}
           {embeddedPoolOrNothing}
         </div>

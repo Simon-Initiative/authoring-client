@@ -74,7 +74,7 @@ export function renderAssessmentNode(
       canRemove={canRemove}
       onRemove={() => onRemove(n.guid)}
       branchingQuestions={
-        props.model instanceof models.AssessmentModel
+        props.model instanceof models.AssessmentModel && props.model.branching
           ? Maybe.just(getBranchingQuestionNumbers(props))
           : Maybe.nothing()}
     />;
