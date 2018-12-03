@@ -218,7 +218,9 @@
         }
     }
 
-    .orgSelect,
+    .orgSelect {
+        max-width: 85%;
+    }
     .themeSelect {
         max-width: 220px;
     }
