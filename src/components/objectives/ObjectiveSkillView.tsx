@@ -20,7 +20,8 @@ import {
 } from 'components/objectives/persistence';
 import * as Messages from 'types/messages';
 import { UserState } from 'reducers/user';
-import { Objective, QuestionRef } from 'components/objectives/Objective';
+import { Objective } from 'components/objectives/Objective';
+import { QuestionRef } from 'components/objectives/utils';
 
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
 import { LearningObjectivesModel } from 'data/models/objective';

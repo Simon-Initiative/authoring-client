@@ -16,52 +16,14 @@ import { stringFormat } from 'utils/format';
 import flatui from 'styles/palettes/flatui';
 import history from 'utils/history';
 import { Tooltip } from 'utils/tooltip';
-
-const PAGE_COUNT_WARNING_THRESHOLD = 1;
-const SKILL_COUNT_WARNING_THRESHOLD = 3;
-const FORMATIVE_COUNT_WARNING_THRESHOLD = 1;
-const SUMMATIVE_COUNT_WARNING_THRESHOLD = 1;
-
-const WarningTip = ({ show, children }) =>
-  show ? (
-    <Tooltip
-      html={children}
-      interactive={true}
-      theme="light"
-      size="small"
-      arrowSize="small">
-      <i className={classNames(['fa fa-exclamation-circle'])}
-        style={{ color: colors.danger, margin: '0px 4px' }} />
-    </Tooltip>
-  )
-  : null;
+import { Skill } from 'components/objectives/Skill';
+import { IssueTooltip } from 'components/objectives/IssueTooltip';
+import { addPluralS, getReadableTitleFromType, QuestionRef } from 'components/objectives/utils';
+import {
+  SKILLS_HELP_LINK, SKILL_COUNT_WARNING_THRESHOLD, PAGE_COUNT_WARNING_THRESHOLD,
+} from 'components/objectives/config';
 
 const SKILL_GRID_HEADER_HEIGHT = 180;
-
-const addPluralS = (string: string, itemCount: number) =>
-  itemCount === 1 ? string : `${string}s`;
-
-const getReadableTitleFromType = (type: string) => {
-  switch (type) {
-    case 'essay':
-      return 'Essay';
-    case 'short_answer':
-      return 'Short Answer';
-    case 'fill_in_the_blank':
-      return 'Fill in the Blank';
-    case 'image_hotspot':
-      return 'Image Hotspot';
-    case 'multiple_choice':
-      return 'Multiple Choice';
-    case 'numeric':
-      return 'Numeric';
-    case 'ordering':
-      return 'Ordering';
-    case 'question':
-    default:
-      return 'Question';
-  }
-};
 
 export const styles: JSSStyles = {
   Objective: {
@@ -102,6 +64,7 @@ export const styles: JSSStyles = {
   detailsQuad: {
     marginLeft: 20,
     paddingBottom: 20,
+    overflowX: 'auto',
 
     '& h3': {
       display: 'flex',
@@ -121,7 +84,7 @@ export const styles: JSSStyles = {
   },
   quadLeft: {
     flex: 1,
-    minWidth: 0,
+    minWidth: 400,
   },
   quadRight: {
     display: 'flex',
@@ -149,6 +112,7 @@ export const styles: JSSStyles = {
     height: 35,
     borderTop: [1, 'solid', colors.grayLighter],
     marginRight: (SKILL_GRID_HEADER_HEIGHT - 20),
+    whiteSpace: 'nowrap',
 
     '&:nth-child(even)': {
       backgroundColor: '#F7FBFF',
@@ -205,11 +169,6 @@ export const styles: JSSStyles = {
     margin: [0, 8],
     backgroundColor: colors.grayLighter,
   },
-  skillBadge: {
-    marginRight: 8,
-    lineHeight: 'inherit',
-    border: [1, 'solid', colors.grayLight],
-  },
   actionButtons: {
     display: 'flex',
     flexDirection: 'row',
@@ -242,48 +201,6 @@ export const styles: JSSStyles = {
     color: colors.grayDark,
     margin: [20, 0, 20, 20],
   },
-  skill: {
-    display: 'flex',
-    flexDirection: 'row',
-    padding: 4,
-    borderBottom: [1, 'solid', colors.grayLighter],
-    height: 35,
-    overflow: 'hidden',
-
-    '&:nth-child(even)': {
-      backgroundColor: '#F7FBFF',
-    },
-
-    '&:last-child': {
-      borderBottom: 'none',
-    },
-
-    '&:hover $skillActions': {
-      display: 'block',
-    },
-  },
-  skillBadges: {
-    whiteSpace: 'nowrap',
-  },
-  skillCountBadgeIcon: {
-    width: 14,
-  },
-  skillTitle: {
-    flex: 1,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    flexFlow: 'row nowrap',
-  },
-  skillActions: {
-    display: 'none',
-    margin: [0, 20],
-  },
-  skillActionButton: {
-    lineHeight: 1,
-    padding: 0,
-    marginLeft: 20,
-  },
   addSkillButton: {
     lineHeight: 1,
     padding: 0,
@@ -303,14 +220,6 @@ export const styles: JSSStyles = {
     margin: 20,
   },
 };
-
-export interface QuestionRef {
-  id: string;
-  title: Maybe<string>;
-  type: string;
-  assessmentType: LegacyTypes;
-  assessmentId: string;
-}
 
 export interface ObjectiveProps {
   course: CourseModel;
@@ -461,19 +370,23 @@ export class Objective
     });
   }
 
-  getOrderedObjectiveQuestions = () => {
+  getOrderedObjectiveQuestions = (skill?: contentTypes.Skill) => {
     const { course, skills, skillQuestionRefs } = this.props;
 
     // because we are reducing on an ordered list of skills, the result
     // will automatically be sorted by skill which is what we want
-    const questionRefs: List<QuestionRef> = skills.reduce(
-      (acc, skill) => acc
-        .concat(skillQuestionRefs
+    const questionRefs: List<QuestionRef> = skill
+      ? skillQuestionRefs
           .valueOr(Map<string, List<QuestionRef>>())
-          .get(skill.id))
-        .toList(),
-      List<QuestionRef>(),
-    )
+          .get(skill.id) || List<QuestionRef>()
+      : skills.reduce(
+        (acc, skill) => acc
+          .concat(skillQuestionRefs
+            .valueOr(Map<string, List<QuestionRef>>())
+            .get(skill.id))
+          .toList(),
+        List<QuestionRef>(),
+      )
     // filter out undefined refs
     .filter(ref => !!ref)
     // dedupe refs
@@ -524,7 +437,9 @@ export class Objective
         <div className={classes.skillGridHeader}>
           <div className="flex-spacer"/>
           <div style={{ height: SKILL_GRID_HEADER_HEIGHT }}>
-            <svg width="100%" height={SKILL_GRID_HEADER_HEIGHT}>
+            <svg
+              width={(35 * orderedObjectiveQuestionRefs.length) + SKILL_GRID_HEADER_HEIGHT}
+              height={SKILL_GRID_HEADER_HEIGHT}>
               <g transform={`translate(-15, ${SKILL_GRID_HEADER_HEIGHT}) rotate(-45)`}>
                 <line
                   x1={10}
@@ -652,144 +567,6 @@ export class Objective
       : null;
   }
 
-  renderSkillActions(skill: contentTypes.Skill) {
-    const { classes, editMode, loading } = this.props;
-    const { skillEdits } = this.state;
-
-    return (
-      <React.Fragment>
-        <Button
-          className={classNames([classes.skillActionButton])}
-          editMode={editMode && !loading}
-          type="link"
-          onClick={() => this.setState({
-            skillEdits: skillEdits.set(skill.guid, true),
-          })}>
-          Rename
-        </Button>
-        <Button
-          className={classNames([classes.skillActionButton, 'btn-remove'])}
-          editMode={editMode && !loading}
-          type="link"
-          onClick={() => this.onSkillRemove(skill)}>
-          Remove
-        </Button>
-      </React.Fragment>
-    );
-  }
-
-  renderSkillBadges(skill: contentTypes.Skill) {
-    const { classes, skillFormativeRefs, skillSummativeRefs, skillPoolRefs } = this.props;
-
-    const formativeCount = skillFormativeRefs.caseOf({
-      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
-      nothing: () => null,
-    });
-
-    const summativeCount = skillSummativeRefs.caseOf({
-      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
-      nothing: () => null,
-    });
-
-    const poolCount = skillPoolRefs.caseOf({
-      just: refMap => refMap.has(skill.id) ? refMap.get(skill.id).size : 0,
-      nothing: () => null,
-    });
-
-    const formativeTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-flask" /> Formative Questions</b>
-      <br/>
-      This is the number of low stakes, practice questions that are associated with this skill
-    </div>;
-    const summativeTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-check" /> Summative Questions</b>
-      <br/>
-      This is the number of high stakes questions that are associated with this skill
-    </div>;
-    const poolTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-shopping-basket" /> Pool Questions</b>
-      <br/>
-      This is the number of pool questions that are associated with this skill
-    </div>;
-
-    const notEnoughFormativesWarning = formativeCount < FORMATIVE_COUNT_WARNING_THRESHOLD
-      ? (
-        <span>
-          at least {FORMATIVE_COUNT_WARNING_THRESHOLD} formative
-        </span>
-      )
-      : null;
-
-    const notEnoughSummativesWarning = summativeCount < SUMMATIVE_COUNT_WARNING_THRESHOLD
-      ? (
-        <span>
-          at least {SUMMATIVE_COUNT_WARNING_THRESHOLD} summative
-        </span>
-      )
-      : null;
-
-    return (
-        <div className={classes.skillBadges}>
-          <WarningTip
-            show={notEnoughFormativesWarning || notEnoughSummativesWarning}>
-            <div>
-              Skills should have {notEnoughFormativesWarning}
-              {notEnoughFormativesWarning && notEnoughSummativesWarning && ' and '}
-              {notEnoughSummativesWarning} {addPluralS('assessment', Math.max(
-                FORMATIVE_COUNT_WARNING_THRESHOLD,
-                SUMMATIVE_COUNT_WARNING_THRESHOLD,
-              ))}
-              <br/>
-              <a href="#">Learn more about skills</a>.
-            </div>
-          </WarningTip>
-          <Tooltip html={formativeTooltip} distance={10}
-            size="small" arrowSize="small">
-            <span className={classNames(['badge badge-light', classes.skillBadge])}
-              style={{
-                color: flatui.nephritis,
-                borderRight: 'none',
-                marginRight: 0,
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
-              }}>
-              {formativeCount} <i className={classNames([
-                'fa fa-flask', classes.skillCountBadgeIcon])}/>
-            </span>
-          </Tooltip>
-          <Tooltip html={summativeTooltip} distance={10}
-            size="small" arrowSize="small">
-            <span
-              className={classNames(['badge badge-light', classes.skillBadge])}
-              style={{
-                color: flatui.amethyst,
-                borderRight: 'none',
-                marginLeft: 0,
-                marginRight: 0,
-                borderRadius: 0,
-              }}>
-              {summativeCount} <i className={classNames([
-                'fa fa-check', classes.skillCountBadgeIcon])}/>
-            </span>
-          </Tooltip>
-          <Tooltip html={poolTooltip} distance={10}
-            size="small" arrowSize="small">
-            <span
-              className={classNames(['badge badge-light', classes.skillBadge])}
-              style={{
-                color: flatui.turquoise,
-                marginLeft: 0,
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-              }}>
-              {poolCount} <i className={classNames([
-                'fa fa-shopping-basket', classes.skillCountBadgeIcon])}/>
-            </span>
-          </Tooltip>
-        </div>
-    );
-  }
-
   renderSkills() {
     const {
       classes, skills, editMode, loading, onEditSkill, highlightText,
@@ -797,31 +574,22 @@ export class Objective
     const { skillEdits } = this.state;
 
     return skills.map(skill => (
-      <div key={skill.guid} className={classes.skill}>
-        {this.renderSkillBadges(skill)}
-        <div className={classes.skillTitle}>
-          <InlineEdit
-            inputStyle={{ width: '80%' }}
-            highlightText={highlightText}
-            isEditing={skillEdits.get(skill.guid)}
-            onEdit={(value) => {
-              this.setState({
-                skillEdits: skillEdits.set(skill.guid, false),
-              });
-              onEditSkill(skill.with({ title: value }));
-            }}
-            onCancel={() => this.setState({
-              skillEdits: skillEdits.set(skill.guid, false),
-            })}
-            editMode={editMode && !loading}
-            value={skill.title} />
-        </div>
-        {!skillEdits.get(skill.guid) &&
-          <div className={classes.skillActions}>
-            {this.renderSkillActions(skill)}
-          </div>
-        }
-      </div>
+      <Skill
+        key={skill.guid}
+        editMode={editMode}
+        skill={skill}
+        loading={loading}
+        highlightText={highlightText}
+        isEditing={skillEdits.get(skill.guid)}
+        skillQuestionRefs={this.getOrderedObjectiveQuestions(skill)}
+        onEnterEditMode={() => this.setState({
+          skillEdits: skillEdits.set(skill.guid, true),
+        })}
+        onExitEditMode={() => this.setState({
+          skillEdits: skillEdits.set(skill.guid, false),
+        })}
+        onRemoveSkill={this.onSkillRemove}
+        onEditSkill={onEditSkill} />
     ));
   }
 
@@ -859,10 +627,10 @@ export class Objective
           <div className={classes.quadLeft}>
             <div className={classes.pageSection}>
               <h3>
-              <WarningTip show={pageCount < PAGE_COUNT_WARNING_THRESHOLD}>
+              <IssueTooltip show={pageCount < PAGE_COUNT_WARNING_THRESHOLD}>
                 Objectives should be referenced by at least {PAGE_COUNT_WARNING_THRESHOLD}
                 {' workbook ' + addPluralS('page', PAGE_COUNT_WARNING_THRESHOLD)}.
-              </WarningTip>
+              </IssueTooltip>
               <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
               Pages
               {workbookPageRefs.caseOf({
@@ -904,12 +672,13 @@ export class Objective
             </div>
             <div className={classes.skillSection}>
               <h3>
-                <WarningTip show={skills.size < SKILL_COUNT_WARNING_THRESHOLD}>
+                <IssueTooltip show={skills.size < SKILL_COUNT_WARNING_THRESHOLD}>
                   Objectives should have at least {SKILL_COUNT_WARNING_THRESHOLD}
                   {' ' + addPluralS('skill', SKILL_COUNT_WARNING_THRESHOLD)}.
                   <br/>
-                  <a href="#">Learn more about skills</a>.
-                </WarningTip>
+                  <a href={SKILLS_HELP_LINK}
+                    target="_blank">Learn more about skills</a>.
+                </IssueTooltip>
                 <i className={classNames(['fa fa-cubes', classes.detailsSectionIcon])} />
                 Skills
                 <span className={classNames(['badge badge-light', classes.countBadge])}>
@@ -1000,19 +769,20 @@ export class Objective
         <span
           className={classNames(['badge badge-light', classes.detailBadge])}
           style={{ marginLeft: 0 }}>
-          <WarningTip show={pageCount < PAGE_COUNT_WARNING_THRESHOLD}>
+          <IssueTooltip show={pageCount < PAGE_COUNT_WARNING_THRESHOLD}>
             Objectives should be referenced by at least {PAGE_COUNT_WARNING_THRESHOLD}
             {' workbook ' + addPluralS('page', PAGE_COUNT_WARNING_THRESHOLD)}.
-          </WarningTip>
+          </IssueTooltip>
           {pageCount} {addPluralS('Page', pageCount)}
         </span>
         <span className={classNames(['badge badge-light', classes.detailBadge])}>
-          <WarningTip show={skillCount < SKILL_COUNT_WARNING_THRESHOLD}>
+          <IssueTooltip show={skillCount < SKILL_COUNT_WARNING_THRESHOLD}>
             Objectives should have at least {SKILL_COUNT_WARNING_THRESHOLD}
             {' ' + addPluralS('skill', SKILL_COUNT_WARNING_THRESHOLD)}.
             <br/>
-            <a href="#">Learn more about skills</a>.
-          </WarningTip>
+            <a href={SKILLS_HELP_LINK}
+              target="_blank">Learn more about skills</a>.
+          </IssueTooltip>
           {skillCount} {addPluralS('Skill', skillCount)}
           <span
             className={classes.detailsOverviewAssessmentCounts} >
