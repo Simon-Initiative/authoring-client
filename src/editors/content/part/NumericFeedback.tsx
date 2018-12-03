@@ -10,7 +10,7 @@ import guid from 'utils/guid';
 const NumericMatchOptions = require('./NumericMatchOptions.bs').jsComponent;
 
 import './Feedback.scss';
-import { BranchSelect } from '../common/BranchSelect';
+import { ConditionalBranchSelect } from '../common/BranchSelect';
 import { Maybe } from 'tsmonad';
 
 export interface NumericFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
@@ -152,7 +152,7 @@ export abstract class NumericFeedback
                 </ItemOption>
               </ItemOptions>
             }>
-            <BranchSelect
+            <ConditionalBranchSelect
               editMode={editMode}
               branch={feedback.lang}
               onChange={lang => this.onResponseEdit(
@@ -221,7 +221,7 @@ export abstract class NumericFeedback
             </ItemOption>
           </ItemOptions>
         }>
-        <BranchSelect
+        <ConditionalBranchSelect
           editMode={editMode}
           branch={feedback.lang}
           onChange={lang => this.onResponseEdit(

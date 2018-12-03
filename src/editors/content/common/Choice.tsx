@@ -15,7 +15,7 @@ import './Choice.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { classNames } from 'styles/jss';
 import { Maybe } from 'tsmonad';
-import { BranchSelect } from './BranchSelect';
+import { ConditionalBranchSelect } from './BranchSelect';
 
 export const ChoiceList = InputList;
 
@@ -120,7 +120,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
 
       feedbackEditor =
         <div>
-          <BranchSelect
+          <ConditionalBranchSelect
             editMode={editMode}
             branch={feedback.lang}
             onChange={lang => onEditFeedback(response, feedback.with({ lang }), null)}

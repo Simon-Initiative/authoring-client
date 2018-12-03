@@ -9,7 +9,7 @@ import {
 } from 'editors/content/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
-import { BranchSelect } from '../common/BranchSelect';
+import { ConditionalBranchSelect } from '../common/BranchSelect';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 
@@ -88,7 +88,7 @@ export class ShortAnswer
           {/* All question types except short answers and essays use feedback.
           Short answers and essays use the explanation instead */}
           <TabSectionContent key="explanation" className="feedback">
-            <BranchSelect
+            <ConditionalBranchSelect
               editMode={editMode}
               branch={feedback.lang}
               onChange={lang => this.onPartEdit(

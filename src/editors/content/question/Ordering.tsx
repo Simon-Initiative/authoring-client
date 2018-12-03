@@ -26,7 +26,7 @@ import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { ContentElements } from 'data/content/common/elements';
 
 import './Ordering.scss';
-import { BranchSelect } from '../common/BranchSelect';
+import { ConditionalBranchSelect } from '../common/BranchSelect';
 
 export const isComplexFeedback = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.filter(autogenResponseFilter).toArray();
@@ -559,7 +559,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                 }
               </ItemOptions>,
             ]}>
-            <BranchSelect
+            <ConditionalBranchSelect
               editMode={editMode}
               branch={feedback.lang}
               onChange={lang => this.onResponseEdit(
@@ -651,7 +651,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             }
           </ItemOptions>,
         ]}>
-        <BranchSelect
+        <ConditionalBranchSelect
           editMode={editMode}
           branch={feedback.lang}
           onChange={lang =>

@@ -9,7 +9,7 @@ import {
 } from 'editors/content/common/InputList';
 import './Feedback.scss';
 import guid from 'utils/guid';
-import { BranchSelect } from '../common/BranchSelect';
+import { ConditionalBranchSelect } from '../common/BranchSelect';
 import { Maybe } from 'tsmonad';
 
 export interface FeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
@@ -150,7 +150,7 @@ export abstract class Feedback
                 </ItemOption>
               </ItemOptions>
             }>
-            <BranchSelect
+            <ConditionalBranchSelect
               editMode={editMode}
               branch={feedback.lang}
               onChange={lang => this.onResponseEdit(
@@ -219,7 +219,7 @@ export abstract class Feedback
             </ItemOption>
           </ItemOptions>
         }>
-        <BranchSelect
+        <ConditionalBranchSelect
           editMode={editMode}
           branch={feedback.lang}
           onChange={lang => this.onResponseEdit(

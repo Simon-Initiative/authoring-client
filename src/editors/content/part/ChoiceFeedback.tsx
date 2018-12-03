@@ -19,7 +19,7 @@ import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
 
 import './ChoiceFeedback.scss';
-import { BranchSelect } from '../common/BranchSelect';
+import { ConditionalBranchSelect } from '../common/BranchSelect';
 
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
   hideOther?: boolean;
@@ -330,7 +330,7 @@ export abstract class ChoiceFeedback
                 }
               </ItemOptions>,
             ]}>
-            <BranchSelect
+            <ConditionalBranchSelect
               editMode={editMode}
               branch={feedback.lang}
               onChange={lang => this.onResponseEdit(
@@ -405,7 +405,7 @@ export abstract class ChoiceFeedback
             }
           </ItemOptions>,
         ]}>
-        <BranchSelect
+        <ConditionalBranchSelect
           editMode={editMode}
           branch={feedback.lang}
           onChange={lang => this.onResponseEdit(
