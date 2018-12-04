@@ -18,6 +18,7 @@ import { Skill } from 'types/course';
 import { InsertInputRefCommand } from 'editors/content/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
+import { Maybe } from 'tsmonad';
 
 import './QuestionEditor.scss';
 
@@ -31,6 +32,7 @@ export interface QuestionEditorProps extends AbstractContentEditorProps<contentT
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
+  branchingQuestions: Maybe<number[]>;
 }
 
 export interface QuestionEditorState {

@@ -122,6 +122,7 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
       connectDropTarget,
       isHovered,
       canDrop,
+      children,
     } = this.props;
 
     return connectDropTarget(
@@ -138,15 +139,16 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
         </div>
         {connectDragPreview(
           <div className={`input-list-item-content ${isHovered && canDrop ? 'drop-hover' : ''} \
-            ${hideBody && options ? 'hide-body' : ''}`}>
+          ${hideBody && options ? 'hide-body' : ''}`}>
             {isHovered && canDrop
-              ? (<div className="drop-target-container"/>)
+              ? (<div className="drop-target-container" />)
               : (null)
             }
             {contentTitle
-                ? (<div className="input-list-item-content-title">{contentTitle}</div>)
-                : (null)
-              }
+              ? (<div className="input-list-item-content-title">{contentTitle}</div>)
+              : (null)
+            }
+            {children}
             {!hideBody
               ? (
                 <ContentContainer
@@ -162,8 +164,8 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
               )
               : (null)
             }
-              {options}
-            </div>,
+            {options}
+          </div>,
         )}
         {onRemove
           ? (
@@ -240,12 +242,12 @@ export const ItemOption: React.StatelessComponent<ItemOptionProps> = ({
 }) => {
   return (
     <div className={`input-list-item-option ${className || ''} ${flex ? 'flex-spacer' : ''}`}>
-        <div className="option-label">
-          {label}
-        </div>
-        <div className="option-content">
-          {children}
-        </div>
+      <div className="option-label">
+        {label}
+      </div>
+      <div className="option-content">
+        {children}
+      </div>
     </div>
   );
 };

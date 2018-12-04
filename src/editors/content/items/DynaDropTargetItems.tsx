@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import {
-    AbstractItemPartEditor, AbstractItemPartEditorProps,
-    AbstractItemPartEditorState,
+  AbstractItemPartEditor, AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
@@ -32,9 +32,9 @@ export interface DynaDropTargetItemsState extends AbstractItemPartEditorState {
  * DynaDropTargetItems Editor
  */
 export class
-DynaDropTargetItems
+  DynaDropTargetItems
   extends AbstractItemPartEditor<contentTypes.FillInTheBlank,
-    DynaDropTargetItemsProps, DynaDropTargetItemsState> {
+  DynaDropTargetItemsProps, DynaDropTargetItemsState> {
 
   constructor(props) {
     super(props);
@@ -49,7 +49,7 @@ DynaDropTargetItems
     return true;
   }
 
-  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback, src) {
+  onFeedbackEdit(response: contentTypes.Response, feedback: contentTypes.Feedback, src) {
     const {
       partModel,
       itemModel,
@@ -72,7 +72,7 @@ DynaDropTargetItems
 
     onEdit(
       itemModel.with(
-      { choices: itemModel.choices.set(choice.guid, choice) }),
+        { choices: itemModel.choices.set(choice.guid, choice) }),
       partModel, src);
   }
 
@@ -132,6 +132,7 @@ DynaDropTargetItems
           editMode={editMode}
           onEditChoice={this.onChoiceEdit}
           onEditFeedback={this.onFeedbackEdit}
+          branchingQuestions={this.props.branchingQuestions}
           onEditScore={this.onScoreEdit} />
       );
     });
@@ -148,23 +149,23 @@ DynaDropTargetItems
 
     return (
       <TabSection className="targets">
-      <TabSectionHeader title="Label">
-        <TabOptionControl name="advanced">
-          <ToggleSwitch
-            checked={advancedScoring}
-            label="Advanced"
-            onClick={onToggleAdvanced} />
-        </TabOptionControl>
-      </TabSectionHeader>
-      <TabSectionContent>
-      <input
-        disabled={!editMode}
-        style={{ fontSize: 16 }}
-        onChange={({ target: { value } }) => onEditInitiatorText(value, initiator)}
-        className="form-control form-control-sm"
-        type="text"
-        defaultValue={initiator.text} />
-      </TabSectionContent>
+        <TabSectionHeader title="Label">
+          <TabOptionControl name="advanced">
+            <ToggleSwitch
+              checked={advancedScoring}
+              label="Advanced"
+              onClick={onToggleAdvanced} />
+          </TabOptionControl>
+        </TabSectionHeader>
+        <TabSectionContent>
+          <input
+            disabled={!editMode}
+            style={{ fontSize: 16 }}
+            onChange={({ target: { value } }) => onEditInitiatorText(value, initiator)}
+            className="form-control form-control-sm"
+            type="text"
+            defaultValue={initiator.text} />
+        </TabSectionContent>
         <TabSectionHeader title="Targets">
         </TabSectionHeader>
         <TabSectionContent>

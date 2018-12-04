@@ -74,7 +74,6 @@ export class Response extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
-
   clone(): Response {
     return ensureIdGuidPresent(this.with({
       feedback: this.feedback.mapEntries(([_, v]) => {
@@ -83,7 +82,6 @@ export class Response extends Immutable.Record(defaultContent) {
       }).toOrderedMap() as Immutable.OrderedMap<string, Feedback>,
     }));
   }
-
 
   with(values: ResponseParams) {
     return this.merge(values) as this;
@@ -157,7 +155,6 @@ export class Response extends Immutable.Record(defaultContent) {
           ? f.with({ body: explanation.clone() }).toPersistence()
           : f.toPersistence());
 
-    console.log('feedback', feedback);
     const o = {
       response: {
         '@match': encodeMatchOperators(sanitizeMatch(this.match)),

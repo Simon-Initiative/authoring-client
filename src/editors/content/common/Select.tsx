@@ -29,5 +29,3 @@ export const Select = (props: SelectProps) => {
   return select;
 
 };
-
-

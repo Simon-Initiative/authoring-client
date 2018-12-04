@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-
+import { Maybe } from 'tsmonad';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { Skill } from 'types/course';
@@ -21,6 +21,7 @@ export type Props = {
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
+  currentPage?: string;
 };
 
 export type EditHandler = (guid: string, node: contentTypes.Node, src) => void;
@@ -31,8 +32,21 @@ export type DuplicateHandler = () => void;
 
 export type FocusHandler = (child: Object, parent: any, textSelection) => void;
 
+function getBranchingQuestionNumbers(props: Props): number[] {
+  const pages = (props.model as models.AssessmentModel).pages.keySeq();
+  const pagesAfterCount = Math.max(
+    pages.skipUntil(p => p === props.currentPage).toArray().length - 1,
+    0);
+  const questionNumbers = [];
+  for (let i = pages.size; i > pages.size - pagesAfterCount; i -= 1) {
+    questionNumbers.push(i);
+  }
+
+  return questionNumbers.reverse();
+}
+
 export function renderAssessmentNode(
-  n : models.Node, props: Props, onEdit: EditHandler,
+  n: models.Node, props: Props, onEdit: EditHandler,
   onRemove: RemoveHandler, onFocus: FocusHandler,
   canRemove: boolean,
   onDuplicate: DuplicateHandler,
@@ -42,59 +56,62 @@ export function renderAssessmentNode(
 
   if (n.contentType === 'Question') {
     return <QuestionEditor
-            key={n.guid}
-            parent={parent}
-            onFocus={onFocus}
-            isQuestionPool={isQuestionPool}
-            isParentAssessmentGraded={isParentAssessmentGraded}
-            editMode={props.editMode}
-            services={props.services}
-            allSkills={props.skills}
-            context={props.context}
-            activeContentGuid={props.activeContentGuid}
-            hover={props.hover}
-            onUpdateHover={props.onUpdateHover}
-            model={n}
-            onDuplicate={props.editMode ? onDuplicate : undefined}
-            onEdit={(c, src) => onEdit(n.guid, c, src)}
-            canRemove={canRemove}
-            onRemove={() => onRemove(n.guid)}
-            />;
-
+      key={n.guid}
+      parent={parent}
+      onFocus={onFocus}
+      isQuestionPool={isQuestionPool}
+      isParentAssessmentGraded={isParentAssessmentGraded}
+      editMode={props.editMode}
+      services={props.services}
+      allSkills={props.skills}
+      context={props.context}
+      activeContentGuid={props.activeContentGuid}
+      hover={props.hover}
+      onUpdateHover={props.onUpdateHover}
+      model={n}
+      onDuplicate={props.editMode ? onDuplicate : undefined}
+      onEdit={(c, src) => onEdit(n.guid, c, src)}
+      canRemove={canRemove}
+      onRemove={() => onRemove(n.guid)}
+      branchingQuestions={
+        props.model instanceof models.AssessmentModel && props.model.branching
+          ? Maybe.just(getBranchingQuestionNumbers(props))
+          : Maybe.nothing()}
+    />;
   }
   if (n.contentType === 'Content') {
     return <ContentEditor
-            parent={parent}
-            key={n.guid}
-            onFocus={onFocus}
-            editMode={props.editMode}
-            services={props.services}
-            context={props.context}
-            activeContentGuid={props.activeContentGuid}
-            hover={props.hover}
-            onUpdateHover={props.onUpdateHover}
-            model={n}
-            onEdit={(c, src) => onEdit(n.guid, c, src)}
-            onRemove={() => onRemove(n.guid)}
-            />;
+      parent={parent}
+      key={n.guid}
+      onFocus={onFocus}
+      editMode={props.editMode}
+      services={props.services}
+      context={props.context}
+      activeContentGuid={props.activeContentGuid}
+      hover={props.hover}
+      onUpdateHover={props.onUpdateHover}
+      model={n}
+      onEdit={(c, src) => onEdit(n.guid, c, src)}
+      onRemove={() => onRemove(n.guid)}
+    />;
   }
   if (n.contentType === 'Selection') {
     return <SelectionEditor
-            parent={parent}
-            key={n.guid}
-            onFocus={onFocus}
-            isParentAssessmentGraded={isParentAssessmentGraded}
-            editMode={props.editMode}
-            services={props.services}
-            context={props.context}
-            activeContentGuid={props.activeContentGuid}
-            hover={props.hover}
-            onUpdateHover={props.onUpdateHover}
-            allSkills={props.skills}
-            model={n}
-            canRemove={canRemove}
-            onEdit={(c, src) => onEdit(n.guid, c, src)}
-            onRemove={() => onRemove(n.guid)}
-            />;
+      parent={parent}
+      key={n.guid}
+      onFocus={onFocus}
+      isParentAssessmentGraded={isParentAssessmentGraded}
+      editMode={props.editMode}
+      services={props.services}
+      context={props.context}
+      activeContentGuid={props.activeContentGuid}
+      hover={props.hover}
+      onUpdateHover={props.onUpdateHover}
+      allSkills={props.skills}
+      model={n}
+      canRemove={canRemove}
+      onEdit={(c, src) => onEdit(n.guid, c, src)}
+      onRemove={() => onRemove(n.guid)}
+    />;
   }
 }

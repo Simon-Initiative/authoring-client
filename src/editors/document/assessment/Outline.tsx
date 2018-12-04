@@ -13,10 +13,18 @@ export interface OutlineProps {
   nodes: Immutable.OrderedMap<string, AssessmentNode>;
   expandedNodes: Immutable.Set<string>;
   selected: string;
-  onEdit: (nodes: Immutable.OrderedMap<string, AssessmentNode>) => void;
+  onEdit: (nodes: Immutable.OrderedMap<string, AssessmentNode>, editDetails: EditDetails) => void;
   onChangeExpansion: (expanded: Immutable.Set<string>) => void;
   onSelect: (selectedNode: AssessmentNode) => void;
   course: CourseModel;
+}
+
+export interface EditDetails {
+  sourceModel: AssessmentNode;
+  sourceParent: Maybe<AssessmentNode>;
+  targetParent: Maybe<AssessmentNode>;
+  originalIndex: number;
+  newIndex: number;
 }
 
 export function getChildren(node: AssessmentNode)
@@ -34,7 +42,7 @@ export function getChildren(node: AssessmentNode)
   }
 }
 
-export function setChildren(node: AssessmentNode, children) : AssessmentNode {
+export function setChildren(node: AssessmentNode, children): AssessmentNode {
   switch (node.contentType) {
     case 'Selection':
       if (node.source.contentType === 'Pool') {
@@ -47,14 +55,12 @@ export function setChildren(node: AssessmentNode, children) : AssessmentNode {
   }
 }
 
-const canHandleDrop : Tree.CanDropHandler<AssessmentNode> = (
+const canHandleDrop: Tree.CanDropHandler<AssessmentNode> = (
   nodeBeingDropped: AssessmentNode,
   originalParent: Maybe<AssessmentNode>,
   originalIndex: number,
   newParent: Maybe<AssessmentNode>,
-  newIndex: number) : boolean => {
-
-
+  newIndex: number): boolean => {
 
   // Regardless of the type of node, if it is a drop
   // attempt in the same parent we do not allow
@@ -106,7 +112,6 @@ const canHandleDrop : Tree.CanDropHandler<AssessmentNode> = (
   return true;
 };
 
-
 export class Outline extends React.PureComponent<OutlineProps, {}> {
 
   constructor(props) {
@@ -139,7 +144,7 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
         onSelect={this.onSelect}
         renderNodeComponent={renderTab.bind(null, course)}
         canHandleDrop={canHandleDrop}
-        />
+      />
     );
   }
 

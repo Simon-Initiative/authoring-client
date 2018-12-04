@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
-    Question, QuestionProps, QuestionState,
+  Question, QuestionProps, QuestionState,
 } from './Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
@@ -48,14 +48,14 @@ export const resetAllScores = (partModel: contentTypes.Part) => {
 };
 
 export interface ImageHotspotProps
-    extends QuestionProps<contentTypes.ImageHotspot> {
+  extends QuestionProps<contentTypes.ImageHotspot> {
   advancedScoringInitialized: boolean;
   advancedScoring: boolean;
   onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
 export interface ImageHotspotState
-    extends QuestionState {
+  extends QuestionState {
 
 }
 
@@ -64,7 +64,7 @@ export interface ImageHotspotState
  */
 @injectSheet(styles)
 export class ImageHotspot
-   extends Question<StyledComponentProps<ImageHotspotProps>, ImageHotspotState> {
+  extends Question<StyledComponentProps<ImageHotspotProps>, ImageHotspotState> {
   choiceMap: Immutable.Map<string, contentTypes.Choice>;
 
   constructor(props) {
@@ -126,7 +126,7 @@ export class ImageHotspot
     onEdit(itemModel, updatedPartModel, updatedPartModel);
   }
 
-  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback, src) {
+  onFeedbackEdit(response: contentTypes.Response, feedback: contentTypes.Feedback, src) {
     const { partModel, itemModel, onEdit } = this.props;
 
     const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
@@ -161,24 +161,24 @@ export class ImageHotspot
 
     return (
       <div className="question-body" key="question">
-          <ContentContainer
-            activeContentGuid={this.props.activeContentGuid}
-            hover={this.props.hover}
-            onUpdateHover={this.props.onUpdateHover}
-            onFocus={this.props.onFocus}
-            editMode={editMode}
-            services={services}
-            context={context}
-            model={body}
-            onEdit={onBodyEdit} />
+        <ContentContainer
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
+          onFocus={this.props.onFocus}
+          editMode={editMode}
+          services={services}
+          context={context}
+          model={body}
+          onEdit={onBodyEdit} />
 
-          <ImageHotspotEditor
-            editMode={editMode}
-            onEdit={onEdit}
-            context={context}
-            services={services}
-            model={itemModel}
-            partModel={partModel} />
+        <ImageHotspotEditor
+          editMode={editMode}
+          onEdit={onEdit}
+          context={context}
+          services={services}
+          model={itemModel}
+          partModel={partModel} />
       </div>
     );
   }
@@ -227,7 +227,8 @@ export class ImageHotspot
           context={context}
           services={services}
           editMode={editMode}
-          onEditChoice={() => {/* do nothing */}}
+          branchingQuestions={this.props.branchingQuestions}
+          onEditChoice={() => {/* do nothing */ }}
           onEditFeedback={this.onFeedbackEdit}
           onEditScore={this.onScoreEdit} />
       );
@@ -245,7 +246,7 @@ export class ImageHotspot
               <ToggleSwitch
                 label="Advanced"
                 checked={advancedScoring}
-                onClick={this.onToggleAdvanced}/>
+                onClick={this.onToggleAdvanced} />
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>

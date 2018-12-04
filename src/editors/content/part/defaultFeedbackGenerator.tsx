@@ -15,7 +15,7 @@ export const AUTOGEN_MAX_CHOICES = 5;
 export const renderMaxChoicesWarning = () => {
   return (
     <div className="message alert alert-warning">
-      <i className="fa fa-info-circle"/>
+      <i className="fa fa-info-circle" />
       {` Providing more than ${AUTOGEN_MAX_CHOICES} choices \
       (Choice ${convert.toAlphaNotation(AUTOGEN_MAX_CHOICES - 1)}) for this question is \
       discouraged and prevents the learning dashboard from showing exact student response \
@@ -35,14 +35,14 @@ export const autogenResponseFilter = (response) => {
 const getFeedbackCombinations =
   (userResponses, choices, allCombinations: CombinationsMap,
    normalizerMap: Object): Immutable.List<string> => {
-  // get all user specified combinations
+    // get all user specified combinations
 
     const existingCombinations = userResponses.map(response => response.match.split(',')
       .filter(s => s));
 
     const normalizedToLetters = existingCombinations.map(combo => combo.map(c => normalizerMap[c]));
 
-  // function that calculates the key of a given combination
+    // function that calculates the key of a given combination
     const getComboKey = (combination: string[]): string => {
       return combination.join(',');
     };
@@ -66,7 +66,8 @@ const getFeedbackCombinations =
  */
 export const modelWithDefaultFeedback = (
   model: contentTypes.Part, choices: contentTypes.Choice[], body: ContentElements, score: string,
-  maxGenChoices: number, onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap) => {
+  maxGenChoices: number, onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap,
+  lang: string = undefined) => {
   // remove all existing default responses
   const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
 
@@ -74,9 +75,12 @@ export const modelWithDefaultFeedback = (
   if (choices.length <= 1) {
     generatedResponses = [];
   } else if (choices.length > maxGenChoices) {
-    const feedback = new contentTypes.Feedback({
+    let feedback = new contentTypes.Feedback({
       body,
     });
+    if (lang !== undefined) {
+      feedback = feedback.with({ lang });
+    }
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
     generatedResponses = [
@@ -114,12 +118,15 @@ export const modelWithDefaultFeedback = (
       userResponses, choices, allCombinations, normalizerMap)
       .toArray()
       .map((combo, i) => {
-        const feedback = new contentTypes.Feedback({
+        let feedback = new contentTypes.Feedback({
           // We only want to clone elements other than the first one, otherwise
           // we will be replacing the model out from underneath the UI,
           // which results in loss of focus
           body: i === 0 ? body : body.clone(),
         });
+        if (lang !== undefined) {
+          feedback = feedback.with({ lang });
+        }
         const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
         // Convert the letters in the combo back to the original choice values
