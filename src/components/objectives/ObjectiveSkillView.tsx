@@ -44,6 +44,7 @@ const getQuestionRefFromPathInfo = (
   switch (pathItem.name) {
     case 'essay':
       return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing(),
@@ -53,6 +54,7 @@ const getQuestionRefFromPathInfo = (
       });
     case 'short_answer':
       return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing(),
@@ -62,6 +64,7 @@ const getQuestionRefFromPathInfo = (
       });
     case 'fill_in_the_blank':
       return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing(),
@@ -71,6 +74,7 @@ const getQuestionRefFromPathInfo = (
       });
     case 'image_hotspot':
       return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing(),
@@ -80,6 +84,7 @@ const getQuestionRefFromPathInfo = (
       });
     case 'multiple_choice':
       return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing(),
@@ -89,6 +94,7 @@ const getQuestionRefFromPathInfo = (
       });
     case 'numeric':
       return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing(),
@@ -98,6 +104,7 @@ const getQuestionRefFromPathInfo = (
       });
     case 'ordering':
       return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing(),
@@ -107,6 +114,7 @@ const getQuestionRefFromPathInfo = (
       });
     case 'question':
       return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing(),

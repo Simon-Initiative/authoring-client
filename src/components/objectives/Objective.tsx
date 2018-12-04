@@ -389,8 +389,13 @@ export class Objective
       )
     // filter out undefined refs
     .filter(ref => !!ref)
-    // dedupe refs
-    .reduce((acc, ref) => acc.find(r => r.id === ref.id) ? acc : acc.push(ref), List<QuestionRef>())
+    // // dedupe refs
+    .reduce(
+      (acc, ref) => acc.find(r => r.key === ref.key)
+        ? acc
+        : acc.push(ref),
+      List<QuestionRef>(),
+    )
     // filter out undefined refs
     .toList();
 
@@ -458,7 +463,7 @@ export class Objective
               </g>
               {orderedObjectiveQuestionRefs
                 .map((question, i) => (
-                  <g key={question.id}
+                  <g key={question.key}
                     transform={`translate(${LEFT_OFFSET + (35 * i)}, `
                       + `${SKILL_GRID_HEADER_HEIGHT}) rotate(-45)`}>
                     <text
@@ -530,7 +535,9 @@ export class Objective
                   ? (
                     <Tooltip title="Formative" distance={15}
                       size="small" arrowSize="small">
-                      <div key={question.id} className={classes.skillGridCell}>
+                      <div
+                        key={question.key}
+                        className={classes.skillGridCell}>
                         <i className={classNames(['fa fa-flask',
                           classes.formativeColor, classes.gridAssessmentIcon])} />
                       </div>

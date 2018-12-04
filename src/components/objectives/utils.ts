@@ -2,6 +2,7 @@ import { Maybe } from 'tsmonad';
 import { LegacyTypes } from 'data/types';
 
 export interface QuestionRef {
+  key: string;
   id: string;
   title: Maybe<string>;
   type: string;
