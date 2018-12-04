@@ -285,7 +285,7 @@ export class Objective
   }
 
   loadReferences = () => {
-    const { course, objective, skillQuestionRefs } = this.props;
+    const { course, objective } = this.props;
 
     this.setState({
       hasRequestedRefs: true,
@@ -371,7 +371,7 @@ export class Objective
   }
 
   getOrderedObjectiveQuestions = (skill?: contentTypes.Skill) => {
-    const { course, skills, skillQuestionRefs } = this.props;
+    const { skills, skillQuestionRefs } = this.props;
 
     // because we are reducing on an ordered list of skills, the result
     // will automatically be sorted by skill which is what we want
@@ -569,7 +569,7 @@ export class Objective
 
   renderSkills() {
     const {
-      classes, skills, editMode, loading, onEditSkill, highlightText,
+      skills, editMode, loading, onEditSkill, highlightText,
     } = this.props;
     const { skillEdits } = this.state;
 

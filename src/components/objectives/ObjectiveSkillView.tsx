@@ -1005,15 +1005,6 @@ export class ObjectiveSkillView
 
     const rows = [];
 
-    const skillsById = this.state.skills.skills
-      .toArray()
-      .reduce(
-        (map, skill) => {
-          map[skill.id] = skill;
-          return map;
-        },
-        {});
-
     const isExpanded = (guid) => {
       if (overrideExpanded) return true;
 
