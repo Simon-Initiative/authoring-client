@@ -547,7 +547,7 @@ export class Objective
                   ? (
                     <Tooltip title="Summative" distance={15}
                       size="small" arrowSize="small">
-                      <div key={question.id} className={classes.skillGridCell}>
+                      <div key={question.key} className={classes.skillGridCell}>
                         <i className={classNames(['fa fa-check',
                           classes.summativeColor, classes.gridAssessmentIcon])} />
                       </div>
@@ -557,14 +557,14 @@ export class Objective
                   ? (
                     <Tooltip title="Question Pool" distance={15}
                       size="small" arrowSize="small">
-                      <div key={question.id} className={classes.skillGridCell}>
+                      <div key={question.key} className={classes.skillGridCell}>
                         <i className={classNames(['fa fa-shopping-basket',
                           classes.poolColor, classes.gridAssessmentIcon])} />
                       </div>
                     </Tooltip>
                   )
                 : (
-                  <div key={question.id} className={classes.skillGridCell}/>
+                  <div key={question.key} className={classes.skillGridCell}/>
                 )
               ))}
             </div>
