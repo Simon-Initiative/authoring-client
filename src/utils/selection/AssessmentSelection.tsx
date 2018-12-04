@@ -127,7 +127,7 @@ export class AssessmentSelection
     return (
         <ModalSelection title="Select Assessment" onCancel={this.props.onCancel}
                         onInsert={() => this.onInsert(this.state.selected.id)}>
-          <table className="table table-hover table-sm">
+          <table className="table table-sm">
             <thead>
             <tr>
                 <th>Title</th>
