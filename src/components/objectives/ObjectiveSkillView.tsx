@@ -136,7 +136,7 @@ const getQuestionRefFromPathInfo = (
 };
 
 const getQuestionRefFromSkillEdge = (
-    edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
+  edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
   return getQuestionRefFromPathInfo(
     edge.metadata.jsonObject.pathInfo, assessmentType, assessmentId);
 };
@@ -272,17 +272,17 @@ export class ObjectiveSkillView
           (acc, skill) => acc.set(
             skill.id,
             (acc.get(skill.id) || Immutable.List<QuestionRef>())
-            .concat(
-              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
-                .map(edge =>
+              .concat(
+                edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                  .map(edge =>
                     getQuestionRefFromSkillEdge(
                       edge, LegacyTypes.inline, edge.sourceId.split(':')[2]))
-                .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
-                  just: ref => true,
-                  nothing: () => false,
-                }))
-                .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
-            ).toList(),
+                  .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
+                    just: ref => true,
+                    nothing: () => false,
+                  }))
+                  .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
+              ).toList(),
           ),
           Immutable.Map<string, Immutable.List<QuestionRef>>(),
         ),
@@ -308,16 +308,16 @@ export class ObjectiveSkillView
           (acc, skill) => acc.set(
             skill.id,
             (acc.get(skill.id) || Immutable.List<QuestionRef>())
-            .concat(
-              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
-                .map(edge => getQuestionRefFromSkillEdge(
-                  edge, LegacyTypes.assessment2, edge.sourceId.split(':')[2]))
-                .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
-                  just: ref => true,
-                  nothing: () => false,
-                }))
-                .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
-            ).toList(),
+              .concat(
+                edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                  .map(edge => getQuestionRefFromSkillEdge(
+                    edge, LegacyTypes.assessment2, edge.sourceId.split(':')[2]))
+                  .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
+                    just: ref => true,
+                    nothing: () => false,
+                  }))
+                  .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
+              ).toList(),
           ),
           Immutable.Map<string, Immutable.List<QuestionRef>>(),
         ),
@@ -343,16 +343,16 @@ export class ObjectiveSkillView
           (acc, skill) => acc.set(
             skill.id,
             (acc.get(skill.id) || Immutable.List<QuestionRef>())
-            .concat(
-              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
-                .map(edge => getQuestionRefFromSkillEdge(
-                  edge, LegacyTypes.assessment2_pool, edge.sourceId.split(':')[2]))
-                .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
-                  just: ref => true,
-                  nothing: () => false,
-                }))
-                .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
-            ).toList(),
+              .concat(
+                edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                  .map(edge => getQuestionRefFromSkillEdge(
+                    edge, LegacyTypes.assessment2_pool, edge.sourceId.split(':')[2]))
+                  .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
+                    just: ref => true,
+                    nothing: () => false,
+                  }))
+                  .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
+              ).toList(),
           ),
           Immutable.Map<string, Immutable.List<QuestionRef>>(),
         ),
@@ -976,7 +976,7 @@ export class ObjectiveSkillView
       this.props.displayModal(
         <RawContentEditor
           rawContent={r}
-          onEdit={onEdit} onCancel={onCancel}/>,
+          onEdit={onEdit} onCancel={onCancel} />,
       );
     });
 
@@ -1038,7 +1038,7 @@ export class ObjectiveSkillView
             key={objective.id}
             course={this.props.course}
             onAddExistingSkill={this.onAddExistingSkill}
-            onRemove={this.removeObjective}
+            onRemove={obj => this.removeObjective(obj)}
             onRemoveSkill={skill => this.removeSkill(objective, skill)}
             onAddNewSkill={this.onAddNewSkill}
             onBeginExternalEdit={this.onBeginExternalEdit}
