@@ -44,3 +44,7 @@ export {
 export {
   deleteResource,
 } from './persistence/resource';
+
+export {
+  fetchEdges,
+} from './persistence/edge';

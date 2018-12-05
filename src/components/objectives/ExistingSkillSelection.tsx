@@ -63,7 +63,7 @@ export class ExistingSkillSelection
         disableInsert={this.state.selected === undefined && this.props.disableInsert}
         onCancel={this.props.onCancel}
         onInsert={this.onInsert}>
-        <table className="table table-hover table-sm">
+        <table className="table table-sm">
           <thead>
             <tr>
               <th>Skill</th>

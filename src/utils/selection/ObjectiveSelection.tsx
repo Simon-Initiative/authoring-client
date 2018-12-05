@@ -64,7 +64,7 @@ export class ObjectiveSelection
       <ModalSelection title="Select Learning Objective"
         onCancel={this.props.onCancel}
         onInsert={() => this.props.onInsert(this.state.selected)}>
-        <table className="table table-hover table-sm">
+        <table className="table table-sm">
           <thead>
               <tr>
                   <th>Objective</th>

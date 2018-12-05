@@ -386,11 +386,12 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       onClick={() => this.onPreview()} />;
 
     const requestQAButton = (redeploy: boolean) =>
-      <RequestButton text="Request QA" className="btn-secondary actionButton requestQA"
+      <RequestButton key="req-qa" text="Request QA" className="btn-secondary actionButton requestQA"
         onClick={() => this.onRequestDeployment(DeployStage.qa, redeploy)} />;
 
     const requestProductionButton = (redeploy: boolean) =>
-      <RequestButton text="Request Production" className="btn-secondary actionButton requestProd"
+      <RequestButton key="req-prod" text="Request Production"
+        className="btn-secondary actionButton requestProd"
         onClick={() => this.onRequestDeployment(DeployStage.prod, redeploy)} />;
 
     const organizationOption = (org: Resource) =>
@@ -430,8 +431,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     switch (model.deploymentStatus) {
       case DeploymentStatus.Development:
         actions.push(
-          <p>If your course package is ready to go to QA, you can request for OLI to deploy
-            the course to the QA server for public review.</p>,
+          <p key="development">If your course package is ready to go to QA, you can request
+            for OLI to deploy the course to the QA server for public review.</p>,
           requestQAButton(false));
         break;
 
@@ -440,8 +441,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
       case DeploymentStatus.QA:
         actions.push(
-          <p>If you've made changes to your course package since your last deployment to QA,
-            you can request for OLI to redeploy the course to the QA server for further review.</p>,
+          <p key="qa">If you've made changes to your course package since your last deployment
+            to QA, you can request for OLI to redeploy the course to the QA server for further
+            review.</p>,
           requestQAButton(true),
           <br />,
           <p>If your course package is ready to go to production, you can request for OLI to deploy
@@ -454,7 +456,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
       case DeploymentStatus.Production:
         actions.push(
-          <p>This course package is available on the production server,
+          <p key="production">This course package is available on the production server,
             but you can notify the OLI team to make non-structural updates to course content.</p>,
           requestProductionButton(true));
         break;
@@ -467,7 +469,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     if (actions.length === 0) {
       actions.push(
-        <div>No actions available in this deployment state.</div>,
+        <div key="none">No actions available in this deployment state.</div>,
       );
     }
 

@@ -148,7 +148,7 @@ export class SortableTable
 
   render() {
     return (
-      <table className="table table-sm table-hover customTable">
+      <table className="table table-sm customTable">
         <thead>
           <tr>
             {this.renderColumnHeaders()}

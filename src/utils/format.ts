@@ -1,3 +1,5 @@
+import { measureTextWidth } from 'utils/measure';
+
 export const convert = {
 
   // Converts a zero-based index to an alpha notation.
@@ -96,5 +98,37 @@ export const stringFormat = {
     }
 
     return text;
+  },
+
+  /**
+   * Returns a truncated version of a string with ellipsis.
+   *
+   * WARNING: This might be an expensive call, as it renders the text into a canvas
+   * element to measure it
+   */
+  ellipsizePx: (
+    text: string, maxWidth: number, fontFamily: string,
+    fontSize: number, fontWeight?: number, fontStyle?: string) => {
+    const ellipsizeWidth = measureTextWidth({
+      text: '...', fontFamily, fontSize, fontWeight, fontStyle });
+    const textWidth = measureTextWidth({
+      text, fontFamily, fontSize, fontWeight, fontStyle });
+
+    if (textWidth <= maxWidth) {
+      return text;
+    }
+
+    if (maxWidth <= ellipsizeWidth) {
+      console.error('ellipsizePx: maxWidth must be greater than size of ellipsis \'...\'');
+      return '...';
+    }
+
+    const findLargestString = (str: string) =>
+      measureTextWidth({
+        text: `${str}...`, fontFamily, fontSize, fontWeight, fontStyle }) <= maxWidth
+        ? str
+        : findLargestString(str.substr(0, str.length - 1));
+
+    return findLargestString(text) + '...';
   },
 };

@@ -176,7 +176,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     const link = resource => span =>
       <button onClick={this.clickResource.bind(this, resource.guid)}
-        className="btn btn-link">{span}</button>;
+        className="btn btn-link title-btn">{span}</button>;
 
     const columnRenderers = [
       r => link(r)(highlightedColumnRenderer('title', r)),
