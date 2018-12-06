@@ -42,10 +42,6 @@ export default class YouTubeEditor
     this.onControlEdit = this.onControlEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps) {
-    return nextProps.model !== this.props.model;
-  }
-
   onSrcEdit(src: string) {
     let videoSrc;
 
