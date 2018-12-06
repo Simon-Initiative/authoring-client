@@ -6,7 +6,6 @@ import { getKey } from '../common';
 import { assessmentTemplate } from '../activity_templates';
 import { isArray, isNullOrUndefined } from 'util';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
-import { ContentElement } from 'data/content/common/interfaces';
 import { splitQuestionsIntoPages } from './utils/assessment';
 
 export type AssessmentModelParams = {
