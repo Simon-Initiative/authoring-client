@@ -292,12 +292,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         page.nodes.contains(node) ? page : activePage,
       model.pages.first());
 
+    locateNextOfKin(this.allNodes(), guid).lift((node) => {
+      onSetCurrentNode(documentId, node);
+      onSetCurrentPage(documentId, findPage(node).guid);
+    });
+
     let pages;
     if (isBranching) {
-      locateNextOfKin(this.allNodes(), guid).lift((node) => {
-        onSetCurrentNode(documentId, node);
-        onSetCurrentPage(documentId, findPage(node).guid);
-      });
       pages = handleBranchingDeletion(documentId, model.pages, guid);
     } else {
       const nodes = removeNode(guid, currentPage.nodes, getChildren, setChildren);
