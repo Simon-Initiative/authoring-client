@@ -244,19 +244,17 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // expanded state of nodes in the outline
   }
 
-  onSelect(currentNode: contentTypes.Node) {
+  onSelect(selectedNode: contentTypes.Node) {
     const { model, activeContext, onSetCurrentNode, onSetCurrentPage } = this.props;
 
     const documentId = activeContext.documentId.valueOr(null);
+    const selectedPage = model.pages.reduce(
+      (activePage, page) =>
+        page.nodes.contains(selectedNode) ? page : activePage,
+      model.pages.first());
 
-    onSetCurrentNode(documentId, currentNode);
-    if (model.branching) {
-      const currentPage = model.pages.reduce(
-        (activePage, page) =>
-          page.nodes.contains(currentNode) ? page : activePage,
-        model.pages.first());
-      onSetCurrentPage(documentId, currentPage.guid);
-    }
+    onSetCurrentNode(documentId, selectedNode);
+    onSetCurrentPage(documentId, selectedPage.guid);
   }
 
   allNodes() {

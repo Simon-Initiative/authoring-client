@@ -30,6 +30,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { Button } from 'editors/content/common/Button';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import ModalPrompt from 'utils/selection/ModalPrompt';
+import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 
 interface SidebarRowProps {
   label?: string;
@@ -204,13 +205,13 @@ export class ContextAwareSidebar
 
   onToggleBranching() {
     const { model, onEditModel, onDisplayModal, onDismissModal } = this.props;
-    const assessmentModel = model as AssessmentModel;
 
-    const toggleBranching = () => onEditModel(
-      assessmentModel.with({
-        branching: !assessmentModel.branching,
-      }),
-    );
+    const toggleBranching = (model: AssessmentModel) => onEditModel(model);
+
+    const assessmentModel = model as AssessmentModel;
+    const newModel = assessmentModel.with({
+      branching: !assessmentModel.branching,
+    });
 
     if (!assessmentModel.branching) {
       onDisplayModal(
@@ -219,7 +220,7 @@ export class ContextAwareSidebar
           on a students\' responses.\n\nDo you want to convert this into a branching assessment? \
           The assessment will need to be restructured if reverted back into a normal assessment.'}
           onInsert={() => {
-            toggleBranching();
+            toggleBranching(splitQuestionsIntoPages(newModel));
             onDismissModal();
           }}
           onCancel={() => onDismissModal()}
@@ -229,7 +230,7 @@ export class ContextAwareSidebar
         />,
       );
     } else {
-      toggleBranching();
+      toggleBranching(newModel);
     }
   }
 
