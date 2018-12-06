@@ -297,15 +297,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       onSetCurrentPage(documentId, findPage(node).guid);
     });
 
-    let pages;
-    if (isBranching) {
-      pages = handleBranchingDeletion(documentId, model.pages, guid);
-    } else {
-      const nodes = removeNode(guid, currentPage.nodes, getChildren, setChildren);
-      pages = nodes.size > 0
+    const nodes = removeNode(guid, currentPage.nodes, getChildren, setChildren);
+    const pages = isBranching
+      ? handleBranchingDeletion(documentId, model.pages, guid)
+      : nodes.size > 0
         ? model.pages.set(currentPage.guid, currentPage.with({ nodes }))
         : model.pages.remove(currentPage.guid);
-    }
 
     this.handleEdit(model.with({ pages }));
   }
