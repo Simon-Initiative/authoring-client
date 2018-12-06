@@ -273,36 +273,38 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onNodeRemove(guid: string) {
+    // Find the node to be removed, remove it, and set an adjacent node to be active.
+    // Branching assessments are handled as a special case since they must remove
+    // edges when a linked-to node is deleted.
 
-    const model = this.props.model;
-    const page = this.getCurrentPage(this.props);
-    const isBranching = this.props.model.branching;
-    const documentId = this.props.activeContext.documentId.valueOr(null);
-    const removed = removeNode(guid, page.nodes, getChildren, setChildren);
+    const { model, activeContext, onSetCurrentNode, onSetCurrentPage } = this.props;
+    const isBranching = model.branching;
+    const currentPage = this.getCurrentPage(this.props);
+    const documentId = activeContext.documentId.valueOr(null);
 
-    locateNextOfKin(removed.size > 0 ? page.nodes : this.allNodes(), guid).lift((node) => {
-
-      this.props.onSetCurrentNode(
-        this.props.activeContext.documentId.valueOr(null), node);
-
-      // We also have to set the current page in branched mode
-      if (isBranching) {
-        const currentPage = model.pages.reduce(
-          (activePage, page) =>
-            page.nodes.contains(node) ? page : activePage,
-          model.pages.first());
-        this.props.onSetCurrentPage(documentId, currentPage.guid);
-      }
-    });
-
-    let pages;
-    if (isBranching) {
-      pages = handleBranchingDeletion(documentId, this.props.model.pages, guid);
-    } else {
-      pages = this.props.model.pages.set(page.guid, page);
+    // Prevent the last node from being removed
+    if (this.allNodes().size <= 1) {
+      return;
     }
 
-    this.handleEdit(this.props.model.with({ pages }));
+    const findPage = node => model.pages.reduce(
+      (activePage, page) =>
+        page.nodes.contains(node) ? page : activePage,
+      model.pages.first());
+
+    locateNextOfKin(this.allNodes(), guid).lift((node) => {
+      onSetCurrentNode(documentId, node);
+      onSetCurrentPage(documentId, findPage(node).guid);
+    });
+
+    const nodes = removeNode(guid, currentPage.nodes, getChildren, setChildren);
+    const pages = isBranching
+      ? handleBranchingDeletion(documentId, model.pages, guid)
+      : nodes.size > 0
+        ? model.pages.set(currentPage.guid, currentPage.with({ nodes }))
+        : model.pages.remove(currentPage.guid);
+
+    this.handleEdit(model.with({ pages }));
   }
 
   onAddContent() {
