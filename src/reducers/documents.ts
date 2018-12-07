@@ -17,8 +17,6 @@ export type ActionTypes =
   documentActions.DocumentLoadedAction |
   documentActions.DocumentRequestedAction |
   documentActions.ModelUpdatedAction |
-  // documentActions.SetCurrentPageAction |
-  // documentActions.SetCurrentNodeAction |
   documentActions.SetCurrentNodeOrPageAction;
 
 export type DocumentsState = Immutable.Map<string, EditedDocument>;
