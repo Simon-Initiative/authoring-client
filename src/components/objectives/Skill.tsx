@@ -124,12 +124,12 @@ export class Skill
       .length;
 
     const summativeCount = skillQuestionRefs
-    .filter(r => r.assessmentType === LegacyTypes.assessment2)
-    .length;
+      .filter(r => r.assessmentType === LegacyTypes.assessment2)
+      .length;
 
     const poolCount = skillQuestionRefs
-    .filter(r => r.assessmentType === LegacyTypes.assessment2_pool)
-    .length;
+      .filter(r => r.assessmentType === LegacyTypes.assessment2_pool)
+      .length;
 
     const formativeTooltip = <div style={{ textAlign: 'left' }}>
       <b><i className="fa fa-flask" /> Formative Questions</b>

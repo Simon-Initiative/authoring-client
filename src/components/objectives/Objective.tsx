@@ -333,43 +333,6 @@ export class Objective
     this.props.onRemoveSkill(model);
   }
 
-  getFormativeAssessmentCount = () => {
-    const { skills, skillFormativeRefs } = this.props;
-
-    return skillFormativeRefs.caseOf({
-      just: refMap => skills.reduce(
-        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
-        0,
-      ),
-      nothing: () => null,
-    });
-
-  }
-
-  getSummativeAssessmentCount = () => {
-    const { skills, skillSummativeRefs } = this.props;
-
-    return skillSummativeRefs.caseOf({
-      just: refMap => skills.reduce(
-        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
-        0,
-      ),
-      nothing: () => null,
-    });
-  }
-
-  getQuestionPoolAssessmentCount = () => {
-    const { skills, skillPoolRefs } = this.props;
-
-    return skillPoolRefs.caseOf({
-      just: refMap => skills.reduce(
-        (acc, skill) => refMap.has(skill.id) ? acc + refMap.get(skill.id).size : acc,
-        0,
-      ),
-      nothing: () => null,
-    });
-  }
-
   getOrderedObjectiveQuestions = (skill?: contentTypes.Skill) => {
     const { skills, skillQuestionRefs } = this.props;
 
@@ -758,7 +721,7 @@ export class Objective
   }
 
   renderAggregateDetails() {
-    const { classes, skills } = this.props;
+    const { classes, skills, skillQuestionRefs } = this.props;
     const { workbookPageRefs } = this.state;
 
     const pageCount = workbookPageRefs.caseOf({
@@ -767,9 +730,6 @@ export class Objective
     });
 
     const skillCount = skills.size;
-    const formativeCount = this.getFormativeAssessmentCount();
-    const summativeCount = this.getSummativeAssessmentCount();
-    const poolCount = this.getQuestionPoolAssessmentCount();
 
     return (
       <React.Fragment>
@@ -791,24 +751,48 @@ export class Objective
               target="_blank">Learn more about skills</a>.
           </IssueTooltip>
           {skillCount} {addPluralS('Skill', skillCount)}
-          <span
-            className={classes.detailsOverviewAssessmentCounts} >
-            <span
-              className={classNames([classes.detailsOverviewSeparator, classes.formativeColor])}>
-              {`${formativeCount} `}
-              <i className="fa fa-flask"/>
-              </span>
-            <span
-              className={classNames([classes.detailsOverviewSeparator, classes.summativeColor])}>
-              {`${summativeCount} `}
-              <i className="fa fa-check"/>
-              </span>
-            <span
-              className={classNames([classes.detailsOverviewSeparator, classes.poolColor])}>
-              {`${poolCount} `}
-              <i className="fa fa-shopping-basket"/>
-            </span>
-          </span>
+          {skillQuestionRefs.caseOf({
+            just: (questionRefs) => {
+              const orderedQuestionRefs = this.getOrderedObjectiveQuestions();
+
+              const formativeCount = orderedQuestionRefs
+              .filter(r => r.assessmentType === LegacyTypes.inline)
+              .length;
+
+              const summativeCount = orderedQuestionRefs
+                .filter(r => r.assessmentType === LegacyTypes.assessment2)
+                .length;
+
+              const poolCount = orderedQuestionRefs
+                .filter(r => r.assessmentType === LegacyTypes.assessment2_pool)
+                .length;
+
+              return (
+                <span
+                  className={classes.detailsOverviewAssessmentCounts} >
+                  <span
+                    className={classNames([
+                      classes.detailsOverviewSeparator, classes.formativeColor])}>
+                    {`${formativeCount} `}
+                    <i className="fa fa-flask"/>
+                    </span>
+                  <span
+                    className={classNames([
+                      classes.detailsOverviewSeparator, classes.summativeColor])}>
+                    {`${summativeCount} `}
+                    <i className="fa fa-check"/>
+                    </span>
+                  <span
+                    className={classNames([
+                      classes.detailsOverviewSeparator, classes.poolColor])}>
+                    {`${poolCount} `}
+                    <i className="fa fa-shopping-basket"/>
+                  </span>
+                </span>
+              );
+            },
+            nothing: () => null,
+          })}
         </span>
       </React.Fragment>
     );
