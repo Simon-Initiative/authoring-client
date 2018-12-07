@@ -43,10 +43,9 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   onUpdateHover: (hover: string) => void;
   currentPage: string;
   currentNode: contentTypes.Node;
-  onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
-  onSetCurrentPage: (documentId: string, pageId: string) => void;
+  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
   course: models.CourseModel;
 }
 
@@ -133,7 +132,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
 
       const currentPage = this.getCurrentPage(nextProps);
-      const { activeContext, onSetCurrentNode } = this.props;
+      const { activeContext, onSetCurrentNodeOrPage } = this.props;
 
       // Handle the case that the current node has changed externally,
       // for instance, from an undo/redo
@@ -141,12 +140,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         .caseOf({
 
           just: (currentNode) => {
-            onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
+            onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), currentNode);
           },
           nothing: () => {
             locateNextOfKin(
               this.getCurrentPage(this.props).nodes, this.props.currentNode.guid).lift(node =>
-                onSetCurrentNode(
+                onSetCurrentNodeOrPage(
                   activeContext.documentId.valueOr(null), node));
           },
         });
@@ -188,7 +187,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           // We detected an addition of a question to an embedded pool
           if (questions.size > prevQuestions.size) {
-            this.props.onSetCurrentNode(
+            this.props.onSetCurrentNodeOrPage(
               this.props.activeContext.documentId.valueOr(null), questions.last());
           }
         }
@@ -198,13 +197,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onEditNode(guid: string, node: models.Node, src) {
 
-    const { activeContext, onSetCurrentNode } = this.props;
+    const { activeContext, onSetCurrentNodeOrPage } = this.props;
 
     const nodes = this.getCurrentPage(this.props).nodes;
 
     this.detectPoolAdditions(node, nodes);
 
-    onSetCurrentNode(activeContext.documentId.valueOr(null), node);
+    onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node);
     this.props.onUpdateContent(this.props.context.documentId, src);
 
     const updatedNodes = updateNode(guid, node, nodes, getChildren, setChildren);
@@ -245,16 +244,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onSelect(selectedNode: contentTypes.Node) {
-    const { model, activeContext, onSetCurrentNode, onSetCurrentPage } = this.props;
+    const { activeContext, onSetCurrentNodeOrPage } = this.props;
 
     const documentId = activeContext.documentId.valueOr(null);
-    const selectedPage = model.pages.reduce(
-      (activePage, page) =>
-        page.nodes.contains(selectedNode) ? page : activePage,
-      model.pages.first());
 
-    onSetCurrentNode(documentId, selectedNode);
-    onSetCurrentPage(documentId, selectedPage.guid);
+    onSetCurrentNodeOrPage(documentId, selectedNode);
   }
 
   allNodes() {
@@ -275,7 +269,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // Branching assessments are handled as a special case since they must remove
     // edges when a linked-to node is deleted.
 
-    const { model, activeContext, onSetCurrentNode, onSetCurrentPage } = this.props;
+    const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
     const isBranching = model.branching;
     const currentPage = this.getCurrentPage(this.props);
     const documentId = activeContext.documentId.valueOr(null);
@@ -285,14 +279,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       return;
     }
 
-    const findPage = node => model.pages.reduce(
-      (activePage, page) =>
-        page.nodes.contains(node) ? page : activePage,
-      model.pages.first());
-
     locateNextOfKin(this.allNodes(), guid).lift((node) => {
-      onSetCurrentNode(documentId, node);
-      onSetCurrentPage(documentId, findPage(node).guid);
+      onSetCurrentNodeOrPage(documentId, node);
     });
 
     const nodes = removeNode(guid, currentPage.nodes, getChildren, setChildren);
@@ -337,7 +325,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   addNode(node) {
-    const { model, activeContext, onSetCurrentNode } = this.props;
+    const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
 
     // Branching assessments place each question on a separate page
     let page = model.branching
@@ -348,7 +336,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     const pages = model.pages.set(page.guid, page);
 
-    onSetCurrentNode(activeContext.documentId.valueOr(null), node);
+    onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node);
     this.handleEdit(model.with({ pages }));
   }
 

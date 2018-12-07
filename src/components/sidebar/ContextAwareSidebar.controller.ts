@@ -6,13 +6,13 @@ import { ContextAwareSidebar, SidebarContent } from 'components/sidebar/ContextA
 import { showSidebar } from 'actions/editorSidebar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
-import { setCurrentPage } from 'actions/document';
+import { setCurrentNodeOrPage } from 'actions/document';
 import { ParentContainer } from 'types/active';
 import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentElement } from 'data/content/common/interfaces';
-import { ContentModel, CourseModel } from 'data/models';
+import { ContentModel, CourseModel, Node } from 'data/models';
 import { modalActions } from 'actions/modal';
 
 interface StateProps {
@@ -31,7 +31,7 @@ interface DispatchProps {
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
-  onSetCurrentPage: (documentId: string, pageId: string) => void;
+  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: Node | string) => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
 }
@@ -79,8 +79,8 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onInsert: content => dispatch(insert(content)),
     onEdit: content => dispatch(edit(content)),
     onHide: () => dispatch(showSidebar(false)),
-    onSetCurrentPage: (documentId: string, pageId: string) =>
-      dispatch(setCurrentPage(documentId, pageId)),
+    onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: Node | string) =>
+      dispatch(setCurrentNodeOrPage(documentId, nodeOrPageId)),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
   };

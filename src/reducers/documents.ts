@@ -4,6 +4,7 @@ import { EditedDocument } from 'types/document';
 import createGuid from 'utils/guid';
 import { ModelTypes, AssessmentModel } from 'data/models';
 import { Maybe } from 'tsmonad';
+import * as contentTypes from 'data/contentTypes';
 
 export type ActionTypes =
   documentActions.DocumentEditingEnableAction |
@@ -16,15 +17,16 @@ export type ActionTypes =
   documentActions.DocumentLoadedAction |
   documentActions.DocumentRequestedAction |
   documentActions.ModelUpdatedAction |
-  documentActions.SetCurrentPageAction |
-  documentActions.SetCurrentNodeAction;
+  // documentActions.SetCurrentPageAction |
+  // documentActions.SetCurrentNodeAction |
+  documentActions.SetCurrentNodeOrPageAction;
 
 export type DocumentsState = Immutable.Map<string, EditedDocument>;
 
 const initialState = Immutable.Map<string, EditedDocument>();
 
 function processUndo(
-  state: DocumentsState, action: documentActions.ChangeUndoneAction) : DocumentsState {
+  state: DocumentsState, action: documentActions.ChangeUndoneAction): DocumentsState {
 
   const ed = state.get(action.documentId);
   const model = ed.undoStack.peek();
@@ -42,7 +44,7 @@ function processUndo(
 }
 
 function processRedo(
-  state: DocumentsState, action: documentActions.ChangeRedoneAction) : DocumentsState {
+  state: DocumentsState, action: documentActions.ChangeRedoneAction): DocumentsState {
 
   const ed = state.get(action.documentId);
 
@@ -64,6 +66,7 @@ export const documents = (
   state: DocumentsState = initialState,
   action: ActionTypes,
 ): DocumentsState => {
+  const ed = state.get(action.documentId);
 
   switch (action.type) {
 
@@ -122,8 +125,6 @@ export const documents = (
       return processUndo(state, action);
 
     case documentActions.MODEL_UPDATED:
-      const ed = state.get(action.documentId);
-
       const document = ed.document.with({ model: action.model });
       return state.set(action.documentId, ed.with({
         document,
@@ -132,17 +133,30 @@ export const documents = (
         redoStack: ed.redoStack.clear(),
       }));
 
-    case documentActions.SET_CURRENT_PAGE:
-      const currentNode = (state.get(action.documentId).document.model as AssessmentModel)
-        .pages.get(action.page).nodes.first();
-      return state.set(action.documentId, state.get(action.documentId).with({
-        currentPage: Maybe.just(action.page),
-        currentNode: Maybe.just(currentNode),
-      }));
+    case documentActions.SET_CURRENT_PAGE_OR_NODE:
+      const assessment = ed.document.model as AssessmentModel;
 
-    case documentActions.SET_CURRENT_NODE:
-      return state.set(action.documentId, state.get(action.documentId).with({
-        currentNode: Maybe.just(action.node),
+      // If we are setting the page and it's a change from the current page,
+      // also set the selectedNode as the first node
+      if (typeof action.nodeOrPageId === 'string') {
+        const selectedPage = action.nodeOrPageId;
+        const selectedNode = ed.currentPage.valueOr('') === selectedPage
+          ? ed.currentNode
+          : Maybe.just(assessment.pages.get(selectedPage).nodes.first());
+        return state.set(action.documentId, ed.with({
+          currentNode: selectedNode,
+          currentPage: Maybe.just(selectedPage),
+        }));
+      }
+
+      // Else we are setting the node, so also set the corresponding page
+      const node = action.nodeOrPageId;
+      return state.set(action.documentId, ed.with({
+        currentNode: Maybe.just(action.nodeOrPageId),
+        currentPage: assessment.pages.reduce(
+          (activePage, page: contentTypes.Page) =>
+            page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
+          ed.currentPage),
       }));
     default:
       return state;
