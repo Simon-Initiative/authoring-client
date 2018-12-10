@@ -127,17 +127,17 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
 
         // update custom element in question body with the updated initiator
         const newCustomElement = customElement.withMutations(
-            (custom: contentTypes.Custom) => custom.with({
-              layoutData: custom.layoutData.caseOf({
-                just: ld => Maybe.just<HTMLLayout>(ld.with({
-                  initiators: ld.initiators.map(i =>
-                    i.guid === updatedInitiator.guid ? updatedInitiator : i,
-                  ).toList(),
-                })),
-                nothing: () => Maybe.nothing<HTMLLayout>(),
-              }),
+          (custom: contentTypes.Custom) => custom.with({
+            layoutData: custom.layoutData.caseOf({
+              just: ld => Maybe.just<HTMLLayout>(ld.with({
+                initiators: ld.initiators.map(i =>
+                  i.guid === updatedInitiator.guid ? updatedInitiator : i,
+                ).toList(),
+              })),
+              nothing: () => Maybe.nothing<HTMLLayout>(),
             }),
-          ) as contentTypes.Custom;
+          }),
+        ) as contentTypes.Custom;
 
         // save updates
         onBodyEdit(model.body.with({
@@ -175,8 +175,8 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     // case where there is no content other than the drag and drop in the model
     const contentWithPlaceholder = (body as ContentElements).content.size === 1
       ? Immutable.OrderedMap<string, ContentElement>()
-          .set(this.placeholderText.guid, this.placeholderText)
-          .concat((body as ContentElements).content) as Immutable.OrderedMap<string, ContentElement>
+        .set(this.placeholderText.guid, this.placeholderText)
+        .concat((body as ContentElements).content) as Immutable.OrderedMap<string, ContentElement>
       : (body as ContentElements).content;
 
     return (
@@ -203,7 +203,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const itemIndex = model.items.toArray().findIndex(
       (i: FillInTheBlank) => i.id === selectedInitiator);
 
-      // safeguard - return if selectedInitiator does not exist in model.items
+    // safeguard - return if selectedInitiator does not exist in model.items
     if (itemIndex < 0) {
       console.error('Error: selected initiator does not exist in model items');
       return;
@@ -232,8 +232,8 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
 
     const renderSkillsLabel = (part: contentTypes.Part) => (
       <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
-          {part.skills.size}
-        </Badge>
+        {part.skills.size}
+      </Badge>
       </span>
     );
 
@@ -248,24 +248,25 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
           ]}>
 
           <DynaDropTargetItems
-              activeContentGuid={this.props.activeContentGuid}
-              hover={this.props.hover}
-              onUpdateHover={this.props.onUpdateHover}
-              context={this.props.context}
-              services={this.props.services}
-              editMode={this.props.editMode}
-              onRemove={this.props.onRemove}
-              onItemFocus={this.props.onItemFocus}
-              advancedScoring={advancedScoring}
-              onFocus={this.props.onFocus}
-              onBlur={this.props.onBlur}
-              initiator={initiator}
-              onEditInitiatorText={this.editInitiatorText}
-              onToggleAdvanced={this.onToggleAdvanced}
-              itemModel={item}
-              partModel={part}
-              layout={layout}
-              onEdit={this.props.onEdit} />
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            context={this.props.context}
+            services={this.props.services}
+            editMode={this.props.editMode}
+            onRemove={this.props.onRemove}
+            onItemFocus={this.props.onItemFocus}
+            advancedScoring={advancedScoring}
+            onFocus={this.props.onFocus}
+            onBlur={this.props.onBlur}
+            initiator={initiator}
+            onEditInitiatorText={this.editInitiatorText}
+            onToggleAdvanced={this.onToggleAdvanced}
+            itemModel={item}
+            partModel={part}
+            layout={layout}
+            branchingQuestions={this.props.branchingQuestions}
+            onEdit={this.props.onEdit} />
 
           {this.renderSkillsTab(item, part)}
           {this.renderHintsTab(item, part)}

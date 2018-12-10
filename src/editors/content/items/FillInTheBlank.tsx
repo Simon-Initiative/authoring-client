@@ -2,8 +2,8 @@ import * as React from 'react';
 import { OrderedMap, Map } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
-    AbstractItemPartEditor, AbstractItemPartEditorProps,
-    AbstractItemPartEditorState,
+  AbstractItemPartEditor, AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Button } from '../common/controls';
 import guid from 'utils/guid';
@@ -26,9 +26,9 @@ export interface FillInTheBlankState extends AbstractItemPartEditorState {
  * FillInTheBlank Question Editor
  */
 export class
-FillInTheBlank
+  FillInTheBlank
   extends AbstractItemPartEditor<contentTypes.FillInTheBlank,
-    FillInTheBlankProps, FillInTheBlankState> {
+  FillInTheBlankProps, FillInTheBlankState> {
 
   generatedResponsesByMatch: Map<string, contentTypes.Response>;
 
@@ -47,7 +47,7 @@ FillInTheBlank
     this.generatedResponsesByMatch = Map<string, contentTypes.Response>();
   }
 
-  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback, src) {
+  onFeedbackEdit(response: contentTypes.Response, feedback: contentTypes.Feedback, src) {
     const {
       partModel,
       itemModel,
@@ -111,7 +111,7 @@ FillInTheBlank
 
     onEdit(
       itemModel.with(
-      { choices: itemModel.choices.set(choice.guid, choice) }),
+        { choices: itemModel.choices.set(choice.guid, choice) }),
       partModel, src);
   }
 
@@ -200,7 +200,7 @@ FillInTheBlank
     return choices.map((choice, i) => {
 
       if (!responsesByMatch.has(choice.value) && responsesByMatch.has('*')
-          && !this.generatedResponsesByMatch.has(choice.value)) {
+        && !this.generatedResponsesByMatch.has(choice.value)) {
         this.generatedResponsesByMatch = this.generatedResponsesByMatch.set(
           choice.value,
           responsesByMatch.get('*').clone().with({ match: choice.value }));
@@ -228,6 +228,7 @@ FillInTheBlank
           onEditChoice={this.onChoiceEdit}
           onEditFeedback={this.onFeedbackEdit}
           onEditScore={this.onScoreEdit}
+          branchingQuestions={this.props.branchingQuestions}
           onRemove={this.props.itemModel.choices.size > 1 ?
             choiceId => this.onRemoveChoice(choiceId, response) :
             undefined} />

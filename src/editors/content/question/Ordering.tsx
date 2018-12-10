@@ -6,7 +6,7 @@ import { OrderingChoice, OrderingChoiceList } from './OrderingChoice';
 import { Button } from '../common/controls';
 import guid from '../../../utils/guid';
 import {
-    Question, QuestionProps, QuestionState,
+  Question, QuestionProps, QuestionState,
 } from './Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
@@ -26,6 +26,7 @@ import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { ContentElements } from 'data/content/common/elements';
 
 import './Ordering.scss';
+import { ConditionalBranchSelect } from '../common/BranchSelect';
 
 export const isComplexFeedback = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.filter(autogenResponseFilter).toArray();
@@ -99,7 +100,6 @@ const buildResponsePlaceholder = (): contentTypes.Response => {
     feedback: feedbacks.set(feedback.guid, feedback),
   });
 };
-
 
 /**
  * The content editor for HtmlContent.
@@ -202,7 +202,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   onChoiceEdit = (choice: contentTypes.Choice, src) => {
     this.props.onEdit(
       this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
+        { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
       this.props.partModel, src);
   }
 
@@ -403,7 +403,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     );
   }
 
-  onDefaultFeedbackEdit = (body: ContentElements, score: string, src) => {
+  onDefaultFeedbackEdit = (body: ContentElements, score: string, lang: string, src) => {
     const { partModel, itemModel, onGetChoicePermutations } = this.props;
 
     const choices = itemModel.choices.toArray();
@@ -415,6 +415,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       score,
       AUTOGEN_MAX_CHOICES,
       onGetChoicePermutations,
+      lang,
     );
 
     this.onPartEdit(updatedModel, src);
@@ -441,6 +442,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             editMode={editMode}
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
+            branchingQuestions={this.props.branchingQuestions}
             onRemove={this.props.itemModel.choices.size > 1 ?
               choiceId => this.onRemoveChoice(choiceId) :
               undefined} />
@@ -471,17 +473,17 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         const viewOnlyChoice = choice.clone();
 
         return (
-            <OrderingChoice
-              className="order-selection"
-              onUpdateHover={() => {}}
-              label={getLabelFromChoice(itemModel, choice)}
-              key={viewOnlyChoice.guid}
-              index={index}
-              choice={viewOnlyChoice}
-              context={context}
-              services={services}
-              onReorderChoice={(originalIndex, newIndex) =>
-                this.onReorderSelection(response, originalIndex, newIndex)} />
+          <OrderingChoice
+            className="order-selection"
+            onUpdateHover={() => { }}
+            label={getLabelFromChoice(itemModel, choice)}
+            key={viewOnlyChoice.guid}
+            index={index}
+            choice={viewOnlyChoice}
+            context={context}
+            services={services}
+            onReorderChoice={(originalIndex, newIndex) =>
+              this.onReorderSelection(response, originalIndex, newIndex)} />
         );
       });
     } catch (err) {
@@ -496,7 +498,8 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   }
 
   renderResponses = () => {
-    const { partModel, context, services, advancedScoring, editMode } = this.props;
+    const { partModel, context, services, advancedScoring, editMode,
+      branchingQuestions } = this.props;
 
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
     const userResponses = partModel.responses.toArray().filter(autogenResponseFilter);
@@ -507,60 +510,80 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
 
     return responsesOrPlaceholder
       .map((response, i) => {
+
+        const feedback = response.feedback.first();
+
         return (
-        <InputListItem
-          activeContentGuid={this.props.activeContentGuid}
-          hover={this.props.hover}
-          onUpdateHover={this.props.onUpdateHover}
-          onFocus={this.props.onFocus}
-          key={response.guid}
-          className="response"
-          id={response.guid}
-          label={!advancedScoring ? '' : `${i + 1}`}
-          contentTitle={!advancedScoring ? 'Correct' : ''}
-          context={context}
-          services={services}
-          editMode={editMode}
-          body={response.feedback.first().body}
-          onEdit={(body, source) => this.onResponseBodyEdit(body, response, source)}
-          onRemove={responsesOrPlaceholder.length <= 1
-            ? null
-            : () => this.onResponseRemove(response)
-          }
-          options={[
-            <ItemOptions key="feedback-options">
-              <ItemOption className="matches"
-                label="Drag choices to set ordering for this feedback" flex>
-                <OrderingChoiceList>
-                  {this.renderOrderSelection(response)}
-                </OrderingChoiceList>
-              </ItemOption>
-              {advancedScoring
-                ? (
-                  <ItemOption className="score" label="Score">
-                    <div className="input-group">
-                      <input
-                        type="number"
-                        className="form-control input-sm form-control-sm"
-                        disabled={!this.props.editMode}
-                        value={response.score}
-                        onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
+          <InputListItem
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            onFocus={this.props.onFocus}
+            key={response.guid}
+            className="response"
+            id={response.guid}
+            label={!advancedScoring ? '' : `${i + 1}`}
+            contentTitle={!advancedScoring ? 'Correct' : ''}
+            context={context}
+            services={services}
+            editMode={editMode}
+            body={feedback.body}
+            onEdit={(body, source) => this.onResponseBodyEdit(body, response, source)}
+            onRemove={responsesOrPlaceholder.length <= 1
+              ? null
+              : () => this.onResponseRemove(response)
+            }
+            options={[
+              <ItemOptions key="feedback-options">
+                <ItemOption className="matches"
+                  label="Drag choices to set ordering for this feedback" flex>
+                  <OrderingChoiceList>
+                    {this.renderOrderSelection(response)}
+                  </OrderingChoiceList>
+                </ItemOption>
+                {advancedScoring
+                  ? (
+                    <ItemOption className="score" label="Score">
+                      <div className="input-group">
+                        <input
+                          type="number"
+                          className="form-control input-sm form-control-sm"
+                          disabled={!this.props.editMode}
+                          value={response.score}
+                          onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
                         />
-                    </div>
-                  </ItemOption>
-                )
-                : (null)
-              }
-            </ItemOptions>,
-          ]} />
+                      </div>
+                    </ItemOption>
+                  )
+                  : (null)
+                }
+              </ItemOptions>,
+            ]}>
+            <ConditionalBranchSelect
+              editMode={editMode}
+              branch={feedback.lang}
+              onChange={lang => this.onResponseEdit(
+                response.with({
+                  feedback: response.feedback.set(feedback.guid, feedback.with({ lang })),
+                }),
+                null)}
+              questions={branchingQuestions}
+            />
+          </InputListItem>
         );
       });
   }
 
   renderDefaultResponse = () => {
-    const { partModel, itemModel, context, services, advancedScoring, editMode } = this.props;
+    const { partModel, itemModel, context, services, advancedScoring, editMode,
+      branchingQuestions } = this.props;
 
     const choices = itemModel.choices.toArray();
+
+    // Questions with 1 choice cannot be incorrect, so don't display an incorrect feedback
+    if (choices.length <= 1) {
+      return null;
+    }
 
     if (!this.defaultFeedbackResponse) {
       const newGuid = guid();
@@ -581,6 +604,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         feedback: defaultResponseItem.feedback,
       });
     }
+    const feedback = defaultResponse.feedback.first();
 
     return (
       <InputListItem
@@ -596,8 +620,9 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         context={context}
         services={services}
         editMode={editMode}
-        body={defaultResponse.feedback.first().body}
-        onEdit={(body, source) => this.onDefaultFeedbackEdit(body, defaultFeedbackScore, source)}
+        body={feedback.body}
+        onEdit={(body, source) =>
+          this.onDefaultFeedbackEdit(body, defaultFeedbackScore, feedback.lang, source)}
         options={[
           <ItemOptions key="feedback-options">
             {choices.length > AUTOGEN_MAX_CHOICES
@@ -615,16 +640,25 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                       type="number"
                       className="form-control input-sm form-control-sm"
                       disabled={!this.props.editMode}
-                      value={defaultResponse.score}
-                      onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
-                      />
+                      value={defaultFeedbackScore}
+                      onChange={({ target: { value } }) =>
+                        this.onDefaultFeedbackEdit(feedback.body, value, feedback.lang, null)}
+                    />
                   </div>
                 </ItemOption>
               )
               : (null)
             }
           </ItemOptions>,
-        ]} />
+        ]}>
+        <ConditionalBranchSelect
+          editMode={editMode}
+          branch={feedback.lang}
+          onChange={lang =>
+            this.onDefaultFeedbackEdit(feedback.body, defaultFeedbackScore, lang, null)}
+          questions={branchingQuestions}
+        />
+      </InputListItem>
     );
   }
 

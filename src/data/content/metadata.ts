@@ -9,7 +9,7 @@ export type MetaDataParams = {
 };
 
 export class MetaData extends Immutable.Record({
-  contentType: 'MetaData',authors: '', license: '', copyright: '', keywords: '',
+  contentType: 'MetaData', authors: '', license: '', copyright: '', keywords: '',
 }) {
 
   contentType: 'MetaData';
@@ -26,7 +26,7 @@ export class MetaData extends Immutable.Record({
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object) : MetaData {
+  static fromPersistence(root: Object): MetaData {
     const a = (root as any);
     let model = new MetaData();
     if (!isNullOrUndefined(a.authors)) {
@@ -44,7 +44,7 @@ export class MetaData extends Immutable.Record({
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       authors: this.authors,
       license: this.license,

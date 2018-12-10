@@ -19,6 +19,9 @@ import {
 import { getQueryVariableFromString } from 'utils/params';
 import './YouTube.scss';
 
+import './Media.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
   onShowSidebar: () => void;
   onDiscover: (id: DiscoverableId) => void;
@@ -39,10 +42,6 @@ export default class YouTubeEditor
     this.onControlEdit = this.onControlEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps) {
-    return nextProps.model !== this.props.model;
-  }
-
   onSrcEdit(src: string) {
     let videoSrc;
 
@@ -61,7 +60,6 @@ export default class YouTubeEditor
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }), src);
   }
-
 
   onControlEdit() {
     const controls = !this.props.model.controls;
@@ -148,6 +146,13 @@ export default class YouTubeEditor
     return (
       <div className="youtubeEditor">
         <iframe src={fullSrc} height={height} width={width} />
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
       </div>
     );
   }

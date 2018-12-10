@@ -21,6 +21,9 @@ import { Details } from 'editors/document/org/Details';
 import { LabelsEditor } from 'editors/content/org/LabelsEditor';
 import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
+import { containsUnitsOnly } from './utils';
+import { ModalMessage } from 'utils/ModalMessage';
+import * as Messages from 'types/messages';
 
 import './OrgEditor.scss';
 
@@ -29,6 +32,39 @@ function isNumberedNodeType(node: any) {
     || node.contentType === contentTypes.OrganizationContentTypes.Module
     || node.contentType === contentTypes.OrganizationContentTypes.Section
     || node.contentType === contentTypes.OrganizationContentTypes.Sequence);
+}
+
+const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
+  + ' information in the OLI Learning Dashboard.  Therefore it is recommended that a one-level'
+  + ' organization use modules instead of units to organize course material.';
+
+function buildMoreInfoAction(display, dismiss) {
+  const moreInfoAction = {
+    label: 'More Info',
+    execute: (message: Messages.Message, dispatch) => {
+      display(
+        <ModalMessage onCancel={dismiss}>{moreInfoText}</ModalMessage>);
+    },
+  };
+  return moreInfoAction;
+}
+
+const content = new Messages.TitledContent().with({
+  title: 'No modules.',
+  message: 'Organizations without modules have learning dashboard limitations in OLI',
+});
+
+function buildUnitsMessage(display, dismiss) {
+
+  return new Messages.Message().with({
+    content,
+    guid: 'UnitsOnly',
+    scope: Messages.Scope.Resource,
+    severity: Messages.Severity.Warning,
+    canUserDismiss: false,
+    actions: Immutable.List([buildMoreInfoAction(display, dismiss)]),
+  });
+
 }
 
 function calculatePositionsAtLevel(
@@ -113,6 +149,10 @@ function identifyNewNodes(last: string[], current: string[]): string[] {
 
 export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
   onUpdateTitle: (title: Title) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
+  dismissModal: () => void;
+  displayModal: (c) => void;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: (documentId: string) => void;
@@ -136,6 +176,8 @@ interface OrgEditorState extends AbstractEditorState {
 class OrgEditor extends AbstractEditor<models.OrganizationModel,
   OrgEditorProps,
   OrgEditorState>  {
+
+  unitsMessageDisplayed: boolean;
   pendingHighlightedNodes: Immutable.Set<string>;
   positionsAtLevel: Object;
   allNodeIds: string[];
@@ -148,6 +190,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       highlightedNodes: Immutable.Set<string>(),
     } as OrgEditorState));
 
+    this.unitsMessageDisplayed = false;
     this.onLabelsEdit = this.onLabelsEdit.bind(this);
     this.onNodeEdit = this.onNodeEdit.bind(this);
     this.onAddSequence = this.onAddSequence.bind(this);
@@ -165,6 +208,22 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
     if (hasMissingResource(props.model, props.context.courseModel)) {
       props.services.refreshCourse(props.context.courseId);
+    }
+
+    this.updateUnitsMessage(props);
+  }
+
+  updateUnitsMessage(props: OrgEditorProps) {
+
+    const containsOnly = containsUnitsOnly(props.model);
+
+    if (this.unitsMessageDisplayed && !containsOnly) {
+      this.unitsMessageDisplayed = false;
+      props.dismissMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
+
+    } else if (!this.unitsMessageDisplayed && containsOnly) {
+      this.unitsMessageDisplayed = true;
+      props.showMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
     }
   }
 
@@ -222,6 +281,9 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   componentWillReceiveProps(nextProps) {
 
     if (this.props.model !== nextProps.model) {
+
+      this.updateUnitsMessage(nextProps);
+
       // Recalculate the position of the nodes ad each level. Doing this here
       // avoids having to do this on ever render.
 

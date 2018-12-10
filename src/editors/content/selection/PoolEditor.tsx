@@ -6,6 +6,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { QuestionEditor } from 'editors/content/question/QuestionEditor';
 import { Skill } from 'types/course';
+import { Maybe } from 'tsmonad';
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
   onRemove: (guid: string) => void;
@@ -16,7 +17,6 @@ export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool>
 export interface PoolState {
 
 }
-
 
 /**
  * The content editor for HtmlContent.
@@ -43,7 +43,6 @@ export class PoolEditor
     }
 
   }
-
 
   onReorderNode(id, index) {
 
@@ -78,7 +77,6 @@ export class PoolEditor
 
   }
 
-
   canAcceptId(id) {
     return this.props.model.questions.get(id) !== undefined;
   }
@@ -104,14 +102,15 @@ export class PoolEditor
 
   renderQuestion(question: contentTypes.Question) {
     return <QuestionEditor
-             key={question.guid}
-             {...this.props}
-             isQuestionPool={false}
-             model={question}
-             onEdit={this.onEditQuestion}
-             canRemove={true}
-             onRemove={this.onRemoveQuestion}
-           />;
+      key={question.guid}
+      {...this.props}
+      isQuestionPool={false}
+      model={question}
+      onEdit={this.onEditQuestion}
+      canRemove={true}
+      onRemove={this.onRemoveQuestion}
+      branchingQuestions={Maybe.nothing()}
+    />;
   }
 
   renderSidebar() {
@@ -121,7 +120,7 @@ export class PoolEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     return (
       <div>
@@ -131,4 +130,3 @@ export class PoolEditor
   }
 
 }
-

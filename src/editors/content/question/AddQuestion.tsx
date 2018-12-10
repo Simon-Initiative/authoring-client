@@ -198,35 +198,35 @@ export class AddQuestion
       })),
       targetArea: new TableTargetArea().with({
         rows: Immutable.List<Row>([new Row().with({
-            isHeader: true,
-            cells: Immutable.List<Cell>([
-              new Cell().with({
-                text: 'Header 1',
-              }),
-              new Cell().with({
-                text: 'Header 2',
-              }),
-              new Cell().with({
-                text: 'Header 3',
-              }),
-            ]),
-          })])
+          isHeader: true,
+          cells: Immutable.List<Cell>([
+            new Cell().with({
+              text: 'Header 1',
+            }),
+            new Cell().with({
+              text: 'Header 2',
+            }),
+            new Cell().with({
+              text: 'Header 3',
+            }),
+          ]),
+        })])
           .concat([new Row(), new Row(), new Row()].reduce(
-          (accRows, newRow) => accRows.push(newRow.with({
-            cells: Immutable.List<Cell>([
-              new Cell().with({
-                target: Maybe.just(guid()),
-              }),
-              new Cell().with({
-                text: 'Enter text or set as drop target',
-              }),
-              new Cell().with({
-                text: 'Enter text or set as drop target',
-              }),
-            ]),
-          })),
-          Immutable.List<Row>(),
-        )).toList(),
+            (accRows, newRow) => accRows.push(newRow.with({
+              cells: Immutable.List<Cell>([
+                new Cell().with({
+                  target: Maybe.just(guid()),
+                }),
+                new Cell().with({
+                  text: 'Enter text or set as drop target',
+                }),
+                new Cell().with({
+                  text: 'Enter text or set as drop target',
+                }),
+              ]),
+            })),
+            Immutable.List<Row>(),
+          )).toList(),
       }),
     });
 
@@ -347,7 +347,7 @@ export class AddQuestion
 
     const imageHotSpotOrNot = !this.props.isSummative
       ? <a onClick={this.onAddImageHotspot}
-          className="dropdown-item">Image Hotspot</a>
+        className="dropdown-item">Image Hotspot</a>
       : null;
 
     return (

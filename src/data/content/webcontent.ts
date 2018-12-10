@@ -9,7 +9,7 @@ export type WebContentParams = {
 };
 
 export class WebContent extends Immutable.Record({
-  contentType: 'WebContent',rev:0, guid: '', fileNode: new FileNode(),
+  contentType: 'WebContent', rev: 0, guid: '', fileNode: new FileNode(),
 }) {
 
   contentType: 'WebContent';
@@ -26,14 +26,14 @@ export class WebContent extends Immutable.Record({
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object) : WebContent {
+  static fromPersistence(root: Object): WebContent {
     const a = (root as any);
     return new WebContent({
-      rev: a.rev, guid: a.guid, type:a.type, fileNode: FileNode.fromPersistence(a.fileNode),
+      rev: a.rev, guid: a.guid, type: a.type, fileNode: FileNode.fromPersistence(a.fileNode),
     });
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       rev: this.rev,
       guid: this.guid,

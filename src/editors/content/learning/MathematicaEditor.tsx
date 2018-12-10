@@ -14,6 +14,7 @@ import { selectFile } from 'editors/content/learning/file';
 import { PurposeTypes } from 'data/content/learning/common';
 import { Select } from 'editors/content/common/controls';
 import { Maybe } from 'tsmonad';
+import { ContentElements } from 'data/content/common/elements';
 
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import {
@@ -21,6 +22,7 @@ import {
 } from 'components/common/Discoverable.controller';
 
 import './Media.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 export interface MathematicaProps extends AbstractContentEditorProps<MathematicaType> {
   onShowSidebar: () => void;
@@ -39,8 +41,13 @@ export default class MathematicaEditor
 
     this.onSelect = this.onSelect.bind(this);
     this.onPurposeChange = this.onPurposeChange.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
   }
 
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }), src);
+  }
 
   onPurposeChange(purpose) {
     const model = this.props.model.with({
@@ -159,6 +166,14 @@ export default class MathematicaEditor
       <div className="mediaEditor">
         <div className="mediaHeader">Mathematica</div>
         <span className="mediaLabel">Source File:</span> {file}
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
+
       </div>
     );
   }

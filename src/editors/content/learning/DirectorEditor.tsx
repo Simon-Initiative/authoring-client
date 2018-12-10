@@ -14,13 +14,15 @@ import { selectFile } from 'editors/content/learning/file';
 import { PurposeTypes } from 'data/content/learning/common';
 import { Select } from 'editors/content/common/controls';
 import { Maybe } from 'tsmonad';
+import { ContentElements } from 'data/content/common/elements';
+
+import './Media.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import {
   DiscoverableId,
 } from 'components/common/Discoverable.controller';
-
-import './Media.scss';
 
 export interface DirectorProps extends AbstractContentEditorProps<DirectorType> {
   onShowSidebar: () => void;
@@ -39,8 +41,13 @@ export default class DirectorEditor
 
     this.onSelect = this.onSelect.bind(this);
     this.onPurposeChange = this.onPurposeChange.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
   }
 
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }), src);
+  }
 
   onPurposeChange(purpose) {
     const model = this.props.model.with({
@@ -159,6 +166,13 @@ export default class DirectorEditor
       <div className="mediaEditor">
         <div className="mediaHeader">Director</div>
         <span className="mediaLabel">Source File:</span> {file}
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
       </div>
     );
   }

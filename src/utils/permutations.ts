@@ -16,7 +16,7 @@ const perm = (labels) => {
 
   for (let i = 0; i < labels.length; i = i + 1) {
 
-    const rest = perm(labels.slice(0,i).concat(labels.slice(i + 1)));
+    const rest = perm(labels.slice(0, i).concat(labels.slice(i + 1)));
 
     if (!rest.length) {
       ret.push([labels[i]]);

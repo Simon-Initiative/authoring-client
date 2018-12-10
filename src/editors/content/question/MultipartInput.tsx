@@ -19,7 +19,6 @@ import { Badge } from '../common/Badge';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
 
-
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
 export interface MultipartInputProps
@@ -86,8 +85,9 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             const updated = (c as contentTypes.ContiguousText).insertEntity(
               EntityTypes.input_ref, false, data, selection, backingText);
 
-            result = [this.props.model.body.with({ content:
-              this.props.model.body.content.set(updated.guid, updated),
+            result = [this.props.model.body.with({
+              content:
+                this.props.model.body.content.set(updated.guid, updated),
             }), input];
 
             this.props.setActiveItemIdActionAction(input);
@@ -99,7 +99,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     return result;
   }
 
-  buildPartWithInitialResponse(match: string, input) : contentTypes.Part {
+  buildPartWithInitialResponse(match: string, input): contentTypes.Part {
 
     const correctFeedback = contentTypes.Feedback.fromText('Correct!', guid());
     const correctResponse = new contentTypes.Response().with({
@@ -173,7 +173,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   setFirstItemActive = () => {
     const { model, setActiveItemIdActionAction } = this.props;
 
-    const firstItem  = model.items.first();
+    const firstItem = model.items.first();
     if (firstItem && firstItem.contentType !== 'Unsupported') {
       setActiveItemIdActionAction(firstItem.id);
     } else {
@@ -215,7 +215,6 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       setActiveItemIdActionAction,
     } = this.props;
 
-
     const onEntitySelected = (key: string, data: Object) => {
       setActiveItemIdActionAction(data['@input']);
     };
@@ -233,21 +232,21 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     return (
       <div className="question-body" key="question">
         <div className="control insert-item">
-            <span>Insert:</span>
-            <button className="btn btn-sm btn-link" type="button"
-              disabled={!this.props.editMode || !canInsertAnotherPart('Numeric')}
-              onClick={() => this.onInsertNumeric(canInsertAnotherPart)}>
-              Numeric
+          <span>Insert:</span>
+          <button className="btn btn-sm btn-link" type="button"
+            disabled={!this.props.editMode || !canInsertAnotherPart('Numeric')}
+            onClick={() => this.onInsertNumeric(canInsertAnotherPart)}>
+            Numeric
             </button>
-            <button className="btn btn-sm btn-link" type="button"
-              disabled={!this.props.editMode || !canInsertAnotherPart('Text')}
-              onClick={() => this.onInsertText(canInsertAnotherPart)}>
-              Text
+          <button className="btn btn-sm btn-link" type="button"
+            disabled={!this.props.editMode || !canInsertAnotherPart('Text')}
+            onClick={() => this.onInsertText(canInsertAnotherPart)}>
+            Text
             </button>
-            <button className="btn btn-sm btn-link" type="button"
-              disabled={!this.props.editMode || !canInsertAnotherPart('FillInTheBlank')}
-              onClick={() => this.onInsertFillInTheBlank(canInsertAnotherPart)}>
-              Dropdown
+          <button className="btn btn-sm btn-link" type="button"
+            disabled={!this.props.editMode || !canInsertAnotherPart('FillInTheBlank')}
+            onClick={() => this.onInsertFillInTheBlank(canInsertAnotherPart)}>
+            Dropdown
             </button>
 
         </div>
@@ -303,6 +302,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               onBlur={props.onBlur}
               itemModel={item}
               partModel={part}
+              branchingQuestions={this.props.branchingQuestions}
               onEdit={props.onEdit} />
           );
         case 'Numeric':
@@ -320,6 +320,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               onBlur={props.onBlur}
               itemModel={item}
               partModel={part}
+              branchingQuestions={this.props.branchingQuestions}
               onEdit={props.onEdit} />
           );
         case 'Text':
@@ -337,6 +338,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               onBlur={props.onBlur}
               itemModel={item}
               partModel={part}
+              branchingQuestions={this.props.branchingQuestions}
               onEdit={props.onEdit} />
           );
       }
@@ -344,8 +346,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
     const renderSkillsLabel = (part: contentTypes.Part) => (
       <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
-          {part.skills.size}
-        </Badge>
+        {part.skills.size}
+      </Badge>
       </span>
     );
 
@@ -367,10 +369,10 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
                 ]}
                 controls={[
                   <Button
-                      type="link"
-                      className="btn-remove"
-                      editMode={editMode}
-                      onClick={() => this.onRemove(item, parts[index])}>
+                    type="link"
+                    className="btn-remove"
+                    editMode={editMode}
+                    onClick={() => this.onRemove(item, parts[index])}>
                     <i className="fa fa-trash" /> Remove Item
                   </Button>,
                 ]}>

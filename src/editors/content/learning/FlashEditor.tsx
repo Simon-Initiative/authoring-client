@@ -45,13 +45,18 @@ export default class FlashEditor
     this.onSelect = this.onSelect.bind(this);
     this.onPurposeChange = this.onPurposeChange.bind(this);
     this.onLoggingToggle = this.onLoggingToggle.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
+  }
+
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
   onLoggingToggle() {
     const model = this.props.model.with({ logging: !this.props.model.logging });
     this.props.onEdit(model, model);
   }
-
 
   onPurposeChange(purpose) {
     const model = this.props.model.with({
@@ -201,7 +206,6 @@ export default class FlashEditor
     this.props.onEdit(model, src);
   }
 
-
   renderParameters() {
 
     if (this.props.model.params.size === 0) {
@@ -233,6 +237,13 @@ export default class FlashEditor
 
         <div>
           <span className="mediaLabel">Source File:</span> {file}
+        </div>
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
         </div>
 
         <span className="mediaLabel">Parameters:</span>

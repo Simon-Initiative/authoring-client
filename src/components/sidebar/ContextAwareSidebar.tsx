@@ -28,6 +28,9 @@ import { relativeToNow, adjustForSkew } from 'utils/date';
 import { Tooltip } from 'utils/tooltip';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Button } from 'editors/content/common/Button';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import ModalPrompt from 'utils/selection/ModalPrompt';
+import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 
 interface SidebarRowProps {
   label?: string;
@@ -130,7 +133,7 @@ export interface ContextAwareSidebarProps {
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
-  onSetCurrentPage: (documentId: string, pageId: string) => void;
+  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   timeSkewInMs: number;
@@ -153,18 +156,19 @@ export class ContextAwareSidebar
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
+    this.onToggleBranching = this.onToggleBranching.bind(this);
   }
 
   onRemovePage(page: contentTypes.Page) {
-    const { context, model, onEditModel, onSetCurrentPage } = this.props;
+    const { context, model, onEditModel, onSetCurrentNodeOrPage, currentPage } = this.props;
     const assessmentModel = model as AssessmentModel;
 
     if (assessmentModel.pages.size > 1) {
       const guid = page.guid;
       const removed = assessmentModel.with({ pages: assessmentModel.pages.delete(guid) });
 
-      if (guid === this.props.currentPage) {
-        onSetCurrentPage(context.documentId, removed.pages.first().guid);
+      if (guid === currentPage) {
+        onSetCurrentNodeOrPage(context.documentId, removed.pages.last().guid);
       }
 
       onEditModel(removed);
@@ -199,6 +203,37 @@ export class ContextAwareSidebar
     );
   }
 
+  onToggleBranching() {
+    const { model, onEditModel, onDisplayModal, onDismissModal } = this.props;
+
+    const toggleBranching = (model: AssessmentModel) => onEditModel(model);
+
+    const assessmentModel = model as AssessmentModel;
+    const newModel = assessmentModel.with({
+      branching: !assessmentModel.branching,
+    });
+
+    if (!assessmentModel.branching) {
+      onDisplayModal(
+        <ModalPrompt
+          text={'Branching assessments allow you to conditionally show or hide questions based \
+          on a students\' responses.\n\nDo you want to convert this into a branching assessment? \
+          The assessment will need to be restructured if reverted back into a normal assessment.'}
+          onInsert={() => {
+            toggleBranching(splitQuestionsIntoPages(newModel));
+            onDismissModal();
+          }}
+          onCancel={() => onDismissModal()}
+          okLabel="Yes"
+          okClassName="primary"
+          cancelLabel="No"
+        />,
+      );
+    } else {
+      toggleBranching(newModel);
+    }
+  }
+
   showDeleteModal = () => {
     this.props.onDisplayModal(
       <DeleteResourceModal
@@ -209,7 +244,7 @@ export class ContextAwareSidebar
 
   renderPageDetails() {
     const {
-      model, resource, editMode, currentPage, onSetCurrentPage,
+      model, resource, editMode, currentPage, onSetCurrentNodeOrPage,
       onEditModel, classes,
     } = this.props;
 
@@ -278,27 +313,31 @@ export class ContextAwareSidebar
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
-            <SidebarGroup label="Pages">
-              <SidebarRow>
-                <PageSelection
-                  {...this.props}
-                  onFocus={() => { }}
-                  onRemove={this.onRemovePage}
-                  editMode={editMode}
-                  pages={model.pages}
-                  current={model.pages.get(currentPage)}
-                  onChangeCurrent={(newPage) => {
-                    onSetCurrentPage(this.props.context.documentId, newPage);
-                  }}
-                  onEdit={this.onPageEdit} />
-                <Button
-                  editMode={editMode}
-                  type="secondary" className="btn btn-sm"
-                  onClick={this.onAddPage}>
-                  Add Page
+            {/* Branching assessments require a specific page structuring,
+            so they cannot be modified by the user */}
+            {model.branching
+              ? null
+              : <SidebarGroup label="Pages">
+                <SidebarRow>
+                  <PageSelection
+                    {...this.props}
+                    onFocus={() => { }}
+                    onRemove={this.onRemovePage}
+                    editMode={editMode}
+                    pages={model.pages}
+                    current={model.pages.get(currentPage)}
+                    onChangeCurrent={(newPage) => {
+                      onSetCurrentNodeOrPage(this.props.context.documentId, newPage);
+                    }}
+                    onEdit={this.onPageEdit} />
+                  <Button
+                    editMode={editMode}
+                    type="secondary" className="btn btn-sm"
+                    onClick={this.onAddPage}>
+                    Add Page
                 </Button>
-              </SidebarRow>
-            </SidebarGroup>
+                </SidebarRow>
+              </SidebarGroup>}
             {model.type === LegacyTypes.assessment2 &&
               <SidebarGroup label="Learning">
                 <SidebarRow label="Recommended Attempts">
@@ -356,6 +395,11 @@ export class ContextAwareSidebar
             }
             <SidebarGroup label="Advanced">
               <SidebarRow>
+                <ToggleSwitch
+                  checked={model.branching}
+                  label="Branching Assessment"
+                  onClick={this.onToggleBranching} />
+                <p></p>
                 <Button
                   className={classes.deleteButton}
                   onClick={this.showDeleteModal}

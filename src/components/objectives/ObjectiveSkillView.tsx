@@ -10,10 +10,9 @@ import { AppServices, DispatchBasedServices } from 'editors/common/AppServices';
 import * as viewActions from 'actions/view';
 import { DuplicateListingInput } from 'components/objectives/DuplicateListingInput';
 import guid from 'utils/guid';
-import { RowType } from 'components/objectives/types';
 import { buildReadOnlyMessage } from 'utils/lock';
 import { buildPersistenceFailureMessage } from 'utils/error';
-
+import { LoadingSpinner } from 'components/common/LoadingSpinner.tsx';
 import { ExistingSkillSelection } from 'components/objectives/ExistingSkillSelection';
 import {
   AggregateModel, buildAggregateModel, UnifiedObjectivesModel,
@@ -21,7 +20,8 @@ import {
 } from 'components/objectives/persistence';
 import * as Messages from 'types/messages';
 import { UserState } from 'reducers/user';
-import { Row } from 'components/objectives/Row';
+import { Objective } from 'components/objectives/Objective';
+import { QuestionRef } from 'components/objectives/utils';
 
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
 import { LearningObjectivesModel } from 'data/models/objective';
@@ -35,6 +35,111 @@ import { LegacyTypes } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
+import SearchBar from 'components/common/SearchBar';
+import { Edge } from 'types/edge';
+
+const getQuestionRefFromPathInfo = (
+  pathItem, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
+  // base case: if this pathItem is a question, return the QuestionRef
+  switch (pathItem.name) {
+    case 'essay':
+      return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
+        id: pathItem['@id'],
+        title: pathItem.title
+          ? Maybe.just(pathItem.title) : Maybe.nothing(),
+        type: 'essay',
+        assessmentType,
+        assessmentId,
+      });
+    case 'short_answer':
+      return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
+        id: pathItem['@id'],
+        title: pathItem.title
+          ? Maybe.just(pathItem.title) : Maybe.nothing(),
+        type: 'short_answer',
+        assessmentType,
+        assessmentId,
+      });
+    case 'fill_in_the_blank':
+      return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
+        id: pathItem['@id'],
+        title: pathItem.title
+          ? Maybe.just(pathItem.title) : Maybe.nothing(),
+        type: 'fill_in_the_blank',
+        assessmentType,
+        assessmentId,
+      });
+    case 'image_hotspot':
+      return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
+        id: pathItem['@id'],
+        title: pathItem.title
+          ? Maybe.just(pathItem.title) : Maybe.nothing(),
+        type: 'image_hotspot',
+        assessmentType,
+        assessmentId,
+      });
+    case 'multiple_choice':
+      return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
+        id: pathItem['@id'],
+        title: pathItem.title
+          ? Maybe.just(pathItem.title) : Maybe.nothing(),
+        type: 'multiple_choice',
+        assessmentType,
+        assessmentId,
+      });
+    case 'numeric':
+      return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
+        id: pathItem['@id'],
+        title: pathItem.title
+          ? Maybe.just(pathItem.title) : Maybe.nothing(),
+        type: 'numeric',
+        assessmentType,
+        assessmentId,
+      });
+    case 'ordering':
+      return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
+        id: pathItem['@id'],
+        title: pathItem.title
+          ? Maybe.just(pathItem.title) : Maybe.nothing(),
+        type: 'ordering',
+        assessmentType,
+        assessmentId,
+      });
+    case 'question':
+      return Maybe.just({
+        key: `${assessmentId}:${pathItem['@id']}`,
+        id: pathItem['@id'],
+        title: pathItem.title
+          ? Maybe.just(pathItem.title) : Maybe.nothing(),
+        type: 'question',
+        assessmentType,
+        assessmentId,
+      });
+    default:
+      break;
+  }
+
+  // item is not a question, recurse on parent if it exists
+  if (pathItem.parent) {
+    return getQuestionRefFromPathInfo(pathItem.parent, assessmentType, assessmentId);
+  }
+
+  // no parent exists. this is the end of the path and a question has not been found
+  return Maybe.nothing();
+};
+
+const getQuestionRefFromSkillEdge = (
+  edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
+  return getQuestionRefFromPathInfo(
+    edge.metadata.jsonObject.pathInfo, assessmentType, assessmentId);
+};
 
 export interface ObjectiveSkillViewProps {
   userName: string;
@@ -61,8 +166,15 @@ interface ObjectiveSkillViewState {
   aggregateModel: AggregateModel;
   skills: UnifiedSkillsModel;
   objectives: UnifiedObjectivesModel;
+  filteredObjectives: Maybe<Immutable.OrderedMap<string, contentTypes.LearningObjective>>;
+  overrideExpanded: boolean;
   isSavePending: boolean;
   loading: boolean;
+  skillFormativeRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
+  skillSummativeRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
+  skillPoolRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
+  skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
+  searchText: string;
 }
 
 // The Learning Objectives and Skills documents require specialized handling
@@ -89,8 +201,15 @@ export class ObjectiveSkillView
       aggregateModel: null,
       skills: null,
       objectives: null,
+      filteredObjectives: Maybe.nothing(),
+      overrideExpanded: false,
       isSavePending: false,
       loading: false,
+      skillFormativeRefs: Maybe.nothing(),
+      skillSummativeRefs: Maybe.nothing(),
+      skillPoolRefs: Maybe.nothing(),
+      skillQuestionRefs: Maybe.nothing(),
+      searchText: '',
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
@@ -98,7 +217,6 @@ export class ObjectiveSkillView
     this.createNew = this.createNew.bind(this);
     this.onObjectiveEdit = this.onObjectiveEdit.bind(this);
     this.onSkillEdit = this.onSkillEdit.bind(this);
-    this.onRemove = this.onRemove.bind(this);
     this.onAddNewSkill = this.onAddNewSkill.bind(this);
     this.onAddExistingSkill = this.onAddExistingSkill.bind(this);
     this.onToggleExpanded = this.onToggleExpanded.bind(this);
@@ -112,12 +230,9 @@ export class ObjectiveSkillView
   }
 
   componentDidMount() {
-    // If node expansion state has not been set by the user, expand all nodes as a default state
-    this.buildModels().then((_) => {
-      this.props.expanded.has('objectives')
-        ? null
-        : this.expandAllObjectives();
-    });
+    this.buildModels();
+
+    this.fetchAllRefs();
   }
 
   componentWillUnmount() {
@@ -133,6 +248,142 @@ export class ObjectiveSkillView
       ]);
 
     }
+  }
+
+  fetchAllRefs() {
+    const { course, skills } = this.props;
+
+    // fetch all formative assessment edges to build skill-formative refs map
+    const fetchFormativeRefs = persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.inline,
+    }).then((edges) => {
+      return {
+        skillFormativeRefs: skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<string>()).concat(
+              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                .map(edge => edge.sourceId.split(':')[2]),
+            ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<string>>(),
+        ),
+        skillFormativeQuestionRefs: skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<QuestionRef>())
+              .concat(
+                edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                  .map(edge =>
+                    getQuestionRefFromSkillEdge(
+                      edge, LegacyTypes.inline, edge.sourceId.split(':')[2]))
+                  .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
+                    just: ref => true,
+                    nothing: () => false,
+                  }))
+                  .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
+              ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<QuestionRef>>(),
+        ),
+      };
+    });
+
+    // fetch all summative assessment edges to build skill-summative refs map
+    const fetchSummativeRefs = persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.assessment2,
+    }).then((edges) => {
+      return {
+        skillSummativeRefs: skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<string>()).concat(
+              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                .map(edge => edge.sourceId.split(':')[2]),
+            ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<string>>(),
+        ),
+        skillSummativeQuestionRefs: skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<QuestionRef>())
+              .concat(
+                edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                  .map(edge => getQuestionRefFromSkillEdge(
+                    edge, LegacyTypes.assessment2, edge.sourceId.split(':')[2]))
+                  .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
+                    just: ref => true,
+                    nothing: () => false,
+                  }))
+                  .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
+              ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<QuestionRef>>(),
+        ),
+      };
+    });
+
+    // fetch all question pool assessment edges to build skill-summative refs map
+    const fetchPoolRefs = persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.assessment2_pool,
+    }).then((edges) => {
+      return {
+        skillPoolRefs: skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<string>()).concat(
+              edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                .map(edge => edge.sourceId.split(':')[2]),
+            ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<string>>(),
+        ),
+        skillPoolQuestionRefs: skills.reduce(
+          (acc, skill) => acc.set(
+            skill.id,
+            (acc.get(skill.id) || Immutable.List<QuestionRef>())
+              .concat(
+                edges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+                  .map(edge => getQuestionRefFromSkillEdge(
+                    edge, LegacyTypes.assessment2_pool, edge.sourceId.split(':')[2]))
+                  .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
+                    just: ref => true,
+                    nothing: () => false,
+                  }))
+                  .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
+              ).toList(),
+          ),
+          Immutable.Map<string, Immutable.List<QuestionRef>>(),
+        ),
+      };
+    });
+
+    Promise.all([fetchFormativeRefs, fetchSummativeRefs, fetchPoolRefs])
+      .then(([
+        { skillFormativeRefs, skillFormativeQuestionRefs },
+        { skillSummativeRefs, skillSummativeQuestionRefs },
+        { skillPoolRefs, skillPoolQuestionRefs },
+      ]) => {
+        this.setState({
+          skillFormativeRefs: Maybe.just(skillFormativeRefs),
+          skillSummativeRefs: Maybe.just(skillSummativeRefs),
+          skillPoolRefs: Maybe.just(skillPoolRefs),
+          skillQuestionRefs: Maybe.just(
+            skills.reduce(
+              (acc, skill) => acc.set(
+                skill.id,
+                Immutable.List<QuestionRef>()
+                  .concat(skillFormativeQuestionRefs.get(skill.id))
+                  .concat(skillSummativeQuestionRefs.get(skill.id))
+                  .concat(skillPoolQuestionRefs.get(skill.id))
+                  .toList(),
+              ),
+              Immutable.Map<string, Immutable.List<QuestionRef>>(),
+            ),
+          ),
+        });
+      });
   }
 
   releaseAllLocks(documents) {
@@ -402,8 +653,8 @@ export class ObjectiveSkillView
   }
 
 
-  attachSkills(model: contentTypes.LearningObjective, skillIds: string[]) {
-    const skills = Immutable.List<string>(model.skills.toArray().concat(skillIds));
+  attachSkills(model: contentTypes.LearningObjective, strings: string[]) {
+    const skills = Immutable.List<string>(model.skills.toArray().concat(strings));
     this.onObjectiveEdit(model.with({ skills }));
   }
 
@@ -416,10 +667,10 @@ export class ObjectiveSkillView
       });
   }
 
-  onExistingSkillInsert(model: contentTypes.LearningObjective, skillId: string) {
+  onExistingSkillInsert(model: contentTypes.LearningObjective, string: string) {
     this.services.dismissModal();
 
-    const updated = model.with({ skills: model.skills.concat(skillId) as Immutable.List<string> });
+    const updated = model.with({ skills: model.skills.concat(string) as Immutable.List<string> });
     this.onObjectiveEdit(updated);
   }
 
@@ -470,12 +721,6 @@ export class ObjectiveSkillView
       disableInsert={skills.size === 0} />);
 
     // Attach the skill ids to the objective and then persist that
-  }
-
-  onRemove(model: RowType) {
-    if (model.contentType === 'LearningObjective') {
-      this.removeObjective(model);
-    }
   }
 
   detachSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
@@ -697,6 +942,11 @@ export class ObjectiveSkillView
   }
 
   onToggleExpanded(guid) {
+    const { overrideExpanded } = this.state;
+
+    // if overrideExpanded is enabled, disable toggle expanded
+    if (overrideExpanded) return;
+
     let action = null;
     if (this.props.expanded.has('objectives')) {
       action = this.props.expanded.get('objectives').has(guid)
@@ -726,29 +976,46 @@ export class ObjectiveSkillView
       this.props.displayModal(
         <RawContentEditor
           rawContent={r}
-          onEdit={onEdit} onCancel={onCancel}/>,
+          onEdit={onEdit} onCancel={onCancel} />,
       );
     });
 
   }
 
+  // Filter resources shown based on title and id
+  filterBySearchText(searchText: string): void {
+    const { skills } = this.props;
+    const text = searchText.trim().toLowerCase();
 
+    const filterFn = (o: contentTypes.LearningObjective): boolean =>
+      o.title.toLowerCase().includes(text)
+      || o.skills.toArray().reduce(
+        (acc, s) => acc || (skills.has(s) && skills.get(s).title.toLowerCase().includes(text)),
+        false,
+      );
+
+    // searchText state is used for highlighting matches, and resources state creates
+    // one row in the table for each resource present
+    this.setState({
+      searchText,
+      filteredObjectives: searchText === ''
+        ? Maybe.nothing<Immutable.OrderedMap<string, contentTypes.LearningObjective>>()
+        : Maybe.just(this.state.objectives.objectives.filter(filterFn).toOrderedMap()),
+      overrideExpanded: searchText === '' ? false : true,
+    });
+  }
 
   renderObjectives() {
-    const { course } = this.props;
+    const {
+      skillFormativeRefs, skillSummativeRefs, skillPoolRefs, overrideExpanded, searchText,
+      skillQuestionRefs,
+    } = this.state;
 
     const rows = [];
 
-    const skillsById = this.state.skills.skills
-      .toArray()
-      .reduce(
-        (map, skill) => {
-          map[skill.id] = skill;
-          return map;
-        },
-        {});
-
     const isExpanded = (guid) => {
+      if (overrideExpanded) return true;
+
       if (this.props.expanded.has('objectives')) {
         const set = this.props.expanded.get('objectives');
         return set.includes(guid);
@@ -757,57 +1024,39 @@ export class ObjectiveSkillView
       return false;
     };
 
-    this.state.objectives.objectives
+    const objectives = this.state.filteredObjectives.caseOf({
+      just: fos => fos,
+      nothing: () => this.state.objectives.objectives,
+    });
+
+    objectives
       .toArray()
       .forEach((objective: contentTypes.LearningObjective) => {
 
-        rows.push(<Row
-          key={objective.id}
-          onAddExistingSkill={this.onAddExistingSkill}
-          onRemove={this.onRemove}
-          onAddNewSkill={this.onAddNewSkill}
-          highlighted={false}
-          onBeginExternalEdit={this.onBeginExternalEdit}
-          model={objective}
-          title={objective.title}
-          isExpanded={isExpanded(objective.id)}
-          toggleExpanded={this.onToggleExpanded}
-          editMode={course.editable && this.state.aggregateModel.isLocked
-            && !this.state.isSavePending}
-          onEdit={this.onObjectiveEdit}
-          loading={this.state.loading} />);
-
-        if (isExpanded(objective.id)) {
-
-          objective.skills.forEach((skillId) => {
-
-            const skill = skillsById[skillId];
-            if (skill !== undefined) {
-
-              const title = this.props.skills.has(skill.id)
-                ? this.props.skills.get(skill.id).title
-                : 'Loading...';
-
-              rows.push(<Row
-                key={objective.id + '-' + skill.id}
-                onAddExistingSkill={this.onAddExistingSkill}
-                onAddNewSkill={this.onAddNewSkill}
-                onRemove={this.removeSkill.bind(this, objective)}
-                highlighted={false}
-                onBeginExternalEdit={this.onBeginExternalEdit}
-                model={skill}
-                title={title}
-                isExpanded={false}
-                toggleExpanded={this.onToggleExpanded}
-                editMode={course.editable && this.state.aggregateModel.isLocked
-                  && !this.state.isSavePending}
-                onEdit={this.onSkillEdit}
-                loading={this.state.loading} />);
-            }
-          });
-        }
-
-
+        rows.push(
+          <Objective
+            key={objective.id}
+            course={this.props.course}
+            onAddExistingSkill={this.onAddExistingSkill}
+            onRemove={obj => this.removeObjective(obj)}
+            onRemoveSkill={skill => this.removeSkill(objective, skill)}
+            onAddNewSkill={this.onAddNewSkill}
+            onBeginExternalEdit={this.onBeginExternalEdit}
+            skillFormativeRefs={skillFormativeRefs}
+            skillSummativeRefs={skillSummativeRefs}
+            skillPoolRefs={skillPoolRefs}
+            skillQuestionRefs={skillQuestionRefs}
+            objective={objective}
+            highlightText={searchText}
+            skills={objective.skills.filter(string => this.props.skills.has(string))
+              .map(string => this.props.skills.get(string)).toList()}
+            isExpanded={isExpanded(objective.id)}
+            onToggleExpanded={this.onToggleExpanded}
+            editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
+            onEdit={this.onObjectiveEdit}
+            onEditSkill={this.onSkillEdit}
+            loading={this.state.loading} />,
+        );
       });
 
     return rows;
@@ -858,13 +1107,9 @@ export class ObjectiveSkillView
 
   renderContent() {
     return (
-      <table className="table table-sm">
-        <tbody>
-
-          {this.renderObjectives()}
-
-        </tbody>
-      </table>
+      <div className="objectives-list">
+        {this.renderObjectives()}
+      </div>
     );
   }
 
@@ -877,17 +1122,23 @@ export class ObjectiveSkillView
         : course.editable && this.state.aggregateModel.isLocked && !this.state.isSavePending;
 
     return (
-      <div className="table-toolbar input-group">
-        <div className="flex-spacer" />
-        <DuplicateListingInput
-          editMode={editable}
-          buttonLabel="Create"
-          width={600}
-          value=""
-          placeholder="New Learning Objective"
-          existing={this.state.objectives === null ? Immutable.List<string>()
-            : this.state.objectives.objectives.toList().map(o => o.title).toList()}
-          onClick={this.createNew} />
+      <div className="table-toolbar">
+        <SearchBar
+          className="inlineSearch"
+          placeholder="Search by Objective or Skill"
+          onChange={searchText => this.filterBySearchText(searchText)} />
+        <div className="input-group">
+          <div className="flex-spacer" />
+          <DuplicateListingInput
+            editMode={editable}
+            buttonLabel="Create"
+            width={400}
+            value=""
+            placeholder="New Learning Objective"
+            existing={this.state.objectives === null ? Immutable.List<string>()
+              : this.state.objectives.objectives.toList().map(o => o.title).toList()}
+            onClick={this.createNew} />
+        </div>
       </div>
     );
   }
@@ -907,7 +1158,11 @@ export class ObjectiveSkillView
   render() {
 
     const content = this.state.aggregateModel === null
-      ? <p>Loading...</p>
+      ? (
+        <div className="page-loading">
+          <LoadingSpinner message="Loading..." />
+        </div>
+      )
       : this.renderContent();
 
     return (

@@ -6,4 +6,11 @@ export const styles: JSSStyles = {
     margin: 'auto',
     width: '100%',
   },
+  caption: {
+    marginLeft: '30px',
+    width: '90%',
+  },
+  captionHeader: {
+    fontWeight: 'bold',
+  },
 };

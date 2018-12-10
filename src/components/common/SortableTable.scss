@@ -1,14 +1,32 @@
+@import "oli/colors";
+
 .customTable {
-  i {
-    color: #222;
-  }
+  background-color: white;
+  border: 1px solid #ddd;
+  color: #222;
+
   th {
     border-top: 0;
     cursor: default;
     min-width: 130px;
+    white-space: nowrap;
+    background-color: #DEDEDE;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-bottom: 2px solid #ddd;
   }
   td {
     border-top: 0;
+    overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-flow: row nowrap;
+    max-width: 400px;
+  }
+
+  tr {
+    &:nth-child(even) {
+      background-color: rgba(240, 244, 247, 0.719);
+    }
   }
 }

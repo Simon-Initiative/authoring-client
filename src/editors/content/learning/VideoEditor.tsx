@@ -19,6 +19,10 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { Source } from 'data/content/learning/source';
 import { modalActions } from 'actions/modal';
 import { selectImage } from 'editors/content/learning/ImageEditor';
+import { ContentElements } from 'data/content/common/elements';
+
+import './Media.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
   onShowSidebar: () => void;
@@ -68,6 +72,12 @@ export default class VideoEditor
     this.onTypeEdit = this.onTypeEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
     this.onSelectPoster = this.onSelectPoster.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
+  }
+
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
   onTypeEdit(type: string) {
@@ -177,6 +187,13 @@ export default class VideoEditor
     return (
       <div className="videoEditor">
         <video width={width} height={height} src={fullSrc} controls={controls} />
+        <div className="captionEditor">
+          <div className="captionHeader">Caption</div>
+          <ContentContainer
+            {...this.props}
+            onEdit={this.onCaptionEdit}
+            model={this.props.model.caption.content} />
+        </div>
       </div>
     );
   }

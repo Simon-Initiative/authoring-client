@@ -10,6 +10,13 @@ import * as Types from 'editors/common/tree/types';
 
 import { renderVisibleNodes } from 'editors/common/tree/render';
 
+export interface TreeEditDetails<NodeType extends Types.HasGuid> {
+  sourceModel: NodeType;
+  sourceParent: Maybe<NodeType>;
+  targetParent: Maybe<NodeType>;
+  originalIndex: number;
+  newIndex: number;
+}
 
 export interface TreeProps<NodeType extends Types.HasGuid> {
 
@@ -40,7 +47,7 @@ export interface TreeProps<NodeType extends Types.HasGuid> {
 
   // Function to execute to report that the tree data has been edited.
   // This likely includes removals and reorders.
-  onEdit: (nodes: Types.Nodes<NodeType>) => void;
+  onEdit: (nodes: Types.Nodes<NodeType>, editDetails: TreeEditDetails<NodeType>) => void;
 
   // Function to execute to report that the tree has changed
   // the node expansion state.
@@ -97,7 +104,15 @@ export class Tree<NodeType extends Types.HasGuid>
       targetParent.map(p => p.guid),
       id, sourceModel, adjustedIndex, removedNodes, getChildren, setChildren);
 
-    onEdit(insertedNodes);
+    const editDetails = {
+      sourceModel,
+      sourceParent,
+      targetParent,
+      originalIndex,
+      newIndex,
+    };
+
+    onEdit(insertedNodes, editDetails);
 
   }
 
@@ -106,7 +121,7 @@ export class Tree<NodeType extends Types.HasGuid>
     const { selected, nodes, editMode, canHandleDrop,
       expandedNodes, getChildren, renderNodeComponent } = this.props;
 
-    const handlers : Types.Handlers = {
+    const handlers: Types.Handlers = {
       onSelect: nodeId => this.props.onSelect(nodeId),
       onCollapse: nodeId =>
         this.props.onChangeExpansion(this.props.expandedNodes.subtract([nodeId])),
@@ -117,7 +132,7 @@ export class Tree<NodeType extends Types.HasGuid>
     // Walk the nodes of the tree in-order, rendering each node, but being
     // careful to only render nodes that are visible (i.e. their parent is
     // is in an expanded state)
-    const renderedNodes : Types.RenderedNode<NodeType>[] = renderVisibleNodes(
+    const renderedNodes: Types.RenderedNode<NodeType>[] = renderVisibleNodes(
       nodes, getChildren, renderNodeComponent, expandedNodes, Immutable.Set([selected]), handlers);
 
     // Hardcoded for now to use the div-based tree renderer.
@@ -151,9 +166,9 @@ export class Tree<NodeType extends Types.HasGuid>
         };
 
         return treeRenderer.renderNode(
-            r.nodeId, r.node,
-            nodeState,
-            r.component, dropTargets, r.indexWithinParent, editMode);
+          r.nodeId, r.node,
+          nodeState,
+          r.component, dropTargets, r.indexWithinParent, editMode);
 
       });
 
@@ -161,4 +176,3 @@ export class Tree<NodeType extends Types.HasGuid>
   }
 
 }
-

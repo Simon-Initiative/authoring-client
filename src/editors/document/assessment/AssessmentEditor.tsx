@@ -9,11 +9,15 @@ import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
 import guid from 'utils/guid';
-import { locateNextOfKin, findNodeByGuid } from 'editors/document/assessment/utils';
+import {
+  locateNextOfKin, findNodeByGuid,
+  handleBranchingReordering, handleBranchingDeletion,
+} from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
 import { AddQuestion } from 'editors/content/question/AddQuestion';
 import { renderAssessmentNode } from 'editors/document/common/questions';
-import { getChildren, Outline, setChildren } from 'editors/document/assessment/Outline';
+import { getChildren, Outline, setChildren, EditDetails }
+  from 'editors/document/assessment/Outline';
 import { updateNode, removeNode } from 'data/utils/tree';
 import { hasUnknownSkill } from 'utils/skills';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
@@ -25,7 +29,6 @@ import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
-
 import './AssessmentEditor.scss';
 import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 
@@ -40,17 +43,15 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   onUpdateHover: (hover: string) => void;
   currentPage: string;
   currentNode: contentTypes.Node;
-  onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
-  onSetCurrentPage: (documentId: string, pageId: string) => void;
+  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
   course: models.CourseModel;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
   collapseInsertPopup: boolean;
 }
-
 
 class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps,
@@ -131,7 +132,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
 
       const currentPage = this.getCurrentPage(nextProps);
-      const { activeContext, onSetCurrentNode } = this.props;
+      const { activeContext, onSetCurrentNodeOrPage } = this.props;
 
       // Handle the case that the current node has changed externally,
       // for instance, from an undo/redo
@@ -139,12 +140,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         .caseOf({
 
           just: (currentNode) => {
-            onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
+            onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), currentNode);
           },
           nothing: () => {
             locateNextOfKin(
               this.getCurrentPage(this.props).nodes, this.props.currentNode.guid).lift(node =>
-                onSetCurrentNode(
+                onSetCurrentNodeOrPage(
                   activeContext.documentId.valueOr(null), node));
           },
         });
@@ -186,7 +187,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           // We detected an addition of a question to an embedded pool
           if (questions.size > prevQuestions.size) {
-            this.props.onSetCurrentNode(
+            this.props.onSetCurrentNodeOrPage(
               this.props.activeContext.documentId.valueOr(null), questions.last());
           }
         }
@@ -196,25 +197,45 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onEditNode(guid: string, node: models.Node, src) {
 
-    const { activeContext, onSetCurrentNode } = this.props;
+    const { activeContext, onSetCurrentNodeOrPage } = this.props;
 
     const nodes = this.getCurrentPage(this.props).nodes;
 
     this.detectPoolAdditions(node, nodes);
 
-    onSetCurrentNode(activeContext.documentId.valueOr(null), node);
+    onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node);
     this.props.onUpdateContent(this.props.context.documentId, src);
 
-    this.onEditNodes(updateNode(guid, node, nodes, getChildren, setChildren));
-  }
-
-  onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
+    const updatedNodes = updateNode(guid, node, nodes, getChildren, setChildren);
 
     let page = this.getCurrentPage(this.props);
-    page = page.with({ nodes });
+    page = page.with({ nodes: updatedNodes });
 
     const pages = this.props.model.pages.set(page.guid, page);
     this.handleEdit(this.props.model.with({ pages }));
+
+  }
+
+  // This handles updates from the outline component, which are only reorders
+  onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>, editDetails: EditDetails) {
+
+    if (this.props.model.branching) {
+      const pages = handleBranchingReordering(
+        this.props.model.resource.id, this.props.model.pages, nodes);
+      this.handleEdit(this.props.model.with({ pages }));
+
+      findNodeByGuid(nodes, editDetails.sourceModel.guid).caseOf({
+        just: node => this.onSelect(node),
+        nothing: () => null,
+      });
+
+    } else {
+      let page = this.getCurrentPage(this.props);
+      page = page.with({ nodes });
+
+      const pages = this.props.model.pages.set(page.guid, page);
+      this.handleEdit(this.props.model.with({ pages }));
+    }
   }
 
   onChangeExpansion(nodes: Immutable.Set<string>) {
@@ -222,37 +243,54 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // expanded state of nodes in the outline
   }
 
-  onSelect(currentNode: contentTypes.Node) {
-    const { activeContext, onSetCurrentNode } = this.props;
+  onSelect(selectedNode: contentTypes.Node) {
+    const { activeContext, onSetCurrentNodeOrPage } = this.props;
 
-    onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
+    const documentId = activeContext.documentId.valueOr(null);
+
+    onSetCurrentNodeOrPage(documentId, selectedNode);
+  }
+
+  allNodes() {
+    return this.props.model.pages.reduce(
+      (nodes, page) => nodes.concat(page.nodes).toOrderedMap(),
+      Immutable.OrderedMap<string, contentTypes.Node>());
   }
 
   canRemoveNode() {
-    const page = this.getCurrentPage(this.props);
-
     const isQuestionOrPool = node =>
       node.contentType === 'Question' || node.contentType === 'Selection';
 
-    return page.nodes.filter(isQuestionOrPool).size > 1;
+    return this.allNodes().filter(isQuestionOrPool).size > 1;
   }
 
   onNodeRemove(guid: string) {
+    // Find the node to be removed, remove it, and set an adjacent node to be active.
+    // Branching assessments are handled as a special case since they must remove
+    // edges when a linked-to node is deleted.
 
-    let page = this.getCurrentPage(this.props);
+    const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
+    const isBranching = model.branching;
+    const currentPage = this.getCurrentPage(this.props);
+    const documentId = activeContext.documentId.valueOr(null);
 
-    const removed = removeNode(guid, page.nodes, getChildren, setChildren);
-
-    if (removed.size > 0) {
-      locateNextOfKin(page.nodes, guid).lift(node =>
-        this.props.onSetCurrentNode(
-          this.props.activeContext.documentId.valueOr(null), node));
-
-      page = page.with({ nodes: removed });
-      const pages = this.props.model.pages.set(page.guid, page);
-
-      this.handleEdit(this.props.model.with({ pages }));
+    // Prevent the last node from being removed
+    if (this.allNodes().size <= 1) {
+      return;
     }
+
+    locateNextOfKin(this.allNodes(), guid).lift((node) => {
+      onSetCurrentNodeOrPage(documentId, node);
+    });
+
+    const nodes = removeNode(guid, currentPage.nodes, getChildren, setChildren);
+    const pages = isBranching
+      ? handleBranchingDeletion(documentId, model.pages, guid)
+      : nodes.size > 0
+        ? model.pages.set(currentPage.guid, currentPage.with({ nodes }))
+        : model.pages.remove(currentPage.guid);
+
+    this.handleEdit(model.with({ pages }));
   }
 
   onAddContent() {
@@ -287,13 +325,19 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   addNode(node) {
-    let page = this.getCurrentPage(this.props);
+    const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
+
+    // Branching assessments place each question on a separate page
+    let page = model.branching
+      ? new contentTypes.Page()
+      : this.getCurrentPage(this.props);
+
     page = page.with({ nodes: page.nodes.set(node.guid, node) });
 
-    const pages = this.props.model.pages.set(page.guid, page);
+    const pages = model.pages.set(page.guid, page);
 
-    this.props.onSetCurrentNode(this.props.activeContext.documentId.valueOr(null), node);
-    this.handleEdit(this.props.model.with({ pages }));
+    onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node);
+    this.handleEdit(model.with({ pages }));
   }
 
   onRemove() {
@@ -425,8 +469,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             editMode={this.props.editMode}
             onQuestionAdd={this.addQuestion.bind(this)}
             isSummative={this.props.model.type === LegacyTypes.assessment2} />
-          <ToolbarButtonMenuDivider />
-          <a className="dropdown-item" onClick={this.onAddContent}>Supporting Content</a>
+          {/* Branching assessments must have supporting content inline */}
+          {this.props.model.branching
+            ? null
+            : <div><ToolbarButtonMenuDivider />
+              <a className="dropdown-item" onClick={this.onAddContent}>Supporting Content</a></div>}
           {questionPoolOrNothing}
           {embeddedPoolOrNothing}
         </div>
@@ -506,7 +553,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <div className="outline-container">
                 <Outline
                   editMode={this.props.editMode}
-                  nodes={page.nodes}
+                  nodes={model.branching
+                    ? this.allNodes()
+                    : page.nodes}
                   expandedNodes={expanded}
                   selected={currentNode.guid}
                   onEdit={this.onEditNodes.bind(this)}
@@ -538,4 +587,3 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 }
 
 export default AssessmentEditor;
-
