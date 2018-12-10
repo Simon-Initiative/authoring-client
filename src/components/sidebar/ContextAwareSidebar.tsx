@@ -30,6 +30,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { Button } from 'editors/content/common/Button';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import ModalPrompt from 'utils/selection/ModalPrompt';
+import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 
 interface SidebarRowProps {
   label?: string;
@@ -132,7 +133,7 @@ export interface ContextAwareSidebarProps {
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
-  onSetCurrentPage: (documentId: string, pageId: string) => void;
+  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   timeSkewInMs: number;
@@ -159,15 +160,15 @@ export class ContextAwareSidebar
   }
 
   onRemovePage(page: contentTypes.Page) {
-    const { context, model, onEditModel, onSetCurrentPage } = this.props;
+    const { context, model, onEditModel, onSetCurrentNodeOrPage, currentPage } = this.props;
     const assessmentModel = model as AssessmentModel;
 
     if (assessmentModel.pages.size > 1) {
       const guid = page.guid;
       const removed = assessmentModel.with({ pages: assessmentModel.pages.delete(guid) });
 
-      if (guid === this.props.currentPage) {
-        onSetCurrentPage(context.documentId, removed.pages.first().guid);
+      if (guid === currentPage) {
+        onSetCurrentNodeOrPage(context.documentId, removed.pages.last().guid);
       }
 
       onEditModel(removed);
@@ -204,13 +205,13 @@ export class ContextAwareSidebar
 
   onToggleBranching() {
     const { model, onEditModel, onDisplayModal, onDismissModal } = this.props;
-    const assessmentModel = model as AssessmentModel;
 
-    const toggleBranching = () => onEditModel(
-      assessmentModel.with({
-        branching: !assessmentModel.branching,
-      }),
-    );
+    const toggleBranching = (model: AssessmentModel) => onEditModel(model);
+
+    const assessmentModel = model as AssessmentModel;
+    const newModel = assessmentModel.with({
+      branching: !assessmentModel.branching,
+    });
 
     if (!assessmentModel.branching) {
       onDisplayModal(
@@ -219,7 +220,7 @@ export class ContextAwareSidebar
           on a students\' responses.\n\nDo you want to convert this into a branching assessment? \
           The assessment will need to be restructured if reverted back into a normal assessment.'}
           onInsert={() => {
-            toggleBranching();
+            toggleBranching(splitQuestionsIntoPages(newModel));
             onDismissModal();
           }}
           onCancel={() => onDismissModal()}
@@ -229,7 +230,7 @@ export class ContextAwareSidebar
         />,
       );
     } else {
-      toggleBranching();
+      toggleBranching(newModel);
     }
   }
 
@@ -243,7 +244,7 @@ export class ContextAwareSidebar
 
   renderPageDetails() {
     const {
-      model, resource, editMode, currentPage, onSetCurrentPage,
+      model, resource, editMode, currentPage, onSetCurrentNodeOrPage,
       onEditModel, classes,
     } = this.props;
 
@@ -326,7 +327,7 @@ export class ContextAwareSidebar
                     pages={model.pages}
                     current={model.pages.get(currentPage)}
                     onChangeCurrent={(newPage) => {
-                      onSetCurrentPage(this.props.context.documentId, newPage);
+                      onSetCurrentNodeOrPage(this.props.context.documentId, newPage);
                     }}
                     onEdit={this.onPageEdit} />
                   <Button

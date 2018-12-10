@@ -3,7 +3,7 @@ import { OrderedMap } from 'immutable';
 import PoolEditor from 'editors/document/pool/PoolEditor';
 import * as contentTypes from 'data/contentTypes';
 import { fetchSkills } from 'actions/skills';
-import { setCurrentNode } from 'actions/document';
+import { setCurrentNodeOrPage } from 'actions/document';
 import { Skill } from 'types/course';
 import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
 import { PoolModel, CourseModel } from 'data/models';
@@ -29,13 +29,13 @@ interface DispatchProps {
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
-  onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
+  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
 }
 
-interface OwnProps extends AbstractEditorProps<PoolModel> {}
+interface OwnProps extends AbstractEditorProps<PoolModel> { }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const { activeContext, skills, hover, course, documents } = state;
@@ -66,8 +66,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));
     },
-    onSetCurrentNode: (documentId: string, node: contentTypes.Node) => {
-      return dispatch(setCurrentNode(documentId, node));
+    onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node) => {
+      return dispatch(setCurrentNodeOrPage(documentId, nodeOrPageId));
     },
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));
