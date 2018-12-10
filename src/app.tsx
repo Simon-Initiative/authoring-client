@@ -3,11 +3,10 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as persistence from './data/persistence';
 import thunkMiddleware from 'redux-thunk';
-import { applyMiddleware, createStore, Store } from 'redux';
+import { applyMiddleware, createStore, Store, compose } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
-import { createLogger } from 'redux-logger';
 import { UserState } from './reducers/user';
 import { getQueryVariable } from './utils/params';
 import history from './utils/history';
@@ -26,13 +25,15 @@ import 'react-tippy/dist/tippy.css';
 // attach global variables to window
 (window as any).React = React;
 
-const loggerMiddleware = (createLogger as any)();
+// Redux devtool extension
+// https://github.com/zalmoxisus/redux-devtools-extension
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const nodeEnv = process.env.NODE_ENV;
 
 const middleware = nodeEnv === 'production'
   ? applyMiddleware(thunkMiddleware)
-  : applyMiddleware(thunkMiddleware, loggerMiddleware);
+  : composeEnhancers(applyMiddleware(thunkMiddleware));
 
 function initStoreWithState(state) {
   const store = createStore(

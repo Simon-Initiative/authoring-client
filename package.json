@@ -49,7 +49,6 @@
     "react-tippy": "^1.2.2",
     "reason-react": "^0.4.2",
     "redux": "^3.6.0",
-    "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.13.1",
