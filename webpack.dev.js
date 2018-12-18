@@ -21,7 +21,6 @@ module.exports = {
             'react-dom',
             'react-redux',
             'redux',
-            'redux-logger',
             'redux-thunk',
             'tsmonad',
             'whatwg-fetch'

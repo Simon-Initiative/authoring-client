@@ -26,7 +26,6 @@ module.exports = {
             'react-dom',
             'react-redux',
             'redux',
-            'redux-logger',
             'redux-thunk',
             'tsmonad',
             'whatwg-fetch'
@@ -64,41 +63,42 @@ module.exports = {
         concatenateModules: true,
     },
     plugins: [
-      new webpack.DefinePlugin({
-        'process.env': {
-            NODE_ENV: JSON.stringify('production')
-        }
-      }),
-      new CleanWebpackPlugin(pathsToClean, cleanOptions),
-      new HtmlWebpackPlugin({
-         template: '!!underscore-template-loader!./index.html',
-         inject: false,
-         favicon: 'assets/oli-icon.png',
-      }),
-      new webpack.HashedModuleIdsPlugin(),
-      new UglifyJsPlugin()
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: JSON.stringify('production')
+            }
+        }),
+        new CleanWebpackPlugin(pathsToClean, cleanOptions),
+        new HtmlWebpackPlugin({
+            template: '!!underscore-template-loader!./index.html',
+            inject: false,
+            favicon: 'assets/oli-icon.png',
+        }),
+        new webpack.HashedModuleIdsPlugin(),
+        new UglifyJsPlugin()
     ],
     module: {
         rules: [
             { test: /\.html$/, loader: 'underscore-template-loader' },
             { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
-              test: /\.scss$/,
-              use: [
-                  { loader: 'style-loader'},
-                  { loader: 'css-loader'},
-                  { loader: 'sass-loader',
-                    options: {
-                        includePaths: [
-                            path.join(__dirname, 'src/stylesheets'),
-                        ],
-                        sourceMap: true
-                    }
-                }]
+                test: /\.scss$/,
+                use: [
+                    { loader: 'style-loader' },
+                    { loader: 'css-loader' },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            includePaths: [
+                                path.join(__dirname, 'src/stylesheets'),
+                            ],
+                            sourceMap: true
+                        }
+                    }]
             },
             { test: /\.(png|gif|jpg|jpeg|svg)$/, use: 'file-loader' },
-            { test: /\.ts$/, use: [ 'babel-loader', 'ts-loader'], exclude: /node_modules/ },
-            { test: /\.tsx$/, use: ['babel-loader','ts-loader'], exclude: /node_modules/ }
+            { test: /\.ts$/, use: ['babel-loader', 'ts-loader'], exclude: /node_modules/ },
+            { test: /\.tsx$/, use: ['babel-loader', 'ts-loader'], exclude: /node_modules/ }
         ]
 
     }
