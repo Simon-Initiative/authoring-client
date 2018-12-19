@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import * as documentActions from 'actions/document';
 import { EditedDocument } from 'types/document';
 import createGuid from 'utils/guid';
-import { ModelTypes, AssessmentModel } from 'data/models';
+import { ModelTypes } from 'data/models';
 import { Maybe } from 'tsmonad';
 import * as contentTypes from 'data/contentTypes';
 
