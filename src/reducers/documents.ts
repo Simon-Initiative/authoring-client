@@ -132,7 +132,7 @@ export const documents = (
       }));
 
     case documentActions.SET_CURRENT_PAGE_OR_NODE:
-      const assessment = ed.document.model as AssessmentModel;
+      const assessment = ed.document.model;
 
       // If we are setting the page and it's a change from the current page,
       // also set the selectedNode as the first node
@@ -140,7 +140,9 @@ export const documents = (
         const selectedPage = action.nodeOrPageId;
         const selectedNode = ed.currentPage.valueOr('') === selectedPage
           ? ed.currentNode
-          : Maybe.just(assessment.pages.get(selectedPage).nodes.first());
+          : assessment.modelType === 'AssessmentModel'
+            ? Maybe.just(assessment.pages.get(selectedPage).nodes.first())
+            : Maybe.nothing<contentTypes.Node>();
         return state.set(action.documentId, ed.with({
           currentNode: selectedNode,
           currentPage: Maybe.just(selectedPage),
@@ -151,10 +153,12 @@ export const documents = (
       const node = action.nodeOrPageId;
       return state.set(action.documentId, ed.with({
         currentNode: Maybe.just(action.nodeOrPageId),
-        currentPage: assessment.pages.reduce(
-          (activePage, page: contentTypes.Page) =>
-            page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
-          ed.currentPage),
+        currentPage: assessment.modelType === 'AssessmentModel'
+            ? assessment.pages.reduce(
+            (activePage, page: contentTypes.Page) =>
+              page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
+            ed.currentPage)
+            : Maybe.nothing(),
       }));
     default:
       return state;
