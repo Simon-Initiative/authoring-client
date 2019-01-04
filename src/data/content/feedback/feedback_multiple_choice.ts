@@ -26,11 +26,11 @@ const defaultFeedbackMultipleChoiceParams: FeedbackMultipleChoiceParams = {
 };
 
 export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMultipleChoiceParams) {
-  guid?: string;
-  id?: string;
-  prompt?: FeedbackPrompt;
-  required?: boolean;
-  choices?: Immutable.OrderedMap<string, FeedbackChoice>;
+  guid: string;
+  id: string;
+  prompt: FeedbackPrompt;
+  required: boolean;
+  choices: Immutable.OrderedMap<string, FeedbackChoice>;
 
   constructor(params?: FeedbackMultipleChoiceParams) {
     super(params);
@@ -49,8 +49,15 @@ export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMult
     // '@id' required
     model = model.with({ id: o['@id'] });
 
-    // '@required' required, defaults to false
-    model = model.with({ required: JSON.parse((o['@required'] as string).toLowerCase()) });
+    if (o['@required'] !== undefined) {
+      model = model.with({
+        required:
+          // JSON.parse will convert to boolean
+          JSON.parse((o['@required'] as string).toLowerCase()),
+      });
+    } else {
+      model = model.with({ required: false });
+    }
 
     getChildren(o).forEach((item) => {
       const key = getKey(item);
@@ -77,15 +84,22 @@ export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMult
   toPersistence(): Object {
     const children = [
       this.prompt.toPersistence(),
-      ...this.choices.toArray().map(item => item.toPersistence()),
+      ...this.choices.size === 0
+        ? [(new FeedbackChoice()).toPersistence()]
+        : this.choices.toArray().map(item => item.toPersistence()),
     ];
 
-    return {
+    const dto = {
       multiple_choice: {
         '@id': this.id,
-        '@required': this.required.toString(),
-        '#array': children,
       },
     };
+
+    if (this.required) {
+      dto.multiple_choice['@required'] = this.required.toString();
+    }
+    dto.multiple_choice['#array'] = children;
+
+    return dto;
   }
 }

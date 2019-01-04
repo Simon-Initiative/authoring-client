@@ -21,10 +21,10 @@ const defaultLikertScaleParams: LikertScaleParams = {
 };
 
 export class LikertScale extends Immutable.Record(defaultLikertScaleParams) {
-  guid?: string;
-  labels?: Immutable.OrderedMap<string, LikertLabel>;
-  scaleSize?: string;
-  scaleCenter?: string;
+  guid: string;
+  labels: Immutable.OrderedMap<string, LikertLabel>;
+  scaleSize: string;
+  scaleCenter: string;
 
   constructor(params?: LikertScaleParams) {
     super(params);

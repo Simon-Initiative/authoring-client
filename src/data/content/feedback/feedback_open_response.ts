@@ -20,10 +20,10 @@ const defaultFeedbackOpenResponseParams: FeedbackOpenResponseParams = {
 };
 
 export class FeedbackOpenResponse extends Immutable.Record(defaultFeedbackOpenResponseParams) {
-  guid?: string;
-  id?: string;
-  prompt?: FeedbackPrompt;
-  required?: boolean;
+  guid: string;
+  id: string;
+  prompt: FeedbackPrompt;
+  required: boolean;
 
   constructor(params?: FeedbackOpenResponseParams) {
     super(params);
@@ -42,8 +42,15 @@ export class FeedbackOpenResponse extends Immutable.Record(defaultFeedbackOpenRe
     // '@id' required
     model = model.with({ id: o['@id'] });
 
-    // '@required' required, defaults to false
-    model = model.with({ required: JSON.parse((o['@required'] as string).toLowerCase()) });
+    if (o['@required'] !== undefined) {
+      model = model.with({
+        required:
+          // JSON.parse will convert to boolean
+          JSON.parse((o['@required'] as string).toLowerCase()),
+      });
+    } else {
+      model = model.with({ required: false });
+    }
 
     getChildren(o).forEach((item) => {
       const key = getKey(item);
@@ -56,6 +63,7 @@ export class FeedbackOpenResponse extends Immutable.Record(defaultFeedbackOpenRe
           });
           break;
         default:
+          break;
       }
     });
 
@@ -67,12 +75,17 @@ export class FeedbackOpenResponse extends Immutable.Record(defaultFeedbackOpenRe
       this.prompt.toPersistence(),
     ];
 
-    return {
+    const dto = {
       open_response: {
         '@id': this.id,
-        '@required': this.required.toString(),
-        '#array': children,
       },
     };
+
+    if (this.required) {
+      dto.open_response['@required'] = this.required.toString();
+    }
+    dto.open_response['#array'] = children;
+
+    return dto;
   }
 }

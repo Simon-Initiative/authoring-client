@@ -24,10 +24,10 @@ const defaultLikertSeriesParams: LikertSeriesParams = {
 };
 
 export class LikertSeries extends Immutable.Record(defaultLikertSeriesParams) {
-  guid?: string;
-  prompt?: FeedbackPrompt;
-  scale?: LikertScale;
-  items?: Immutable.OrderedMap<string, LikertItem>;
+  guid: string;
+  prompt: FeedbackPrompt;
+  scale: LikertScale;
+  items: Immutable.OrderedMap<string, LikertItem>;
 
   constructor(params?: LikertSeriesParams) {
     super(params);
@@ -74,7 +74,9 @@ export class LikertSeries extends Immutable.Record(defaultLikertSeriesParams) {
     const children = [
       this.prompt.toPersistence(),
       this.scale.toPersistence(),
-      this.items.toArray().map(label => label.toPersistence()),
+      ...this.items.size === 0
+        ? [(new LikertItem()).toPersistence()]
+        : this.items.toArray().map(item => item.toPersistence()),
     ];
 
     return {

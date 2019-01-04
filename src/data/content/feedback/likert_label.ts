@@ -1,22 +1,24 @@
 import * as Immutable from 'immutable';
+import { ContentElements, TEXT_ELEMENTS } from '../common/elements';
+import { getChildren } from '../common';
 
 type LikertLabelParams = {
   guid?: string;
-  text?: string;
+  text?: ContentElements;
   // value = integer value in the scale described by the text label
   value?: string;
 };
 
 const defaultLikertLabelParams: LikertLabelParams = {
   guid: '',
-  text: '',
+  text: ContentElements.fromText('', '', TEXT_ELEMENTS),
   value: '',
 };
 
 export class LikertLabel extends Immutable.Record(defaultLikertLabelParams) {
-  guid?: string;
-  text?: string;
-  value?: string;
+  guid: string;
+  text: ContentElements;
+  value: string;
 
   constructor(params?: LikertLabelParams) {
     super(params);
@@ -31,11 +33,10 @@ export class LikertLabel extends Immutable.Record(defaultLikertLabelParams) {
 
     const o = json.label;
 
-    // '@value' required
     model = model.with({ value: o['@value'] });
 
-    // '#text' required
-    model = model.with({ text: o['#text'] });
+    const text = ContentElements.fromPersistence(getChildren(o), '', TEXT_ELEMENTS, null, notify);
+    model = model.with({ text });
 
     return model;
   }
@@ -44,7 +45,10 @@ export class LikertLabel extends Immutable.Record(defaultLikertLabelParams) {
     return {
       label: {
         '@value': this.value,
-        '#text': this.text,
+        '#text': this.text.extractPlainText().caseOf({
+          just: s => s,
+          nothing: () => '',
+        }),
       },
     };
   }

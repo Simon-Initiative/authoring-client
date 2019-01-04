@@ -13,8 +13,8 @@ const defaultFeedbackDescriptionParams: FeedbackDescriptionParams = {
 };
 
 export class FeedbackDescription extends Immutable.Record(defaultFeedbackDescriptionParams) {
-  guid?: string;
-  content?: ContentElements;
+  guid: string;
+  content: ContentElements;
 
   constructor(params?: FeedbackDescriptionParams) {
     super(params);

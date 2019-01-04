@@ -13,8 +13,8 @@ const defaultFeedbackPromptParams: FeedbackPromptParams = {
 };
 
 export class FeedbackPrompt extends Immutable.Record(defaultFeedbackPromptParams) {
-  guid?: string;
-  content?: ContentElements;
+  guid: string;
+  content: ContentElements;
 
   constructor(params?: FeedbackPromptParams) {
     super(params);

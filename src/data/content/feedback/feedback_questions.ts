@@ -24,8 +24,8 @@ const defaultFeedbackQuestionsParams: FeedbackQuestionsParams = {
 };
 
 export class FeedbackQuestions extends Immutable.Record(defaultFeedbackQuestionsParams) {
-  guid?: string;
-  questions?: Immutable.OrderedMap<string, FeedbackQuestion>;
+  guid: string;
+  questions: Immutable.OrderedMap<string, FeedbackQuestion>;
 
   constructor(params?: FeedbackQuestionsParams) {
     super(params);
@@ -76,7 +76,9 @@ export class FeedbackQuestions extends Immutable.Record(defaultFeedbackQuestions
   }
 
   toPersistence(): Object {
-    const children = this.questions.toArray().map(item => item.toPersistence());
+    const children = this.questions.size === 0
+      ? [(new LikertSeries()).toPersistence()]
+      : this.questions.toArray().map(item => item.toPersistence());
 
     return {
       questions: {

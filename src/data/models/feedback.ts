@@ -10,10 +10,11 @@ import { Title } from '../content/learning/title';
 import { ObjRef } from '../content/learning/objref';
 import { LikertSeries } from '../content/feedback/likert_series';
 import { Maybe } from 'tsmonad';
+import { isArray } from 'util';
 
 // oli_feedback_1_2.dtd
 export type FeedbackModelParams = {
-  modelType?: string,
+  resource?: contentTypes.Resource,
   guid?: string,
   id?: string,
   type?: LegacyTypes,
@@ -26,8 +27,9 @@ export type FeedbackModelParams = {
   questions?: FeedbackQuestions,
 };
 
-const defaultFeedbackModelParams: FeedbackModelParams = {
+const defaultFeedbackModelParams = {
   modelType: 'FeedbackModel',
+  resource: new contentTypes.Resource(),
   guid: '',
   id: '',
   type: LegacyTypes.feedback,
@@ -45,16 +47,17 @@ const defaultFeedbackModelParams: FeedbackModelParams = {
 
 export class FeedbackModel
   extends Immutable.Record(defaultFeedbackModelParams) {
-  modelType?: string;
-  guid?: string;
-  id?: string;
-  type?: LegacyTypes;
-  lock?: contentTypes.Lock;
-  title?: Title;
+  modelType: 'FeedbackModel';
+  resource: contentTypes.Resource;
+  guid: string;
+  id: string;
+  type: LegacyTypes;
+  lock: contentTypes.Lock;
+  title: Title;
   shortTitle: Maybe<string>;
-  objrefs?: Immutable.OrderedMap<string, ObjRef>;
-  description?: FeedbackDescription;
-  questions?: Immutable.OrderedMap<string, FeedbackQuestion>;
+  objrefs: Immutable.OrderedMap<string, ObjRef>;
+  description: FeedbackDescription;
+  questions: Immutable.OrderedMap<string, FeedbackQuestion>;
 
   constructor(params?: FeedbackModelParams) {
     super(params);
@@ -66,18 +69,25 @@ export class FeedbackModel
 
   static fromPersistence(json: any, notify: () => void = () => null): FeedbackModel {
 
-    let model = new FeedbackModel({ guid: createGuid() });
+    let model = new FeedbackModel();
 
     const o = (json as any);
-
+    model = model.with({ resource: contentTypes.Resource.fromPersistence(o) });
+    model = model.with({ guid: o.guid });
+    model = model.with({ type: o.type });
     if (o.lock !== undefined && o.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(o.lock) });
     }
-
-    // id required
     model = model.with({ id: o['@id'] });
 
-    getChildren(o).forEach((item) => {
+    let fb = null;
+    if (isArray(o.doc)) {
+      fb = o.doc[0].feedback;
+    } else {
+      fb = o.doc.feedback;
+    }
+
+    fb['#array'].forEach((item) => {
 
       const key = getKey(item);
       const id = createGuid();
@@ -125,10 +135,17 @@ export class FeedbackModel
       ...this.questions.toArray().map(item => item.toPersistence()),
     );
 
-    return {
+    const doc = [{
       feedback: {
+        '@id': this.resource.id,
         '#array': children,
       },
+    }];
+
+    const root = {
+      doc,
     };
+
+    return Object.assign({}, this.resource, root, this.lock.toPersistence());
   }
 }

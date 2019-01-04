@@ -23,11 +23,11 @@ const defaultLikertParams: LikertParams = {
 };
 
 export class Likert extends Immutable.Record(defaultLikertParams) {
-  guid?: string;
-  id?: string;
-  prompt?: FeedbackPrompt;
-  scale?: LikertScale;
-  required?: boolean;
+  guid: string;
+  id: string;
+  prompt: FeedbackPrompt;
+  scale: LikertScale;
+  required: boolean;
 
   constructor(params?: LikertParams) {
     super(params);
@@ -45,8 +45,15 @@ export class Likert extends Immutable.Record(defaultLikertParams) {
     // '@id' required
     model = model.with({ id: o['@id'] });
 
-    // '@required' required, defaults to false
-    model = model.with({ required: JSON.parse((o['@required'] as string).toLowerCase()) });
+    if (o['@required'] !== undefined) {
+      model = model.with({
+        required:
+          // JSON.parse will convert to boolean
+          JSON.parse((o['@required'] as string).toLowerCase()),
+      });
+    } else {
+      model = model.with({ required: false });
+    }
 
     getChildren(o).forEach((item) => {
       const key = getKey(item);
@@ -58,7 +65,7 @@ export class Likert extends Immutable.Record(defaultLikertParams) {
             prompt: FeedbackPrompt.fromPersistence(item, id, notify),
           });
           break;
-        case 'scale':
+        case 'likert_scale':
           model = model.with({
             scale: LikertScale.fromPersistence(item, id, notify),
           });
@@ -76,12 +83,17 @@ export class Likert extends Immutable.Record(defaultLikertParams) {
       this.scale.toPersistence(),
     ];
 
-    return {
+    const dto = {
       likert: {
         '@id': this.id,
-        '@required': this.required.toString(),
-        '#array': children,
       },
     };
+
+    if (this.required) {
+      dto.likert['@required'] = this.required.toString();
+    }
+    dto.likert['#array'] = children;
+
+    return dto;
   }
 }

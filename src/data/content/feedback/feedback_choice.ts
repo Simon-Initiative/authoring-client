@@ -1,21 +1,23 @@
 import * as Immutable from 'immutable';
+import { ContentElements, TEXT_ELEMENTS } from '../common/elements';
+import { getChildren } from '../common';
 
 type FeedbackChoiceParams = {
   guid?: string;
   id?: string;
-  text?: string;
+  text?: ContentElements;
 };
 
 const defaultFeedbackChoiceParams: FeedbackChoiceParams = {
   guid: '',
   id: '',
-  text: '',
+  text: ContentElements.fromText('', '', TEXT_ELEMENTS),
 };
 
 export class FeedbackChoice extends Immutable.Record(defaultFeedbackChoiceParams) {
-  guid?: string;
-  id?: string;
-  text?: string;
+  guid: string;
+  id: string;
+  text: ContentElements;
 
   constructor(params?: FeedbackChoiceParams) {
     super(params);
@@ -30,11 +32,10 @@ export class FeedbackChoice extends Immutable.Record(defaultFeedbackChoiceParams
 
     const o = json.choice;
 
-    // '@id' required
     model = model.with({ id: o['@id'] });
 
-    // '#text' required
-    model = model.with({ text: o['#text'] });
+    const text = ContentElements.fromPersistence(getChildren(o), '', TEXT_ELEMENTS, null, notify);
+    model = model.with({ text });
 
     return model;
   }
@@ -43,7 +44,10 @@ export class FeedbackChoice extends Immutable.Record(defaultFeedbackChoiceParams
     return {
       choice: {
         '@id': this.id,
-        '#text': this.text,
+        '#text': this.text.extractPlainText().caseOf({
+          just: s => s,
+          nothing: () => '',
+        }),
       },
     };
   }
