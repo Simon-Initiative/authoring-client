@@ -5,7 +5,6 @@ import { getKey } from '../common';
 import { LegacyTypes } from '../types';
 import { FeedbackQuestion, FeedbackQuestions } from '../content/feedback/feedback_questions';
 import { FeedbackDescription } from '../content/feedback/feedback_description';
-import { getChildren } from '../content/common';
 import { Title } from '../content/learning/title';
 import { ObjRef } from '../content/learning/objref';
 import { LikertSeries } from '../content/feedback/likert_series';
