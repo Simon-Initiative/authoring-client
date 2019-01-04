@@ -11,13 +11,13 @@ import { createLogger } from 'redux-logger';
 import { UserState } from './reducers/user';
 import { getQueryVariable } from './utils/params';
 import history from './utils/history';
-import rootReducer from './reducers';
-import { loadCourse } from 'actions/course';
+import rootReducer, { State } from './reducers';
 import { AppContainer } from 'react-hot-loader';
 import initEditorRegistry from './editors/manager/registrar';
 import { registerContentTypes } from 'data/registrar';
 import { releaseAll } from 'actions/document';
 import { ApplicationRoot } from './ApplicationRoot';
+import { updateRoute } from 'actions/router';
 
 // import application styles
 import 'stylesheets/index.scss';
@@ -34,25 +34,16 @@ const middleware = nodeEnv === 'production'
   ? applyMiddleware(thunkMiddleware)
   : applyMiddleware(thunkMiddleware, loggerMiddleware);
 
-function initStoreWithState(state) {
+function getPathName(pathname: string): string {
+  return pathname.startsWith('/state') ? '' : pathname;
+}
+
+function initStoreWithState(state: Partial<State>) {
   const store = createStore(
     rootReducer, state, middleware,
   );
 
-  if ((module as any).hot) {
-    // Enable Webpack hot module replacement for reducers
-    (module as any).hot.accept('./reducers', () => {
-      const nextRootReducer = require('./reducers');
-      store.replaceReducer(nextRootReducer);
-    });
-  }
-
   return store;
-}
-
-function historyRequiresCourseLoad() {
-  return window.location.hash !== ''
-    && window.location.hash.indexOf('-') !== -1;
 }
 
 function tryLogin(): Promise<UserState> {
@@ -65,92 +56,66 @@ function tryLogin(): Promise<UserState> {
   });
 }
 
-function render(store, current): Promise<boolean> {
+function render(store): Promise<boolean> {
 
   // Now do the initial rendering
   return new Promise((resolve, reject) => {
     ReactDOM.render(
       <AppContainer>
-        <CurrentApplicationRoot store={store} location={current} />
+        <ApplicationRoot store={store} />
       </AppContainer>,
       document.getElementById('app'), () => resolve(true));
   });
 
 }
 
-
-let store: Store<any> = null;
-let CurrentApplicationRoot = ApplicationRoot;
-
 function main() {
   // Application specific initialization
   initEditorRegistry();
   registerContentTypes();
 
-  let userInfo = null;
-
   const redirectFragment = getQueryVariable('redirect_fragment');
-  const current = {
-    hash: '',
-    pathname: '/' + (redirectFragment === null ? '' : redirectFragment),
-    search: '',
-  };
+  const fullPathname = redirectFragment ? redirectFragment : getPathName(history.location.pathname);
+  const [pathname, search] = fullPathname.split('?');
+  let store = null as Store<Partial<State>>;
 
   tryLogin()
     .then((user) => {
+      store = initStoreWithState({
+        user,
+      });
 
-      store = initStoreWithState({ user });
+      store.dispatch(updateRoute(pathname, search));
 
-      // initialize user data
-      if (historyRequiresCourseLoad()) {
-
-        const hash = window.location.hash;
-        const courseId = hash.substr(hash.indexOf('-') + 1);
-
-        userInfo = user;
-        return store.dispatch(loadCourse(courseId));
-      }
-      render(store, current);
-
-    })
-    .then((model) => {
-      render(store, current);
+      render(store);
     })
     .catch((err) => {
-      render(initStoreWithState({ user: userInfo }), current);
+      const store = initStoreWithState({});
+
+      store.dispatch(updateRoute(pathname, search));
+
+      render(store);
     });
 
+  // respond to url changes
+  history.listen(({ pathname, search }) => store.dispatch(updateRoute(pathname, search)));
+
+  function clearHeldLocks() {
+    return function (dispatch, getState) {
+      if (getState().locks.size > 0) {
+        getState().locks
+          .toArray()
+          .forEach(({ courseId, documentId }) => persistence.releaseLock(courseId, documentId));
+      }
+    };
+  }
+
+  window.addEventListener('beforeunload', (event) => {
+    if (store !== null) {
+      store.dispatch(releaseAll());
+      store.dispatch(clearHeldLocks());
+    }
+  });
 }
 
 main();
-
-history.listen((current) => {
-
-  render(store, current)
-    .then(result => window.scrollTo(0, 0));
-});
-
-function clearHeldLocks() {
-  return function (dispatch, getState) {
-    if (getState().locks.size > 0) {
-      getState().locks
-        .toArray()
-        .forEach(({ courseId, documentId }) => persistence.releaseLock(courseId, documentId));
-    }
-  };
-}
-
-window.addEventListener('beforeunload', (event) => {
-  if (store !== null) {
-    store.dispatch(releaseAll());
-    store.dispatch(clearHeldLocks());
-  }
-});
-
-if ((module as any).hot) {
-  (module as any).hot.accept('./ApplicationRoot', () => {
-    CurrentApplicationRoot = require('./ApplicationRoot').ApplicationRoot;
-
-    render(store, window.location);
-  });
-}

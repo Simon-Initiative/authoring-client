@@ -256,7 +256,7 @@ export function createNew(model: models.ContentModel) {
 }
 
 export function load(courseId: string, documentId: string) {
-  return function (dispatch, getState) : Promise<any> {
+  return function (dispatch, getState): Promise<persistence.Document> {
 
     const userName = getState().user.profile.username;
 
@@ -302,6 +302,8 @@ export function load(courseId: string, documentId: string) {
           dispatch(documentLoaded(documentId, document, strategy, editingAllowed));
 
         });
+
+        return document;
       });
   };
 }
@@ -318,7 +320,7 @@ export function release(documentId: string) {
     const editedDocument: EditedDocument = getState().documents.get(documentId);
     dispatch(documentReleased(documentId));
 
-    editedDocument.persistence.destroy();
+    return editedDocument.persistence.destroy();
   };
 }
 
