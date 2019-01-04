@@ -16,7 +16,6 @@ import { isArray } from 'util';
 export type FeedbackModelParams = {
   resource?: contentTypes.Resource,
   guid?: string,
-  id?: string,
   type?: LegacyTypes,
   lock?: contentTypes.Lock,
   title?: Title,
@@ -31,7 +30,6 @@ const defaultFeedbackModelParams = {
   modelType: 'FeedbackModel',
   resource: new contentTypes.Resource(),
   guid: '',
-  id: '',
   type: LegacyTypes.feedback,
   lock: new contentTypes.Lock(),
   title: Title.fromText('New Feedback'),
@@ -50,7 +48,6 @@ export class FeedbackModel
   modelType: 'FeedbackModel';
   resource: contentTypes.Resource;
   guid: string;
-  id: string;
   type: LegacyTypes;
   lock: contentTypes.Lock;
   title: Title;
@@ -78,7 +75,6 @@ export class FeedbackModel
     if (o.lock !== undefined && o.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(o.lock) });
     }
-    model = model.with({ id: o['@id'] });
 
     let fb = null;
     if (isArray(o.doc)) {
