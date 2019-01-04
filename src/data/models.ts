@@ -2,6 +2,7 @@ import * as types from './types';
 
 import { PoolModel } from './models/pool';
 import { AssessmentModel } from './models/assessment';
+// import { FeedbackModel } from './models/feedback';
 import { CourseModel } from './models/course';
 import { MediaModel } from './models/media';
 import { LearningObjectivesModel } from './models/objective';
@@ -13,6 +14,7 @@ import { WorkbookPageModel } from './models/workbook';
 export { Node } from './content/assessment/node';
 export { PoolModel } from './models/pool';
 export { AssessmentModel } from './models/assessment';
+// export { FeedbackModel } from './models/feedback';
 export { CourseModel } from './models/course';
 export { DefaultModel } from './models/default';
 export { MediaModel } from './models/media';
