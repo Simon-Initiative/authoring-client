@@ -11,6 +11,7 @@ import { LikertSeries } from '../content/feedback/likert_series';
 import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
 
+
 // oli_feedback_1_2.dtd
 export type FeedbackModelParams = {
   resource?: contentTypes.Resource,
