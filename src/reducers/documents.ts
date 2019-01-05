@@ -149,7 +149,9 @@ export const documents = (
         const selectedPage = action.nodeOrPageId;
         const selectedNode = ed.currentPage.valueOr('') === selectedPage
           ? ed.currentNode
-          : Maybe.just(assessment.pages.get(selectedPage).nodes.first());
+          : assessment.modelType === 'AssessmentModel'
+            ? Maybe.just(assessment.pages.get(selectedPage).nodes.first())
+            : Maybe.nothing<contentTypes.Node>();
         return state.set(action.documentId, ed.with({
           currentNode: selectedNode,
           currentPage: Maybe.just(selectedPage),
@@ -160,10 +162,12 @@ export const documents = (
       const node = action.nodeOrPageId;
       return state.set(action.documentId, ed.with({
         currentNode: Maybe.just(action.nodeOrPageId),
-        currentPage: assessment.pages.reduce(
-          (activePage, page: contentTypes.Page) =>
-            page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
-          ed.currentPage),
+        currentPage: assessment.modelType === 'AssessmentModel'
+          ? assessment.pages.reduce(
+            (activePage, page: contentTypes.Page) =>
+              page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
+            ed.currentPage)
+          : Maybe.nothing(),
       }));
     default:
       return state;
