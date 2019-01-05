@@ -5,7 +5,6 @@ import createGuid from 'utils/guid';
 import { ModelTypes, AssessmentModel, PoolModel } from 'data/models';
 import { Maybe } from 'tsmonad';
 import * as contentTypes from 'data/contentTypes';
-import { editorSidebar } from './editorSidebar';
 
 export type ActionTypes =
   documentActions.DocumentEditingEnableAction |
