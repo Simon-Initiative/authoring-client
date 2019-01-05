@@ -2,9 +2,10 @@ import * as Immutable from 'immutable';
 import * as documentActions from 'actions/document';
 import { EditedDocument } from 'types/document';
 import createGuid from 'utils/guid';
-import { ModelTypes, AssessmentModel } from 'data/models';
+import { ModelTypes, AssessmentModel, PoolModel } from 'data/models';
 import { Maybe } from 'tsmonad';
 import * as contentTypes from 'data/contentTypes';
+import { editorSidebar } from './editorSidebar';
 
 export type ActionTypes =
   documentActions.DocumentEditingEnableAction |
@@ -132,6 +133,15 @@ export const documents = (
       }));
 
     case documentActions.SET_CURRENT_PAGE_OR_NODE:
+
+      // For pools, there are no pages, so just set the node
+      if (ed.document.model instanceof PoolModel
+        && (!(typeof action.nodeOrPageId === 'string'))) {
+        return state.set(action.documentId, ed.with({
+          currentNode: Maybe.just(action.nodeOrPageId),
+        }));
+      }
+
       const assessment = ed.document.model as AssessmentModel;
 
       // If we are setting the page and it's a change from the current page,
