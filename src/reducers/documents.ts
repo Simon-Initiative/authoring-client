@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import * as documentActions from 'actions/document';
 import { EditedDocument } from 'types/document';
 import createGuid from 'utils/guid';
-import { ModelTypes, AssessmentModel } from 'data/models';
+import { ModelTypes, AssessmentModel, PoolModel } from 'data/models';
 import { Maybe } from 'tsmonad';
 import * as contentTypes from 'data/contentTypes';
 
@@ -132,6 +132,15 @@ export const documents = (
       }));
 
     case documentActions.SET_CURRENT_PAGE_OR_NODE:
+
+      // For pools, there are no pages, so just set the node
+      if (ed.document.model instanceof PoolModel
+        && (!(typeof action.nodeOrPageId === 'string'))) {
+        return state.set(action.documentId, ed.with({
+          currentNode: Maybe.just(action.nodeOrPageId),
+        }));
+      }
+
       const assessment = ed.document.model as AssessmentModel;
 
       // If we are setting the page and it's a change from the current page,
@@ -140,7 +149,9 @@ export const documents = (
         const selectedPage = action.nodeOrPageId;
         const selectedNode = ed.currentPage.valueOr('') === selectedPage
           ? ed.currentNode
-          : Maybe.just(assessment.pages.get(selectedPage).nodes.first());
+          : assessment.modelType === 'AssessmentModel'
+            ? Maybe.just(assessment.pages.get(selectedPage).nodes.first())
+            : Maybe.nothing<contentTypes.Node>();
         return state.set(action.documentId, ed.with({
           currentNode: selectedNode,
           currentPage: Maybe.just(selectedPage),
@@ -151,10 +162,12 @@ export const documents = (
       const node = action.nodeOrPageId;
       return state.set(action.documentId, ed.with({
         currentNode: Maybe.just(action.nodeOrPageId),
-        currentPage: assessment.pages.reduce(
-          (activePage, page: contentTypes.Page) =>
-            page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
-          ed.currentPage),
+        currentPage: assessment.modelType === 'AssessmentModel'
+          ? assessment.pages.reduce(
+            (activePage, page: contentTypes.Page) =>
+              page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
+            ed.currentPage)
+          : Maybe.nothing(),
       }));
     default:
       return state;
