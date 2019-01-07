@@ -36,7 +36,7 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   currentNode: Maybe<contentTypes.Node>;
-  onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
+  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
@@ -100,7 +100,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
       // Handle the case that the current node has changed externally,
       // for instance, from an undo/redo
-      const { model, activeContext, onSetCurrentNode } = this.props;
+      const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
 
       const previousNodeGuid = this.props.currentNode.caseOf({
         just: currentNode => currentNode.guid,
@@ -108,25 +108,26 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       });
 
       findNodeByGuid(nextProps.model.pool.questions, previousNodeGuid)
-      .caseOf({
-        just: (currentNode) => {
-          onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
-        },
-        nothing: () => {
-          locateNextOfKin(model.pool.questions, previousNodeGuid).lift(node =>
-            onSetCurrentNode(
-              activeContext.documentId.valueOr(null), node));
-        },
-      });
+        .caseOf({
+          just: (currentNode) => {
+            onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), currentNode);
+          },
+          nothing: () => {
+            locateNextOfKin(model.pool.questions, previousNodeGuid).lift(node =>
+              onSetCurrentNodeOrPage(
+                activeContext.documentId.valueOr(null), node));
+          },
+        });
     }
   }
 
   addQuestion(question: contentTypes.Question) {
     const pool = this.props.model.pool.with({
-      questions: this.props.model.pool.questions.set(question.guid, question) });
+      questions: this.props.model.pool.questions.set(question.guid, question),
+    });
     const updated = this.props.model.with({ pool });
 
-    this.props.onSetCurrentNode(this.props.activeContext.documentId.valueOr(null), question);
+    this.props.onSetCurrentNodeOrPage(this.props.activeContext.documentId.valueOr(null), question);
     this.handleEdit(updated);
     this.setState({
       collapseInsertPopup: true,
@@ -148,12 +149,12 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
   onEdit(guid: string, question: contentTypes.Question, src) {
 
-    const { onSetCurrentNode, activeContext } = this.props;
+    const { onSetCurrentNodeOrPage, activeContext } = this.props;
 
     const questions = this.props.model.pool.questions.set(guid, question);
     const pool = this.props.model.pool.with({ questions });
 
-    onSetCurrentNode(activeContext.documentId.valueOr(null), question);
+    onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), question);
     this.props.onUpdateContent(this.props.context.documentId, src);
 
     this.handleEdit(this.props.model.with({ pool }));
@@ -179,9 +180,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   onSelect(currentNode: contentTypes.Node) {
-    const { activeContext, onSetCurrentNode } = this.props;
+    const { activeContext, onSetCurrentNodeOrPage } = this.props;
 
-    onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
+    onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), currentNode);
   }
 
   onFocus(model: Object, parent, textSelection) {
@@ -196,7 +197,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
   onRemove(guid: string) {
 
-    const { model, activeContext, onSetCurrentNode } = this.props;
+    const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
 
     if (model.pool.questions.size > 1) {
 
@@ -215,7 +216,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       // Get the node at the adjusted index
       const newCurrent = pool.questions
         .toArray()[adjustedIndex];
-      onSetCurrentNode(activeContext.documentId.valueOr(null), newCurrent);
+      onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), newCurrent);
 
       this.handleEdit(this.props.model.with({ pool }));
     }

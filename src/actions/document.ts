@@ -15,8 +15,10 @@ import { buildReadOnlyMessage } from 'utils/lock';
 import { Maybe } from 'tsmonad';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
-import { PersistenceStrategy,
-  PersistenceState } from 'editors/manager/persistence/PersistenceStrategy';
+import {
+  PersistenceStrategy,
+  PersistenceState,
+} from 'editors/manager/persistence/PersistenceStrategy';
 import { WritelockModal } from 'components/WritelockModal.controller';
 import { ConflictModal } from 'components/ConflictModal.controller';
 import { State } from 'reducers';
@@ -50,13 +52,13 @@ export const documentLoaded = (
   documentId: string, document: persistence.Document,
   persistence: PersistenceStrategy,
   editingAllowed: boolean)
-: DocumentLoadedAction => ({
-  type: DOCUMENT_LOADED,
-  documentId,
-  document,
-  persistence,
-  editingAllowed,
-});
+  : DocumentLoadedAction => ({
+    type: DOCUMENT_LOADED,
+    documentId,
+    document,
+    persistence,
+    editingAllowed,
+  });
 
 export type DOCUMENT_EDITING_ENABLE = 'document/DOCUMENT_EDITING_ENABLE';
 export const DOCUMENT_EDITING_ENABLE = 'document/DOCUMENT_EDITING_ENABLE';
@@ -67,7 +69,7 @@ export type DocumentEditingEnableAction = {
   editable: boolean,
 };
 
-export function documentEditingEnable(editable : boolean, documentId : string) {
+export function documentEditingEnable(editable: boolean, documentId: string) {
   return {
     type: DOCUMENT_EDITING_ENABLE,
     editable,
@@ -85,11 +87,11 @@ export type DocumentFailedAction = {
 };
 
 export const documentFailed = (documentId: string, error: string)
-: DocumentFailedAction => ({
-  type: DOCUMENT_FAILED,
-  documentId,
-  error,
-});
+  : DocumentFailedAction => ({
+    type: DOCUMENT_FAILED,
+    documentId,
+    error,
+  });
 
 
 export type MODEL_UPDATED = 'document/MODEL_UPDATED';
@@ -237,20 +239,20 @@ function logResourceDetails(resource: Resource) {
 
 export function createNew(model: models.ContentModel) {
 
-  return function (dispatch, getState) : Promise<persistence.Document> {
+  return function (dispatch, getState): Promise<persistence.Document> {
 
     const course = getState().course;
 
     return new Promise((resolve, reject) => {
       persistence.createDocument(course.guid, model)
-      .then((result) => {
-        const r = (result as any).model.resource;
+        .then((result) => {
+          const r = (result as any).model.resource;
 
-        const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
-        dispatch(updateCourseResources(updated));
+          const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
+          dispatch(updateCourseResources(updated));
 
-        resolve(r);
-      });
+          resolve(r);
+        });
     });
   };
 }
@@ -289,8 +291,10 @@ export function load(courseId: string, documentId: string) {
           if (!editingAllowed) {
 
             const lockDetails = strategy.getLockDetails();
-            const message = buildReadOnlyMessage(lockDetails, { label: 'Reload',
-              execute: () => this.fetchDocument(this.props.course.guid, this.props.documentId)});
+            const message = buildReadOnlyMessage(lockDetails, {
+              label: 'Reload',
+              execute: () => this.fetchDocument(this.props.course.guid, this.props.documentId),
+            });
             dispatch(showMessage(message));
           } else {
             if (holder.changeMade) {
@@ -310,7 +314,7 @@ export function load(courseId: string, documentId: string) {
 
 export function releaseAll() {
   return function (dispatch, getState) {
-    const documents : EditedDocument[] = getState().documents.toArray();
+    const documents: EditedDocument[] = getState().documents.toArray();
     documents.forEach(d => dispatch(release(d.documentId)));
   };
 }
@@ -327,7 +331,7 @@ export function release(documentId: string) {
 export function save(documentId: string, model: models.ContentModel, isUndoRedo?: boolean) {
   return function (dispatch, getState) {
 
-    const editedDocument : EditedDocument = getState().documents.get(documentId);
+    const editedDocument: EditedDocument = getState().documents.get(documentId);
 
     if (model.modelType !== 'CourseModel' && model.modelType !== 'MediaModel') {
       const resource = model.resource.with({ dateUpdated: new Date() });
@@ -350,7 +354,7 @@ export function save(documentId: string, model: models.ContentModel, isUndoRedo?
 export function undo(documentId: string) {
   return function (dispatch, getState) {
 
-    const editedDocument : EditedDocument = getState().documents.get(documentId);
+    const editedDocument: EditedDocument = getState().documents.get(documentId);
     const model = editedDocument.undoStack.peek();
 
     if (model) {
@@ -364,7 +368,7 @@ export function undo(documentId: string) {
 export function redo(documentId: string) {
   return function (dispatch, getState) {
 
-    const editedDocument : EditedDocument = getState().documents.get(documentId);
+    const editedDocument: EditedDocument = getState().documents.get(documentId);
     const model = editedDocument.redoStack.peek();
 
     if (model) {
@@ -374,33 +378,20 @@ export function redo(documentId: string) {
   };
 }
 
-export type SET_CURRENT_PAGE = 'document/SET_CURRENT_PAGE';
-export const SET_CURRENT_PAGE: SET_CURRENT_PAGE = 'document/SET_CURRENT_PAGE';
+export type SET_CURRENT_PAGE_OR_NODE = 'document/SET_CURRENT_PAGE_OR_NODE';
+export const SET_CURRENT_PAGE_OR_NODE: SET_CURRENT_PAGE_OR_NODE =
+  'document/SET_CURRENT_PAGE_OR_NODE';
 
-export type SetCurrentPageAction = {
-  type: SET_CURRENT_PAGE,
-  documentId: string,
-  page: string,
+export type SetCurrentNodeOrPageAction = {
+  type: SET_CURRENT_PAGE_OR_NODE,
+  documentId,
+  nodeOrPageId: contentTypes.Node | string,
 };
 
-export const setCurrentPage = (documentId: string, page: string): SetCurrentPageAction => ({
-  type: SET_CURRENT_PAGE,
-  documentId,
-  page,
-});
-
-export type SET_CURRENT_NODE = 'document/SET_CURRENT_NODE';
-export const SET_CURRENT_NODE: SET_CURRENT_NODE = 'document/SET_CURRENT_NODE';
-
-export type SetCurrentNodeAction = {
-  type: SET_CURRENT_NODE,
-  documentId,
-  node: contentTypes.Node,
-};
-
-export const setCurrentNode
-  = (documentId: string, node: contentTypes.Node): SetCurrentNodeAction => ({
-    type: SET_CURRENT_NODE,
-    documentId,
-    node,
-  });
+export const setCurrentNodeOrPage
+  = (documentId: string, nodeOrPageId: contentTypes.Node | string):
+    SetCurrentNodeOrPageAction => ({
+      type: SET_CURRENT_PAGE_OR_NODE,
+      documentId,
+      nodeOrPageId,
+    });
