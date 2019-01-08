@@ -9,12 +9,15 @@ import {
 } from 'actions/router';
 import { OtherAction } from './utils';
 
-export type ActionTypes = UpdateRouteAction | ResetRouteAction | OtherAction;
+export type ActionTypes = UpdateRouteAction
+  | ResetRouteAction
+  | OtherAction;
 
 // model
 interface RouterStateParams {
   route: ROUTE;
   path: string;
+  search: string;
   courseId: Maybe<string>;
   resourceId: Maybe<string>;
   urlParams: Map<string, string>;
@@ -23,6 +26,7 @@ interface RouterStateParams {
 const defaults = (params: Partial<RouterStateParams> = {}): RouterStateParams => ({
   route: params.route || ROUTE.ROOT,
   path: params.path || '',
+  search: params.search || '?',
   courseId: params.courseId || Maybe.nothing(),
   resourceId: params.resourceId || Maybe.nothing(),
   urlParams: params.urlParams || Map<string, string>(),
@@ -31,6 +35,7 @@ const defaults = (params: Partial<RouterStateParams> = {}): RouterStateParams =>
 export class RouterState extends Record(defaults()) implements RouterStateParams {
   route: ROUTE;
   path: string;
+  search: string;
   courseId: Maybe<string>;
   resourceId: Maybe<string>;
   urlParams: Map<string, string>;
@@ -56,6 +61,7 @@ export const router = (
       return state.with({
         route: action.route,
         path: action.path,
+        search: action.search,
         courseId: action.courseId,
         resourceId: action.resourceId,
         urlParams: action.urlParams || Map<string, string>(),

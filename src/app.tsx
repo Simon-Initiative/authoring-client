@@ -21,6 +21,7 @@ import { updateRoute } from 'actions/router';
 // import application styles
 import 'stylesheets/index.scss';
 import 'react-tippy/dist/tippy.css';
+import { Dispatch } from 'react-redux';
 
 // attach global variables to window
 (window as any).React = React;
@@ -102,7 +103,7 @@ function main() {
   history.listen(({ pathname, search }) => store.dispatch(updateRoute(pathname, search)));
 
   function clearHeldLocks() {
-    return function (dispatch, getState) {
+    return function (dispatch: Dispatch<State>, getState: () => State) {
       if (getState().locks.size > 0) {
         getState().locks
           .toArray()
