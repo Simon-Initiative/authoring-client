@@ -241,6 +241,7 @@ export interface ObjectiveProps {
   onBeginExternalEdit: (model: contentTypes.LearningObjective) => void;
   onRemove: (model: contentTypes.LearningObjective) => void;
   onRemoveSkill: (model: contentTypes.Skill) => void;
+  onPushRoute: (path: string) => void;
 }
 
 export interface ObjectiveState {
@@ -394,7 +395,7 @@ export class Objective
   }
 
   renderSkillGridHeader() {
-    const { classes, course } = this.props;
+    const { classes, course, onPushRoute } = this.props;
 
     const LEFT_OFFSET = 20;
     const diagonalDist = (height: number) => Math.sqrt(2 * (height * height));
@@ -432,8 +433,9 @@ export class Objective
                     <text
                       className={classes.assessmentLink}
                       transform="translate(10, 2)"
-                      onClick={() => history.push(
-                        `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`)}>
+                      onClick={() => onPushRoute(
+                        `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
+                        + `?questionId=${question.id}`)}>
                       {stringFormat.ellipsizePx(
                         question.title.valueOr(
                           getReadableTitleFromType(question.type)),

@@ -9,6 +9,7 @@ import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as lockActions from 'actions/locks';
 import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
 import { modalActions } from 'actions/modal';
+import { push } from 'actions/router';
 
 interface StateProps {
   skills: any;
@@ -24,6 +25,7 @@ interface DispatchProps {
   dismissMessage: (message: Messages.Message) => void;
   displayModal: (component: any) => void;
   dismissModal: () => void;
+  onPushRoute: (path: string) => void;
   registerLocks: RegisterLocks;
   unregisterLocks: UnregisterLocks;
 }
@@ -76,6 +78,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     dismissModal: () => {
       dispatch(modalActions.dismiss());
     },
+    onPushRoute: path => dispatch(push(path)),
   };
 };
 
