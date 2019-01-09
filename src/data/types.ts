@@ -10,6 +10,7 @@ export enum LegacyTypes {
   workbook_page = 'x-oli-workbook_page',
   assessment2 = 'x-oli-assessment2',
   inline = 'x-oli-inline-assessment',
+  feedback = 'x-oli-feedback',
   organization = 'x-oli-organization',
   learning_objective = 'x-oli-objective',
   learning_objectives = 'x-oli-learning_objectives',

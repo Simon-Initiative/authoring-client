@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import * as documentActions from 'actions/document';
 import { EditedDocument } from 'types/document';
 import createGuid from 'utils/guid';
-import { ModelTypes } from 'data/models';
+import { ModelTypes, AssessmentModel, PoolModel } from 'data/models';
 import { Maybe } from 'tsmonad';
 import * as contentTypes from 'data/contentTypes';
 
@@ -132,7 +132,16 @@ export const documents = (
       }));
 
     case documentActions.SET_CURRENT_PAGE_OR_NODE:
-      const assessment = ed.document.model;
+
+      // For pools, there are no pages, so just set the node
+      if (ed.document.model instanceof PoolModel
+        && (!(typeof action.nodeOrPageId === 'string'))) {
+        return state.set(action.documentId, ed.with({
+          currentNode: Maybe.just(action.nodeOrPageId),
+        }));
+      }
+
+      const assessment = ed.document.model as AssessmentModel;
 
       // If we are setting the page and it's a change from the current page,
       // also set the selectedNode as the first node
@@ -154,11 +163,11 @@ export const documents = (
       return state.set(action.documentId, ed.with({
         currentNode: Maybe.just(action.nodeOrPageId),
         currentPage: assessment.modelType === 'AssessmentModel'
-            ? assessment.pages.reduce(
+          ? assessment.pages.reduce(
             (activePage, page: contentTypes.Page) =>
               page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
             ed.currentPage)
-            : Maybe.nothing(),
+          : Maybe.nothing(),
       }));
     default:
       return state;

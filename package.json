@@ -1,6 +1,6 @@
 {
   "name": "course-editor",
-  "version": "0.18.2",
+  "version": "0.19.0",
   "description": "",
   "main": "./src/app.tsx",
   "author": "",
@@ -13,7 +13,6 @@
     "@types/react-dom": "16.0.3",
     "@types/react-redux": "^4.4.36",
     "@types/redux": "^3.6.0",
-    "@types/redux-logger": "^3.0.0",
     "@types/redux-thunk": "^2.1.0",
     "babel-core": "^6.22.1",
     "babel-loader": "^7.1.4",
@@ -49,7 +48,6 @@
     "react-tippy": "^1.2.2",
     "reason-react": "^0.4.2",
     "redux": "^3.6.0",
-    "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.13.1",
