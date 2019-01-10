@@ -14,7 +14,6 @@ import { InlineEdit } from './InlineEdit';
 import { CourseModel } from 'data/models';
 import { stringFormat } from 'utils/format';
 import flatui from 'styles/palettes/flatui';
-import history from 'utils/history';
 import { Tooltip } from 'utils/tooltip';
 import { Skill } from 'components/objectives/Skill';
 import { IssueTooltip } from 'components/objectives/IssueTooltip';
