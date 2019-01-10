@@ -19,7 +19,7 @@ export enum ROUTE {
   OBJECTIVES = 'objectives',
 }
 
-const getUrlParams = (search: string): Map<string, string> =>
+export const getUrlParams = (search: string): Map<string, string> =>
   search ? search.replace('?', '').split('&').reduce(
     (acc, val) => {
       const [param, value] = val.split('=');
@@ -34,7 +34,7 @@ const getUrlParams = (search: string): Map<string, string> =>
   )
   : Map<string, string>();
 
-const stringifyUrlParams = (urlParams: Map<string, string>): string =>
+export const stringifyUrlParams = (urlParams: Map<string, string>): string =>
   urlParams.keySeq().reduce(
     (acc, name, index) => {
       return `${acc}${index > 0 ? '&' : ''}${name}=${urlParams.get(name)}`;
