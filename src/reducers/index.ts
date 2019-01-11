@@ -20,6 +20,7 @@ import { user, UserState } from 'reducers/user';
 import { questionEditor, QuestionEditorState } from 'reducers/questionEditor';
 import { documents, DocumentsState } from 'reducers/documents';
 import { activeContext, ActiveContextState } from 'reducers/active';
+import { router, RouterState } from 'reducers/router';
 import { clipboard, ClipboardState } from 'reducers/clipboard';
 import { XrefState, xref } from 'reducers/xref';
 
@@ -40,6 +41,7 @@ export interface State {
   modal: ModalState;
   objectives: ObjectiveState;
   requests: RequestsState;
+  router: RouterState;
   server: ServerState;
   skills: SkillsState;
   user: UserState;
@@ -65,6 +67,7 @@ const reducers = combineReducers({
   modal,          // modal display state
   objectives,     // The current learning objectives
   requests,       // the current pending async requests
+  router,          // current application route information
   server,         // server specific info (time skew, etc)
   skills,         // all known skills for the current course
   user,           // Information about current user, null if not logged in

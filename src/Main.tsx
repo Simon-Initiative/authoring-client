@@ -1,11 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { bindActionCreators } from 'redux';
-import { setServerTimeSkew } from 'actions/server';
-import { modalActions } from 'actions/modal';
-import * as viewActions from 'actions/view';
-import { load, release } from 'actions/document';
-import { loadCourse } from 'actions/course';
+import { Maybe } from 'tsmonad';
+import * as persistence from 'data/persistence';
 import { UserState } from 'reducers/user';
 import { ModalState } from 'reducers/modal';
 import { CourseState } from 'reducers/course';
@@ -16,13 +12,11 @@ import * as contentTypes from 'data/contentTypes';
 import * as models from 'data/models';
 import guid from 'utils/guid';
 import { LegacyTypes } from 'data/types';
-import { Maybe } from 'tsmonad';
 import Header from 'components/Header.controller';
 import Footer from 'components/Footer';
 import { CoursesViewSearchable } from './components/CoursesViewSearchable.controller';
 import DocumentView from 'components/DocumentView';
 import ResourceView from 'components/ResourceView';
-import Preview from 'components/Preview';
 import CreateCourseView from 'components/CreateCourseView';
 import ObjectiveSkillView from 'components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from 'components/ImportCourseView';
@@ -30,15 +24,16 @@ import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
 import Messages from 'components/message/Messages.controller';
-import * as Msg from 'types/messages';
-import { getQueryVariableFromString } from 'utils/params';
-import * as messageActions from 'actions/messages';
 import { Resource, ResourceState } from 'data/content/resource';
 import { GlobalError } from 'components/GlobalError';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import './Main.scss';
 import CourseEditor from 'editors/document/course/CourseEditor.controller';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
+import { RouterState } from 'reducers/router';
+import { ROUTE } from 'actions/router';
+import { ResourceLoading } from 'components/ResourceLoading';
+
+import './Main.scss';
 
 type ResourceList = {
   title: string,
@@ -54,13 +49,6 @@ function res(title, resourceType, filterFn, createResourceFn): ResourceList {
     filterFn,
     createResourceFn,
   };
-}
-
-function getPathName(pathname: string): string {
-  if (pathname.startsWith('/state')) {
-    return '/';
-  }
-  return pathname;
 }
 
 const createOrg = (courseId, title, type) => {
@@ -131,13 +119,17 @@ const resources = {
 };
 
 interface MainProps {
-  location: any;
   user: UserState;
   modal: ModalState;
-  course: CourseState;
+  course: Maybe<CourseState>;
   expanded: ExpandedState;
+  router: RouterState;
   server: ServerState;
   hover: HoverState;
+  onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onRelease: (documentId: string) => Promise<{}>;
+  onSetServerTimeSkew: () => void;
+  onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
 }
@@ -146,24 +138,16 @@ interface MainState {
   hasErrored: boolean;
 }
 
-
 /**
  * Main React Component
  */
 @DragDropContext(HTML5Backend)
 export default class Main extends React.Component<MainProps, MainState> {
-
-  modalActions: Object;
-  viewActions: Object;
   error: Object;
   info: Object;
 
   constructor(props) {
     super(props);
-    const { onDispatch } = this.props;
-
-    this.modalActions = bindActionCreators((modalActions as any), onDispatch);
-    this.viewActions = bindActionCreators((viewActions as any), onDispatch);
 
     this.state = {
       hasErrored: false,
@@ -180,140 +164,143 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   componentDidMount() {
-    const { onDispatch } = this.props;
+    const { onSetServerTimeSkew } = this.props;
 
     // Fire off the async request to determine server time skew
-    onDispatch(setServerTimeSkew());
+    onSetServerTimeSkew();
 
-    this.loadCourseIfNecessary(this.props);
+    this.loadCourseIfNecessary();
   }
 
-  loadCourseIfNecessary(props: MainProps) {
+  loadCourseIfNecessary() {
+    const { course, router, onLoadCourse } = this.props;
 
-    const { course, location, onDispatch } = props;
-    const url = getPathName(location.pathname);
+    router.courseId.lift((courseId) => {
+      const courseGuid = course.caseOf({
+        just: c => c.guid,
+        nothing: () => '',
+      });
 
-    switch (url) {
-      case '/':
-      case '/create':
-      case '/import':
-        return;
-      default:
-        const courseId = url.substr(url.indexOf('-') + 1);
-        if (course === null || course.guid !== courseId) {
-          onDispatch(loadCourse(courseId));
-        }
-    }
-
+      if (courseGuid !== courseId) {
+        onLoadCourse(courseId);
+      }
+    });
   }
 
   componentWillReceiveProps(nextProps: MainProps) {
-    if (this.props.location.pathname !== nextProps.location.pathname) {
-      this.loadCourseIfNecessary(nextProps);
+    if (this.props.router !== nextProps.router) {
+      this.loadCourseIfNecessary();
     }
   }
 
   renderResource(resource: ResourceList) {
     const { onDispatch, server, course } = this.props;
 
-    const orgHelpPopover = <HelpPopover activateOnClick>
-      <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
-    </HelpPopover>;
-
-    return (
-      <ResourceView
-        serverTimeSkewInMs={server.timeSkewInMs}
-        course={course}
-        title={resource.title}
-        resourceType={resource.resourceType}
-        filterFn={resource.filterFn}
-        createResourceFn={resource.createResourceFn}
-        dispatch={onDispatch}
-        helpPopover={resource.resourceType === LegacyTypes.organization ? orgHelpPopover : null} />
+    const orgHelpPopover = (
+      <HelpPopover activateOnClick>
+        <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
+      </HelpPopover>
     );
+
+    return course.caseOf({
+      just: c => (
+        <ResourceView
+          serverTimeSkewInMs={server.timeSkewInMs}
+          course={c}
+          title={resource.title}
+          resourceType={resource.resourceType}
+          filterFn={resource.filterFn}
+          createResourceFn={resource.createResourceFn}
+          dispatch={onDispatch}
+          helpPopover={resource.resourceType === LegacyTypes.organization ? orgHelpPopover : null}
+        />
+      ),
+      nothing: () => (
+        <ResourceLoading />
+      ),
+    });
   }
 
-  getView(url: string): JSX.Element {
-    const { onDispatch, expanded, user, course } = this.props;
+  getView(): JSX.Element {
+    const { expanded, user, course, router, onLoad, onRelease, onDispatch } = this.props;
 
-    if (url === '/') {
-      return <CoursesViewSearchable
-              serverTimeSkewInMs={this.props.server.timeSkewInMs}
-              userId={user.userId} />;
-    }
-    if (url === '/create') {
-      return <CreateCourseView dispatch={onDispatch} />;
-    }
-    if (url === '/import') {
-      return <ImportCourseView dispatch={onDispatch} />;
-    }
-    if (url.startsWith('/preview')) {
-
-      const documentId = url.substring(8, url.indexOf('-'));
-      const hasParams = url.indexOf('?') !== -1;
-      const courseId = hasParams
-        ? url.substring(url.indexOf('-') + 1, url.indexOf('?'))
-        : url.substr(url.indexOf('-') + 1);
-      const query = url.substr(url.indexOf('?') + 1);
-      const previewUrl = getQueryVariableFromString('url', query);
-      const shouldRefresh = getQueryVariableFromString('refresh', query) === 'true';
-
-      const maybePreviewUrl = previewUrl === null
-        ? Maybe.nothing<string>() : Maybe.just(previewUrl);
-
-      return <Preview
-        showMessage={(message: Msg.Message) => {
-          this.props.onDispatch(messageActions.showMessage(message));
-        }}
-        dismissMessage={(message: Msg.Message) => {
-          this.props.onDispatch(messageActions.dismissSpecificMessage(message));
-        }}
-        email={this.props.user.profile.email}
-        shouldRefresh={shouldRefresh}
-        previewUrl={maybePreviewUrl}
-        documentId={documentId}
-        courseId={courseId} />;
-
-    }
-    if (url.startsWith('/objectives-') && course) {
-      return <ObjectiveSkillView
-        course={course}
-        dispatch={onDispatch}
-        expanded={expanded}
-        userName={user.user} />;
-    }
-
-    if (course) {
-
-      const documentId: string = url.substr(1, url.indexOf('-') - 1);
-
-      if (documentId === course.guid) {
-        return <CourseEditor
-          model={course}
-          editMode={course.editable}
-        />;
+    switch (router.route) {
+      case ROUTE.IMPORT:
+        return <ImportCourseView dispatch={onDispatch} />;
+      case ROUTE.CREATE:
+        return <CreateCourseView dispatch={onDispatch} />;
+      case ROUTE.ROOT:
+        return <CoursesViewSearchable
+          serverTimeSkewInMs={this.props.server.timeSkewInMs}
+          userId={user.userId} />;
+      case ROUTE.OBJECTIVES:
+        return course.caseOf({
+          just: c => (
+            <ObjectiveSkillView
+              course={c}
+              dispatch={onDispatch}
+              expanded={expanded}
+              userName={user.user} />
+          ),
+          nothing: () => (
+            <ResourceLoading />
+          ),
+        });
+      case ROUTE.ORGANIZATIONS: {
+        return this.renderResource(resources.organizations);
       }
-      if (resources[documentId] !== undefined) {
-        return this.renderResource(resources[documentId]);
+      case ROUTE.PAGES: {
+        return this.renderResource(resources.pages);
       }
+      case ROUTE.FORMATIVE: {
+        return this.renderResource(resources.formativeassessments);
+      }
+      case ROUTE.SUMMATIVE: {
+        return this.renderResource(resources.summativeassessments);
+      }
+      case ROUTE.POOLS: {
+        return this.renderResource(resources.pools);
+      }
+      default: {
+        return course.caseOf({
+          just: c => router.resourceId.caseOf({
+            just: (resourceId) => {
+              if (resourceId === c.guid) {
+                return (
+                  <CourseEditor
+                    model={c}
+                    editMode={c.editable} />
+                );
+              }
+              if (resources[resourceId] !== undefined) {
+                return this.renderResource(resources[resourceId]);
+              }
 
-      const onRelease = (docId: string) => onDispatch(release(docId));
-      const onLoad = (docId: string) => onDispatch(load(course.guid, docId));
-
-      return (
-        <DocumentView
-          onLoad={onLoad}
-          onRelease={onRelease}
-          profile={user.profile}
-          course={course}
-          userId={user.userId}
-          userName={user.user}
-          documentId={documentId} />
-      );
-
+              return (
+                <DocumentView
+                  onLoad={(docId: string) => onLoad(c.guid, docId)}
+                  onRelease={(docId: string) => onRelease(docId)}
+                  profile={user.profile}
+                  course={c}
+                  userId={user.userId}
+                  userName={user.user}
+                  documentId={resourceId} />
+              );
+            },
+            nothing: () => {
+              return (
+                <CourseEditor
+                  model={c}
+                  editMode={c.editable} />
+              );
+            },
+          }),
+          nothing: () => (
+            <ResourceLoading />
+          ),
+        });
+      }
     }
-    return undefined;
-
   }
 
 
@@ -350,8 +337,6 @@ export default class Main extends React.Component<MainProps, MainState> {
         .map((component, i) => <div key={i}>{component}</div>);
     }
 
-    const currentView = this.getView(getPathName(this.props.location.pathname));
-
     return (
       <div className="main" onMouseOver={() => hover && onUpdateHover(null)}>
         <div className="main-header">
@@ -359,7 +344,7 @@ export default class Main extends React.Component<MainProps, MainState> {
           <Header />
         </div>
         <div className="main-content">
-          {currentView}
+          {this.getView()}
         </div>
         <div className="main-footer">
           <Footer name={user.profile.username} email={user.profile.email} />

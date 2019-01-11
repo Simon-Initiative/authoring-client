@@ -5,7 +5,6 @@ const Provider = (require('react-redux') as RR).Provider;
 
 interface ApplicationRootProps {
   store: any;
-  location: any;
 }
 
 interface RR {
@@ -20,7 +19,7 @@ export class ApplicationRoot extends React.Component<ApplicationRootProps, {}> {
   render(): JSX.Element {
     return (
       <Provider store={this.props.store}>
-        <Main location={this.props.location}/>
+        <Main />
       </Provider>
     );
   }

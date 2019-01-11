@@ -3,6 +3,7 @@ import * as React from 'react';
 import './Toast.scss';
 
 export interface ToastProps {
+  className?: string;
   style?: React.CSSProperties;
   icon: JSX.Element;
   heading: string;
@@ -26,10 +27,10 @@ export class Toast
   extends React.Component<ToastProps, ToastState> {
 
   render() {
-    const { style, icon, heading, content, severity } = this.props;
+    const { className, style, icon, heading, content, severity } = this.props;
 
     return (
-      <div style={style} className={`toast ${severity}`}>
+      <div style={style} className={`toast ${severity} ${className ? className : ''}`}>
         <div className="toast-icon">
           {icon}
         </div>
