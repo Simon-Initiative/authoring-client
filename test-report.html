@@ -1,0 +1,47 @@
+<html><head><meta charset="utf-8"/><title>Test suite</title><style type="text/css">
+	html,body {font-family:Arial,Helvetica,sans-serif;font-size:1rem;margin:0;padding:0;color:#333;}
+	body {padding:1rem;2rem;font-size:0.85rem;}
+	#title {margin-top: 0;}
+	#timestamp {font-weight:bold;color:#666;margin-bottom:0.5rem;}
+	#summary {color:#999;margin-bottom:1em;}
+	.suite-info {padding:1em;background-color:#eee;border-bottom:2px solid #999;font-weight:bold;color:#999;}
+	.suite-table {width:100%;font-size:0.85rem;margin-bottom:1em;}
+	.suite-table td {padding:0.5rem;}
+	.suite-table tr.passed {background-color:#DFF2BF;color:#4F8A10;}
+	.suite-table tr.pending {background-color:#FEEFB3;color:#9F6000;}
+	.suite-table tr.failed {background-color:#FFBABA;color:#D8000C;}
+	.suite-table td {font-size:0.85rem;border-bottom:1px solid #aaa;vertical-align:top;}
+	.suite-table td.suite {font-weight:bold;width:20%;}
+	.suite-table td.test {font-style:italic;width:60%;}
+	.suite-table td.test .failureMsg {font-weight:bold;font-size:0.7rem;}
+	.suite-table td.result {width:20%;text-align:right;}
+</style></head><body><h1 id="title">Test suite</h1></body><div id="timestamp">Start: 1/11/2019, 10:51:34 AM</div><div id="summary">
+		30 tests /
+		22 passed /
+		8 failed /
+		0 pending
+	</div><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/dev/test/editors/common/tree/utils-test.js (1.915s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="failed"><td class="suite"/><td class="test">top level remove</td><td class="result">failed</td></tr><tr class="failed"><td class="suite"/><td class="test">second-level remove</td><td class="result">failed</td></tr><tr class="failed"><td class="suite"/><td class="test">top level insert</td><td class="result">failed</td></tr><tr class="failed"><td class="suite"/><td class="test">recursive insert</td><td class="result">failed</td></tr><tr class="failed"><td class="suite"/><td class="test">top level update</td><td class="result">failed</td></tr><tr class="failed"><td class="suite"/><td class="test">recursive update</td><td class="result">failed</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/test/editors/common/tree/utils-test.ts (2.139s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">top level remove</td><td class="result">passed in 0.02s</td></tr><tr class="passed"><td class="suite"/><td class="test">second-level remove</td><td class="result">passed in 0.004s</td></tr><tr class="passed"><td class="suite"/><td class="test">top level insert</td><td class="result">passed in 0.021s</td></tr><tr class="passed"><td class="suite"/><td class="test">recursive insert</td><td class="result">passed in 0.013s</td></tr><tr class="passed"><td class="suite"/><td class="test">top level update</td><td class="result">passed in 0.005s</td></tr><tr class="passed"><td class="suite"/><td class="test">recursive update</td><td class="result">passed in 0.005s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/test/utils/permutations-test.ts (0.487s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">should return all the permutations</td><td class="result">passed in 0.012s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/test/utils/numbering-test.ts (0.388s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">leading zero test</td><td class="result">passed in 0.006s</td></tr><tr class="passed"><td class="suite"/><td class="test">upper roman numerals test</td><td class="result">passed in 0.002s</td></tr><tr class="passed"><td class="suite"/><td class="test">lower roman numerals test</td><td class="result">passed in 0.001s</td></tr><tr class="passed"><td class="suite"/><td class="test">lower alpha test</td><td class="result">passed in 0.002s</td></tr><tr class="passed"><td class="suite"/><td class="test">upper alpha test</td><td class="result">passed in 0.002s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/dev/test/data/models/workbook-test.js (6.257s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="failed"><td class="suite"/><td class="test">WorkbookPageModel</td><td class="result">failed</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/test/data/models/contiguous-test.ts (33.708s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">Contiguous text parsing</td><td class="result">passed in 0.046s</td></tr><tr class="passed"><td class="suite"/><td class="test">Non-overlapping markup text parsing</td><td class="result">passed in 0.033s</td></tr><tr class="passed"><td class="suite"/><td class="test">overlapping markup text parsing</td><td class="result">passed in 0.016s</td></tr><tr class="passed"><td class="suite"/><td class="test">only contiguous text</td><td class="result">passed in 0.021s</td></tr><tr class="passed"><td class="suite"/><td class="test">inline entities</td><td class="result">passed in 0.011s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/dev/test/utils/format-test.js (0.114s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">toAlphaNotation test</td><td class="result">passed in 0.017s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/test/data/models/full-test.ts (31.524s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">Single, top-level section</td><td class="result">passed in 0.197s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/test/utils/format-test.ts (0.166s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">toAlphaNotation test</td><td class="result">passed in 0.02s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/dev/test/utils/feedback-test.js (0.233s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">Creating Feedback Form URL</td><td class="result">passed in 0.006s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/test/utils/feedback-test.ts (0.243s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="passed"><td class="suite"/><td class="test">Creating Feedback Form URL</td><td class="result">passed in 0.008s</td></tr></table><div class="suite-info">
+			/Users/dmsiegel/dev/course-editor/test/utils/mime-test.ts (0.558s)
+		</div><table class="suite-table" cellspacing="0" cellpadding="0"><tr class="failed"><td class="suite"/><td class="test">Testing mimeType determination</td><td class="result">failed</td></tr></table></html>
