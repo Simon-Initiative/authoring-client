@@ -8,7 +8,7 @@ import { InlineEdit } from './InlineEdit';
 import { Button } from 'components/common/Button';
 import { IssueTooltip } from 'components/objectives/IssueTooltip';
 import { Tooltip } from 'utils/tooltip';
-import { addPluralS, QuestionRef } from 'components/objectives/utils';
+import { QuestionRef } from 'components/objectives/utils';
 import { LegacyTypes } from 'data/types';
 import {
   checkModel, ModelCheckerRule, RequirementType,

@@ -54,7 +54,7 @@ export const objectiveModelRules: ModelCheckerRule<LearningObjective, RuleData>[
   requirementType: RequirementType.Should,
   requirement: 'have valid skills',
   isIssue: (data: LearningObjective, aux) => {
-    const { pageCount, skills, skillQuestionRefs } = aux;
+    const { skills, skillQuestionRefs } = aux;
     return skills.reduce(
       (acc, skill) => {
         // const skill = skills.find(s => s.id === skillId);
