@@ -4,7 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-import { QuestionEditor } from 'editors/content/question/QuestionEditor';
+import { QuestionEditor } from 'editors/content/question/question/QuestionEditor';
 import { Skill } from 'types/course';
 import { Maybe } from 'tsmonad';
 

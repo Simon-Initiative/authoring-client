@@ -54,7 +54,7 @@ const boxTarget = {
   isOver: monitor.isOver(),
   canDrop: monitor.canDrop(),
   draggedItem: monitor.getItem(),
-}))export class RepositionTarget<NodeType extends Types.HasGuid>
+})) export class RepositionTarget<NodeType extends Types.HasGuid>
   extends React.Component<RepositionTargetProps<NodeType>, RepositionTargetState> {
 
   constructor(props) {
@@ -68,7 +68,7 @@ const boxTarget = {
     const classes = 'reposition-target ' + ((isOver && canDrop) ? 'reposition-target-active' : '');
 
     return (this.props as any).connectDropTarget(
-      <div className={classes}/>,
+      <div className={classes} />,
     );
   }
 

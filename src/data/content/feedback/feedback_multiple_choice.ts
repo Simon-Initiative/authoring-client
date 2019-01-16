@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { getChildren } from 'data/content/common';
+import { getChildren, augment } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { FeedbackChoice } from './feedback_choice';
@@ -15,7 +15,9 @@ type FeedbackMultipleChoiceParams = {
   choices?: Immutable.OrderedMap<string, FeedbackChoice>;
 };
 
-const defaultFeedbackMultipleChoiceParams: FeedbackMultipleChoiceParams = {
+const defaultFeedbackMultipleChoiceParams = {
+  contentType: 'FeedbackMultipleChoice',
+  elementType: 'multiple_choice',
   guid: '',
   id: '',
   prompt: new FeedbackPrompt(),
@@ -26,6 +28,8 @@ const defaultFeedbackMultipleChoiceParams: FeedbackMultipleChoiceParams = {
 };
 
 export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMultipleChoiceParams) {
+  contentType: 'FeedbackMultipleChoice';
+  elementType: 'multiple_choice';
   guid: string;
   id: string;
   prompt: FeedbackPrompt;
@@ -33,7 +37,7 @@ export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMult
   choices: Immutable.OrderedMap<string, FeedbackChoice>;
 
   constructor(params?: FeedbackMultipleChoiceParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackMultipleChoiceParams): FeedbackMultipleChoice {

@@ -2,48 +2,58 @@ import * as React from 'react';
 
 import * as Tree from 'editors/common/tree';
 import {
-  Node as AssessmentNode, Question, Selection, ContiguousText, Content, Pool, PoolRef,
+  Node, Question, Selection, ContiguousText, Content, Pool, PoolRef,
 } from 'data/contentTypes';
-import { getLabelForQuestion } from 'editors/content/question/Question';
+import { getLabelForQuestion } from 'editors/content/question/question/Question';
 
 import './tabs.scss';
 import { CourseModel } from 'data/models';
+import { LikertSeries } from 'data/content/feedback/likert_series';
+import { Likert } from 'data/content/feedback/likert';
+import { FeedbackMultipleChoice } from 'data/content/feedback/feedback_multiple_choice';
 
 const newText: (type: string) => string = type => 'New ' + type;
 
 export interface TabProps {
   course?: CourseModel;
-  node: AssessmentNode;
-  nodeState: Tree.NodeState<AssessmentNode>;
+  node: Node;
+  nodeState: Tree.NodeState<Node>;
   handlers: Tree.Handlers;
   connectDragSource?: any;
 }
 
 export function renderTab(
-  course: CourseModel, node: AssessmentNode,
-  nodeState: Tree.NodeState<AssessmentNode>,
+  course: CourseModel, node: Node,
+  nodeState: Tree.NodeState<Node>,
   handlers: Tree.Handlers): JSX.Element {
+
+  const coreProps = {
+    nodeState,
+    handlers,
+  };
 
   switch (node.contentType) {
     case 'Question':
-      return <QuestionTab
-        node={node} nodeState={nodeState} handlers={handlers} />;
+      return <QuestionTab {...coreProps} node={node} />;
     case 'Content':
-      return <ContentTab
-        node={node} nodeState={nodeState} handlers={handlers} />;
+      return <ContentTab {...coreProps} node={node} />;
     case 'Unsupported':
-      return <UnsupportedTab
-        node={node} nodeState={nodeState} handlers={handlers} />;
+      return <UnsupportedTab {...coreProps} node={node} />;
     case 'Selection':
       if (node.source.contentType === 'PoolRef') {
-        return <PoolRefTab
-          course={course} node={node} nodeState={nodeState} handlers={handlers} />;
+        return <PoolRefTab {...coreProps} node={node} course={course} />;
       }
-      return <PoolTab
-        course={course} node={node} nodeState={nodeState} handlers={handlers} />;
+      return <PoolTab {...coreProps} node={node} course={course} />;
+    case 'LikertSeries':
+      return <LikertSeriesTab {...coreProps} node={node} />;
+    case 'Likert':
+      return <LikertTab {...coreProps} node={node} />;
+    case 'FeedbackMultipleChoice':
+      return <FeedbackMultipleChoiceTab {...coreProps} node={node} />;
+    case 'FeedbackOpenResponse':
+      return <FeedbackOpenResponseTab {...coreProps} node={node} />;
     default:
-      return <UnsupportedTab
-        node={node} nodeState={nodeState} handlers={handlers} />;
+      return <UnsupportedTab {...coreProps} node={node} />;
   }
 }
 
@@ -86,7 +96,6 @@ const Label = (props) => {
 
 const QuestionTab = (props: TabProps) => {
   const q = props.node as Question;
-
 
   const textBlocks = q.body.content
     .filter(contentElement => contentElement.contentType === 'ContiguousText');
@@ -189,9 +198,77 @@ const PoolRefTab = (props: TabProps) => {
   );
 };
 
+const LikertSeriesTab = (props: TabProps) => {
+  const p = props.node as LikertSeries;
+
+  const previewText = 'REPLACE - Likert Series Preview Text';
+
+  return (
+    <Tab
+      {...props}
+      label="Likert Series"
+      previewText={previewText}
+    />
+  );
+};
+
+const LikertTab = (props: TabProps) => {
+  const p = props.node as Likert;
+
+  // const previewText = pool
+  //   ? props.course.resourcesById.get(pool.idref).title + ' (' + selection(p) + ')'
+  //   : selection(p);
+
+  const previewText = 'REPLACE - Likert Preview Text';
+
+  return (
+    <Tab
+      {...props}
+      label="Likert"
+      previewText={previewText}
+    />
+  );
+};
+
+const FeedbackMultipleChoiceTab = (props: TabProps) => {
+  const p = props.node as FeedbackMultipleChoice;
+
+  // const previewText = pool
+  //   ? props.course.resourcesById.get(pool.idref).title + ' (' + selection(p) + ')'
+  //   : selection(p);
+
+  const previewText = 'REPLACE - Feedback Multiple Choice Preview Text';
+
+  return (
+    <Tab
+      {...props}
+      label="Multiple Choice"
+      previewText={previewText}
+    />
+  );
+};
+
+const FeedbackOpenResponseTab = (props: TabProps) => {
+  const p = props.node as Selection;
+
+  // const previewText = pool
+  //   ? props.course.resourcesById.get(pool.idref).title + ' (' + selection(p) + ')'
+  //   : selection(p);
+
+  const previewText = 'REPLACE - Feedback Open Response Preview Text';
+
+  return (
+    <Tab
+      {...props}
+      label="Open Response"
+      previewText={previewText}
+    />
+  );
+};
+
 interface TabProperties {
-  node: AssessmentNode;
-  nodeState: Tree.NodeState<AssessmentNode>;
+  node: Node;
+  nodeState: Tree.NodeState<Node>;
   handlers: Tree.Handlers;
   previewText: string;
   label: string;
@@ -201,12 +278,6 @@ interface TabProperties {
 }
 
 class Tab extends React.PureComponent<TabProperties, {}> {
-
-  ref: any;
-
-  constructor(props) {
-    super(props);
-  }
 
   render(): JSX.Element {
     const {

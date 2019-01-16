@@ -103,6 +103,14 @@ const resources = {
       type,
       title: contentTypes.Title.fromText(title),
     })),
+  feedbackassessments: res(
+    'Feedback Assessments',
+    LegacyTypes.feedback,
+    (resource: Resource) => resource.type === LegacyTypes.feedback
+      && resource.resourceState !== ResourceState.DELETED,
+    (courseId, title, type) => models.FeedbackModel.createNew(
+      guid(), title, 'Description'),
+  ),
   pages: res(
     'Workbook Pages',
     LegacyTypes.workbook_page,
@@ -238,8 +246,8 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     if (url === '/') {
       return <CoursesViewSearchable
-              serverTimeSkewInMs={this.props.server.timeSkewInMs}
-              userId={user.userId} />;
+        serverTimeSkewInMs={this.props.server.timeSkewInMs}
+        userId={user.userId} />;
     }
     if (url === '/create') {
       return <CreateCourseView dispatch={onDispatch} />;

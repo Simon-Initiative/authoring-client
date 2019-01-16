@@ -1,15 +1,15 @@
 import * as React from 'react';
-import * as contentTypes from '../../../data/contentTypes';
-import { Select } from '../common/controls';
+import * as contentTypes from '../../../../data/contentTypes';
+import { Select } from '../../common/controls';
 import {
   Question, QuestionProps, QuestionState,
-} from './Question';
+} from '../question/Question';
 import {
   TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
-import { ConditionalBranchSelect } from '../common/BranchSelect';
+import { ConditionalBranchSelect } from '../../common/BranchSelect';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 

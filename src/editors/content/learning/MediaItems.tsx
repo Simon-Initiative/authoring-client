@@ -129,7 +129,7 @@ export class MediaMetadataEditor
   onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({ text });
     const model: contentTypes.MediaItem = (this.props.model as MediaType).with({ titleContent });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model);
   }
 
   // onCitationTitleEdit(title: string) {

@@ -6,23 +6,25 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import guid from 'utils/guid';
 import { ContentElements } from 'data/content/common/elements';
-import { MultipleChoice } from 'editors/content/question/MultipleChoice.controller';
-import { Essay } from 'editors/content/question/Essay';
-import { CheckAllThatApply } from 'editors/content/question/CheckAllThatApply.controller';
-import { ImageHotspot } from 'editors/content/question/ImageHotspot.controller';
-import { ShortAnswer } from 'editors/content/question/ShortAnswer';
-import { Ordering } from 'editors/content/question/Ordering.controller';
-import { DynaDropInput } from 'editors/content/question/DynaDropInput.controller';
-import { MultipartInput } from 'editors/content/question/MultipartInput.controller';
+import { MultipleChoice } from 'editors/content/question/multiplechoice/MultipleChoice.controller';
+import { Essay } from 'editors/content/question/essay/Essay';
+import { CheckAllThatApply } from
+  'editors/content/question/checkallthatapply/CheckAllThatApply.controller';
+import { ImageHotspot } from 'editors/content/question/imagehotspot/ImageHotspot.controller';
+import { ShortAnswer } from 'editors/content/question/shortanswer/ShortAnswer';
+import { Ordering } from 'editors/content/question/ordering/Ordering.controller';
+import { DynaDropInput } from 'editors/content/question/draganddrop/DynaDropInput.controller';
+import { MultipartInput } from 'editors/content/question/multipart/MultipartInput.controller';
 import { Skill } from 'types/course';
-import { InsertInputRefCommand } from 'editors/content/question/commands';
+import { InsertInputRefCommand } from 'editors/content/question/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
 import { Maybe } from 'tsmonad';
 
 import './QuestionEditor.scss';
+import { ContentElement } from 'data/content/common/interfaces';
 
-export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
+export interface Props extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   onDuplicate?: () => void;
   isParentAssessmentGraded?: boolean;
@@ -35,7 +37,7 @@ export interface QuestionEditorProps extends AbstractContentEditorProps<contentT
   branchingQuestions: Maybe<number[]>;
 }
 
-export interface QuestionEditorState {
+export interface State {
   activeItemId: string;
 }
 
@@ -43,77 +45,39 @@ export interface QuestionEditorState {
  * Question Editor Component
  */
 export class QuestionEditor
-  extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
-  lastBody: ContentElements;
+  extends AbstractContentEditor<contentTypes.Question, Props, State> {
+  lastBody: ContentElements = this.props.model.body;
   itemToAdd: any;
-  fillInTheBlankCommand: InsertInputRefCommand;
-  numericCommand: InsertInputRefCommand;
-  textCommand: InsertInputRefCommand;
+  fillInTheBlankCommand: InsertInputRefCommand =
+    new InsertInputRefCommand(this, this.createFillInTheBlank, 'FillInTheBlank');
+  numericCommand: InsertInputRefCommand =
+    new InsertInputRefCommand(this, () => new contentTypes.Numeric(), 'Numeric');
+  textCommand: InsertInputRefCommand =
+    new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
 
-  constructor(props) {
-    super(props);
+  state = {
+    ...this.state,
+    activeItemId: null,
+  };
 
-    this.state = {
-      activeItemId: null,
-    };
-
-    const createFillInTheBlank = () => {
-      const value = guid().replace('-', '');
-      const choice = contentTypes.Choice.fromText('', guid()).with({ value });
-
-      const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
-
-      return new contentTypes.FillInTheBlank().with({ choices });
-    };
-
-    this.onBlur = this.onBlur.bind(this);
-    this.onFocusChange = this.onFocusChange.bind(this);
-    this.canInsertAnotherPart = this.canInsertAnotherPart.bind(this);
-    this.onBodyEdit = this.onBodyEdit.bind(this);
-    this.onItemPartEdit = this.onItemPartEdit.bind(this);
-    this.onRemove = this.onRemove.bind(this);
-    this.onGradingChange = this.onGradingChange.bind(this);
-    this.onVariablesChange = this.onVariablesChange.bind(this);
-    this.onAddItemPart = this.onAddItemPart.bind(this);
-
-    this.fillInTheBlankCommand
-      = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
-    this.numericCommand
-      = new InsertInputRefCommand(this, () => new contentTypes.Numeric(), 'Numeric');
-    this.textCommand
-      = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
-
-    this.lastBody = this.props.model.body;
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    return nextProps.activeContentGuid !== this.props.activeContentGuid ||
+      nextProps.model !== this.props.model ||
+      nextProps.context !== this.props.context ||
+      nextProps.allSkills !== this.props.allSkills ||
+      nextProps.hover !== this.props.hover ||
+      nextProps.activeContentGuid !== this.props.activeContentGuid ||
+      nextState.activeItemId !== this.state.activeItemId;
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
-      return true;
-    }
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextProps.context !== this.props.context) {
-      return true;
-    }
+  createFillInTheBlank() {
+    const choice = contentTypes.Choice.fromText('', guid()).with({
+      value: guid().replace('-', ''),
+    });
 
-    if (nextProps.allSkills !== this.props.allSkills) {
-      return true;
-    }
-
-    if (nextProps.activeItemId !== this.state.activeItemId) {
-      return true;
-    }
-
-    if (nextProps.hover !== this.props.hover) {
-      return true;
-    }
-
-    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
-      return true;
-    }
-
-    return false;
+    return new contentTypes.FillInTheBlank().with({
+      choices: Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice),
+    });
   }
 
   /** Override Parent Method */
@@ -123,19 +87,19 @@ export class QuestionEditor
     }
   }
 
-  onBlur(activeItemId: string) {
+  onBlur = (activeItemId: string) => {
     if (this.state.activeItemId === activeItemId) {
       this.setState({ activeItemId: null });
     }
   }
 
-  onFocusChange(activeItemId: string) {
+  onFocusChange = (activeItemId: string) => {
     this.setState({ activeItemId });
   }
 
-  canInsertAnotherPart(
+  canInsertAnotherPart = (
     question: contentTypes.Question,
-    contentTypeToAdd: 'Numeric' | 'Text' | 'FillInTheBlank'): boolean {
+    contentTypeToAdd: 'Numeric' | 'Text' | 'FillInTheBlank'): boolean => {
 
     if (!this.props.isParentAssessmentGraded) {
       return true;
@@ -146,8 +110,7 @@ export class QuestionEditor
       || question.items.first().contentType === contentTypeToAdd;
   }
 
-  onBodyEdit(body: ContentElements, src) {
-
+  onBodyEdit = (body: ContentElements, src: ContentElement) => {
     let question = this.props.model.with({ body });
 
     if (this.lastBody !== undefined) {
@@ -209,17 +172,20 @@ export class QuestionEditor
     this.props.onEdit(question, src);
   }
 
-  onItemPartEdit(item, part, src) {
-    let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
-    model = model.with({ parts: model.parts.set(part.guid, part) });
-    this.props.onEdit(model, src);
+  onItemPartEdit = (
+    item: contentTypes.QuestionItem, part: contentTypes.Part, src: ContentElement) => {
+    const { model, onEdit } = this.props;
+    onEdit(
+      model.with({
+        parts: model.parts.set(part.guid, part),
+        items: model.items.set(item.guid, item),
+      }),
+      src);
   }
 
-  onRemove(itemModel: contentTypes.QuestionItem, partModel) {
-
-    const items = this.props.model.items.delete(itemModel.guid);
-    const parts = this.props.model.parts.delete(partModel.guid);
-    let model = this.props.model;
+  onRemove = (itemModel: contentTypes.QuestionItem, partModel) => {
+    let { model } = this.props;
+    const { onEdit } = this.props;
 
     switch (itemModel.contentType) {
       case 'Numeric':
@@ -228,15 +194,17 @@ export class QuestionEditor
         model = model.removeInputRef(itemModel.id);
     }
 
-    model = model.with({ items, parts });
-    this.props.onEdit(model);
+    onEdit(model.with({
+      items: model.items.delete(itemModel.guid),
+      parts: model.parts.delete(partModel.guid),
+    }));
   }
 
-  onGradingChange(grading) {
+  onGradingChange = (grading) => {
     this.props.onEdit(this.props.model.with({ grading }));
   }
 
-  onVariablesChange(variables: Immutable.OrderedMap<string, contentTypes.Variable>) {
+  onVariablesChange = (variables: Immutable.OrderedMap<string, contentTypes.Variable>) => {
     this.props.onEdit(this.props.model.with({ variables }));
   }
 
@@ -244,26 +212,29 @@ export class QuestionEditor
     // Do nothing for questions
   }
 
-  onAddItemPart(item, part, body) {
-
-    const model = this.props.model.with({
-      body,
-      items: this.props.model.items.set(item.guid, item),
-      parts: this.props.model.parts.set(part.guid, part),
-    });
+  onAddItemPart = (
+    item: contentTypes.QuestionItem, part: contentTypes.Part, body: ContentElements) => {
+    const { model, onEdit } = this.props;
 
     this.lastBody = body;
 
-    this.props.onEdit(model, null);
+    onEdit(
+      model.with({
+        body,
+        items: this.props.model.items.set(item.guid, item),
+        parts: this.props.model.parts.set(part.guid, part),
+      }),
+      null);
   }
 
   renderQuestionBody(): JSX.Element {
-    const { canRemove } = this.props;
+    const { canRemove, model, onDuplicate, isParentAssessmentGraded, isQuestionPool,
+      onRemove } = this.props;
 
-    const item = this.props.model.items.first();
-    const part = this.props.model.parts.first();
+    const item = model.items.first();
+    const part = model.parts.first();
 
-    const isMultipart = (this.props.model.items.size === 0)
+    const isMultipart = (model.items.size === 0)
       || item.contentType === 'Text'
       || item.contentType === 'Numeric'
       || item.contentType === 'FillInTheBlank';
@@ -275,32 +246,34 @@ export class QuestionEditor
       onBlur: this.onBlur,
       itemModel: item,
       partModel: part,
-      body: this.props.model.body,
-      grading: this.props.model.grading,
+      body: model.body,
+      grading: model.grading,
       onGradingChange: this.onGradingChange,
       onVariablesChange: this.onVariablesChange,
-      onDuplicate: this.props.onDuplicate,
+      onDuplicate,
       onBodyEdit: this.onBodyEdit,
-      hideGradingCriteria: !this.props.isParentAssessmentGraded,
-      hideVariables: !this.props.isQuestionPool,
+      hideGradingCriteria: !isParentAssessmentGraded,
+      hideVariables: !isQuestionPool,
       canRemoveQuestion: canRemove,
-      onRemoveQuestion: this.props.onRemove.bind(this, this.props.model.guid),
+      onRemoveQuestion: onRemove.bind(this, model.guid),
       onEdit: (c, p, src) => this.onItemPartEdit(c, p, src),
     };
 
     if (isMultipart) {
-      if (containsDynaDropCustom(this.props.model.body)) {
+      if (containsDynaDropCustom(model.body)) {
         return (
           <DynaDropInput
-            {...questionProps} itemModel={item}
+            {...questionProps}
+            itemModel={item}
             onAddItemPart={this.onAddItemPart} />
         );
       }
 
       return (
         <MultipartInput
-          {...questionProps} itemModel={item}
-          canInsertAnotherPart={part => this.canInsertAnotherPart(this.props.model, part)}
+          {...questionProps}
+          itemModel={item}
+          canInsertAnotherPart={part => this.canInsertAnotherPart(model, part)}
           onAddItemPart={this.onAddItemPart} />
       );
     }

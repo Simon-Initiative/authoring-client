@@ -9,7 +9,7 @@ import {
 } from 'editors/content/common/TabContainer';
 import { Hints } from 'editors/content/part/Hints';
 import SkillsEditor from 'editors/content/skills/SkillsEditor';
-import { CriteriaEditor } from 'editors/content/question/CriteriaEditor';
+import { CriteriaEditor } from 'editors/content/question/question/CriteriaEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import guid from 'utils/guid';
@@ -186,17 +186,18 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), c);
   }
 
-  onCriteriaRemove(guid) {
+  onCriteriaRemove(guid: string) {
     const criteria = this.props.partModel.criteria.delete(guid);
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), null);
   }
 
-  onCriteriaEdit(c) {
+  onCriteriaEdit(c: contentTypes.GradingCriteria) {
     const criteria = this.props.partModel.criteria.set(c.guid, c);
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), c);
   }
 
-  onSkillsEdit(skills, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+  onSkillsEdit(
+    skills: Immutable.Set<string>, item: contentTypes.QuestionItem, part: contentTypes.Part) {
     const { onEdit } = this.props;
 
     onEdit(item, part.with({ skills }), skills);

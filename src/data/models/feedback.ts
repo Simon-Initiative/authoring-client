@@ -10,6 +10,8 @@ import { ObjRef } from '../content/learning/objref';
 import { LikertSeries } from '../content/feedback/likert_series';
 import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
+import { augment } from 'data/content/common';
+import { ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 
 // oli_feedback_1_2.dtd
 export type FeedbackModelParams = {
@@ -35,11 +37,7 @@ const defaultFeedbackModelParams = {
   shortTitle: Maybe.nothing<string>(),
   objrefs: Immutable.OrderedMap<string, ObjRef>(),
   description: new FeedbackDescription(),
-  questions: new FeedbackQuestions({
-    questions: Immutable.OrderedMap<string, FeedbackQuestion>([
-      [createGuid(), new LikertSeries()],
-    ]),
-  }),
+  questions: new FeedbackQuestions(),
 };
 
 export class FeedbackModel
@@ -53,14 +51,29 @@ export class FeedbackModel
   shortTitle: Maybe<string>;
   objrefs: Immutable.OrderedMap<string, ObjRef>;
   description: FeedbackDescription;
-  questions: Immutable.OrderedMap<string, FeedbackQuestion>;
+  questions: FeedbackQuestions;
 
   constructor(params?: FeedbackModelParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackModelParams): FeedbackModel {
     return this.merge(values) as this;
+  }
+
+  static createNew(id: string, title: string, description: string) {
+    const series = new LikertSeries();
+    return new FeedbackModel({
+      title: new contentTypes.Title({ text: ContentElements.fromText(title, '', TEXT_ELEMENTS) }),
+      resource: new contentTypes.Resource({ id, title }),
+      guid: id,
+      description: new FeedbackDescription({
+        content: ContentElements.fromText(description, '', MATERIAL_ELEMENTS),
+      }),
+      questions: new FeedbackQuestions({
+        questions: Immutable.OrderedMap<string, FeedbackQuestion>([[series.guid, series]]),
+      }),
+    });
   }
 
   static fromPersistence(json: any, notify: () => void = () => null): FeedbackModel {
@@ -126,8 +139,9 @@ export class FeedbackModel
     this.shortTitle.lift(item => children.push({ short_title: item }));
 
     children.push(
-      ...this.objrefs.toArray().map(item => item.toPersistence()), this.description.toPersistence(),
-      ...this.questions.toArray().map(item => item.toPersistence()),
+      ...this.objrefs.toArray().map(item => item.toPersistence()),
+      this.description.toPersistence(),
+      this.questions.toPersistence(),
     );
 
     const doc = [{

@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { getChildren } from 'data/content/common';
+import { getChildren, augment } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { FeedbackPrompt } from './feedback_prompt';
@@ -12,7 +12,9 @@ type FeedbackOpenResponseParams = {
   required?: boolean;
 };
 
-const defaultFeedbackOpenResponseParams: FeedbackOpenResponseParams = {
+const defaultFeedbackOpenResponseParams = {
+  contentType: 'FeedbackOpenResponse',
+  elementType: 'open_response',
   guid: '',
   id: '',
   prompt: new FeedbackPrompt(),
@@ -20,13 +22,15 @@ const defaultFeedbackOpenResponseParams: FeedbackOpenResponseParams = {
 };
 
 export class FeedbackOpenResponse extends Immutable.Record(defaultFeedbackOpenResponseParams) {
+  contentType: 'FeedbackOpenResponse';
+  elementType: 'open_response';
   guid: string;
   id: string;
   prompt: FeedbackPrompt;
   required: boolean;
 
   constructor(params?: FeedbackOpenResponseParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackOpenResponseParams): FeedbackOpenResponse {

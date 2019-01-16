@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { ContentElements, TEXT_ELEMENTS } from '../common/elements';
-import { getChildren } from '../common';
+import { getChildren, augment } from '../common';
 
 type LikertLabelParams = {
   guid?: string;
@@ -9,19 +9,23 @@ type LikertLabelParams = {
   value?: string;
 };
 
-const defaultLikertLabelParams: LikertLabelParams = {
+const defaultLikertLabelParams = {
+  contentType: 'LikertLabel',
+  elementType: 'label',
   guid: '',
   text: ContentElements.fromText('', '', TEXT_ELEMENTS),
   value: '',
 };
 
 export class LikertLabel extends Immutable.Record(defaultLikertLabelParams) {
+  contentType: 'LikertLabel';
+  elementType: 'label';
   guid: string;
   text: ContentElements;
   value: string;
 
   constructor(params?: LikertLabelParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: LikertLabelParams): LikertLabel {

@@ -3,9 +3,9 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
-} from './Question';
+} from '../question/Question';
 import { TabContainer } from 'editors/content/common/TabContainer';
-import { DynaDropTargetItems } from '../items/DynaDropTargetItems';
+import { DynaDropTargetItems } from '../../items/DynaDropTargetItems';
 import { FillInTheBlank }
   from 'data/content/assessment/fill_in_the_blank';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
@@ -16,7 +16,7 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
-import { Badge } from '../common/Badge';
+import { Badge } from '../../common/Badge';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
 import { Maybe } from 'tsmonad';
 export const isComplexScoring = (partModel: contentTypes.Part) => {

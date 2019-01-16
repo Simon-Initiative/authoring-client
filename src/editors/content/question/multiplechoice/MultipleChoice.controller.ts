@@ -3,7 +3,7 @@ import { MultipleChoice } from './MultipleChoice';
 import * as contentTypes from 'data/contentTypes';
 import { toggleAdvancedScoring } from 'actions/questionEditor';
 import { State } from 'reducers';
-import { QuestionProps } from './Question';
+import { QuestionProps } from '../question/Question';
 
 interface StateProps {
   advancedScoringInitialized: boolean;
@@ -34,6 +34,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(MultipleChoice);
+  (mapStateToProps, mapDispatchToProps)(MultipleChoice);
 
 export { controller as MultipleChoice };

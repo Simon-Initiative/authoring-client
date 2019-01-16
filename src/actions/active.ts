@@ -64,7 +64,7 @@ export function insert(content: ContentElement | ContentElement[]) {
 
     const { activeContext } = getState();
 
-    activeContext.container.lift((parent : ParentContainer) => {
+    activeContext.container.lift((parent: ParentContainer) => {
       parent.onAddNew(content, activeContext.textSelection);
     });
 
@@ -78,7 +78,7 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
     const { activeContext, course } = getState();
     const courseId = course.guid;
 
-    activeContext.container.lift((parent : ParentContainer) => {
+    activeContext.container.lift((parent: ParentContainer) => {
 
       // If we have dependencies to resolve, we first present the user with a UI
       // allowing them to track the resolution progress
@@ -107,7 +107,7 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
 export function edit(content: ContentElement) {
   return function (dispatch, getState) {
     const { activeContext } = getState();
-    activeContext.container.lift((parent : ParentContainer) => {
+    activeContext.container.lift((parent) => {
       parent.onEdit(content, content);
     });
   };

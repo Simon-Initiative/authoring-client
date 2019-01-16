@@ -4,7 +4,7 @@ import { Likert } from './likert';
 import { FeedbackMultipleChoice } from './feedback_multiple_choice';
 import { FeedbackOpenResponse } from './feedback_open_response';
 import createGuid from 'utils/guid';
-import { getChildren } from '../common';
+import { getChildren, augment } from '../common';
 import { getKey } from 'data/common';
 
 export type FeedbackQuestion =
@@ -18,17 +18,21 @@ type FeedbackQuestionsParams = {
   questions?: Immutable.OrderedMap<string, FeedbackQuestion>;
 };
 
-const defaultFeedbackQuestionsParams: FeedbackQuestionsParams = {
+const defaultFeedbackQuestionsParams = {
+  contentType: 'FeedbackQuestions',
+  elementType: 'questions',
   guid: '',
   questions: Immutable.OrderedMap<string, FeedbackQuestion>(),
 };
 
 export class FeedbackQuestions extends Immutable.Record(defaultFeedbackQuestionsParams) {
+  contentType: 'FeedbackQuestions';
+  elementType: 'questions';
   guid: string;
   questions: Immutable.OrderedMap<string, FeedbackQuestion>;
 
   constructor(params?: FeedbackQuestionsParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackQuestionsParams): FeedbackQuestions {

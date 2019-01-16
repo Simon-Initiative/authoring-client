@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { getChildren } from 'data/content/common';
+import { getChildren, augment } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { FeedbackPrompt } from './feedback_prompt';
@@ -14,7 +14,9 @@ type LikertSeriesParams = {
   items?: Immutable.OrderedMap<string, LikertItem>;
 };
 
-const defaultLikertSeriesParams: LikertSeriesParams = {
+const defaultLikertSeriesParams = {
+  contentType: 'LikertSeries',
+  elementType: 'likert_series',
   guid: '',
   prompt: new FeedbackPrompt(),
   scale: new LikertScale(),
@@ -24,13 +26,15 @@ const defaultLikertSeriesParams: LikertSeriesParams = {
 };
 
 export class LikertSeries extends Immutable.Record(defaultLikertSeriesParams) {
+  contentType: 'LikertSeries';
+  elementType: 'likert_series';
   guid: string;
   prompt: FeedbackPrompt;
   scale: LikertScale;
   items: Immutable.OrderedMap<string, LikertItem>;
 
   constructor(params?: LikertSeriesParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: LikertSeriesParams): LikertSeries {

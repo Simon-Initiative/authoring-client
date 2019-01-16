@@ -1,23 +1,28 @@
 import * as Immutable from 'immutable';
 import createGuid from 'utils/guid';
 import { INLINE_ELEMENTS, ContentElements, MATERIAL_ELEMENTS } from '../common/elements';
+import { augment } from '../common';
 
 type FeedbackDescriptionParams = {
   guid?: string;
   content?: ContentElements;
 };
 
-const defaultFeedbackDescriptionParams: FeedbackDescriptionParams = {
+const defaultFeedbackDescriptionParams = {
+  contentType: 'FeedbackDescription',
+  elementType: 'description',
   guid: '',
   content: new ContentElements().with({ supportedElements: Immutable.List(MATERIAL_ELEMENTS) }),
 };
 
 export class FeedbackDescription extends Immutable.Record(defaultFeedbackDescriptionParams) {
+  contentType: 'FeedbackDescription';
+  elementType: 'description';
   guid: string;
   content: ContentElements;
 
   constructor(params?: FeedbackDescriptionParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackDescriptionParams): FeedbackDescription {

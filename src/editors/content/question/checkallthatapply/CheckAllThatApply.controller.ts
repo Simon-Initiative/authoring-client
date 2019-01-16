@@ -1,30 +1,28 @@
 import { connect } from 'react-redux';
 import * as contentTypes from 'data/contentTypes';
-import { QuestionProps } from './Question';
-import { DynaDropInput } from './DynaDropInput';
-import { State } from 'reducers';
-import { ActiveContext } from 'types/active';
+import { QuestionProps } from '../question/Question';
+import { CheckAllThatApply } from './CheckAllThatApply';
+import { CombinationsMap } from 'types/combinations';
+import { computeCombinations } from 'actions/choices';
 import { toggleAdvancedScoring } from 'actions/questionEditor';
+import { State } from 'reducers';
 
 interface StateProps {
-  activeContext: ActiveContext;
-  selectedInitiator: string;
   advancedScoringInitialized: boolean;
   advancedScoring: boolean;
 }
 
 interface DispatchProps {
+  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
   onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
-interface OwnProps extends QuestionProps<contentTypes.QuestionItem> {
-  onAddItemPart: (item, part, body) => void;
+interface OwnProps extends QuestionProps<contentTypes.MultipleChoice> {
+
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
-    activeContext: state.activeContext,
-    selectedInitiator: state.dynadragdrop.selectedInitiator,
     advancedScoringInitialized: state.questionEditor.hasIn(['scoring', ownProps.model.guid]),
     advancedScoring: state.questionEditor.getIn(['scoring', ownProps.model.guid]),
   };
@@ -32,6 +30,9 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
+    onGetChoiceCombinations: (comboNum: number): CombinationsMap => {
+      return dispatch(computeCombinations(comboNum));
+    },
     onToggleAdvancedScoring: (id: string, value?: boolean) => {
       dispatch(toggleAdvancedScoring(id, value));
     },
@@ -39,6 +40,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(DynaDropInput);
+  (mapStateToProps, mapDispatchToProps)(CheckAllThatApply);
 
-export { controller as DynaDropInput };
+export { controller as CheckAllThatApply };

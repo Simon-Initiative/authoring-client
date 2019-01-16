@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { ContentElements, TEXT_ELEMENTS } from '../common/elements';
-import { getChildren } from '../common';
+import { getChildren, augment } from '../common';
 
 type FeedbackChoiceParams = {
   guid?: string;
@@ -8,19 +8,23 @@ type FeedbackChoiceParams = {
   text?: ContentElements;
 };
 
-const defaultFeedbackChoiceParams: FeedbackChoiceParams = {
+const defaultFeedbackChoiceParams = {
+  contentType: 'FeedbackChoice',
+  elementType: 'choice',
   guid: '',
   id: '',
   text: ContentElements.fromText('', '', TEXT_ELEMENTS),
 };
 
 export class FeedbackChoice extends Immutable.Record(defaultFeedbackChoiceParams) {
+  contentType: 'FeedbackChoice';
+  elementType: 'choice';
   guid: string;
   id: string;
   text: ContentElements;
 
   constructor(params?: FeedbackChoiceParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackChoiceParams): FeedbackChoice {

@@ -1,13 +1,13 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import { Choice, ChoiceList, updateChoiceValuesAndRefs } from '../common/Choice';
+import * as contentTypes from '../../../../data/contentTypes';
+import { Choice, ChoiceList, updateChoiceValuesAndRefs } from '../../common/Choice';
 import { OrderingChoice, OrderingChoiceList } from './OrderingChoice';
-import { Button } from '../common/controls';
-import guid from '../../../utils/guid';
+import { Button } from '../../common/controls';
+import guid from '../../../../utils/guid';
 import {
   Question, QuestionProps, QuestionState,
-} from './Question';
+} from '../question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
@@ -26,7 +26,7 @@ import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { ContentElements } from 'data/content/common/elements';
 
 import './Ordering.scss';
-import { ConditionalBranchSelect } from '../common/BranchSelect';
+import { ConditionalBranchSelect } from '../../common/BranchSelect';
 
 export const isComplexFeedback = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.filter(autogenResponseFilter).toArray();

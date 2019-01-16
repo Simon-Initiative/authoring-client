@@ -6,8 +6,8 @@ import {
 } from 'editors/document/common/AbstractEditor';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-import { AddQuestion } from 'editors/content/question/AddQuestion';
-import { Outline } from 'editors/document/assessment/Outline';
+import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
+import { Outline } from 'editors/document/assessment/outline/Outline';
 import { renderAssessmentNode } from 'editors/document/common/questions';
 import { findNodeByGuid, locateNextOfKin } from 'editors/document/assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';
@@ -21,6 +21,7 @@ import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
 
 import './PoolEditor.scss';
+import { LegacyTypes } from 'data/types';
 
 interface PoolEditor {
 
@@ -244,7 +245,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
           <AddQuestion
             editMode={editMode}
             onQuestionAdd={this.addQuestion.bind(this)}
-            isSummative />
+            assessmentType={LegacyTypes.assessment2_pool} />
         </div>
         <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
       </React.Fragment>

@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
-} from './Question';
+} from '../question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
@@ -13,7 +13,7 @@ import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { ImageHotspotEditor } from './imagehotspot/ImageHotspotEditor';
+import { ImageHotspotEditor } from './ImageHotspotEditor';
 
 import { styles } from './ImageHotspot.styles';
 

@@ -1,11 +1,10 @@
 import { connect } from 'react-redux';
 import * as contentTypes from 'data/contentTypes';
-import { QuestionProps } from './Question';
-import { CheckAllThatApply } from './CheckAllThatApply';
-import { CombinationsMap } from 'types/combinations';
-import { computeCombinations } from 'actions/choices';
+import { QuestionProps } from '../question/Question';
+import { Ordering } from './Ordering';
+import { PermutationsMap } from 'types/combinations';
+import { computePermutations } from 'actions/choices';
 import { toggleAdvancedScoring } from 'actions/questionEditor';
-import { State } from 'reducers';
 
 interface StateProps {
   advancedScoringInitialized: boolean;
@@ -13,15 +12,15 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
+  onGetChoicePermutations: (comboNum: number) => PermutationsMap;
   onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
-interface OwnProps extends QuestionProps<contentTypes.MultipleChoice> {
+interface OwnProps extends QuestionProps<contentTypes.Ordering> {
 
 }
 
-const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   return {
     advancedScoringInitialized: state.questionEditor.hasIn(['scoring', ownProps.model.guid]),
     advancedScoring: state.questionEditor.getIn(['scoring', ownProps.model.guid]),
@@ -30,8 +29,8 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onGetChoiceCombinations: (comboNum: number): CombinationsMap => {
-      return dispatch(computeCombinations(comboNum));
+    onGetChoicePermutations: (comboNum: number): PermutationsMap => {
+      return dispatch(computePermutations(comboNum));
     },
     onToggleAdvancedScoring: (id: string, value?: boolean) => {
       dispatch(toggleAdvancedScoring(id, value));
@@ -40,6 +39,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(CheckAllThatApply);
+  (mapStateToProps, mapDispatchToProps)(Ordering);
 
-export { controller as CheckAllThatApply };
+export { controller as Ordering };

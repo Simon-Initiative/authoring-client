@@ -4,20 +4,20 @@ import { dismissScopedMessages } from './messages';
 import { Scope } from 'types/messages';
 import * as courseActions from 'actions/course';
 
-function isDifferentCourse(getState, courseId) : boolean {
+function isDifferentCourse(getState, courseId): boolean {
   const course: models.CourseModel = getState().course;
   return course === null || course.guid !== courseId;
 }
 
 
 export type ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
-export const ENTER_APPLICATION_VIEW : ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
+export const ENTER_APPLICATION_VIEW: ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
 
 export type EnterApplicationViewAction = {
   type: ENTER_APPLICATION_VIEW,
 };
 
-function enterApplicationView() : EnterApplicationViewAction {
+function enterApplicationView(): EnterApplicationViewAction {
   return {
     type: ENTER_APPLICATION_VIEW,
   };
@@ -60,6 +60,7 @@ export type ViewActions = {
   viewPages: (courseId: string) => void,
   viewFormativeAssessments: (courseId: string) => void,
   viewSummativeAssessments: (courseId: string) => void,
+  viewFeedbackAssessments: (courseId: string) => void,
   viewPools: (courseId: string) => void,
 };
 
@@ -96,6 +97,11 @@ export function viewFormativeAssessments(courseId: string) {
 export function viewSummativeAssessments(courseId: string) {
   return transitionCourseView
     .bind(undefined, '/summativeassessments-' + courseId, courseId);
+}
+
+export function viewFeedbackAssessments(courseId: string) {
+  return transitionCourseView
+    .bind(undefined, '/feedbackassessments-' + courseId, courseId);
 }
 
 export function viewOrganizations(courseId: string) {

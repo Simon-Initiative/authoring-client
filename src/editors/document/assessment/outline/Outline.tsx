@@ -3,46 +3,78 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
 import * as Tree from 'editors/common/tree';
-import { Node as AssessmentNode } from 'data/contentTypes';
-import { renderTab } from 'editors/document/assessment/tabs';
+import { Node } from 'data/contentTypes';
+import { renderTab } from 'editors/document/assessment/outline/tabs';
 import { findNodeByGuid } from 'editors/document/assessment/utils';
 import { CourseModel } from 'data/models';
-
-export interface OutlineProps {
-  editMode: boolean;
-  nodes: Immutable.OrderedMap<string, AssessmentNode>;
-  expandedNodes: Immutable.Set<string>;
-  selected: string;
-  onEdit: (nodes: Immutable.OrderedMap<string, AssessmentNode>, editDetails: EditDetails) => void;
-  onChangeExpansion: (expanded: Immutable.Set<string>) => void;
-  onSelect: (selectedNode: AssessmentNode) => void;
-  course: CourseModel;
-}
+import { Question } from 'data/content/assessment/question';
 
 export interface EditDetails {
-  sourceModel: AssessmentNode;
-  sourceParent: Maybe<AssessmentNode>;
-  targetParent: Maybe<AssessmentNode>;
+  sourceModel: Node;
+  sourceParent: Maybe<Node>;
+  targetParent: Maybe<Node>;
   originalIndex: number;
   newIndex: number;
 }
 
-export function getChildren(node: AssessmentNode)
-  : Maybe<Immutable.OrderedMap<string, AssessmentNode>> {
+export interface OutlineProps {
+  editMode: boolean;
+  nodes: Immutable.OrderedMap<string, Node>;
+  expandedNodes: Immutable.Set<string>;
+  selected: string;
+  onEdit: (nodes: Immutable.OrderedMap<string, Node>, editDetails: EditDetails) => void;
+  onChangeExpansion: (expanded: Immutable.Set<string>) => void;
+  onSelect: (selectedNode: Node) => void;
+  course: CourseModel;
+}
+
+export class Outline extends React.PureComponent<OutlineProps, {}> {
+
+  onSelect = (selected: string) => {
+    findNodeByGuid(this.props.nodes, selected)
+      .lift(n => this.props.onSelect(n));
+  }
+
+  render() {
+
+    const { nodes, expandedNodes, selected, editMode,
+      onEdit, onChangeExpansion, course } = this.props;
+
+    return (
+      <Tree.Component
+        editMode={editMode}
+        treeType={Tree.TreeType.DIV}
+        nodes={nodes}
+        getChildren={getChildren}
+        setChildren={setChildren}
+        expandedNodes={expandedNodes}
+        selected={selected}
+        onEdit={onEdit}
+        onChangeExpansion={onChangeExpansion}
+        onSelect={this.onSelect}
+        renderNodeComponent={renderTab.bind(null, course)}
+        canHandleDrop={canHandleDrop}
+      />
+    );
+  }
+}
+
+export function getChildren(node: Node): Maybe<Immutable.OrderedMap<string, Node>> {
 
   switch (node.contentType) {
     case 'Selection':
+      // Selection pools are currently the only Node that supports children
       if (node.source.contentType === 'Pool') {
         return Maybe.just(node.source.questions);
       }
 
-      return Maybe.nothing<AssessmentNode>();
+      return Maybe.nothing<Node>();
     default:
-      return Maybe.nothing<AssessmentNode>();
+      return Maybe.nothing<Node>();
   }
 }
 
-export function setChildren(node: AssessmentNode, children): AssessmentNode {
+export function setChildren(node: Node, children: Immutable.OrderedMap<string, Question>): Node {
   switch (node.contentType) {
     case 'Selection':
       if (node.source.contentType === 'Pool') {
@@ -55,11 +87,11 @@ export function setChildren(node: AssessmentNode, children): AssessmentNode {
   }
 }
 
-const canHandleDrop: Tree.CanDropHandler<AssessmentNode> = (
-  nodeBeingDropped: AssessmentNode,
-  originalParent: Maybe<AssessmentNode>,
+const canHandleDrop: Tree.CanDropHandler<Node> = (
+  nodeBeingDropped: Node,
+  originalParent: Maybe<Node>,
   originalIndex: number,
-  newParent: Maybe<AssessmentNode>,
+  newParent: Maybe<Node>,
   newIndex: number): boolean => {
 
   // Regardless of the type of node, if it is a drop
@@ -112,40 +144,3 @@ const canHandleDrop: Tree.CanDropHandler<AssessmentNode> = (
   return true;
 };
 
-export class Outline extends React.PureComponent<OutlineProps, {}> {
-
-  constructor(props) {
-    super(props);
-
-    this.onSelect = this.onSelect.bind(this);
-  }
-
-  onSelect(selected: string) {
-    findNodeByGuid(this.props.nodes, selected)
-      .lift(n => this.props.onSelect(n));
-  }
-
-  render() {
-
-    const { nodes, expandedNodes, selected, editMode,
-      onEdit, onChangeExpansion, course } = this.props;
-
-    return (
-      <Tree.Component
-        editMode={editMode}
-        treeType={Tree.TreeType.DIV}
-        nodes={nodes}
-        getChildren={getChildren}
-        setChildren={setChildren}
-        expandedNodes={expandedNodes}
-        selected={selected}
-        onEdit={onEdit}
-        onChangeExpansion={onChangeExpansion}
-        onSelect={this.onSelect}
-        renderNodeComponent={renderTab.bind(null, course)}
-        canHandleDrop={canHandleDrop}
-      />
-    );
-  }
-
-}

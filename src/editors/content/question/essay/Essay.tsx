@@ -3,7 +3,7 @@ import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
-} from 'editors/content/question/Question';
+} from 'editors/content/question/question/Question';
 import {
   TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';

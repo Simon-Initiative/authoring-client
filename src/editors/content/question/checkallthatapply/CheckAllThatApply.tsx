@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { ChoiceFeedback } from '../part/ChoiceFeedback';
+import { ChoiceFeedback } from '../../part/ChoiceFeedback';
 import {
   Question, QuestionProps, QuestionState,
-} from './Question';
+} from '../question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { Button } from '../common/controls';
+import { Button } from '../../common/controls';
 import { CombinationsMap } from 'types/combinations';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 import {

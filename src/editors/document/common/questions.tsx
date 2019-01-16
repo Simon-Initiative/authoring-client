@@ -6,14 +6,20 @@ import * as contentTypes from 'data/contentTypes';
 import { Skill } from 'types/course';
 import { AppContext } from '../../common/AppContext';
 import { AppServices } from '../../common/AppServices';
-import { QuestionEditor } from '../../content/question/QuestionEditor';
+import { QuestionEditor } from '../../content/question/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { LegacyTypes } from '../../../data/types';
 import { ParentContainer } from 'types/active';
+import { LikertSeriesEditor } from 'editors/content/feedback/LikertSeriesEditor';
+import { LikertEditor } from 'editors/content/feedback/LikertEditor';
+import { FeedbackMultipleChoiceEditor }
+  from 'editors/content/feedback/multiplechoice/FeedbackMultipleChoiceEditor';
+import { FeedbackOpenResponseEditor } from 'editors/content/feedback/FeedbackOpenResponse';
 
 export type Props = {
   model: models.AssessmentModel | models.PoolModel,
+  n: models.Node,
   editMode: boolean,
   context: AppContext,
   services: AppServices,
@@ -22,6 +28,13 @@ export type Props = {
   hover: string;
   onUpdateHover: (hover: string) => void;
   currentPage?: string;
+  onEdit: EditHandler,
+  onRemove: RemoveHandler,
+  onFocus: FocusHandler,
+  canRemove: boolean,
+  onDuplicate: DuplicateHandler,
+  // parent: ParentContainer,
+  isQuestionPool: boolean,
 };
 
 export type EditHandler = (guid: string, node: contentTypes.Node, src) => void;
@@ -31,6 +44,94 @@ export type RemoveHandler = (guid: string) => void;
 export type DuplicateHandler = () => void;
 
 export type FocusHandler = (child: Object, parent: any, textSelection) => void;
+
+export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
+  render() {
+    const { editMode, services, context, activeContentGuid, hover, onUpdateHover,
+      n, onFocus, onEdit, onRemove, onDuplicate, canRemove, isQuestionPool } = this.props;
+    const isParentAssessmentGraded = this.props.model.resource.type !== LegacyTypes.inline;
+
+    const sharedProps = {
+      key: n.guid,
+      // parent,
+      onFocus,
+      editMode,
+      services,
+      context,
+      activeContentGuid,
+      hover,
+      onUpdateHover,
+      onEdit: (c, src) => onEdit(n.guid, c, src),
+      onRemove: () => onRemove(n.guid),
+    };
+
+    let content: JSX.Element;
+
+    if (n.contentType === 'Question') {
+      content = <QuestionEditor
+        {...sharedProps}
+        isQuestionPool={isQuestionPool}
+        isParentAssessmentGraded={isParentAssessmentGraded}
+        allSkills={this.props.skills}
+        model={n}
+        onDuplicate={this.props.editMode ? onDuplicate : undefined}
+        canRemove={canRemove}
+        branchingQuestions={
+          this.props.model instanceof models.AssessmentModel && this.props.model.branching
+            ? Maybe.just(getBranchingQuestionNumbers(this.props))
+            : Maybe.nothing()}
+      />;
+    }
+    if (n.contentType === 'Content') {
+      content = <ContentEditor
+        {...sharedProps}
+        model={n}
+      />;
+    }
+    if (n.contentType === 'Selection') {
+      content = <SelectionEditor
+        {...sharedProps}
+        model={n}
+        allSkills={this.props.skills}
+        canRemove={canRemove}
+      />;
+    }
+    if (n.contentType === 'LikertSeries') {
+      content = <LikertSeriesEditor
+        {...sharedProps}
+        model={n}
+        canRemove={canRemove}
+      />;
+    }
+    if (n.contentType === 'Likert') {
+      content = <LikertEditor
+        {...sharedProps}
+        model={n}
+        canRemove={canRemove}
+      />;
+    }
+    if (n.contentType === 'FeedbackMultipleChoice') {
+      content = <FeedbackMultipleChoiceEditor
+        {...sharedProps}
+        model={n}
+        canRemove={canRemove}
+      />;
+    }
+    if (n.contentType === 'FeedbackOpenResponse') {
+      content = <FeedbackOpenResponseEditor
+        {...sharedProps}
+        model={n}
+        canRemove={canRemove}
+      />;
+    }
+
+    return (
+      <div className="node-container">
+        {content}
+      </div>
+    );
+  }
+}
 
 function getBranchingQuestionNumbers(props: Props): number[] {
   const pages = (props.model as models.AssessmentModel).pages.keySeq();
@@ -43,75 +144,4 @@ function getBranchingQuestionNumbers(props: Props): number[] {
   }
 
   return questionNumbers.reverse();
-}
-
-export function renderAssessmentNode(
-  n: models.Node, props: Props, onEdit: EditHandler,
-  onRemove: RemoveHandler, onFocus: FocusHandler,
-  canRemove: boolean,
-  onDuplicate: DuplicateHandler,
-  parent: ParentContainer, isQuestionPool: boolean) {
-
-  const isParentAssessmentGraded = props.model.resource.type !== LegacyTypes.inline;
-
-  if (n.contentType === 'Question') {
-    return <QuestionEditor
-      key={n.guid}
-      parent={parent}
-      onFocus={onFocus}
-      isQuestionPool={isQuestionPool}
-      isParentAssessmentGraded={isParentAssessmentGraded}
-      editMode={props.editMode}
-      services={props.services}
-      allSkills={props.skills}
-      context={props.context}
-      activeContentGuid={props.activeContentGuid}
-      hover={props.hover}
-      onUpdateHover={props.onUpdateHover}
-      model={n}
-      onDuplicate={props.editMode ? onDuplicate : undefined}
-      onEdit={(c, src) => onEdit(n.guid, c, src)}
-      canRemove={canRemove}
-      onRemove={() => onRemove(n.guid)}
-      branchingQuestions={
-        props.model instanceof models.AssessmentModel && props.model.branching
-          ? Maybe.just(getBranchingQuestionNumbers(props))
-          : Maybe.nothing()}
-    />;
-  }
-  if (n.contentType === 'Content') {
-    return <ContentEditor
-      parent={parent}
-      key={n.guid}
-      onFocus={onFocus}
-      editMode={props.editMode}
-      services={props.services}
-      context={props.context}
-      activeContentGuid={props.activeContentGuid}
-      hover={props.hover}
-      onUpdateHover={props.onUpdateHover}
-      model={n}
-      onEdit={(c, src) => onEdit(n.guid, c, src)}
-      onRemove={() => onRemove(n.guid)}
-    />;
-  }
-  if (n.contentType === 'Selection') {
-    return <SelectionEditor
-      parent={parent}
-      key={n.guid}
-      onFocus={onFocus}
-      isParentAssessmentGraded={isParentAssessmentGraded}
-      editMode={props.editMode}
-      services={props.services}
-      context={props.context}
-      activeContentGuid={props.activeContentGuid}
-      hover={props.hover}
-      onUpdateHover={props.onUpdateHover}
-      allSkills={props.skills}
-      model={n}
-      canRemove={canRemove}
-      onEdit={(c, src) => onEdit(n.guid, c, src)}
-      onRemove={() => onRemove(n.guid)}
-    />;
-  }
 }

@@ -67,8 +67,12 @@ export function buildItemMap(model: Question) {
 
   return model.items.toArray().reduce(
     (p, c) => {
-      if ((c as any).id !== undefined) {
-        p[(c as any).id] = c;
+      if (c.contentType === 'Unsupported') {
+        return p;
+      }
+
+      if (c.id !== undefined) {
+        p[c.id] = c;
         return p;
       }
 

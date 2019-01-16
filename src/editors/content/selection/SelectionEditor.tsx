@@ -5,20 +5,20 @@ import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import { Select, TextInput } from 'editors/content/common/controls';
-import { AddQuestion } from 'editors/content/question/AddQuestion';
+import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
 import { PoolRefEditor } from 'editors/content/selection/PoolRefEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import { REMOVE_QUESTION_DISABLED_MSG } from 'editors/content/question/Question';
+import { REMOVE_QUESTION_DISABLED_MSG } from 'editors/content/question/question/Question';
 
 import './SelectionEditor.scss';
+import { LegacyTypes } from 'data/types';
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
   onDuplicate?: () => void;
-  isParentAssessmentGraded?: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   canRemove: boolean;
 }
@@ -76,19 +76,20 @@ export class SelectionEditor
   renderSource() {
     if (this.props.model.source.contentType === 'PoolRef') {
       return <PoolRefEditor
-               {...this.props}
-               model={this.props.model.source}
-               onEdit={this.onSourceEdit}
-               onRemove={() => this.props.onRemove(this.props.model.guid)}
-             />;
+        {...this.props}
+        model={this.props.model.source}
+        onEdit={this.onSourceEdit}
+        onRemove={() => this.props.onRemove(this.props.model.guid)}
+      />;
     }
   }
 
   onAddQuestion(question: contentTypes.Question) {
     if (this.props.model.source.contentType === 'Pool') {
-      const source = this.props.model.source.with(
-        { questions: this.props.model.source.questions
-          .set(question.guid, question) });
+      const source = this.props.model.source.with({
+        questions: this.props.model.source.questions
+          .set(question.guid, question),
+      });
       const updated = this.props.model.with({ source });
       this.props.onEdit(updated);
     }
@@ -130,7 +131,7 @@ export class SelectionEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const controls = (
       <div className="controls">
@@ -141,7 +142,7 @@ export class SelectionEditor
               <AddQuestion
                 editMode={this.props.editMode}
                 onQuestionAdd={this.onAddQuestion.bind(this)}
-                isSummative={true}/>
+                assessmentType={LegacyTypes.assessment2_pool} />
               <br />
             </div>
           )
@@ -193,15 +194,15 @@ export class SelectionEditor
 
     return (
       <div className="selection-editor">
-          {this.renderTitle()}
+        {this.renderTitle()}
 
-          <br />
+        <br />
 
-          {titleEditor}
+        {titleEditor}
 
-          {controls}
+        {controls}
 
-          {this.renderSource()}
+        {this.renderSource()}
 
       </div>
     );

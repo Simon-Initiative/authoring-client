@@ -17,7 +17,8 @@ import {
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { PageSelection } from 'editors/document/assessment/PageSelection';
-import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
+import { createMultipleChoiceQuestion }
+  from 'editors/content/question/addquestion/questionFactories';
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
 import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';

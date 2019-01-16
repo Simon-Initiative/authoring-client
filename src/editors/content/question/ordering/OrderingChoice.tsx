@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as contentTypes from '../../../data/contentTypes';
+import * as contentTypes from '../../../../data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { DragTypes } from 'utils/drag';
@@ -12,7 +12,7 @@ import './OrderingChoice.scss';
 
 export const OrderingChoiceList = InputList;
 
-export interface OrderingChoiceProps  {
+export interface OrderingChoiceProps {
   className?: string;
   index: number;
   label: string;
@@ -48,7 +48,7 @@ export class OrderingChoice extends React.PureComponent<OrderingChoiceProps, Ord
         activeContentGuid=""
         hover=""
         onUpdateHover={this.props.onUpdateHover}
-        onFocus={() => {}}
+        onFocus={() => { }}
         context={context}
         services={services}
         editMode={false}
@@ -59,7 +59,7 @@ export class OrderingChoice extends React.PureComponent<OrderingChoiceProps, Ord
         onDragDrop={onReorderChoice}
         dragType={DragTypes.OrderingChoice}
         body={choice.body}
-        onEdit={() => {}} />
+        onEdit={() => { }} />
     );
   }
 }

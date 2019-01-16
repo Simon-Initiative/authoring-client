@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import * as contentTypes from 'data/contentTypes';
-import { QuestionProps } from './Question';
+import { QuestionProps } from '../question/Question';
 import { MultipartInput, PartAddPredicate } from './MultipartInput';
 import { State } from 'reducers';
 import { ActiveContext } from 'types/active';
@@ -36,6 +36,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(MultipartInput);
+  (mapStateToProps, mapDispatchToProps)(MultipartInput);
 
 export { controller as MultipartInput };

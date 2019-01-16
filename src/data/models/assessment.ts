@@ -7,11 +7,12 @@ import { assessmentTemplate } from '../activity_templates';
 import { isArray, isNullOrUndefined } from 'util';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { splitQuestionsIntoPages } from './utils/assessment';
+import { AssessmentType, LegacyTypes } from 'data/types';
 
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
   guid?: string,
-  type?: string;
+  type?: AssessmentType;
   recommendedAttempts?: string;
   maxAttempts?: string;
   branching?: boolean,
@@ -22,7 +23,7 @@ export type AssessmentModelParams = {
 };
 const defaultAssessmentModelParams = {
   modelType: 'AssessmentModel',
-  type: '',
+  type: LegacyTypes.inline,
   resource: new contentTypes.Resource(),
   guid: '',
   recommendedAttempts: '3',
@@ -72,7 +73,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   modelType: 'AssessmentModel';
   resource: contentTypes.Resource;
   guid: string;
-  type: string;
+  type: AssessmentType;
   recommendedAttempts: string;
   maxAttempts: string;
   branching: boolean;

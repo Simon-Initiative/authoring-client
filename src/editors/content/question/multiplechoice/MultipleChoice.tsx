@@ -5,7 +5,7 @@ import { Button } from 'editors/content/common/controls';
 import guid from 'utils/guid';
 import {
   Question, QuestionProps, QuestionState,
-} from 'editors/content/question/Question';
+} from 'editors/content/question/question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';

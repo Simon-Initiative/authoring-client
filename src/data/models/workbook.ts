@@ -51,10 +51,11 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   }
 
   static createNew(id: string, title: string, body: string) {
-
     return new WorkbookPageModel({
-      head: new contentTypes.Head({ title:
-        new contentTypes.Title({ text: ContentElements.fromText(title, '', TEXT_ELEMENTS) }) }),
+      head: new contentTypes.Head({
+        title:
+          new contentTypes.Title({ text: ContentElements.fromText(title, '', TEXT_ELEMENTS) }),
+      }),
       resource: new contentTypes.Resource({ id, title }),
       guid: id,
       body: ContentElements.fromText(body, '', WB_ELEMENTS),
@@ -89,8 +90,9 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           model = model.with({ head: contentTypes.Head.fromPersistence(item, id, notify) });
           break;
         case 'body':
-          model = model.with({ body: ContentElements
-            .fromPersistence(item.body, id, WB_ELEMENTS, null, notify) });
+          model = model.with({
+            body: ContentElements.fromPersistence(item.body, id, WB_ELEMENTS, null, notify),
+          });
           break;
         case 'bib:file':
           model = model.with({ bibFile: Maybe.just(item) });
@@ -105,8 +107,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   toPersistence(): Object {
 
     const content = this.body.content.size === 0
-       ? [{ p: { '#text': ' ' } }]
-       : this.body.toPersistence();
+      ? [{ p: { '#text': ' ' } }]
+      : this.body.toPersistence();
 
     const children = [
       this.head.toPersistence(),

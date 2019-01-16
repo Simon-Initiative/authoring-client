@@ -3,19 +3,19 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
-} from './Question';
+} from '../question/Question';
 import { TabContainer } from 'editors/content/common/TabContainer';
-import { FillInTheBlank } from '../items/FillInTheBlank';
-import { Text } from '../items/Text';
-import { Numeric } from '../items/Numeric';
+import { FillInTheBlank } from '../../items/FillInTheBlank';
+import { Text } from '../../items/Text';
+import { Numeric } from '../../items/Numeric';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
 import { ActiveContext, TextSelection } from 'types/active';
-import { EntityTypes } from '../../../data/content/learning/common';
+import { EntityTypes } from '../../../../data/content/learning/common';
 import guid from 'utils/guid';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import { Badge } from '../common/Badge';
+import { Badge } from '../../common/Badge';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
 
