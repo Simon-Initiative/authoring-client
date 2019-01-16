@@ -8,11 +8,12 @@ import * as React from 'react';
 import { isNullOrUndefined } from 'util';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { LogAttribute, LogLevel, LogStyle, LogTag, logger } from 'utils/logger';
-import './ResourceView.scss';
 import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
 import { LegacyTypes } from 'data/types';
+
+import './ResourceView.scss';
 
 export interface ResourceViewProps {
   course: models.CourseModel;

@@ -9,7 +9,9 @@ import * as contentTypes from 'data/contentTypes';
 import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
 import { Outline } from 'editors/document/assessment/outline/Outline';
 import { renderAssessmentNode } from 'editors/document/common/questions';
-import { findNodeByGuid, locateNextOfKin } from 'editors/document/assessment/utils';
+import {
+  findNodeByGuid, findQuestionById, locateNextOfKin,
+} from 'editors/document/assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
@@ -19,6 +21,7 @@ import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTe
 import { ContiguousText } from 'data/content/learning/contiguous';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
+import { RouterState } from 'reducers/router';
 
 import './PoolEditor.scss';
 import { LegacyTypes } from 'data/types';
@@ -41,7 +44,10 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  onSetSearchParam: (name, value) => void;
+  onClearSearchParam: (name) => void;
   course: models.CourseModel;
+  router: RouterState;
 }
 
 interface PoolEditorState extends AbstractEditorState {
@@ -90,7 +96,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       this.props.showMessage(this.noSkillsMessage);
     }
 
-    this.onSelect(this.props.model.pool.questions.first());
+    this.selectRoutedOrDefaultQuestion(this.props.router);
   }
 
   componentWillReceiveProps(nextProps: PoolEditorProps) {
@@ -119,6 +125,39 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                 activeContext.documentId.valueOr(null), node));
           },
         });
+    }
+    if (this.props.router !== nextProps.router) {
+      this.selectRoutedOrDefaultQuestion(nextProps.router);
+    }
+  }
+
+  selectFirstQuestion = () => {
+    const { activeContext, onSetCurrentNodeOrPage } = this.props;
+    onSetCurrentNodeOrPage(
+      activeContext.documentId.valueOr(null), this.props.model.pool.questions.first());
+  }
+
+  selectRoutedOrDefaultQuestion = (router: RouterState) => {
+    const { activeContext, onSetCurrentNodeOrPage, model } = this.props;
+
+    if (router.urlParams.get('questionId')) {
+      const urlSelectedQuestion =
+        findQuestionById(model.pool.questions, router.urlParams.get('questionId'));
+
+      urlSelectedQuestion.caseOf({
+        just: question => onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), question),
+        nothing: () => this.selectFirstQuestion(),
+      });
+    } else if (router.urlParams.get('nodeGuid')) {
+      const urlSelectedNode =
+        findNodeByGuid(model.pool.questions, router.urlParams.get('nodeGuid'));
+
+      urlSelectedNode.caseOf({
+        just: node => onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node),
+        nothing: () => this.selectFirstQuestion(),
+      });
+    } else {
+      this.selectFirstQuestion();
     }
   }
 
@@ -180,10 +219,16 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     // expanded state of nodes in the outline
   }
 
-  onSelect(currentNode: contentTypes.Node) {
-    const { activeContext, onSetCurrentNodeOrPage } = this.props;
+  onSelect(node: contentTypes.Node) {
+    const { onSetSearchParam, onClearSearchParam } = this.props;
 
-    onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), currentNode);
+    if (node.contentType === 'Question') {
+      onSetSearchParam('questionId', node.id);
+      onClearSearchParam('nodeGuid');
+    } else {
+      onSetSearchParam('nodeGuid', node.guid);
+      onClearSearchParam('questionId');
+    }
   }
 
   onFocus(model: Object, parent, textSelection) {
@@ -299,7 +344,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                   selected={currentNode.caseOf({ just: node => node.guid, nothing: () => '' })}
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
-                  onSelect={this.onSelect.bind(this)}
+                  onSelect={this.onSelect}
                   course={course}
                 />
                 {this.renderAdd()}

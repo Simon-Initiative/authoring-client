@@ -13,6 +13,8 @@ import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
+import { RouterState } from 'reducers/router';
+import { setSearchParam, clearSearchParam } from 'actions/router';
 
 interface StateProps {
   activeContext: any;
@@ -20,6 +22,7 @@ interface StateProps {
   course: CourseModel;
   currentPage: string;
   currentNode: contentTypes.Node;
+  router: RouterState;
 }
 
 interface DispatchProps {
@@ -32,12 +35,14 @@ interface DispatchProps {
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
   onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
+  onSetSearchParam: (name, value) => void;
+  onClearSearchParam: (name) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<AssessmentModel> { }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
-  const { activeContext, hover, documents, course } = state;
+  const { activeContext, hover, documents, course, router } = state;
 
   return {
     activeContext,
@@ -51,6 +56,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
       just: docId => documents.get(docId).currentNode.valueOr(null),
       nothing: null,
     }),
+    router,
   };
 };
 
@@ -80,6 +86,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     dismissMessage: (message: Messages.Message) => {
       dispatch(dismissSpecificMessage(message));
     },
+    onSetSearchParam: (name, value) => dispatch(setSearchParam(name, value)),
+    onClearSearchParam: name => dispatch(clearSearchParam(name)),
   };
 };
 

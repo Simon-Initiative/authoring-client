@@ -10,7 +10,7 @@ import * as contentTypes from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
 import guid from 'utils/guid';
 import {
-  locateNextOfKin, findNodeByGuid,
+  locateNextOfKin, findNodeByGuid, findQuestionById,
   handleBranchingReordering, handleBranchingDeletion,
 } from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
@@ -32,6 +32,7 @@ import { buildMissingSkillsMessage } from 'utils/error';
 import './AssessmentEditor.scss';
 import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 import { ContentElement } from 'data/content/common/interfaces';
+import { RouterState } from 'reducers/router';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
@@ -47,7 +48,10 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
   onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
+  onSetSearchParam: (name, value) => void;
+  onClearSearchParam: (name) => void;
   course: models.CourseModel;
+  router: RouterState;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -87,6 +91,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
       || this.props.hover !== nextProps.hover
       || this.props.currentPage !== nextProps.currentPage
       || this.props.currentNode !== nextProps.currentNode
+      || this.props.router !== nextProps.router
       || this.state.undoStackSize !== nextState.undoStackSize
       || this.state.redoStackSize !== nextState.redoStackSize
       || this.state.collapseInsertPopup !== nextState.collapseInsertPopup;
@@ -132,6 +137,57 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
                 onSetCurrentNodeOrPage(documentId, node));
           },
         });
+    }
+    if (this.props.router !== nextProps.router) {
+      this.selectRoutedOrDefaultNode(nextProps.router);
+    }
+  }
+
+  selectFirstQuestion = () => {
+    const { activeContext, model, onSetCurrentNodeOrPage } = this.props;
+    const documentId = activeContext.documentId.valueOr(null);
+
+    if (model.pages.size > 0) {
+      onSetCurrentNodeOrPage(documentId, this.props.model.pages.first().nodes.first());
+    } else {
+      onSetCurrentNodeOrPage(documentId, this.props.model.nodes.first());
+    }
+  }
+
+  selectRoutedOrDefaultNode = (router: RouterState) => {
+    const { activeContext, onSetCurrentNodeOrPage, model } = this.props;
+    const documentId = activeContext.documentId.valueOr(null);
+
+    if (router.urlParams.get('questionId')) {
+      const urlSelectedQuestion =
+        model.pages.reduce(
+          (acc, page) => acc.caseOf({
+            just: n => Maybe.just(n),
+            nothing: () => findQuestionById(page.nodes, router.urlParams.get('questionId')),
+          }),
+          findQuestionById(model.nodes, router.urlParams.get('questionId')),
+        );
+
+      urlSelectedQuestion.caseOf({
+        just: question => onSetCurrentNodeOrPage(documentId, question),
+        nothing: () => this.selectFirstQuestion(),
+      });
+    } else if (router.urlParams.get('nodeGuid')) {
+      const urlSelectedNode =
+        model.pages.reduce(
+          (acc, page) => acc.caseOf({
+            just: n => Maybe.just(n),
+            nothing: () => findQuestionById(page.nodes, router.urlParams.get('nodeGuid')),
+          }),
+          findNodeByGuid(model.nodes, router.urlParams.get('nodeGuid')),
+        );
+
+      urlSelectedNode.caseOf({
+        just: node => onSetCurrentNodeOrPage(documentId, node),
+        nothing: () => this.selectFirstQuestion(),
+      });
+    } else {
+      this.selectFirstQuestion();
     }
   }
 
@@ -240,12 +296,16 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     // expanded state of nodes in the outline
   }
 
-  onSelect(selectedNode: contentTypes.Node) {
-    const { activeContext, onSetCurrentNodeOrPage } = this.props;
+  onSelect = (node: contentTypes.Node) => {
+    const { onSetSearchParam, onClearSearchParam } = this.props;
 
-    const documentId = activeContext.documentId.valueOr(null);
-
-    onSetCurrentNodeOrPage(documentId, selectedNode);
+    if (node.contentType === 'Question') {
+      onSetSearchParam('questionId', node.id);
+      onClearSearchParam('nodeGuid');
+    } else {
+      onSetSearchParam('nodeGuid', node.guid);
+      onClearSearchParam('questionId');
+    }
   }
 
   allNodes() {
@@ -561,17 +621,16 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
                   selected={currentNode.guid}
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
-                  onSelect={this.onSelect.bind(this)}
+                  onSelect={this.onSelect}
                   course={course}
                 />
                 {this.renderAdd()}
               </div>
-              <div className="node-container">
-                {renderAssessmentNode(
-                  currentNode, assessmentNodeProps, this.onEditNode,
-                  this.onNodeRemove, this.onFocus, this.canRemoveNode(),
-                  this.onDuplicateQuestion, this, false)}
-              </div>
+              <AssessmentNodeRenderer
+                currentNode, assessmentNodeProps, this.onEditNode,
+this.onNodeRemove, this.onFocus, this.canRemoveNode(),
+this.onDuplicateQuestion, this, false)
+/>
             </div>
           </div>
           <ContextAwareSidebar

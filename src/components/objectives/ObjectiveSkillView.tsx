@@ -160,6 +160,7 @@ export interface ObjectiveSkillViewProps {
   dismissMessage: (message: Messages.Message) => void;
   displayModal: (component: any) => void;
   dismissModal: () => void;
+  onPushRoute: (path: string) => void;
 }
 
 interface ObjectiveSkillViewState {
@@ -1006,6 +1007,7 @@ export class ObjectiveSkillView
   }
 
   renderObjectives() {
+    const { onPushRoute } = this.props;
     const {
       skillFormativeRefs, skillSummativeRefs, skillPoolRefs, overrideExpanded, searchText,
       skillQuestionRefs,
@@ -1042,6 +1044,7 @@ export class ObjectiveSkillView
             onRemoveSkill={skill => this.removeSkill(objective, skill)}
             onAddNewSkill={this.onAddNewSkill}
             onBeginExternalEdit={this.onBeginExternalEdit}
+            onPushRoute={onPushRoute}
             skillFormativeRefs={skillFormativeRefs}
             skillSummativeRefs={skillSummativeRefs}
             skillPoolRefs={skillPoolRefs}
