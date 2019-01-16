@@ -1,127 +1,111 @@
-@import 'oli/typography';
-@import 'oli/colors';
+@import "oli/typography";
+@import "oli/colors";
 
 .assessment-editor {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  .title-row {
-    margin: 10px 0;
-  }
-
-  .assessment-content {
-    display: flex;
-    flex-direction: row;
-    overflow: hidden;
     flex: 1;
-
-    .html-editor-well {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      overflow: auto;
-      padding: 10px 30px 0 30px;
-
-      .TitleTextEditor {
-        margin-bottom: 10px;
-        border-bottom: 1px solid $gray-lighter;
-      }
-
-      .content-decorator {
-        margin-top: 20px;
-
-        &:first-child {
-          margin-top: 0;
-        }
-      }
-
-      .content-container > * {
-        margin: 10px 0;
-      }
-    }
-  }
-
-  .slash {
-    color: #606060;
-  }
-
-  .outline-and-node-container {
     display: flex;
-    flex: 1 1 auto;
-  }
-
-  .outline-container {
-    display: flex;
-    overflow-y: auto;
-    flex: 0 0 300px;
     flex-direction: column;
-    margin-right: 2px;
-
-    .tree-container, .tree-list {
-      padding-right: 6px;
-      overflow-y: auto;
-    }
-  }
-
-  .insert-new {
-    cursor: pointer;
-    background-color: #E2E4E6;
-    font-size: 80%;
-    border-radius: 0 0 3px 3px;
-    padding: 8px 10px;
-    flex: 0 0 auto;
-  }
-
-  a.insert-new:not([href]):not([tabindex]):hover {
-    color: darken(#3f4446, 20%);
-    text-decoration: underline;
-    background-color: darken(#edeff0, 10%);
-  }
-
-  a.insert-new:not([href]):not([tabindex]) {
-    color: #3f4446;
-  }
-
-  .insert-popup {
-    background-color: #E2E4E6;
-    font-size: 80%;
-    max-height: 100%;
-    width: 100%;
-    transition: max-height .4s;
     overflow: hidden;
-    flex: 0 0 auto;
 
-    &.collapsed {
-      max-height: 0;
+    .title-row {
+        margin: 10px 0;
     }
 
-    a.dropdown-item {
-      &:hover {
-        background-color: #f8f9fa;
-      }
-      &:active {
-        background-color: #f8f9fa;
-      }
-      cursor: pointer;
+    .assessment-content {
+        display: flex;
+        flex-direction: row;
+        overflow: hidden;
+        flex: 1;
+
+        .html-editor-well {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            overflow: auto;
+            padding: 10px 30px 0 30px;
+
+            .TitleTextEditor {
+                margin-bottom: 10px;
+                border-bottom: 1px solid $gray-lighter;
+            }
+
+            .content-decorator {
+                margin-top: 20px;
+
+                &:first-child {
+                    margin-top: 0;
+                }
+            }
+
+            .content-container > * {
+                margin: 10px 0;
+            }
+        }
     }
-  }
 
-  .node-container {
-    overflow: auto;
-    flex: 1 1 auto;
-  }
-
-  .label {
-    font-family: $sans-font;
-    font-size: 13px;
-    color: #606060;
-  }
-
-  .add-menu {
-    button.btn.btn-sm {
-      font-size: 1rem;
+    .slash {
+        color: #606060;
     }
-  }
+
+    .outline-and-node-container {
+        display: flex;
+        flex: 1 1 auto;
+    }
+
+    .insert-new {
+        cursor: pointer;
+        background-color: #E2E4E6;
+        font-size: 80%;
+        border-radius: 0 0 3px 3px;
+        padding: 8px 10px;
+        flex: 0 0 auto;
+    }
+
+    a.insert-new:not([href]):not([tabindex]):hover {
+        color: darken(#3f4446, 20%);
+        text-decoration: underline;
+        background-color: darken(#edeff0, 10%);
+    }
+
+    a.insert-new:not([href]):not([tabindex]) {
+        color: #3f4446;
+    }
+
+    .insert-popup {
+        background-color: #E2E4E6;
+        font-size: 80%;
+        max-height: 100%;
+        width: 100%;
+        transition: max-height .4s;
+        overflow: hidden;
+        flex: 0 0 auto;
+
+        &.collapsed {
+            max-height: 0;
+        }
+
+        a.dropdown-item {
+            &:hover {
+                background-color: #f8f9fa;
+            }
+
+            &:active {
+                background-color: #f8f9fa;
+            }
+
+            cursor: pointer;
+        }
+    }
+
+    .label {
+        font-family: $sans-font;
+        font-size: 13px;
+        color: #606060;
+    }
+
+    .add-menu {
+        button.btn.btn-sm {
+            font-size: 1rem;
+        }
+    }
 }

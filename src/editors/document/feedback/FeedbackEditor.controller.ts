@@ -10,6 +10,8 @@ import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
+import { Node } from 'data/content/assessment/node';
+import { setCurrentNodeOrPage } from 'actions/document';
 
 interface StateProps {
   activeContext: any;
@@ -26,6 +28,7 @@ interface DispatchProps {
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  onSetCurrentNode: (documentId: string, node: Node) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<FeedbackModel> { }
@@ -63,6 +66,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
 
     dismissMessage: (message: Messages.Message) =>
       dispatch(dismissSpecificMessage(message)),
+
+    onSetCurrentNode: (documentId: string, node: Node) =>
+      dispatch(setCurrentNodeOrPage(documentId, node)),
   };
 };
 

@@ -8,7 +8,7 @@ import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
 import { Outline } from 'editors/document/assessment/outline/Outline';
-import { renderAssessmentNode } from 'editors/document/common/questions';
+import { AssessmentNodeRenderer } from 'editors/document/common/questions';
 import {
   findNodeByGuid, findQuestionById, locateNextOfKin,
 } from 'editors/document/assessment/utils';
@@ -25,6 +25,8 @@ import { RouterState } from 'reducers/router';
 
 import './PoolEditor.scss';
 import { LegacyTypes } from 'data/types';
+import { ContentElement } from 'data/content/common/interfaces';
+import { Node } from 'data/content/assessment/node';
 
 interface PoolEditor {
 
@@ -187,7 +189,10 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.props.onEdit(this.props.model.with({ pool, resource }));
   }
 
-  onEdit(guid: string, question: contentTypes.Question, src) {
+  onEdit(guid: string, question: contentTypes.Node, src) {
+    if (question.contentType !== 'Question') {
+      return;
+    }
 
     const { onSetCurrentNodeOrPage, activeContext } = this.props;
 
@@ -315,11 +320,6 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       nothing: () => '',
     });
 
-    const assesmentNodeProps = {
-      ...this.props,
-      activeContentGuid,
-    };
-
     return (
       <div className="pool-editor">
         <ContextAwareToolbar editMode={editMode} context={context} model={model} />
@@ -336,29 +336,33 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               editorStyles={{ fontSize: 32 }} />
 
             <div className="outline-and-node-container">
-              <div className="outline-container">
-                <Outline
-                  editMode={this.props.editMode}
-                  nodes={model.pool.questions}
-                  expandedNodes={expanded}
-                  selected={currentNode.caseOf({ just: node => node.guid, nothing: () => '' })}
-                  onEdit={this.onEditNodes.bind(this)}
-                  onChangeExpansion={this.onChangeExpansion.bind(this)}
-                  onSelect={this.onSelect}
-                  course={course}
-                />
-                {this.renderAdd()}
-              </div>
-              <div className="node-container">
-                {currentNode.caseOf({
-                  just: node => renderAssessmentNode(
-                    node, assesmentNodeProps, this.onEdit,
-                    this.onRemove, this.onFocus,
-                    this.canRemoveNode(), this.onDuplicateNode, null, true),
-                  nothing: () => null,
-                })}
-              </div>
+              <Outline
+                editMode={this.props.editMode}
+                nodes={model.pool.questions}
+                expandedNodes={expanded}
+                selected={currentNode.caseOf({ just: node => node.guid, nothing: () => '' })}
+                onEdit={this.onEditNodes.bind(this)}
+                onChangeExpansion={this.onChangeExpansion.bind(this)}
+                onSelect={this.onSelect}
+                course={course}
+              />
+              {this.renderAdd()}
             </div>
+            {currentNode.lift(node =>
+              <AssessmentNodeRenderer
+                {...this.props}
+                allSkills={this.props.context.skills}
+                activeContentGuid={activeContentGuid}
+                model={node}
+                onEdit={(c: Node, src: ContentElement) => this.onEdit(node.guid, c, src)}
+                onRemove={this.onRemove}
+                onFocus={this.onFocus}
+                canRemove={this.canRemoveNode()}
+                onDuplicate={this.onDuplicateNode}
+                nodeParentModel={model}
+                parent={null}
+                isQuestionPool={true}
+              />)}
           </div>
           <ContextAwareSidebar
             context={context}

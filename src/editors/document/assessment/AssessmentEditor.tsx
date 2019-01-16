@@ -30,9 +30,9 @@ import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
 import './AssessmentEditor.scss';
-import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 import { ContentElement } from 'data/content/common/interfaces';
 import { RouterState } from 'reducers/router';
+import { Node } from 'data/content/assessment/node';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
@@ -61,9 +61,6 @@ interface AssessmentEditorState extends AbstractEditorState {
 export default class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps,
   AssessmentEditorState> {
-
-  noSkillsMessage: Messages.Message;
-  supportedElements: Immutable.List<string> = Immutable.List<string>();
 
   state: AssessmentEditorState = {
     ...this.state,
@@ -107,6 +104,9 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
 
     this.checkActiveNodeStillExists(nextProps);
   }
+
+  noSkillsMessage: Messages.Message;
+  supportedElements: Immutable.List<string> = Immutable.List<string>();
 
   wasSkillAdded = (nextProps: AssessmentEditorProps) => {
     return this.props.context.skills.size <= 0 &&
@@ -350,36 +350,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     this.handleEdit(model.with({ pages }));
   }
 
-  // onAddContent = () => {
-  //   if (!this.props.editMode) return;
-
-  //   const content = contentTypes.Content.fromText('', guid());
-  //   this.addNode(content);
-  //   this.setState({
-  //     collapseInsertPopup: true,
-  //   });
-  // }
-
-  // addQuestion(question: contentTypes.Question) {
-  //   if (!this.props.editMode) return;
-
-  //   const content = question.with({ guid: guid() });
-  //   this.addNode(content);
-  //   this.setState({
-  //     collapseInsertPopup: true,
-  //   });
-  // }
-
-  // onAddPool = () => {
-  //   if (!this.props.editMode) return;
-
-  //   const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
-  //   this.addNode(pool);
-  //   this.setState({
-  //     collapseInsertPopup: true,
-  //   });
-  // }
-
+  // item : AssessmentNode
   onAddQuestion = (item) => {
     if (!this.props.editMode) return;
 
@@ -589,12 +560,6 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
       nothing: () => '',
     });
 
-    const assessmentNodeProps = {
-      ...this.props,
-      skills: this.props.context.skills,
-      activeContentGuid,
-    };
-
     return (
       <div className="assessment-editor">
         <ContextAwareToolbar editMode={editMode} context={this.props.context} model={model} />
@@ -611,26 +576,33 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
               editorStyles={{ fontSize: 32 }} />
 
             <div className="outline-and-node-container">
-              <div className="outline-container">
-                <Outline
-                  editMode={this.props.editMode}
-                  nodes={model.branching
-                    ? this.allNodes()
-                    : page.nodes}
-                  expandedNodes={expanded}
-                  selected={currentNode.guid}
-                  onEdit={this.onEditNodes.bind(this)}
-                  onChangeExpansion={this.onChangeExpansion.bind(this)}
-                  onSelect={this.onSelect}
-                  course={course}
-                />
-                {this.renderAdd()}
-              </div>
+              <Outline
+                editMode={this.props.editMode}
+                nodes={model.branching
+                  ? this.allNodes()
+                  : page.nodes}
+                expandedNodes={expanded}
+                selected={currentNode.guid}
+                onEdit={this.onEditNodes.bind(this)}
+                onChangeExpansion={this.onChangeExpansion.bind(this)}
+                onSelect={this.onSelect}
+                course={course}
+              />
+              {this.renderAdd()}
               <AssessmentNodeRenderer
-                currentNode, assessmentNodeProps, this.onEditNode,
-this.onNodeRemove, this.onFocus, this.canRemoveNode(),
-this.onDuplicateQuestion, this, false)
-/>
+                {...this.props}
+                allSkills={this.props.context.skills}
+                activeContentGuid={activeContentGuid}
+                model={currentNode}
+                onEdit={(c: Node, src: ContentElement) => this.onEditNode(currentNode.guid, c, src)}
+                onRemove={this.onNodeRemove}
+                onFocus={this.onFocus}
+                canRemove={this.canRemoveNode()}
+                onDuplicate={this.onDuplicateQuestion}
+                nodeParentModel={model}
+                parent={this}
+                isQuestionPool={false}
+              />
             </div>
           </div>
           <ContextAwareSidebar

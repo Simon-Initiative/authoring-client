@@ -2,126 +2,96 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import * as models from 'data/models';
-import * as contentTypes from 'data/contentTypes';
 import { Skill } from 'types/course';
-import { AppContext } from '../../common/AppContext';
-import { AppServices } from '../../common/AppServices';
 import { QuestionEditor } from '../../content/question/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { LegacyTypes } from '../../../data/types';
-import { ParentContainer } from 'types/active';
 import { LikertSeriesEditor } from 'editors/content/feedback/LikertSeriesEditor';
 import { LikertEditor } from 'editors/content/feedback/LikertEditor';
 import { FeedbackMultipleChoiceEditor }
   from 'editors/content/feedback/multiplechoice/FeedbackMultipleChoiceEditor';
 import { FeedbackOpenResponseEditor } from 'editors/content/feedback/FeedbackOpenResponse';
+import 'questions.scss';
+import { AbstractContentEditorProps } from 'editors/content/common/AbstractContentEditor';
+import { Node } from 'data/content/assessment/node';
+import { AssessmentModel } from 'data/models/assessment';
+import { PoolModel } from 'data/models/pool';
+import { FeedbackModel } from 'data/models/feedback';
 
-export type Props = {
-  model: models.AssessmentModel | models.PoolModel,
-  n: models.Node,
-  editMode: boolean,
-  context: AppContext,
-  services: AppServices,
-  skills: Immutable.OrderedMap<string, Skill>,
-  activeContentGuid: string;
-  hover: string;
-  onUpdateHover: (hover: string) => void;
+export interface Props extends AbstractContentEditorProps<Node> {
+  nodeParentModel: AssessmentModel | PoolModel | FeedbackModel;
+  allSkills: Immutable.OrderedMap<string, Skill>;
   currentPage?: string;
-  onEdit: EditHandler,
-  onRemove: RemoveHandler,
-  onFocus: FocusHandler,
-  canRemove: boolean,
-  onDuplicate: DuplicateHandler,
-  // parent: ParentContainer,
-  isQuestionPool: boolean,
-};
-
-export type EditHandler = (guid: string, node: contentTypes.Node, src) => void;
+  onRemove: RemoveHandler;
+  canRemove: boolean;
+  onDuplicate: DuplicateHandler;
+  isQuestionPool: boolean;
+}
 
 export type RemoveHandler = (guid: string) => void;
 
 export type DuplicateHandler = () => void;
 
-export type FocusHandler = (child: Object, parent: any, textSelection) => void;
-
 export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
   render() {
-    const { editMode, services, context, activeContentGuid, hover, onUpdateHover,
-      n, onFocus, onEdit, onRemove, onDuplicate, canRemove, isQuestionPool } = this.props;
-    const isParentAssessmentGraded = this.props.model.resource.type !== LegacyTypes.inline;
+    const { currentPage, onRemove, onDuplicate, model, nodeParentModel } = this.props;
+    const isParentAssessmentGraded = nodeParentModel.resource.type !== LegacyTypes.inline;
 
     const sharedProps = {
-      key: n.guid,
-      // parent,
-      onFocus,
-      editMode,
-      services,
-      context,
-      activeContentGuid,
-      hover,
-      onUpdateHover,
-      onEdit: (c, src) => onEdit(n.guid, c, src),
-      onRemove: () => onRemove(n.guid),
+      ...this.props,
+      key: model.guid,
+      onRemove: () => onRemove(model.guid),
     };
 
     let content: JSX.Element;
 
-    if (n.contentType === 'Question') {
+    if (model.contentType === 'Question') {
       content = <QuestionEditor
         {...sharedProps}
-        isQuestionPool={isQuestionPool}
         isParentAssessmentGraded={isParentAssessmentGraded}
-        allSkills={this.props.skills}
-        model={n}
+        model={model}
         onDuplicate={this.props.editMode ? onDuplicate : undefined}
-        canRemove={canRemove}
         branchingQuestions={
-          this.props.model instanceof models.AssessmentModel && this.props.model.branching
-            ? Maybe.just(getBranchingQuestionNumbers(this.props))
+          nodeParentModel instanceof models.AssessmentModel && nodeParentModel.branching
+            ? Maybe.just(getBranchingQuestionNumbers(nodeParentModel, currentPage))
             : Maybe.nothing()}
       />;
     }
-    if (n.contentType === 'Content') {
+    if (model.contentType === 'Content') {
       content = <ContentEditor
         {...sharedProps}
-        model={n}
+        model={model}
       />;
     }
-    if (n.contentType === 'Selection') {
+    if (model.contentType === 'Selection') {
       content = <SelectionEditor
         {...sharedProps}
-        model={n}
-        allSkills={this.props.skills}
-        canRemove={canRemove}
+        model={model}
       />;
     }
-    if (n.contentType === 'LikertSeries') {
+    if (model.contentType === 'LikertSeries') {
       content = <LikertSeriesEditor
         {...sharedProps}
-        model={n}
-        canRemove={canRemove}
+        model={model}
       />;
     }
-    if (n.contentType === 'Likert') {
+    if (model.contentType === 'Likert') {
       content = <LikertEditor
         {...sharedProps}
-        model={n}
-        canRemove={canRemove}
+        model={model}
       />;
     }
-    if (n.contentType === 'FeedbackMultipleChoice') {
+    if (model.contentType === 'FeedbackMultipleChoice') {
       content = <FeedbackMultipleChoiceEditor
         {...sharedProps}
-        model={n}
-        canRemove={canRemove}
+        model={model}
       />;
     }
-    if (n.contentType === 'FeedbackOpenResponse') {
+    if (model.contentType === 'FeedbackOpenResponse') {
       content = <FeedbackOpenResponseEditor
         {...sharedProps}
-        model={n}
-        canRemove={canRemove}
+        model={model}
       />;
     }
 
@@ -133,10 +103,10 @@ export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
   }
 }
 
-function getBranchingQuestionNumbers(props: Props): number[] {
-  const pages = (props.model as models.AssessmentModel).pages.keySeq();
+function getBranchingQuestionNumbers(model: models.AssessmentModel, currentPage: string): number[] {
+  const pages = model.pages.keySeq();
   const pagesAfterCount = Math.max(
-    pages.skipUntil(p => p === props.currentPage).toArray().length - 1,
+    pages.skipUntil(p => p === currentPage).toArray().length - 1,
     0);
   const questionNumbers = [];
   for (let i = pages.size; i > pages.size - pagesAfterCount; i -= 1) {

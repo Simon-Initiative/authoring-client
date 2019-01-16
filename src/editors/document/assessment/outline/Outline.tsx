@@ -8,6 +8,7 @@ import { renderTab } from 'editors/document/assessment/outline/tabs';
 import { findNodeByGuid } from 'editors/document/assessment/utils';
 import { CourseModel } from 'data/models';
 import { Question } from 'data/content/assessment/question';
+import 'Outline.scss';
 
 export interface EditDetails {
   sourceModel: Node;
@@ -41,20 +42,22 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
       onEdit, onChangeExpansion, course } = this.props;
 
     return (
-      <Tree.Component
-        editMode={editMode}
-        treeType={Tree.TreeType.DIV}
-        nodes={nodes}
-        getChildren={getChildren}
-        setChildren={setChildren}
-        expandedNodes={expandedNodes}
-        selected={selected}
-        onEdit={onEdit}
-        onChangeExpansion={onChangeExpansion}
-        onSelect={this.onSelect}
-        renderNodeComponent={renderTab.bind(null, course)}
-        canHandleDrop={canHandleDrop}
-      />
+      <div className="outline-container">
+        <Tree.Component
+          editMode={editMode}
+          treeType={Tree.TreeType.DIV}
+          nodes={nodes}
+          getChildren={getChildren}
+          setChildren={setChildren}
+          expandedNodes={expandedNodes}
+          selected={selected}
+          onEdit={onEdit}
+          onChangeExpansion={onChangeExpansion}
+          onSelect={this.onSelect}
+          renderNodeComponent={renderTab.bind(null, course)}
+          canHandleDrop={canHandleDrop}
+        />
+      </div>
     );
   }
 }

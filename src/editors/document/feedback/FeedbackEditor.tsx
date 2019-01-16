@@ -15,7 +15,7 @@ import {
 } from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
 import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
-import { renderAssessmentNode } from 'editors/document/common/questions';
+import { AssessmentNodeRenderer } from 'editors/document/common/questions';
 import { getChildren, Outline, setChildren, EditDetails }
   from 'editors/document/assessment/outline/Outline';
 import { updateNode, removeNode } from 'data/utils/tree';
@@ -32,6 +32,8 @@ import { buildMissingSkillsMessage } from 'utils/error';
 import './AssessmentEditor.scss';
 import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 import { ContentElement } from 'data/content/common/interfaces';
+import { Node } from 'data/content/assessment/node';
+import { FeedbackQuestion } from 'data/content/feedback/feedback_questions';
 
 interface Props extends AbstractEditorProps<models.FeedbackModel> {
   activeContext: ActiveContext;
@@ -45,13 +47,14 @@ interface Props extends AbstractEditorProps<models.FeedbackModel> {
   dismissMessage: (message: Messages.Message) => void;
   course: models.CourseModel;
   currentNode: models.FeedbackQuestionNode;
+  onSetCurrentNode: (documentId: string, node: Node) => void;
 }
 
 interface State extends AbstractEditorState {
   collapseInsertPopup: boolean;
 }
 
-export default class AssessmentEditor extends AbstractEditor<models.FeedbackModel, Props, State> {
+export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel, Props, State> {
 
   state: State = {
     ...this.state,
@@ -69,35 +72,29 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    // this.checkActiveNodeStillExists(nextProps);
+    this.checkActiveNodeStillExists(nextProps);
   }
 
-  // checkActiveNodeStillExists = (nextProps: Props) => {
-  //   // Handle the case that the current node has changed externally,
-  //   // for instance, from an undo/redo
-  //   if (this.props.currentNode === nextProps.currentNode &&
-  //  this.props.model !== nextProps.model) {
+  supportedElements: Immutable.List<string> = Immutable.List<string>();
 
-  //     const currentPage = this.getCurrentPage(nextProps);
-  //     const { activeContext, onSetCurrentNodeOrPage } = this.props;
-  //     const documentId = activeContext.documentId.valueOr(null);
+  checkActiveNodeStillExists = (nextProps: Props) => {
+    // Handle the case that the current node has changed externally,
+    // for instance, from an undo/redo
+    const { activeContext, onSetCurrentNode, currentNode, model } = this.props;
 
-  //     findNodeByGuid(currentPage.nodes, this.props.currentNode.guid)
-  //       .caseOf({
-  //         // If the node is still part of the current page, select the same node as active
-  //         just: (currentNode) => {
-  //           onSetCurrentNodeOrPage(documentId, currentNode);
-  //         },
-  //         // Else there was some sort of external change, and an adjacent node needs to be
-  //         // selected as active
-  //         nothing: () => {
-  //           locateNextOfKin(
-  //             this.props.model.questions, this.props.currentNode.guid).lift(node =>
-  //               onSetCurrentNodeOrPage(documentId, node));
-  //         },
-  //       });
-  //   }
-  // }
+    if (this.props.currentNode === nextProps.currentNode &&
+      this.props.model !== nextProps.model) {
+
+      const documentId = activeContext.documentId.valueOr(null);
+
+      findNodeByGuid(this.allNodes(), currentNode.guid)
+        .caseOf({
+          just: currentNode => Maybe.just(onSetCurrentNode(documentId, currentNode)),
+          nothing: () => locateNextOfKin(model.questions, currentNode.guid)
+            .lift(node => onSetCurrentNode(documentId, node)),
+        });
+    }
+  }
 
   onTitleEdit = (ct: ContiguousText, src: ContentElement) => {
     const { model, onEdit } = this.props;
@@ -121,19 +118,25 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
 
     onUpdateContent(context.documentId, src);
 
-    // this.handleEdit(model.with({
-    //   questions: updateNode(guid, node, nodes, getChildren, setChildren),
-    // }));
+    this.handleEdit(model.with({
+      questions: model.questions.with({
+        questions: updateNode(guid, node, nodes, getChildren, setChildren),
+      }),
+    }));
   }
 
   // This handles updates from the outline component, which are only reorders
-  onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>, editDetails: EditDetails) {
+  onEditNodes(
+    questions: Immutable.OrderedMap<string, models.FeedbackQuestionNode>,
+    editDetails: EditDetails) {
 
     const { model } = this.props;
 
-    // this.handleEdit(model.with({
-    //   questions: nodes,
-    // }));
+    this.handleEdit(model.with({
+      questions: model.questions.with({
+        questions,
+      }),
+    }));
   }
 
   onChangeExpansion(nodes: Immutable.Set<string>) {
@@ -142,77 +145,66 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
   }
 
   onSelect(selectedNode: contentTypes.Node) {
-    const { activeContext } = this.props;
+    const { activeContext, onSetCurrentNode } = this.props;
 
     const documentId = activeContext.documentId.valueOr(null);
 
-    // onSetCurrentNodeOrPage(documentId, selectedNode);
+    onSetCurrentNode(documentId, selectedNode);
   }
 
-  // allNodes() {
-  //   return this.props.model.pages.reduce(
-  //     (nodes, page) => nodes.concat(page.nodes).toOrderedMap(),
-  //     Immutable.OrderedMap<string, contentTypes.Node>());
-  // }
+  canRemoveNode() {
+    return this.allNodes().size > 1;
+  }
 
-  // canRemoveNode() {
-  //   const x = (node: models.Node) =>
-  //     node.contentType === 'x' || node.contentType === 'x';
+  allNodes(): Immutable.OrderedMap<string, Node> {
+    return this.props.model.questions.questions;
+  }
 
-  //   return this.allNodes().filter(x).size > 1;
-  // }
+  onNodeRemove = (guid: string) => {
+    // Find the node to be removed, remove it, and set an adjacent node to be active.
 
-  // onNodeRemove = (guid: string) => {
-  //   // Find the node to be removed, remove it, and set an adjacent node to be active.
-  //   // Branching assessments are handled as a special case since they must remove
-  //   // edges when a linked-to node is deleted.
+    const { model, activeContext, onSetCurrentNode } = this.props;
+    const documentId = activeContext.documentId.valueOr(null);
 
-  //   // const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
-  //   // const currentPage = this.getCurrentPage(this.props);
-  //   const documentId = activeContext.documentId.valueOr(null);
+    // Prevent the last node from being removed
+    if (this.allNodes().size <= 1) {
+      return;
+    }
 
-  //   // Prevent the last node from being removed
-  //   if (this.allNodes().size <= 1) {
-  //     return;
-  //   }
+    locateNextOfKin(this.allNodes(), guid).lift((node) => {
+      onSetCurrentNode(documentId, node);
+    });
 
-  //   locateNextOfKin(this.allNodes(), guid).lift((node) => {
-  //     onSetCurrentNodeOrPage(documentId, node);
-  //   });
+    this.handleEdit(model.with({
+      questions:
+        model.questions.with({
+          questions: removeNode(guid, this.allNodes(), getChildren, setChildren) as
+            Immutable.OrderedMap<string, models.FeedbackQuestionNode>,
+        }),
+    }));
+  }
 
-  //   const nodes = removeNode(guid, currentPage.nodes, getChildren, setChildren);
-  //   const pages = nodes.size > 0
-  //     ? model.pages.set(currentPage.guid, currentPage.with({ nodes }))
-  //     : model.pages.remove(currentPage.guid);
-
-  //   this.handleEdit(model.with({ pages }));
-  // }
-
-  addQuestion(question: contentTypes.Question) {
+  // item : AssessmentNode
+  onAddQuestion = (item) => {
     if (!this.props.editMode) return;
 
-    const content = question.with({ guid: guid() });
-    // this.addNode(content);
+    const node = item.with({ guid: guid() });
+    this.addNode(node);
     this.setState({
       collapseInsertPopup: true,
     });
   }
 
-  // addNode(node: models.Node) {
-  //   const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
+  addNode(node: models.FeedbackQuestionNode) {
+    const { model, activeContext, onSetCurrentNode } = this.props;
 
-  //   // Branching assessments place each question on a separate page
-  //   let page = model.branching
-  //     ? new contentTypes.Page()
-  //     : this.getCurrentPage(this.props);
-
-  //   page = page.with({ nodes: page.nodes.set(node.guid, node) });
-
-  //   onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node);
-  //   this.handleEdit(model.with({
-  //     pages: model.pages.set(page.guid, page),
-  //   }));
-  // }
+    onSetCurrentNode(activeContext.documentId.valueOr(null), node);
+    this.handleEdit(model.with({
+      questions: model.questions.with({
+        questions: model.questions.questions.set(node.guid, node),
+      }),
+    }));
+  }
 
   onRemove() {
     // this method is never used, but is required by ParentContainer
@@ -250,57 +242,14 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
     }));
   }
 
-  // onSelectPool = () => {
-  //   if (!this.props.editMode) return;
-
-  //   const predicate = (res: Resource): boolean =>
-  //     res.type === LegacyTypes.assessment2_pool
-  //     && res.resourceState !== ResourceState.DELETED;
-
-  //   this.props.services.displayModal(
-  //     <ResourceSelection
-  //       filterPredicate={predicate}
-  //       courseId={this.props.context.courseId}
-  //       onInsert={this.onInsertPool}
-  //       onCancel={this.onCancelSelectPool} />);
-  // }
-
-  // onCancelSelectPool = () => {
-  //   this.props.services.dismissModal();
-  // }
-
-  // onInsertPool = (resource: Resource) => {
-  //   this.props.services.dismissModal();
-
-  //   // Handle case where Insert is clicked after no pool selection is made
-  //   if (!resource || resource.id === '') {
-  //     return;
-  //   }
-
-  //   this.props.services.fetchIdByGuid(resource.guid)
-  //     .then((idref) => {
-  //       const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
-  //       this.addNode(pool);
-  //       this.setState({
-  //         collapseInsertPopup: true,
-  //       });
-  //     });
-  // }
-
   renderSettings() {
     return (
-      <Collapse caption="Settings">
+      <Collapse caption="No Settings">
         <div style={{ marginLeft: '25px' }}>
-          <form>
-
-            <div className="form-group row">
-
-            </div>
-
-            <div className="form-group row">
-
-            </div>
-          </form>
+          {/* <form>
+            <div className="form-group row"></div>
+            <div className="form-group row"></div>
+          </form> */}
         </div>
       </Collapse>
     );
@@ -315,7 +264,7 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
         <div className={`insert-popup ${collapseInsertPopup ? 'collapsed' : ''}`}>
           <AddQuestion
             editMode={editMode}
-            onQuestionAdd={this.addQuestion.bind(this)}
+            onQuestionAdd={this.onAddQuestion}
             assessmentType={LegacyTypes.feedback} />
         </div>
         <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
@@ -342,10 +291,8 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
   }
 
   onDuplicateQuestion = () => {
-    // if (this.props.currentNode.contentType === 'Question') {
-    //   const duplicated = this.props.currentNode.clone();
-    //   this.addNode(duplicated);
-    // }
+    const duplicated = this.props.currentNode.clone();
+    this.addNode(duplicated);
   }
 
   collapseInsertPopup = () => {
@@ -355,28 +302,21 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
   }
 
   render() {
-    const { context, services, editMode, model, course, currentNode, onEdit } = this.props;
-
-    // const page = this.getCurrentPage(this.props);
+    const { context, services, editMode, model, course, currentNode, onEdit,
+      activeContext } = this.props;
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(model.questions.toArray().map(n => n.guid));
 
-    const activeContentGuid = this.props.activeContext.activeChild.caseOf({
+    const activeContentGuid = activeContext.activeChild.caseOf({
       just: c => c.guid,
       nothing: () => '',
     });
 
-    const feedbackNodeProps = {
-      ...this.props,
-      skills: this.props.context.skills,
-      activeContentGuid,
-    };
-
     return (
       <div className="feedback-editor">
-        <ContextAwareToolbar editMode={editMode} context={this.props.context} model={model} />
+        <ContextAwareToolbar editMode={editMode} context={context} model={model} />
         <div className="feedback-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
 
@@ -390,25 +330,31 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
               editorStyles={{ fontSize: 32 }} />
 
             <div className="outline-and-node-container">
-              <div className="outline-container">
-                <Outline
-                  editMode={this.props.editMode}
-                  nodes={this.props.model.questions}
-                  expandedNodes={expanded}
-                  selected={currentNode.guid}
-                  onEdit={this.onEditNodes.bind(this)}
-                  onChangeExpansion={this.onChangeExpansion.bind(this)}
-                  onSelect={this.onSelect.bind(this)}
-                  course={course}
-                />
-                {this.renderAdd()}
-              </div>
-              <div className="node-container">
-                {renderAssessmentNode(
-                  currentNode, feedbackNodeProps, this.onEditNode,
-                  this.onNodeRemove, this.onFocus, this.canRemoveNode(),
-                  this.onDuplicateQuestion, this, false)}
-              </div>
+              <Outline
+                editMode={this.props.editMode}
+                nodes={this.props.model.questions}
+                expandedNodes={expanded}
+                selected={currentNode.guid}
+                onEdit={this.onEditNodes.bind(this)}
+                onChangeExpansion={this.onChangeExpansion.bind(this)}
+                onSelect={this.onSelect.bind(this)}
+                course={course}
+              />
+              {this.renderAdd()}
+              <AssessmentNodeRenderer
+                {...this.props}
+                allSkills={this.props.context.skills}
+                activeContentGuid={activeContentGuid}
+                model={currentNode}
+                onEdit={(c: Node, src: ContentElement) => this.onEditNode(currentNode.guid, c, src)}
+                onRemove={this.onNodeRemove}
+                onFocus={this.onFocus}
+                canRemove={this.canRemoveNode()}
+                onDuplicate={this.onDuplicateQuestion}
+                nodeParentModel={model}
+                parent={this}
+                isQuestionPool={false}
+              />
             </div>
           </div>
           <ContextAwareSidebar
@@ -421,4 +367,3 @@ export default class AssessmentEditor extends AbstractEditor<models.FeedbackMode
       </div>);
   }
 }
-
