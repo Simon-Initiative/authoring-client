@@ -9,10 +9,43 @@ import { Button } from 'components/common/Button';
 import { IssueTooltip } from 'components/objectives/IssueTooltip';
 import { Tooltip } from 'utils/tooltip';
 import { addPluralS, QuestionRef } from 'components/objectives/utils';
-import {
-  FORMATIVE_COUNT_WARNING_THRESHOLD, SUMMATIVE_COUNT_WARNING_THRESHOLD, SKILLS_HELP_LINK,
-} from 'components/objectives/config';
 import { LegacyTypes } from 'data/types';
+import {
+  checkModel, ModelCheckerRule, RequirementType,
+} from 'data/linter/modelChecker';
+
+export interface ModelRuleData {
+  formativeCount: number;
+  summativeCount: number;
+}
+
+enum Issue {
+  AT_LEAST_3_FORMATIVE = 'AT_LEAST_3_FORMATIVES',
+  AT_LEAST_3_SUMMATIVE = 'AT_LEAST_3_SUMMATIVE',
+}
+
+export const skillModelRules: ModelCheckerRule<contentTypes.Skill, ModelRuleData>[] = [{
+  id: Issue.AT_LEAST_3_FORMATIVE,
+  name: 'Skill',
+  requirementType: RequirementType.Should,
+  requirement: 'have at least 3 formative questions',
+  isIssue: (data: contentTypes.Skill, aux) => {
+    const { formativeCount } = aux;
+    return formativeCount < 3;
+  },
+},{
+  id: Issue.AT_LEAST_3_SUMMATIVE,
+  name: 'Skill',
+  requirementType: RequirementType.Should,
+  requirement: 'have at least 3 summative questions',
+  isIssue: (data: contentTypes.Skill, aux) => {
+    const { summativeCount } = aux;
+    return summativeCount < 3;
+  },
+}];
+
+export const SKILLS_HELP_LINK = '//olihelp.freshdesk.com/support/solutions/articles/32000023904'
+  + '-what-are-learning-objectives-and-skills-';
 
 export const styles: JSSStyles = {
   Skill: {
@@ -147,38 +180,34 @@ export class Skill
       This is the number of pool questions that are associated with this skill
     </div>;
 
-    const notEnoughFormativesWarning = formativeCount < FORMATIVE_COUNT_WARNING_THRESHOLD
-      ? (
-        <span>
-          at least {FORMATIVE_COUNT_WARNING_THRESHOLD} formative
-        </span>
-      )
-      : null;
-
-    const notEnoughSummativesWarning = summativeCount < SUMMATIVE_COUNT_WARNING_THRESHOLD
-      ? (
-        <span>
-          at least {SUMMATIVE_COUNT_WARNING_THRESHOLD} summative
-        </span>
-      )
-      : null;
+    const checkModelResults = checkModel(
+      skill, skillModelRules, { formativeCount, summativeCount });
 
     return (
         <div className={classes.skillBadges}>
-          <IssueTooltip
-            show={!!(notEnoughFormativesWarning || notEnoughSummativesWarning)}>
-            <div>
-              Skills should have {notEnoughFormativesWarning}
-              {notEnoughFormativesWarning && notEnoughSummativesWarning && ' and '}
-              {notEnoughSummativesWarning} {addPluralS('question', Math.max(
-                FORMATIVE_COUNT_WARNING_THRESHOLD,
-                SUMMATIVE_COUNT_WARNING_THRESHOLD,
-              ))}
-              <br/>
-              <a href={SKILLS_HELP_LINK}
-                target="_blank">Learn more about skills</a>.
-            </div>
-          </IssueTooltip>
+          {checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
+            || checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE)
+            ? (
+              <IssueTooltip
+                show={checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
+                  || checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE)}>
+                  Skills should {checkModelResults.getIssue(Issue.AT_LEAST_3_FORMATIVE).caseOf({
+                    just: issue => issue.rule.requirement,
+                    nothing: () => null,
+                  })}
+                  {checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
+                    && checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE) && ' and '}
+                  {checkModelResults.getIssue(Issue.AT_LEAST_3_SUMMATIVE).caseOf({
+                    just: issue => issue.rule.requirement,
+                    nothing: () => null,
+                  })}
+                  <br/>
+                  <a href={SKILLS_HELP_LINK}
+                    target="_blank">Learn more about skills</a>.
+              </IssueTooltip>
+            )
+            : undefined
+          }
           <Tooltip html={formativeTooltip} distance={10}
             size="small" arrowSize="small">
             <span className={classNames(['badge badge-light', classes.skillBadge])}
