@@ -109,10 +109,6 @@ export class QuestionEditor
       return true;
     }
 
-    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
-      return true;
-    }
-
     return false;
   }
 
