@@ -11,18 +11,22 @@ import { LikertSeries } from 'data/content/feedback/likert_series';
 import { LikertScale } from 'data/content/feedback/likert_scale';
 import * as Immutable from 'immutable';
 import { LikertItem } from 'data/content/feedback/likert_item';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+  AbstractContentEditorState,
+} from 'editors/content/common/AbstractContentEditor';
 
-export interface Props {
+export interface Props extends AbstractContentEditorProps<LikertSeries> {
   onEdit;
   model: LikertSeries;
   canRemove;
 }
 
-export interface State {
+export interface State extends AbstractContentEditorState {
 
 }
 
-export class LikertSeriesEditor extends React.PureComponent<Props, State> {
+export class LikertSeriesEditor extends AbstractContentEditor<LikertSeries, Props, State> {
 
   onPromptEdit = (prompt: FeedbackPrompt, src: ContentElement) => {
     const { onEdit, model } = this.props;
@@ -39,7 +43,15 @@ export class LikertSeriesEditor extends React.PureComponent<Props, State> {
     onEdit(model.with({ scale }), src);
   }
 
-  renderDetails() {
+  renderSidebar() {
+    return null;
+  }
+
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() {
     const { model } = this.props;
 
     return (

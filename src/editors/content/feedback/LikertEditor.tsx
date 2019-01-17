@@ -9,18 +9,22 @@ import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Likert } from 'data/content/feedback/likert';
 import { LikertScale } from 'data/content/feedback/likert_scale';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+  AbstractContentEditorState,
+} from 'editors/content/common/AbstractContentEditor';
 
-export interface Props {
+export interface Props extends AbstractContentEditorProps<Likert> {
   onEdit;
   model: Likert;
   canRemove;
 }
 
-export interface State {
+export interface State extends AbstractContentEditorState {
 
 }
 
-export class LikertEditor extends React.PureComponent<Props, State> {
+export class LikertEditor extends AbstractContentEditor<Likert, Props, State> {
 
   onPromptEdit = (prompt: FeedbackPrompt, src: ContentElement) => {
     const { onEdit, model } = this.props;
@@ -37,7 +41,15 @@ export class LikertEditor extends React.PureComponent<Props, State> {
     onEdit(model.with({ required: !model.required }), this);
   }
 
-  renderDetails() {
+  renderSidebar() {
+    return null;
+  }
+
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() {
     const { model } = this.props;
 
     return (
