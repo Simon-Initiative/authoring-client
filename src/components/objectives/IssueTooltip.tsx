@@ -11,7 +11,7 @@ export const styles: JSSStyles = {
 };
 
 export interface IssueTooltipProps {
-  show: boolean;
+  show?: boolean;
 }
 
 /**
@@ -19,7 +19,7 @@ export interface IssueTooltipProps {
  */
 export const IssueTooltip: React.StatelessComponent<StyledComponentProps<IssueTooltipProps>>
   = injectSheetSFC<IssueTooltipProps>(styles)(({
-  className, classes, children, show,
+  className, classes, children, show = true,
 }) => {
     return show ? (
       <Tooltip
