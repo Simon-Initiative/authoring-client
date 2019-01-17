@@ -4,14 +4,12 @@ import { Maybe } from 'tsmonad';
 import {
   AbstractEditor, AbstractEditorProps, AbstractEditorState,
 } from 'editors/document/common/AbstractEditor';
-import { TextInput } from 'editors/content/common/TextInput';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
 import guid from 'utils/guid';
 import {
   locateNextOfKin, findNodeByGuid,
-  handleBranchingReordering, handleBranchingDeletion,
 } from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
 import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
@@ -19,21 +17,16 @@ import { AssessmentNodeRenderer } from 'editors/document/common/questions';
 import { getChildren, Outline, setChildren, EditDetails }
   from 'editors/document/assessment/outline/Outline';
 import { updateNode, removeNode } from 'data/utils/tree';
-import { hasUnknownSkill } from 'utils/skills';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import ResourceSelection from 'utils/selection/ResourceSelection.controller';
-import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
-import { buildMissingSkillsMessage } from 'utils/error';
-import './AssessmentEditor.scss';
-import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
-import { FeedbackQuestion } from 'data/content/feedback/feedback_questions';
+
+import './FeedbackEditor.scss';
 
 interface Props extends AbstractEditorProps<models.FeedbackModel> {
   activeContext: ActiveContext;

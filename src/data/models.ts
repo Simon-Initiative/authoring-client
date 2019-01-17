@@ -31,6 +31,7 @@ export enum ModelTypes {
   CourseModel = 'CourseModel',
   WorkbookPageModel = 'WorkbookPageModel',
   AssessmentModel = 'AssessmentModel',
+  FeedbackModel = 'FeedbackModel',
   MediaModel = 'MediaModel',
   OrganizationModel = 'OrganizationModel',
   LearningObjectiveModel = 'LearningObjectiveModel',

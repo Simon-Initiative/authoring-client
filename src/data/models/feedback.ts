@@ -12,6 +12,8 @@ import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
 import { ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS } from 'data/content/common/elements';
+import { LikertScale } from 'data/content/feedback/likert_scale';
+import { LikertItem } from 'data/content/feedback/likert_item';
 
 // oli_feedback_1_2.dtd
 export type FeedbackModelParams = {
@@ -70,7 +72,16 @@ export class FeedbackModel
   }
 
   static createNew(id: string, title: string, description: string) {
-    const series = new LikertSeries();
+    const item = new LikertItem();
+    const series = new LikertSeries({
+      scale: new LikertScale({
+        scaleSize: '3',
+        scaleCenter: '2',
+      }),
+      items: Immutable.OrderedMap<string, LikertItem>([
+        [item.guid, item],
+      ]),
+    });
     return new FeedbackModel({
       title: new contentTypes.Title({ text: ContentElements.fromText(title, '', TEXT_ELEMENTS) }),
       resource: new contentTypes.Resource({ id, title }),

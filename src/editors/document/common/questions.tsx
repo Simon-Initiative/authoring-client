@@ -12,7 +12,7 @@ import { LikertEditor } from 'editors/content/feedback/LikertEditor';
 import { FeedbackMultipleChoiceEditor }
   from 'editors/content/feedback/multiplechoice/FeedbackMultipleChoiceEditor';
 import { FeedbackOpenResponseEditor } from 'editors/content/feedback/FeedbackOpenResponse';
-import 'questions.scss';
+import './questions.scss';
 import { AbstractContentEditorProps } from 'editors/content/common/AbstractContentEditor';
 import { Node } from 'data/content/assessment/node';
 import { AssessmentModel } from 'data/models/assessment';
