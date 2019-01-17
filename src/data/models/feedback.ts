@@ -10,7 +10,7 @@ import { ObjRef } from '../content/learning/objref';
 import { LikertSeries } from '../content/feedback/likert_series';
 import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
-import { augment } from 'data/content/common';
+import { augment, ensureIdGuidPresent } from 'data/content/common';
 import { ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 
 // oli_feedback_1_2.dtd
@@ -59,6 +59,14 @@ export class FeedbackModel
 
   with(values: FeedbackModelParams): FeedbackModel {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackModel {
+    return ensureIdGuidPresent(this.with({
+      title: this.title.clone(),
+      description: this.description.clone(),
+      questions: this.questions.clone(),
+    }));
   }
 
   static createNew(id: string, title: string, description: string) {

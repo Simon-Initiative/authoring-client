@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
 import { ContentElements, TEXT_ELEMENTS } from '../common/elements';
 import { getChildren, augment } from '../common';
+import { ensureIdGuidPresent } from 'data/content/common';
 
 type LikertLabelParams = {
   guid?: string;
@@ -30,6 +31,12 @@ export class LikertLabel extends Immutable.Record(defaultLikertLabelParams) {
 
   with(values: LikertLabelParams): LikertLabel {
     return this.merge(values) as this;
+  }
+
+  clone(): LikertLabel {
+    return ensureIdGuidPresent(this.with({
+      text: this.text.clone(),
+    }));
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): LikertLabel {

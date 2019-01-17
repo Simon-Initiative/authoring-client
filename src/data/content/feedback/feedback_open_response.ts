@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { getChildren, augment } from 'data/content/common';
+import { getChildren, augment, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { FeedbackPrompt } from './feedback_prompt';
@@ -35,6 +35,12 @@ export class FeedbackOpenResponse extends Immutable.Record(defaultFeedbackOpenRe
 
   with(values: FeedbackOpenResponseParams): FeedbackOpenResponse {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackOpenResponse {
+    return ensureIdGuidPresent(this.with({
+      prompt: this.prompt.clone(),
+    }));
   }
 
   static fromPersistence(

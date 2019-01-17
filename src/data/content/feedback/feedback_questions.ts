@@ -6,6 +6,7 @@ import { FeedbackOpenResponse } from './feedback_open_response';
 import createGuid from 'utils/guid';
 import { getChildren, augment } from '../common';
 import { getKey } from 'data/common';
+import { ensureIdGuidPresent } from 'data/content/common';
 
 export type FeedbackQuestion =
   LikertSeries
@@ -37,6 +38,10 @@ export class FeedbackQuestions extends Immutable.Record(defaultFeedbackQuestions
 
   with(values: FeedbackQuestionsParams): FeedbackQuestions {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackQuestions {
+    return ensureIdGuidPresent(this);
   }
 
   static fromPersistence(

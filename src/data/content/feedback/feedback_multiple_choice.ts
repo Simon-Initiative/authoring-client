@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { getChildren, augment } from 'data/content/common';
+import { getChildren, augment, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { FeedbackChoice } from './feedback_choice';
@@ -42,6 +42,12 @@ export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMult
 
   with(values: FeedbackMultipleChoiceParams): FeedbackMultipleChoice {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackMultipleChoice {
+    return ensureIdGuidPresent(this.with({
+      prompt: this.prompt.clone(),
+    }));
   }
 
   static fromPersistence(

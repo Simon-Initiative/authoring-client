@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { LikertLabel } from './likert_label';
-import { getChildren, augment } from 'data/content/common';
+import { getChildren, augment, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 
@@ -36,6 +36,10 @@ export class LikertScale extends Immutable.Record(defaultLikertScaleParams) {
 
   with(values: LikertScaleParams): LikertScale {
     return this.merge(values) as this;
+  }
+
+  clone(): LikertScale {
+    return ensureIdGuidPresent(this);
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): LikertScale {

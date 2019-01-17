@@ -78,7 +78,6 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     const type = this.props.resourceType;
     const resource = this.props.createResourceFn(
       this.props.course.guid, title, type);
-    console.log('Resource', resource);
 
     (this.refs['title'] as any).value = '';
 

@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
 import { ContentElements, TEXT_ELEMENTS } from '../common/elements';
 import { getChildren, augment } from '../common';
+import { ensureIdGuidPresent } from 'data/content/common';
 
 type FeedbackChoiceParams = {
   guid?: string;
@@ -29,6 +30,12 @@ export class FeedbackChoice extends Immutable.Record(defaultFeedbackChoiceParams
 
   with(values: FeedbackChoiceParams): FeedbackChoice {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackChoice {
+    return ensureIdGuidPresent(this.with({
+      text: this.text.clone(),
+    }));
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): FeedbackChoice {

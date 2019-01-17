@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import createGuid from 'utils/guid';
 import { INLINE_ELEMENTS, ContentElements } from '../common/elements';
 import { augment } from '../common';
+import { ensureIdGuidPresent } from 'data/content/common';
 
 type FeedbackPromptParams = {
   guid?: string;
@@ -27,6 +28,12 @@ export class FeedbackPrompt extends Immutable.Record(defaultFeedbackPromptParams
 
   with(values: FeedbackPromptParams): FeedbackPrompt {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackPrompt {
+    return ensureIdGuidPresent(this.with({
+      content: this.content.clone(),
+    }));
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): FeedbackPrompt {
