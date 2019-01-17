@@ -209,62 +209,6 @@ export default class Main extends React.Component<MainProps, MainState> {
         <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
       </HelpPopover>
     );
-<<<<<<< HEAD
-  }
-
-  getView(url: string): JSX.Element {
-    const { onDispatch, expanded, user, course } = this.props;
-
-    if (url === '/') {
-      return <CoursesViewSearchable
-        serverTimeSkewInMs={this.props.server.timeSkewInMs}
-        userId={user.userId} />;
-    }
-    if (url === '/create') {
-      return <CreateCourseView dispatch={onDispatch} />;
-    }
-    if (url === '/import') {
-      return <ImportCourseView dispatch={onDispatch} />;
-    }
-    if (url.startsWith('/preview')) {
-
-      const documentId = url.substring(8, url.indexOf('-'));
-      const hasParams = url.indexOf('?') !== -1;
-      const courseId = hasParams
-        ? url.substring(url.indexOf('-') + 1, url.indexOf('?'))
-        : url.substr(url.indexOf('-') + 1);
-      const query = url.substr(url.indexOf('?') + 1);
-      const previewUrl = getQueryVariableFromString('url', query);
-      const shouldRefresh = getQueryVariableFromString('refresh', query) === 'true';
-
-      const maybePreviewUrl = previewUrl === null
-        ? Maybe.nothing<string>() : Maybe.just(previewUrl);
-
-      return <Preview
-        showMessage={(message: Msg.Message) => {
-          this.props.onDispatch(messageActions.showMessage(message));
-        }}
-        dismissMessage={(message: Msg.Message) => {
-          this.props.onDispatch(messageActions.dismissSpecificMessage(message));
-        }}
-        email={this.props.user.profile.email}
-        shouldRefresh={shouldRefresh}
-        previewUrl={maybePreviewUrl}
-        documentId={documentId}
-        courseId={courseId} />;
-
-    }
-    if (url.startsWith('/objectives-') && course) {
-      return <ObjectiveSkillView
-        course={course}
-        dispatch={onDispatch}
-        expanded={expanded}
-        userName={user.user} />;
-    }
-
-    if (course) {
-=======
->>>>>>> SPRINT-0.20.0
 
     return course.caseOf({
       just: c => (
