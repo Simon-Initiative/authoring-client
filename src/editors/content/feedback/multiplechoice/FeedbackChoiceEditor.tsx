@@ -31,12 +31,12 @@ export class FeedbackChoiceEditor extends React.PureComponent<Props, State> {
         <TabSectionHeader title="How would an expert answer this question?">
         </TabSectionHeader>
         <TabSectionContent key="explanation" className="feedback">
-          <ExplanationEditor
+          {/* <ExplanationEditor
             {...this.props}
             model={model.explanation}
             onEdit={(explanation, src) => this.onPartEdit(
               model.with({ explanation }),
-              src)} />
+              src)} /> */}
         </TabSectionContent>
       </TabSection>
     );

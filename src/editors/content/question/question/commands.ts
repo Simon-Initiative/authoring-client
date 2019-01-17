@@ -1,13 +1,13 @@
 import { EditorState } from 'draft-js';
-import { AbstractCommand } from '../common/command';
-import { EntityTypes } from '../../../data/content/learning/common';
-import { InsertInlineEntityCommand } from '../common/draft/commands/insert';
-import guid from '../../../utils/guid';
+import { AbstractCommand } from 'editors/content/common/command';
+import { EntityTypes } from 'data/content/learning/common';
+import { InsertInlineEntityCommand } from 'editors/content/common/draft/commands/insert';
+import guid from 'utils/guid';
 
 export class InsertInputRefCommand extends AbstractCommand<EditorState> {
 
   question: any;
-  itemBuilder:  () => any;
+  itemBuilder: () => any;
   typeLabel: string;
 
   constructor(question: any, itemBuilder: () => any, typeLabel: string) {
@@ -18,7 +18,7 @@ export class InsertInputRefCommand extends AbstractCommand<EditorState> {
     this.typeLabel = typeLabel;
   }
 
-  execute(state: EditorState, context, services) : Promise<EditorState> {
+  execute(state: EditorState, context, services): Promise<EditorState> {
 
     this.question.itemToAdd = this.itemBuilder();
 

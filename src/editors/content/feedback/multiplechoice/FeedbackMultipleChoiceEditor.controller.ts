@@ -1,20 +1,16 @@
 import { connect } from 'react-redux';
-import { MultipleChoice } from './MultipleChoice';
+import { FeedbackMultipleChoiceEditor } from './FeedbackMultipleChoiceEditor';
 import * as contentTypes from 'data/contentTypes';
 import { toggleAdvancedScoring } from 'actions/questionEditor';
 import { State } from 'reducers';
-import { QuestionProps } from './Question';
 
 interface StateProps {
-  advancedScoringInitialized: boolean;
-  advancedScoring: boolean;
 }
 
 interface DispatchProps {
-  onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
-interface OwnProps extends QuestionProps<contentTypes.MultipleChoice> {
+interface OwnProps {
 
 }
 
@@ -29,6 +25,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(MultipleChoice);
+  (mapStateToProps, mapDispatchToProps)(FeedbackMultipleChoiceEditor);
 
-export { controller as MultipleChoice };
+export { controller as FeedbackMultipleChoice };
