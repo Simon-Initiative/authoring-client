@@ -38,7 +38,7 @@ const defaultContent = {
   id: '',
   title: '',
   src: '',
-  type: 'video/mpeg',
+  type: '',
   controls: true,
   href: '',
   poster: '',

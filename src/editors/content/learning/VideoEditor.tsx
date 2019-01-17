@@ -20,6 +20,8 @@ import { Source } from 'data/content/learning/source';
 import { modalActions } from 'actions/modal';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { ContentElements } from 'data/content/common/elements';
+import { determineMimeTypeFromFilename } from 'utils/mime';
+import { ModalMessage } from 'utils/ModalMessage';
 
 import './Media.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
@@ -39,9 +41,28 @@ export function selectVideo(
 
     const selected = { video: null };
 
+    const displayMimeTypeError = () => {
+      // Display an error message letting the user know that
+      // since the mime type couldn't be determined, we cannot
+      // use this video
+      const message = (
+        <ModalMessage onCancel={() => dismiss()}>
+          <b>Unable to use this video</b><br /><br />
+          We could not determine the MIME type based on this file's extension.
+        </ModalMessage>
+      );
+
+      display(message);
+    };
+
     const mediaLibrary =
       <ModalSelection title="Select a Video File"
-        onInsert={() => { dismiss(); resolve(selected.video); }}
+        onInsert={() => {
+          dismiss();
+          selected.video === false
+            ? displayMimeTypeError() : resolve(selected.video);
+        }
+        }
         onCancel={() => dismiss()}>
         <MediaManager model={model ? model : new Video()}
           resourcePath={resourcePath}
@@ -51,11 +72,27 @@ export function selectVideo(
           selectionType={SELECTION_TYPES.SINGLE}
           initialSelectionPaths={[model ? model.sources.first().src : model]}
           onSelectionChange={(video) => {
-            const source = new Source({
-              src: adjustPath(video[0].pathTo, resourcePath),
-            });
-            const sources = OrderedMap<string, Source>().set(source.guid, source);
-            selected.video = new Video().with({ sources });
+
+            // Only allow saving of the selected video if we can determine
+            // the mime type based on the filename.
+            try {
+
+              const type = determineMimeTypeFromFilename(video[0].pathTo);
+              const source = new Source({
+                src: adjustPath(video[0].pathTo, resourcePath),
+                type,
+              });
+              const sources = OrderedMap<string, Source>().set(source.guid, source);
+              selected.video = new Video().with({ sources, type });
+
+              // To test out the display of the mime type error, uncomment the following:
+              // throw new Error('Test');
+
+            } catch (e) {
+              selected.video = false;
+            }
+
+
           }} />
       </ModalSelection>;
 
