@@ -6,28 +6,6 @@ import { getKey } from '../../common';
 import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { ContentElements } from 'data/content/common/elements';
 
-const encodeMatchOperators = (match: string) => {
-  const operatorEncodings = {
-    '<': '&lt;',
-    '>': '&gt;',
-  };
-
-  return Object.keys(operatorEncodings).reduce(
-    (match, encKey) => match.replace(encKey, operatorEncodings[encKey]),
-    match);
-};
-
-const decodeMatchOperators = (match: string) => {
-  const operatorDecodings = {
-    '&lt;': '<',
-    '&gt;': '>',
-  };
-
-  return Object.keys(operatorDecodings).reduce(
-    (match, decKey) => match.replace(decKey, operatorDecodings[decKey]),
-    match);
-};
-
 const sanitizeMatch = (match: string) => {
   // remove trailing # if no precision value is defined
   return match.substr(match.length - 1, 1) === '#'
@@ -99,7 +77,7 @@ export class Response extends Immutable.Record(defaultContent) {
       model = model.with({ name: r['@name'] });
     }
     if (r['@match'] !== undefined) {
-      model = model.with({ match: decodeMatchOperators(r['@match']) });
+      model = model.with({ match: r['@match'] });
     }
     if (r['@score'] !== undefined) {
       model = model.with({ score: r['@score'] });
@@ -157,7 +135,7 @@ export class Response extends Immutable.Record(defaultContent) {
 
     const o = {
       response: {
-        '@match': encodeMatchOperators(sanitizeMatch(this.match)),
+        '@match': sanitizeMatch(this.match),
         '@score': this.score.trim() === '' ? '0' : this.score,
         '@name': this.name,
         '#array': [...concepts, ...feedback],

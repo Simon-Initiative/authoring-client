@@ -2,7 +2,6 @@ var path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const pathsToClean = ['dist'];
 const cleanOptions = {};
@@ -35,6 +34,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].[chunkhash].js'
     },
+    devtool: 'source-map',
     externals: {
     },
     resolve: {
@@ -75,7 +75,6 @@ module.exports = {
             favicon: 'assets/oli-icon.png',
         }),
         new webpack.HashedModuleIdsPlugin(),
-        new UglifyJsPlugin()
     ],
     module: {
         rules: [
