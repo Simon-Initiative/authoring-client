@@ -195,7 +195,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         model.pages.reduce(
           (acc, page) => acc.caseOf({
             just: n => Maybe.just(n),
-            nothing: () => findQuestionById(page.nodes, router.urlParams.get('nodeGuid')),
+            nothing: () => findNodeByGuid(page.nodes, router.urlParams.get('nodeGuid')),
           }),
           findNodeByGuid(model.nodes, router.urlParams.get('nodeGuid')),
         );
