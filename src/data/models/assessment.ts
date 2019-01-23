@@ -89,6 +89,57 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     return this.merge(values) as this;
   }
 
+  static parseChildren(assessment, notify, originalModel): AssessmentModel {
+
+    let model = originalModel;
+    assessment['#array'].forEach((item) => {
+
+      const key = getKey(item);
+      const id = guid();
+
+      switch (key) {
+        case 'page':
+          model = model.with(
+            { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id, notify)) });
+          break;
+        case 'question':
+          model = model.with({
+            nodes:
+              model.nodes.set(id, contentTypes.Question.fromPersistence(item, id, notify)),
+          });
+          break;
+        case 'content':
+          model = model.with({
+            nodes: model.nodes.set(id, contentTypes.Content.fromPersistence(item, id, notify)),
+          });
+          break;
+        case 'selection':
+          model = model.with({
+            nodes:
+              model.nodes.set(id, contentTypes.Selection.fromPersistence(item, id, notify)),
+          });
+          break;
+        case 'title':
+          break;
+        // Content service looks for a short title with text equal to "reveal"
+        // to display a branching assessment
+        case 'short_title':
+          item.short_title['#text'] !== undefined &&
+            item.short_title['#text'] === 'reveal'
+            ? model = model.with({ branching: true })
+            : model = model.with({ branching: false });
+          break;
+        case 'section':
+          model = AssessmentModel.parseChildren(item['section'], notify, model);
+          break;
+        default:
+          model = contentTypes.Unsupported.fromPersistence(item, id, notify);
+      }
+    });
+
+    return model;
+  }
+
   static fromPersistence(json: Object, notify: () => void): AssessmentModel {
 
     let model = new AssessmentModel();
@@ -143,50 +194,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     }
     // 4. Neither value defined: handled implicitly by applying both default parameter values
 
-    assessment['#array'].forEach((item) => {
-
-      const key = getKey(item);
-      const id = guid();
-
-      switch (key) {
-        case 'page':
-          model = model.with(
-            { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id, notify)) });
-          break;
-        case 'question':
-          model = model.with({
-            nodes:
-              model.nodes.set(id, contentTypes.Question.fromPersistence(item, id, notify)),
-          });
-          break;
-        case 'content':
-          model = model.with({
-            nodes: model.nodes.set(id, contentTypes.Content.fromPersistence(item, id, notify)),
-          });
-          break;
-        case 'selection':
-          model = model.with({
-            nodes:
-              model.nodes.set(id, contentTypes.Selection.fromPersistence(item, id, notify)),
-          });
-          break;
-        case 'title':
-          break;
-        // Content service looks for a short title with text equal to "reveal"
-        // to display a branching assessment
-        case 'short_title':
-          item.short_title['#text'] !== undefined &&
-            item.short_title['#text'] === 'reveal'
-            ? model = model.with({ branching: true })
-            : model = model.with({ branching: false });
-          break;
-        default:
-          model = model.with({
-            nodes:
-              model.nodes.set(id, contentTypes.Unsupported.fromPersistence(item, id, notify)),
-          });
-      }
-    });
+    model = AssessmentModel.parseChildren(assessment, notify, model);
 
     // Adjust models to ensure that we never have a page-less assessment
     model = migrateNodesToPage(model);
