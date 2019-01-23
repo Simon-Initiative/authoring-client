@@ -1,6 +1,5 @@
+import { createHashHistory } from 'history';
 
-const createHistory = require('history').createHashHistory;
-
-export default createHistory({
+export default createHashHistory({
   hashType: 'noslash', // Omit the leading slash
 });

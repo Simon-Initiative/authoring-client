@@ -14,6 +14,8 @@ import { updateHover } from 'actions/hover';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
+import { RouterState } from 'reducers/router';
+import { setSearchParam, clearSearchParam } from 'actions/router';
 
 interface StateProps {
   skills: OrderedMap<string, Skill>;
@@ -21,6 +23,7 @@ interface StateProps {
   hover: string;
   course: CourseModel;
   currentNode: Maybe<contentTypes.Node>;
+  router: RouterState;
 }
 
 interface DispatchProps {
@@ -33,12 +36,14 @@ interface DispatchProps {
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  onSetSearchParam: (name, value) => void;
+  onClearSearchParam: (name) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<PoolModel> { }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
-  const { activeContext, skills, hover, course, documents } = state;
+  const { activeContext, skills, hover, course, documents, router } = state;
 
   return {
     activeContext,
@@ -49,6 +54,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
       just: docId => documents.get(docId).currentNode,
       nothing: Maybe.nothing(),
     }),
+    router,
   };
 };
 
@@ -78,6 +84,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     dismissMessage: (message: Messages.Message) => {
       dispatch(dismissSpecificMessage(message));
     },
+    onSetSearchParam: (name, value) => dispatch(setSearchParam(name, value)),
+    onClearSearchParam: name => dispatch(clearSearchParam(name)),
   };
 };
 

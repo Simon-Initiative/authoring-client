@@ -34,7 +34,7 @@ const defaultContent = {
   id: '',
   title: '',
   src: '',
-  type: 'audio/mpeg',
+  type: '',
   controls: true,
   sources: Immutable.OrderedMap<string, Source>(),
   tracks: Immutable.OrderedMap<string, Track>(),

@@ -10,7 +10,7 @@ import * as contentTypes from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
 import guid from 'utils/guid';
 import {
-  locateNextOfKin, findNodeByGuid,
+  locateNextOfKin, findNodeByGuid, findQuestionById,
   handleBranchingReordering, handleBranchingDeletion,
 } from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
@@ -31,6 +31,7 @@ import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
 import './AssessmentEditor.scss';
 import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
+import { RouterState } from 'reducers/router';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
@@ -46,7 +47,10 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
   onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
+  onSetSearchParam: (name, value) => void;
+  onClearSearchParam: (name) => void;
   course: models.CourseModel;
+  router: RouterState;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -101,6 +105,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
       this.props.showMessage(this.noSkillsMessage);
     }
+
+    this.selectRoutedOrDefaultNode(this.props.router);
   }
 
   shouldComponentUpdate(
@@ -114,6 +120,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       || this.props.hover !== nextProps.hover
       || this.props.currentPage !== nextProps.currentPage
       || this.props.currentNode !== nextProps.currentNode
+      || this.props.router !== nextProps.router
       || this.state.undoStackSize !== nextState.undoStackSize
       || this.state.redoStackSize !== nextState.redoStackSize
       || this.state.collapseInsertPopup !== nextState.collapseInsertPopup;
@@ -122,7 +129,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
-
     if (this.props.context.skills.size <= 0 &&
       nextProps.context.skills.size > 0 &&
       this.noSkillsMessage !== undefined) {
@@ -133,6 +139,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
       const currentPage = this.getCurrentPage(nextProps);
       const { activeContext, onSetCurrentNodeOrPage } = this.props;
+      const documentId = activeContext.documentId.valueOr(null);
 
       // Handle the case that the current node has changed externally,
       // for instance, from an undo/redo
@@ -140,15 +147,65 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         .caseOf({
 
           just: (currentNode) => {
-            onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), currentNode);
+            onSetCurrentNodeOrPage(documentId, currentNode);
           },
           nothing: () => {
             locateNextOfKin(
               this.getCurrentPage(this.props).nodes, this.props.currentNode.guid).lift(node =>
-                onSetCurrentNodeOrPage(
-                  activeContext.documentId.valueOr(null), node));
+                onSetCurrentNodeOrPage(documentId, node));
           },
         });
+    }
+    if (this.props.router !== nextProps.router) {
+      this.selectRoutedOrDefaultNode(nextProps.router);
+    }
+  }
+
+  selectFirstQuestion = () => {
+    const { activeContext, model, onSetCurrentNodeOrPage } = this.props;
+    const documentId = activeContext.documentId.valueOr(null);
+
+    if (model.pages.size > 0) {
+      onSetCurrentNodeOrPage(documentId, this.props.model.pages.first().nodes.first());
+    } else {
+      onSetCurrentNodeOrPage(documentId, this.props.model.nodes.first());
+    }
+  }
+
+  selectRoutedOrDefaultNode = (router: RouterState) => {
+    const { activeContext, onSetCurrentNodeOrPage, model } = this.props;
+    const documentId = activeContext.documentId.valueOr(null);
+
+    if (router.urlParams.get('questionId')) {
+      const urlSelectedQuestion =
+        model.pages.reduce(
+          (acc, page) => acc.caseOf({
+            just: n => Maybe.just(n),
+            nothing: () => findQuestionById(page.nodes, router.urlParams.get('questionId')),
+          }),
+          findQuestionById(model.nodes, router.urlParams.get('questionId')),
+        );
+
+      urlSelectedQuestion.caseOf({
+        just: question => onSetCurrentNodeOrPage(documentId, question),
+        nothing: () => this.selectFirstQuestion(),
+      });
+    } else if (router.urlParams.get('nodeGuid')) {
+      const urlSelectedNode =
+        model.pages.reduce(
+          (acc, page) => acc.caseOf({
+            just: n => Maybe.just(n),
+            nothing: () => findNodeByGuid(page.nodes, router.urlParams.get('nodeGuid')),
+          }),
+          findNodeByGuid(model.nodes, router.urlParams.get('nodeGuid')),
+        );
+
+      urlSelectedNode.caseOf({
+        just: node => onSetCurrentNodeOrPage(documentId, node),
+        nothing: () => this.selectFirstQuestion(),
+      });
+    } else {
+      this.selectFirstQuestion();
     }
   }
 
@@ -243,12 +300,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // expanded state of nodes in the outline
   }
 
-  onSelect(selectedNode: contentTypes.Node) {
-    const { activeContext, onSetCurrentNodeOrPage } = this.props;
+  onSelect = (node: contentTypes.Node) => {
+    const { onSetSearchParam, onClearSearchParam } = this.props;
 
-    const documentId = activeContext.documentId.valueOr(null);
-
-    onSetCurrentNodeOrPage(documentId, selectedNode);
+    if (node.contentType === 'Question') {
+      onSetSearchParam('questionId', node.id);
+      onClearSearchParam('nodeGuid');
+    } else {
+      onSetSearchParam('nodeGuid', node.guid);
+      onClearSearchParam('questionId');
+    }
   }
 
   allNodes() {
@@ -560,7 +621,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                   selected={currentNode.guid}
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
-                  onSelect={this.onSelect.bind(this)}
+                  onSelect={this.onSelect}
                   course={course}
                 />
                 {this.renderAdd()}

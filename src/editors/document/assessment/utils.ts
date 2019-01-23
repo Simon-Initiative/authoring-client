@@ -177,6 +177,44 @@ export function findNodeByGuid(
 }
 
 /**
+ * Finds a question node based on id in an assessment.
+ */
+export function findQuestionById(
+  nodes: Immutable.OrderedMap<string, contentTypes.Node>, id: string): Maybe<contentTypes.Node> {
+
+  // Check top level nodes first
+  const foundQuestion = nodes.filter(n => n.contentType === 'Question')
+    .find((n: contentTypes.Question) => n.id === id);
+  if (foundQuestion) {
+    return Maybe.just(foundQuestion);
+  }
+
+  // Check contents of all embedded pools next
+  return nodes
+    .toArray()
+    .reduce(
+      (node, p) => {
+        if (p.contentType === 'Selection') {
+          if (p.source.contentType === 'Pool') {
+            const pool: contentTypes.Pool = p.source;
+            return node.caseOf({
+              just: n => node,
+              nothing: () => {
+                const n = pool.questions.find(q => q.id === id);
+                return n === undefined
+                  ? Maybe.nothing<contentTypes.Node>()
+                  : Maybe.just(n);
+              },
+            });
+          }
+        }
+        return node;
+      },
+      Maybe.nothing<contentTypes.Node>());
+
+}
+
+/**
  *
  * Find closest relative.  In an assessment tree, find either the given node's
  * immediate next sibling - or, if the node has no siblings, return the node's parent.
