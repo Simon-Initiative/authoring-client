@@ -9,6 +9,7 @@ export const CONTENT_COLORS = {
   Alternatives: flatui.sunflower,
   Applet: flatui.greenSea,
   Audio: flatui.pumpkin,
+  Answer: flatui.wetAsphalt,
   BlockCode: flatui.concrete,
   BlockFormula: colors.pink,
   BlockQuote: distinct.distinctLavender,
@@ -33,6 +34,8 @@ export const CONTENT_COLORS = {
   Hint: flatui.alizarin,
   IFrame: flatui.carrot,
   Image: flatui.sunflower,
+  Inquiry: colors.primary,
+  InquiryQuestion: flatui.silver,
   Instructions: flatui.emerald,
   Li: distinct.distinctMint,
   Line: distinct.distinctTeal,
@@ -61,10 +64,11 @@ export const CONTENT_COLORS = {
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
 
 export enum insertableContentTypes {
-  Activity, Alternative, Alternatives, Applet, Audio, BlockCode, BlockFormula,
+  Activity, Alternative, Alternatives, Answer, Applet, Audio, BlockCode, BlockFormula,
   BlockQuote, CellData, CellHeader, CodeBlock, Composite, Conjugate, Conjugation,
   ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, Figure,
-  Flash, Hint, IFrame, Image, Instructions, Li, Line, Materials, Math, Mathematica, Meaning,
+  Flash, Hint, IFrame, Image, Inquiry, InquiryQuestion, Instructions,
+  Li, Line, Materials, Math, Mathematica, Meaning,
   Ol, Panopto, Param, Pronunciation, Pullout, Section, Speaker, Sym, Table, Translation,
   Ul, Unity, Video, WbInline, YouTube,
 }
@@ -76,6 +80,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Activity: return <i style={style} className={'fa fa-check'} />;
     case i.Alternative: return <i style={style} className={'fa fa-plus-square-o'} />;
     case i.Alternatives: return <i style={style} className={'fa fa-plus-square'} />;
+    case i.Answer: return <i style={style} className={'fa fa-exclamation'} />;
     case i.Applet: return <i style={style} className={'fa fa-coffee'} />;
     case i.Audio: return <i style={style} className={'fa fa-volume-up'} />;
     case i.BlockCode: return <i style={style} className={'fa fa-code'} />;
@@ -99,6 +104,8 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Flash: return <i style={style} className={'fa fa-bolt'} />;
     case i.Hint: return <i style={style} className={'fa fa-hand-o-right'} />;
     case i.IFrame: return <i style={style} className={'fa fa-window-maximize'} />;
+    case i.Inquiry: return <i style={style} className={'fa fa-commenting-o'} />;
+    case i.InquiryQuestion: return <i style={style} className={'fa fa-question'} />;
     case i.Image: return <i style={style} className={'fa fa-image'} />;
     case i.Instructions: return <i style={style} className={'fa fa-file-text'} />;
     case i.Li: return <i style={style} className={'fa fa-list'} />;

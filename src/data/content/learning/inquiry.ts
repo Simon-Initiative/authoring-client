@@ -5,6 +5,7 @@ import createGuid from 'utils/guid';
 import { Question } from './question';
 import { Answer } from './answer';
 import { Title } from './title';
+import { InquiryQuestion } from 'data/contentTypes';
 
 export type InquiryParams = {
   questions?: Immutable.OrderedMap<string, Question>,
@@ -56,12 +57,12 @@ export class Inquiry extends Immutable.Record(defaultContent) {
 
     model = setId(model, t, notify);
 
+    let q = null;
+
     getChildren(t).forEach((item) => {
 
       const key = getKey(item);
       const id = createGuid();
-
-      let q = null;
 
       switch (key) {
         case 'question':
@@ -94,12 +95,24 @@ export class Inquiry extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
-    const t = {
+
+    // Serialize the title, then each question followed by the question's answers
+    const dummyQuestion = new InquiryQuestion();
+    const children = this.questions.size > 0
+      ? this.questions.toArray().reduce(
+        (p, q) => {
+          return [...p, q.toPersistence(), ...q.answers.toArray().map(a => a.toPersistence())];
+        },
+        [this.title.toPersistence()],
+      )
+      : [this.title.toPersistence(), dummyQuestion.toPersistence()];
+
+    return {
       inquiry: {
-        '#array': this.content.toPersistence(),
+        '#array': children,
+        '@id': this.id,
       },
     };
 
-    return t;
   }
 }

@@ -407,6 +407,14 @@ export class InsertToolbar
               disabled={!editMode || !parentSupportsElementType('conjugation')}>
               {getContentIcon(insertableContentTypes.Conjugation, { width: 22 })} Conjugation
             </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                const inquiry = new contentTypes.Inquiry();
+                onInsert(inquiry);
+              }}
+              disabled={!editMode || !parentSupportsElementType('inquiry')}>
+              {getContentIcon(insertableContentTypes.Inquiry, { width: 22 })} Inquiry
+            </ToolbarButtonMenuItem>
           </ToolbarQuadMenu>
 
           <ToolbarLayout.Column maxWidth="100px">
@@ -526,9 +534,9 @@ export class InsertToolbar
                   });
 
                   onCreateNew(model)
-                  .then((resource) => {
-                    onInsert(new contentTypes.Activity().with({ idref: resource.id }));
-                  });
+                    .then((resource) => {
+                      onInsert(new contentTypes.Activity().with({ idref: resource.id }));
+                    });
 
                 }}
                 disabled={!editMode || !parentSupportsElementType('wb:inline')}>
@@ -536,7 +544,7 @@ export class InsertToolbar
                 Create summative assessment
               </ToolbarButtonMenuItem>
 
-              <ToolbarButtonMenuDivider/>
+              <ToolbarButtonMenuDivider />
 
               <ToolbarButtonMenuItem
                 onClick={() => {

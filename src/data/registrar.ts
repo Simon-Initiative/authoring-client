@@ -9,6 +9,7 @@ export function registerContentTypes() {
   registerType('alternative', ct.Alternative.fromPersistence);
   registerType('alternatives', ct.Alternatives.fromPersistence);
   registerType('anchor', ct.Anchor.fromPersistence);
+  registerType('answer', ct.Answer.fromPersistence);
   registerType('applet', ct.Applet.fromPersistence);
   registerType('audio', ct.Audio.fromPersistence);
   registerType('caption', ct.Caption.fromPersistence);
@@ -34,6 +35,7 @@ export function registerContentTypes() {
   registerType('formula', ct.BlockFormula.fromPersistence);
   registerType('iframe', ct.IFrame.fromPersistence);
   registerType('image', ct.Image.fromPersistence);
+  registerType('inquiry', ct.Inquiry.fromPersistence);
   registerType('instructions', ct.Instructions.fromPersistence);
   registerType('li', ct.Li.fromPersistence);
   registerType('line', ct.Line.fromPersistence);
@@ -52,6 +54,7 @@ export function registerContentTypes() {
   registerType('pref:value', ct.PrefValue.fromPersistence);
   registerType('pronunciation', ct.Pronunciation.fromPersistence);
   registerType('pullout', ct.Pullout.fromPersistence);
+  registerType('question', ct.InquiryQuestion.fromPersistence);
   registerType('quote', ct.BlockQuote.fromPersistence);
   registerType('section', ct.WorkbookSection.fromPersistence);
   registerType('source', ct.Source.fromPersistence);
