@@ -44,11 +44,14 @@ export const CONTENT_COLORS = {
   Panopto: flatui.greenSea,
   Param: flatui.silver,
   Pronunciation: flatui.alizarin,
+  Proof: flatui.peterRiver,
   Pullout: distinct.distinctNavy,
   Section: distinct.distinctBlue,
   Speaker: distinct.distinctTeal,
+  Statement: distinct.distinctNavy,
   Sym: colors.warning,
   Table: flatui.pomegranite,
+  Theorem: distinct.distinctBrown,
   Translation: flatui.amethyst,
   Ul: distinct.distinctOlive,
   Unity: flatui.greenSea,
@@ -65,7 +68,8 @@ export enum insertableContentTypes {
   BlockQuote, CellData, CellHeader, CodeBlock, Composite, Conjugate, Conjugation,
   ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, Figure,
   Flash, Hint, IFrame, Image, Instructions, Li, Line, Materials, Math, Mathematica, Meaning,
-  Ol, Panopto, Param, Pronunciation, Pullout, Section, Speaker, Sym, Table, Translation,
+  Ol, Panopto, Param, Pronunciation, Proof, Pullout,
+  Section, Speaker, Statement, Sym, Table, Theorem, Translation,
   Ul, Unity, Video, WbInline, YouTube,
 }
 
@@ -111,11 +115,14 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Panopto: return <i style={style} className={'fa fa-video-camera'} />;
     case i.Param: return <i style={style} className={'fa fa-sticky-note-o'} />;
     case i.Pronunciation: return <i style={style} className={'fa fa-headphones'} />;
+    case i.Proof: return <i style={style} className={'fa fa-sticky-note'} />;
     case i.Pullout: return <i style={style} className={'fa fa-external-link-square'} />;
     case i.Section: return <i style={style} className={'fa fa-list-alt'} />;
     case i.Speaker: return <i style={style} className={'fa fa-comments'} />;
+    case i.Statement: return <i style={style} className={'fa fa-edit'} />;
     case i.Sym: return <i style={style} className={'fa fa-sun-o'} />;
     case i.Table: return <i style={style} className={'fa fa-table'} />;
+    case i.Theorem: return <i style={style} className={'fa fa-university'} />;
     case i.Translation: return <i style={style} className={'fa fa-globe'} />;
     case i.Ul: return <i style={style} className={'fa fa-list-ul'} />;
     case i.Unity: return <i style={style} className={'fa fa-gamepad'} />;

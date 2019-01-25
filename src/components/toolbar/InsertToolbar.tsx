@@ -354,6 +354,15 @@ export class InsertToolbar
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
+
+                const theorem = new contentTypes.Theorem();
+                onInsert(theorem);
+              }}
+              disabled={!editMode || !parentSupportsElementType('theorem')}>
+              <i style={{ width: 22 }} className={'fa fa-university'} /> Theorem
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
                 const speakerId = guid();
                 const lineId = guid();
 
@@ -526,9 +535,9 @@ export class InsertToolbar
                   });
 
                   onCreateNew(model)
-                  .then((resource) => {
-                    onInsert(new contentTypes.Activity().with({ idref: resource.id }));
-                  });
+                    .then((resource) => {
+                      onInsert(new contentTypes.Activity().with({ idref: resource.id }));
+                    });
 
                 }}
                 disabled={!editMode || !parentSupportsElementType('wb:inline')}>
@@ -536,7 +545,7 @@ export class InsertToolbar
                 Create summative assessment
               </ToolbarButtonMenuItem>
 
-              <ToolbarButtonMenuDivider/>
+              <ToolbarButtonMenuDivider />
 
               <ToolbarButtonMenuItem
                 onClick={() => {

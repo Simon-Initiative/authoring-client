@@ -52,13 +52,16 @@ export { Popout } from 'data/content/learning/popout';
 export { PrefLabel } from 'data/content/learning/preflabel';
 export { PrefValue } from 'data/content/learning/prefvalue';
 export { Pronunciation } from 'data/content/learning/pronunciation';
+export { Proof } from 'data/content/learning/proof';
 export { Pullout } from 'data/content/learning/pullout';
 export { Quote } from 'data/content/learning/quote';
 export { Row } from 'data/content/learning/row';
 export { Source } from 'data/content/learning/source';
 export { Speaker } from 'data/content/learning/speaker';
+export { Statement } from 'data/content/learning/statement';
 export { Sym } from 'data/content/learning/sym';
 export { Table } from 'data/content/learning/table';
+export { Theorem } from 'data/content/learning/theorem';
 export { Title } from 'data/content/learning/title';
 export { Track } from 'data/content/learning/track';
 export { Translation } from 'data/content/learning/translation';
@@ -113,8 +116,10 @@ export { Unsupported } from 'data/content/unsupported';
 export { WebContent } from 'data/content/webcontent';
 
 // Organization
-export { AudienceTypes, DependencyTypes, GrainSizes, ConditionTypes,
-  PurposeTypes, ScoringModes, CategoryTypes } from 'data/content/org/types';
+export {
+  AudienceTypes, DependencyTypes, GrainSizes, ConditionTypes,
+  PurposeTypes, ScoringModes, CategoryTypes,
+} from 'data/content/org/types';
 export { Before } from 'data/content/org/before';
 export { Dependencies } from 'data/content/org/dependencies';
 export { Dependency } from 'data/content/org/dependency';

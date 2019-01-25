@@ -37,7 +37,7 @@ const defaultContent = {
   statements: Immutable.OrderedMap<string, Statement>(),
   proofsOrExamples: Immutable.OrderedMap<string, ProofOrExample>(),
   theoremType: TheoremType.Theorem,
-  title: Title.fromText('Theorem Title'),
+  title: Title.fromText(''),
   guid: '',
 };
 
