@@ -34,10 +34,11 @@ import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
 import SearchBar from 'components/common/SearchBar';
 import { Edge, PathElement } from 'types/edge';
-
-import './ObjectiveSkillView.scss';
 import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
 import colors from 'styles/colors';
+import { ConfirmModal } from 'components/ConfirmModal';
+
+import './ObjectiveSkillView.scss';
 
 type SkillPathElement = PathElement & { title?: string };
 
@@ -911,7 +912,7 @@ export class ObjectiveSkillView
       this.services.displayModal(
         <ModalMessage
           onCancel={() => this.services.dismissModal()}
-          okLabel="Okay">
+          okLabel="Ok">
           All skills must be removed from an objective before the objective can be deleted.
         </ModalMessage>);
       return Promise.resolve(false);
@@ -992,46 +993,61 @@ export class ObjectiveSkillView
 
     this.canDeleteObjective(obj)
       .then((canDelete) => {
-
         if (canDelete) {
-          const originalDocument = this.state.objectives.mapping.get(obj.id);
+          const confirmDelete = () => {
+            const originalDocument = this.state.objectives.mapping.get(obj.id);
 
-          const objectives = (originalDocument.model as models.LearningObjectivesModel)
-            .objectives.delete(obj.guid);
-          const model =
-            (originalDocument.model as models.LearningObjectivesModel)
-              .with({ objectives });
+            const objectives = (originalDocument.model as models.LearningObjectivesModel)
+              .objectives.delete(obj.guid);
+            const model =
+              (originalDocument.model as models.LearningObjectivesModel)
+                .with({ objectives });
 
-          const updatedDocument = originalDocument.with({ model });
+            const updatedDocument = originalDocument.with({ model });
 
-          const unified = Object.assign({}, this.state.objectives);
+            const unified = Object.assign({}, this.state.objectives);
 
-          const index = unified.documents.indexOf(originalDocument);
+            const index = unified.documents.indexOf(originalDocument);
 
-          unified.documents[index] = updatedDocument;
-          unified.objectives = unified.objectives.delete(obj.id);
+            unified.documents[index] = updatedDocument;
+            unified.objectives = unified.objectives.delete(obj.id);
 
-          // We need to remap the existing objective ids to the
-          // new version of the newBucket document
-          const idsToDocument = unified.mapping
-            .filter((doc, id) => doc._id === originalDocument._id)
-            .map((doc, id) => updatedDocument)
-            .toOrderedMap();
-          unified.mapping = unified.mapping.merge(idsToDocument);
+            // We need to remap the existing objective ids to the
+            // new version of the newBucket document
+            const idsToDocument = unified.mapping
+              .filter((doc, id) => doc._id === originalDocument._id)
+              .map((doc, id) => updatedDocument)
+              .toOrderedMap();
+            unified.mapping = unified.mapping.merge(idsToDocument);
 
-          if (originalDocument === unified.newBucket) {
-            unified.newBucket = updatedDocument;
-          }
+            if (originalDocument === unified.newBucket) {
+              unified.newBucket = updatedDocument;
+            }
 
-          this.setState(
-            { objectives: unified, isSavePending: true },
+            this.setState(
+              { objectives: unified, isSavePending: true },
 
-            () => persistence.persistDocument(updatedDocument)
-              .then(result => this.saveCompleted())
-              .catch(error => this.failureEncountered(error)),
-          );
+              () => persistence.persistDocument(updatedDocument)
+                .then(result => this.saveCompleted())
+                .catch(error => this.failureEncountered(error)),
+            );
 
-          this.props.onSetObjectives(unified.objectives);
+            this.props.onSetObjectives(unified.objectives);
+          };
+
+          this.services.displayModal(
+            <ConfirmModal
+              className="confirm-delete-modal"
+              onCancel={() => this.services.dismissModal()}
+              onConfirm={() => {
+                confirmDelete();
+                this.services.dismissModal();
+              }}
+              confirmLabel="Remove"
+              confirmClass="btn-remove">
+              Are you sure you want to remove objective '{obj.title}'?
+              This action cannot be undone.
+            </ConfirmModal>);
         }
 
       });

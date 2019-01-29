@@ -46,4 +46,28 @@
     margin-top: 50px;
     font-size: 1.3em;
   }
+
+}
+
+.ConfirmModal {
+  &.confirm-delete-modal {
+    .btn.btn-primary.confirmBtn {
+      background-color: $remove;
+      border-color: $remove;
+
+      &:hover {
+        background-color: darken($remove, 10%);
+        border-color: darken($remove, 10%);
+      }
+
+      &:active {
+        background-color: darken($remove, 15%);
+        border-color: darken($remove, 15%);
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
 }
