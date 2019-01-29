@@ -37,6 +37,7 @@ import { Edge, PathElement } from 'types/edge';
 
 import './ObjectiveSkillView.scss';
 import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
+import colors from 'styles/colors';
 
 type SkillPathElement = PathElement & { title?: string };
 
@@ -1267,16 +1268,19 @@ export class ObjectiveSkillView
     return (
       <div className="filter-bar table-toolbar">
         <div className="input-group">
+          <span style={{ padding: '6px 0' }} >Organization:</span>
           <Dropdown label={selectedOrganization.caseOf({
             just: orgId => organizations.get(orgId).title,
             nothing: () => 'Loading Organizations...',
           })}>
             {organizations.valueSeq().map(org => (
               <DropdownItem
-                label={org.title}
+                key={org.guid}
                 onClick={() => this.setState({
                   selectedOrganization: Maybe.just(org.id),
-                })} />
+                })}>
+                  {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
+                </DropdownItem>
             ))}
           </Dropdown>
           <div className="flex-spacer" />

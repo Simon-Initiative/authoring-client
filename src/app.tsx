@@ -36,9 +36,9 @@ const nodeEnv = process.env.NODE_ENV;
 let reduxLoggingEnabled = (window as Window).localStorage.getItem('redux-logging') === 'true';
 (window as any).showReduxLogs = (show: boolean) => {
   reduxLoggingEnabled = !!show;
-  (window as Window).localStorage.setItem('redux-logging', show === true ? 'true' : 'false');
+  (window as Window).localStorage.setItem('redux-logging', reduxLoggingEnabled ? 'true' : 'false');
 
-  return true ? 'Redux logging enabled' : 'Redux logging disabled';
+  return reduxLoggingEnabled ? 'Redux logging enabled' : 'Redux logging disabled';
 };
 (window as any).help = () => {
   console.log(`
