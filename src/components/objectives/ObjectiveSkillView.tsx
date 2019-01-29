@@ -36,6 +36,7 @@ import SearchBar from 'components/common/SearchBar';
 import { Edge, PathElement } from 'types/edge';
 
 import './ObjectiveSkillView.scss';
+import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
 
 type SkillPathElement = PathElement & { title?: string };
 
@@ -286,6 +287,7 @@ interface ObjectiveSkillViewState {
   organizationResourceMap: Maybe<Immutable.Map<string, Immutable.List<string>>>;
   skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
   searchText: string;
+  selectedOrganization: Maybe<string>;
 }
 
 // The Learning Objectives and Skills documents require specialized handling
@@ -319,6 +321,7 @@ export class ObjectiveSkillView
       organizationResourceMap: Maybe.nothing(),
       skillQuestionRefs: Maybe.nothing(),
       searchText: '',
+      selectedOrganization: Maybe.nothing(),
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
@@ -460,6 +463,7 @@ export class ObjectiveSkillView
 
       this.setState({
         organizationResourceMap: Maybe.just(organizationResourceMap),
+        selectedOrganization: Maybe.maybe(organizationResourceMap.keySeq().first()),
         skillQuestionRefs: Maybe.just(
           skills.reduce(
             (acc, skill) => acc.set(
@@ -1097,7 +1101,7 @@ export class ObjectiveSkillView
     });
   }
 
-  getFilteredQuestionRefs() {
+  getFilteredQuestionRefs(organizationId: string) {
     const {
       skillQuestionRefs, organizationResourceMap,
     } = this.state;
@@ -1106,8 +1110,7 @@ export class ObjectiveSkillView
       orgResources => skillQuestionRefs.lift(skillQuestionRefs =>
         skillQuestionRefs.map(questionRefs =>
           questionRefs.filter(questionRef => orgResources.first() &&
-            //TODO: CHANGE TO SUPPORT ORG SELECTION
-            orgResources.first().contains(questionRef.assessmentId)).toList(),
+            orgResources.get(organizationId).contains(questionRef.assessmentId)).toList(),
         ).toMap(),
       ),
     );
@@ -1115,8 +1118,9 @@ export class ObjectiveSkillView
 
   renderObjectives() {
     const { onPushRoute } = this.props;
-    const { overrideExpanded, searchText } = this.state;
-    const skillQuestionRefs = this.getFilteredQuestionRefs();
+    const { overrideExpanded, searchText, selectedOrganization } = this.state;
+    const skillQuestionRefs = selectedOrganization.bind(selectedOrg =>
+      this.getFilteredQuestionRefs(selectedOrg));
 
     const rows = [];
 
@@ -1248,6 +1252,39 @@ export class ObjectiveSkillView
     );
   }
 
+  renderFilterbar() {
+    const { course } = this.props;
+    const { organizationResourceMap, selectedOrganization } = this.state;
+
+    const organizations = organizationResourceMap.caseOf({
+      just: orgResources => orgResources.keySeq().reduce(
+        (map, orgId) => map.set(orgId, course.resourcesById.get(orgId) as contentTypes.Resource),
+        Immutable.Map<string, contentTypes.Resource>(),
+      ).toMap(),
+      nothing: () => Immutable.Map<string, contentTypes.Resource>(),
+    });
+
+    return (
+      <div className="filter-bar table-toolbar">
+        <div className="input-group">
+          <Dropdown label={selectedOrganization.caseOf({
+            just: orgId => organizations.get(orgId).title,
+            nothing: () => 'Loading Organizations...',
+          })}>
+            {organizations.valueSeq().map(org => (
+              <DropdownItem
+                label={org.title}
+                onClick={() => this.setState({
+                  selectedOrganization: Maybe.just(org.id),
+                })} />
+            ))}
+          </Dropdown>
+          <div className="flex-spacer" />
+        </div>
+      </div>
+    );
+  }
+
   renderTitle() {
     const src = 'https://www.youtube.com/embed/14O7XCgsznY';
 
@@ -1265,7 +1302,7 @@ export class ObjectiveSkillView
     const content = this.state.aggregateModel === null
       ? (
         <div className="page-loading">
-          <LoadingSpinner message="Loading..." />
+          <LoadingSpinner message="Loading Objectives..." />
         </div>
       )
       : this.renderContent();
@@ -1279,6 +1316,7 @@ export class ObjectiveSkillView
                 <div className="col-12">
                   {this.renderTitle()}
                   {this.renderCreation()}
+                  {this.renderFilterbar()}
                   {content}
                 </div>
               </div>

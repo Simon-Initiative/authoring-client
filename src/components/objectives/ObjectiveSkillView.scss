@@ -21,6 +21,12 @@
     margin: 10px 0 20px 0;
   }
 
+  .filter-bar {
+    .btn.btn-secondary.dropdown-toggle {
+      font-size: 1em;
+    }
+  }
+
   .rst__node .rst__nodeContent h2 {
     color: $blue;
     margin-top: 10px;
