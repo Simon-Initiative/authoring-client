@@ -13,13 +13,15 @@ const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe', 'applet',
 const ELEMENTS_BLOCK = ['codeblock', 'p'];
 const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
 const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
-  'dialog', 'figure', 'conjugation'];
+  'dialog', 'figure', 'conjugation', 'inquiry'];
 
 export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign', 'sym',
   'term', 'var', '#math'];
 
-export const INLINE_ELEMENTS = [...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
-  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'table'];
+export const INLINE_ELEMENTS = [
+  ...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
+  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'table',
+];
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
