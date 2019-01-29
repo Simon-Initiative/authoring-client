@@ -526,9 +526,9 @@ export class InsertToolbar
                   });
 
                   onCreateNew(model)
-                  .then((resource) => {
-                    onInsert(new contentTypes.Activity().with({ idref: resource.id }));
-                  });
+                    .then((resource) => {
+                      onInsert(new contentTypes.Activity().with({ idref: resource.id }));
+                    });
 
                 }}
                 disabled={!editMode || !parentSupportsElementType('wb:inline')}>
@@ -536,7 +536,7 @@ export class InsertToolbar
                 Create summative assessment
               </ToolbarButtonMenuItem>
 
-              <ToolbarButtonMenuDivider/>
+              <ToolbarButtonMenuDivider />
 
               <ToolbarButtonMenuItem
                 onClick={() => {
@@ -588,7 +588,14 @@ export class InsertToolbar
               icon={<i className={'fa fa-cogs'} />}
               label={'Advanced'}
               disabled={!editMode || !supportsAtLeastOne(
-                'alternatives')}>
+                'alternatives', 'command')}>
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  onInsert(new contentTypes.Command());
+                }}
+                disabled={!editMode || !parentSupportsElementType('command')}>
+                {getContentIcon(insertableContentTypes.Command, { width: 22 })}Command
+              </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
                   const alt1 = new contentTypes.Alternative().with({

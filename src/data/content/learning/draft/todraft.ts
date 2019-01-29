@@ -9,11 +9,11 @@ let inlineHandlers = null;
 
 export function toDraft(
   toParse: Object[],
-  isInlineText : boolean = false, backingTextProvider : Object = null) : ContentState {
+  isInlineText: boolean = false, backingTextProvider: Object = null): ContentState {
 
-  const draft : common.RawDraft = {
-    entityMap : {},
-    blocks : [],
+  const draft: common.RawDraft = {
+    entityMap: {},
+    blocks: [],
   };
 
   if (isInlineText) {
@@ -49,6 +49,7 @@ inlineTerminalTags['m:math'] = singleSpace;
 inlineTerminalTags['#math'] = singleSpace;
 inlineTerminalTags['image'] = singleSpace;
 inlineTerminalTags['sym'] = singleSpace;
+inlineTerminalTags['command'] = 'Command';
 
 // Content of input_refs are data-driven
 inlineTerminalTags['input_ref'] = (item, provider) => {
@@ -69,14 +70,14 @@ inlineTagsDefaultContent['cite'] = ' ';
 
 
 type ParsingContext = {
-  draft : common.RawDraft,
+  draft: common.RawDraft,
   depth: number,
 };
 
 type WorkingBlock = {
-  fullText : string,
-  markups : common.RawInlineStyle[],
-  entities : common.RawEntityRange[],
+  fullText: string,
+  markups: common.RawInlineStyle[],
+  entities: common.RawEntityRange[],
 };
 
 type InlineHandler = (
@@ -89,6 +90,7 @@ type InlineHandler = (
 
 function getInlineHandlers() {
   const inlineHandlers = {
+    command: commandHandler.bind(undefined, 'IMMUTABLE', common.EntityTypes.command),
     input_ref: inputRefHandler.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
     activity_link: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
@@ -120,8 +122,8 @@ function getInlineHandlers() {
       undefined, 'IMMUTABLE',
       common.EntityTypes.math, 'math', registeredTypes['math']),
     sym: insertDataDrivenEntity.bind(
-        undefined, 'IMMUTABLE',
-        common.EntityTypes.sym, 'sym', registeredTypes['sym']),
+      undefined, 'IMMUTABLE',
+      common.EntityTypes.sym, 'sym', registeredTypes['sym']),
     quote: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
       common.EntityTypes.quote, 'quote', registeredTypes['quote']),
@@ -154,7 +156,7 @@ function em(
   workingBlock.markups.push({ offset, length, style });
 }
 
-function extractAttrs(item: Object) : Object {
+function extractAttrs(item: Object): Object {
   const key = common.getKey(item);
   return Object
     .keys(item[key])
@@ -210,6 +212,25 @@ function inputRefHandler(
 }
 
 
+function commandHandler(
+  mutability: string, type: string, offset: number, length: number, item: Object,
+  context: ParsingContext, workingBlock: WorkingBlock, blockBefore: WorkingBlock,
+  backingTextProvider: Object) {
+
+  const key = common.generateRandomKey();
+
+  workingBlock.entities.push({ offset, length, key });
+
+  const data = registeredTypes['command'](item);
+
+  context.draft.entityMap[key] = {
+    type,
+    mutability,
+    data,
+  };
+}
+
+
 function hashMath(
   offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {
@@ -254,7 +275,7 @@ function formulaInline(
 }
 
 
-function getInlineHandler(key: string) : InlineHandler {
+function getInlineHandler(key: string): InlineHandler {
 
   // Lazily initialize the handlers to avoid a webpack
   // module import problem
@@ -275,8 +296,8 @@ function getInlineHandler(key: string) : InlineHandler {
 
 
 
-function addNewBlock(params : common.RawDraft, values : Object) : common.RawContentBlock {
-  const defaultBlock : common.RawContentBlock = {
+function addNewBlock(params: common.RawDraft, values: Object): common.RawContentBlock {
+  const defaultBlock: common.RawContentBlock = {
     key: common.generateRandomKey(),
     text: ' ',
     type: 'unstyled',
@@ -285,14 +306,14 @@ function addNewBlock(params : common.RawDraft, values : Object) : common.RawCont
     entityRanges: [],
     data: { type: '' },
   };
-  const block : common.RawContentBlock = Object.assign({}, defaultBlock, values);
+  const block: common.RawContentBlock = Object.assign({}, defaultBlock, values);
   params.blocks.push(block);
 
   return block;
 }
 
 
-function getChildren(item: Object, ignore = null) : Object[] {
+function getChildren(item: Object, ignore = null): Object[] {
 
   const key = common.getKey(item);
 
@@ -314,7 +335,7 @@ function getChildren(item: Object, ignore = null) : Object[] {
   return [item[key]];
 }
 
-function cloneWorkingBlock(blockContext: WorkingBlock) : WorkingBlock {
+function cloneWorkingBlock(blockContext: WorkingBlock): WorkingBlock {
   return {
     fullText: blockContext.fullText,
     markups: [...blockContext.markups],
@@ -398,8 +419,8 @@ function paragraph(item: Object, context: ParsingContext, backingTextProvider: O
 
   const blockContext = {
     fullText: '',
-    markups : [],
-    entities : [],
+    markups: [],
+    entities: [],
   };
 
   children.forEach(subItem => processInline(subItem, context, blockContext, backingTextProvider));
@@ -413,7 +434,7 @@ function paragraph(item: Object, context: ParsingContext, backingTextProvider: O
 
 }
 
-function extractIdTitle(item: any) : Object {
+function extractIdTitle(item: any): Object {
   const data = { id: '', title: '', type: '' };
 
   if (item !== undefined && item !== null && item.p && item.p['@id'] !== undefined) {

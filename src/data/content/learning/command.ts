@@ -3,7 +3,8 @@ import { augment, getChildren } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { Message } from './message';
-import { Title } from './title';
+
+const DEFAULT_TITLE = 'Go';
 
 export enum CommandStyle {
   Link = 'link',
@@ -18,7 +19,7 @@ export enum CommandType {
 
 export type CommandParams = {
   target?: string,
-  title?: Title,
+  title?: string,
   style?: CommandStyle,
   commandType?: CommandType,
   message?: Message,
@@ -26,9 +27,9 @@ export type CommandParams = {
 };
 
 const defaultContent = {
-  contentType: 'CommandLink',
+  contentType: 'Command',
   elementType: 'command',
-  title: Title.fromText(''),
+  title: DEFAULT_TITLE,
   target: '',
   style: CommandStyle.Link,
   commandType: CommandType.Message,
@@ -38,13 +39,13 @@ const defaultContent = {
 
 export class Command extends Immutable.Record(defaultContent) {
 
-  contentType: 'CommandLink';
+  contentType: 'Command';
   elementType: 'command';
   target: string;
   style: CommandStyle;
   commandType: CommandType;
   message: Message;
-  title: Title;
+  title: string;
   guid: string;
 
   constructor(params?: CommandParams) {
@@ -82,7 +83,7 @@ export class Command extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'title':
           model = model.with({
-            title: Title.fromPersistence(item, id, notify),
+            title: item['title']['#text'] !== undefined ? item['title']['#text'] : DEFAULT_TITLE,
           });
           break;
         case 'message':
@@ -101,7 +102,7 @@ export class Command extends Immutable.Record(defaultContent) {
         '@style': this.style,
         '@target': this.target,
         '@type': this.commandType,
-        '#array': [this.title.toPersistence(), this.message.toPersistence()],
+        '#array': [{ title: { '#text': this.title } }, this.message.toPersistence()],
       },
     };
   }

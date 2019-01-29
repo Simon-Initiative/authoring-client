@@ -10,6 +10,7 @@ import BlockQuoteEditor from 'editors/content/learning/blockquote/BlockQuoteEdit
 import CellEditor from 'editors/content/learning/table/CellEditor';
 import CiteEditor from 'editors/content/learning/CiteEditor';
 import CodeBlockEditor from 'editors/content/learning/CodeBlockEditor';
+import CommandEditor from 'editors/content/learning/CommandEditor';
 import CompositeEditor from 'editors/content/learning/CompositeEditor';
 import ConjugateEditor from 'editors/content/learning/conjugation/ConjugateEditor';
 import ConjugationEditor from 'editors/content/learning/conjugation/ConjugationEditor';
@@ -86,6 +87,7 @@ function init() {
   registry['CellHeader'] = connectEditor(CellEditor);
   registry['Cite'] = connectEditor(CiteEditor);
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
+  registry['Command'] = connectEditor(CommandEditor);
   registry['Composite'] = connectEditor(CompositeEditor);
   registry['Conjugate'] = connectEditor(ConjugateEditor);
   registry['Conjugation'] = connectEditor(ConjugationEditor);

@@ -15,6 +15,7 @@ export { CellHeader } from 'data/content/learning/cellheader';
 export { Cite } from 'data/content/learning/cite';
 export { Code } from 'data/content/learning/code';
 export { CodeBlock } from 'data/content/learning/codeblock';
+export { Command } from 'data/content/learning/command';
 export { Composite } from 'data/content/learning/composite';
 export { Conjugate } from 'data/content/learning/conjugate';
 export { Conjugation } from 'data/content/learning/conjugation';
@@ -113,8 +114,10 @@ export { Unsupported } from 'data/content/unsupported';
 export { WebContent } from 'data/content/webcontent';
 
 // Organization
-export { AudienceTypes, DependencyTypes, GrainSizes, ConditionTypes,
-  PurposeTypes, ScoringModes, CategoryTypes } from 'data/content/org/types';
+export {
+  AudienceTypes, DependencyTypes, GrainSizes, ConditionTypes,
+  PurposeTypes, ScoringModes, CategoryTypes,
+} from 'data/content/org/types';
 export { Before } from 'data/content/org/before';
 export { Dependencies } from 'data/content/org/dependencies';
 export { Dependency } from 'data/content/org/dependency';

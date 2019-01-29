@@ -18,14 +18,28 @@ const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'com
 export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign', 'sym',
   'term', 'var', '#math'];
 
-export const INLINE_ELEMENTS = [...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
-  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'table'];
+export const INLINE_ELEMENTS = [
+  ...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
+  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'table',
+  'command',
+];
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
 export const BOX_ELEMENTS = [...MATERIAL_ELEMENTS, 'materials', 'alternatives'];
 export const EXTRA_ELEMENTS = [...ELEMENTS_BLOCK, ...ELEMENTS_MIXED];
-export const BODY_ELEMENTS = [...BOX_ELEMENTS, ...ELEMENTS_SEMANTIC];
+const BODY_ELEMENTS_INHERITED = BOX_ELEMENTS.reduce(
+  (p, c) => {
+    if (c !== 'command') {
+      p.push(c);
+    }
+    return p;
+  },
+  [],
+);
+
+export const BODY_ELEMENTS = [...ELEMENTS_SEMANTIC, ...BODY_ELEMENTS_INHERITED];
+
 
 export type ContentElementsParams = {
   content?: Immutable.OrderedMap<string, ContentElement>,
