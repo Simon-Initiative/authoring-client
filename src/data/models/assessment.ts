@@ -7,6 +7,7 @@ import { assessmentTemplate } from '../activity_templates';
 import { isArray, isNullOrUndefined } from 'util';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { splitQuestionsIntoPages } from './utils/assessment';
+import { LegacyTypes } from '../types';
 
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
