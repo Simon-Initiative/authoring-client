@@ -22,7 +22,7 @@ export const styles: JSSStyles = {
     display: 'flex',
     flexDirection: 'column',
   },
-  answerContet: {
+  answerContent: {
     flexGrow: 1,
     paddingLeft: 20,
   },

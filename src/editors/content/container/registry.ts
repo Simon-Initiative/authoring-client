@@ -109,7 +109,7 @@ function init() {
   registry['IFrame'] = connectEditor(IFrameEditor);
   registry['Image'] = connectEditor(ImageEditor);
   registry['Inquiry'] = connectEditor(InquiryEditor);
-  registry['Question'] = connectEditor(InquiryQuestionEditor);
+  registry['InquiryQuestion'] = connectEditor(InquiryQuestionEditor);
   registry['Instructions'] = connectEditor(InstructionsEditor);
   registry['Li'] = connectEditor(ListItemEditor);
   registry['Line'] = connectEditor(LineEditor);

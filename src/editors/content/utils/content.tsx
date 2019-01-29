@@ -35,7 +35,7 @@ export const CONTENT_COLORS = {
   IFrame: flatui.carrot,
   Image: flatui.sunflower,
   Inquiry: colors.primary,
-  InquiryQuestion: flatui.silver,
+  InquiryQuestion: distinct.distinctMaroon,
   Instructions: flatui.emerald,
   Li: distinct.distinctMint,
   Line: distinct.distinctTeal,

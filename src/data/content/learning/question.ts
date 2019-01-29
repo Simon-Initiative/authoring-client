@@ -12,7 +12,7 @@ export type QuestionParams = {
 };
 
 const defaultContent = {
-  contentType: 'Question',
+  contentType: 'InquiryQuestion',
   elementType: 'question',
   id: '',
   answers: Immutable.OrderedMap<string, Answer>(),
@@ -22,7 +22,7 @@ const defaultContent = {
 
 export class Question extends Immutable.Record(defaultContent) {
 
-  contentType: 'Question';
+  contentType: 'InquiryQuestion';
   elementType: 'question';
   content: ContentElements;
   answers: Immutable.OrderedMap<string, Answer>;
