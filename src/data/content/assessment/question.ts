@@ -62,6 +62,16 @@ const defaultQuestionParams = {
 const defaultItem = new ShortAnswer().toPersistence();
 const defaultPart = new Part().toPersistence();
 
+
+// This returns the input array, but trimmed to remove any 'extra'
+// part instances beyond the number that should be there
+export function filterOutExtraParts(parts: Part[], sizeOfInputs: number): Part[] {
+  if (parts.length > sizeOfInputs) {
+    return parts.slice(0, parts.length - (parts.length - sizeOfInputs));
+  }
+  return parts;
+}
+
 // Create a map of item ids to the items
 export function buildItemMap(model: Question) {
 
@@ -722,8 +732,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         ...this.items
           .toArray()
           .map(item => item.toPersistence()),
-        ...this.parts
-          .toArray()
+        ...filterOutExtraParts(this.parts.toArray(), this.items.size)
           // Short answers and essays in formative assessments show both the feedback and the
           // explanation to the student, so we need to keep them in sync
           .map(part => part.toPersistence({ saveExplanationToFeedback: isShortAnswerOrEssay })),
