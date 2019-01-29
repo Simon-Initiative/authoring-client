@@ -32,8 +32,11 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { RouterState } from 'reducers/router';
 import { ROUTE } from 'actions/router';
 import { ResourceLoading } from 'components/ResourceLoading';
+import * as Msg from 'types/messages';
+import * as messageActions from 'actions/messages';
 
 import './Main.scss';
+import Preview from 'components/Preview';
 
 type ResourceList = {
   title: string,
@@ -237,6 +240,26 @@ export default class Main extends React.Component<MainProps, MainState> {
         return <ImportCourseView dispatch={onDispatch} />;
       case ROUTE.CREATE:
         return <CreateCourseView dispatch={onDispatch} />;
+      case ROUTE.PREVIEW: {
+        const documentId = router.resourceId;
+        const courseId = router.courseId;
+        const shouldRefresh = router.urlParams.get('refresh') === 'true';
+        const previewUrl = router.urlParams.get('url');
+        const maybePreviewUrl = previewUrl ? Maybe.nothing<string>() : Maybe.just(previewUrl);
+
+        return <Preview
+          showMessage={(message: Msg.Message) => {
+            onDispatch(messageActions.showMessage(message));
+          }}
+          dismissMessage={(message: Msg.Message) => {
+            onDispatch(messageActions.dismissSpecificMessage(message));
+          }}
+          email={this.props.user.profile.email}
+          shouldRefresh={shouldRefresh}
+          previewUrl={maybePreviewUrl}
+          documentId={documentId.valueOrThrow(new Error('document id must be defined for preview'))}
+          courseId={courseId.valueOrThrow(new Error('course id must be defined for preview'))} />;
+      }
       case ROUTE.ROOT:
         return <CoursesViewSearchable
           serverTimeSkewInMs={this.props.server.timeSkewInMs}

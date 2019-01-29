@@ -10,6 +10,7 @@ export enum ROUTE {
   RESOURCE = 'resource',
   CREATE = 'create',
   IMPORT = 'import',
+  PREVIEW = 'preview',
   SKILLS = 'skills',
   PAGES = 'pages',
   FORMATIVE = 'formative',
@@ -32,7 +33,7 @@ export const getUrlParams = (search: string): Map<string, string> =>
     },
     Map<string, string>(),
   )
-  : Map<string, string>();
+    : Map<string, string>();
 
 export const stringifyUrlParams = (urlParams: Map<string, string>): string =>
   urlParams.keySeq().reduce(
@@ -121,6 +122,13 @@ export const getRouteFromPath = (path: string, search: string) => {
           ...parseCourseResourceIds(path),
         };
       default:
+        if (path.startsWith('preview')) {
+          return {
+            route: ROUTE.PREVIEW,
+            ...parseCourseResourceIds(path.replace(/^preview/, '')),
+          };
+        }
+
         return {
           route: ROUTE.RESOURCE,
           ...parseCourseResourceIds(path),

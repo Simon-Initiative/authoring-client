@@ -291,6 +291,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     return (
       <React.Fragment>
+        {console.log('here')}
         <div className={`insert-popup ${collapseInsertPopup ? 'collapsed' : ''}`}>
           <AddQuestion
             editMode={editMode}
@@ -344,25 +345,28 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                 onEdit={this.onEditNodes.bind(this)}
                 onChangeExpansion={this.onChangeExpansion.bind(this)}
                 onSelect={this.onSelect}
-                course={course}
-              />
-              {this.renderAdd()}
+                course={course}>
+                {this.renderAdd()}
+              </Outline>
+              {currentNode.caseOf({
+                just: node =>
+                  <AssessmentNodeRenderer
+                    {...this.props}
+                    allSkills={this.props.context.skills}
+                    activeContentGuid={activeContentGuid}
+                    model={node}
+                    onEdit={(c: Node, src: ContentElement) => this.onEdit(node.guid, c, src)}
+                    onRemove={this.onRemove}
+                    onFocus={this.onFocus}
+                    canRemove={this.canRemoveNode()}
+                    onDuplicate={this.onDuplicateNode}
+                    nodeParentModel={model}
+                    parent={null}
+                    isQuestionPool={true}
+                  />,
+                nothing: () => null
+              })}
             </div>
-            {currentNode.lift(node =>
-              <AssessmentNodeRenderer
-                {...this.props}
-                allSkills={this.props.context.skills}
-                activeContentGuid={activeContentGuid}
-                model={node}
-                onEdit={(c: Node, src: ContentElement) => this.onEdit(node.guid, c, src)}
-                onRemove={this.onRemove}
-                onFocus={this.onFocus}
-                canRemove={this.canRemoveNode()}
-                onDuplicate={this.onDuplicateNode}
-                nodeParentModel={model}
-                parent={null}
-                isQuestionPool={true}
-              />)}
           </div>
           <ContextAwareSidebar
             context={context}

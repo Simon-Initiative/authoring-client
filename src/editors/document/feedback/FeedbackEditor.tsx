@@ -325,15 +325,15 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
             <div className="outline-and-node-container">
               <Outline
                 editMode={this.props.editMode}
-                nodes={this.props.model.questions}
+                nodes={this.props.model.questions.questions}
                 expandedNodes={expanded}
                 selected={currentNode.guid}
                 onEdit={this.onEditNodes.bind(this)}
                 onChangeExpansion={this.onChangeExpansion.bind(this)}
                 onSelect={this.onSelect.bind(this)}
-                course={course}
-              />
-              {this.renderAdd()}
+                course={course}>
+                {this.renderAdd()}
+              </Outline>
               <AssessmentNodeRenderer
                 {...this.props}
                 allSkills={this.props.context.skills}

@@ -177,7 +177,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
         model.pages.reduce(
           (acc, page) => acc.caseOf({
             just: n => Maybe.just(n),
-            nothing: () => findQuestionById(page.nodes, router.urlParams.get('nodeGuid')),
+            nothing: () => findNodeByGuid(page.nodes, router.urlParams.get('nodeGuid')),
           }),
           findNodeByGuid(model.nodes, router.urlParams.get('nodeGuid')),
         );
@@ -586,9 +586,9 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
                 onEdit={this.onEditNodes.bind(this)}
                 onChangeExpansion={this.onChangeExpansion.bind(this)}
                 onSelect={this.onSelect}
-                course={course}
-              />
-              {this.renderAdd()}
+                course={course}>
+                {this.renderAdd()}
+              </Outline>
               <AssessmentNodeRenderer
                 {...this.props}
                 allSkills={this.props.context.skills}

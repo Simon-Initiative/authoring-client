@@ -3,8 +3,6 @@ import * as contentTypes from 'data/contentTypes';
 import {
   TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import guid from 'utils/guid';
-import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
 import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
 import { ContentElement } from 'data/content/common/interfaces';
 import { LikertSeries } from 'data/content/feedback/likert_series';
@@ -17,8 +15,6 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 
 export interface Props extends AbstractContentEditorProps<LikertSeries> {
-  onEdit;
-  model: LikertSeries;
   canRemove;
 }
 

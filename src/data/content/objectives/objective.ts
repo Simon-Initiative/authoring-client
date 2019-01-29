@@ -18,11 +18,11 @@ function extractFullTextHelper(obj: Object[], str: string): string {
       return accum + ' ' + text;
     }
     const key = getKey(o);
-    if (o[key]['#text'] !== undefined) {
+    if (o[key] && o[key]['#text'] !== undefined) {
       const text: string = o[key]['#text'];
       return accum + ' ' + text;
     }
-    if (o[key]['#array'] !== undefined) {
+    if (o[key] && o[key]['#array'] !== undefined) {
       return extractFullTextHelper(o[key]['#array'] as Object[], accum as string);
     }
     return accum;
@@ -102,7 +102,13 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
       // Strip out the id attr if it has been absorbed from the objective
       children.forEach((c) => { if (c['@id'] === model.id) { delete c['@id']; } });
 
-      model = model.with({ rawContent: Maybe.just(children) });
+      if (o['#array'] === undefined && o['#text'] === undefined) {
+        // handle the case when objective is empty, treat it as empty #text string
+        model = model.with({ title: '' });
+      } else {
+        // objective has content other than simple text, set as rawContent
+        model = model.with({ rawContent: Maybe.just(children) });
+      }
     }
 
     return model;

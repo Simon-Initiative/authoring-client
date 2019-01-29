@@ -396,11 +396,13 @@ export class ContextAwareSidebar
             }
             <SidebarGroup label="Advanced">
               <SidebarRow>
-                <ToggleSwitch
-                  checked={model.branching}
-                  label="Branching Assessment"
-                  onClick={this.onToggleBranching} />
-                <p></p>
+                {model.type === LegacyTypes.inline
+                  ? <React.Fragment><ToggleSwitch
+                    checked={model.branching}
+                    label="Branching Assessment"
+                    onClick={this.onToggleBranching} />
+                    <p></p></React.Fragment>
+                  : null}
                 <Button
                   className={classes.deleteButton}
                   onClick={this.showDeleteModal}

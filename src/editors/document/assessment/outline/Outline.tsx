@@ -39,7 +39,7 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
   render() {
 
     const { nodes, expandedNodes, selected, editMode,
-      onEdit, onChangeExpansion, course } = this.props;
+      onEdit, onChangeExpansion, course, children } = this.props;
 
     return (
       <div className="outline-container">
@@ -55,8 +55,8 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
           onChangeExpansion={onChangeExpansion}
           onSelect={this.onSelect}
           renderNodeComponent={renderTab.bind(null, course)}
-          canHandleDrop={canHandleDrop}
-        />
+          canHandleDrop={canHandleDrop} />
+        {children}
       </div>
     );
   }
@@ -113,7 +113,11 @@ const canHandleDrop: Tree.CanDropHandler<Node> = (
     }
   }
 
-  if (nodeBeingDropped.contentType === 'Question') {
+  if (nodeBeingDropped.contentType === 'Question' ||
+    nodeBeingDropped.contentType === 'FeedbackMultipleChoice' ||
+    nodeBeingDropped.contentType === 'FeedbackOpenResponse' ||
+    nodeBeingDropped.contentType === 'Likert' ||
+    nodeBeingDropped.contentType === 'LikertSeries') {
 
     // A question can be repositioned anywhere
     return true;

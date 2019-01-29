@@ -20,6 +20,8 @@ import { buildUrl } from 'utils/path';
 import { MediaMetadataEditor } from 'editors/content/learning/MediaItems';
 import { Source } from 'data/content/learning/source';
 import { ContentElements } from 'data/content/common/elements';
+import { determineMimeTypeFromFilename } from 'utils/mime';
+import { ModalMessage } from 'utils/ModalMessage';
 
 import './Media.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
@@ -39,9 +41,28 @@ export function selectAudio(
 
     const selected = { audio: null };
 
+    const displayMimeTypeError = () => {
+      // Display an error message letting the user know that
+      // since the mime type couldn't be determined, we cannot
+      // use this audio file
+      const message = (
+        <ModalMessage onCancel={() => dismiss()}>
+          <b>Unable to use this audio clip</b><br /><br />
+          We could not determine the MIME type based on this file's extension.
+        </ModalMessage>
+      );
+
+      display(message);
+    };
+
     const mediaLibrary =
       <ModalSelection title="Select an Audio File"
-        onInsert={() => { dismiss(); resolve(selected.audio); }}
+        onInsert={() => {
+          dismiss();
+          selected.audio === false
+            ? displayMimeTypeError() : resolve(selected.audio);
+        }
+        }
         onCancel={() => dismiss()}>
         <MediaManager model={model ? model : new Audio()}
           resourcePath={resourcePath}
@@ -51,11 +72,26 @@ export function selectAudio(
           selectionType={SELECTION_TYPES.SINGLE}
           initialSelectionPaths={[model ? model.sources.first().src : model]}
           onSelectionChange={(audio) => {
-            const source = new Source({
-              src: adjustPath(audio[0].pathTo, resourcePath),
-            });
-            const sources = Immutable.OrderedMap<string, Source>().set(source.guid, source);
-            selected.audio = new Audio().with({ sources });
+
+            // Only allow saving of the selected audio if we can determine
+            // the mime type based on the filename.
+            try {
+
+              const type = determineMimeTypeFromFilename(audio[0].pathTo);
+              const source = new Source({
+                src: adjustPath(audio[0].pathTo, resourcePath),
+                type,
+              });
+              const sources = Immutable.OrderedMap<string, Source>().set(source.guid, source);
+              selected.audio = new Audio().with({ sources, type });
+
+              // To test out the display of the mime type error, uncomment the following:
+              // throw new Error('Test');
+
+            } catch (e) {
+              selected.audio = false;
+            }
+
           }} />
       </ModalSelection>;
 

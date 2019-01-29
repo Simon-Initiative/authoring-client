@@ -1,53 +1,57 @@
 import * as React from 'react';
-import * as contentTypes from 'data/contentTypes';
-import {
-  TabSection, TabSectionContent, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
-import guid from 'utils/guid';
-import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
-import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
 import { ContentElement } from 'data/content/common/interfaces';
 import { FeedbackOpenResponse } from 'data/content/feedback/feedback_open_response';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { ContentElements } from 'data/content/common/elements';
+import {
+  AbstractContentEditor, AbstractContentEditorProps, AbstractContentEditorState,
+} from 'editors/content/common/AbstractContentEditor';
 
-export interface Props {
-  onEdit;
-  model: FeedbackOpenResponse;
-  canRemove;
+export interface Props extends AbstractContentEditorProps<FeedbackOpenResponse> {
+
 }
 
-export interface State {
+export interface State extends AbstractContentEditorState {
 
 }
 
-export class FeedbackOpenResponseEditor extends React.PureComponent<Props, State> {
+export class FeedbackOpenResponseEditor extends
+  AbstractContentEditor<FeedbackOpenResponse, Props, State> {
 
-  onPromptEdit = (prompt: FeedbackPrompt, src: ContentElement) => {
+  onPromptEdit = (content: ContentElements, src: ContentElement) => {
     const { onEdit, model } = this.props;
-    onEdit(model.with({ prompt }), src);
+    onEdit(model.with({ prompt: model.prompt.with({ content }) }), src);
   }
 
   onToggleRequired = () => {
     const { model, onEdit } = this.props;
-
-    onEdit(model.with({ required: !model.required }), this);
+    onEdit(model.with({ required: !model.required }), model);
   }
 
-  renderDetails() {
-    const { model } = this.props;
+  renderSidebar() {
+    return null;
+  }
+
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() {
+    const { editMode, services, context, model } = this.props;
 
     return (
-      <TabSection key="choices" className="choices">
-        <TabSectionHeader title="How would an expert answer this question?">
-        </TabSectionHeader>
-        <TabSectionContent key="explanation" className="feedback">
-          {/* <ExplanationEditor
-            {...this.props}
-            model={model.explanation}
-            onEdit={(explanation, src) => this.onPartEdit(
-              model.with({ explanation }),
-              src)} /> */}
-        </TabSectionContent>
-      </TabSection>
+      <div className="question-body" key="question">
+        <ContentContainer
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
+          onFocus={this.props.onFocus}
+          editMode={editMode}
+          services={services}
+          context={context}
+          model={model.prompt.content}
+          onEdit={this.onPromptEdit} />
+      </div>
     );
   }
 }

@@ -10,7 +10,7 @@ import { LegacyTypes } from 'data/types';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
-'editors/content/utils/content';
+  'editors/content/utils/content';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ResourceState } from 'data/content/resource';
@@ -77,9 +77,13 @@ export default class XrefEditor
     }
   }
 
+  thisId = this.props.context.courseModel.resources.get(
+    this.props.context.documentId).id;
+
   pages = this.props.context.courseModel.resources
     .toArray()
     .filter(r => r.type === LegacyTypes.workbook_page &&
+      r.id !== this.thisId &&
       r.resourceState !== ResourceState.DELETED);
 
   onChangeTarget() {
@@ -90,7 +94,7 @@ export default class XrefEditor
       // Handle contiguous text as a special case, retrieving the ID of the first paragraph
       if (item.contentType === 'ContiguousText') {
         id = (item as contentTypes.ContiguousText).getFirstReferenceId();
-      // Else, if it's a valid xref target, it must have an ID
+        // Else, if it's a valid xref target, it must have an ID
       } else if (isValidXrefTarget(item)) {
         id = (item as any).id;
       }

@@ -176,8 +176,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
         // Content service looks for a short title with text equal to "reveal"
         // to display a branching assessment
         case 'short_title':
-          item.short_title['#text'] !== undefined &&
-            item.short_title['#text'] === 'reveal'
+          item.short_title && item.short_title['#text'] === 'reveal'
+            && model.type === LegacyTypes.inline
             ? model = model.with({ branching: true })
             : model = model.with({ branching: false });
           break;
