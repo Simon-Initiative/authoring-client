@@ -4,13 +4,8 @@ import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps, RenderContext }
   from 'editors/content/common/AbstractContentEditor';
 import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
-import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockCodeToolbar from './BlockCodeToolbar.controller';
-import { getEditorByContentType } from 'editors/content/container/registry';
 import { styles } from './BlockCode.styles';
 
 export interface BlockCodeEditorProps
