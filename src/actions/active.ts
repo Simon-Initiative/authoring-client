@@ -5,6 +5,9 @@ import { ParsedContent } from 'data/parsers/common/types';
 import * as contentTypes from 'data/contentTypes';
 import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
+import { validateRemoval } from 'data/models/utils/validation';
+import { displayModalMessasge } from 'utils/message';
+
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -126,6 +129,14 @@ export function edit(content: ContentElement) {
 export function remove(item: ContentElement) {
   return function (dispatch, getState) {
     const { activeContext }: { activeContext: ActiveContextState } = getState();
+    const { documents } = getState();
+
+    if (!validateRemoval(documents.first().document.model, item)) {
+      displayModalMessasge(
+        dispatch,
+        'Removing this element would leave one or more command elements untargetted.');
+      return;
+    }
 
     const container: ParentContainer = activeContext.container.caseOf({
       just: container => container,
