@@ -17,6 +17,7 @@ import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 import { findNodes as findWorkbookNodes } from 'data/models/utils/workbook';
 import { findNodes as findAssessmentNodes } from 'data/models/utils/assessment';
 import { findNodes as findPoolNodes } from 'data/models/utils/pool';
+import { MapFn, map as rawMap } from 'data/utils/map';
 
 import {
   PersistenceStrategy,
@@ -25,7 +26,7 @@ import {
 import { WritelockModal } from 'components/WritelockModal.controller';
 import { ConflictModal } from 'components/ConflictModal.controller';
 import { State } from 'reducers';
-import { IdentifiableContentElement } from 'data/content/common/interfaces';
+import { IdentifiableContentElement, ContentElement } from 'data/content/common/interfaces';
 
 export type DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
 export const DOCUMENT_REQUESTED: DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
@@ -329,6 +330,14 @@ export function release(documentId: string) {
     dispatch(documentReleased(documentId));
 
     return editedDocument.persistence.destroy();
+  };
+}
+
+export function mapAndSave(fn: MapFn, documentId: string) {
+  return function (dispatch, getState) {
+    const editedDocument: EditedDocument = getState().documents.get(documentId);
+    const model = rawMap(fn, ((editedDocument.document.model as any) as ContentElement));
+    dispatch(save(documentId, (model as any) as models.ContentModel));
   };
 }
 

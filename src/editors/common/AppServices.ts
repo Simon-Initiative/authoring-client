@@ -12,7 +12,7 @@ import * as models from 'data/models';
 import * as Messages from 'types/messages';
 import guid from 'utils/guid';
 import { ContentElement } from 'data/content/common/interfaces';
-
+import { MapFn } from 'data/utils/map';
 import { fetchSkills } from 'actions/skills';
 import { fetchObjectives } from 'actions//objectives';
 
@@ -70,6 +70,8 @@ export interface AppServices {
   refreshObjectives: (courseId: string) => void;
 
   refreshCourse: (courseId: string) => void;
+
+  mapAndSave: (fn: MapFn, documentId: string) => void;
 }
 
 export interface DispatchBasedServices {
@@ -157,6 +159,10 @@ export class DispatchBasedServices implements AppServices {
   fetchContentElementByGuid(documentId: string, guid: string)
     : Promise<Maybe<ContentElement>> {
     return this.dispatch(docActions.fetchContentElementByGuid(documentId, guid));
+  }
+
+  mapAndSave(fn: MapFn, documentId: string) {
+    this.dispatch(docActions.mapAndSave(fn, documentId));
   }
 
   createResource(courseId: string, resource): Promise<persistence.Document> {

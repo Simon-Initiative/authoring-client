@@ -110,11 +110,23 @@ export default class CommandEditor
   }
 
   onSelectTarget() {
+    const model = this.props.model;
+    const services = this.props.services;
+    const documentId = this.props.context.documentId;
+
     selectTargetElement()
       .then((e) => {
         e.lift((element) => {
-          const model = this.props.model.with({ target: element.id });
-          this.props.onEdit(model, model);
+
+          services.mapAndSave(
+            (e) => {
+              if (e === model) {
+                return e.with({ target: element.id });
+              }
+              return e;
+            },
+            documentId,
+          );
         });
       });
   }

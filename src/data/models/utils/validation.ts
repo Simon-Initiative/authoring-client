@@ -1,6 +1,8 @@
 import { ContentModel } from '../../models';
 import { ContentElement } from '../../content/common/interfaces';
+import { ContiguousText } from '../../content/learning/contiguous';
 import { filter, reduce } from '../../utils/map';
+import { EntityTypes } from 'data/content/learning/common';
 
 export function validateRemoval(model: ContentModel, itemToRemove: ContentElement): boolean {
 
@@ -18,6 +20,12 @@ export function validateRemoval(model: ContentModel, itemToRemove: ContentElemen
       }
       if (e.contentType === 'Command') {
         p[1].push(e.target);
+      }
+      if (e.contentType === 'ContiguousText') {
+        const ct = e as ContiguousText;
+        ct.getEntitiesByType(EntityTypes.command).forEach((e) => {
+          p[1].push(e.entity.data.target);
+        });
       }
       return p;
     },
