@@ -416,7 +416,15 @@ export class InsertToolbar
               }}
               disabled={!editMode || !parentSupportsElementType('conjugation')}>
               {getContentIcon(insertableContentTypes.Conjugation, { width: 22 })} Conjugation
-              </ToolbarButtonMenuItem>
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                const inquiry = new contentTypes.Inquiry();
+                onInsert(inquiry);
+              }}
+              disabled={!editMode || !parentSupportsElementType('inquiry')}>
+              {getContentIcon(insertableContentTypes.Inquiry, { width: 22 })} Inquiry
+            </ToolbarButtonMenuItem>
           </ToolbarQuadMenu>
 
           <ToolbarLayout.Column maxWidth="100px">
