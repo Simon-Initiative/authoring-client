@@ -1,3 +1,5 @@
+@import 'oli/colors';
+
 .content-container .DraftEditor-root a.entity-hyperlink {
   color: blue;
 }
@@ -13,7 +15,7 @@
 }
 
 .command {
-  background-color: blue;
+  background-color: $primary;
   color: white;
   font-weight: bold;
 }

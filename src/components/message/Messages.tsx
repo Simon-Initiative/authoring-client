@@ -40,21 +40,22 @@ export class Messages
   }
 
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     // Only display one instance of each message severity at a time
 
     const errors = highestPriority(this.props.messages, Severity.Error);
     const warnings = highestPriority(this.props.messages, Severity.Warning);
     const infos = highestPriority(this.props.messages, Severity.Information);
+    const tasks = highestPriority(this.props.messages, Severity.Task);
 
-    const messages = [...errors, ...warnings, ...infos];
+    const messages = [...errors, ...warnings, ...infos, ...tasks];
 
     return (
       <div className="messages">
         <ReactCSSTransitionGroup transitionName="message"
-        transitionEnterTimeout={250} transitionLeaveTimeout={250}>
-          {messages.map(m => <Message key={m.guid} {...this.props} message={m}/>)}
+          transitionEnterTimeout={250} transitionLeaveTimeout={250}>
+          {messages.map(m => <Message key={m.guid} {...this.props} message={m} />)}
         </ReactCSSTransitionGroup>
       </div>
     );

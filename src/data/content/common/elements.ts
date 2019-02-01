@@ -6,7 +6,7 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 
-const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra'];
+const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra', 'command'];
 const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
 const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe', 'applet',
   'flash', 'director', 'mathematica', 'panopto', 'unity'];

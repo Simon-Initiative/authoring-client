@@ -59,12 +59,22 @@ export const resetActive = (): ResetActiveAction => ({
 });
 
 
-export function insert(content: ContentElement | ContentElement[]) {
+/**
+ * Insert element action.
+ * @param content The element to insert
+ * @param contextSnapshot Optional, a snapshot of the active context to use
+ *
+ */
+export function insert(
+  content: ContentElement | ContentElement[],
+  contextSnapshot = null) {
   return function (dispatch, getState) {
 
-    const { activeContext } = getState();
+    const activeContext = contextSnapshot === null
+      ? getState().activeContext
+      : contextSnapshot;
 
-    activeContext.container.lift((parent : ParentContainer) => {
+    activeContext.container.lift((parent: ParentContainer) => {
       parent.onAddNew(content, activeContext.textSelection);
     });
 
@@ -78,7 +88,7 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
     const { activeContext, course } = getState();
     const courseId = course.guid;
 
-    activeContext.container.lift((parent : ParentContainer) => {
+    activeContext.container.lift((parent: ParentContainer) => {
 
       // If we have dependencies to resolve, we first present the user with a UI
       // allowing them to track the resolution progress
@@ -107,7 +117,7 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
 export function edit(content: ContentElement) {
   return function (dispatch, getState) {
     const { activeContext } = getState();
-    activeContext.container.lift((parent : ParentContainer) => {
+    activeContext.container.lift((parent: ParentContainer) => {
       parent.onEdit(content, content);
     });
   };

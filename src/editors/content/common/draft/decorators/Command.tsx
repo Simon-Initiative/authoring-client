@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/learning/common';
-import { Command as CommandData } from 'data/content/learning/command';
-import { StyledInlineEntity } from './StyledInlineEntity';
-
 import './styles.scss';
 
 class Command extends React.PureComponent<any, any> {
@@ -14,13 +11,11 @@ class Command extends React.PureComponent<any, any> {
 
 
   render(): JSX.Element {
-    const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-
     return (
       <span
         data-offset-key={this.props.offsetKey}
         className="command">
-        Command
+        {this.props.children}
       </span>
     );
   }

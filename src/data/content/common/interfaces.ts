@@ -8,3 +8,6 @@ export interface ContentElement extends HasGuid, Persistable, Record<any, any> {
   elementType: string;
 }
 
+export interface IdentifiableContentElement extends ContentElement {
+  id: string;
+}

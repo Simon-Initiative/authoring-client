@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
+import { ActiveContextState } from 'reducers/active';
 import { ContentModel, AssessmentModel } from 'data/models';
 import { injectSheet, JSSProps } from 'styles/jss';
 import { ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
@@ -26,6 +27,8 @@ import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
 import { findNodes } from 'data/models/utils/workbook';
 import { getContentIcon, insertableContentTypes } from 'editors/content/utils/content';
+import { Message } from 'types/messages';
+import { selectTargetElement } from 'components/message/selection';
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -38,7 +41,7 @@ const imgSize = 24;
 const TableCreation = require('editors/content/learning/table/TableCreation.bs').jsComponent;
 
 export interface InsertToolbarProps {
-  onInsert: (content: Object) => void;
+  onInsert: (content: Object, context?) => void;
   requestLatestModel: () => Promise<ContentModel>;
   parentSupportsElementType: (type: string) => boolean;
   context: AppContext;
@@ -48,6 +51,10 @@ export interface InsertToolbarProps {
   onCreateNew: (model: ContentModel) => Promise<Resource>;
   resourcePath: string;
   courseModel: CourseModel;
+  onShowMessage: (message: Message) => void;
+  onDismissMessage: (message: Message) => void;
+  content: Maybe<Object>;
+  activeContext: ActiveContextState;
 }
 
 export interface InsertToolbarState {
@@ -67,6 +74,8 @@ function collectInlines(model: ContentModel): Immutable.Map<string, ContentEleme
   }
   return Immutable.Map<string, ContentElement>();
 }
+
+
 
 /**
  * InsertToolbar React Component
@@ -91,6 +100,7 @@ export class InsertToolbar
       });
     });
   }
+
 
   render() {
     const { onInsert, parentSupportsElementType, resourcePath, context, editMode,
@@ -223,7 +233,7 @@ export class InsertToolbar
               onClick={() => onInsert(contentTypes.ContiguousText.fromText('', guid()))}
               disabled={!editMode || !parentSupportsElementType('p')}>
               {getContentIcon(insertableContentTypes.ContiguousText)} Text
-            </ToolbarButton>
+              </ToolbarButton>
             <ToolbarWideMenu
               icon={getContentIcon(insertableContentTypes.Table)}
               label={'Table'}
@@ -258,7 +268,7 @@ export class InsertToolbar
               }}
               disabled={!editMode || !parentSupportsElementType('video')}>
               {getContentIcon(insertableContentTypes.Video, { width: 22 })} OLI hosted video
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuDivider />
             <ToolbarButtonMenuForm>
               <small className="text-muted">Third party media extensions</small>
@@ -268,32 +278,32 @@ export class InsertToolbar
               disabled={!editMode || !parentSupportsElementType('mathematica')}
               onClick={() => pickFileThenInsert(new contentTypes.Mathematica(), 'src')}>
               <img src={WOLFRAM_ICON} height={imgSize} width={imgSize} /> Wolfram Mathematica
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               disabled={!editMode || !parentSupportsElementType('applet')}
               onClick={() => pickFileThenInsert(new contentTypes.Applet(), 'archive')}>
               <img src={APPLET_ICON} height={imgSize} width={imgSize} /> Java Applet
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               disabled={!editMode || !parentSupportsElementType('flash')}
               onClick={() => pickFileThenInsert(new contentTypes.Flash(), 'src')}>
               <img src={FLASH_ICON} height={imgSize} width={imgSize} /> Adobe Flash
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               disabled={!editMode || !parentSupportsElementType('director')}
               onClick={() => pickFileThenInsert(new contentTypes.Director(), 'src')}>
               <img src={DIRECTOR_ICON} height={imgSize} width={imgSize} /> Adobe Director
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               disabled={!editMode || !parentSupportsElementType('panopto')}
               onClick={() => pickFileThenInsert(new contentTypes.Panopto(), 'src')}>
               {getContentIcon(insertableContentTypes.Panopto, { width: 22 })} Panopto
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               disabled={!editMode || !parentSupportsElementType('unity')}
               onClick={() => pickFileThenInsert(new contentTypes.Unity(), 'src')}>
               <img src={UNITY_ICON} height={imgSize} width={imgSize} /> Unity
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
           </ToolbarQuadMenu>
 
           <ToolbarQuadMenu
@@ -312,7 +322,7 @@ export class InsertToolbar
               onClick={() => onInsert(new contentTypes.Example())}
               disabled={!editMode || !parentSupportsElementType('example')}>
               {getContentIcon(insertableContentTypes.Example, { width: 22 })} Example
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
 
@@ -327,7 +337,7 @@ export class InsertToolbar
               }}
               disabled={!editMode || !parentSupportsElementType('definition')}>
               {getContentIcon(insertableContentTypes.Definition, { width: 22 })} Definition
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
                 // Create a hierarchy with a definition attached to a term attached to a
@@ -351,7 +361,7 @@ export class InsertToolbar
               }}
               disabled={!editMode || !parentSupportsElementType('dl')}>
               <i style={{ width: 22 }} className={'fa fa-list-ul'} /> Definition List
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
                 const speakerId = guid();
@@ -374,7 +384,7 @@ export class InsertToolbar
               }}
               disabled={!editMode || !parentSupportsElementType('dialog')}>
               {getContentIcon(insertableContentTypes.Dialog, { width: 22 })} Dialog
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
                 const header1 = new contentTypes.CellHeader();
@@ -406,7 +416,7 @@ export class InsertToolbar
               }}
               disabled={!editMode || !parentSupportsElementType('conjugation')}>
               {getContentIcon(insertableContentTypes.Conjugation, { width: 22 })} Conjugation
-            </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
           </ToolbarQuadMenu>
 
           <ToolbarLayout.Column maxWidth="100px">
@@ -425,7 +435,7 @@ export class InsertToolbar
                 }}
                 disabled={!editMode || !parentSupportsElementType('ol')}>
                 {getContentIcon(insertableContentTypes.Ol, { width: 22 })} Ordered list
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
                   const li = new contentTypes.Li();
@@ -436,7 +446,7 @@ export class InsertToolbar
                 }}
                 disabled={!editMode || !parentSupportsElementType('ul')}>
                 {getContentIcon(insertableContentTypes.Ul, { width: 22 })} Unordered list
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
 
             <ToolbarWideMenu
@@ -474,7 +484,7 @@ export class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('wb:inline')}>
                 {getContentIcon(insertableContentTypes.WbInline, { width: 22 })}
                 Insert formative assessment
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
                   const model = new AssessmentModel({
@@ -491,7 +501,7 @@ export class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('wb:inline')}>
                 {getContentIcon(insertableContentTypes.WbInline, { width: 22 })}
                 Create formative assessment
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider />
 
@@ -516,7 +526,7 @@ export class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('activity')}>
                 {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
                 Insert summative assessment
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuItem
                 onClick={() => {
@@ -534,7 +544,7 @@ export class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('wb:inline')}>
                 {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
                 Create summative assessment
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider />
 
@@ -547,7 +557,7 @@ export class InsertToolbar
                 }}
                 disabled={!editMode || !parentSupportsElementType('composite_activity')}>
                 {getContentIcon(insertableContentTypes.Composite, { width: 22 })} Composite activity
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">
@@ -560,12 +570,12 @@ export class InsertToolbar
                 onClick={() => onInsert(new contentTypes.Pullout())}
                 disabled={!editMode || !parentSupportsElementType('pullout')}>
                 {getContentIcon(insertableContentTypes.Pullout, { width: 22 })} Pullout
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => onInsert(new contentTypes.WorkbookSection())}
                 disabled={!editMode || !parentSupportsElementType('section')}>
                 {getContentIcon(insertableContentTypes.Section, { width: 22 })} Section
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
                   const material1 = new contentTypes.Material();
@@ -581,7 +591,7 @@ export class InsertToolbar
                 }}
                 disabled={!editMode || !parentSupportsElementType('materials')}>
                 {getContentIcon(insertableContentTypes.Materials, { width: 22 })} Horizontal group
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
 
             <ToolbarWideMenu
@@ -591,11 +601,22 @@ export class InsertToolbar
                 'alternatives', 'command')}>
               <ToolbarButtonMenuItem
                 onClick={() => {
-                  onInsert(new contentTypes.Command());
+
+                  const snapshot = this.props.activeContext;
+
+                  selectTargetElement()
+                    .then((e) => {
+                      e.lift((element) => {
+                        onInsert(
+                          new contentTypes.Command().with({ target: element.id }),
+                          snapshot);
+                      });
+                    });
+
                 }}
                 disabled={!editMode || !parentSupportsElementType('command')}>
                 {getContentIcon(insertableContentTypes.Command, { width: 22 })}Command
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
                   const alt1 = new contentTypes.Alternative().with({
@@ -617,7 +638,7 @@ export class InsertToolbar
                 }}
                 disabled={!editMode || !parentSupportsElementType('alternatives')}>
                 {getContentIcon(insertableContentTypes.Alternatives, { width: 22 })}Variable content
-              </ToolbarButtonMenuItem>
+                </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
 

@@ -14,6 +14,9 @@ import { buildPersistenceFailureMessage } from 'utils/error';
 import { buildReadOnlyMessage } from 'utils/lock';
 import { Maybe } from 'tsmonad';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
+import { findNodes as findWorkbookNodes } from 'data/models/utils/workbook';
+import { findNodes as findAssessmentNodes } from 'data/models/utils/assessment';
+import { findNodes as findPoolNodes } from 'data/models/utils/pool';
 
 import {
   PersistenceStrategy,
@@ -22,6 +25,7 @@ import {
 import { WritelockModal } from 'components/WritelockModal.controller';
 import { ConflictModal } from 'components/ConflictModal.controller';
 import { State } from 'reducers';
+import { IdentifiableContentElement } from 'data/content/common/interfaces';
 
 export type DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
 export const DOCUMENT_REQUESTED: DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
@@ -375,6 +379,41 @@ export function redo(documentId: string) {
       dispatch(save(documentId, model, true));
       dispatch(changeRedone(documentId));
     }
+  };
+}
+
+export function fetchContentElementById(documentId: string, elementId: string) {
+  return fetchContentElementByPredicate(documentId, e => elementId === e.id);
+}
+
+
+export function fetchContentElementByGuid(documentId: string, elementId: string) {
+  return fetchContentElementByPredicate(documentId, e => elementId === e.guid);
+}
+
+export function fetchContentElementByPredicate(documentId: string, pred) {
+  return function (dispatch, getState): Promise<Maybe<IdentifiableContentElement>> {
+
+    const editedDoc = getState().documents.get(documentId);
+    const model: models.ContentModel = editedDoc.document.model;
+
+    const toMaybe = (results) => {
+      if (results.length === 0) {
+        return Maybe.nothing();
+      }
+      return Maybe.just(results[0]);
+    };
+
+    if (model.modelType === 'WorkbookPageModel') {
+      return Promise.resolve(toMaybe(findWorkbookNodes(model, pred)));
+    }
+    if (model.modelType === 'AssessmentModel') {
+      return Promise.resolve(toMaybe(findAssessmentNodes(model, pred)));
+    }
+    if (model.modelType === 'PoolModel') {
+      return Promise.resolve(toMaybe(findPoolNodes(model, pred)));
+    }
+    return Promise.resolve(Maybe.nothing());
   };
 }
 

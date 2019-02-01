@@ -49,7 +49,16 @@ inlineTerminalTags['m:math'] = singleSpace;
 inlineTerminalTags['#math'] = singleSpace;
 inlineTerminalTags['image'] = singleSpace;
 inlineTerminalTags['sym'] = singleSpace;
-inlineTerminalTags['command'] = 'Command';
+inlineTerminalTags['command'] = (item, provider) => {
+
+  const arr = item['command']['#array'];
+  for (let i = 0; i < arr.length; i += 1) {
+    if (arr[i]['title'] !== undefined) {
+      return arr[i]['title']['#text'];
+    }
+  }
+  return 'Command';
+};
 
 // Content of input_refs are data-driven
 inlineTerminalTags['input_ref'] = (item, provider) => {
