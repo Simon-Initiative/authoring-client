@@ -364,7 +364,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                     parent={null}
                     isQuestionPool={true}
                   />,
-                nothing: () => null
+                nothing: () => null,
               })}
             </div>
           </div>

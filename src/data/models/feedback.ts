@@ -11,7 +11,10 @@ import { LikertSeries } from '../content/feedback/likert_series';
 import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
-import { ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS, INLINE_ELEMENTS } from 'data/content/common/elements';
+import {
+  ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS,
+  INLINE_ELEMENTS,
+} from 'data/content/common/elements';
 import { LikertScale } from 'data/content/feedback/likert_scale';
 import { LikertItem } from 'data/content/feedback/likert_item';
 import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
