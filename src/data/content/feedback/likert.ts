@@ -34,7 +34,7 @@ export class Likert extends Immutable.Record(defaultLikertParams) {
   required: boolean;
 
   constructor(params?: LikertParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: LikertParams): Likert {

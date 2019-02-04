@@ -59,6 +59,7 @@ export interface QuestionState {
 }
 
 export const getLabelForQuestion = (question: contentTypes.Question): string => {
+
   if (containsDynaDropCustom(question.body)) {
     return 'Drag and Drop';
   }

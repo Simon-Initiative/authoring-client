@@ -29,6 +29,7 @@ export const CONTENT_COLORS = {
   Dialog: distinct.distinctTeal,
   Director: flatui.greenSea,
   Example: flatui.turquoise,
+  FeedbackChoice: flatui.greenSea,
   Figure: flatui.greenSea,
   Flash: flatui.greenSea,
   Hint: flatui.alizarin,
@@ -66,7 +67,7 @@ export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.
 export enum insertableContentTypes {
   Activity, Alternative, Alternatives, Answer, Applet, Audio, BlockCode, BlockFormula,
   BlockQuote, CellData, CellHeader, CodeBlock, Composite, Conjugate, Conjugation,
-  ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, Figure,
+  ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, FeedbackChoice, Figure,
   Flash, Hint, IFrame, Image, Inquiry, InquiryQuestion, Instructions,
   Li, Line, Materials, Math, Mathematica, Meaning,
   Ol, Panopto, Param, Pronunciation, Pullout, Section, Speaker, Sym, Table, Translation,
@@ -100,6 +101,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Dialog: return <i style={style} className={'fa fa-comments'} />;
     case i.Director: return <i style={style} className={'fa fa-compass'} />;
     case i.Example: return <i style={style} className={'fa fa-bar-chart'} />;
+    case i.FeedbackChoice: return <i style={style} className={'fa fa-circle-o'} />;
     case i.Figure: return <i style={style} className={'fa fa-address-card'} />;
     case i.Flash: return <i style={style} className={'fa fa-bolt'} />;
     case i.Hint: return <i style={style} className={'fa fa-hand-o-right'} />;

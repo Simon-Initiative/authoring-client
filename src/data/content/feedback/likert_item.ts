@@ -30,7 +30,7 @@ export class LikertItem extends Immutable.Record(defaultLikertItemParams) {
   required?: boolean;
 
   constructor(params?: LikertItemParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: LikertItemParams): LikertItem {

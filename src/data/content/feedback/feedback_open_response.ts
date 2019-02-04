@@ -30,7 +30,7 @@ export class FeedbackOpenResponse extends Immutable.Record(defaultFeedbackOpenRe
   required: boolean;
 
   constructor(params?: FeedbackOpenResponseParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: FeedbackOpenResponseParams): FeedbackOpenResponse {

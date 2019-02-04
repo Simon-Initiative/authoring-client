@@ -1,7 +1,7 @@
 import * as contentTypes from 'data/contentTypes';
 import guid from 'utils/guid';
 import * as Immutable from 'immutable';
-import { ContentElements } from 'data/content/common/elements';
+import { ContentElements, TEXT_ELEMENTS, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
 import { Initiator } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import {
@@ -18,6 +18,10 @@ import { Likert } from 'data/content/feedback/likert';
 import { LikertSeries } from 'data/content/feedback/likert_series';
 import { FeedbackMultipleChoice } from 'data/content/feedback/feedback_multiple_choice';
 import { FeedbackOpenResponse } from 'data/content/feedback/feedback_open_response';
+import { LikertItem } from 'data/content/feedback/likert_item';
+import { LikertScale } from 'data/content/feedback/likert_scale';
+import { FeedbackChoice } from 'data/content/feedback/feedback_choice';
+import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
 
 export function createMultipleChoiceQuestion(select: string) {
   let model = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
@@ -289,17 +293,56 @@ export function createEmbeddedPool() {
 }
 
 export function createLikertSeries() {
-  return new LikertSeries({ guid: guid() });
+  const item = new LikertItem({
+    prompt: new FeedbackPrompt({
+      content: ContentElements.fromText(
+        'This is an example question prompt for you to edit.', '', INLINE_ELEMENTS),
+    }),
+  });
+  return new LikertSeries({
+    scale: new LikertScale({
+      scaleSize: '3',
+      scaleCenter: '2',
+    }),
+    items: Immutable.OrderedMap<string, LikertItem>([
+      [item.guid, item],
+    ]),
+  });
 }
 
 export function createLikert() {
-  return new Likert({ guid: guid() });
+  return new Likert({
+    prompt: new FeedbackPrompt({
+      content: ContentElements.fromText(
+        'This is an example question prompt for you to edit.', '', INLINE_ELEMENTS),
+    }),
+    scale: new LikertScale({
+      scaleSize: '3',
+      scaleCenter: '2',
+    }),
+  });
 }
 
 export function createFeedbackMultipleChoice() {
-  return new FeedbackMultipleChoice({ guid: guid() });
+  const choice = new FeedbackChoice({
+    text: ContentElements.fromText('First choice', '', TEXT_ELEMENTS),
+  });
+  return new FeedbackMultipleChoice({
+    prompt: new FeedbackPrompt({
+      content: ContentElements.fromText(
+        'This is an example question prompt for you to edit.', '', INLINE_ELEMENTS),
+    }),
+    choices: Immutable.OrderedMap<string, FeedbackChoice>([
+      [choice.guid, choice],
+    ]),
+  });
 }
 
 export function createFeedbackOpenResponse() {
-  return new FeedbackOpenResponse({ guid: guid() });
+  return new FeedbackOpenResponse({
+    prompt: new FeedbackPrompt({
+      content: ContentElements.fromText(
+        'This is an example question prompt for you to edit.', '', INLINE_ELEMENTS),
+    }),
+  });
 }

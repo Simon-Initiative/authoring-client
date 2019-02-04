@@ -11,9 +11,11 @@ import { LikertSeries } from '../content/feedback/likert_series';
 import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
-import { ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS } from 'data/content/common/elements';
+import { ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { LikertScale } from 'data/content/feedback/likert_scale';
 import { LikertItem } from 'data/content/feedback/likert_item';
+import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
+import guid from 'utils/guid';
 
 // oli_feedback_1_2.dtd
 export type FeedbackModelParams = {
@@ -72,7 +74,12 @@ export class FeedbackModel
   }
 
   static createNew(id: string, title: string, description: string) {
-    const item = new LikertItem();
+    const item = new LikertItem({
+      prompt: new FeedbackPrompt({
+        content: ContentElements.fromText(
+          'This is an example question prompt for you to edit.', guid(), INLINE_ELEMENTS),
+      }),
+    });
     const series = new LikertSeries({
       scale: new LikertScale({
         scaleSize: '3',
@@ -83,14 +90,18 @@ export class FeedbackModel
       ]),
     });
     return new FeedbackModel({
-      title: new contentTypes.Title({ text: ContentElements.fromText(title, '', TEXT_ELEMENTS) }),
+      title: new contentTypes.Title({
+        text: ContentElements.fromText(title, guid(), TEXT_ELEMENTS),
+      }),
       resource: new contentTypes.Resource({ id, title }),
       guid: id,
       description: new FeedbackDescription({
         content: ContentElements.fromText(description, '', MATERIAL_ELEMENTS),
       }),
       questions: new FeedbackQuestions({
-        questions: Immutable.OrderedMap<string, FeedbackQuestion>([[series.guid, series]]),
+        questions: Immutable.OrderedMap<string, FeedbackQuestion>([
+          [series.guid, series],
+        ]),
       }),
     });
   }
@@ -175,5 +186,21 @@ export class FeedbackModel
     };
 
     return Object.assign({}, this.resource, root, this.lock.toPersistence());
+  }
+}
+
+
+export function getLabelForFeedbackQuestion(model: FeedbackQuestion) {
+  switch (model.contentType) {
+    case 'LikertSeries':
+      return 'Likert Series';
+    case 'Likert':
+      return 'Likert Question';
+    case 'FeedbackMultipleChoice':
+      return 'Multiple Choice';
+    case 'FeedbackOpenResponse':
+      return 'Open Response';
+    default:
+      return 'Question';
   }
 }

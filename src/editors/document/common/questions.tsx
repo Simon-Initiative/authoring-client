@@ -35,14 +35,20 @@ export type DuplicateHandler = () => void;
 
 export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
   render() {
-    const { currentPage, onRemove, onDuplicate, model, nodeParentModel } = this.props;
+    const { currentPage, onRemove, onDuplicate, model, nodeParentModel, editMode } = this.props;
     const isParentAssessmentGraded = nodeParentModel.resource.type !== LegacyTypes.inline;
 
     const sharedProps = {
       ...this.props,
       key: model.guid,
       onRemove: () => onRemove(model.guid),
+      onDuplicate: editMode ? onDuplicate : undefined,
     };
+
+    const isFeedback = model.contentType === 'FeedbackMultipleChoice' ||
+      model.contentType === 'FeedbackOpenResponse' ||
+      model.contentType === 'Likert' ||
+      model.contentType === 'LikertSeries';
 
     let content: JSX.Element;
 
@@ -51,7 +57,7 @@ export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
         {...sharedProps}
         isParentAssessmentGraded={isParentAssessmentGraded}
         model={model}
-        onDuplicate={this.props.editMode ? onDuplicate : undefined}
+        // onDuplicate={this.props.editMode ? onDuplicate : undefined}
         branchingQuestions={
           nodeParentModel instanceof models.AssessmentModel && nodeParentModel.branching
             ? Maybe.just(getBranchingQuestionNumbers(nodeParentModel, currentPage))
@@ -96,7 +102,7 @@ export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
     }
 
     return (
-      <div className="node-container">
+      <div className={`node-container ${isFeedback ? 'feedback-question' : ''}`}>
         {content}
       </div>
     );

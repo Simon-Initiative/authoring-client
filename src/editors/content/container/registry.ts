@@ -61,6 +61,7 @@ import {
 } from 'editors/content/learning/contiguoustext/ContiguousTextEditor.controller';
 import { CustomEditor } from 'editors/content/learning/CustomEditor';
 import { connectEditor, connectPopupEditor } from 'editors/content/container/connectEditor';
+import { FeedbackChoiceEditor } from 'editors/content/feedback/multiplechoice/FeedbackChoiceEditor';
 
 let registry = null;
 
@@ -103,6 +104,7 @@ function init() {
   registry['Dt'] = connectEditor(DtEditor);
   registry['Example'] = connectEditor(ExampleEditor);
   registry['Extra'] = connectPopupEditor(ExtraDefinitionEditor);
+  registry['FeedbackChoice'] = connectEditor(FeedbackChoiceEditor);
   registry['Figure'] = connectEditor(FigureEditor);
   registry['Flash'] = connectEditor(FlashEditor);
   registry['Hint'] = HintEditor;

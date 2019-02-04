@@ -3,12 +3,19 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { FeedbackOpenResponse } from 'data/content/feedback/feedback_open_response';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { ContentElements } from 'data/content/common/elements';
-import {
-  AbstractContentEditor, AbstractContentEditorProps, AbstractContentEditorState,
-} from 'editors/content/common/AbstractContentEditor';
+import { REMOVE_QUESTION_DISABLED_MSG }
+  from 'editors/content/question/question/Question';
+import { ContentTitle } from 'editors/content/common/ContentTitle';
+import { AbstractContentEditor, AbstractContentEditorProps, AbstractContentEditorState }
+  from 'editors/content/common/AbstractContentEditor';
+import { getLabelForFeedbackQuestion } from 'data/models/feedback';
+import './common.scss';
+
 
 export interface Props extends AbstractContentEditorProps<FeedbackOpenResponse> {
-
+  canRemove: boolean;
+  onRemove: () => void;
+  onDuplicate: () => void;
 }
 
 export interface State extends AbstractContentEditorState {
@@ -36,21 +43,40 @@ export class FeedbackOpenResponseEditor extends
     return null;
   }
 
+  renderQuestionTitle = () => {
+    const { model, canRemove, onRemove, editMode, onDuplicate } = this.props;
+
+    return (
+      <ContentTitle
+        title={getLabelForFeedbackQuestion(model)}
+        onDuplicate={onDuplicate}
+        editMode={editMode}
+        canRemove={canRemove}
+        removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
+        onRemove={onRemove}
+        helpPopover={null} />
+    );
+  }
+
   renderMain() {
     const { editMode, services, context, model } = this.props;
 
     return (
-      <div className="question-body" key="question">
-        <ContentContainer
-          activeContentGuid={this.props.activeContentGuid}
-          hover={this.props.hover}
-          onUpdateHover={this.props.onUpdateHover}
-          onFocus={this.props.onFocus}
-          editMode={editMode}
-          services={services}
-          context={context}
-          model={model.prompt.content}
-          onEdit={this.onPromptEdit} />
+      <div className="feedback-question-editor">
+        {this.renderQuestionTitle()}
+        <div className="question-body" key="question">
+          Write your question:
+          <ContentContainer
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            onFocus={this.props.onFocus}
+            editMode={editMode}
+            services={services}
+            context={context}
+            model={model.prompt.content}
+            onEdit={this.onPromptEdit} />
+        </div>
       </div>
     );
   }

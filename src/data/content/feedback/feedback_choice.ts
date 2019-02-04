@@ -25,7 +25,7 @@ export class FeedbackChoice extends Immutable.Record(defaultFeedbackChoiceParams
   text: ContentElements;
 
   constructor(params?: FeedbackChoiceParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: FeedbackChoiceParams): FeedbackChoice {

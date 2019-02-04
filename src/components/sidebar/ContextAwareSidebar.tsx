@@ -444,6 +444,36 @@ export class ContextAwareSidebar
             </SidebarGroup>
           </SidebarContent>
         );
+      case ModelTypes.FeedbackModel:
+        return (
+          <SidebarContent title="Feedback Assessment" onHide={this.props.onHide}>
+            <SidebarGroup label="General">
+              <SidebarRow>
+                <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  Created {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+              <SidebarRow>
+                <Tooltip title={dateFormatted(adjusted(resource.dateUpdated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  Updated {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+            </SidebarGroup>
+            <SidebarGroup label="Advanced">
+              <SidebarRow>
+                <Button
+                  className={classes.deleteButton}
+                  onClick={this.showDeleteModal}
+                  editMode={editMode}
+                  type="outline-danger">
+                  Delete this Assessment
+              </Button>
+              </SidebarRow>
+            </SidebarGroup>
+          </SidebarContent>
+        );
       default:
         return null;
     }

@@ -27,6 +27,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
 
 import './FeedbackEditor.scss';
+import { FeedbackQuestion } from 'data/content/feedback/feedback_questions';
 
 interface Props extends AbstractEditorProps<models.FeedbackModel> {
   activeContext: ActiveContext;
@@ -103,17 +104,20 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
     }));
   }
 
-  onEditNode = (guid: string, node: models.Node, src: ContentElement) => {
+  onEditNode = (guid: string, node: FeedbackQuestion, src: ContentElement) => {
 
-    const { activeContext, context, model, onUpdateContent } = this.props;
+    const { activeContext, context, model, onUpdateContent, onSetCurrentNode } = this.props;
 
-    const nodes = model.questions;
+    const nodes = model.questions.questions as Immutable.OrderedMap<string, Node>;
 
     onUpdateContent(context.documentId, src);
+    onSetCurrentNode(activeContext.documentId.valueOr(null), node);
 
     this.handleEdit(model.with({
       questions: model.questions.with({
-        questions: updateNode(guid, node, nodes, getChildren, setChildren),
+        questions: updateNode<Node>(
+          guid, node, nodes, getChildren,
+          setChildren) as Immutable.OrderedMap<string, FeedbackQuestion>,
       }),
     }));
   }
@@ -339,7 +343,8 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
                 allSkills={this.props.context.skills}
                 activeContentGuid={activeContentGuid}
                 model={currentNode}
-                onEdit={(c: Node, src: ContentElement) => this.onEditNode(currentNode.guid, c, src)}
+                onEdit={(c: Node, src: ContentElement) => this.onEditNode(
+                  currentNode.guid, c as FeedbackQuestion, src)}
                 onRemove={this.onNodeRemove}
                 onFocus={this.onFocus}
                 canRemove={this.canRemoveNode()}

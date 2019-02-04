@@ -1,44 +1,52 @@
 import * as React from 'react';
-import {
-  TabSection, TabSectionContent, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
-import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
 import { ContentElement } from 'data/content/common/interfaces';
 import { FeedbackChoice } from 'data/content/feedback/feedback_choice';
 import { ContentElements } from 'data/content/common/elements';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import {
+  AbstractContentEditorProps, AbstractContentEditorState,
+  AbstractContentEditor,
+} from 'editors/content/common/AbstractContentEditor';
 
-export interface Props {
-  onEdit;
-  model: FeedbackChoice;
+export interface Props extends AbstractContentEditorProps<FeedbackChoice> {
+  canRemove: boolean;
+  onRemove: () => void;
+  onDuplicate: () => void;
+  label: string;
 }
 
-export interface State {
+export interface State extends AbstractContentEditorState {
 
 }
 
-export class FeedbackChoiceEditor extends React.PureComponent<Props, State> {
+export class FeedbackChoiceEditor extends AbstractContentEditor<FeedbackChoice, Props, State> {
 
   onTextEdit = (text: ContentElements, src: ContentElement) => {
     const { onEdit, model } = this.props;
     onEdit(model.with({ text }), src);
   }
 
-  render() {
-    const { model } = this.props;
+  renderSidebar() {
+    return null;
+  }
+
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() {
+    const { label, model } = this.props;
 
     return (
-      <TabSection key="choices" className="choices">
-        <TabSectionHeader title="How would an expert answer this question?">
-        </TabSectionHeader>
-        <TabSectionContent key="explanation" className="feedback">
-          {/* <ExplanationEditor
-            {...this.props}
-            model={model.explanation}
-            onEdit={(explanation, src) => this.onPartEdit(
-              model.with({ explanation }),
-              src)} /> */}
-        </TabSectionContent>
-      </TabSection>
+      <div className="feedback-choice-editor">
+        {label}
+        <ContentContainer
+          {...this.props}
+          model={model.text}
+          onEdit={this.onTextEdit}
+          overrideRemove={(model: ContentElements, childModel) => model.size < 2}
+        />
+      </div>
     );
   }
 }

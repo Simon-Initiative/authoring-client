@@ -1,188 +1,148 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from 'data/contentTypes';
-import { Button } from 'editors/content/common/controls';
-import guid from 'utils/guid';
-import {
-  TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
-import { ChoiceList, Choice } from 'editors/content/common/Choice';
-import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { FeedbackMultipleChoice } from 'data/content/feedback/feedback_multiple_choice';
-
-import './FeedbackMultipleChoice.scss';
-import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
 import { ContentElement } from 'data/content/common/interfaces';
-import { FeedbackChoiceEditor } from 'editors/content/feedback/multiplechoice/FeedbackChoiceEditor';
+import { FeedbackMultipleChoice } from 'data/content/feedback/feedback_multiple_choice';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { ContentElements } from 'data/content/common/elements';
+import {
+  AbstractContentEditor, AbstractContentEditorProps, AbstractContentEditorState,
+} from 'editors/content/common/AbstractContentEditor';
+import { getLabelForFeedbackQuestion } from 'data/models/feedback';
+import { REMOVE_QUESTION_DISABLED_MSG } from 'editors/content/question/question/Question';
+import { ContentTitle } from 'editors/content/common/ContentTitle';
+import { FeedbackChoice } from 'data/content/feedback/feedback_choice';
+import guid from 'utils/guid';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 
-export interface Props {
-  editMode: boolean;
-  model: FeedbackMultipleChoice;
-  onEdit;
-  canRemove;
+export interface Props extends AbstractContentEditorProps<FeedbackMultipleChoice> {
+  canRemove: boolean;
+  onRemove: () => void;
+  onDuplicate: () => void;
 }
 
-export interface State {
+export interface State extends AbstractContentEditorState {
 
 }
 
-/**
- * The content editor for Multiple Choice Question
- */
-export class FeedbackMultipleChoiceEditor extends React.PureComponent<Props, State> {
+export class FeedbackMultipleChoiceEditor extends
+  AbstractContentEditor<FeedbackMultipleChoice, Props, State> {
 
-  // onPromptEdit = (prompt: FeedbackPrompt, src: ContentElement) => {
-  //   const { model, onEdit } = this.props;
+  renderQuestionTitle = () => {
+    const { model, canRemove, onRemove, editMode, onDuplicate } = this.props;
 
-  //   onEdit(model, src);
-  // }
+    return (
+      <ContentTitle
+        title={getLabelForFeedbackQuestion(model)}
+        onDuplicate={onDuplicate}
+        editMode={editMode}
+        canRemove={canRemove}
+        removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
+        onRemove={onRemove}
+        helpPopover={null} />
+    );
+  }
 
-  // onToggleRequired = () => {
-  //   const { model, onEdit } = this.props;
+  onPromptEdit = (content: ContentElements, src: ContentElement) => {
+    const { onEdit, model } = this.props;
+    onEdit(model.with({ prompt: model.prompt.with({ content }) }), src);
+  }
 
-  //   onEdit(model.with({
-  //     required: !model.required,
-  //   }));
-  // }
+  onChoiceEdit = (elements: ContentElements, src: ContentElement) => {
+    const items = elements
+      .content
+      .toArray()
+      .map(e => [e.guid, e]);
 
-  // onAddChoice = () => {
-  //   const { model, onEdit } = this.props;
+    const model = this.props.model.with({
+      choices: Immutable.OrderedMap<string, FeedbackChoice>(items),
+    });
 
-  //   onEdit(model, this);
-  // }
+    this.props.onEdit(model, src);
+  }
 
-  // onChoiceEdit = (choice: contentTypes.Choice, src: ContentElement) => {
-  //   const { model, onEdit } = this.props;
+  onAddChoice = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-  //   const updated = model.with({
-  //     choices: model.choices.set(choice.guid, choice),
-  //   });
-  //   onEdit(
-  //     updated,
-  //     model,
-  //     src);
-  // }
+    const { model, onEdit } = this.props;
+    const { choices } = model;
 
-  // onRemoveChoice = (choiceId: string, response: contentTypes.Response) => {
-  //   // need at least one choice
-  //   if (this.props.model.choices.size <= 1) {
-  //     return;
-  //   }
+    const id = guid();
 
-  //   const { model, onEdit } = this.props;
+    const choice = new FeedbackChoice().with({
+      guid: id,
+      id,
+    });
 
-  //   const updatedItemModel = model.with(
-  //     { choices: model.choices.delete(choiceId) });
+    onEdit(model.with({ choices: choices.set(choice.guid, choice) }), choice);
+  }
 
-  //   let updatePartModel = model;
-  //   if (response) {
-  //     updatePartModel = model.with(
-  //       { responses: model.responses.delete(response.guid) });
-  //   }
+  onToggleRequired = () => {
+    const { model, onEdit } = this.props;
+    onEdit(model.with({ required: !model.required }), model);
+  }
 
-  //   onEdit(updatedItemModel, updatePartModel, updatedItemModel);
-  // }
+  renderSidebar() {
+    return (
+      <SidebarContent title="Multiple Choice" />
+    );
+  }
 
-  // onReorderChoices = (originalIndex: number, newIndex: number) => {
-  //   const { onEdit, model } = this.props;
+  renderToolbar() {
+    return (
+      <ToolbarGroup label="Multiple Choice" columns={3} highlightColor={CONTENT_COLORS.Activity}>
+      </ToolbarGroup>
+    );
+  }
 
-  //   // convert OrderedMap to shallow javascript array
-  //   const choices = model.choices.toArray();
+  renderMain() {
+    const { editMode, services, context, model, activeContentGuid, hover,
+      onUpdateHover, onFocus } = this.props;
 
-  //   // remove selected choice from array and insert it into new position
-  //   const choice = choices.splice(originalIndex, 1)[0];
-  //   choices.splice(newIndex, 0, choice);
+    const choices = new ContentElements().with({
+      content: model.choices,
+      supportedElements: Immutable.List(['choice']),
+    });
 
-  //   // update item model
-  //   const updatedItemModel = model.with({
-  //     // set choices to a new OrderedMap with updated choice ordering
-  //     choices: choices.reduce(
-  //       (acc, c) => {
-  //         return acc.set(c.guid, c);
-  //       },
-  //       Immutable.OrderedMap<string, contentTypes.Choice>(),
-  //     ),
-  //   });
+    const getLabel = (e, i) => <span>{'Choice ' + (i + 1)}</span>;
+    const labels = {};
+    model.choices.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
+    const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
 
-  //   onEdit(
-  //     updatedItemModel,
-  //     model,
-  //     updatedItemModel,
-  //   );
-  // }
-
-  // renderChoices() {
-  //   const { context, editMode, model } = this.props;
-
-  //   const choices = model.choices.toArray();
-
-  //   return choices.map((choice, i) => {
-  //     return (
-  //       <FeedbackChoiceEditor
-  //         activeContentGuid={this.props.activeContentGuid}
-  //         hover={this.props.hover}
-  //         onUpdateHover={this.props.onUpdateHover}
-  //         onFocus={this.props.onFocus}
-  //         key={choice.guid}
-  //         index={i}
-  //         choice={choice}
-  //         allowFeedback
-  //         allowScore={advancedScoring}
-  //         simpleSelectProps={{
-  //           selected: response.score !== '0',
-  //           onToggleSimpleSelect: this.onToggleSimpleSelect,
-  //         }}
-  //         response={response}
-  //         allowReorder={!model.shuffle}
-  //         context={context}
-  //         services={services}
-  //         editMode={editMode}
-  //         onReorderChoice={this.onReorderChoices}
-  //         onEditChoice={this.onChoiceEdit}
-  //         onEditFeedback={this.onFeedbackEdit}
-  //         onEditScore={this.onScoreEdit}
-  //         onRemove={this.props.model.choices.size > 1 ?
-  //           choiceId => this.onRemoveChoice(choiceId, response) :
-  //           undefined
-  //         }
-  //         branchingQuestions={this.props.branchingQuestions}
-  //       />
-  //     );
-  //   });
-  // }
-
-  renderDetails() {
-    const { editMode, model } = this.props;
-
-    // return (
-    //   <React.Fragment>
-    //     <TabSection key="choices" className="choices">
-    //       <TabSectionHeader title="Choices">
-    //         <TabOptionControl name="add-choice">
-    //           <Button
-    //             editMode={editMode}
-    //             type="link"
-    //             onClick={this.onAddChoice}>
-    //             Add Choice
-    //           </Button>
-    //         </TabOptionControl>
-    //         <TabOptionControl name="shuffle">
-    //           <ToggleSwitch
-    //             editMode={editMode}
-    //             checked={model.required}
-    //             label="Response Required"
-    //             onClick={this.onToggleRequired} />
-    //         </TabOptionControl>
-    //       </TabSectionHeader>
-    //       <TabSectionContent>
-    //         <div className="instruction-label">
-    // Select the correct choice and provide feedback</div>
-    //         <ChoiceList className="multiple-choice-choices">
-    //           {this.renderChoices()}
-    //         </ChoiceList>
-    //       </TabSectionContent>
-    //     </TabSection>
-    //   </React.Fragment>
-    // );
+    return (
+      <div className="feedback-question-editor">
+        <div className="feedback-question">
+          {this.renderQuestionTitle()}
+          <div className="question-body" key="question">
+            Enter your question:
+            <ContentContainer
+              activeContentGuid={activeContentGuid}
+              hover={hover}
+              onUpdateHover={onUpdateHover}
+              onFocus={onFocus}
+              editMode={editMode}
+              services={services}
+              context={context}
+              model={model.prompt.content}
+              onEdit={this.onPromptEdit} />
+            <div className="choicesContainer">
+              <ContentContainer
+                {...this.props}
+                model={choices}
+                bindProperties={bindLabel}
+                onEdit={this.onChoiceEdit}
+                overrideRemove={(model: ContentElements, childModel) => model.size < 2}
+              />
+              <button type="button"
+                disabled={!editMode}
+                onClick={this.onAddChoice}
+                className="btn btn-link">+ Add choice</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 }

@@ -37,7 +37,7 @@ export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMult
   choices: Immutable.OrderedMap<string, FeedbackChoice>;
 
   constructor(params?: FeedbackMultipleChoiceParams) {
-    super(augment(params));
+    super(augment(params, true));
   }
 
   with(values: FeedbackMultipleChoiceParams): FeedbackMultipleChoice {

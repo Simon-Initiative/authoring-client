@@ -11,6 +11,7 @@ import { CourseModel } from 'data/models';
 import { LikertSeries } from 'data/content/feedback/likert_series';
 import { Likert } from 'data/content/feedback/likert';
 import { FeedbackMultipleChoice } from 'data/content/feedback/feedback_multiple_choice';
+import { FeedbackOpenResponse } from 'data/content/feedback/feedback_open_response';
 
 const newText: (type: string) => string = type => 'New ' + type;
 
@@ -199,9 +200,20 @@ const PoolRefTab = (props: TabProps) => {
 };
 
 const LikertSeriesTab = (props: TabProps) => {
-  const p = props.node as LikertSeries;
+  const node = props.node as LikertSeries;
 
-  const previewText = 'REPLACE - Likert Series Preview Text';
+  const textBlocks = node.prompt.content.content
+    .filter(contentElement => contentElement.contentType === 'ContiguousText');
+
+  const newContentText = newText('Likert Series');
+  const previewText = textBlocks.size > 0
+    ? (textBlocks.first() as ContiguousText)
+      .extractPlainText()
+      .caseOf({
+        just: t => t !== '' ? t : newContentText,
+        nothing: () => newContentText,
+      })
+    : node.contentType;
 
   return (
     <Tab
@@ -213,31 +225,45 @@ const LikertSeriesTab = (props: TabProps) => {
 };
 
 const LikertTab = (props: TabProps) => {
-  const p = props.node as Likert;
+  const node = props.node as Likert;
 
-  // const previewText = pool
-  //   ? props.course.resourcesById.get(pool.idref).title + ' (' + selection(p) + ')'
-  //   : selection(p);
+  const textBlocks = node.prompt.content.content
+    .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
-  const previewText = 'REPLACE - Likert Preview Text';
+  const newContentText = newText('Likert Question');
+  const previewText = textBlocks.size > 0
+    ? (textBlocks.first() as ContiguousText)
+      .extractPlainText()
+      .caseOf({
+        just: t => t !== '' ? t : newContentText,
+        nothing: () => newContentText,
+      })
+    : node.contentType;
 
   return (
     <Tab
       {...props}
-      label="Likert"
+      label="Likert Question"
       previewText={previewText}
     />
   );
 };
 
 const FeedbackMultipleChoiceTab = (props: TabProps) => {
-  const p = props.node as FeedbackMultipleChoice;
+  const node = props.node as FeedbackMultipleChoice;
 
-  // const previewText = pool
-  //   ? props.course.resourcesById.get(pool.idref).title + ' (' + selection(p) + ')'
-  //   : selection(p);
+  const textBlocks = node.prompt.content.content
+    .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
-  const previewText = 'REPLACE - Feedback Multiple Choice Preview Text';
+  const newContentText = newText('Multiple Choice');
+  const previewText = textBlocks.size > 0
+    ? (textBlocks.first() as ContiguousText)
+      .extractPlainText()
+      .caseOf({
+        just: t => t !== '' ? t : newContentText,
+        nothing: () => newContentText,
+      })
+    : node.contentType;
 
   return (
     <Tab
@@ -249,13 +275,20 @@ const FeedbackMultipleChoiceTab = (props: TabProps) => {
 };
 
 const FeedbackOpenResponseTab = (props: TabProps) => {
-  const p = props.node as Selection;
+  const node = props.node as FeedbackOpenResponse;
 
-  // const previewText = pool
-  //   ? props.course.resourcesById.get(pool.idref).title + ' (' + selection(p) + ')'
-  //   : selection(p);
+  const textBlocks = node.prompt.content.content
+    .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
-  const previewText = 'REPLACE - Feedback Open Response Preview Text';
+  const newContentText = newText('Open Response');
+  const previewText = textBlocks.size > 0
+    ? (textBlocks.first() as ContiguousText)
+      .extractPlainText()
+      .caseOf({
+        just: t => t !== '' ? t : newContentText,
+        nothing: () => newContentText,
+      })
+    : node.contentType;
 
   return (
     <Tab
