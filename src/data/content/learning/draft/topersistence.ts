@@ -36,6 +36,7 @@ inlineTerminalTags['#math'] = true;
 inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
 inlineTerminalTags['sym'] = true;
+inlineTerminalTags['command'] = true;
 
 
 type Container = Object[];
@@ -51,6 +52,7 @@ type OverlappingRanges = {
 
 const entityHandlers = {
   activity_link,
+  command,
   xref,
   link,
   extra,
@@ -686,6 +688,13 @@ function math(s: common.RawEntityRange, text: string, entityMap: common.RawEntit
   const { data } = entityMap[s.key];
   return data.toPersistence();
 }
+
+function command(s: common.RawEntityRange, text: string, entityMap: common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+  return data.toPersistence();
+}
+
 
 function translateInlineEntity(
   s: common.RawEntityRange, text: string, entityMap: common.RawEntityMap) {

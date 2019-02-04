@@ -17,6 +17,7 @@ const classesForSeverity = {
   [Messages.Severity.Error]: 'navbar-dark message message--error',
   [Messages.Severity.Warning]: 'navbar-light message message--warning',
   [Messages.Severity.Information]: 'navbar-light message message--information',
+  [Messages.Severity.Task]: 'navbar-light message message--task',
 };
 
 export class Message
@@ -43,6 +44,7 @@ export class Message
       <button
         key={action.label}
         className="btn btn-action"
+        disabled={!action.enabled}
         onClick={() => this.props.executeAction(message, action)}
         type="button">{action.label}
       </button>

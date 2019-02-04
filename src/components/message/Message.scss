@@ -42,6 +42,14 @@
     }
   }
 
+  &.message--task {
+    background-color: $tasks;
+    .message__text {
+      color: white;
+    }
+  }
+
+
   &.message--information {
     background-color: $peter-river;
     .message__text {

@@ -1,13 +1,13 @@
+import { ContentElement } from 'data/content/common/interfaces';
 
 import * as models from 'data/models';
-import { ContentElement } from 'data/content/common/interfaces';
 import { visitNodes } from 'data/utils/tree';
 import { getChildren } from './navigation';
 
-// Given a workbook page model and a predicate, find all content type
+// Given a pool model and a predicate, find all content type
 // instances (aka ContentElements) that meet the predicate
 export function findNodes(
-  model: models.WorkbookPageModel,
+  model: models.PoolModel,
   predicate: (node: ContentElement) => boolean): ContentElement[] {
 
   const matching = [];
@@ -17,9 +17,7 @@ export function findNodes(
     }
   };
 
-  visitNodes(visitor, model.body.content, getChildren);
+  visitNodes(visitor, model.pool, getChildren);
 
   return matching;
 }
-
-

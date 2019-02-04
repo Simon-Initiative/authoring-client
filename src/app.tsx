@@ -17,6 +17,7 @@ import { registerContentTypes } from 'data/registrar';
 import { releaseAll } from 'actions/document';
 import { ApplicationRoot } from './ApplicationRoot';
 import { updateRoute } from 'actions/router';
+import { registerStore } from 'utils/store';
 import { createLogger } from 'redux-logger';
 
 // import application styles
@@ -110,14 +111,14 @@ function main() {
       store = initStoreWithState({
         user,
       });
-
+      registerStore(store);
       store.dispatch(updateRoute(pathname, search));
 
       render(store);
     })
     .catch((err) => {
       const store = initStoreWithState({});
-
+      registerStore(store);
       store.dispatch(updateRoute(pathname, search));
 
       render(store);

@@ -13,6 +13,8 @@ export type NodeId = string;
 // The data for a tree.
 export type Nodes<NodeType extends HasGuid> = Immutable.OrderedMap<NodeId, NodeType>;
 
+
+
 // We abstract away navigating the tree and allow the client
 // to implement this to control navigation
 export type ChildrenAccessor<NodeType extends HasGuid>
@@ -37,7 +39,7 @@ export type NodeVisitor<NodeType extends HasGuid> = (node: NodeType) => void;
 export function visitNodes<NodeType extends HasGuid>(
   visitor: NodeVisitor<NodeType>,
   currentNodes: Nodes<NodeType>,
-  getChildren: ChildrenAccessor<NodeType>) : void {
+  getChildren: ChildrenAccessor<NodeType>): void {
 
   currentNodes
     .toArray()
@@ -59,7 +61,7 @@ export function removeNode<NodeType extends HasGuid>(
   idToRemove: NodeId,
   nodes: Nodes<NodeType>,
   getChildren: ChildrenAccessor<NodeType>,
-  setChildren: ChildrenMutator<NodeType>) : Nodes<NodeType> {
+  setChildren: ChildrenMutator<NodeType>): Nodes<NodeType> {
 
   // If the node to remove is in this set of children,
   // just simply remove it and we are done.
@@ -81,7 +83,7 @@ export function removeNode<NodeType extends HasGuid>(
 
 // Helper insertion function.
 function insert<NodeType extends HasGuid>(
-  nodes: Nodes<NodeType>, childId: NodeId, childToAdd: NodeType, index: number) : Nodes<NodeType> {
+  nodes: Nodes<NodeType>, childId: NodeId, childToAdd: NodeType, index: number): Nodes<NodeType> {
 
   const arr = nodes
     .map((v, k) => [k, v])
@@ -109,7 +111,7 @@ export function insertNode<NodeType extends HasGuid>(
   index: number,
   nodes: Nodes<NodeType>,
   getChildren: ChildrenAccessor<NodeType>,
-  setChildren: ChildrenMutator<NodeType>) : Nodes<NodeType> {
+  setChildren: ChildrenMutator<NodeType>): Nodes<NodeType> {
 
   return targetParentId.caseOf({
     just: (parentId) => {
@@ -126,13 +128,13 @@ export function insertNode<NodeType extends HasGuid>(
       }
 
       return nodes
-      .map(node => getChildren(node).caseOf({
-        just: nodes =>
-          setChildren(node, insertNode(
-            targetParentId, childId, childToAdd, index, nodes, getChildren, setChildren)),
-        nothing: () => node,
-      }))
-      .toOrderedMap();
+        .map(node => getChildren(node).caseOf({
+          just: nodes =>
+            setChildren(node, insertNode(
+              targetParentId, childId, childToAdd, index, nodes, getChildren, setChildren)),
+          nothing: () => node,
+        }))
+        .toOrderedMap();
     },
     nothing: () => {
       return insert(nodes, childId, childToAdd, index);
@@ -153,7 +155,7 @@ export function updateNode<NodeType extends HasGuid>(
   newNode: NodeType,
   currentNodes: Nodes<NodeType>,
   getChildren: ChildrenAccessor<NodeType>,
-  setChildren: ChildrenMutator<NodeType>) : Nodes<NodeType> {
+  setChildren: ChildrenMutator<NodeType>): Nodes<NodeType> {
 
   // If the node to update is in this set of children,
   // just simply update it and we are done.

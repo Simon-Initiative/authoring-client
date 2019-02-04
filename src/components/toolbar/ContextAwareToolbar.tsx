@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer } from 'types/active';
+import { ParentContainer, ActiveContext } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { Maybe } from 'tsmonad';
 import { Resource } from 'data/content/resource';
@@ -14,6 +14,7 @@ import { ItemToolbar } from 'components/toolbar/ItemToolbar.controller';
 import { ActionsToolbar } from 'components/toolbar/ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
 import { ContentModel, ModelTypes } from 'data/models';
+import { Message } from 'types/messages';
 import {
   styles, TOOLBAR_HIDE_ANIMATION_DURATION_MS,
 } from 'components/toolbar/ContextAwareToolbar.styles';
@@ -121,17 +122,20 @@ export interface ToolbarProps {
   resource: Resource;
   editMode: boolean;
   supportedElements: Immutable.List<string>;
+  activeContext: ActiveContext;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
   context: AppContext;
   model: ContentModel;
-  onInsert: (content: Object) => void;
+  onInsert: (content: Object, snapshot) => void;
   onEdit: (content: Object) => void;
   hideLabels?: boolean;
   onShowSidebar: () => void;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
   onCreateNew: (model: ContentModel) => Promise<Resource>;
+  onShowMessage: (message: Message) => void;
+  onDismissMessage: (message: Message) => void;
 }
 
 @injectSheet(styles)
@@ -174,7 +178,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
     const {
       onInsert, onEdit, content, container, supportedElements, model,
       classes, onDisplayModal, onDismissModal, context, resource, editMode,
-      onCreateNew,
+      onCreateNew, onDismissMessage, onShowMessage, activeContext,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -237,13 +241,17 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
           <InsertToolbar
             editMode={editMode}
+            activeContext={activeContext}
+            content={content}
             onCreateNew={onCreateNew}
             requestLatestModel={requestModel}
             context={context}
             courseModel={this.props.courseModel}
             resourcePath={determineBaseUrl(this.props.resource)}
-            onInsert={item => onInsert(item)}
+            onInsert={(item, snapshot) => onInsert(item, snapshot)}
             parentSupportsElementType={parentSupportsElementType}
+            onDismissMessage={onDismissMessage}
+            onShowMessage={onShowMessage}
             onDisplayModal={onDisplayModal}
             onDismissModal={onDismissModal} />
         </ToolbarGroup>

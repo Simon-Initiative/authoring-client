@@ -17,6 +17,7 @@ export const CONTENT_COLORS = {
   CellHeader: flatui.pomegranite,
   Cite: distinct.distinctMagenta,
   CodeBlock: flatui.wetAsphalt,
+  Command: flatui.belizeHole,
   Composite: flatui.belizeHole,
   Conjugate: flatui.midnightBlue,
   Conjugation: flatui.midnightBlue,
@@ -65,7 +66,7 @@ export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.
 
 export enum insertableContentTypes {
   Activity, Alternative, Alternatives, Answer, Applet, Audio, BlockCode, BlockFormula,
-  BlockQuote, CellData, CellHeader, CodeBlock, Composite, Conjugate, Conjugation,
+  BlockQuote, CellData, CellHeader, CodeBlock, Command, Composite, Conjugate, Conjugation,
   ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, Figure,
   Flash, Hint, IFrame, Image, Inquiry, InquiryQuestion, Instructions,
   Li, Line, Materials, Math, Mathematica, Meaning,
@@ -89,6 +90,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.CellData: return <i style={style} className={'fa fa-table'} />;
     case i.CellHeader: return <i style={style} className={'fa fa-table'} />;
     case i.CodeBlock: return <i style={style} className={'fa fa-code'} />;
+    case i.Command: return <i style={style} className={'fa fa-toggle-right'} />;
     case i.Composite: return <i style={style} className={'fa fa-clone'} />;
     case i.Conjugate: return <i style={style} className={'fa fa-language'} />;
     case i.Conjugation: return <i style={style} className={'fa fa-language'} />;
