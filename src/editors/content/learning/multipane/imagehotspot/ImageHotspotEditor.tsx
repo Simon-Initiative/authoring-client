@@ -1,15 +1,17 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
+import { ImageHotspot as ImageHotspotType } from 'data/content/workbook/multipanel/image_hotspot';
+import { Hotspot } from 'data/content/workbook/multipanel/hotspot';
 import { AppContext } from 'editors/common/AppContext';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { injectSheet, classNames, JSSStyles } from 'styles/jss';
+import colors from 'styles/colors';
+import { disableSelect } from 'styles/mixins';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { buildUrl } from 'utils/path';
 import { RectangleEditor } from 'editors/content/question/imagehotspot/RectangleEditor';
 import { CircleEditor } from 'editors/content/question/imagehotspot/CircleEditor';
-import { styles } from 'editors/content/question/imagehotspot/ImageHotspotEditor.styles';
-import { Hotspot } from 'data/content/assessment/image_hotspot/hotspot';
 import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
 import ModalSelection from 'utils/selection/ModalSelection';
@@ -22,6 +24,64 @@ import { adjustPath } from 'editors/content/media/utils';
 import { fetchImageSize } from 'utils/image';
 import { convert } from 'utils/format';
 import { PolygonEditor } from 'editors/content/question/imagehotspot/PolygonEditor';
+import { Typeahead } from 'react-bootstrap-typeahead';
+import { Panel } from 'data/content/workbook/multipanel/panel';
+import { LoadingSpinner } from 'components/common/LoadingSpinner';
+
+const BORDER_STYLE = '1px solid #ced4da';
+
+export const styles: JSSStyles = {
+  ImageHotspotEditor: {
+    extend: [disableSelect],
+    display: 'flex',
+    flexDirection: 'column',
+    border: BORDER_STYLE,
+    minWidth: 400,
+  },
+  toolbar: {
+    display: 'flex',
+    flexDirection: 'row',
+    background: '#fafafa',
+    borderBottom: BORDER_STYLE,
+    padding: 2,
+  },
+  imageBody: {
+    flex: 1,
+  },
+  hotspotBody: {
+    position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: colors.grayLighter,
+  },
+  hotspots: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
+  noImage: {
+    minHeight: 300,
+  },
+  removeHotspotButton: {
+    color: colors.remove,
+  },
+  hotspotDetails: {
+    padding: 10,
+    fontSize: 12,
+
+    '& h3': {
+      fontSize: 14,
+      fontWeight: 600,
+    },
+  },
+  panelSelection: {
+    marginBottom: 10,
+  },
+  activityPageSelection: {
+
+  },
+};
 
 const DEFAULT_IMAGE = require('./hotspot_instructions.png');
 
@@ -53,22 +113,23 @@ const selectImage = (
   });
 };
 
-const getFeedbackLabel = (value: string, partModel: contentTypes.Part) => {
-  return convert.toAlphaNotation(partModel.responses.toArray().findIndex(r => r.match === value));
+const getFeedbackLabel = (index: number) => {
+  return convert.toAlphaNotation(index);
 };
 
 export interface ImageHotspotEditorProps {
   className?: string;
   editMode: boolean;
-  model: contentTypes.ImageHotspot;
-  partModel: contentTypes.Part;
+  model: ImageHotspotType;
+  activityPageCount: Maybe<number>;
+  panels: Immutable.List<Panel>;
   context: AppContext;
   services: AppServices;
-  onEdit: (model: contentTypes.ImageHotspot, partModel: contentTypes.Part, src?: Object) => void;
+  onEdit: (model: ImageHotspotType, src?: Object) => void;
 }
 
 export interface ImageHotspotEditorState {
-  selectedHotspot: Maybe<string>;
+  selectedHotspot: Maybe<Hotspot>;
 }
 
 /**
@@ -100,7 +161,7 @@ export class ImageHotspotEditor
   }
 
   onEditCoords(guid: string, coords: Immutable.List<number>) {
-    const { model, partModel, onEdit } = this.props;
+    const { model, onEdit } = this.props;
 
     onEdit(
       model.with({
@@ -109,18 +170,17 @@ export class ImageHotspotEditor
           model.hotspots.get(guid).with({ coords }),
         ),
       }),
-      partModel,
     );
   }
 
-  onSelectHotspot(guid: Maybe<string>) {
+  onSelectHotspot(hotspot: Maybe<Hotspot>) {
     this.setState({
-      selectedHotspot: guid,
+      selectedHotspot: hotspot,
     });
   }
 
   onSelectImage() {
-    const { context, services, model, partModel, onEdit } = this.props;
+    const { context, services, model, onEdit } = this.props;
 
     const dispatch = (services as any).dispatch;
     const dismiss = () => dispatch(modalActions.dismiss());
@@ -152,19 +212,17 @@ export class ImageHotspotEditor
           width,
           height,
         }),
-        partModel,
       );
     });
   }
 
   onAddHotspot(shape: string) {
-    const { model, partModel, onEdit } = this.props;
+    const { model, onEdit } = this.props;
 
     // create new hotspot
     const match = guid();
     let newHotspot = new Hotspot({
       shape,
-      value: match,
     });
 
     // set default coordinates depending on the shape type
@@ -193,19 +251,6 @@ export class ImageHotspotEditor
         break;
     }
 
-    // create corresponding response feedback
-    const feedback = contentTypes.Feedback.fromText('', guid());
-    let response = new contentTypes.Response();
-    response = response.with({
-      match,
-      input: partModel.responses.size > 0
-        ? partModel.responses.first().input
-        : guid(),
-      feedback: response.feedback.set(feedback.guid, feedback),
-    });
-    const updatedPartModel = partModel.with(
-      { responses: partModel.responses.set(response.guid, response) });
-
     // add new hotspot to the model
     onEdit(
       model.with({
@@ -214,37 +259,35 @@ export class ImageHotspotEditor
           newHotspot,
         ),
       }),
-      updatedPartModel,
     );
 
     // select the new hotspot
     this.setState({
-      selectedHotspot: Maybe.just(newHotspot.guid),
+      selectedHotspot: Maybe.just(newHotspot),
     });
   }
 
-  onRemoveHotspot(guid: string) {
-    const { model, partModel, onEdit } = this.props;
+  onRemoveHotspot(maybeHotspot: Maybe<Hotspot>) {
+    const { model, onEdit } = this.props;
 
-    onEdit(
-      model.with({
-        hotspots: model.hotspots.remove(guid),
-      }),
-      partModel.with({
-        responses: partModel.responses
-          .filter(r => r.match !== model.hotspots.get(guid).value)
-          .toOrderedMap(),
-      }),
-    );
+    maybeHotspot.lift((hotspot) => {
+      onEdit(
+        model.with({
+          hotspots: model.hotspots.remove(hotspot.guid),
+        }),
+      );
 
-    // deselect deleted hotspot
-    this.setState({
-      selectedHotspot: Maybe.nothing<string>(),
+      // deselect deleted hotspot
+      this.setState({
+        selectedHotspot: Maybe.nothing<Hotspot>(),
+      });
     });
   }
 
   render() {
-    const { className, classes, editMode, context, model, partModel } = this.props;
+    const {
+      className, classes, editMode, context, model, activityPageCount, panels, onEdit,
+    } = this.props;
     const { selectedHotspot } = this.state;
 
     return (
@@ -282,7 +325,7 @@ export class ImageHotspotEditor
         </ToolbarButton>
         <div className="flex-spacer" />
         <ToolbarButton
-            onClick={() => this.onRemoveHotspot(selectedHotspot.valueOr(''))}
+            onClick={() => this.onRemoveHotspot(selectedHotspot)}
             size={ToolbarButtonSize.Fit}
             className={classes.removeHotspotButton}
             tooltip={selectedHotspot.caseOf({ just: () => true, nothing: () => false })
@@ -316,22 +359,31 @@ export class ImageHotspotEditor
                   width={model.width} height={model.height} />
                 <svg
                   className={classes.hotspots} width={model.width} height={model.height}>
-                  {model.hotspots.sort(h => h.guid === selectedHotspot.valueOr('') ? 1 : 0)
+                  {model.hotspots.sort(h => selectedHotspot.caseOf({
+                    just: s => h.guid === s.guid ? 1 : 0,
+                    nothing: () => 0,
+                  }))
                     .toArray()
-                    .map((hotspot) => {
+                    .map((hotspot, index) => {
                       switch (hotspot.shape) {
                         case 'rect':
                           return (
                             <RectangleEditor
                               key={hotspot.guid}
                               id={hotspot.guid}
-                              label={getFeedbackLabel(hotspot.value, partModel)}
-                              selected={hotspot.guid === selectedHotspot.valueOr('')}
+                              label={getFeedbackLabel(index)}
+                              selected={selectedHotspot.caseOf({
+                                just: s => hotspot.guid === s.guid,
+                                nothing: () => false,
+                              })}
                               boundingClientRect={this.svgRef
                                 ? Maybe.just(this.svgRef.getBoundingClientRect())
                                 : Maybe.nothing()}
                               coords={hotspot.coords}
-                              onSelect={this.onSelectHotspot}
+                              onSelect={maybeId =>
+                                maybeId.lift(id =>
+                                  this.onSelectHotspot(
+                                    Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
                               onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
                           );
                         case 'circle':
@@ -339,13 +391,19 @@ export class ImageHotspotEditor
                             <CircleEditor
                               key={hotspot.guid}
                               id={hotspot.guid}
-                              label={getFeedbackLabel(hotspot.value, partModel)}
-                              selected={hotspot.guid === selectedHotspot.valueOr('')}
+                              label={getFeedbackLabel(index)}
+                              selected={selectedHotspot.caseOf({
+                                just: s => hotspot.guid === s.guid,
+                                nothing: () => false,
+                              })}
                               boundingClientRect={this.svgRef
                                 ? Maybe.just(this.svgRef.getBoundingClientRect())
                                 : Maybe.nothing()}
                               coords={hotspot.coords}
-                              onSelect={this.onSelectHotspot}
+                              onSelect={maybeId =>
+                                maybeId.lift(id =>
+                                  this.onSelectHotspot(
+                                    Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
                               onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
                           );
                         case 'poly':
@@ -353,13 +411,19 @@ export class ImageHotspotEditor
                             <PolygonEditor
                               key={hotspot.guid}
                               id={hotspot.guid}
-                              label={getFeedbackLabel(hotspot.value, partModel)}
-                              selected={hotspot.guid === selectedHotspot.valueOr('')}
+                              label={getFeedbackLabel(index)}
+                              selected={selectedHotspot.caseOf({
+                                just: s => hotspot.guid === s.guid,
+                                nothing: () => false,
+                              })}
                               boundingClientRect={this.svgRef
                                 ? Maybe.just(this.svgRef.getBoundingClientRect())
                                 : Maybe.nothing()}
                               coords={hotspot.coords}
-                              onSelect={this.onSelectHotspot}
+                              onSelect={maybeId =>
+                                maybeId.lift(id =>
+                                  this.onSelectHotspot(
+                                    Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
                               onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
                           );
                         default:
@@ -374,6 +438,78 @@ export class ImageHotspotEditor
             )
           }
         </div>
+          {selectedHotspot.caseOf({
+            just: hotspot => (
+              <div className={classes.hotspotDetails}>
+                <h3>Hotspot {getFeedbackLabel(
+                  model.hotspots.toArray().findIndex(h => h.guid === hotspot.guid),
+                )}</h3>
+                <div className={classes.panelSelection}>
+                  PANEL:
+                  <Typeahead
+                    multiple
+                    bsSize="small"
+                    onChange={(selected: Panel[]) => {
+                      if (selected.length > 0) {
+                        const lastSelected = selected.pop();
+                        onEdit(model.with({
+                          hotspots: model.hotspots.set(
+                            hotspot.guid,
+                            hotspot.with({
+                              panelRef: lastSelected.id,
+                            }),
+                          ),
+                        }));
+                      }
+                    }}
+                    options={panels.toArray()}
+                    labelKey={panel =>
+                      panel.title.valueOr(
+                        `Panel ${panels.findIndex(p => p.guid === panel.guid) + 1}`)}
+                    selected={Maybe.maybe(panels.find(panel => panel.id === hotspot.panelRef))
+                      .caseOf({
+                        just: p => [p],
+                        nothing: () => [],
+                      })} />
+                </div>
+                <div className={classes.activityPageSelection}>
+                  ACTIVITY PAGE:
+                  {activityPageCount.caseOf({
+                    just: pageCount => (
+                      <Typeahead
+                        multiple
+                        bsSize="small"
+                        onChange={(selected: number[]) => {
+                          if (selected.length > 0) {
+                            const lastSelected = selected.pop();
+                            onEdit(model.with({
+                              hotspots: model.hotspots.set(
+                                hotspot.guid,
+                                hotspot.with({
+                                  activityRef: `${lastSelected + 1}`,
+                                }),
+                              ),
+                            }));
+                          }
+                        }}
+                        options={[...Array(pageCount).keys()]}
+                        labelKey={index => `Page ${index + 1}`}
+                        selected={[Number(hotspot.activityRef)]} />
+                    ),
+                    nothing: () => (
+                      <LoadingSpinner message="Loading Assessment..." />
+                    ),
+                  })
+                  }
+                </div>
+              </div>
+            ),
+            nothing: () => (
+              <div className={classes.hotspotDetails}>
+                Select a hotspot to set target panel and activity page.
+              </div>
+            ),
+          })}
       </div>
     );
   }

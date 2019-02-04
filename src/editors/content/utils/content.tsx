@@ -43,6 +43,7 @@ export const CONTENT_COLORS = {
   Math: distinct.distinctLime,
   Mathematica: flatui.greenSea,
   Meaning: flatui.asbestos,
+  Multipanel: flatui.asbestos,
   Ol: distinct.distinctOlive,
   Panopto: flatui.greenSea,
   Param: flatui.silver,
@@ -68,7 +69,7 @@ export enum insertableContentTypes {
   BlockQuote, CellData, CellHeader, CodeBlock, Composite, Conjugate, Conjugation,
   ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, Figure,
   Flash, Hint, IFrame, Image, Inquiry, InquiryQuestion, Instructions,
-  Li, Line, Materials, Math, Mathematica, Meaning,
+  Li, Line, Materials, Math, Mathematica, Meaning, Multipanel,
   Ol, Panopto, Param, Pronunciation, Pullout, Section, Speaker, Sym, Table, Translation,
   Ul, Unity, Video, WbInline, YouTube,
 }
@@ -114,6 +115,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Math: return <i style={style} className={'fa fa-etsy'} />;
     case i.Mathematica: return <i style={style} className="unicode-icon">∫</i>;
     case i.Meaning: return <i style={style} className={'fa fa-comment'} />;
+    case i.Multipanel: return <i style={style} className={'fa fa-object-ungroup'} />;
     case i.Ol: return <i style={style} className={'fa fa-list-ol'} />;
     case i.Panopto: return <i style={style} className={'fa fa-video-camera'} />;
     case i.Param: return <i style={style} className={'fa fa-sticky-note-o'} />;

@@ -6,8 +6,8 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 
-const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra'];
-const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
+const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra', 'multipanel'];
+export const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
 const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe', 'applet',
   'flash', 'director', 'mathematica', 'panopto', 'unity'];
 const ELEMENTS_BLOCK = ['codeblock', 'p'];
@@ -26,8 +26,9 @@ export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
 export const BOX_ELEMENTS = [...MATERIAL_ELEMENTS, 'materials', 'alternatives'];
-export const EXTRA_ELEMENTS = [...ELEMENTS_BLOCK, ...ELEMENTS_MIXED];
 export const BODY_ELEMENTS = [...BOX_ELEMENTS, ...ELEMENTS_SEMANTIC];
+export const CONTROL_ELEMENTS = ['pref:choose', 'pref:if'];
+export const EXTRA_ELEMENTS = [...ELEMENTS_BLOCK, ...ELEMENTS_MIXED, ...CONTROL_ELEMENTS];
 
 export type ContentElementsParams = {
   content?: Immutable.OrderedMap<string, ContentElement>,

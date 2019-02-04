@@ -45,6 +45,7 @@ export function registerContentTypes() {
   registerType('math', ct.Math.fromPersistence);
   registerType('mathematica', ct.Mathematica.fromPersistence);
   registerType('meaning', ct.Meaning.fromPersistence);
+  registerType('multipanel', ct.Multipanel.fromPersistence);
   registerType('objref', ct.ObjRef.fromPersistence);
   registerType('ol', ct.Ol.fromPersistence);
   registerType('panopto', ct.Panopto.fromPersistence);
