@@ -315,7 +315,7 @@ export class HTMLTableEditor
 
     const renderTableRow = (row: Row, index) => {
       return (
-        <tr key={row.guid} className={row.isHeader && classes.headerRow}>
+        <tr key={row.guid} className={classNames([row.isHeader && classes.headerRow])}>
           <td>
             {this.renderDropdown(
               index,
@@ -333,7 +333,8 @@ export class HTMLTableEditor
                 className={classNames([classes.cell, classes.targetCell])}
                 inputVal={inputVal}
                 selectedInitiator={selectedInitiator}
-                canToggleType={question.parts.first().responses.size > 1}
+                canToggleType={question.parts.first()
+                  && question.parts.first().responses.size > 1}
                 onToggleType={this.toggleCellType}
                 editMode={editMode}
                 onDrop={onTargetDrop}
