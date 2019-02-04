@@ -5,7 +5,8 @@ import { ContentElement } from 'data/content/common/interfaces';
 export type MapFn = (e: ContentElement) => ContentElement;
 
 // The core map routine.  Maps an entire tree of content
-// elements, executing a depth first traversal and visitation
+// elements, executing a depth first traversal and visitation.
+
 export function map(mapper: MapFn, root: ContentElement) {
 
   const visited = Object.keys((root as any).toJSON()).reduce(
@@ -35,7 +36,7 @@ export function map(mapper: MapFn, root: ContentElement) {
   return mapper(visited);
 }
 
-// Helper routines for writing mappers
+// Helper routine for filter impl:
 
 export type IterableChildren = {
   key: string,
@@ -60,10 +61,9 @@ export function children(e: ContentElement): IterableChildren[] {
   ).filter(pair => pair.iterable !== null);
 }
 
-
-// Common map usages
-
-// Filter a content element tree
+// Filter a content element tree.  Note that the visitation
+// order here is different than the map implementation. Nodes
+// are visited in the traversal before their children.
 export type FilterFn = (e: ContentElement) => boolean;
 export function filter(fn: FilterFn, root: ContentElement) {
 
@@ -115,7 +115,12 @@ export function filter(fn: FilterFn, root: ContentElement) {
   );
 }
 
+
 export type ReduceFn = (previous: any, current: ContentElement) => any;
+
+// Reduce a ContentElement hierarchy.  Similar to map, filter implementations
+// this reduce implementation will work on full ContentModels - one
+// simply needs to cast the model to a ContentElement.
 export function reduce(
   fn: ReduceFn, initial: any, root: ContentElement): any {
 
