@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
 import { LearningObjective, Skill } from 'data/contentTypes';
 import ObjectiveSkillView from './ObjectiveSkillView';
-import { setSkills, updateSkills } from 'actions/skills';
+import { fetchSkills, setSkills, updateSkills } from 'actions/skills';
 import { setObjectives, updateObjectives } from 'actions/objectives';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
@@ -17,6 +17,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
+  onFetchSkills: (courseId: string) => any;
   onSetSkills: (skills: OrderedMap<string, Skill>) => void;
   onUpdateSkills: (skills: OrderedMap<string, Skill>) => void;
   onSetObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
@@ -48,6 +49,10 @@ const mapStateToProps = (state): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
+
+    onFetchSkills: (courseId: string) => {
+      return dispatch(fetchSkills(courseId));
+    },
     onSetSkills: (skills: OrderedMap<string, Skill>) => {
       dispatch(setSkills(skills));
     },

@@ -127,7 +127,7 @@ export default class DeleteObjectiveSkillModal extends
     return (
       <ModalMessage
         onCancel={() => this.props.services.dismissModal()}
-        okLabel="Okay">
+        okLabel="Ok">
         {edgeTable}
       </ModalMessage>
     );

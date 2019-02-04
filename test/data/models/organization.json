@@ -1,0 +1,166 @@
+{
+  "rev": 22,
+  "guid": "2c928089687c978a016880028d0802f3",
+  "id": "math-h2e3n77d-1.0_default",
+  "type": "x-oli-organization",
+  "title": "Default Organization",
+  "shortTitle": null,
+  "lastRevision": {
+    "rev": 0,
+    "guid": "d98f2aeaa7ba404aae91d6d690dba5d3",
+    "revisionNumber": 17,
+    "previousRevision": "2b5091113974410b90c9c9cf93173ccc",
+    "md5": "3bb097cc20247872debfce4e8e6ea83f",
+    "author": "manager",
+    "revisionType": "SYSTEM",
+    "dateCreated": "Jan 25, 2019 10:16:08 PM",
+    "dateUpdated": "Jan 25, 2019 10:16:08 PM"
+  },
+  "lastSession": "93be13b78ad9465ca894504bcd201024",
+  "metadata": {
+    "jsonObject": {
+      "version": "1.0"
+    }
+  },
+  "dateCreated": "Jan 24, 2019 1:17:58 PM",
+  "dateUpdated": "Jan 25, 2019 10:16:08 PM",
+  "resourceState": "ACTIVE",
+  "fileNode": {
+    "rev": 0,
+    "guid": "2c928089687c978a01688715a11710fc",
+    "pathTo": "organizations/default/organization.json",
+    "pathFrom": "organizations/default/organization.xml",
+    "fileName": "organization.xml",
+    "mimeType": "application/json",
+    "fileSize": 0,
+    "dateCreated": "Jan 25, 2019 10:16:08 PM",
+    "dateUpdated": "Jan 25, 2019 10:16:08 PM"
+  },
+  "doc": {
+    "organization": {
+      "@id": "math-h2e3n77d-1.0_default",
+      "#array": [
+        {
+          "title": {
+            "#text": "Default Organization"
+          }
+        },
+        {
+          "description": {
+            "#text": "Sample organization included with the OLI project template."
+          }
+        },
+        {
+          "audience": {
+            "#text": "This organization is intended as an example for OLI content authors."
+          }
+        },
+        {
+          "labels": {
+            "@unit": "Unit",
+            "@module": "Module",
+            "@section": "Section",
+            "@sequence": "Sequence"
+          }
+        },
+        {
+          "sequences": {
+            "#array": [
+              {
+                "sequence": {
+                  "@id": "part1",
+                  "#array": [
+                    {
+                      "title": {
+                        "#text": "Project Template"
+                      }
+                    },
+                    {
+                      "unit": {
+                        "@id": "lesson1",
+                        "#array": [
+                          {
+                            "title": {
+                              "#text": "Lesson 1"
+                            }
+                          },
+                          {
+                            "module": {
+                              "@id": "introduction",
+                              "#array": [
+                                {
+                                  "title": {
+                                    "#text": "Introduction"
+                                  }
+                                },
+                                {
+                                  "item": {
+                                    "@id": "d1146946467745eda151e488f0cf4134",
+                                    "#array": [
+                                      {
+                                        "resourceref": {
+                                          "@idref": "a281e4f0165a4d819560b60b3b16c83d"
+                                        }
+                                      }
+                                    ],
+                                    "@scoring_mode": "default"
+                                  }
+                                },
+                                {
+                                  "item": {
+                                    "@id": "e9b1ed0598644ff3bbb9de10043734e0",
+                                    "#array": [
+                                      {
+                                        "resourceref": {
+                                          "@idref": "a34976d58e5340e096d12c9ff7b2dfc5"
+                                        }
+                                      }
+                                    ],
+                                    "@scoring_mode": "default"
+                                  }
+                                },
+                                {
+                                  "item": {
+                                    "@id": "d0d6e71aa845410c939f6853d1138c76",
+                                    "#array": [
+                                      {
+                                        "resourceref": {
+                                          "@idref": "newe3cd90b7c1ff4598be594f30888c0143"
+                                        }
+                                      }
+                                    ],
+                                    "@scoring_mode": "default"
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "item": {
+                              "@id": "fc727343ff7e489fb478882e73212b5a",
+                              "#array": [
+                                {
+                                  "resourceref": {
+                                    "@idref": "calculusbda3cfe2419c42f5926e694553216593"
+                                  }
+                                }
+                              ],
+                              "@scoring_mode": "default"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "@audience": "all",
+                  "@category": "content"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "@version": "1.0"
+    }
+  }
+}
