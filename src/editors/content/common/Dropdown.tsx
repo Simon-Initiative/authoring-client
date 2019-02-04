@@ -2,7 +2,8 @@ import * as React from 'react';
 
 export type DropdownItemProps = {
   onClick: (e?: any) => void,
-  label: string,
+  label?: string,
+  children?: any,
 };
 
 export type DropdownProps = {
@@ -11,7 +12,7 @@ export type DropdownProps = {
 };
 
 export const DropdownItem = (props: DropdownItemProps) => {
-  return <a onClick={props.onClick} className="dropdown-item">{props.label}</a>;
+  return <a onClick={props.onClick} className="dropdown-item">{props.children || props.label}</a>;
 };
 
 export const Dropdown = (props: DropdownProps) => {
