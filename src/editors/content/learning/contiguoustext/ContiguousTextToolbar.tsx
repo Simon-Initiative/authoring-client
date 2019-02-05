@@ -14,10 +14,13 @@ import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
-'editors/content/utils/content';
+  'editors/content/utils/content';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { Resource } from 'data/content/resource';
 import { CourseModel } from 'data/models/course';
+import {
+  selectTargetElement,
+} from 'components/message/selection';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
 import { styles } from './ContiguousText.styles';
 
@@ -309,8 +312,9 @@ export default class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
-              selectImage(null, determineBaseUrl(this.props.resource), this.props.courseModel,
-                          this.props.onDisplayModal, this.props.onDismissModal)
+              selectImage(
+                null, determineBaseUrl(this.props.resource), this.props.courseModel,
+                this.props.onDisplayModal, this.props.onDismissModal)
                 .then((image) => {
                   if (image !== null) {
                     onEdit(model.addEntity(EntityTypes.image, true, image, selection));
@@ -320,6 +324,28 @@ export default class ContiguousTextToolbar
             tooltip="Insert Image"
             disabled={!supports('image') || !pointEntitiesEnabled}>
             {getContentIcon(insertableContentTypes.Image)}
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={() => {
+
+              const selectionSnapshot = selection;
+
+              selectTargetElement()
+                .then((e) => {
+                  e.lift((element) => {
+                    const command = new contentTypes.Command().with({ target: element.id });
+                    onEdit(model.addEntity(EntityTypes.command, false, command, selectionSnapshot));
+                  });
+                });
+
+            }}
+            tooltip="Insert Command"
+
+            // We work around the limitation of the element spec
+            // by allowing commands whereever links are allowed
+            disabled={!supports('link') || !rangeEntitiesEnabled}>
+
+            {getContentIcon(insertableContentTypes.Command)}
           </ToolbarButton>
 
         </ToolbarLayout.Inline>

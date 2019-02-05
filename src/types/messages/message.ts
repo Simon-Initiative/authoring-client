@@ -7,6 +7,7 @@ export enum Severity {
   Error = 'Error',
   Warning = 'Warning',
   Information = 'Information',
+  Task = 'Task',
 }
 
 export enum Priority {
@@ -31,6 +32,7 @@ export enum ContentType {
 
 export type MessageAction = {
   label: string,
+  enabled: boolean,
   execute: (message: Message, dispatch) => void;
 };
 
@@ -40,7 +42,7 @@ export type MessageAction = {
 export type MessageContents = TitledContent;
 
 export type MessageParams = {
-  guid? : string,
+  guid?: string,
   severity?: Severity;
   priority?: Priority;
   scope?: Scope;
