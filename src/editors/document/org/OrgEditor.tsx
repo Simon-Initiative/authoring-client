@@ -41,6 +41,7 @@ const moreInfoText = 'Organizations that do not contain any modules will not dis
 function buildMoreInfoAction(display, dismiss) {
   const moreInfoAction = {
     label: 'More Info',
+    enabled: true,
     execute: (message: Messages.Message, dispatch) => {
       display(
         <ModalMessage onCancel={dismiss}>{moreInfoText}</ModalMessage>);

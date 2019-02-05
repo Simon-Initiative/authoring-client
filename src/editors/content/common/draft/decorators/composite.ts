@@ -12,6 +12,7 @@ import image from './Image';
 import code from './Code';
 import extra from './Extra';
 import sym from './Sym';
+import command from './Command';
 
 const decorators = [
   unsupported,
@@ -26,8 +27,9 @@ const decorators = [
   sym,
   code,
   extra,
+  command,
 ];
 
-export function buildCompositeDecorator(props: Object) : CompositeDecorator {
+export function buildCompositeDecorator(props: Object): CompositeDecorator {
   return new CompositeDecorator(decorators.map(build => build(props)));
 }

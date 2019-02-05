@@ -16,6 +16,7 @@ export { CellHeader } from 'data/content/learning/cellheader';
 export { Cite } from 'data/content/learning/cite';
 export { Code } from 'data/content/learning/code';
 export { CodeBlock } from 'data/content/learning/codeblock';
+export { Command } from 'data/content/learning/command';
 export { Composite } from 'data/content/learning/composite';
 export { Conjugate } from 'data/content/learning/conjugate';
 export { Conjugation } from 'data/content/learning/conjugation';
