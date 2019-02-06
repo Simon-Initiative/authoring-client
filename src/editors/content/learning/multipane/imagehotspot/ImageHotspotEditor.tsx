@@ -24,9 +24,9 @@ import { adjustPath } from 'editors/content/media/utils';
 import { fetchImageSize } from 'utils/image';
 import { convert } from 'utils/format';
 import { PolygonEditor } from 'editors/content/question/imagehotspot/PolygonEditor';
-import { Typeahead } from 'react-bootstrap-typeahead';
 import { Panel } from 'data/content/workbook/multipanel/panel';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
+import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
 
 const BORDER_STYLE = '1px solid #ced4da';
 
@@ -81,6 +81,9 @@ export const styles: JSSStyles = {
   activityPageSelection: {
 
   },
+  hotspotOptionDropdown: {
+    verticalAlign: 'text-bottom',
+  },
 };
 
 const DEFAULT_IMAGE = require('./hotspot_instructions.png');
@@ -121,15 +124,17 @@ export interface ImageHotspotEditorProps {
   className?: string;
   editMode: boolean;
   model: ImageHotspotType;
+  introPanelRef: Maybe<string>;
   activityPageCount: Maybe<number>;
   panels: Immutable.List<Panel>;
   context: AppContext;
   services: AppServices;
   onEdit: (model: ImageHotspotType, src?: Object) => void;
+  onEditIntroPanelRef: (introPanelRef: Maybe<string>) => void;
 }
 
 export interface ImageHotspotEditorState {
-  selectedHotspot: Maybe<Hotspot>;
+  selectedHotspot: Maybe<string>;
 }
 
 /**
@@ -173,9 +178,9 @@ export class ImageHotspotEditor
     );
   }
 
-  onSelectHotspot(hotspot: Maybe<Hotspot>) {
+  onSelectHotspot(maybeHotspot: Maybe<Hotspot>) {
     this.setState({
-      selectedHotspot: hotspot,
+      selectedHotspot: maybeHotspot.lift(hotspot => hotspot.guid),
     });
   }
 
@@ -263,23 +268,23 @@ export class ImageHotspotEditor
 
     // select the new hotspot
     this.setState({
-      selectedHotspot: Maybe.just(newHotspot),
+      selectedHotspot: Maybe.just(newHotspot.guid),
     });
   }
 
-  onRemoveHotspot(maybeHotspot: Maybe<Hotspot>) {
+  onRemoveHotspot(maybeHotspotGuid: Maybe<string>) {
     const { model, onEdit } = this.props;
 
-    maybeHotspot.lift((hotspot) => {
+    maybeHotspotGuid.lift((hotspotGuid) => {
       onEdit(
         model.with({
-          hotspots: model.hotspots.remove(hotspot.guid),
+          hotspots: model.hotspots.remove(hotspotGuid),
         }),
       );
 
       // deselect deleted hotspot
       this.setState({
-        selectedHotspot: Maybe.nothing<Hotspot>(),
+        selectedHotspot: Maybe.nothing<string>(),
       });
     });
   }
@@ -287,6 +292,7 @@ export class ImageHotspotEditor
   render() {
     const {
       className, classes, editMode, context, model, activityPageCount, panels, onEdit,
+      introPanelRef, onEditIntroPanelRef,
     } = this.props;
     const { selectedHotspot } = this.state;
 
@@ -360,7 +366,7 @@ export class ImageHotspotEditor
                 <svg
                   className={classes.hotspots} width={model.width} height={model.height}>
                   {model.hotspots.sort(h => selectedHotspot.caseOf({
-                    just: s => h.guid === s.guid ? 1 : 0,
+                    just: s => h.guid === s ? 1 : 0,
                     nothing: () => 0,
                   }))
                     .toArray()
@@ -373,7 +379,7 @@ export class ImageHotspotEditor
                               id={hotspot.guid}
                               label={getFeedbackLabel(index)}
                               selected={selectedHotspot.caseOf({
-                                just: s => hotspot.guid === s.guid,
+                                just: s => hotspot.guid === s,
                                 nothing: () => false,
                               })}
                               boundingClientRect={this.svgRef
@@ -393,7 +399,7 @@ export class ImageHotspotEditor
                               id={hotspot.guid}
                               label={getFeedbackLabel(index)}
                               selected={selectedHotspot.caseOf({
-                                just: s => hotspot.guid === s.guid,
+                                just: s => hotspot.guid === s,
                                 nothing: () => false,
                               })}
                               boundingClientRect={this.svgRef
@@ -413,7 +419,7 @@ export class ImageHotspotEditor
                               id={hotspot.guid}
                               label={getFeedbackLabel(index)}
                               selected={selectedHotspot.caseOf({
-                                just: s => hotspot.guid === s.guid,
+                                just: s => hotspot.guid === s,
                                 nothing: () => false,
                               })}
                               boundingClientRect={this.svgRef
@@ -439,62 +445,65 @@ export class ImageHotspotEditor
           }
         </div>
           {selectedHotspot.caseOf({
-            just: hotspot => (
+            just: hotspotGuid => (
               <div className={classes.hotspotDetails}>
                 <h3>Hotspot {getFeedbackLabel(
-                  model.hotspots.toArray().findIndex(h => h.guid === hotspot.guid),
+                  model.hotspots.toArray().findIndex(h => h.guid === hotspotGuid),
                 )}</h3>
                 <div className={classes.panelSelection}>
                   PANEL:
-                  <Typeahead
-                    multiple
-                    bsSize="small"
-                    onChange={(selected: Panel[]) => {
-                      if (selected.length > 0) {
-                        const lastSelected = selected.pop();
-                        onEdit(model.with({
-                          hotspots: model.hotspots.set(
-                            hotspot.guid,
-                            hotspot.with({
-                              panelRef: lastSelected.id,
-                            }),
-                          ),
-                        }));
-                      }
-                    }}
-                    options={panels.toArray()}
-                    labelKey={panel =>
-                      panel.title.valueOr(
-                        `Panel ${panels.findIndex(p => p.guid === panel.guid) + 1}`)}
-                    selected={Maybe.maybe(panels.find(panel => panel.id === hotspot.panelRef))
-                      .caseOf({
-                        just: p => [p],
-                        nothing: () => [],
-                      })} />
+                  <Dropdown
+                    className={classes.hotspotOptionDropdown}
+                    label={
+                      Maybe.maybe(panels.find((panel, i) =>
+                        panel.id === model.hotspots.get(hotspotGuid).panelRef))
+                        .caseOf({
+                          just: panel => panel.title
+                            .valueOrCompute(() =>
+                              `Panel ${panels.findIndex(p => p.guid === panel.guid) + 1}`),
+                          nothing: () => 'Select a Panel',
+                        })
+                    }>
+                    {panels.toArray().map((panel, i) => (
+                      <DropdownItem
+                        key={panel.guid}
+                        label={panel.title.valueOr(`Panel ${i + 1}`)}
+                        onClick={() => {
+                          onEdit(model.with({
+                            hotspots: model.hotspots.set(
+                              hotspotGuid,
+                              model.hotspots.get(hotspotGuid).with({
+                                panelRef: panel.id,
+                              }),
+                            ),
+                          }));
+                        }} />
+                    ))}
+                  </Dropdown>
                 </div>
                 <div className={classes.activityPageSelection}>
                   ACTIVITY PAGE:
                   {activityPageCount.caseOf({
                     just: pageCount => (
-                      <Typeahead
-                        multiple
-                        bsSize="small"
-                        onChange={(selected: number[]) => {
-                          if (selected.length > 0) {
-                            const lastSelected = selected.pop();
-                            onEdit(model.with({
-                              hotspots: model.hotspots.set(
-                                hotspot.guid,
-                                hotspot.with({
-                                  activityRef: `${lastSelected + 1}`,
-                                }),
-                              ),
-                            }));
-                          }
-                        }}
-                        options={[...Array(pageCount).keys()]}
-                        labelKey={index => `Page ${index + 1}`}
-                        selected={[Number(hotspot.activityRef)]} />
+                      <Dropdown
+                        className={classes.hotspotOptionDropdown}
+                        label={`Page ${model.hotspots.get(hotspotGuid).activityRef}`}>
+                        {[...Array(pageCount).keys()].map(i => (
+                          <DropdownItem
+                            key={i}
+                            label={`Page ${i + 1}`}
+                            onClick={() => {
+                              onEdit(model.with({
+                                hotspots: model.hotspots.set(
+                                  hotspotGuid,
+                                  model.hotspots.get(hotspotGuid).with({
+                                    activityRef: `${i + 1}`,
+                                  }),
+                                ),
+                              }));
+                            }} />
+                        ))}
+                      </Dropdown>
                     ),
                     nothing: () => (
                       <LoadingSpinner message="Loading Assessment..." />
@@ -506,7 +515,33 @@ export class ImageHotspotEditor
             ),
             nothing: () => (
               <div className={classes.hotspotDetails}>
-                Select a hotspot to set target panel and activity page.
+                INTRO PANEL:
+                <Dropdown
+                  className={classes.hotspotOptionDropdown}
+                  label={
+                    introPanelRef.caseOf({
+                      just: introPanelRef => Maybe.maybe(
+                        panels.find((panel, i) => panel.id === introPanelRef),
+                      ).caseOf({
+                        just: panel => panel.title
+                          .valueOrCompute(() =>
+                            `Panel ${panels.findIndex(p => p.guid === panel.guid) + 1}`),
+                        nothing: () => 'Select a Panel',
+                      }),
+                      nothing: () => 'Select a Panel',
+                    })
+                  }>
+                  {panels.toArray().map((panel, i) => (
+                    <DropdownItem
+                      key={panel.guid}
+                      label={panel.title.valueOr(`Panel ${i + 1}`)}
+                      onClick={() => {
+                        onEditIntroPanelRef(Maybe.just(panel.id));
+                      }} />
+                  ))}
+                </Dropdown>
+                <br />
+                Select a hotspot to set a target panel and activity page.
               </div>
             ),
           })}

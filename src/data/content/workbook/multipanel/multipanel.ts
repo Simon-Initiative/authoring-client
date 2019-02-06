@@ -28,7 +28,7 @@ const defaultContent = {
   title: Maybe.nothing(),
   imageHotspot: new ImageHotspot(),
   panels: Immutable.List<Panel>(),
-  introPanelRef: '',
+  introPanelRef: Maybe.nothing(),
   inline: new WbInline(),
 };
 
@@ -84,7 +84,8 @@ export class Multipanel extends Immutable.Record(defaultContent) {
           });
           break;
         case 'panels':
-          model = model.with({ introPanelRef: Maybe.maybe(item['@intro_panel_ref']) });
+          model = model.with({ introPanelRef: Maybe.maybe(
+            (item as any).panels['@intro_panel_ref']) });
 
           getChildren((item as any).panels).forEach((p) => {
             model = model.with({

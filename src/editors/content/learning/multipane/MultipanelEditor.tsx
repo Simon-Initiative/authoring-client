@@ -256,12 +256,16 @@ export default class Multipanel
             <ImageHotspotEditor
               editMode={editMode}
               model={model.imageHotspot}
+              introPanelRef={model.introPanelRef}
               activityPageCount={activityPageCount}
               panels={model.panels}
               context={context}
               services={services}
               onEdit={(imageHotspot, src?: Object) =>
                 onEdit(model.with({ imageHotspot }), src)
+              }
+              onEditIntroPanelRef={introPanelRef =>
+                onEdit(model.with({ introPanelRef }))
               } />
             <div className={classes.hotspotDetails}>
 
@@ -271,9 +275,11 @@ export default class Multipanel
             <div className={classes.panelTabs}>
               <div className={classes.panelTabScroll}>
                 {model.panels.toArray().map((panel, i) => (
-                  <div className={classNames([
-                    classes.panelTab,
-                    selectedPanel === panel.guid && classes.activePanelTab])}
+                  <div
+                    key={panel.guid}
+                    className={classNames([
+                      classes.panelTab,
+                      selectedPanel === panel.guid && classes.activePanelTab])}
                     onClick={() => this.setState({
                       selectedPanel: panel.guid,
                     })}>
@@ -325,6 +331,7 @@ export default class Multipanel
               )}
           </div>
         </div>
+        <h5>Activity</h5>
         <div className={classes.bottom}>
           <div className={classes.wbinline}>
             <h5><i className="fa fa-flask"/> {title}</h5>

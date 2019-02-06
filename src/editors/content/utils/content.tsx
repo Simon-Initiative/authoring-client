@@ -44,7 +44,7 @@ export const CONTENT_COLORS = {
   Math: distinct.distinctLime,
   Mathematica: flatui.greenSea,
   Meaning: flatui.asbestos,
-  Multipanel: flatui.asbestos,
+  Multipanel: flatui.belizeHole,
   Ol: distinct.distinctOlive,
   Panopto: flatui.greenSea,
   Param: flatui.silver,

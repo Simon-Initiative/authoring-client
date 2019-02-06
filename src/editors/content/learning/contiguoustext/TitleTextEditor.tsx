@@ -54,10 +54,12 @@ export const TitleTextEditor
               onEdit={onEdit} />
           )
           : (
-            <div contentEditable={true} onInput={({ target }) =>
-            onEdit((target as HTMLElement).innerText)}>
-              {model}
-            </div>
+            <div
+              contentEditable={true}
+              onInput={({ target }) =>
+              onEdit((target as HTMLElement).innerText)}
+              suppressContentEditableWarning={true}
+            dangerouslySetInnerHTML={{ __html: (model as string) }}/>
           )
         }
         <div className={classes.editIcon}>
