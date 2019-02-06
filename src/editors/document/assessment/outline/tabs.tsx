@@ -255,7 +255,7 @@ const FeedbackMultipleChoiceTab = (props: TabProps) => {
   const textBlocks = node.prompt.content.content
     .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
-  const newContentText = newText('Multiple Choice');
+  const newContentText = newText('Multiple Choice Question');
   const previewText = textBlocks.size > 0
     ? (textBlocks.first() as ContiguousText)
       .extractPlainText()
@@ -268,7 +268,7 @@ const FeedbackMultipleChoiceTab = (props: TabProps) => {
   return (
     <Tab
       {...props}
-      label="Multiple Choice"
+      label="Multiple Choice Question"
       previewText={previewText}
     />
   );
@@ -280,7 +280,7 @@ const FeedbackOpenResponseTab = (props: TabProps) => {
   const textBlocks = node.prompt.content.content
     .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
-  const newContentText = newText('Open Response');
+  const newContentText = newText('Open-Ended Question');
   const previewText = textBlocks.size > 0
     ? (textBlocks.first() as ContiguousText)
       .extractPlainText()
@@ -293,7 +293,7 @@ const FeedbackOpenResponseTab = (props: TabProps) => {
   return (
     <Tab
       {...props}
-      label="Open Response"
+      label="Open-Ended Question"
       previewText={previewText}
     />
   );
