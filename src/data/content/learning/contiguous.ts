@@ -261,15 +261,18 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     });
   }
 
-  // Replace's an entity's data and the text
+  // Replaces an entity's data and it's corresponding
+  // block text.
   replaceEntity(key: string, type: string, mutable: boolean, data: Object, text: string) {
 
     // Remove the current entity
     let model = this.removeEntity(key);
 
-    // Update the text
+    // Find the entity in question
     const matched = getAllEntities(this.content).filter(e => e.entityKey === key);
     if (matched.length === 1) {
+
+      // Now update the text
       const rawSelection = new SelectionState({
         anchorKey: matched[0].range.contentBlock.key,
         focusKey: matched[0].range.contentBlock.key,
@@ -279,15 +282,13 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       let selection = new TextSelection(rawSelection);
       model = model.with({ content: Modifier.replaceText(model.content, rawSelection, text) });
 
-      const originalLength = (matched[0].range.end - matched[0].range.start);
-
       // Adjust the selection to account for potential differences the length of
       // the original vs replacement text.
+      const originalLength = (matched[0].range.end - matched[0].range.start);
       selection = selection.merge({
         focusOffset:
           selection.getFocusOffset() - (originalLength - text.length),
       });
-
 
       // Now apply the entity as a new one with the updated text in place
       return model.addEntity(type, mutable, data, selection);
