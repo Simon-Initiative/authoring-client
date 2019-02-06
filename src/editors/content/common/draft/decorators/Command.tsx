@@ -3,7 +3,7 @@ import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/learning/common';
 import './styles.scss';
 
-class Command extends React.PureComponent<any, any> {
+class Command extends React.Component<any, any> {
 
   constructor(props) {
     super(props);
