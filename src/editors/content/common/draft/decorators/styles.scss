@@ -1,3 +1,5 @@
+@import 'oli/colors';
+
 .content-container .DraftEditor-root a.entity-hyperlink {
   color: blue;
 }
@@ -10,4 +12,10 @@
   text-align:  left !important;
   width: '400px';
   overflow-x: scroll;
+}
+
+.command {
+  background-color: $primary;
+  color: white;
+  font-weight: bold;
 }

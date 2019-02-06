@@ -5,6 +5,9 @@ import { ParsedContent } from 'data/parsers/common/types';
 import * as contentTypes from 'data/contentTypes';
 import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
+import { validateRemoval } from 'data/models/utils/validation';
+import { displayModalMessasge } from 'utils/message';
+
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -59,10 +62,20 @@ export const resetActive = (): ResetActiveAction => ({
 });
 
 
-export function insert(content: ContentElement | ContentElement[]) {
+/**
+ * Insert element action.
+ * @param content The element to insert
+ * @param contextSnapshot Optional, a snapshot of the active context to use
+ *
+ */
+export function insert(
+  content: ContentElement | ContentElement[],
+  contextSnapshot = null) {
   return function (dispatch, getState) {
 
-    const { activeContext } = getState();
+    const activeContext = contextSnapshot === null
+      ? getState().activeContext
+      : contextSnapshot;
 
     activeContext.container.lift((parent: ParentContainer) => {
       parent.onAddNew(content, activeContext.textSelection);
@@ -107,7 +120,7 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
 export function edit(content: ContentElement) {
   return function (dispatch, getState) {
     const { activeContext } = getState();
-    activeContext.container.lift((parent) => {
+    activeContext.container.lift((parent: ParentContainer) => {
       parent.onEdit(content, content);
     });
   };
@@ -116,6 +129,14 @@ export function edit(content: ContentElement) {
 export function remove(item: ContentElement) {
   return function (dispatch, getState) {
     const { activeContext }: { activeContext: ActiveContextState } = getState();
+    const { documents } = getState();
+
+    if (!validateRemoval(documents.first().document.model, item)) {
+      displayModalMessasge(
+        dispatch,
+        'Removing this element would leave one or more command elements untargetted.');
+      return;
+    }
 
     const container: ParentContainer = activeContext.container.caseOf({
       just: container => container,

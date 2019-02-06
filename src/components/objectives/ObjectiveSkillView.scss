@@ -21,6 +21,12 @@
     margin: 10px 0 20px 0;
   }
 
+  .filter-bar {
+    .btn.btn-secondary.dropdown-toggle {
+      font-size: 1em;
+    }
+  }
+
   .rst__node .rst__nodeContent h2 {
     color: $blue;
     margin-top: 10px;
@@ -39,5 +45,29 @@
     text-align: center;
     margin-top: 50px;
     font-size: 1.3em;
+  }
+
+}
+
+.ConfirmModal {
+  &.confirm-delete-modal {
+    .btn.btn-primary.confirmBtn {
+      background-color: $remove;
+      border-color: $remove;
+
+      &:hover {
+        background-color: darken($remove, 10%);
+        border-color: darken($remove, 10%);
+      }
+
+      &:active {
+        background-color: darken($remove, 15%);
+        border-color: darken($remove, 15%);
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
   }
 }

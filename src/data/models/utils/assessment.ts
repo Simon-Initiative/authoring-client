@@ -3,6 +3,29 @@ import * as contentTypes from 'data/contentTypes';
 import { AssessmentModel } from '../assessment';
 import { ContentElement } from 'data/content/common/interfaces';
 
+import * as models from 'data/models';
+import { visitNodes } from 'data/utils/tree';
+import { getChildren } from './navigation';
+
+// Given an assessment model and a predicate, find all content type
+// instances (aka ContentElements) that meet the predicate
+export function findNodes(
+  model: models.AssessmentModel,
+  predicate: (node: ContentElement) => boolean): ContentElement[] {
+
+  const matching = [];
+  const visitor = (n) => {
+    if (predicate(n)) {
+      matching.push(n);
+    }
+  };
+
+  visitNodes(visitor, model.pages, getChildren);
+
+  return matching;
+}
+
+
 export function splitQuestionsIntoPages(model: AssessmentModel) {
   const nodes = [];
   model.pages.forEach((page) => {

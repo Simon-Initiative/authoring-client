@@ -17,6 +17,8 @@ import { registerContentTypes } from 'data/registrar';
 import { releaseAll } from 'actions/document';
 import { ApplicationRoot } from './ApplicationRoot';
 import { updateRoute } from 'actions/router';
+import { registerStore } from 'utils/store';
+import { createLogger } from 'redux-logger';
 
 // import application styles
 import 'stylesheets/index.scss';
@@ -32,9 +34,32 @@ const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ||
 
 const nodeEnv = process.env.NODE_ENV;
 
+let reduxLoggingEnabled = (window as Window).localStorage.getItem('redux-logging') === 'true';
+(window as any).showReduxLogs = (show: boolean) => {
+  reduxLoggingEnabled = !!show;
+  (window as Window).localStorage.setItem('redux-logging', reduxLoggingEnabled ? 'true' : 'false');
+
+  return reduxLoggingEnabled ? 'Redux logging enabled' : 'Redux logging disabled';
+};
+(window as any).help = () => {
+  console.log(`
+Available Commands:
+  showReduxLogs(show: boolean)
+    Enable redux logging if show is true, otherwise disable redux logging.
+    Setting persists in local storage.
+
+  help()
+    Show available commands
+  `);
+};
+
+const logger = createLogger({
+  predicate: () => reduxLoggingEnabled,
+});
+
 const middleware = nodeEnv === 'production'
-  ? applyMiddleware(thunkMiddleware)
-  : composeEnhancers(applyMiddleware(thunkMiddleware));
+  ? applyMiddleware(thunkMiddleware, logger)
+  : composeEnhancers(applyMiddleware(thunkMiddleware, logger));
 
 function getPathName(pathname: string): string {
   return pathname.startsWith('/state') ? '' : pathname;
@@ -86,14 +111,14 @@ function main() {
       store = initStoreWithState({
         user,
       });
-
+      registerStore(store);
       store.dispatch(updateRoute(pathname, search));
 
       render(store);
     })
     .catch((err) => {
       const store = initStoreWithState({});
-
+      registerStore(store);
       store.dispatch(updateRoute(pathname, search));
 
       render(store);

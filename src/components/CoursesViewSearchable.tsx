@@ -18,6 +18,7 @@ function reportProblemAction(): Messages.MessageAction {
 
   return {
     label: 'Report Problem',
+    enabled: true,
     execute: () => window.open(url, 'ReportProblemTab'),
   };
 }
@@ -53,7 +54,7 @@ export type CoursesViewProps = {
   createCourse: () => any,
   importCourse: () => any,
   onSelect: (string) => any, // the id of the course to be viewed
-  sendMessage: (msg : Messages.Message) => any;
+  sendMessage: (msg: Messages.Message) => any;
 };
 
 export type CoursesViewState = {
@@ -132,19 +133,19 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
             this.state.courses.caseOf({
               just: courses => courses.length === 0 ?
                 <NoCourses
-                createCourse={this.props.createCourse}
-                importCourse={this.props.importCourse}
+                  createCourse={this.props.createCourse}
+                  importCourse={this.props.importCourse}
                 /> :
                 <CoursesViewSearchableTable
-                searchText={this.state.searchText}
-                textChange={this.textChange}
-                serverTimeSkewInMs={this.props.serverTimeSkewInMs}
-                createCourse={this.props.createCourse}
-                importCourse={this.props.importCourse}
-                rows={this.filterCourses()}
-                onSelect={this.props.onSelect}
+                  searchText={this.state.searchText}
+                  textChange={this.textChange}
+                  serverTimeSkewInMs={this.props.serverTimeSkewInMs}
+                  createCourse={this.props.createCourse}
+                  importCourse={this.props.importCourse}
+                  rows={this.filterCourses()}
+                  onSelect={this.props.onSelect}
                 />,
-              nothing: () => <Waiting/>,
+              nothing: () => <Waiting />,
             })
           }
         </div>
@@ -161,7 +162,7 @@ const Waiting = (): JSX.Element => {
   );
 };
 
-const CreateImport = ({ createCourse, importCourse }) : JSX.Element => {
+const CreateImport = ({ createCourse, importCourse }): JSX.Element => {
   return (<div className="input-group">
     <div className="flex-spacer" />
     <form className="form-inline">
@@ -185,7 +186,7 @@ const CreateImport = ({ createCourse, importCourse }) : JSX.Element => {
 const NoCourses = ({ createCourse, importCourse }): JSX.Element => {
   return (
     <div>
-      <CreateImport createCourse={createCourse} importCourse={importCourse}/>
+      <CreateImport createCourse={createCourse} importCourse={importCourse} />
       <div>
         <p className="lead">
           <b>You have no course packages available.</b>
@@ -203,14 +204,14 @@ const NoCourses = ({ createCourse, importCourse }): JSX.Element => {
 
 const TableToolbar = ({ textChange, createCourse, importCourse }): JSX.Element => {
   return (
-      <div className="table-toolbar">
-        <SearchBar
-          className="inlineSearch"
-          placeholder="Search by Title, Version or Unique ID"
-          onChange={textChange}
-        />
-        <CreateImport createCourse={createCourse} importCourse={importCourse}/>
-      </div>
+    <div className="table-toolbar">
+      <SearchBar
+        className="inlineSearch"
+        placeholder="Search by Title, Version or Unique ID"
+        onChange={textChange}
+      />
+      <CreateImport createCourse={createCourse} importCourse={importCourse} />
+    </div>
   );
 };
 
@@ -225,9 +226,9 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
   ];
 
   const link = course => span =>
-      <button disabled={course.buildStatus !== 'READY'}
-        onClick={() => onSelect(course.guid)}
-        className="btn btn-link">{span}</button>;
+    <button disabled={course.buildStatus !== 'READY'}
+      onClick={() => onSelect(course.guid)}
+      className="btn btn-link">{span}</button>;
 
   const columnRenderers = [
     r => link(r)(highlightedColumnRenderer(
@@ -240,7 +241,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   const highlightedColumnRenderer = (
     prop: string,
-    r: CourseDescription, appendText : string = '') =>
+    r: CourseDescription, appendText: string = '') =>
     searchText.length < 3
       ? <span>{r[prop] + appendText}</span>
       : highlightMatchesStr(r[prop] + appendText, searchText);
@@ -256,18 +257,18 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   return (
     <div className="resource-view new">
-        <div className="document">
-          <div className="editor">
-            <TableToolbar
-              importCourse={importCourse}
-              textChange={textChange}
-              createCourse={createCourse}/>
-            <SortableTable
-              model={rows.map(r => ({ key: r.guid, data: r }))}
-              columnComparators={comparators}
-              columnRenderers={columnRenderers}
-              columnLabels={labels} />
-          </div>
+      <div className="document">
+        <div className="editor">
+          <TableToolbar
+            importCourse={importCourse}
+            textChange={textChange}
+            createCourse={createCourse} />
+          <SortableTable
+            model={rows.map(r => ({ key: r.guid, data: r }))}
+            columnComparators={comparators}
+            columnRenderers={columnRenderers}
+            columnLabels={labels} />
+        </div>
       </div>
     </div>
   );

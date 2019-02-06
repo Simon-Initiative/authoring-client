@@ -13,6 +13,8 @@ export type NodeId = string;
 // The data for a tree.
 export type Nodes<NodeType extends HasGuid> = Immutable.OrderedMap<NodeId, NodeType>;
 
+
+
 // We abstract away navigating the tree and allow the client
 // to implement this to control navigation
 export type ChildrenAccessor<NodeType extends HasGuid>

@@ -298,8 +298,12 @@ export class ContextAwareSidebar
           </SidebarContent>
         );
       case ModelTypes.AssessmentModel:
+        const title = model.type === LegacyTypes.inline
+          ? 'Formative Assessment'
+          : 'Summative Assessment';
+
         return (
-          <SidebarContent title="Assessment" onHide={this.props.onHide}>
+          <SidebarContent title={title} onHide={this.props.onHide}>
             <SidebarGroup label="General">
               <SidebarRow>
                 <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}

@@ -1,6 +1,8 @@
 import * as types from 'data/types';
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 import { modalActions } from 'actions/modal';
+import * as docActions from 'actions/document';
 import * as persistence from 'data/persistence';
 import * as contentTypes from 'data/contentTypes';
 import * as view from 'actions/view';
@@ -9,7 +11,8 @@ import * as messageActions from 'actions/messages';
 import * as models from 'data/models';
 import * as Messages from 'types/messages';
 import guid from 'utils/guid';
-
+import { ContentElement } from 'data/content/common/interfaces';
+import { MapFn } from 'data/utils/map';
 import { fetchSkills } from 'actions/skills';
 import { fetchObjectives } from 'actions//objectives';
 
@@ -49,10 +52,16 @@ export interface AppServices {
   // Fetch guid by an id
   fetchGuidById: (id: string) => Promise<string>;
 
+  // Fetch a content element in the current resource
+  // by its id
+  fetchContentElementById: (docId: string, id: string) => Promise<Maybe<ContentElement>>;
+
+  fetchContentElementByGuid: (docId: string, guid: string) => Promise<Maybe<ContentElement>>;
+
   // Fetch a colleciton of attributes by some other attribute,
   // returns an object whose keys are the attributes requested
   fetchAttributesBy(
-    attributesToFetch: string[], attributeToFindBy: string, findByValue: any) : Promise<any>;
+    attributesToFetch: string[], attributeToFindBy: string, findByValue: any): Promise<any>;
 
   updateCourseResource: (resource: contentTypes.Resource) => void;
 
@@ -61,6 +70,8 @@ export interface AppServices {
   refreshObjectives: (courseId: string) => void;
 
   refreshCourse: (courseId: string) => void;
+
+  mapAndSave: (fn: MapFn, documentId: string) => void;
 }
 
 export interface DispatchBasedServices {
@@ -87,12 +98,12 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(view.viewDocument(documentId, courseId));
   }
 
-  createWorkbookPage(title: string, courseId: string) : Promise<persistence.Document> {
+  createWorkbookPage(title: string, courseId: string): Promise<persistence.Document> {
     const resource = models.WorkbookPageModel.createNew(guid(), 'New Page', 'Empty contents');
     return this.createResource(courseId, resource);
   }
 
-  createAssessment(title: string, courseId: string) : Promise<persistence.Document> {
+  createAssessment(title: string, courseId: string): Promise<persistence.Document> {
     const resource = new models.AssessmentModel({
       type: types.LegacyTypes.assessment2,
       title: contentTypes.Title.fromText(title),
@@ -125,25 +136,39 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(courseActions.loadCourse(courseId));
   }
 
-  fetchIdByGuid(guid: string) : Promise<string> {
+  fetchIdByGuid(guid: string): Promise<string> {
     return this.fetchAttributesBy(['id'], 'guid', guid)
       .then(o => o.id);
   }
 
-  fetchGuidById(id: string) : Promise<string> {
+  fetchGuidById(id: string): Promise<string> {
     return this.fetchAttributesBy(['guid'], 'id', id)
       .then(o => o.guid);
   }
 
-  fetchTitleById(internalId: string) : Promise<string> {
+  fetchTitleById(internalId: string): Promise<string> {
     return this.fetchAttributesBy(['title'], 'id', internalId)
       .then(o => o.title);
   }
 
-  createResource(courseId: string, resource) : Promise<persistence.Document> {
+  fetchContentElementById(documentId: string, id: string)
+    : Promise<Maybe<ContentElement>> {
+    return this.dispatch(docActions.fetchContentElementById(documentId, id));
+  }
+
+  fetchContentElementByGuid(documentId: string, guid: string)
+    : Promise<Maybe<ContentElement>> {
+    return this.dispatch(docActions.fetchContentElementByGuid(documentId, guid));
+  }
+
+  mapAndSave(fn: MapFn, documentId: string) {
+    this.dispatch(docActions.mapAndSave(fn, documentId));
+  }
+
+  createResource(courseId: string, resource): Promise<persistence.Document> {
     return new Promise((resolve, reject) => {
 
-      let creationResult : persistence.Document = null;
+      let creationResult: persistence.Document = null;
       persistence.createDocument(courseId, resource)
         .then((result: persistence.Document) => {
           creationResult = result;
@@ -163,7 +188,7 @@ export class DispatchBasedServices implements AppServices {
   }
 
   fetchAttributesBy(
-    attributesToFetch: string[], attributeToFindBy: string, findByValue: any) : Promise<any> {
+    attributesToFetch: string[], attributeToFindBy: string, findByValue: any): Promise<any> {
 
     const find = (model) => {
       return model.resources
@@ -187,20 +212,20 @@ export class DispatchBasedServices implements AppServices {
 
     return new Promise((resolve, reject) => {
       persistence.retrieveCoursePackage(this.courseModel.guid)
-      .then((doc) => {
+        .then((doc) => {
 
-        if (doc.model.modelType === 'CourseModel') {
-          const found = find(doc.model);
-          if (found !== undefined && found !== null) {
-            resolve(extract(found));
+          if (doc.model.modelType === 'CourseModel') {
+            const found = find(doc.model);
+            if (found !== undefined && found !== null) {
+              resolve(extract(found));
 
-            this.dispatch(courseActions.courseChanged(doc.model));
+              this.dispatch(courseActions.courseChanged(doc.model));
 
-          } else {
-            reject('Could not find resource');
+            } else {
+              reject('Could not find resource');
+            }
           }
-        }
-      });
+        });
     });
   }
 }

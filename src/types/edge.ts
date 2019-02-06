@@ -1,6 +1,6 @@
 import { LegacyTypes } from 'data/types';
 
-type PathElement = {
+export type PathElement = {
   name: string;
   parent: PathElement;
 };

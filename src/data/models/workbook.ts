@@ -91,7 +91,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           break;
         case 'body':
           model = model.with({
-            body: ContentElements.fromPersistence(item.body, id, WB_ELEMENTS, null, notify),
+            body: ContentElements
+              .fromPersistence(item.body, id, WB_ELEMENTS, null, notify),
           });
           break;
         case 'bib:file':

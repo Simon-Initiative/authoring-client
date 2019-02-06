@@ -11,9 +11,10 @@ export type LockDetails = {
   lockedAt: number;
 };
 
-function buildModalMessageAction(label, text) : Messages.MessageAction {
+function buildModalMessageAction(label, text): Messages.MessageAction {
   return {
     label,
+    enabled: true,
     execute: (message: Messages.Message, dispatch) => {
       const dismiss = () => dispatch(modalActions.dismiss());
       dispatch(modalActions.display(
@@ -83,7 +84,7 @@ export function renderLocked(lockDetails: LockDetails) {
 
   const message = lockDetails === null
     ? 'The time limit of your exclusive access for editing this page has expired.\n\n'
-      + 'Reload this page to attempt to continue editing'
+    + 'Reload this page to attempt to continue editing'
     : 'The contents of this page is being edited by ' + lockDetails.lockedBy;
 
   return (

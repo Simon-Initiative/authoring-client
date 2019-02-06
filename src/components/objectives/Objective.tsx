@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { List, Map } from 'immutable';
+import { List, Map, OrderedMap } from 'immutable';
 import { Maybe } from 'tsmonad';
 import * as contentTypes from '../../data/contentTypes';
 import { StyledComponentProps } from 'types/component';
@@ -17,7 +17,9 @@ import flatui from 'styles/palettes/flatui';
 import { Tooltip } from 'utils/tooltip';
 import { Skill, skillModelRules } from 'components/objectives/Skill';
 import { IssueTooltip } from 'components/objectives/IssueTooltip';
-import { addPluralS, getReadableTitleFromType, QuestionRef } from 'components/objectives/utils';
+import {
+  addPluralS, getReadableTitleFromType, QuestionRef, calculateGuaranteedSummativeCount,
+} from 'components/objectives/utils';
 import { checkModel, ModelCheckerRule, RequirementType } from 'data/linter/modelChecker';
 
 export interface RuleData {
@@ -57,7 +59,6 @@ export const objectiveModelRules: ModelCheckerRule<LearningObjective, RuleData>[
     const { skills, skillQuestionRefs } = aux;
     return skills.reduce(
       (acc, skill) => {
-        // const skill = skills.find(s => s.id === skillId);
         const refs = getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill);
         const formativeCount = refs
           .filter(r => r.assessmentType === LegacyTypes.inline)
@@ -84,34 +85,34 @@ export const SKILLS_HELP_LINK = '//olihelp.freshdesk.com/support/solutions/artic
   + '-what-are-learning-objectives-and-skills-';
 
 const getOrderedObjectiveQuestions = (
-  skills, skillQuestionRefs, skill?: contentTypes.Skill,
+  skills,
+  skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>,
+  skill?: contentTypes.Skill,
 ) => {
-
   // because we are reducing on an ordered list of skills, the result
   // will automatically be sorted by skill which is what we want
-  const questionRefs: List<QuestionRef> = skill
-    ? skillQuestionRefs
-      .valueOr(Map<string, List<QuestionRef>>())
-      .get(skill.id) || List<QuestionRef>()
-    : skills.reduce(
-      (acc, skill) => acc
-        .concat(skillQuestionRefs
+
+  const questionRefs: Map<string, QuestionRef> = (
+    skill
+      ? skillQuestionRefs
           .valueOr(Map<string, List<QuestionRef>>())
-          .get(skill.id))
-        .toList(),
-      List<QuestionRef>(),
-    )
-      // filter out undefined refs
-      .filter(ref => !!ref)
-      // // dedupe refs
-      .reduce(
-        (acc, ref) => acc.find(r => r.key === ref.key)
-          ? acc
-          : acc.push(ref),
+          .get(skill.id) || List<QuestionRef>()
+      : skills.reduce(
+        (acc, skill) => acc
+          .concat(skillQuestionRefs
+            .valueOr(Map<string, List<QuestionRef>>())
+            .get(skill.id))
+          .toList(),
         List<QuestionRef>(),
       )
-      // filter out undefined refs
-      .toList();
+  )
+  // filter out undefined refs
+  .filter(ref => !!ref)
+  // dedupe refs
+  .reduce(
+    (acc, ref) => acc.set(ref.id, ref),
+    OrderedMap<string, QuestionRef>(),
+  );
 
   return questionRefs.toArray();
 };
@@ -319,9 +320,6 @@ export interface ObjectiveProps {
   objective: contentTypes.LearningObjective;
   skills: List<contentTypes.Skill>;
   loading: boolean;
-  skillFormativeRefs: Maybe<Map<string, List<string>>>;
-  skillSummativeRefs: Maybe<Map<string, List<string>>>;
-  skillPoolRefs: Maybe<Map<string, List<string>>>;
   skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
   highlightText?: string;
   onToggleExpanded: (id) => void;
@@ -815,19 +813,27 @@ export class Objective
           {skillCount} {addPluralS('Skill', skillCount)}
           {skillQuestionRefs.caseOf({
             just: (questionRefs) => {
-              const orderedQuestionRefs = getOrderedObjectiveQuestions(skills, skillQuestionRefs);
+              const formativeCount = skills.reduce(
+                (sum, skill) => sum +
+                  getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill)
+                  .filter(r => r.assessmentType === LegacyTypes.inline)
+                  .length,
+                0,
+              );
+              
+              const summativeCount = skills.reduce(
+                (sum, skill) => sum +
+                  getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill)
+                  .filter(r => r.assessmentType === LegacyTypes.assessment2)
+                  .length,
+                0,
+              );
 
-              const formativeCount = orderedQuestionRefs
-                .filter(r => r.assessmentType === LegacyTypes.inline)
-                .length;
-
-              const summativeCount = orderedQuestionRefs
-                .filter(r => r.assessmentType === LegacyTypes.assessment2)
-                .length;
-
-              const poolCount = orderedQuestionRefs
-                .filter(r => r.assessmentType === LegacyTypes.assessment2_pool)
-                .length;
+              const guaranteedSummativeCount = skills.reduce(
+                (sum, skill) => sum + calculateGuaranteedSummativeCount(
+                  getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill), 0),
+                summativeCount,
+              );
 
               return (
                 <span
@@ -841,15 +847,9 @@ export class Objective
                   <span
                     className={classNames([
                       classes.detailsOverviewSeparator, classes.summativeColor])}>
-                    {`${summativeCount} `}
-                    <i className="fa fa-check" />
-                  </span>
-                  <span
-                    className={classNames([
-                      classes.detailsOverviewSeparator, classes.poolColor])}>
-                    {`${poolCount} `}
-                    <i className="fa fa-shopping-basket" />
-                  </span>
+                    {`${guaranteedSummativeCount} `}
+                    <i className="fa fa-check"/>
+                    </span>
                 </span>
               );
             },

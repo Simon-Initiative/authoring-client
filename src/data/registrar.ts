@@ -16,6 +16,7 @@ export function registerContentTypes() {
   registerType('cite', ct.Cite.fromPersistence);
   registerType('code', ct.BlockCode.fromPersistence);
   registerType('codeblock', ct.CodeBlock.fromPersistence);
+  registerType('command', ct.Command.fromPersistence);
   registerType('composite_activity', ct.Composite.fromPersistence);
   registerType('conjugate', ct.Conjugate.fromPersistence);
   registerType('conjugation', ct.Conjugation.fromPersistence);
