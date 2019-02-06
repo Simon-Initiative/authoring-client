@@ -14,7 +14,7 @@ export type PurposeType = {
 };
 
 // tslint:disable-next-line
-export const PurposeTypes : PurposeType[] = [
+export const PurposeTypes: PurposeType[] = [
   { value: 'checkpoint', label: 'Checkpoint' },
   { value: 'lab', label: 'Lab' },
   { value: 'learnbydoing', label: 'Learn by doing' },
@@ -35,6 +35,7 @@ export enum EntityTypes {
 
   // Inline entities
   activity_link = 'activity_link',
+  command = 'command',
   extra = 'extra',
   sym = 'sym',
   link = 'link',
@@ -110,7 +111,7 @@ export function generateRandomKey(): string {
 export type RawEntityMap = Object;
 
 export type RawDraft = {
-  entityMap : RawEntityMap,
+  entityMap: RawEntityMap,
   blocks: RawContentBlock[],
 };
 

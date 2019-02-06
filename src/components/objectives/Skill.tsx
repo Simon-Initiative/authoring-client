@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Map } from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
@@ -8,7 +9,7 @@ import { InlineEdit } from './InlineEdit';
 import { Button } from 'components/common/Button';
 import { IssueTooltip } from 'components/objectives/IssueTooltip';
 import { Tooltip } from 'utils/tooltip';
-import { QuestionRef } from 'components/objectives/utils';
+import { QuestionRef, calculateGuaranteedSummativeCount } from 'components/objectives/utils';
 import { LegacyTypes } from 'data/types';
 import {
   checkModel, ModelCheckerRule, RequirementType,
@@ -153,35 +154,34 @@ export class Skill
     const { classes, skillQuestionRefs } = this.props;
 
     const formativeCount = skillQuestionRefs
-      .filter(r => r.assessmentType === LegacyTypes.inline)
-      .length;
+      .filter(ref => ref.assessmentType === LegacyTypes.inline)
+      .reduce((map, ref) => map.set(ref.id, ref), Map<string, QuestionRef>())
+      .size;
 
     const summativeCount = skillQuestionRefs
       .filter(r => r.assessmentType === LegacyTypes.assessment2)
       .length;
 
-    const poolCount = skillQuestionRefs
-      .filter(r => r.assessmentType === LegacyTypes.assessment2_pool)
-      .length;
+    const guaranteedSummativeCount = calculateGuaranteedSummativeCount(
+      skillQuestionRefs, summativeCount);
 
     const formativeTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-flask" /> Formative Questions</b>
+      <b><i className="fa fa-flask" /> Formative Question Coverage</b>
       <br/>
-      This is the number of low stakes, practice questions that are associated with this skill
+      This is the number of low stakes, practice questions that are associated with this skill.
     </div>;
     const summativeTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-check" /> Summative Questions</b>
+      <b><i className="fa fa-check" /> Summative Question Coverage</b>
       <br/>
-      This is the number of high stakes questions that are associated with this skill
-    </div>;
-    const poolTooltip = <div style={{ textAlign: 'left' }}>
-      <b><i className="fa fa-shopping-basket" /> Pool Questions</b>
+      This is the number of high stakes, graded questions that are associated with this skill.
       <br/>
-      This is the number of pool questions that are associated with this skill
+      <br/>
+      This includes the number of pool questions associated with this skill that a student is
+      guaranteed to receive.
     </div>;
 
     const checkModelResults = checkModel(
-      skill, skillModelRules, { formativeCount, summativeCount });
+      skill, skillModelRules, { formativeCount, summativeCount: guaranteedSummativeCount });
 
     return (
         <div className={classes.skillBadges}>
@@ -228,27 +228,12 @@ export class Skill
               className={classNames(['badge badge-light', classes.skillBadge])}
               style={{
                 color: flatui.amethyst,
-                borderRight: 'none',
-                marginLeft: 0,
-                marginRight: 0,
-                borderRadius: 0,
-              }}>
-              {summativeCount} <i className={classNames([
-                'fa fa-check', classes.skillCountBadgeIcon])}/>
-            </span>
-          </Tooltip>
-          <Tooltip html={poolTooltip} distance={10}
-            size="small" arrowSize="small">
-            <span
-              className={classNames(['badge badge-light', classes.skillBadge])}
-              style={{
-                color: flatui.turquoise,
                 marginLeft: 0,
                 borderTopLeftRadius: 0,
                 borderBottomLeftRadius: 0,
               }}>
-              {poolCount} <i className={classNames([
-                'fa fa-shopping-basket', classes.skillCountBadgeIcon])}/>
+              {guaranteedSummativeCount} <i className={classNames([
+                'fa fa-check', classes.skillCountBadgeIcon])}/>
             </span>
           </Tooltip>
         </div>

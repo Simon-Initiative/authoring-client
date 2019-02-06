@@ -79,6 +79,7 @@ function buildEditOrgAction(
   courseId: string, label: string): Messages.MessageAction {
   return {
     label,
+    enabled: true,
     execute: (message: Messages.Message, dispatch) => {
       dispatch(viewActions.viewOrganizations(courseId));
     },
@@ -134,6 +135,7 @@ function buildReportProblemAction(): Messages.MessageAction {
 
   return {
     label: 'Report Problem',
+    enabled: true,
     execute: (message, dispatch) => {
       window.open(url, 'ReportProblemTab');
     },

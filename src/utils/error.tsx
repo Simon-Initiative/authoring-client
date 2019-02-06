@@ -14,6 +14,7 @@ export function buildReportProblemAction(
 
   return {
     label: 'Report Problem',
+    enabled: true,
     execute: (message, dispatch) => {
       window.open(url, 'ReportProblemTab');
     },
@@ -60,6 +61,7 @@ export function buildPersistenceFailureMessage(reason: string, user: UserProfile
 function buildModalMessageAction(label, text): Messages.MessageAction {
   return {
     label,
+    enabled: true,
     execute: (message: Messages.Message, dispatch) => {
       const dismiss = () => dispatch(modalActions.dismiss());
       dispatch(modalActions.display(
@@ -71,6 +73,7 @@ function buildModalMessageAction(label, text): Messages.MessageAction {
 function goToObjectivesPage(label: string, courseId: string): Messages.MessageAction {
   return {
     label,
+    enabled: true,
     execute: (message: Messages.Message, dispatch) => {
       dispatch(viewObjectives(courseId));
     },

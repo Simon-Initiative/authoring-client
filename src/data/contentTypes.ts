@@ -4,6 +4,7 @@ export { Alternate } from 'data/content/learning/alternate';
 export { Alternative } from 'data/content/learning/alternative';
 export { Alternatives } from 'data/content/learning/alternatives';
 export { Anchor } from 'data/content/learning/anchor';
+export { Answer } from 'data/content/learning/answer';
 export { Applet } from 'data/content/learning/applet';
 export { Audio } from 'data/content/learning/audio';
 export { BlockCode } from 'data/content/learning/blockcode';
@@ -15,6 +16,7 @@ export { CellHeader } from 'data/content/learning/cellheader';
 export { Cite } from 'data/content/learning/cite';
 export { Code } from 'data/content/learning/code';
 export { CodeBlock } from 'data/content/learning/codeblock';
+export { Command } from 'data/content/learning/command';
 export { Composite } from 'data/content/learning/composite';
 export { Conjugate } from 'data/content/learning/conjugate';
 export { Conjugation } from 'data/content/learning/conjugation';
@@ -34,6 +36,8 @@ export { Flash } from 'data/content/learning/flash';
 export { Formula } from 'data/content/learning/formula';
 export { IFrame } from 'data/content/learning/iframe';
 export { Image } from 'data/content/learning/image';
+export { Inquiry } from 'data/content/learning/inquiry';
+export { Question as InquiryQuestion } from 'data/content/learning/question';
 export { Instructions } from 'data/content/learning/instructions';
 export { Li } from 'data/content/learning/li';
 export { Line } from 'data/content/learning/line';
@@ -113,8 +117,10 @@ export { Unsupported } from 'data/content/unsupported';
 export { WebContent } from 'data/content/webcontent';
 
 // Organization
-export { AudienceTypes, DependencyTypes, GrainSizes, ConditionTypes,
-  PurposeTypes, ScoringModes, CategoryTypes } from 'data/content/org/types';
+export {
+  AudienceTypes, DependencyTypes, GrainSizes, ConditionTypes,
+  PurposeTypes, ScoringModes, CategoryTypes,
+} from 'data/content/org/types';
 export { Before } from 'data/content/org/before';
 export { Dependencies } from 'data/content/org/dependencies';
 export { Dependency } from 'data/content/org/dependency';

@@ -7,6 +7,8 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { ParentContainer } from 'types/active';
 import { State } from 'reducers';
 import { Dispatch } from 'redux';
+import { validateRemoval } from 'data/models/utils/validation';
+import { displayModalMessasge } from 'utils/message';
 
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
@@ -25,9 +27,21 @@ export const setItem = (item: ContentElement, page: string): SetItemAction => ({
 
 export function cut(item: ContentElement, page: string) {
   return function (dispatch: Dispatch<State>, getState: () => State) {
-    const { activeContext } = getState();
-    dispatch(copy(item, page));
-    activeContext.container.lift(parent => parent.onRemove(item));
+    const { activeContext, documents } = getState();
+
+    // We will have to re-implement if we ever support multiple
+    // concurrent document editing, as this simply just grabs the first
+    // document
+
+    if (validateRemoval(documents.first().document.model, item)) {
+      dispatch(copy(item, page) as any);
+      activeContext.container.lift(parent => parent.onRemove(item));
+    } else {
+      displayModalMessasge(
+        dispatch,
+        'Cutting this element would leave one or more command elements untargetted.');
+    }
+
   };
 }
 

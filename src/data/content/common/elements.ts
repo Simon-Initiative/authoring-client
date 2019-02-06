@@ -6,26 +6,40 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 
-const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra'];
+const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra', 'command'];
 const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
 const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe', 'applet',
   'flash', 'director', 'mathematica', 'panopto', 'unity'];
 const ELEMENTS_BLOCK = ['codeblock', 'p'];
 const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
 const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
-  'dialog', 'figure', 'conjugation'];
+  'dialog', 'figure', 'conjugation', 'inquiry'];
 
 export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign', 'sym',
   'term', 'var', '#math'];
 
-export const INLINE_ELEMENTS = [...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
-  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'table'];
+export const INLINE_ELEMENTS = [
+  ...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
+  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'table',
+  'command',
+];
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
 export const BOX_ELEMENTS = [...MATERIAL_ELEMENTS, 'materials', 'alternatives'];
 export const EXTRA_ELEMENTS = [...ELEMENTS_BLOCK, ...ELEMENTS_MIXED];
-export const BODY_ELEMENTS = [...BOX_ELEMENTS, ...ELEMENTS_SEMANTIC];
+const BODY_ELEMENTS_INHERITED = BOX_ELEMENTS.reduce(
+  (p, c) => {
+    if (c !== 'command') {
+      p.push(c);
+    }
+    return p;
+  },
+  [],
+);
+
+export const BODY_ELEMENTS = [...ELEMENTS_SEMANTIC, ...BODY_ELEMENTS_INHERITED];
+
 
 export type ContentElementsParams = {
   content?: Immutable.OrderedMap<string, ContentElement>,
