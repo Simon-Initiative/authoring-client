@@ -12,11 +12,11 @@ import { styles } from 'editors/content/learning/contiguoustext/TitleTextEditor.
 
 export interface TitleTextEditorProps {
   editorStyles?: any;
-  model: ContiguousText | string;
+  model: ContiguousText;
   context: AppContext;
   services: AppServices;
   editMode: boolean;
-  onEdit: (updated: ContiguousText | string, source?: Object) => void;
+  onEdit: (updated: ContiguousText, source?: Object) => void;
   onFocus: (
     model: any, parent: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
@@ -36,32 +36,20 @@ export const TitleTextEditor
         classes.titleTextEditor,
         !editMode && classes.disabled,
         className])}>
-        {(model as any).contentType === 'ContiguousText'
-          ? (
-            <ContiguousTextEditor
-              onInsertParsedContent={() => { }}
-              className={classes.contiguousTextEditor}
-              activeContentGuid={null}
-              hover={null}
-              onUpdateHover={() => { }}
-              onFocus={onFocus}
-              context={context}
-              services={services}
-              editMode={editMode}
-              model={(model as ContiguousText).with({ mode: ContiguousTextMode.SimpleText })}
-              editorStyles={editorStyles}
-              hideBorder={true}
-              onEdit={onEdit} />
-          )
-          : (
-            <div
-              contentEditable={true}
-              onInput={({ target }) =>
-              onEdit((target as HTMLElement).innerText)}
-              suppressContentEditableWarning={true}
-            dangerouslySetInnerHTML={{ __html: (model as string) }}/>
-          )
-        }
+          <ContiguousTextEditor
+            onInsertParsedContent={() => { }}
+            className={classes.contiguousTextEditor}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => { }}
+            onFocus={onFocus}
+            context={context}
+            services={services}
+            editMode={editMode}
+            model={(model as ContiguousText).with({ mode: ContiguousTextMode.SimpleText })}
+            editorStyles={editorStyles}
+            hideBorder={true}
+            onEdit={onEdit} />
         <div className={classes.editIcon}>
           <i className="fa fa-pencil" />
         </div>

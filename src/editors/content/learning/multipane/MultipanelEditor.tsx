@@ -20,6 +20,12 @@ import { Button } from 'editors/content/common/Button';
 import { disableSelect } from 'styles/mixins';
 import { retrieveDocument } from 'data/persistence';
 import { AssessmentModel } from 'data/models';
+import { Panel } from 'data/content/workbook/multipanel/panel';
+import {
+  ContentElements, MATERIAL_ELEMENTS, ELEMENTS_MIXED, CONTROL_ELEMENTS,
+} from 'data/content/common/elements';
+import guid from 'utils/guid';
+import { TextInput } from 'editors/content/common/controls';
 
 const BORDER_STYLE = '1px solid #ced4da';
 
@@ -77,14 +83,11 @@ const styles: JSSStyles = {
     borderBottom: BORDER_STYLE,
     fontSize: 12,
     padding: [10, 6],
+    maxWidth: 180,
     cursor: 'pointer',
 
-    '&:hover': {
+    '&:hover $panelTabName': {
       color: colors.hover,
-    },
-
-    '&:last-child': {
-      borderRight: 'none',
     },
   },
   panelTabName: {
@@ -95,7 +98,6 @@ const styles: JSSStyles = {
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
     minWidth: 40,
-    maxWidth: 100,
   },
   removePanelButton: {
     marginLeft: 4,
@@ -106,6 +108,13 @@ const styles: JSSStyles = {
 
     '&:hover': {
       color: colors.remove,
+    },
+  },
+  removePanelButtonDisabled: {
+    color: colors.gray,
+
+    '&:hover': {
+      color: colors.gray,
     },
   },
   activePanelTab: {
@@ -134,7 +143,13 @@ const styles: JSSStyles = {
     paddingLeft: 30,
   },
   contentTitle: {
+    display: 'flex',
+    flexDirection: 'row',
     padding: [10, 0],
+  },
+  contentTitleLabel: {
+    marginRight: 10,
+    paddingTop: 2,
   },
   hotspotSelection: {
     fontSize: 12,
@@ -178,6 +193,7 @@ export interface MultipanelState {
 export default class Multipanel
   extends AbstractContentEditor<MultipanelType,
   StyledComponentProps<MultipanelProps>, MultipanelState> {
+  panelTabScrollDiv: HTMLElement;
 
   constructor(props: MultipanelProps) {
     super(props);
@@ -216,6 +232,102 @@ export default class Multipanel
     return true;
   }
 
+  onTitleEdit = (ct: contentTypes.ContiguousText, sourceObject) => {
+    const { model, onEdit } = this.props;
+
+    const title = model.title.valueOr(contentTypes.Title.fromText(''));
+
+    onEdit(
+      model.with({
+        title: Maybe.just(title.with({
+          text: title.text.with({
+            content: title.text.content.set(ct.guid, ct),
+          }),
+        })),
+      }),
+      sourceObject,
+    );
+  }
+
+  onPanelEdit = (panel: Panel, sourceObject?) => {
+    const { model, onEdit } = this.props;
+
+    onEdit(
+      model.with({
+        panels: model.panels.map(p => p.guid === panel.guid ? panel : p,
+        ).toList(),
+      }),
+      sourceObject,
+    );
+  }
+
+  onAddPanel = () => {
+    const { model, onEdit } = this.props;
+
+    const newPanel = new Panel({
+      title: Maybe.just(`New Panel ${model.panels.size + 1}`),
+      content: ContentElements.fromText(
+        '',
+        guid(),
+        [...MATERIAL_ELEMENTS, ...ELEMENTS_MIXED, ...CONTROL_ELEMENTS],
+      ),
+    });
+
+    onEdit(
+      model.with({
+        panels: model.panels.push(newPanel),
+      }),
+    );
+
+    this.setState(
+      {
+        selectedPanel: newPanel.guid,
+      },
+      () => setImmediate(this.scrollToLastTab),
+    );
+  }
+
+  onRemovePanel = (id: string) => {
+    const { model, onEdit } = this.props;
+
+    // safeguard, we can never have less than 1 panel
+    if (model.panels.size <= 1) return;
+
+    // find a panel that isnt this one to replace refs with.
+    // because we always have at least one panel, this is guaranteed to exist
+    const swapPanel = model.panels.find(p => p.id !== id);
+
+    onEdit(
+      model.with({
+        // remove panel
+        panels: model.panels.filter(p => p.id !== id).toList(),
+        // remove all refs to this panel
+        introPanelRef: model.introPanelRef.bind(
+          panelRef => panelRef === id ? Maybe.nothing() : Maybe.just(panelRef),
+        ),
+        imageHotspot: model.imageHotspot.with({
+          hotspots: model.imageHotspot.hotspots.map(
+            hotspot => hotspot.with({
+              panelRef: hotspot.panelRef === id ? swapPanel.id : hotspot.panelRef,
+            }),
+          ).toOrderedMap(),
+        }),
+      }),
+    );
+
+    setImmediate(() =>
+      this.setState({
+        selectedPanel: swapPanel.guid,
+      }),
+    );
+  }
+
+  scrollToLastTab = () => {
+    if (this.panelTabScrollDiv) {
+      this.panelTabScrollDiv.scrollLeft = this.panelTabScrollDiv.scrollWidth;
+    }
+  }
+
   renderSidebar() {
     return (
       <SidebarContent title="Multipanel">
@@ -227,6 +339,87 @@ export default class Multipanel
     return (
       <ToolbarGroup label="Multipanel" highlightColor={CONTENT_COLORS.Multipanel}>
       </ToolbarGroup>
+    );
+  }
+
+  renderPanelView(currentPanel: Panel) {
+    const { classes, editMode, model } = this.props;
+    const { selectedPanel } = this.state;
+
+    return (
+      <div className={classes.panelView}>
+        <div className={classes.panelTabs}>
+          <div
+            className={classes.panelTabScroll}
+            ref={(ref) => { this.panelTabScrollDiv = ref; }}>
+            {model.panels.toArray().map((panel, i) => (
+              <div
+                key={panel.guid}
+                className={classNames([
+                  classes.panelTab,
+                  selectedPanel === panel.guid && classes.activePanelTab])}
+                onClick={() => this.setState({
+                  selectedPanel: panel.guid,
+                })}>
+                <div className={classes.panelTabName}>
+                  {panel.title.valueOr(`Panel ${i + 1}`)}
+                </div>
+                <div
+                  className={classNames([
+                    classes.removePanelButton,
+                    model.panels.size <= 1 && classes.removePanelButtonDisabled,
+                  ])}
+                  onClick={() => model.panels.size > 1 && this.onRemovePanel(panel.id)}>
+                  <i className="fa fa-times" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className={classNames([classes.addPanelButton])}>
+            <Button
+              type="link"
+              editMode={editMode}
+              onClick={this.onAddPanel}>
+              <i className="fa fa-plus-circle" /> Add
+            </Button>
+          </div>
+        </div>
+          {currentPanel && (
+            <div className={classes.tabContent}>
+              <div className={classes.contentTitle}>
+                <div className={classes.contentTitleLabel}>
+                  Title:
+                </div>
+                <TextInput
+                  editMode={editMode}
+                  label="Title"
+                  type="text"
+                  value={currentPanel.title.valueOr('')}
+                  onEdit={text =>
+                    this.onPanelEdit(
+                      currentPanel.with({
+                        title: Maybe.maybe(text as string),
+                      }),
+                  )} />
+              </div>
+              <div className={classes.content}>
+                <ContentContainer
+                  activeContentGuid={null}
+                  hover={null}
+                  onUpdateHover={() => { }}
+                  {...this.props}
+                  model={currentPanel.content}
+                  onEdit={(updated, src) =>
+                    this.onPanelEdit(
+                      currentPanel.with({
+                        content: updated,
+                      }),
+                      src,
+                  )} />
+              </div>
+            </div>
+          )}
+      </div>
     );
   }
 
@@ -245,11 +438,11 @@ export default class Multipanel
           className={classes.title}
           context={this.props.context}
           services={this.props.services}
-          onFocus={() => this.props.onFocus(model, this.props.parent, Maybe.nothing())}
+          onFocus={this.props.onFocus}
           model={(model.title.valueOr(contentTypes.Title.fromText(''))
             .text.content.first() as contentTypes.ContiguousText)}
           editMode={this.props.editMode}
-          onEdit={() => {}}
+          onEdit={this.onTitleEdit}
           editorStyles={{ fontSize: 20, fontWeight: 600 }} />
         <div className={classes.top}>
           <div className={classes.hotspotEditor}>
@@ -271,67 +464,9 @@ export default class Multipanel
 
             </div>
           </div>
-          <div className={classes.panelView}>
-            <div className={classes.panelTabs}>
-              <div className={classes.panelTabScroll}>
-                {model.panels.toArray().map((panel, i) => (
-                  <div
-                    key={panel.guid}
-                    className={classNames([
-                      classes.panelTab,
-                      selectedPanel === panel.guid && classes.activePanelTab])}
-                    onClick={() => this.setState({
-                      selectedPanel: panel.guid,
-                    })}>
-                    <div className={classes.panelTabName}>
-                      {panel.title.valueOr(`Panel ${i + 1}`)}
-                    </div>
-                    <div
-                      className={classes.removePanelButton}
-                      onClick={() => {
-
-                      }}>
-                      <i className="fa fa-times"/>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className={classNames([classes.addPanelButton])}>
-                <Button
-                  type="link"
-                  editMode={editMode}
-                  onClick={() => {}}>
-                  <i className="fa fa-plus-circle" /> Add
-                </Button>
-              </div>
-            </div>
-              {currentPanel && (
-                <div className={classes.tabContent}>
-                  <div className={classes.contentTitle}>
-                    <TitleTextEditor
-                      className="flex-spacer"
-                      context={this.props.context}
-                      services={this.props.services}
-                      onFocus={this.props.onFocus}
-                      model={currentPanel.title.valueOr('')}
-                      editMode={this.props.editMode}
-                      onEdit={(text) => {}}
-                      editorStyles={{ fontSize: 20, fontWeight: 600 }} />
-                  </div>
-                  <div className={classes.content}>
-                    <ContentContainer
-                      activeContentGuid={null}
-                      hover={null}
-                      onUpdateHover={() => { }}
-                      {...this.props}
-                      model={currentPanel.content}
-                      onEdit={() => {}} />
-                  </div>
-                </div>
-              )}
-          </div>
+          {this.renderPanelView(currentPanel)}
         </div>
-        <h5>Activity</h5>
+        <h5 style={{ marginTop: 20 }}>Activity</h5>
         <div className={classes.bottom}>
           <div className={classes.wbinline}>
             <h5><i className="fa fa-flask"/> {title}</h5>
