@@ -7,17 +7,12 @@ import { FeedbackQuestion, FeedbackQuestions } from '../content/feedback/feedbac
 import { FeedbackDescription } from '../content/feedback/feedback_description';
 import { Title } from '../content/learning/title';
 import { ObjRef } from '../content/learning/objref';
-import { LikertSeries } from '../content/feedback/likert_series';
 import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
 import {
   ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS,
-  INLINE_ELEMENTS,
 } from 'data/content/common/elements';
-import { LikertScale } from 'data/content/feedback/likert_scale';
-import { LikertItem } from 'data/content/feedback/likert_item';
-import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
 import guid from 'utils/guid';
 import { createLikertSeries } from 'editors/content/question/addquestion/questionFactories';
 
@@ -78,12 +73,6 @@ export class FeedbackModel
   }
 
   static createNew(id: string, title: string, description: string) {
-    const item = new LikertItem({
-      prompt: new FeedbackPrompt({
-        content: ContentElements.fromText(
-          'This is an example question prompt for you to edit.', guid(), INLINE_ELEMENTS),
-      }),
-    });
     const series = createLikertSeries();
     return new FeedbackModel({
       title: new contentTypes.Title({

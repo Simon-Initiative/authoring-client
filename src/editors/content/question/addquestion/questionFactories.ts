@@ -358,23 +358,23 @@ export function createLikertSeries() {
 export function createLikert() {
   const labels = [
     new LikertLabel({
-      text: ContentElements.fromText('Strongly Disagree', guid(), TEXT_ELEMENTS),
+      text: ContentElements.fromText('1', guid(), TEXT_ELEMENTS),
       value: '1',
     }),
     new LikertLabel({
-      text: ContentElements.fromText('Disagree', guid(), TEXT_ELEMENTS),
+      text: ContentElements.fromText('2', guid(), TEXT_ELEMENTS),
       value: '2',
     }),
     new LikertLabel({
-      text: ContentElements.fromText('Neither Agree Nor Disagree', guid(), TEXT_ELEMENTS),
+      text: ContentElements.fromText('3', guid(), TEXT_ELEMENTS),
       value: '3',
     }),
     new LikertLabel({
-      text: ContentElements.fromText('Agree', guid(), TEXT_ELEMENTS),
+      text: ContentElements.fromText('4', guid(), TEXT_ELEMENTS),
       value: '4',
     }),
     new LikertLabel({
-      text: ContentElements.fromText('Strongly Agree', guid(), TEXT_ELEMENTS),
+      text: ContentElements.fromText('5', guid(), TEXT_ELEMENTS),
       value: '5',
     }),
   ];
@@ -382,7 +382,7 @@ export function createLikert() {
     prompt: new FeedbackPrompt({
       content: ContentElements.fromText(
         // tslint:disable-next-line:max-line-length
-        'This is an example question prompt for you to edit. For instance:\nHow engaging did you find the material in chapter 1?',
+        'Here is an example question prompt for you to edit. This single question prompt has its own scale and can support rich content such as images and videos, giving it more flexibility than a question series.\nYou can edit the scale size and each of the labels directly below.\nYour prompt might be something like:\nOn a scale from 1 to 5 with 5 being the highest, how engaging did you find the material in chapter 1?',
         guid(), INLINE_ELEMENTS),
     }),
     scale: new LikertScale({
@@ -416,7 +416,7 @@ export function createFeedbackMultipleChoice() {
     prompt: new FeedbackPrompt({
       content: ContentElements.fromText(
         // tslint:disable-next-line:max-line-length
-        'This is an example question prompt for you to edit. For instance:\nWhich of these choices do you feel best applies to you?',
+        'Here is an example question prompt for you to edit. This question prompt can support rich content, such as images and videos. Your prompt might be something like: \nWhich of these choices do you feel best applies to you?',
         guid(), INLINE_ELEMENTS),
     }),
     choices: Immutable.OrderedMap<string, FeedbackChoice>(
@@ -429,7 +429,7 @@ export function createFeedbackOpenResponse() {
     prompt: new FeedbackPrompt({
       content: ContentElements.fromText(
         // tslint:disable-next-line:max-line-length
-        'This is an example question prompt for you to edit. For instance:\nWhat single change could we make to most improve the course?',
+        'Here is an example question prompt for you to edit. This question prompt can support rich content, such as images and videos. Your prompt might be something like:\nWhat single change could we make to most improve the course?',
         guid(), INLINE_ELEMENTS),
     }),
   });

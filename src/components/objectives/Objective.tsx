@@ -644,13 +644,13 @@ export class Objective
                 <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
                 Pages
               {workbookPageRefs.caseOf({
-                  just: refs => (
+                just: refs => (
                     <span className={classNames(['badge badge-light', classes.countBadge])}>
                       {refs.size}
                     </span>
                   ),
-                  nothing: () => null,
-                })}
+                nothing: () => null,
+              })}
               </h3>
               {workbookPageRefs.caseOf({
                 just: (refs) => {

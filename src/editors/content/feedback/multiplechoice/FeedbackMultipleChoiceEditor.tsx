@@ -15,6 +15,8 @@ import guid from 'utils/guid';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { TabOptionControl } from 'editors/content/common/TabContainer';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface Props extends AbstractContentEditorProps<FeedbackMultipleChoice> {
   canRemove: boolean;
@@ -29,37 +31,21 @@ export interface State extends AbstractContentEditorState {
 export class FeedbackMultipleChoiceEditor extends
   AbstractContentEditor<FeedbackMultipleChoice, Props, State> {
 
-  renderQuestionTitle = () => {
-    const { model, canRemove, onRemove, editMode, onDuplicate } = this.props;
-
-    return (
-      <ContentTitle
-        title={getLabelForFeedbackQuestion(model)}
-        onDuplicate={onDuplicate}
-        editMode={editMode}
-        canRemove={canRemove}
-        removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
-        onRemove={onRemove}
-        helpPopover={null} />
-    );
-  }
-
-  onPromptEdit = (content: ContentElements, src: ContentElement) => {
+  onEditPrompt = (content: ContentElements, src: ContentElement) => {
     const { onEdit, model } = this.props;
     onEdit(model.with({ prompt: model.prompt.with({ content }) }), src);
   }
 
-  onChoiceEdit = (elements: ContentElements, src: ContentElement) => {
+  onEditChoice = (elements: ContentElements, src: ContentElement) => {
+    const { onEdit, model } = this.props;
     const items = elements
       .content
       .toArray()
       .map(e => [e.guid, e]);
 
-    const model = this.props.model.with({
-      choices: Immutable.OrderedMap<string, FeedbackChoice>(items),
-    });
-
-    this.props.onEdit(model, src);
+    onEdit(
+      model.with({ choices: Immutable.OrderedMap<string, FeedbackChoice>(items) }),
+      src);
   }
 
   onAddChoice = (e) => {
@@ -99,7 +85,7 @@ export class FeedbackMultipleChoiceEditor extends
 
   renderMain() {
     const { editMode, services, context, model, activeContentGuid, hover,
-      onUpdateHover, onFocus } = this.props;
+      onUpdateHover, onFocus, onDuplicate, canRemove, onRemove } = this.props;
 
     const choices = new ContentElements().with({
       content: model.choices,
@@ -114,7 +100,14 @@ export class FeedbackMultipleChoiceEditor extends
     return (
       <div className="feedback-question-editor">
         <div className="feedback-question">
-          {this.renderQuestionTitle()}
+          <ContentTitle
+            title={getLabelForFeedbackQuestion(model)}
+            onDuplicate={onDuplicate}
+            editMode={editMode}
+            canRemove={canRemove}
+            removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
+            onRemove={onRemove}
+            helpPopover={null} />
           <div className="question-body" key="question">
             <ContentContainer
               activeContentGuid={activeContentGuid}
@@ -125,13 +118,21 @@ export class FeedbackMultipleChoiceEditor extends
               services={services}
               context={context}
               model={model.prompt.content}
-              onEdit={this.onPromptEdit} />
+              onEdit={this.onEditPrompt} />
+            <br />
+            <TabOptionControl name="required">
+              <ToggleSwitch
+                checked={model.required}
+                label="Required Question"
+                onClick={this.onToggleRequired} />
+            </TabOptionControl>
+            <br />
             <div className="choicesContainer">
               <ContentContainer
                 {...this.props}
                 model={choices}
                 bindProperties={bindLabel}
-                onEdit={this.onChoiceEdit}
+                onEdit={this.onEditChoice}
                 overrideRemove={(model: ContentElements, childModel) => model.size < 2}
               />
               <button type="button"

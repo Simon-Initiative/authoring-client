@@ -1,21 +1,23 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import guid from 'utils/guid';
 
 import { Button } from 'editors/content/common/Button';
 import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 import { LikertScale } from 'data/content/feedback/likert_scale';
 import { LikertItem } from 'data/content/feedback/likert_item';
 import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
-
-import './QuestionTable.scss';
 import { DynaDropLabel } from 'editors/content/learning/dynadragdrop/DynaDropLabel';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import { LikertLabel } from 'data/content/feedback/likert_label';
 import { ContentElements, TEXT_ELEMENTS, INLINE_ELEMENTS } from 'data/content/common/elements';
-import guid from 'utils/guid';
+import { Select } from 'editors/content/common/Select';
+import { onEditScaleSize } from '../utils';
+import { onEditLabelText } from 'editors/content/feedback/utils';
+
+import './QuestionTable.scss';
 
 // Adapted from HTMLTableEditor
-export interface QuestionTableProps {
+export interface Props {
   editMode: boolean;
   scale: LikertScale;
   onEditScale: (scale: LikertScale) => void;
@@ -23,19 +25,16 @@ export interface QuestionTableProps {
   onEditItems: (items: Immutable.OrderedMap<string, LikertItem>) => void;
 }
 
-export interface QuestionTableState {
+export interface State { }
 
-}
-
-export class QuestionTable
-  extends React.PureComponent<QuestionTableProps, QuestionTableState> {
+export class QuestionTable extends React.PureComponent<Props, State> {
 
   onAddRow(index: number) {
     const { items, onEditItems } = this.props;
 
     const item = new LikertItem({
       prompt: new FeedbackPrompt({
-        content: ContentElements.fromText('New prompt', guid(), INLINE_ELEMENTS),
+        content: ContentElements.fromText('New question prompt', guid(), INLINE_ELEMENTS),
       }),
     });
 
@@ -50,16 +49,6 @@ export class QuestionTable
     const { items, onEditItems } = this.props;
 
     onEditItems(items.take(index).concat(items.skip(index + 1)).toOrderedMap());
-  }
-
-  onEditLabelText(text: string, label: LikertLabel) {
-    const { scale, onEditScale } = this.props;
-
-    onEditScale(scale.with({
-      labels: scale.labels.set(label.guid, label.with({
-        text: ContentElements.fromText(text, guid(), TEXT_ELEMENTS),
-      })).toOrderedMap(),
-    }));
   }
 
   onEditItemText(text: string, item: LikertItem) {
@@ -106,7 +95,7 @@ export class QuestionTable
   }
 
   render() {
-    const { editMode, scale, items } = this.props;
+    const { editMode, scale, items, onEditScale } = this.props;
 
     const renderTableRow = (item: LikertItem, index) => {
       return (
@@ -143,16 +132,22 @@ export class QuestionTable
       );
     };
 
-    console.log('scale', scale)
-    console.log('items', items)
+    const scaleOptions = [1, 3, 5, 7]
+      .map(n => <option key={n} value={n}>{n}</option>);
 
     return (
       <div className="likert-table">
         <table>
           <thead>
             <tr>
-              <th /><th />
-              {/* {console.log('scale.labels', scale.labels)} */}
+              <th />
+              <th><Select
+                editMode={this.props.editMode}
+                label="Scale Size"
+                value={scale.scaleSize}
+                onChange={size => onEditScaleSize(size, scale, onEditScale)}>
+                {scaleOptions}
+              </Select></th>
               {scale.labels.toArray().map((label =>
                 <DynaDropLabel
                   key={label.guid}
@@ -163,17 +158,17 @@ export class QuestionTable
                   editMode={editMode}
                   text={(label.text.content.first() as ContiguousText)
                     .extractPlainText().valueOr('')}
-                  onEdit={value => this.onEditLabelText(value, label)} />))}
+                  onEdit={text => onEditLabelText(text, label, scale, onEditScale)} />))}
             </tr>
           </thead>
           <tbody>
             {items.toArray().map(renderTableRow)}
           </tbody>
         </table>
-        <div>
+        <div className="add-row">
           <Button type="link" editMode={editMode}
             onClick={() => this.onAddRow(items.size)} >
-            <i className="fa fa-plus" /> Add a Row
+            <i className="fa fa-plus" /> Add a Question
           </Button>
         </div>
       </div>

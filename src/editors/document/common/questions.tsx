@@ -8,7 +8,7 @@ import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { LegacyTypes } from '../../../data/types';
 import { LikertSeriesEditor } from 'editors/content/feedback/likertseries/LikertSeriesEditor';
-import { LikertEditor } from 'editors/content/feedback/singlequestion/LikertEditor';
+import { LikertEditor } from 'editors/content/feedback/singlelikertquestion/LikertEditor';
 import { FeedbackMultipleChoiceEditor }
   from 'editors/content/feedback/multiplechoice/FeedbackMultipleChoiceEditor';
 import { FeedbackOpenResponseEditor }

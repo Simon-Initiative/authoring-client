@@ -1,3 +1,10 @@
 .feedback-choice-editor {
-    margin-left: 20px;
+    .content-container {
+        padding-left: 20px;
+    }
+
+    span {
+        font-size: 13px;
+        color: #606060;
+    }
 }

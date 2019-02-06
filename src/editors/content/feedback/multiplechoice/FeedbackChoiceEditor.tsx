@@ -8,6 +8,8 @@ import {
   AbstractContentEditor,
 } from 'editors/content/common/AbstractContentEditor';
 
+import './FeedbackMultipleChoice.scss';
+
 export interface Props extends AbstractContentEditorProps<FeedbackChoice> {
   canRemove: boolean;
   onRemove: () => void;

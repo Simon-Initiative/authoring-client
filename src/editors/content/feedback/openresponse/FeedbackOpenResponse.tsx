@@ -10,6 +10,8 @@ import { AbstractContentEditor, AbstractContentEditorProps, AbstractContentEdito
   from 'editors/content/common/AbstractContentEditor';
 import { getLabelForFeedbackQuestion } from 'data/models/feedback';
 import '../common.scss';
+import { TabOptionControl } from 'editors/content/common/TabContainer';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 
 export interface Props extends AbstractContentEditorProps<FeedbackOpenResponse> {
@@ -75,6 +77,13 @@ export class FeedbackOpenResponseEditor extends
             context={context}
             model={model.prompt.content}
             onEdit={this.onPromptEdit} />
+          <br />
+          <TabOptionControl name="required">
+            <ToggleSwitch
+              checked={model.required}
+              label="Required Question"
+              onClick={this.onToggleRequired} />
+          </TabOptionControl>
         </div>
       </div>
     );
