@@ -23,7 +23,6 @@ import {
 } from 'components/message/selection';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
 import { styles } from './ContiguousText.styles';
-import { Maybe } from 'tsmonad';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
