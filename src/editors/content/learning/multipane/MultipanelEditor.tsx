@@ -150,6 +150,7 @@ const styles: JSSStyles = {
   contentTitleLabel: {
     marginRight: 10,
     paddingTop: 2,
+    fontWeight: 600,
   },
   hotspotSelection: {
     fontSize: 12,
