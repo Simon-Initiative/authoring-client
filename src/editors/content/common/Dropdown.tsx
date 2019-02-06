@@ -40,5 +40,3 @@ export const Dropdown = (props: DropdownProps) => {
     </div>
   );
 };
-
-
