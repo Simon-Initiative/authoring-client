@@ -7,11 +7,12 @@ import { QuestionEditor } from '../../content/question/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { LegacyTypes } from '../../../data/types';
-import { LikertSeriesEditor } from 'editors/content/feedback/LikertSeriesEditor';
-import { LikertEditor } from 'editors/content/feedback/LikertEditor';
+import { LikertSeriesEditor } from 'editors/content/feedback/likertseries/LikertSeriesEditor';
+import { LikertEditor } from 'editors/content/feedback/singlequestion/LikertEditor';
 import { FeedbackMultipleChoiceEditor }
   from 'editors/content/feedback/multiplechoice/FeedbackMultipleChoiceEditor';
-import { FeedbackOpenResponseEditor } from 'editors/content/feedback/FeedbackOpenResponse';
+import { FeedbackOpenResponseEditor }
+  from 'editors/content/feedback/openresponse/FeedbackOpenResponse';
 import './questions.scss';
 import { AbstractContentEditorProps } from 'editors/content/common/AbstractContentEditor';
 import { Node } from 'data/content/assessment/node';

@@ -116,7 +116,6 @@ export class FeedbackMultipleChoiceEditor extends
         <div className="feedback-question">
           {this.renderQuestionTitle()}
           <div className="question-body" key="question">
-            Enter your question:
             <ContentContainer
               activeContentGuid={activeContentGuid}
               hover={hover}

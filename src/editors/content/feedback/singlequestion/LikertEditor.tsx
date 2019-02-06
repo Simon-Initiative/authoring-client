@@ -10,7 +10,7 @@ import {
   AbstractContentEditor, AbstractContentEditorProps,
   AbstractContentEditorState,
 } from 'editors/content/common/AbstractContentEditor';
-import './common.scss';
+import '../common.scss';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { Select } from 'editors/content/common/Select';

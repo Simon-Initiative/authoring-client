@@ -5,6 +5,8 @@ import createGuid from 'utils/guid';
 import { FeedbackPrompt } from './feedback_prompt';
 import { LikertScale } from './likert_scale';
 import { LikertItem } from './likert_item';
+import { ContentElements } from '../common/elements';
+import { INLINE_ELEMENTS } from 'data/content/common/elements';
 
 type LikertSeriesParams = {
   guid?: string;
@@ -20,9 +22,7 @@ const defaultLikertSeriesParams = {
   guid: '',
   prompt: new FeedbackPrompt(),
   scale: new LikertScale(),
-  items: Immutable.OrderedMap<string, LikertItem>([
-    [createGuid(), new LikertItem()],
-  ]),
+  items: Immutable.OrderedMap<string, LikertItem>(),
 };
 
 export class LikertSeries extends Immutable.Record(defaultLikertSeriesParams) {
@@ -86,7 +86,12 @@ export class LikertSeries extends Immutable.Record(defaultLikertSeriesParams) {
       this.prompt.toPersistence(),
       this.scale.toPersistence(),
       ...this.items.size === 0
-        ? [(new LikertItem()).toPersistence()]
+        ? [(new LikertItem({
+          prompt: new FeedbackPrompt({
+            content: ContentElements.fromText(
+              'Question Prompt', createGuid(), INLINE_ELEMENTS),
+          }),
+        })).toPersistence()]
         : this.items.toArray().map(item => item.toPersistence()),
     ];
 

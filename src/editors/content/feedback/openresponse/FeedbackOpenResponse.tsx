@@ -9,7 +9,7 @@ import { ContentTitle } from 'editors/content/common/ContentTitle';
 import { AbstractContentEditor, AbstractContentEditorProps, AbstractContentEditorState }
   from 'editors/content/common/AbstractContentEditor';
 import { getLabelForFeedbackQuestion } from 'data/models/feedback';
-import './common.scss';
+import '../common.scss';
 
 
 export interface Props extends AbstractContentEditorProps<FeedbackOpenResponse> {
@@ -65,7 +65,6 @@ export class FeedbackOpenResponseEditor extends
       <div className="feedback-question-editor">
         {this.renderQuestionTitle()}
         <div className="question-body" key="question">
-          Write your question:
           <ContentContainer
             activeContentGuid={this.props.activeContentGuid}
             hover={this.props.hover}

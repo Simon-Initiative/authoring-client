@@ -205,7 +205,7 @@ const LikertSeriesTab = (props: TabProps) => {
   const textBlocks = node.prompt.content.content
     .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
-  const newContentText = newText('Likert Series');
+  const newContentText = newText('Question Series with Scale');
   const previewText = textBlocks.size > 0
     ? (textBlocks.first() as ContiguousText)
       .extractPlainText()
@@ -218,7 +218,7 @@ const LikertSeriesTab = (props: TabProps) => {
   return (
     <Tab
       {...props}
-      label="Likert Series"
+      label="Question Series with Scale"
       previewText={previewText}
     />
   );
@@ -230,7 +230,7 @@ const LikertTab = (props: TabProps) => {
   const textBlocks = node.prompt.content.content
     .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
-  const newContentText = newText('Likert Question');
+  const newContentText = newText('Single Question with Scale');
   const previewText = textBlocks.size > 0
     ? (textBlocks.first() as ContiguousText)
       .extractPlainText()
@@ -243,7 +243,7 @@ const LikertTab = (props: TabProps) => {
   return (
     <Tab
       {...props}
-      label="Likert Question"
+      label="Single Question with Scale"
       previewText={previewText}
     />
   );

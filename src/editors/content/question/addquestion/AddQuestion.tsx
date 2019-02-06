@@ -73,10 +73,10 @@ const RenderOptions: { [key in AddOption]?: ToJSXElement } = {
   ImageHotspot: button(createImageHotspot, 'Image Hotspot'),
   EmbeddedPool: button(createEmbeddedPool, 'Embedded Pool'),
   SupportingContent: button(createSupportingContent, 'Supporting Content'),
-  LikertSeries: button(createLikertSeries, 'Question Series'),
-  Likert: button(createLikert, 'Single Question'),
-  FeedbackMultipleChoice: button(createFeedbackMultipleChoice, 'Multiple Choice'),
-  FeedbackOpenResponse: button(createFeedbackOpenResponse, 'Open Response'),
+  LikertSeries: button(createLikertSeries, 'Question Series with Scale'),
+  Likert: button(createLikert, 'Question with Scale'),
+  FeedbackMultipleChoice: button(createFeedbackMultipleChoice, 'Multiple Choice Question'),
+  FeedbackOpenResponse: button(createFeedbackOpenResponse, 'Open-Ended Question'),
   Separator: () => <ToolbarButtonMenuDivider />,
 };
 

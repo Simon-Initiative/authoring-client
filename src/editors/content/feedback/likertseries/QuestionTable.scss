@@ -1,0 +1,78 @@
+@import "oli/colors";
+
+.likert-table {
+    table {
+        width: 100%;
+        border-collapse: inherit;
+
+        // border: 1px solid #444;
+        border-radius: 3px;
+
+        thead {
+            text-align: center;
+
+            tr {
+                height: 40px;
+
+                // background-color: #111;
+           
+            }
+
+            th {
+                font-size: 16px;
+            }
+        }
+
+        tbody {
+            td {
+                height: 40px;
+                font-size: 14px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+
+                i {
+                    color: #666;
+                }
+            }
+
+            .question-table-radio {
+                border: 1px solid #eee;
+                border-radius: 5px;
+                text-align: center;
+                vertical-align: middle;
+                background-color: #eee;
+            }
+        }
+
+        .dropdown {
+            &.button {
+                color: #444;
+            }
+        }
+
+        .show-on-right {
+            float: 'right';
+        }
+
+        .header-row {
+            &.cell {
+                font-weight: 600;
+                background-color: #eee;
+                text-align: 'center';
+            }
+        }
+
+        .cell {
+            border: 1px solid #eee;
+            min-width: 50;
+            min-height: 50;
+            position: 'relative';
+        }
+
+        .cell-header {
+            padding: 4;
+            border: 1 px solid 'transparent';
+            border-bottom: 1px solid #eee;
+        }
+    }
+}

@@ -22,6 +22,7 @@ import { LikertItem } from 'data/content/feedback/likert_item';
 import { LikertScale } from 'data/content/feedback/likert_scale';
 import { FeedbackChoice } from 'data/content/feedback/feedback_choice';
 import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
+import { LikertLabel } from 'data/content/feedback/likert_label';
 
 export function createMultipleChoiceQuestion(select: string) {
   let model = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
@@ -293,48 +294,133 @@ export function createEmbeddedPool() {
 }
 
 export function createLikertSeries() {
-  const item = new LikertItem({
+  const items = [
+    new LikertItem({
+      prompt: new FeedbackPrompt({
+        content: ContentElements.fromText(
+          'I found the section easy to understand',
+          '', INLINE_ELEMENTS),
+      }),
+    }),
+    new LikertItem({
+      prompt: new FeedbackPrompt({
+        content: ContentElements.fromText(
+          'I found the section engaging',
+          '', INLINE_ELEMENTS),
+      }),
+    }),
+    new LikertItem({
+      prompt: new FeedbackPrompt({
+        content: ContentElements.fromText(
+          'I found the practice questions helped me to better learn the material',
+          '', INLINE_ELEMENTS),
+      }),
+    }),
+  ];
+  const labels = [
+    new LikertLabel({
+      text: ContentElements.fromText('Strongly Disagree', guid(), TEXT_ELEMENTS),
+      value: '1',
+    }),
+    new LikertLabel({
+      text: ContentElements.fromText('Disagree', guid(), TEXT_ELEMENTS),
+      value: '2',
+    }),
+    new LikertLabel({
+      text: ContentElements.fromText('Neither Agree Nor Disagree', guid(), TEXT_ELEMENTS),
+      value: '3',
+    }),
+    new LikertLabel({
+      text: ContentElements.fromText('Agree', guid(), TEXT_ELEMENTS),
+      value: '4',
+    }),
+    new LikertLabel({
+      text: ContentElements.fromText('Strongly Agree', guid(), TEXT_ELEMENTS),
+      value: '5',
+    }),
+  ];
+  return new LikertSeries({
     prompt: new FeedbackPrompt({
       content: ContentElements.fromText(
-        'This is an example question prompt for you to edit.', '', INLINE_ELEMENTS),
+        // tslint:disable-next-line:max-line-length
+        'Here is an example question series for you to edit. This text is the question prompt, and the table below shows the series of questions the student should answer. You can directly edit the labels in the scale above the questions, as well as the text of the questions themselves. For example, you might say something like:\nPlease answer the following questions about your experience learning from the section on photosynthesis:',
+        guid(), INLINE_ELEMENTS),
     }),
-  });
-  return new LikertSeries({
     scale: new LikertScale({
-      scaleSize: '3',
-      scaleCenter: '2',
+      scaleSize: '5',
+      scaleCenter: '3',
+      labels: Immutable.OrderedMap<string, LikertLabel>(labels.map(label => [label.guid, label])),
     }),
-    items: Immutable.OrderedMap<string, LikertItem>([
-      [item.guid, item],
-    ]),
+    items: Immutable.OrderedMap<string, LikertItem>(items.map(item => [item.guid, item])),
   });
 }
 
 export function createLikert() {
+  const labels = [
+    new LikertLabel({
+      text: ContentElements.fromText('Strongly Disagree', guid(), TEXT_ELEMENTS),
+      value: '1',
+    }),
+    new LikertLabel({
+      text: ContentElements.fromText('Disagree', guid(), TEXT_ELEMENTS),
+      value: '2',
+    }),
+    new LikertLabel({
+      text: ContentElements.fromText('Neither Agree Nor Disagree', guid(), TEXT_ELEMENTS),
+      value: '3',
+    }),
+    new LikertLabel({
+      text: ContentElements.fromText('Agree', guid(), TEXT_ELEMENTS),
+      value: '4',
+    }),
+    new LikertLabel({
+      text: ContentElements.fromText('Strongly Agree', guid(), TEXT_ELEMENTS),
+      value: '5',
+    }),
+  ];
   return new Likert({
     prompt: new FeedbackPrompt({
       content: ContentElements.fromText(
-        'This is an example question prompt for you to edit.', '', INLINE_ELEMENTS),
+        // tslint:disable-next-line:max-line-length
+        'This is an example question prompt for you to edit. For instance:\nHow engaging did you find the material in chapter 1?',
+        guid(), INLINE_ELEMENTS),
     }),
     scale: new LikertScale({
-      scaleSize: '3',
-      scaleCenter: '2',
+      scaleSize: '5',
+      scaleCenter: '3',
+      labels: Immutable.OrderedMap<string, LikertLabel>(labels.map(label => [label.guid, label])),
     }),
   });
 }
 
 export function createFeedbackMultipleChoice() {
-  const choice = new FeedbackChoice({
-    text: ContentElements.fromText('First choice', '', TEXT_ELEMENTS),
-  });
+  const choices = [
+    new FeedbackChoice({
+      text: ContentElements.fromText(
+        'I have a strong grasp on the topic', '', TEXT_ELEMENTS),
+    }),
+    new FeedbackChoice({
+      text: ContentElements.fromText(
+        'I have a decent understanding of the topic', '', TEXT_ELEMENTS),
+    }),
+    new FeedbackChoice({
+      text: ContentElements.fromText(
+        'I\'m not sure if I understand it well or not', '', TEXT_ELEMENTS),
+    }),
+    new FeedbackChoice({
+      text: ContentElements.fromText(
+        'I don\'t understand the topic very well', '', TEXT_ELEMENTS),
+    }),
+  ];
   return new FeedbackMultipleChoice({
     prompt: new FeedbackPrompt({
       content: ContentElements.fromText(
-        'This is an example question prompt for you to edit.', '', INLINE_ELEMENTS),
+        // tslint:disable-next-line:max-line-length
+        'This is an example question prompt for you to edit. For instance:\nWhich of these choices do you feel best applies to you?',
+        guid(), INLINE_ELEMENTS),
     }),
-    choices: Immutable.OrderedMap<string, FeedbackChoice>([
-      [choice.guid, choice],
-    ]),
+    choices: Immutable.OrderedMap<string, FeedbackChoice>(
+      choices.map(choice => [choice.guid, choice])),
   });
 }
 
@@ -342,7 +428,9 @@ export function createFeedbackOpenResponse() {
   return new FeedbackOpenResponse({
     prompt: new FeedbackPrompt({
       content: ContentElements.fromText(
-        'This is an example question prompt for you to edit.', '', INLINE_ELEMENTS),
+        // tslint:disable-next-line:max-line-length
+        'This is an example question prompt for you to edit. For instance:\nWhat single change could we make to most improve the course?',
+        guid(), INLINE_ELEMENTS),
     }),
   });
 }

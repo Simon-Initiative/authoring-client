@@ -19,6 +19,7 @@ import { LikertScale } from 'data/content/feedback/likert_scale';
 import { LikertItem } from 'data/content/feedback/likert_item';
 import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
 import guid from 'utils/guid';
+import { createLikertSeries } from 'editors/content/question/addquestion/questionFactories';
 
 // oli_feedback_1_2.dtd
 export type FeedbackModelParams = {
@@ -83,15 +84,7 @@ export class FeedbackModel
           'This is an example question prompt for you to edit.', guid(), INLINE_ELEMENTS),
       }),
     });
-    const series = new LikertSeries({
-      scale: new LikertScale({
-        scaleSize: '3',
-        scaleCenter: '2',
-      }),
-      items: Immutable.OrderedMap<string, LikertItem>([
-        [item.guid, item],
-      ]),
-    });
+    const series = createLikertSeries();
     return new FeedbackModel({
       title: new contentTypes.Title({
         text: ContentElements.fromText(title, guid(), TEXT_ELEMENTS),
@@ -196,13 +189,13 @@ export class FeedbackModel
 export function getLabelForFeedbackQuestion(model: FeedbackQuestion) {
   switch (model.contentType) {
     case 'LikertSeries':
-      return 'Likert Series';
+      return 'Question Series with Scale';
     case 'Likert':
-      return 'Likert Question';
+      return 'Question with Scale';
     case 'FeedbackMultipleChoice':
-      return 'Multiple Choice';
+      return 'Multiple Choice Question';
     case 'FeedbackOpenResponse':
-      return 'Open Response';
+      return 'Open-Ended Question';
     default:
       return 'Question';
   }
