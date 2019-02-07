@@ -2,36 +2,36 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Hotspot } from './hotspot';
 import createGuid from '../../../../utils/guid';
-import { augment, getChildren, setId, ensureIdGuidPresent } from '../../common';
+import { getChildren, setId, ensureIdGuidPresent } from '../../common';
 import { getKey } from '../../../common';
 
 export type HotspotVisibility = 'transparent' | 'visable';
 
 export type ImageHotspotParams = {
-  guid?: string,
-  id?: Maybe<string>,
-  src?: string,
-  alt?: string,
-  width?: number,
-  height?: number,
-  hotspotVisibility?: HotspotVisibility,
-  hotspots?: Immutable.OrderedMap<string, Hotspot>,
+  guid: string,
+  id: Maybe<string>,
+  src: string,
+  alt: string,
+  width: number,
+  height: number,
+  hotspotVisibility: HotspotVisibility,
+  hotspots: Immutable.OrderedMap<string, Hotspot>,
 };
 
-const defaultContent = {
+const defaults = (params: Partial<ImageHotspotParams> = {}) => ({
   contentType: 'ImageHotspot',
   elementType: 'image_hotspot',
-  guid: '',
-  id: '',
-  src: '',
-  alt: '',
-  width: 600,
-  height: 400,
-  hotspotVisibility: 'transparent',
-  hotspots : Immutable.OrderedMap<string, Hotspot>(),
-};
+  guid: params.guid || createGuid(),
+  id: params.id || createGuid(),
+  src: params.src || 'NO_IMAGE_SELECTED',
+  alt: params.alt || '',
+  width: params.width || 600,
+  height: params.height || 400,
+  hotspotVisibility: params.hotspotVisibility || 'transparent',
+  hotspots: params.hotspots || Immutable.OrderedMap<string, Hotspot>(),
+});
 
-export class ImageHotspot extends Immutable.Record(defaultContent) {
+export class ImageHotspot extends Immutable.Record(defaults()) {
 
   contentType: 'ImageHotspot';
   elementType: 'image_hotspot';
@@ -44,11 +44,11 @@ export class ImageHotspot extends Immutable.Record(defaultContent) {
   hotspotVisibility: HotspotVisibility;
   hotspots: Immutable.OrderedMap<string, Hotspot>;
 
-  constructor(params?: ImageHotspotParams) {
-    super(augment(params));
+  constructor(params?: Partial<ImageHotspotParams>) {
+    super(defaults(params));
   }
 
-  clone() : ImageHotspot {
+  clone(): ImageHotspot {
     return ensureIdGuidPresent(this.with({
       hotspots: this.hotspots.mapEntries(([_, v]) => {
         const clone: Hotspot = v.clone();
@@ -57,7 +57,7 @@ export class ImageHotspot extends Immutable.Record(defaultContent) {
     }));
   }
 
-  with(values: ImageHotspotParams) {
+  with(values: Partial<ImageHotspotParams>) {
     return this.merge(values) as this;
   }
 

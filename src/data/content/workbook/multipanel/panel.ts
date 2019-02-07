@@ -1,28 +1,29 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
-import { augment, ensureIdGuidPresent, setId } from 'data/content/common';
+import { ensureIdGuidPresent, setId } from 'data/content/common';
 import {
   ContentElements, MATERIAL_ELEMENTS, ELEMENTS_MIXED, CONTROL_ELEMENTS,
 } from 'data/content/common/elements';
 
 export type PanelParams = {
-  guid?: string,
-  id?: string,
-  title?: Maybe<string>,
-  content?: ContentElements,
+  guid: string,
+  id: string,
+  title: Maybe<string>,
+  content: ContentElements,
 };
 
-const defaultContent = {
+const defaults = (params: Partial<PanelParams> = {}) => ({
   contentType: 'Panel',
   elementType: 'panel',
-  guid: '',
-  id: '',
-  title: Maybe.nothing(),
-  content: Maybe.nothing(),
-};
+  guid: params. guid || createGuid(),
+  id: params.id || createGuid(),
+  title: params.title || Maybe.nothing(),
+  content: params.content || ContentElements.fromText(
+    '', createGuid(), [...MATERIAL_ELEMENTS, ...ELEMENTS_MIXED, ...CONTROL_ELEMENTS]),
+});
 
-export class Panel extends Immutable.Record(defaultContent) {
+export class Panel extends Immutable.Record(defaults()) {
   contentType: 'Panel';
   elementType: 'panel';
   guid: string;
@@ -30,8 +31,8 @@ export class Panel extends Immutable.Record(defaultContent) {
   title: Maybe<string>;
   content: ContentElements;  // Supports PANEL_ELEMENTS
 
-  constructor(params?: PanelParams) {
-    super(augment(params, true));
+  constructor(params?: Partial<PanelParams>) {
+    super(defaults(params));
   }
 
   clone() : Panel {
@@ -40,7 +41,7 @@ export class Panel extends Immutable.Record(defaultContent) {
     }));
   }
 
-  with(values: PanelParams) {
+  with(values: Partial<PanelParams>) {
     return this.merge(values) as this;
   }
 

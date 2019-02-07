@@ -6,15 +6,12 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 
-const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra', 'command',
-  'multipanel'];
+const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra', 'command'];
 export const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
 const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe', 'applet',
   'flash', 'director', 'mathematica', 'panopto', 'unity'];
 const ELEMENTS_BLOCK = ['codeblock', 'p'];
 const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
-const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
-  'dialog', 'figure', 'conjugation', 'inquiry'];
 
 export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign', 'sym',
   'term', 'var', '#math'];
@@ -24,6 +21,10 @@ export const INLINE_ELEMENTS = [
   ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'table',
   'command',
 ];
+
+const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
+  'dialog', 'figure', 'conjugation', 'inquiry', 'multipanel'];
+
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
@@ -41,6 +42,8 @@ const BODY_ELEMENTS_INHERITED = BOX_ELEMENTS.reduce(
 );
 
 export const BODY_ELEMENTS = [...ELEMENTS_SEMANTIC, ...BODY_ELEMENTS_INHERITED];
+
+export const NO_ELEMENTS = [];
 
 export type ContentElementsParams = {
   content?: Immutable.OrderedMap<string, ContentElement>,

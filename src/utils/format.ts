@@ -12,6 +12,9 @@ export const convert = {
   //   27 -> 'AB'
   //
   toAlphaNotation: (index: number): string => {
+    if (index === undefined || index === null || index < 0) {
+      return '';
+    }
 
     let num = index;
     let rem;

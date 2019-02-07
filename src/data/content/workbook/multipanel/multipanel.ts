@@ -2,37 +2,38 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 import { ImageHotspot } from './image_hotspot';
-import { augment, getChildren, setId, ensureIdGuidPresent } from 'data/content/common';
+import { Hotspot } from './hotspot';
+import { getChildren, setId, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Title } from 'data/content/learning/title';
 import { WbInline } from '../wbinline';
 import { Panel } from './panel';
 
 export type MultipanelParams = {
-  guid?: string,
-  id?: string,
-  purpose?: Maybe<string>,
-  title?: Maybe<Title>,
-  imageHotspot?: ImageHotspot,
-  panels?: Immutable.List<Panel>,
-  introPanelRef?: Maybe<string>,
-  inline?: WbInline,
+  guid: string,
+  id: string,
+  purpose: Maybe<string>,
+  title: Maybe<Title>,
+  imageHotspot: ImageHotspot,
+  panels: Immutable.List<Panel>,
+  introPanelRef: Maybe<string>,
+  inline: WbInline,
 };
 
-const defaultContent = {
+const defaults = (params: Partial<MultipanelParams> = {}) => ({
   contentType: 'Multipanel',
   elementType: 'multipanel',
-  guid: '',
-  id: '',
-  purpose: Maybe.nothing(),
-  title: Maybe.nothing(),
-  imageHotspot: new ImageHotspot(),
-  panels: Immutable.List<Panel>(),
-  introPanelRef: Maybe.nothing(),
-  inline: new WbInline(),
-};
+  guid: params.guid || createGuid(),
+  id: params.id || createGuid(),
+  purpose: params.purpose || Maybe.nothing(),
+  title: params.title || Maybe.nothing(),
+  imageHotspot: params.imageHotspot || new ImageHotspot(),
+  panels: params.panels || Immutable.List<Panel>(),
+  introPanelRef: params.introPanelRef || Maybe.nothing(),
+  inline: params.inline || new WbInline(),
+});
 
-export class Multipanel extends Immutable.Record(defaultContent) {
+export class Multipanel extends Immutable.Record(defaults()) {
   contentType: 'Multipanel';
   elementType: 'multipanel';
   guid: string;
@@ -44,8 +45,8 @@ export class Multipanel extends Immutable.Record(defaultContent) {
   introPanelRef: Maybe<string>;
   inline: WbInline;
 
-  constructor(params?: MultipanelParams) {
-    super(augment(params));
+  constructor(params: Partial<MultipanelParams>) {
+    super(defaults(params));
   }
 
   clone() : Multipanel {
@@ -57,7 +58,7 @@ export class Multipanel extends Immutable.Record(defaultContent) {
     }));
   }
 
-  with(values: MultipanelParams) {
+  with(values: Partial<MultipanelParams>) {
     return this.merge(values) as this;
   }
 

@@ -39,7 +39,7 @@ import MaterialsEditor from 'editors/content/learning/MaterialsEditor';
 import MathEditor from 'editors/content/learning/MathEditor';
 import MathematicaEditor from 'editors/content/learning/MathematicaEditor';
 import MeaningEditor from 'editors/content/learning/MeaningEditor';
-import MultipanelEditor from 'editors/content/learning/multipane/MultipanelEditor';
+import { MultipanelEditor } from 'editors/content/learning/multipane/MultipanelEditor.controller';
 import OrderedListEditor from 'editors/content/learning/OrderedListEditor';
 import PanoptoEditor from 'editors/content/learning/PanoptoEditor';
 import ParamEditor from 'editors/content/learning/ParamEditor';

@@ -95,5 +95,15 @@ export const styles: JSSStyles = {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
     },
+
+    '&.active-content .wbinline': {
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+    },
+
+    '&.active-content .ActivityEditor': {
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+    },
   },
 };

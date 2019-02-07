@@ -3,6 +3,14 @@
 .modal-dialog {
   &.modal-xlg {
     max-width: 1000px;
+    height: 60vh;
+
+    .modal-content {
+      .modal-body {
+        max-height: 50vh;
+        min-height: 50vh;
+      }
+    }
   }
 
   button.close {

@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { Multipanel as MultipanelType } from 'data/content/workbook/multipanel/multipanel';
+import {
+  Multipanel,
+} from 'data/content/workbook/multipanel/multipanel';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -10,7 +12,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { DiscoverableId } from 'types/discoverable';
 import { ImageHotspotEditor } from './imagehotspot/ImageHotspotEditor';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSStyles, JSSProps } from 'styles/jss';
+import { injectSheet, classNames, JSSStyles } from 'styles/jss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { TitleTextEditor } from '../contiguoustext/TitleTextEditor';
 import colors from 'styles/colors';
@@ -19,13 +21,17 @@ import flatui from 'styles/palettes/flatui';
 import { Button } from 'editors/content/common/Button';
 import { disableSelect } from 'styles/mixins';
 import { retrieveDocument } from 'data/persistence';
-import { AssessmentModel } from 'data/models';
+import { AssessmentModel, ContentModel } from 'data/models';
 import { Panel } from 'data/content/workbook/multipanel/panel';
 import {
   ContentElements, MATERIAL_ELEMENTS, ELEMENTS_MIXED, CONTROL_ELEMENTS,
 } from 'data/content/common/elements';
 import guid from 'utils/guid';
 import { TextInput } from 'editors/content/common/controls';
+import { collectInlines } from 'utils/course';
+import ResourceSelection from 'utils/selection/ResourceSelection.controller';
+import { LegacyTypes } from 'data/types';
+import { ResourceState } from 'data/content/resource';
 
 const BORDER_STYLE = '1px solid #ced4da';
 
@@ -44,9 +50,9 @@ const styles: JSSStyles = {
     flexDirection: 'row',
   },
   bottom: {
-    backgroundColor: 'rgba(46, 204, 113,0.1)',
-    border: [1, 'solid', 'rgba(46, 204, 113,1.0)'],
-    borderLeft: [4, 'solid', 'rgba(46, 204, 113,1.0)'],
+    backgroundColor: 'rgba(60, 180, 75, 0.1)',
+    border: [1, 'solid', 'rgba(60, 180, 75, 1.0)'],
+    borderLeft: [4, 'solid', 'rgba(60, 180, 75, 1.0)'],
     borderRadius: 4,
     margin: [6, 0],
   },
@@ -91,7 +97,7 @@ const styles: JSSStyles = {
     },
   },
   panelTabName: {
-    extends: [disableSelect],
+    extend: [disableSelect],
     flex: 1,
     overflow: 'hidden',
     flexFlow: 'row nowrap',
@@ -175,13 +181,16 @@ const styles: JSSStyles = {
   },
 };
 
-export interface MultipanelProps
-  extends AbstractContentEditorProps<MultipanelType> {
+export interface MultipanelEditorProps
+  extends AbstractContentEditorProps<Multipanel> {
+  documentModel: ContentModel;
   onShowSidebar: () => void;
   onDiscover: (id: DiscoverableId) => void;
+  onDisplayModal: (component) => void;
+  onDismissModal: () => void;
 }
 
-export interface MultipanelState {
+export interface MultipanelEditorState {
   selectedPanel: string;
   isLoadingActivity: boolean;
   activityPageCount: Maybe<number>;
@@ -191,12 +200,12 @@ export interface MultipanelState {
  * The content editor for contiguous text.
  */
 @injectSheet(styles)
-export default class Multipanel
-  extends AbstractContentEditor<MultipanelType,
-  StyledComponentProps<MultipanelProps>, MultipanelState> {
+export class MultipanelEditor
+  extends AbstractContentEditor<Multipanel,
+  StyledComponentProps<MultipanelEditorProps>, MultipanelEditorState> {
   panelTabScrollDiv: HTMLElement;
 
-  constructor(props: MultipanelProps) {
+  constructor(props: MultipanelEditorProps) {
     super(props);
 
     this.state = {
@@ -208,7 +217,15 @@ export default class Multipanel
   }
 
   componentDidMount() {
+    this.fetchActivityDetails();
+  }
+
+  fetchActivityDetails() {
     const { model, context } = this.props;
+
+    this.setState({
+      isLoadingActivity: true,
+    });
 
     Maybe.maybe(context.courseModel.resourcesById.get(model.inline.idref))
       .lift((inline) => {
@@ -229,7 +246,13 @@ export default class Multipanel
       });
   }
 
-  shouldComponentUpdate(nextProps: StyledComponentProps<MultipanelProps>): boolean {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.model.inline.idref !== nextProps.model.inline.idref) {
+      this.fetchActivityDetails();
+    }
+  }
+
+  shouldComponentUpdate(nextProps: StyledComponentProps<MultipanelEditorProps>): boolean {
     return true;
   }
 
@@ -323,6 +346,35 @@ export default class Multipanel
     );
   }
 
+  onSelectInlineActivity() {
+    const { model, context, documentModel, onDisplayModal, onDismissModal, onEdit } = this.props;
+
+    const existingInlines = collectInlines(documentModel);
+
+    return onDisplayModal(
+      <ResourceSelection
+        title="Select Formative Assessment for Activity"
+        filterPredicate={(res: contentTypes.Resource): boolean =>
+          res.type === LegacyTypes.inline
+          && res.resourceState !== ResourceState.DELETED
+          && !existingInlines.has(res.id)}
+        courseId={context.courseId}
+        onInsert={(resource) => {
+          onDismissModal();
+          const resources = context.courseModel.resources.toArray();
+          const found = resources.find(r => r.id === resource.id);
+          if (found !== undefined) {
+            onEdit(model.with({
+              inline: model.inline.with({
+                idref: found.id,
+              }),
+            }));
+          }
+        }}
+        onCancel={onDismissModal}
+      />);
+  }
+
   scrollToLastTab = () => {
     if (this.panelTabScrollDiv) {
       this.panelTabScrollDiv.scrollLeft = this.panelTabScrollDiv.scrollWidth;
@@ -393,7 +445,7 @@ export default class Multipanel
                 </div>
                 <TextInput
                   editMode={editMode}
-                  label="Title"
+                  label="Enter a title for this panel"
                   type="text"
                   value={currentPanel.title.valueOr('')}
                   onEdit={text =>
@@ -426,7 +478,7 @@ export default class Multipanel
 
   renderMain(): JSX.Element {
     const { classes, className, context, services, editMode, model, onEdit } = this.props;
-    const { selectedPanel, activityPageCount } = this.state;
+    const { selectedPanel, activityPageCount, isLoadingActivity } = this.state;
 
     const resource = this.props.context.courseModel.resourcesById.get(model.inline.idref);
     const title = resource === undefined ? 'Loading...' : resource.title;
@@ -452,6 +504,7 @@ export default class Multipanel
               model={model.imageHotspot}
               introPanelRef={model.introPanelRef}
               activityPageCount={activityPageCount}
+              isLoadingActivity={isLoadingActivity}
               panels={model.panels}
               context={context}
               services={services}
@@ -470,17 +523,10 @@ export default class Multipanel
         <h5 style={{ marginTop: 20 }}>Activity</h5>
         <div className={classes.bottom}>
           <div className={classes.wbinline}>
-            <h5><i className="fa fa-flask"/> {title}</h5>
+            <h5><i
+              className="fa fa-flask"
+              style={{ color: CONTENT_COLORS.WbInline }}/> {title}</h5>
             <div className={classes.wbinlineButtons}>
-              <button
-                onClick={() => {
-
-                }}
-                type="button"
-                style={{ colors: flatui.emerald }}
-                className="btn btn-link">
-                Change Activity
-              </button>
               <button
                 onClick={() => {
                   const guid = context.courseModel.resourcesById
@@ -491,6 +537,13 @@ export default class Multipanel
                 style={{ colors: flatui.emerald }}
                 className="btn btn-link">
                 Edit Activity
+              </button>
+              <button
+                onClick={() => this.onSelectInlineActivity()}
+                type="button"
+                style={{ colors: flatui.emerald }}
+                className="btn btn-link">
+                Change Activity
               </button>
             </div>
           </div>

@@ -25,7 +25,7 @@ export const DropdownItem = (props: DropdownItemProps) => {
 
 export const Dropdown = (props: DropdownProps) => {
   return (
-    <div className={classNames([props.className, 'dropdown'])} style={{ display: 'inline' }}>
+    <div className={classNames([props.className, 'dropdown'])}>
       <button
         className="btn btn-secondary btn-link dropdown-toggle"
         type="button"

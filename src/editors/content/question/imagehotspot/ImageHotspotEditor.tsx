@@ -146,11 +146,24 @@ export class ImageHotspotEditor
       })),
     )
     .then(({ src, width, height }) => {
+      // reposition hotspots so they are guaranteed to be in the image
+      const hotspots = model.hotspots.map(hotspot =>
+        hotspot.with({
+          coords: Immutable.List<number>([
+            Math.floor(width / 2) - 50,
+            Math.floor(height / 2) - 50,
+            Math.floor(width / 2) + 50,
+            Math.floor(height / 2) + 50,
+          ]),
+        }),
+      ).toOrderedMap();
+
       onEdit(
         model.with({
           src,
           width,
           height,
+          hotspots,
         }),
         partModel,
       );

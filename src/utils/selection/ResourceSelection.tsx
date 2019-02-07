@@ -12,10 +12,11 @@ import { highlightMatches } from 'components/common/SearchBarLogic';
 export interface ResourceSelectionProps {
   timeSkewInMs: number;
   course: models.CourseModel;
+  courseId: string;
+  title? :string;
+  filterPredicate: (res: Resource) => boolean;
   onInsert: (item: Resource) => void;
   onCancel: () => void;
-  courseId: string;
-  filterPredicate: (res: Resource) => boolean;
 }
 
 export interface ResourceSelectionState {
@@ -136,7 +137,7 @@ export default class ResourceSelection
     return (
       <div className="resourceSelection">
         <ModalSelection
-          title="Select Resource"
+          title={this.props.title || 'Select Resource'}
           onCancel={this.props.onCancel}
           onInsert={() => this.props.onInsert(this.state.selected)}
           disableInsert={this.state.selected === undefined}>

@@ -12,7 +12,6 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { buildUrl } from 'utils/path';
 import { RectangleEditor } from 'editors/content/question/imagehotspot/RectangleEditor';
 import { CircleEditor } from 'editors/content/question/imagehotspot/CircleEditor';
-import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
 import ModalSelection from 'utils/selection/ModalSelection';
 import {
@@ -27,8 +26,11 @@ import { PolygonEditor } from 'editors/content/question/imagehotspot/PolygonEdit
 import { Panel } from 'data/content/workbook/multipanel/panel';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
+import { TextInput } from 'editors/content/common/controls';
 
 const BORDER_STYLE = '1px solid #ced4da';
+
+const DEFAULT_IMAGE = require('./hotspot_instructions.png');
 
 export const styles: JSSStyles = {
   ImageHotspotEditor: {
@@ -75,18 +77,36 @@ export const styles: JSSStyles = {
       fontWeight: 600,
     },
   },
+  hotspotTitle: {
+    marginBottom: 10,
+  },
   panelSelection: {
     marginBottom: 10,
   },
   activityPageSelection: {
-
+    marginBottom: 10,
   },
   hotspotOptionDropdown: {
-    verticalAlign: 'text-bottom',
+    '& button': {
+      padding: 0,
+    },
+  },
+  selectImgLink: {
+    color: colors.selection,
+    cursor: 'pointer',
+
+    '&:hover': {
+      color: colors.hover,
+    },
+    '&:active': {
+      color: colors.active,
+    },
+  },
+  errorMsg: {
+    color: colors.danger,
+    margin: [10, 0],
   },
 };
-
-const DEFAULT_IMAGE = require('./hotspot_instructions.png');
 
 const selectImage = (
   src: string, resourcePath: string, courseModel, display, dismiss):
@@ -126,6 +146,7 @@ export interface ImageHotspotEditorProps {
   model: ImageHotspotType;
   introPanelRef: Maybe<string>;
   activityPageCount: Maybe<number>;
+  isLoadingActivity: boolean;
   panels: Immutable.List<Panel>;
   context: AppContext;
   services: AppServices;
@@ -205,29 +226,43 @@ export class ImageHotspotEditor
       }))
       .catch(() => Promise.resolve({
         src,
-        // default to 400 x 600 on sizing failure
+        // default to 600 x 400 on sizing failure
         width: 600,
         height: 400,
       })),
     )
     .then(({ src, width, height }) => {
+      // reposition hotspots so they are guaranteed to be in the image
+      const hotspots = model.hotspots.map(hotspot =>
+        hotspot.with({
+          coords: Immutable.List<number>([
+            Math.floor(width / 2) - 50,
+            Math.floor(height / 2) - 50,
+            Math.floor(width / 2) + 50,
+            Math.floor(height / 2) + 50,
+          ]),
+        }),
+      ).toOrderedMap();
+
       onEdit(
         model.with({
           src,
           width,
           height,
+          hotspots,
         }),
       );
     });
   }
 
   onAddHotspot(shape: string) {
-    const { model, onEdit } = this.props;
+    const { model, panels, onEdit } = this.props;
 
     // create new hotspot
-    const match = guid();
     let newHotspot = new Hotspot({
       shape,
+      activityRef: '1',
+      panelRef: panels.first().id,
     });
 
     // set default coordinates depending on the shape type
@@ -289,10 +324,153 @@ export class ImageHotspotEditor
     });
   }
 
+  renderPanelDetails() {
+    const { classes, introPanelRef, panels, onEditIntroPanelRef } = this.props;
+
+    return (
+      <div className={classes.hotspotDetails}>
+        Introduction Panel:
+        <Dropdown
+          className={classes.hotspotOptionDropdown}
+          label={
+            introPanelRef.caseOf({
+              just: introPanelRef => Maybe.maybe(
+                panels.find((panel, i) => panel.id === introPanelRef),
+              ).caseOf({
+                just: panel => panel.title
+                  .valueOrCompute(() =>
+                    `Panel ${panels.findIndex(p => p.guid === panel.guid) + 1}`),
+                nothing: () => 'Select a Panel',
+              }),
+              nothing: () => 'Select a Panel',
+            })
+          }>
+          <DropdownItem
+            key="none"
+            label="(None)"
+            onClick={() => {
+              onEditIntroPanelRef(Maybe.nothing());
+            }} />
+          {panels.toArray().map((panel, i) => (
+            <DropdownItem
+              key={panel.guid}
+              label={panel.title.valueOr(`Panel ${i + 1}`)}
+              onClick={() => {
+                onEditIntroPanelRef(Maybe.just(panel.id));
+              }} />
+          ))}
+        </Dropdown>
+        <br />
+        Select a hotspot to set a target panel and activity page.
+      </div>
+    );
+  }
+
+  renderHotspotDetails(hotspot: Hotspot, hotspotIndex: number) {
+    const {
+      classes, editMode, model, panels, activityPageCount, isLoadingActivity,
+      onEdit,
+    } = this.props;
+
+    return (
+      <div className={classes.hotspotDetails}>
+        <h3>Hotspot {getFeedbackLabel(hotspotIndex)}</h3>
+
+        <div className={classes.hotspotTitle}>
+          <div className={classes.hotspotTitleLabel}>
+            Title:
+          </div>
+          <TextInput
+            editMode={editMode}
+            type="text"
+            label="Enter a title for this hotspot"
+            value={hotspot.title.valueOr('')}
+            onEdit={text =>
+              onEdit(model.with({
+                hotspots: model.hotspots.set(
+                  hotspot.guid,
+                  hotspot.with({
+                    title: text ? Maybe.just(text) : Maybe.nothing(),
+                  }),
+                ),
+              }))
+            } />
+        </div>
+        <div className={classes.panelSelection}>
+          Panel:
+          <Dropdown
+            className={classes.hotspotOptionDropdown}
+            label={
+              Maybe.maybe(panels.find((panel, i) =>
+                panel.id === (
+                  hotspot.panelRef)))
+                .caseOf({
+                  just: panel => panel.title
+                    .valueOrCompute(() =>
+                      `Panel ${panels.findIndex(p => p.guid === panel.guid) + 1}`),
+                  nothing: () => 'Select a Panel',
+                })
+            }>
+            {panels.toArray().map((panel, i) => (
+              <DropdownItem
+                key={panel.guid}
+                label={panel.title.valueOr(`Panel ${i + 1}`)}
+                onClick={() => {
+                  onEdit(model.with({
+                    hotspots: model.hotspots.set(
+                      hotspot.guid,
+                      hotspot.with({
+                        panelRef: panel.id,
+                      }),
+                    ),
+                  }));
+                }} />
+            ))}
+          </Dropdown>
+        </div>
+        <div className={classes.activityPageSelection}>
+          Activity Page:
+          {activityPageCount.caseOf({
+            just: pageCount => (
+              <Dropdown
+                className={classes.hotspotOptionDropdown}
+                label={`Page ${hotspot.activityRef}`}>
+                {[...Array(pageCount).keys()].map(i => (
+                  <DropdownItem
+                    key={i}
+                    label={`Page ${i + 1}`}
+                    onClick={() => {
+                      onEdit(model.with({
+                        hotspots: model.hotspots.set(
+                          hotspot.guid,
+                          hotspot.with({
+                            activityRef: `${i + 1}`,
+                          }),
+                        ),
+                      }));
+                    }} />
+                ))}
+              </Dropdown>
+            ),
+            nothing: () => isLoadingActivity
+              ? (
+                <LoadingSpinner message="Loading Activity Pages..." />
+              )
+              : (
+                <div className={classes.errorMsg}>
+                  Activity pages failed to load. Please try refreshing the page
+                </div>
+              ),
+          })
+          }
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const {
-      className, classes, editMode, context, model, activityPageCount, panels, onEdit,
-      introPanelRef, onEditIntroPanelRef,
+      className, classes, editMode, context, model,
     } = this.props;
     const { selectedHotspot } = this.state;
 
@@ -336,7 +514,7 @@ export class ImageHotspotEditor
             className={classes.removeHotspotButton}
             tooltip={selectedHotspot.caseOf({ just: () => true, nothing: () => false })
               && model.hotspots.size <= 1
-                ? 'An image hotspot question must contain at least one hotspot. '
+                ? 'An image hotspot must contain at least one hotspot. '
                   + 'Please add another hotspot before removing this one.'
                 : 'Remove selected hotspot'
             }
@@ -440,110 +618,22 @@ export class ImageHotspotEditor
               </div>
             )
             : (
-              <div className={classes.noImage} />
+              <div className={classes.noImage}>
+                <span className={classes.selectImgLink} onClick={this.onSelectImage}>
+                  Select and image
+                </span> to get started
+              </div>
             )
           }
         </div>
           {selectedHotspot.caseOf({
-            just: hotspotGuid => (
-              <div className={classes.hotspotDetails}>
-                <h3>Hotspot {getFeedbackLabel(
-                  model.hotspots.toArray().findIndex(h => h.guid === hotspotGuid),
-                )}</h3>
-                <div className={classes.panelSelection}>
-                  PANEL:
-                  <Dropdown
-                    className={classes.hotspotOptionDropdown}
-                    label={
-                      Maybe.maybe(panels.find((panel, i) =>
-                        panel.id === model.hotspots.get(hotspotGuid).panelRef))
-                        .caseOf({
-                          just: panel => panel.title
-                            .valueOrCompute(() =>
-                              `Panel ${panels.findIndex(p => p.guid === panel.guid) + 1}`),
-                          nothing: () => 'Select a Panel',
-                        })
-                    }>
-                    {panels.toArray().map((panel, i) => (
-                      <DropdownItem
-                        key={panel.guid}
-                        label={panel.title.valueOr(`Panel ${i + 1}`)}
-                        onClick={() => {
-                          onEdit(model.with({
-                            hotspots: model.hotspots.set(
-                              hotspotGuid,
-                              model.hotspots.get(hotspotGuid).with({
-                                panelRef: panel.id,
-                              }),
-                            ),
-                          }));
-                        }} />
-                    ))}
-                  </Dropdown>
-                </div>
-                <div className={classes.activityPageSelection}>
-                  ACTIVITY PAGE:
-                  {activityPageCount.caseOf({
-                    just: pageCount => (
-                      <Dropdown
-                        className={classes.hotspotOptionDropdown}
-                        label={`Page ${model.hotspots.get(hotspotGuid).activityRef}`}>
-                        {[...Array(pageCount).keys()].map(i => (
-                          <DropdownItem
-                            key={i}
-                            label={`Page ${i + 1}`}
-                            onClick={() => {
-                              onEdit(model.with({
-                                hotspots: model.hotspots.set(
-                                  hotspotGuid,
-                                  model.hotspots.get(hotspotGuid).with({
-                                    activityRef: `${i + 1}`,
-                                  }),
-                                ),
-                              }));
-                            }} />
-                        ))}
-                      </Dropdown>
-                    ),
-                    nothing: () => (
-                      <LoadingSpinner message="Loading Assessment..." />
-                    ),
-                  })
-                  }
-                </div>
-              </div>
-            ),
-            nothing: () => (
-              <div className={classes.hotspotDetails}>
-                INTRO PANEL:
-                <Dropdown
-                  className={classes.hotspotOptionDropdown}
-                  label={
-                    introPanelRef.caseOf({
-                      just: introPanelRef => Maybe.maybe(
-                        panels.find((panel, i) => panel.id === introPanelRef),
-                      ).caseOf({
-                        just: panel => panel.title
-                          .valueOrCompute(() =>
-                            `Panel ${panels.findIndex(p => p.guid === panel.guid) + 1}`),
-                        nothing: () => 'Select a Panel',
-                      }),
-                      nothing: () => 'Select a Panel',
-                    })
-                  }>
-                  {panels.toArray().map((panel, i) => (
-                    <DropdownItem
-                      key={panel.guid}
-                      label={panel.title.valueOr(`Panel ${i + 1}`)}
-                      onClick={() => {
-                        onEditIntroPanelRef(Maybe.just(panel.id));
-                      }} />
-                  ))}
-                </Dropdown>
-                <br />
-                Select a hotspot to set a target panel and activity page.
-              </div>
-            ),
+            just: (hotspotGuid) => {
+              const hotspotIndex = model.hotspots.toArray().findIndex(h => h.guid === hotspotGuid);
+              return hotspotIndex >= 0
+                ? this.renderHotspotDetails(model.hotspots.get(hotspotGuid), hotspotIndex)
+                : this.renderPanelDetails();
+            },
+            nothing: () => this.renderPanelDetails(),
           })}
       </div>
     );

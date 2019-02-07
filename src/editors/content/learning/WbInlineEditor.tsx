@@ -66,7 +66,7 @@ export default class WbInlineEditor
     const inlineAssessmentOptions = this.props.context.courseModel.resources
       .toArray()
       .filter(r => r.type === LegacyTypes.inline && r.resourceState !== ResourceState.DELETED)
-      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+      .map(r => <option key={r.guid} value={r.id}>{r.title}</option>);
 
     // A purpose is not required, so we need to add an option for an empty type
     const purposeTypesWithEmpty = PurposeTypes.slice();
@@ -117,9 +117,12 @@ export default class WbInlineEditor
   renderMain() {
     const resource = this.props.context.courseModel.resourcesById.get(this.props.model.idref);
     const title = resource === undefined ? 'Loading...' : resource.title;
+
+    const iconStyle = { color: CONTENT_COLORS.WbInline };
+
     return (
       <div className="wbinline">
-        <h5>{title}</h5>
+        <h5><i className="fa fa-flask" style={iconStyle}/> {title}</h5>
         <button
           onClick={this.onClick}
           type="button"
