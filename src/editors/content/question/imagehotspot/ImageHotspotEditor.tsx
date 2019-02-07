@@ -148,14 +148,26 @@ export class ImageHotspotEditor
     .then(({ src, width, height }) => {
       // reposition hotspots so they are guaranteed to be in the image
       const hotspots = model.hotspots.map(hotspot =>
-        hotspot.with({
-          coords: Immutable.List<number>([
-            Math.floor(width / 2) - 50,
-            Math.floor(height / 2) - 50,
-            Math.floor(width / 2) + 50,
-            Math.floor(height / 2) + 50,
-          ]),
-        }),
+        hotspot.shape === 'rect'
+          ? hotspot.with({
+            coords: Immutable.List<number>([
+              Math.floor(width / 2) - 50,
+              Math.floor(height / 2) - 50,
+              Math.floor(width / 2) + 50,
+              Math.floor(height / 2) + 50,
+            ]),
+          })
+        : hotspot.shape === 'circle'
+          ? hotspot.with({
+            coords: Immutable.List<number>([
+              Math.floor(width / 2),
+              Math.floor(height / 2),
+              100,
+            ]),
+          })
+        // TODO: handle case when hotspot is a polygon
+        : hotspot
+        ,
       ).toOrderedMap();
 
       onEdit(

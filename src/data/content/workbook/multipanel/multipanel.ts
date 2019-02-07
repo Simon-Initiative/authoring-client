@@ -2,7 +2,6 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 import { ImageHotspot } from './image_hotspot';
-import { Hotspot } from './hotspot';
 import { getChildren, setId, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Title } from 'data/content/learning/title';

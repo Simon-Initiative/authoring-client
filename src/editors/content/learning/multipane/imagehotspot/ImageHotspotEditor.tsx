@@ -37,8 +37,10 @@ export const styles: JSSStyles = {
     extend: [disableSelect],
     display: 'flex',
     flexDirection: 'column',
-    border: BORDER_STYLE,
     minWidth: 400,
+  },
+  imageContainer: {
+    border: BORDER_STYLE,
   },
   toolbar: {
     display: 'flex',
@@ -234,14 +236,26 @@ export class ImageHotspotEditor
     .then(({ src, width, height }) => {
       // reposition hotspots so they are guaranteed to be in the image
       const hotspots = model.hotspots.map(hotspot =>
-        hotspot.with({
-          coords: Immutable.List<number>([
-            Math.floor(width / 2) - 50,
-            Math.floor(height / 2) - 50,
-            Math.floor(width / 2) + 50,
-            Math.floor(height / 2) + 50,
-          ]),
-        }),
+        hotspot.shape === 'rect'
+          ? hotspot.with({
+            coords: Immutable.List<number>([
+              Math.floor(width / 2) - 50,
+              Math.floor(height / 2) - 50,
+              Math.floor(width / 2) + 50,
+              Math.floor(height / 2) + 50,
+            ]),
+          })
+        : hotspot.shape === 'circle'
+          ? hotspot.with({
+            coords: Immutable.List<number>([
+              Math.floor(width / 2),
+              Math.floor(height / 2),
+              100,
+            ]),
+          })
+        // TODO: handle case when hotspot is a polygon
+        : hotspot
+        ,
       ).toOrderedMap();
 
       onEdit(
@@ -478,153 +492,155 @@ export class ImageHotspotEditor
       <div
         className={classNames(['ImageHotspotEditor', classes.ImageHotspotEditor, className])}
         style={{ width: model.width && model.width + 2 }}>
-        <div className={classes.toolbar}>
-        <ToolbarButton
-            onClick={this.onSelectImage}
-            size={ToolbarButtonSize.Small}
-            tooltip="Select Hotspot Image"
-            disabled={!editMode}>
-          <i className="fa fa-picture-o" />
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => this.onAddHotspot('rect')}
-            size={ToolbarButtonSize.Fit}
-            tooltip="Create a rectangle hotspot"
-            disabled={!editMode}>
-          Rectangle
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => this.onAddHotspot('circle')}
-            size={ToolbarButtonSize.Fit}
-            tooltip="Create a circle hotspot"
-            disabled={!editMode}>
-          Circle
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => this.onAddHotspot('poly')}
-            size={ToolbarButtonSize.Fit}
-            tooltip="Create a polygon hotspot"
-            disabled={true || !editMode}>
-          Polygon
-        </ToolbarButton>
-        <div className="flex-spacer" />
-        <ToolbarButton
-            onClick={() => this.onRemoveHotspot(selectedHotspot)}
-            size={ToolbarButtonSize.Fit}
-            className={classes.removeHotspotButton}
-            tooltip={selectedHotspot.caseOf({ just: () => true, nothing: () => false })
-              && model.hotspots.size <= 1
-                ? 'An image hotspot must contain at least one hotspot. '
-                  + 'Please add another hotspot before removing this one.'
-                : 'Remove selected hotspot'
+        <div className={classes.imageContainer}>
+          <div className={classes.toolbar}>
+            <ToolbarButton
+                onClick={this.onSelectImage}
+                size={ToolbarButtonSize.Small}
+                tooltip="Select Hotspot Image"
+                disabled={!editMode}>
+              <i className="fa fa-picture-o" />
+            </ToolbarButton>
+            <ToolbarButton
+                onClick={() => this.onAddHotspot('rect')}
+                size={ToolbarButtonSize.Fit}
+                tooltip="Create a rectangle hotspot"
+                disabled={!editMode}>
+              Rectangle
+            </ToolbarButton>
+            <ToolbarButton
+                onClick={() => this.onAddHotspot('circle')}
+                size={ToolbarButtonSize.Fit}
+                tooltip="Create a circle hotspot"
+                disabled={!editMode}>
+              Circle
+            </ToolbarButton>
+            <ToolbarButton
+                onClick={() => this.onAddHotspot('poly')}
+                size={ToolbarButtonSize.Fit}
+                tooltip="Create a polygon hotspot"
+                disabled={true || !editMode}>
+              Polygon
+            </ToolbarButton>
+            <div className="flex-spacer" />
+            <ToolbarButton
+                onClick={() => this.onRemoveHotspot(selectedHotspot)}
+                size={ToolbarButtonSize.Fit}
+                className={classes.removeHotspotButton}
+                tooltip={selectedHotspot.caseOf({ just: () => true, nothing: () => false })
+                  && model.hotspots.size <= 1
+                    ? 'An image hotspot must contain at least one hotspot. '
+                      + 'Please add another hotspot before removing this one.'
+                    : 'Remove selected hotspot'
+                }
+                disabled={selectedHotspot.caseOf({ just: () => false, nothing: () => true })
+                  || model.hotspots.size <= 1}>
+              Remove Hotspot
+            </ToolbarButton>
+          </div>
+          <div
+            className={classes.imageBody}
+            onMouseDown={e => this.onSelectHotspot(Maybe.nothing())}>
+            {model.src
+              ? (
+                <div
+                  className={classes.hotspotBody}>
+                  <img
+                    ref={this.setSvgRef}
+                    src={model.src === 'NO_IMAGE_SELECTED'
+                      ? DEFAULT_IMAGE
+                      : buildUrl(
+                        context.baseUrl,
+                        context.courseId,
+                        context.resourcePath,
+                        model.src,
+                    )}
+                    width={model.width} height={model.height} />
+                  <svg
+                    className={classes.hotspots} width={model.width} height={model.height}>
+                    {model.hotspots.sort(h => selectedHotspot.caseOf({
+                      just: s => h.guid === s ? 1 : 0,
+                      nothing: () => 0,
+                    }))
+                      .toArray()
+                      .map((hotspot, index) => {
+                        switch (hotspot.shape) {
+                          case 'rect':
+                            return (
+                              <RectangleEditor
+                                key={hotspot.guid}
+                                id={hotspot.guid}
+                                label={getFeedbackLabel(index)}
+                                selected={selectedHotspot.caseOf({
+                                  just: s => hotspot.guid === s,
+                                  nothing: () => false,
+                                })}
+                                boundingClientRect={this.svgRef
+                                  ? Maybe.just(this.svgRef.getBoundingClientRect())
+                                  : Maybe.nothing()}
+                                coords={hotspot.coords}
+                                onSelect={maybeId =>
+                                  maybeId.lift(id =>
+                                    this.onSelectHotspot(
+                                      Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
+                                onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
+                            );
+                          case 'circle':
+                            return (
+                              <CircleEditor
+                                key={hotspot.guid}
+                                id={hotspot.guid}
+                                label={getFeedbackLabel(index)}
+                                selected={selectedHotspot.caseOf({
+                                  just: s => hotspot.guid === s,
+                                  nothing: () => false,
+                                })}
+                                boundingClientRect={this.svgRef
+                                  ? Maybe.just(this.svgRef.getBoundingClientRect())
+                                  : Maybe.nothing()}
+                                coords={hotspot.coords}
+                                onSelect={maybeId =>
+                                  maybeId.lift(id =>
+                                    this.onSelectHotspot(
+                                      Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
+                                onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
+                            );
+                          case 'poly':
+                            return (
+                              <PolygonEditor
+                                key={hotspot.guid}
+                                id={hotspot.guid}
+                                label={getFeedbackLabel(index)}
+                                selected={selectedHotspot.caseOf({
+                                  just: s => hotspot.guid === s,
+                                  nothing: () => false,
+                                })}
+                                boundingClientRect={this.svgRef
+                                  ? Maybe.just(this.svgRef.getBoundingClientRect())
+                                  : Maybe.nothing()}
+                                coords={hotspot.coords}
+                                onSelect={maybeId =>
+                                  maybeId.lift(id =>
+                                    this.onSelectHotspot(
+                                      Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
+                                onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
+                            );
+                          default:
+                            return null;
+                        }
+                      })}
+                  </svg>
+                </div>
+              )
+              : (
+                <div className={classes.noImage}>
+                  <span className={classes.selectImgLink} onClick={this.onSelectImage}>
+                    Select and image
+                  </span> to get started
+                </div>
+              )
             }
-            disabled={selectedHotspot.caseOf({ just: () => false, nothing: () => true })
-              || model.hotspots.size <= 1}>
-          Remove Hotspot
-        </ToolbarButton>
-        </div>
-        <div
-          className={classes.imageBody}
-          onMouseDown={e => this.onSelectHotspot(Maybe.nothing())}>
-          {model.src
-            ? (
-              <div
-                className={classes.hotspotBody}>
-                <img
-                  ref={this.setSvgRef}
-                  src={model.src === 'NO_IMAGE_SELECTED'
-                    ? DEFAULT_IMAGE
-                    : buildUrl(
-                      context.baseUrl,
-                      context.courseId,
-                      context.resourcePath,
-                      model.src,
-                  )}
-                  width={model.width} height={model.height} />
-                <svg
-                  className={classes.hotspots} width={model.width} height={model.height}>
-                  {model.hotspots.sort(h => selectedHotspot.caseOf({
-                    just: s => h.guid === s ? 1 : 0,
-                    nothing: () => 0,
-                  }))
-                    .toArray()
-                    .map((hotspot, index) => {
-                      switch (hotspot.shape) {
-                        case 'rect':
-                          return (
-                            <RectangleEditor
-                              key={hotspot.guid}
-                              id={hotspot.guid}
-                              label={getFeedbackLabel(index)}
-                              selected={selectedHotspot.caseOf({
-                                just: s => hotspot.guid === s,
-                                nothing: () => false,
-                              })}
-                              boundingClientRect={this.svgRef
-                                ? Maybe.just(this.svgRef.getBoundingClientRect())
-                                : Maybe.nothing()}
-                              coords={hotspot.coords}
-                              onSelect={maybeId =>
-                                maybeId.lift(id =>
-                                  this.onSelectHotspot(
-                                    Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
-                              onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
-                          );
-                        case 'circle':
-                          return (
-                            <CircleEditor
-                              key={hotspot.guid}
-                              id={hotspot.guid}
-                              label={getFeedbackLabel(index)}
-                              selected={selectedHotspot.caseOf({
-                                just: s => hotspot.guid === s,
-                                nothing: () => false,
-                              })}
-                              boundingClientRect={this.svgRef
-                                ? Maybe.just(this.svgRef.getBoundingClientRect())
-                                : Maybe.nothing()}
-                              coords={hotspot.coords}
-                              onSelect={maybeId =>
-                                maybeId.lift(id =>
-                                  this.onSelectHotspot(
-                                    Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
-                              onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
-                          );
-                        case 'poly':
-                          return (
-                            <PolygonEditor
-                              key={hotspot.guid}
-                              id={hotspot.guid}
-                              label={getFeedbackLabel(index)}
-                              selected={selectedHotspot.caseOf({
-                                just: s => hotspot.guid === s,
-                                nothing: () => false,
-                              })}
-                              boundingClientRect={this.svgRef
-                                ? Maybe.just(this.svgRef.getBoundingClientRect())
-                                : Maybe.nothing()}
-                              coords={hotspot.coords}
-                              onSelect={maybeId =>
-                                maybeId.lift(id =>
-                                  this.onSelectHotspot(
-                                    Maybe.maybe(model.hotspots.find(h => h.guid === id))))}
-                              onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
-                          );
-                        default:
-                          return null;
-                      }
-                    })}
-                </svg>
-              </div>
-            )
-            : (
-              <div className={classes.noImage}>
-                <span className={classes.selectImgLink} onClick={this.onSelectImage}>
-                  Select and image
-                </span> to get started
-              </div>
-            )
-          }
+          </div>
         </div>
           {selectedHotspot.caseOf({
             just: (hotspotGuid) => {

@@ -225,6 +225,7 @@ export class MultipanelEditor
 
     this.setState({
       isLoadingActivity: true,
+      activityPageCount: Maybe.nothing<number>(),
     });
 
     Maybe.maybe(context.courseModel.resourcesById.get(model.inline.idref))
@@ -353,7 +354,7 @@ export class MultipanelEditor
 
     return onDisplayModal(
       <ResourceSelection
-        title="Select Formative Assessment for Activity"
+        title="Select an Assessment for Hotspot Activity"
         filterPredicate={(res: contentTypes.Resource): boolean =>
           res.type === LegacyTypes.inline
           && res.resourceState !== ResourceState.DELETED
@@ -520,7 +521,7 @@ export class MultipanelEditor
           </div>
           {this.renderPanelView(currentPanel)}
         </div>
-        <h5 style={{ marginTop: 20 }}>Activity</h5>
+        <h5 style={{ marginTop: 20 }}>Hotspot Activity</h5>
         <div className={classes.bottom}>
           <div className={classes.wbinline}>
             <h5><i

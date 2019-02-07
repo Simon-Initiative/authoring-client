@@ -595,7 +595,7 @@ export class InsertToolbar
 
                       return onDisplayModal(
                         <ResourceSelection
-                          title="Select Formative Assessment for Activity"
+                          title="Select an Assessment for Hotspot Activity"
                           filterPredicate={(res: Resource): boolean =>
                             res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
