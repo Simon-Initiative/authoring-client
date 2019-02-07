@@ -127,7 +127,7 @@ export default class WbInlineEditor
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit Assessment
+          Edit Formative Assessment
         </button>
       </div>
     );

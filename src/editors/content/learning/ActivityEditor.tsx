@@ -136,7 +136,7 @@ export default class ActivityEditor
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit Activity
+          Edit Summative Assessment
         </button>
       </div>
     );
