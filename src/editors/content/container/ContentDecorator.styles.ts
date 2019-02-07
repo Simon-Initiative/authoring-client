@@ -91,17 +91,17 @@ export const styles: JSSStyles = {
     flex: 1,
     width: '100%',
 
-    '&.active-content .contiguousTextEditor': {
+    '&.active-content > div > .contiguousTextEditor': {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
     },
 
-    '&.active-content .wbinline': {
+    '&.active-content > div > .wbinline': {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
     },
 
-    '&.active-content .ActivityEditor': {
+    '&.active-content > div > .ActivityEditor': {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
     },
