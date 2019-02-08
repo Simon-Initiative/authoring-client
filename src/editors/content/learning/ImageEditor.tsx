@@ -20,7 +20,7 @@ import { buildUrl } from 'utils/path';
 import { fetchImageSize, ImageSize } from 'utils/image';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { modalActions } from 'actions/modal';
-import { MediaMetadataEditor } from 'editors/content/learning/MediaItems';
+import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import { AppContext } from 'editors/common/AppContext';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { AppServices } from 'editors/common/AppServices';
@@ -168,6 +168,7 @@ export class ImageSizeSidebar extends
   }
 
   render() {
+    const { editMode } = this.props;
     const { width, height } = this.props.model;
 
     return (
@@ -187,8 +188,7 @@ export class ImageSizeSidebar extends
                   value="native"
                   checked={this.state.isNativeSize}
                   onChange={() => this.onToggleNativeSizing(true)}
-                  type="radio" />&nbsp;
-Default
+                  type="radio" />&nbsp; Default
             </label>
             </div>
             <div className="form-check">
@@ -198,33 +198,37 @@ Default
                   onChange={() => this.onToggleNativeSizing(false)}
                   value="custom"
                   checked={!this.state.isNativeSize}
-                  type="radio" />&nbsp;
-Custom
+                  type="radio" />&nbsp; Custom
             </label>
             </div>
           </SidebarRow>
           <SidebarRow label="Width">
-            <form>
-              <div className="input-group input-group-sm">
-                <TextInput width="100px" label=""
-                  editMode={this.props.editMode && !this.state.isNativeSize}
-                  value={width.toString()}
-                  type="number"
-                  onEdit={this.onEditWidth}
-                /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
-            </form>
-          </SidebarRow>
-          <SidebarRow label="Height">
-            <div className="input-group input-group-sm">
-              <TextInput width="100px" label=""
-                editMode={this.props.editMode && !this.state.isNativeSize}
-                value={height.toString()}
+            <div className="input-group input-group-sm mb-3">
+              <TextInput
                 type="number"
-                onEdit={this.onEditHeight} />
-              <span className="input-group-addon ">pixels</span>
+                label="Enter width"
+                editMode={editMode && !this.state.isNativeSize}
+                value={width}
+                onEdit={this.onEditWidth} />
+              <div className="input-group-append">
+                <span className="input-group-text" id="basic-addon2">pixels</span>
+              </div>
             </div>
           </SidebarRow>
-          <SidebarRow label="">
+          <SidebarRow label="Height">
+            <div className="input-group input-group-sm mb-3">
+              <TextInput
+                type="number"
+                label="Enter height"
+                editMode={editMode && !this.state.isNativeSize}
+                value={height}
+                onEdit={this.onEditHeight} />
+              <div className="input-group-append">
+                <span className="input-group-text" id="basic-addon2">pixels</span>
+              </div>
+            </div>
+          </SidebarRow>
+          <SidebarRow>
             <ToggleSwitch
               editMode={this.props.editMode &&
                 this.state.isSizeReceived &&

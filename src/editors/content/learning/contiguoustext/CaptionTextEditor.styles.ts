@@ -4,7 +4,7 @@ import { JSSStyles } from 'styles/jss';
 
 export const styles: JSSStyles = {
   captionTextEditor: {
-
+    marginTop: 10,
   },
   content: {
     display: 'flex',
