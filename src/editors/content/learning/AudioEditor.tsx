@@ -24,7 +24,6 @@ import { determineMimeTypeFromFilename } from 'utils/mime';
 import { ModalMessage } from 'utils/ModalMessage';
 
 import './Media.scss';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {

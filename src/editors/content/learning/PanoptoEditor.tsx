@@ -18,7 +18,6 @@ import {
 } from 'components/common/Discoverable.controller';
 
 import './Media.scss';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface PanoptoProps extends AbstractContentEditorProps<PanoptoType> {

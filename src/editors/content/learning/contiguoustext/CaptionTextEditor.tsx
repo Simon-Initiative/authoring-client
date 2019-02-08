@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { Maybe, maybe } from 'tsmonad';
+import { Maybe } from 'tsmonad';
 import { ParentContainer, TextSelection } from 'types/active';
 import { styles } from 'editors/content/learning/contiguoustext/CaptionTextEditor.styles';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
@@ -48,7 +48,7 @@ export class CaptionTextEditor
   }
 
   renderCreateButton = () => {
-    const { classes, model, parent, onFocus } = this.props;
+    const { classes } = this.props;
 
     return (
       <div

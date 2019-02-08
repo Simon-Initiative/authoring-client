@@ -20,7 +20,7 @@ import { buildUrl } from 'utils/path';
 import { fetchImageSize, ImageSize } from 'utils/image';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { modalActions } from 'actions/modal';
-import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
+import { MediaMetadataEditor } from 'editors/content/learning/MediaItems';
 import { AppContext } from 'editors/common/AppContext';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { AppServices } from 'editors/common/AppServices';
@@ -28,7 +28,6 @@ import { AppServices } from 'editors/common/AppServices';
 const IMAGE = require('../../../../assets/400x300.png');
 
 import { styles } from './MediaElement.styles';
-import { ContentContainer } from '../container/ContentContainer';
 import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface ImageSizeSidebarProps {

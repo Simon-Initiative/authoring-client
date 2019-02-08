@@ -17,7 +17,6 @@ import { Maybe } from 'tsmonad';
 import { ContentElements } from 'data/content/common/elements';
 
 import './Media.scss';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import {

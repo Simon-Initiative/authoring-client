@@ -20,7 +20,6 @@ import { getQueryVariableFromString } from 'utils/params';
 import './YouTube.scss';
 
 import './Media.scss';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
