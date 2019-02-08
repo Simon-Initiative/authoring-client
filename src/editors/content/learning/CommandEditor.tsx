@@ -6,7 +6,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { Select, TextInput } from 'editors/content/common/controls';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -16,6 +16,18 @@ import {
 } from 'components/message/selection';
 import '../common/draft/decorators/styles.scss';
 import { IdentifiableContentElement } from 'data/content/common/interfaces';
+import { caseOf } from 'utils/utils';
+import { Button } from 'components/common/Button';
+import { Maybe } from 'tsmonad';
+
+const parseCommandMessageText = (message: string) => {
+  const [start, end] = message.split(';');
+
+  return {
+    startCuePoint: Maybe.maybe(start).lift(cue => cue.split('=')[1]),
+    endCuePoint: Maybe.maybe(end).lift(cue => cue.split('=')[1]),
+  };
+};
 
 export interface CommandEditorProps
   extends AbstractContentEditorProps<contentTypes.Command> {
@@ -131,6 +143,30 @@ export default class CommandEditor
       });
   }
 
+  onEditCuePoint(text: string, cuepoint: 'startcuepoint' | 'endcuepoint') {
+    const { model } = this.props;
+    const { startCuePoint, endCuePoint } = parseCommandMessageText(model.message.text);
+
+    let messageText = model.message.text;
+    switch (cuepoint) {
+      case 'startcuepoint':
+        messageText = endCuePoint.caseOf({
+          just: endCue => `startcuepoint=${text};endcuepoint=${endCue}`,
+          nothing: () => `startcuepoint=${text}`,
+        });
+        break;
+      case 'endcuepoint':
+      default:
+        messageText = startCuePoint.caseOf({
+          just: startCue => `startcuepoint=${startCue};endcuepoint=${text}`,
+          nothing: () => `endcuepoint=${text}`,
+        });
+        break;
+    }
+
+    this.onMessageEdit(messageText);
+  }
+
   renderMain() {
 
     const linkOrButton = this.props.model.style === CommandStyle.Button
@@ -150,6 +186,8 @@ export default class CommandEditor
     const { editMode, model, onEdit } = this.props;
 
     let targetDisplay;
+    type MessageType = 'Media' | 'Other';
+    let messageType: MessageType = 'Other';
 
     if (this.state.targetRequest.type === 'Pending') {
       targetDisplay = null;
@@ -157,7 +195,14 @@ export default class CommandEditor
       targetDisplay = <div>Unknown</div>;
     } else {
       targetDisplay = <div>{this.state.targetRequest.element.contentType}</div>;
+      messageType = caseOf<MessageType>(this.state.targetRequest.element.contentType)({
+        Video: 'Media',
+        Audio: 'Media',
+        YouTube: 'Media',
+      })('Other');
     }
+
+    const { startCuePoint, endCuePoint } = parseCommandMessageText(model.message.text);
 
     return (
       <SidebarContent title="Command">
@@ -174,9 +219,13 @@ export default class CommandEditor
         <SidebarGroup label="Target">
           {targetDisplay}
           <div>
-            <button type="button" className="btn btn-primary" onClick={this.onSelectTarget}>
+            <Button
+              type="primary"
+              className="btn-sm"
+              editMode={editMode}
+              onClick={this.onSelectTarget}>
               Select Target
-            </button>
+            </Button>
           </div>
         </SidebarGroup>
         <SidebarGroup label="Type">
@@ -199,15 +248,52 @@ export default class CommandEditor
             <option key={CommandStyle.Link} value={CommandStyle.Link}>Link</option>
           </Select>
         </SidebarGroup>
-        <SidebarGroup label="Message">
-          <TextInput
-            editMode={editMode}
-            width="100%"
-            label=""
-            value={model.message.text}
-            type="string"
-            onEdit={this.onMessageEdit}
-          />
+        <SidebarGroup label={
+          caseOf<string>(messageType)({
+            Media: 'Media Message',
+          })('Message')}>
+          {caseOf<JSX.Element>(messageType)({
+            Media: (
+              <React.Fragment>
+                <SidebarRow label="Start">
+                  <div className="input-group input-group-sm mb-3">
+                    <TextInput
+                      editMode={editMode}
+                      label="Enter seconds 00.00"
+                      value={startCuePoint.valueOr('')}
+                      type="number"
+                      onEdit={text => this.onEditCuePoint(text, 'startcuepoint')} />
+                    <div className="input-group-append">
+                      <span className="input-group-text">seconds</span>
+                    </div>
+                  </div>
+                </SidebarRow>
+                <SidebarRow label="End">
+                  <div className="input-group input-group-sm mb-3">
+                    <TextInput
+                      editMode={editMode}
+                      label="Enter seconds 00.00"
+                      value={endCuePoint.valueOr('')}
+                      type="number"
+                      onEdit={text => this.onEditCuePoint(text, 'endcuepoint')} />
+                    <div className="input-group-append">
+                      <span className="input-group-text">seconds</span>
+                    </div>
+                  </div>
+                </SidebarRow>
+              </React.Fragment>
+            ),
+          })((
+            <React.Fragment>
+              <TextInput
+                type="text"
+                editMode={editMode}
+                width="100%"
+                label=""
+                value={model.message.text}
+                onEdit={this.onMessageEdit} />
+            </React.Fragment>
+          ))}
         </SidebarGroup>
       </SidebarContent>
     );

@@ -25,6 +25,7 @@ import { ModalMessage } from 'utils/ModalMessage';
 
 import './Media.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
   onShowSidebar: () => void;
@@ -208,7 +209,10 @@ export default class VideoEditor
   }
 
   renderMain(): JSX.Element {
-
+    const {
+      editMode, activeContentGuid, context, parent, services, onFocus, hover,
+      onUpdateHover, model,
+    } = this.props;
     const { sources, controls, width, height } = this.props.model;
 
     let fullSrc = '';
@@ -224,13 +228,18 @@ export default class VideoEditor
     return (
       <div className="videoEditor">
         <video width={width} height={height} src={fullSrc} controls={controls} />
-        <div className="captionEditor">
-          <div className="captionHeader">Caption</div>
-          <ContentContainer
-            {...this.props}
-            onEdit={this.onCaptionEdit}
-            model={this.props.model.caption.content} />
-        </div>
+
+        <CaptionTextEditor
+          editMode={editMode}
+          activeContentGuid={activeContentGuid}
+          context={context}
+          parent={parent}
+          services={services}
+          onFocus={onFocus}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onEdit={this.onCaptionEdit}
+          model={model.caption.content} />
       </div>
     );
   }

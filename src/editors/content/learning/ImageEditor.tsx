@@ -29,6 +29,7 @@ const IMAGE = require('../../../../assets/400x300.png');
 
 import { styles } from './MediaElement.styles';
 import { ContentContainer } from '../container/ContentContainer';
+import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface ImageSizeSidebarProps {
   services: AppServices;
@@ -398,8 +399,10 @@ export default class ImageEditor
   }
 
   renderMain(): JSX.Element {
-
-    const { classes, model } = this.props;
+    const {
+      classes, editMode, activeContentGuid, context, parent, services, onFocus, hover,
+      onUpdateHover, model,
+    } = this.props;
     const { src, height, width } = model;
 
     let fullSrc;
@@ -416,13 +419,18 @@ export default class ImageEditor
     return (
       <div className={classes.mediaElement}>
         <img src={fullSrc} height={height} width={width} />
-        <div className={classes.captionEditor}>
-          <div className={classes.captionHeader}>Caption</div>
-          <ContentContainer
-            {...this.props}
-            onEdit={this.onCaptionEdit}
-            model={this.props.model.caption.content} />
-        </div>
+
+        <CaptionTextEditor
+          editMode={editMode}
+          activeContentGuid={activeContentGuid}
+          context={context}
+          parent={parent}
+          services={services}
+          onFocus={onFocus}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onEdit={this.onCaptionEdit}
+          model={model.caption.content} />
       </div>
     );
   }

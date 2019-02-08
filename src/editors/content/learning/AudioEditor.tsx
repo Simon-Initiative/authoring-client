@@ -25,6 +25,7 @@ import { ModalMessage } from 'utils/ModalMessage';
 
 import './Media.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
   onShowSidebar: () => void;
@@ -187,7 +188,10 @@ export default class AudioEditor
   }
 
   renderMain(): JSX.Element {
-
+    const {
+      editMode, activeContentGuid, context, parent, services, onFocus, hover,
+      onUpdateHover, model,
+    } = this.props;
     const { sources, controls } = this.props.model;
 
     let fullSrc = '';
@@ -203,13 +207,18 @@ export default class AudioEditor
     return (
       <div className="audioEditor">
         <audio src={fullSrc} controls={controls} />
-        <div className="captionEditor">
-          <div className="captionHeader">Caption</div>
-          <ContentContainer
-            {...this.props}
-            onEdit={this.onCaptionEdit}
-            model={this.props.model.caption.content} />
-        </div>
+
+        <CaptionTextEditor
+          editMode={editMode}
+          activeContentGuid={activeContentGuid}
+          context={context}
+          parent={parent}
+          services={services}
+          onFocus={onFocus}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onEdit={this.onCaptionEdit}
+          model={model.caption.content} />
       </div>
     );
   }

@@ -23,6 +23,7 @@ import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/lea
 import {
   DiscoverableId,
 } from 'components/common/Discoverable.controller';
+import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface DirectorProps extends AbstractContentEditorProps<DirectorType> {
   onShowSidebar: () => void;
@@ -158,6 +159,10 @@ export default class DirectorEditor
   }
 
   renderMain(): JSX.Element {
+    const {
+      editMode, activeContentGuid, context, parent, services, onFocus, hover,
+      onUpdateHover, model,
+    } = this.props;
 
     const src = this.props.model.src;
     const file = src.substr(src.lastIndexOf('/') + 1);
@@ -166,13 +171,18 @@ export default class DirectorEditor
       <div className="mediaEditor">
         <div className="mediaHeader">Director</div>
         <span className="mediaLabel">Source File:</span> {file}
-        <div className="captionEditor">
-          <div className="captionHeader">Caption</div>
-          <ContentContainer
-            {...this.props}
-            onEdit={this.onCaptionEdit}
-            model={this.props.model.caption.content} />
-        </div>
+
+        <CaptionTextEditor
+          editMode={editMode}
+          activeContentGuid={activeContentGuid}
+          context={context}
+          parent={parent}
+          services={services}
+          onFocus={onFocus}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onEdit={this.onCaptionEdit}
+          model={model.caption.content} />
       </div>
     );
   }
