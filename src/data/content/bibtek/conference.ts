@@ -11,7 +11,7 @@ export type ConferenceParams = {
   booktitle?: string,
   year?: string,
   editor?: Maybe<string>,
-  volumeNumber?: Maybe<c.VolumeOrNumber>,
+  volumeNumber?: Maybe<Immutable.Map<string, string>>,
   series?: Maybe<string>,
   pages?: Maybe<string>,
   address?: Maybe<string>,
@@ -33,6 +33,7 @@ const defaultContent = {
   year: '',
   editor: Maybe.nothing(),
   volumeNumber: Maybe.nothing(),
+  address: Maybe.nothing(),
   series: Maybe.nothing(),
   pages: Maybe.nothing(),
   organization: Maybe.nothing(),
@@ -54,7 +55,7 @@ export class Conference extends Immutable.Record(defaultContent) {
   booktitle: string;
   year: string;
   editor: Maybe<string>;
-  volumeNumber: Maybe<c.VolumeOrNumber>;
+  volumeNumber: Maybe<Immutable.Map<string, string>>;
   series: Maybe<string>;
   pages: Maybe<string>;
   address: Maybe<string>;
@@ -144,10 +145,10 @@ export class Conference extends Immutable.Record(defaultContent) {
     const b = a['bib:conference'];
 
     this.volumeNumber.lift((v) => {
-      if (v.type === 'number') {
-        b['@number'] = v;
+      if (v.has('number')) {
+        b['@number'] = v.get('number');
       } else {
-        b['@volume'] = v;
+        b['@volume'] = v.get('volume');
       }
     });
 

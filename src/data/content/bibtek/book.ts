@@ -5,11 +5,11 @@ import * as c from './common';
 
 export type BookParams = {
   id?: string;
-  authorEditor?: c.AuthorOrEditor;
+  authorEditor?: Immutable.Map<string, string>;
   title?: string;
   publisher?: string;
   year?: string;
-  volumeNumber?: Maybe<c.VolumeOrNumber>;
+  volumeNumber?: Maybe<Immutable.Map<string, string>>;
   series?: Maybe<string>;
   address?: Maybe<string>;
   edition?: Maybe<string>;
@@ -44,11 +44,11 @@ export class Book extends Immutable.Record(defaultContent) {
   contentType: 'Book';
   elementType: 'bib:book';
   id: string;
-  authorEditor: c.AuthorOrEditor;
+  authorEditor: Immutable.Map<string, string>;
   title: string;
   publisher: string;
   year: string;
-  volumeNumber: Maybe<c.VolumeOrNumber>;
+  volumeNumber: Maybe<Immutable.Map<string, string>>;
   series: Maybe<string>;
   address: Maybe<string>;
   edition: Maybe<string>;
@@ -124,25 +124,27 @@ export class Book extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
+
     const a = {
-      'bib:book': {
-        '@title': this.title,
-        '@publisher': this.publisher,
-        '@year': this.year,
-      },
+      'bib:book': {},
     };
     const b = a['bib:book'];
 
-    if (this.authorEditor.type === 'author') {
-      b['@author'] = this.authorEditor.author;
+    if (this.authorEditor.has('author')) {
+      b['@author'] = this.authorEditor.get('author');
     } else {
-      b['@editor'] = this.authorEditor.editor;
+      b['@editor'] = this.authorEditor.get('editor');
     }
+
+    b['@title'] = this.title;
+    b['@publisher'] = this.publisher;
+    b['@year'] = this.year;
+
     this.volumeNumber.lift((v) => {
-      if (v.type === 'number') {
-        b['@number'] = v;
+      if (v.has('number')) {
+        b['@number'] = v.get('number');
       } else {
-        b['@volume'] = v;
+        b['@volume'] = v.get('volume');
       }
     });
     this.series.lift(v => b['@series'] = v);

@@ -1,6 +1,7 @@
 
 import { getChildren } from '../common';
 import { getKey } from '../../common';
+import * as Immutable from 'immutable';
 
 export function indexText(o) {
   return getChildren(o).reduce(
@@ -40,57 +41,21 @@ export function el(name: string, value: string) {
   };
 }
 
-export interface Author {
-  type: 'author';
-  author: string;
+export function makeAuthor(v: string): Immutable.Map<string, string> {
+  return Immutable.Map<string, string>().set('author', v);
 }
 
-export function makeAuthor(author: string): Author {
-  return {
-    type: 'author',
-    author,
-  };
-}
-
-export interface Editor {
-  type: 'editor';
-  editor: string;
-}
-
-export function makeEditor(editor: string): Editor {
-  return {
-    type: 'editor',
-    editor,
-  };
-}
-
-export type AuthorOrEditor = Author | Editor;
-
-
-export interface Volume {
-  type: 'volume';
-  volume: string;
-}
-
-export interface Number {
-  type: 'number';
-  number: string;
+export function makeEditor(v: string): Immutable.Map<string, string> {
+  return Immutable.Map<string, string>().set('editor', v);
 }
 
 
-export function makeVolume(volume: string): Volume {
-  return {
-    type: 'volume',
-    volume,
-  };
+export function makeVolume(v: string): Immutable.Map<string, string> {
+  return Immutable.Map<string, string>().set('volume', v);
 }
 
 
-export function makeNumber(number: string): Number {
-  return {
-    type: 'number',
-    number,
-  };
+export function makeNumber(v: string): Immutable.Map<string, string> {
+  return Immutable.Map<string, string>().set('number', v);
 }
 
-export type VolumeOrNumber = Volume | Number;

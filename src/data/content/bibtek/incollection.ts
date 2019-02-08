@@ -12,7 +12,7 @@ export type InCollectionParams = {
   publisher?: string,
   year?: string,
   editor?: Maybe<string>,
-  volumeNumber?: Maybe<c.VolumeOrNumber>,
+  volumeNumber?: Maybe<Immutable.Map<string, string>>,
   collectionType?: Maybe<string>,
   series?: Maybe<string>,
   chapter?: Maybe<string>,
@@ -61,7 +61,7 @@ export class InCollection extends Immutable.Record(defaultContent) {
   publisher: string;
   year: string;
   editor: Maybe<string>;
-  volumeNumber: Maybe<c.VolumeOrNumber>;
+  volumeNumber: Maybe<Immutable.Map<string, string>>;
   collectionType: Maybe<string>;
   series: Maybe<string>;
   chapter: Maybe<string>;
@@ -157,10 +157,10 @@ export class InCollection extends Immutable.Record(defaultContent) {
     const b = a['bib:incollection'];
 
     this.volumeNumber.lift((v) => {
-      if (v.type === 'number') {
-        b['@number'] = v;
+      if (v.has('number')) {
+        b['@number'] = v.get('number');
       } else {
-        b['@volume'] = v;
+        b['@volume'] = v.get('volume');
       }
     });
 

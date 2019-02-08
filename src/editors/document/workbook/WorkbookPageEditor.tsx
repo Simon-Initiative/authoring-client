@@ -20,6 +20,7 @@ import { buildMissingObjectivesMessage } from 'utils/error';
 import { DEFAULT_OBJECTIVE_TITLE } from 'data/models/objective';
 
 import './WorkbookPageEditor.scss';
+import { Button } from 'editors/content/common/Button';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: string) => void;
@@ -56,6 +57,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.unFocus = this.unFocus.bind(this);
+    this.addEntry = this.addEntry.bind(this);
 
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
@@ -177,6 +179,15 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     );
   }
 
+  addEntry() {
+    const e = new contentTypes.Book();
+    const bibEntries = this.props.model.bibliography.bibEntries.set(e.guid, e);
+    const bibliography = this.props.model.bibliography.with({ bibEntries });
+    const model = this.props.model.with({ bibliography });
+
+    this.handleEdit(model);
+  }
+
   renderBibliography() {
 
     const { model, hover, onUpdateHover } = this.props;
@@ -203,6 +214,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div style={{ topMargin: '100px' }}>
         <h3>Bibliography</h3>
+        <Button editMode={this.props.editMode} onClick={this.addEntry}>Add entry</Button>
         <ContentContainer
           parent={null}
           activeContentGuid={activeGuid}

@@ -3,41 +3,15 @@ import { augment, ensureIdGuidPresent } from '../common';
 import { Maybe } from 'tsmonad';
 import * as c from './common';
 
-export type BookLocation = ChapterAndPages | Pages;
-
-export function makePages(pages: string): Pages {
-  return {
-    type: 'pages',
-    pages,
-  };
-}
-export function makeChapterAndPages(chapter: string, pages: Maybe<string>): ChapterAndPages {
-  return {
-    type: 'chapterpages',
-    chapter,
-    pages,
-  };
-}
-
-export interface ChapterAndPages {
-  type: 'chapterpages';
-  chapter: string;
-  pages: Maybe<string>;
-}
-
-export interface Pages {
-  type: 'pages';
-  pages: string;
-}
-
 export type InBookParams = {
   id?: string;
-  authorEditor?: c.AuthorOrEditor;
+  authorEditor?: Immutable.Map<string, string>;
   title?: string;
   publisher?: string;
   year?: string;
-  bookLocation?: BookLocation;
-  volumeNumber?: Maybe<c.VolumeOrNumber>;
+  chapter?: Maybe<string>;
+  pages?: Maybe<string>;
+  volumeNumber?: Maybe<Immutable.Map<string, string>>;
   series?: Maybe<string>;
   bookType?: Maybe<string>;
   address?: Maybe<string>;
@@ -57,7 +31,8 @@ const defaultContent = {
   title: '',
   publisher: '',
   year: '',
-  bookLocation: makePages(''),
+  chatper: Maybe.nothing(),
+  pages: Maybe.nothing(),
   volumeNumber: Maybe.nothing(),
   bookType: Maybe.nothing(),
   series: Maybe.nothing(),
@@ -75,12 +50,13 @@ export class InBook extends Immutable.Record(defaultContent) {
   contentType: 'InBook';
   elementType: 'bib:inbook';
   id: string;
-  authorEditor: c.AuthorOrEditor;
+  authorEditor: Immutable.Map<string, string>;
   title: string;
   publisher: string;
   year: string;
-  bookLocation: BookLocation;
-  volumeNumber: Maybe<c.VolumeOrNumber>;
+  chapter: Maybe<string>;
+  pages: Maybe<string>;
+  volumeNumber: Maybe<Immutable.Map<string, string>>;
   bookType: Maybe<string>;
   series: Maybe<string>;
   address: Maybe<string>;
@@ -145,6 +121,12 @@ export class InBook extends Immutable.Record(defaultContent) {
     if (wb['@month'] !== undefined) {
       model = model.with({ month: Maybe.just(wb['@month']) });
     }
+    if (wb['@chapter'] !== undefined) {
+      model = model.with({ chapter: Maybe.just(wb['@chapter']) });
+    }
+    if (wb['@pages'] !== undefined) {
+      model = model.with({ pages: Maybe.just(wb['@pages']) });
+    }
     if (wb['@key'] !== undefined) {
       model = model.with({ key: Maybe.just(wb['@key']) });
     }
@@ -152,46 +134,59 @@ export class InBook extends Immutable.Record(defaultContent) {
       model = model.with({ crossref: Maybe.just(wb['@crossref']) });
     }
 
-    // Book location is the trickiest to parse
-    if (wb['@chapter'] !== undefined && wb['@pages'] !== undefined) {
-      model = model.with({ bookLocation: makeChapterAndPages(wb['@chapter'], wb['@pages']) });
-    } else if (wb['@chapter'] !== undefined) {
-      model = model.with({ bookLocation: makeChapterAndPages(wb['@chapter'], Maybe.nothing()) });
-    } else if (wb['@pages'] !== undefined) {
-      model = model.with({ bookLocation: makePages(wb['@pages']) });
-    }
 
     return model;
   }
 
   toPersistence(): Object {
     const a = {
-      'bib:inbook': {
-        '@title': this.title,
-        '@publisher': this.publisher,
-        '@year': this.year,
-      },
+      'bib:book': {},
     };
-    const b = a['bib:inbook'];
+    const b = a['bib:book'];
 
-    if (this.authorEditor.type === 'author') {
-      b['@author'] = this.authorEditor.author;
+    if (this.authorEditor.has('author')) {
+      b['@author'] = this.authorEditor.get('author');
     } else {
-      b['@editor'] = this.authorEditor.editor;
+      b['@editor'] = this.authorEditor.get('editor');
     }
+
+    b['@title'] = this.title;
+    b['@publisher'] = this.publisher;
+    b['@year'] = this.year;
+
     this.volumeNumber.lift((v) => {
-      if (v.type === 'number') {
-        b['@number'] = v;
+      if (v.has('number')) {
+        b['@number'] = v.get('number');
       } else {
-        b['@volume'] = v;
+        b['@volume'] = v.get('volume');
       }
     });
-    if (this.bookLocation.type === 'chapterpages') {
-      b['@chapter'] = this.bookLocation.chapter;
-      this.bookLocation.pages.lift(v => b['@pages'] = v);
-    } else {
-      b['@pages'] = this.bookLocation.pages;
-    }
+
+    this.chapter.caseOf({
+      just: (c) => {
+        this.pages.caseOf({
+          just: (p) => {
+            b['@pages'] = p;
+            b['@chapter'] = c;
+          },
+          nothing: () => {
+            b['@chapter'] = c;
+          },
+        });
+      },
+      nothing: () => {
+        this.pages.caseOf({
+          just: (p) => {
+            b['@pages'] = p;
+          },
+          nothing: () => {
+            b['@pages'] = '';
+          },
+        });
+      },
+    });
+
+
     this.series.lift(v => b['@series'] = v);
     this.address.lift(v => b['@address'] = v);
     this.edition.lift(v => b['@edition'] = v);

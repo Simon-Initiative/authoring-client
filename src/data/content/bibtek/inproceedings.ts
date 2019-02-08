@@ -11,7 +11,7 @@ export type InProceedingsParams = {
   booktitle?: string,
   year?: string,
   editor?: Maybe<string>,
-  volumeNumber?: Maybe<c.VolumeOrNumber>,
+  volumeNumber?: Maybe<Immutable.Map<string, string>>,
   series?: Maybe<string>,
   pages?: Maybe<string>,
   address?: Maybe<string>,
@@ -54,7 +54,7 @@ export class InProceedings extends Immutable.Record(defaultContent) {
   booktitle: string;
   year: string;
   editor: Maybe<string>;
-  volumeNumber: Maybe<c.VolumeOrNumber>;
+  volumeNumber: Maybe<Immutable.Map<string, string>>;
   series: Maybe<string>;
   pages: Maybe<string>;
   address: Maybe<string>;
@@ -144,10 +144,10 @@ export class InProceedings extends Immutable.Record(defaultContent) {
     const b = a['bib:inproceedings'];
 
     this.volumeNumber.lift((v) => {
-      if (v.type === 'number') {
-        b['@number'] = v;
+      if (v.has('number')) {
+        b['@number'] = v.get('number');
       } else {
-        b['@volume'] = v;
+        b['@volume'] = v.get('volume');
       }
     });
 

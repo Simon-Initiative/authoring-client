@@ -9,7 +9,7 @@ export type ProceedingsParams = {
   title?: string,
   year?: string,
   editor?: Maybe<string>,
-  volumeNumber?: Maybe<c.VolumeOrNumber>,
+  volumeNumber?: Maybe<Immutable.Map<string, string>>,
   series?: Maybe<string>,
   publisher?: Maybe<string>,
   address?: Maybe<string>,
@@ -48,7 +48,7 @@ export class Proceedings extends Immutable.Record(defaultContent) {
   title: string;
   year: string;
   editor: Maybe<string>;
-  volumeNumber: Maybe<c.VolumeOrNumber>;
+  volumeNumber: Maybe<Immutable.Map<string, string>>;
   series: Maybe<string>;
   publisher: Maybe<string>;
   address: Maybe<string>;
@@ -130,10 +130,10 @@ export class Proceedings extends Immutable.Record(defaultContent) {
     const b = a['bib:proceedings'];
 
     this.volumeNumber.lift((v) => {
-      if (v.type === 'number') {
-        b['@number'] = v;
+      if (v.has('number')) {
+        b['@number'] = v.get('number');
       } else {
-        b['@volume'] = v;
+        b['@volume'] = v.get('volume');
       }
     });
 
