@@ -67,7 +67,7 @@ export function toPersistence(entry: Entry): Object {
   };
   const o = entry.toPersistence();
   const firstKey = Object.keys(o)[0];
-  e[firstKey] = o[firstKey];
+  e['bib:entry'][firstKey] = o[firstKey];
 
   return e;
 }

@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
 import { augment, ensureIdGuidPresent } from '../common';
 import { Maybe } from 'tsmonad';
+import { indexText, toElements } from './common';
 
 export type PhdThesisParams = {
   id?: string;
@@ -65,7 +66,7 @@ export class PhdThesis extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string, notify: () => void): PhdThesis {
 
-    const wb = (root as any)['bib:phdthesis'];
+    const wb = indexText((root as any)['bib:phdthesis']);
 
     let model = new PhdThesis({ guid });
 
@@ -121,6 +122,6 @@ export class PhdThesis extends Immutable.Record(defaultContent) {
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);
 
-    return a;
+    return toElements(a, 'bib:phdthesis');
   }
 }

@@ -79,7 +79,7 @@ export class Conference extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string, notify: () => void): Conference {
 
-    const wb = (root as any)['bib:conference'];
+    const wb = c.indexText((root as any)['bib:conference']);
 
     let model = new Conference({ guid });
 
@@ -161,6 +161,6 @@ export class Conference extends Immutable.Record(defaultContent) {
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);
 
-    return a;
+    return c.toElements(a, 'bib:conference');
   }
 }

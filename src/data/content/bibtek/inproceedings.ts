@@ -79,7 +79,7 @@ export class InProceedings extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string, notify: () => void): InProceedings {
 
-    const wb = (root as any)['bib:inproceedings'];
+    const wb = c.indexText((root as any)['bib:inproceedings']);
 
     let model = new InProceedings({ guid });
 
@@ -161,6 +161,6 @@ export class InProceedings extends Immutable.Record(defaultContent) {
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);
 
-    return a;
+    return c.toElements(a, 'bib:inproceedings');
   }
 }

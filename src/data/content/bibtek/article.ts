@@ -1,6 +1,8 @@
 import * as Immutable from 'immutable';
 import { augment, ensureIdGuidPresent } from '../common';
+import { indexText, el } from './common';
 import { Maybe } from 'tsmonad';
+
 
 export type ArticleParams = {
   id?: string;
@@ -66,9 +68,11 @@ export class Article extends Immutable.Record(defaultContent) {
     return ensureIdGuidPresent(this);
   }
 
+
+
   static fromPersistence(root: Object, guid: string, notify: () => void): Article {
 
-    const wb = (root as any)['bib:article'];
+    const wb = indexText((root as any)['bib:article']);
 
     let model = new Article({ guid });
 
@@ -111,23 +115,24 @@ export class Article extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
-    const a = {
+    const c = [
+      el('bib:author', this.author),
+      el('bib:title', this.title),
+      el('bib:journal', this.journal),
+      el('bib:year', this.year),
+    ];
+    this.volume.lift(v => c.push(el('bib:volume', v)));
+    this.number.lift(v => c.push(el('bib:number', v)));
+    this.pages.lift(v => c.push(el('bib:pages', v)));
+    this.month.lift(v => c.push(el('bib:month', v)));
+    this.note.lift(v => c.push(el('bib:note', v)));
+    this.key.lift(v => c.push(el('bib:key', v)));
+    this.crossref.lift(v => c.push(el('bib:crossref', v)));
+
+    return {
       'bib:article': {
-        '@author': this.author,
-        '@title': this.title,
-        '@journal': this.journal,
-        '@year': this.year,
+        '#array': c,
       },
     };
-    const b = a['bib:article'];
-    this.volume.lift(v => b['@volume'] = v);
-    this.number.lift(v => b['@number'] = v);
-    this.pages.lift(v => b['@pages'] = v);
-    this.month.lift(v => b['@month'] = v);
-    this.note.lift(v => b['@note'] = v);
-    this.key.lift(v => b['@key'] = v);
-    this.crossref.lift(v => b['@crossref'] = v);
-
-    return a;
   }
 }

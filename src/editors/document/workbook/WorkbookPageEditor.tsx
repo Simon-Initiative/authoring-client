@@ -8,6 +8,7 @@ import { Resource } from 'data/content/resource';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
+import { ContentElements } from 'data/content/common/elements';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { Objectives } from 'editors/document/workbook/Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -34,9 +35,9 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
   dismissMessage: (message: Messages.Message) => void;
 }
 
-interface WorkbookPageEditorState extends AbstractEditorState {}
+interface WorkbookPageEditorState extends AbstractEditorState { }
 
-function hasMissingResource() : boolean {
+function hasMissingResource(): boolean {
   // TODO restore post wb fix
   return false;
 }
@@ -80,7 +81,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const { objectives, courseId } = context;
 
     if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE ||
-        objectives.size < 1) {
+      objectives.size < 1) {
       this.noObjectivesMessage = buildMissingObjectivesMessage(courseId);
       showMessage(this.noObjectivesMessage);
     }
@@ -88,14 +89,14 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
     if (this.props.context.objectives.size <= 1 &&
-        nextProps.context.objectives.size > 1 &&
-        this.noObjectivesMessage !== undefined) {
+      nextProps.context.objectives.size > 1 &&
+      this.noObjectivesMessage !== undefined) {
       this.props.dismissMessage(this.noObjectivesMessage);
     }
 
     if (nextProps.model !== this.props.model) {
       if (this.hasMissingObjective(
-          nextProps.model.head.objrefs, nextProps.context.objectives)) {
+        nextProps.model.head.objrefs, nextProps.context.objectives)) {
         nextProps.services.refreshObjectives(nextProps.context.courseId);
       }
     }
@@ -109,9 +110,27 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(model);
   }
 
-  onBodyEdit(content : any, source: Object) {
+  onBodyEdit(content: any, source: Object) {
     const model = this.props.model.with({ body: content });
     this.props.onUpdateContent(this.props.context.documentId, source);
+
+    this.handleEdit(model);
+  }
+
+  onEntryEdit(elements: ContentElements, src) {
+
+    this.props.onUpdateContent(this.props.context.documentId, src);
+
+    const items = elements
+      .content
+      .toArray()
+      .map(e => [e.guid, e]);
+
+    const bibliography = this.props.model.bibliography.with({
+      bibEntries: Immutable.OrderedMap<string, contentTypes.Entry>(items),
+    });
+
+    const model = this.props.model.with({ bibliography });
 
     this.handleEdit(model);
   }
@@ -151,10 +170,53 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         {...this.props}
         activeContentGuid={null}
         hover={null}
-        onUpdateHover={() => {}}
+        onUpdateHover={() => { }}
         model={this.props.model.head.objrefs}
-        onFocus={() => {}}
-        onEdit={this.onObjectivesEdit}/>
+        onFocus={() => { }}
+        onEdit={this.onObjectivesEdit} />
+    );
+  }
+
+  renderBibliography() {
+
+    const { model, hover, onUpdateHover } = this.props;
+
+    const activeGuid = this.props.activeContext.activeChild.caseOf({
+      just: c => (c as any).guid,
+      nothing: () => '',
+    });
+
+    const getLabel = (e, i) => i + 1;
+
+    const elements = new ContentElements().with({
+      content: model.bibliography.bibEntries,
+    });
+
+    const labels = {};
+    model.bibliography.bibEntries.toArray().map((e, i) => {
+      labels[e.guid]
+        = <span style={{ display: 'inline-block', minWidth: '12px' }}>{getLabel(e, i)}</span>;
+    });
+
+    const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
+
+    return (
+      <div style={{ topMargin: '100px' }}>
+        <h3>Bibliography</h3>
+        <ContentContainer
+          parent={null}
+          activeContentGuid={activeGuid}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onFocus={this.onFocus.bind(this)}
+          editMode={this.props.editMode}
+          services={this.props.services}
+          context={this.props.context}
+          model={elements}
+          bindProperties={bindLabel}
+          onEdit={this.onEntryEdit.bind(this)}
+        />
+      </div>
     );
   }
 
@@ -195,6 +257,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               context={this.props.context}
               model={this.props.model.body}
               onEdit={(c, s) => this.onBodyEdit(c, s)} />
+
+            {this.renderBibliography()}
+
           </div>
           <ContextAwareSidebar
             context={context}

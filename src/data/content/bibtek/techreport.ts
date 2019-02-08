@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
 import { augment, ensureIdGuidPresent } from '../common';
 import { Maybe } from 'tsmonad';
+import { indexText, toElements } from './common';
 
 export type TechReportParams = {
   id?: string;
@@ -68,7 +69,7 @@ export class TechReport extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string, notify: () => void): TechReport {
 
-    const wb = (root as any)['bib:techreport'];
+    const wb = indexText((root as any)['bib:techreport']);
 
     let model = new TechReport({ guid });
 
@@ -128,6 +129,6 @@ export class TechReport extends Immutable.Record(defaultContent) {
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);
 
-    return a;
+    return toElements(a, 'bib:techreport');
   }
 }

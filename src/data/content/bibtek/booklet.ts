@@ -1,5 +1,6 @@
 import * as Immutable from 'immutable';
 import { augment, ensureIdGuidPresent } from '../common';
+import { indexText, toElements } from './common';
 import { Maybe } from 'tsmonad';
 
 export type BookletParams = {
@@ -62,7 +63,7 @@ export class Booklet extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string, notify: () => void): Booklet {
 
-    const wb = (root as any)['bib:booklet'];
+    const wb = indexText((root as any)['bib:booklet']);
 
     let model = new Booklet({ guid });
 
@@ -114,6 +115,6 @@ export class Booklet extends Immutable.Record(defaultContent) {
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);
 
-    return a;
+    return toElements(a, 'bib:booklet');
   }
 }

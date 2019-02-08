@@ -1,4 +1,45 @@
 
+import { getChildren } from '../common';
+import { getKey } from '../../common';
+
+export function indexText(o) {
+  return getChildren(o).reduce(
+    (p, c) => {
+      const key = getKey(c);
+      const asAttribute = key.replace('bib:', '@');
+      p[asAttribute] = c[key]['#text'];
+      return p;
+    },
+    {},
+  );
+}
+
+export function toElements(root, key) {
+  const c = Object.keys(root[key]).reduce(
+    (p, c) => {
+      p.push({
+        [c.replace('@', 'bib:')]: { '#text': root[key][c] },
+      });
+      return p;
+    },
+    [],
+  );
+
+  return {
+    [key]: {
+      '#array': c,
+    },
+  };
+}
+
+export function el(name: string, value: string) {
+  return {
+    [name]: {
+      '#text': value,
+    },
+  };
+}
+
 export interface Author {
   type: 'author';
   author: string;
