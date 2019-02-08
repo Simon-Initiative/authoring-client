@@ -17,7 +17,7 @@ export type WorkbookPageModelParams = {
   head?: contentTypes.Head,
   body?: ContentElements,
   lock?: contentTypes.Lock,
-  bibFile?: Maybe<Object>,
+  bibliography?: contentTypes.Bibliography,
 };
 
 const defaultWorkbookPageModelParams = {
@@ -28,7 +28,7 @@ const defaultWorkbookPageModelParams = {
   head: new contentTypes.Head(),
   body: new ContentElements(),
   lock: new contentTypes.Lock(),
-  bibFile: Maybe.nothing(),
+  bibliography: new contentTypes.Bibliography(),
 };
 
 export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModelParams) {
@@ -40,7 +40,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   head: contentTypes.Head;
   body: ContentElements;
   lock: contentTypes.Lock;
-  bibFile: Maybe<Object>;
+  bibliography: contentTypes.Bibliography;
 
   constructor(params?: WorkbookPageModelParams) {
     params ? super(params) : super();
@@ -97,7 +97,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           });
           break;
         case 'bib:file':
-          model = model.with({ bibFile: Maybe.just(item) });
+          model = model.with(
+            { bibliography: contentTypes.Bibliography.fromPersistence(item, id, notify) });
           break;
         default:
       }
@@ -115,9 +116,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     const children = [
       this.head.toPersistence(),
       { body: { '#array': content } },
+      this.bibliography.toPersistence(),
     ];
-
-    this.bibFile.lift(b => children.push(b));
 
     const doc = [{
       workbook_page: {
