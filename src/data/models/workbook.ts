@@ -4,7 +4,6 @@ import guid from 'utils/guid';
 import { getKey } from 'data/common';
 import { isArray } from 'util';
 import { ContentElements, TEXT_ELEMENTS, BODY_ELEMENTS } from 'data/content/common/elements';
-import { Maybe } from 'tsmonad';
 import { LegacyTypes } from 'data/types';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
