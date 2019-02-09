@@ -31,7 +31,7 @@ const defaultContent = {
   title: '',
   publisher: '',
   year: '',
-  chatper: Maybe.nothing(),
+  chapter: Maybe.nothing(),
   pages: Maybe.nothing(),
   volumeNumber: Maybe.nothing(),
   bookType: Maybe.nothing(),
@@ -109,6 +109,9 @@ export class InBook extends Immutable.Record(defaultContent) {
     if (wb['@series'] !== undefined) {
       model = model.with({ series: Maybe.just(wb['@series']) });
     }
+    if (wb['@type'] !== undefined) {
+      model = model.with({ bookType: Maybe.just(wb['@type']) });
+    }
     if (wb['@address'] !== undefined) {
       model = model.with({ address: Maybe.just(wb['@address']) });
     }
@@ -140,9 +143,9 @@ export class InBook extends Immutable.Record(defaultContent) {
 
   toPersistence(): Object {
     const a = {
-      'bib:book': {},
+      'bib:inbook': {},
     };
-    const b = a['bib:book'];
+    const b = a['bib:inbook'];
 
     if (this.authorEditor.has('author')) {
       b['@author'] = this.authorEditor.get('author');
@@ -151,23 +154,13 @@ export class InBook extends Immutable.Record(defaultContent) {
     }
 
     b['@title'] = this.title;
-    b['@publisher'] = this.publisher;
-    b['@year'] = this.year;
-
-    this.volumeNumber.lift((v) => {
-      if (v.has('number')) {
-        b['@number'] = v.get('number');
-      } else {
-        b['@volume'] = v.get('volume');
-      }
-    });
 
     this.chapter.caseOf({
       just: (c) => {
         this.pages.caseOf({
           just: (p) => {
-            b['@pages'] = p;
             b['@chapter'] = c;
+            b['@pages'] = p;
           },
           nothing: () => {
             b['@chapter'] = c;
@@ -186,8 +179,19 @@ export class InBook extends Immutable.Record(defaultContent) {
       },
     });
 
+    b['@publisher'] = this.publisher;
+    b['@year'] = this.year;
+
+    this.volumeNumber.lift((v) => {
+      if (v.has('number')) {
+        b['@number'] = v.get('number');
+      } else {
+        b['@volume'] = v.get('volume');
+      }
+    });
 
     this.series.lift(v => b['@series'] = v);
+    this.bookType.lift(v => b['@type'] = v);
     this.address.lift(v => b['@address'] = v);
     this.edition.lift(v => b['@edition'] = v);
     this.month.lift(v => b['@month'] = v);

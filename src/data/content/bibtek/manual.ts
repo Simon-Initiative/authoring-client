@@ -77,7 +77,7 @@ export class Manual extends Immutable.Record(defaultContent) {
       model = model.with({ title: wb['@title'] });
     }
     if (wb['@organization'] !== undefined) {
-      model = model.with({ organization: wb['@organization'] });
+      model = model.with({ organization: Maybe.just(wb['@organization']) });
     }
     if (wb['@address'] !== undefined) {
       model = model.with({ address: Maybe.just(wb['@address']) });
@@ -108,11 +108,11 @@ export class Manual extends Immutable.Record(defaultContent) {
   toPersistence(): Object {
     const a = {
       'bib:manual': {
-        '@title': this.title,
       },
     };
     const b = a['bib:manual'];
     this.author.lift(v => b['@author'] = v);
+    b['@title'] = this.title;
     this.organization.lift(v => b['@organization'] = v);
     this.address.lift(v => b['@address'] = v);
     this.edition.lift(v => b['@edition'] = v);

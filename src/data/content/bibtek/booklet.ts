@@ -109,8 +109,8 @@ export class Booklet extends Immutable.Record(defaultContent) {
     const b = a['bib:booklet'];
     this.howPublished.lift(v => b['@howpublished'] = v);
     this.address.lift(v => b['@address'] = v);
-    this.year.lift(v => b['@year'] = v);
     this.month.lift(v => b['@month'] = v);
+    this.year.lift(v => b['@year'] = v);
     this.note.lift(v => b['@note'] = v);
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);

@@ -113,6 +113,12 @@ export class InCollection extends Immutable.Record(defaultContent) {
     if (wb['@number'] !== undefined) {
       model = model.with({ volumeNumber: Maybe.just(c.makeNumber(wb['@number'])) });
     }
+    if (wb['@pages'] !== undefined) {
+      model = model.with({ pages: Maybe.just(wb['@pages']) });
+    }
+    if (wb['@chapter'] !== undefined) {
+      model = model.with({ chapter: Maybe.just(wb['@chapter']) });
+    }
     if (wb['@series'] !== undefined) {
       model = model.with({ series: Maybe.just(wb['@series']) });
     }
@@ -156,6 +162,8 @@ export class InCollection extends Immutable.Record(defaultContent) {
     };
     const b = a['bib:incollection'];
 
+    this.editor.lift(v => b['@editor'] = v);
+
     this.volumeNumber.lift((v) => {
       if (v.has('number')) {
         b['@number'] = v.get('number');
@@ -164,9 +172,8 @@ export class InCollection extends Immutable.Record(defaultContent) {
       }
     });
 
-    this.editor.lift(v => b['@editor'] = v);
-    this.collectionType.lift(v => b['@type'] = v);
     this.series.lift(v => b['@series'] = v);
+    this.collectionType.lift(v => b['@type'] = v);
     this.chapter.lift(v => b['@chapter'] = v);
     this.pages.lift(v => b['@pages'] = v);
     this.address.lift(v => b['@address'] = v);

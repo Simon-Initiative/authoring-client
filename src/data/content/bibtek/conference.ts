@@ -18,6 +18,7 @@ export type ConferenceParams = {
   organization?: Maybe<string>,
   note?: Maybe<string>,
   month?: Maybe<string>,
+  publisher?: Maybe<string>,
   key?: Maybe<string>,
   crossref?: Maybe<string>,
   guid?: string,
@@ -37,8 +38,8 @@ const defaultContent = {
   series: Maybe.nothing(),
   pages: Maybe.nothing(),
   organization: Maybe.nothing(),
-  edition: Maybe.nothing(),
   note: Maybe.nothing(),
+  publisher: Maybe.nothing(),
   month: Maybe.nothing(),
   key: Maybe.nothing(),
   crossref: Maybe.nothing(),
@@ -61,6 +62,7 @@ export class Conference extends Immutable.Record(defaultContent) {
   address: Maybe<string>;
   organization: Maybe<string>;
   note: Maybe<string>;
+  publisher: Maybe<string>;
   month: Maybe<string>;
   key: Maybe<string>;
   crossref: Maybe<string>;
@@ -123,6 +125,9 @@ export class Conference extends Immutable.Record(defaultContent) {
     if (wb['@month'] !== undefined) {
       model = model.with({ month: Maybe.just(wb['@month']) });
     }
+    if (wb['@publisher'] !== undefined) {
+      model = model.with({ publisher: Maybe.just(wb['@publisher']) });
+    }
     if (wb['@key'] !== undefined) {
       model = model.with({ key: Maybe.just(wb['@key']) });
     }
@@ -143,6 +148,7 @@ export class Conference extends Immutable.Record(defaultContent) {
       },
     };
     const b = a['bib:conference'];
+    this.editor.lift(v => b['@editor'] = v);
 
     this.volumeNumber.lift((v) => {
       if (v.has('number')) {
@@ -152,12 +158,12 @@ export class Conference extends Immutable.Record(defaultContent) {
       }
     });
 
-    this.editor.lift(v => b['@editor'] = v);
-    this.organization.lift(v => b['@organization'] = v);
     this.series.lift(v => b['@series'] = v);
     this.pages.lift(v => b['@pages'] = v);
     this.address.lift(v => b['@address'] = v);
     this.month.lift(v => b['@month'] = v);
+    this.organization.lift(v => b['@organization'] = v);
+    this.publisher.lift(v => b['@publisher'] = v);
     this.note.lift(v => b['@note'] = v);
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);

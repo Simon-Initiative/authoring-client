@@ -16,6 +16,7 @@ export type InProceedingsParams = {
   pages?: Maybe<string>,
   address?: Maybe<string>,
   organization?: Maybe<string>,
+  publisher?: Maybe<string>,
   note?: Maybe<string>,
   month?: Maybe<string>,
   key?: Maybe<string>,
@@ -32,11 +33,12 @@ const defaultContent = {
   booktitle: '',
   year: '',
   editor: Maybe.nothing(),
+  address: Maybe.nothing(),
   volumeNumber: Maybe.nothing(),
   series: Maybe.nothing(),
   pages: Maybe.nothing(),
   organization: Maybe.nothing(),
-  edition: Maybe.nothing(),
+  publisher: Maybe.nothing(),
   note: Maybe.nothing(),
   month: Maybe.nothing(),
   key: Maybe.nothing(),
@@ -59,6 +61,7 @@ export class InProceedings extends Immutable.Record(defaultContent) {
   pages: Maybe<string>;
   address: Maybe<string>;
   organization: Maybe<string>;
+  publisher: Maybe<string>;
   note: Maybe<string>;
   month: Maybe<string>;
   key: Maybe<string>;
@@ -116,6 +119,9 @@ export class InProceedings extends Immutable.Record(defaultContent) {
     if (wb['@organization'] !== undefined) {
       model = model.with({ organization: Maybe.just(wb['@organization']) });
     }
+    if (wb['@publisher'] !== undefined) {
+      model = model.with({ publisher: Maybe.just(wb['@publisher']) });
+    }
     if (wb['@note'] !== undefined) {
       model = model.with({ note: Maybe.just(wb['@note']) });
     }
@@ -142,6 +148,7 @@ export class InProceedings extends Immutable.Record(defaultContent) {
       },
     };
     const b = a['bib:inproceedings'];
+    this.editor.lift(v => b['@editor'] = v);
 
     this.volumeNumber.lift((v) => {
       if (v.has('number')) {
@@ -151,12 +158,12 @@ export class InProceedings extends Immutable.Record(defaultContent) {
       }
     });
 
-    this.editor.lift(v => b['@editor'] = v);
-    this.organization.lift(v => b['@organization'] = v);
     this.series.lift(v => b['@series'] = v);
     this.pages.lift(v => b['@pages'] = v);
     this.address.lift(v => b['@address'] = v);
     this.month.lift(v => b['@month'] = v);
+    this.organization.lift(v => b['@organization'] = v);
+    this.publisher.lift(v => b['@publisher'] = v);
     this.note.lift(v => b['@note'] = v);
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);

@@ -121,13 +121,16 @@ export class Proceedings extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
+
     const a = {
       'bib:proceedings': {
-        '@title': this.title,
-        '@year': this.year,
       },
     };
     const b = a['bib:proceedings'];
+    this.editor.lift(v => b['@editor'] = v);
+
+    b['@title'] = this.title;
+    b['@year'] = this.year;
 
     this.volumeNumber.lift((v) => {
       if (v.has('number')) {
@@ -137,12 +140,11 @@ export class Proceedings extends Immutable.Record(defaultContent) {
       }
     });
 
-    this.editor.lift(v => b['@editor'] = v);
-    this.organization.lift(v => b['@organization'] = v);
     this.series.lift(v => b['@series'] = v);
-    this.publisher.lift(v => b['@publisher'] = v);
     this.address.lift(v => b['@address'] = v);
     this.month.lift(v => b['@month'] = v);
+    this.organization.lift(v => b['@organization'] = v);
+    this.publisher.lift(v => b['@publisher'] = v);
     this.note.lift(v => b['@note'] = v);
     this.key.lift(v => b['@key'] = v);
     this.crossref.lift(v => b['@crossref'] = v);

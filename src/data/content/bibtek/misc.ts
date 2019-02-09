@@ -68,10 +68,10 @@ export class Misc extends Immutable.Record(defaultContent) {
       model = model.with({ author: Maybe.just(wb['@author']) });
     }
     if (wb['@title'] !== undefined) {
-      model = model.with({ title: wb['@title'] });
+      model = model.with({ title: Maybe.just(wb['@title']) });
     }
     if (wb['@howpublished'] !== undefined) {
-      model = model.with({ howPublished: Maybe.just(wb['@howPublished']) });
+      model = model.with({ howPublished: Maybe.just(wb['@howpublished']) });
     }
     if (wb['@month'] !== undefined) {
       model = model.with({ month: Maybe.just(wb['@month']) });
