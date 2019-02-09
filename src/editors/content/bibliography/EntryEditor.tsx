@@ -287,7 +287,9 @@ export default class EntryEditor
 
     return (
       <div className={classNames([classes.entry])}>
-        <h5>{toFriendlyLabel(this.props.model.contentType)}</h5>
+        <div className={classNames([classes.entryLabel])}>
+          {toFriendlyLabel(this.props.model.contentType)}
+        </div>
         <table style={{ width: '100%' }}>
           <tbody>
             {this.renderAttributeEditors(this.props.model)}

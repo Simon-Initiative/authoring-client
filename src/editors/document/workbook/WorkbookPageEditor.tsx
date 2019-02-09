@@ -20,7 +20,6 @@ import { buildMissingObjectivesMessage } from 'utils/error';
 import { DEFAULT_OBJECTIVE_TITLE } from 'data/models/objective';
 
 import './WorkbookPageEditor.scss';
-import { Button } from 'editors/content/common/Button';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: string) => void;
@@ -36,12 +35,31 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
   dismissMessage: (message: Messages.Message) => void;
 }
 
-interface WorkbookPageEditorState extends AbstractEditorState { }
+interface WorkbookPageEditorState extends AbstractEditorState {
+  collapseInsertPopup: boolean;
+}
 
 function hasMissingResource(): boolean {
   // TODO restore post wb fix
   return false;
 }
+
+const entryInstances = {
+  Article: new contentTypes.Article(),
+  Book: new contentTypes.Book(),
+  Booklet: new contentTypes.Booklet(),
+  Conference: new contentTypes.Conference(),
+  InBook: new contentTypes.InBook(),
+  InCollection: new contentTypes.InCollection(),
+  InProceedings: new contentTypes.InProceedings(),
+  Manual: new contentTypes.Manual(),
+  MastersThesis: new contentTypes.MastersThesis(),
+  PhdThesis: new contentTypes.PhdThesis(),
+  Proceedings: new contentTypes.Proceedings(),
+  TechReport: new contentTypes.TechReport(),
+  Misc: new contentTypes.Misc(),
+  Unpublished: new contentTypes.Unpublished(),
+};
 
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
@@ -50,7 +68,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   noObjectivesMessage: Messages.Message;
 
   constructor(props: WorkbookPageEditorProps) {
-    super(props, {});
+    super(props, { collapseInsertPopup: true });
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onModelEdit = this.onModelEdit.bind(this);
@@ -58,6 +76,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.onFocus = this.onFocus.bind(this);
     this.unFocus = this.unFocus.bind(this);
     this.addEntry = this.addEntry.bind(this);
+    this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
@@ -66,6 +85,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     if (hasMissingResource()) {
       props.services.refreshCourse(props.context.courseId);
     }
+
   }
 
   hasMissingObjective(
@@ -179,13 +199,19 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     );
   }
 
-  addEntry() {
-    const e = new contentTypes.Book();
+  addEntry(e) {
     const bibEntries = this.props.model.bibliography.bibEntries.set(e.guid, e);
     const bibliography = this.props.model.bibliography.with({ bibEntries });
     const model = this.props.model.with({ bibliography });
 
     this.handleEdit(model);
+  }
+
+
+  collapseInsertPopup() {
+    this.setState({
+      collapseInsertPopup: !this.state.collapseInsertPopup,
+    });
   }
 
   renderBibliography() {
@@ -197,37 +223,51 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       nothing: () => '',
     });
 
-    const getLabel = (e, i) => i + 1;
-
     const elements = new ContentElements().with({
       content: model.bibliography.bibEntries,
     });
 
-    const labels = {};
-    model.bibliography.bibEntries.toArray().map((e, i) => {
-      labels[e.guid]
-        = <span style={{ display: 'inline-block', minWidth: '12px' }}>{getLabel(e, i)}</span>;
+    const containerOrNone = model.bibliography.bibEntries.size > 0
+      ? <ContentContainer
+        parent={null}
+        activeContentGuid={activeGuid}
+        hover={hover}
+        onUpdateHover={onUpdateHover}
+        onFocus={this.onFocus.bind(this)}
+        editMode={this.props.editMode}
+        services={this.props.services}
+        context={this.props.context}
+        model={elements}
+        onEdit={this.onEntryEdit.bind(this)}
+      />
+      : null;
+
+    const entryChoices = Object.keys(entryInstances).map((key) => {
+      return (
+        <a onClick={(e) => { e.preventDefault(); this.addEntry(entryInstances[key]); }}
+          className="dropdown-item">{key}</a>
+      );
     });
 
-    const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
-
     return (
-      <div style={{ topMargin: '100px' }}>
-        <h3>Bibliography</h3>
-        <Button editMode={this.props.editMode} onClick={this.addEntry}>Add entry</Button>
-        <ContentContainer
-          parent={null}
-          activeContentGuid={activeGuid}
-          hover={hover}
-          onUpdateHover={onUpdateHover}
-          onFocus={this.onFocus.bind(this)}
-          editMode={this.props.editMode}
-          services={this.props.services}
-          context={this.props.context}
-          model={elements}
-          bindProperties={bindLabel}
-          onEdit={this.onEntryEdit.bind(this)}
-        />
+      <div className="bibliography">
+        <div>
+          <span className="wbLabel inline">Bibliography</span>&nbsp;&nbsp;
+          <span className="badge badge-primary">
+            {this.props.model.bibliography.bibEntries.size}
+          </span>
+          <button className="btn btn-link" type="button" data-toggle="collapse"
+            data-target="#bibContent" aria-expanded="false" aria-controls="bibContent">
+            Show / Hide
+          </button>
+        </div>
+        <div className="collapse" id="bibContent">
+          {containerOrNone}
+          <div className={`insert-popup ${this.state.collapseInsertPopup ? 'collapsed' : ''}`}>
+            {entryChoices}
+          </div>
+          <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
+        </div>
       </div>
     );
   }
@@ -257,6 +297,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               editorStyles={{ fontSize: 32 }} />
 
             {this.renderObjectives()}
+
+            <span className="wbLabel">Content</span>
 
             <ContentContainer
               parent={null}
