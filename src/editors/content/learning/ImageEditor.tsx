@@ -28,7 +28,7 @@ import { AppServices } from 'editors/common/AppServices';
 const IMAGE = require('../../../../assets/400x300.png');
 
 import { styles } from './MediaElement.styles';
-import { ContentContainer } from '../container/ContentContainer';
+import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface ImageSizeSidebarProps {
   services: AppServices;
@@ -167,6 +167,7 @@ export class ImageSizeSidebar extends
   }
 
   render() {
+    const { editMode } = this.props;
     const { width, height } = this.props.model;
 
     return (
@@ -186,8 +187,7 @@ export class ImageSizeSidebar extends
                   value="native"
                   checked={this.state.isNativeSize}
                   onChange={() => this.onToggleNativeSizing(true)}
-                  type="radio" />&nbsp;
-Default
+                  type="radio" />&nbsp; Default
             </label>
             </div>
             <div className="form-check">
@@ -197,33 +197,37 @@ Default
                   onChange={() => this.onToggleNativeSizing(false)}
                   value="custom"
                   checked={!this.state.isNativeSize}
-                  type="radio" />&nbsp;
-Custom
+                  type="radio" />&nbsp; Custom
             </label>
             </div>
           </SidebarRow>
           <SidebarRow label="Width">
-            <form>
-              <div className="input-group input-group-sm">
-                <TextInput width="100px" label=""
-                  editMode={this.props.editMode && !this.state.isNativeSize}
-                  value={width.toString()}
-                  type="number"
-                  onEdit={this.onEditWidth}
-                /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
-            </form>
-          </SidebarRow>
-          <SidebarRow label="Height">
-            <div className="input-group input-group-sm">
-              <TextInput width="100px" label=""
-                editMode={this.props.editMode && !this.state.isNativeSize}
-                value={height.toString()}
+            <div className="input-group input-group-sm mb-3">
+              <TextInput
                 type="number"
-                onEdit={this.onEditHeight} />
-              <span className="input-group-addon ">pixels</span>
+                label="Enter width"
+                editMode={editMode && !this.state.isNativeSize}
+                value={width}
+                onEdit={this.onEditWidth} />
+              <div className="input-group-append">
+                <span className="input-group-text" id="basic-addon2">pixels</span>
+              </div>
             </div>
           </SidebarRow>
-          <SidebarRow label="">
+          <SidebarRow label="Height">
+            <div className="input-group input-group-sm mb-3">
+              <TextInput
+                type="number"
+                label="Enter height"
+                editMode={editMode && !this.state.isNativeSize}
+                value={height}
+                onEdit={this.onEditHeight} />
+              <div className="input-group-append">
+                <span className="input-group-text" id="basic-addon2">pixels</span>
+              </div>
+            </div>
+          </SidebarRow>
+          <SidebarRow>
             <ToggleSwitch
               editMode={this.props.editMode &&
                 this.state.isSizeReceived &&
@@ -398,8 +402,10 @@ export default class ImageEditor
   }
 
   renderMain(): JSX.Element {
-
-    const { classes, model } = this.props;
+    const {
+      classes, editMode, activeContentGuid, context, parent, services, onFocus, hover,
+      onUpdateHover, model,
+    } = this.props;
     const { src, height, width } = model;
 
     let fullSrc;
@@ -416,13 +422,18 @@ export default class ImageEditor
     return (
       <div className={classes.mediaElement}>
         <img src={fullSrc} height={height} width={width} />
-        <div className={classes.captionEditor}>
-          <div className={classes.captionHeader}>Caption</div>
-          <ContentContainer
-            {...this.props}
-            onEdit={this.onCaptionEdit}
-            model={this.props.model.caption.content} />
-        </div>
+
+        <CaptionTextEditor
+          editMode={editMode}
+          activeContentGuid={activeContentGuid}
+          context={context}
+          parent={parent}
+          services={services}
+          onFocus={onFocus}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onEdit={this.onCaptionEdit}
+          model={model.caption.content} />
       </div>
     );
   }
