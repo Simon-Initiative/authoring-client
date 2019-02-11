@@ -10,7 +10,6 @@ import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import guid from 'utils/guid';
 import { Remove } from 'components/common/Remove';
-import { caseOf } from 'utils/utils';
 
 export interface CaptionTextEditorProps {
   hover: string;
