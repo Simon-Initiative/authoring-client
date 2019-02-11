@@ -26,6 +26,7 @@ import {
 
 import './Media.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface AppletProps extends AbstractContentEditorProps<AppletType> {
   onShowSidebar: () => void;
@@ -229,18 +230,26 @@ export default class AppletEditor
   }
 
   renderMain(): JSX.Element {
+    const {
+      editMode, activeContentGuid, context, parent, services, onFocus, hover,
+      onUpdateHover, model,
+    } = this.props;
 
     return (
       <div className="mediaEditor">
 
         <div className="mediaHeader">Applet</div>
-        <div className="captionEditor">
-          <div className="captionHeader">Caption</div>
-          <ContentContainer
-            {...this.props}
-            onEdit={this.onCaptionEdit}
-            model={this.props.model.caption.content} />
-        </div>
+        <CaptionTextEditor
+          editMode={editMode}
+          activeContentGuid={activeContentGuid}
+          context={context}
+          parent={parent}
+          services={services}
+          onFocus={onFocus}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onEdit={this.onCaptionEdit}
+          model={model.caption.content} />
         <span className="mediaLabel">Parameters:</span>
         {this.renderParameters()}
         <button type="button"

@@ -13,6 +13,7 @@ import { TextSelection } from 'types/active';
 import guid from 'utils/guid';
 
 import './ContentContainer.scss';
+import { classNames } from 'styles/jss';
 
 export type BoundProperty = {
   propertyName: string,
@@ -26,6 +27,7 @@ export enum Layout {
 
 export interface ContentContainerProps
     extends AbstractContentEditorProps<ContentElements> {
+  className?: string;
   hideContentLabel?: boolean | string[];
   disableContentSelection?: boolean | string[];
   bindProperties?: (element: ContentElement) => BoundProperty[];
@@ -290,7 +292,7 @@ export class ContentContainer
     const { hideContentLabel, disableContentSelection, hover,
       hideSingleDecorator = false,
       hideAllDecorators = false,
-      onUpdateHover, layout = Layout.Vertical } = this.props;
+      onUpdateHover, layout = Layout.Vertical, className } = this.props;
 
     const bindProperties = this.props.bindProperties === undefined
       ? element => []
@@ -360,10 +362,12 @@ export class ContentContainer
           );
       });
 
-    const classNames = layout === Layout.Horizontal ? 'layout-horizontal' : '';
-    const classes = 'content-container ' + classNames;
     return (
-      <div className={classes}
+      <div className={classNames([
+        className,
+        'content-container',
+        layout === Layout.Horizontal ? 'layout-horizontal' : '',
+      ])}
         onMouseOver={() => onUpdateHover && onUpdateHover(null)}>
         {editors}
       </div>
