@@ -416,7 +416,12 @@ export class MultipanelEditor
                   selectedPanel: panel.guid,
                 })}>
                 <div className={classes.panelTabName}>
-                  {panel.title.valueOr(`Panel ${i + 1}`)}
+                  {panel.title.caseOf({
+                    just: title => title !== ''
+                      ? title
+                      : `Panel ${i + 1}`,
+                    nothing: () => `Panel ${i + 1}`,
+                  })}
                 </div>
                 <div
                   className={classNames([
