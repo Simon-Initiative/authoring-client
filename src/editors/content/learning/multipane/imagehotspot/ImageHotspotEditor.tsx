@@ -385,7 +385,7 @@ export class ImageHotspotEditor
               just: visibility => visibility === 'transparent'
                 ? 'Transparent'
                 : 'Visible',
-              nothing: () => 'Select visibility',
+              nothing: () => 'Select Visibility',
             })
           }>
           <DropdownItem
