@@ -27,7 +27,7 @@ const defaults = (params: Partial<ImageHotspotParams> = {}) => ({
   alt: params.alt || '',
   width: params.width || 600,
   height: params.height || 400,
-  visibility: params.visibility || 'transparent',
+  visibility: params.visibility || Maybe.nothing(),
   hotspots: params.hotspots || Immutable.OrderedMap<string, Hotspot>(),
 });
 
