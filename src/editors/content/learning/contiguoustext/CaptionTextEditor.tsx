@@ -10,6 +10,7 @@ import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import guid from 'utils/guid';
 import { Remove } from 'components/common/Remove';
+import { caseOf } from 'utils/utils';
 
 export interface CaptionTextEditorProps {
   hover: string;
@@ -76,8 +77,10 @@ export class CaptionTextEditor
         classes.captionTextEditor,
         !editMode && classes.disabled,
         className])}>
-        {model.extractPlainText().caseOf({
-          just: plainText => (plainText !== '' || isEditing)
+        {isEditing || model.extractPlainText().caseOf({
+          just: plainText => plainText !== '',
+          nothing: () => false,
+        })
             ? (
               <div className={classes.content}>
                 <div className={classes.flex}>
@@ -103,9 +106,8 @@ export class CaptionTextEditor
                   }} />
               </div>
             )
-            : this.renderCreateButton(),
-          nothing: () => this.renderCreateButton(),
-        })}
+            : this.renderCreateButton()
+        }
       </div>
     );
   }
