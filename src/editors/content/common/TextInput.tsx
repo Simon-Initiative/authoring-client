@@ -2,7 +2,7 @@ import * as React from 'react';
 
 export interface TextInputProps {
   editMode: boolean;
-  width: string;
+  width?: string;
   label: string;
   value: string;
   type: string;
