@@ -23,12 +23,12 @@ export const INLINE_ELEMENTS = [
 ];
 
 const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
-  'dialog', 'figure', 'conjugation', 'inquiry', 'multipanel'];
+  'dialog', 'figure', 'conjugation', 'inquiry'];
 
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
-export const BOX_ELEMENTS = [...MATERIAL_ELEMENTS, 'materials', 'alternatives'];
+export const BOX_ELEMENTS = [...MATERIAL_ELEMENTS, 'materials', 'alternatives', 'multipanel'];
 export const CONTROL_ELEMENTS = ['pref:choose', 'pref:if'];
 export const EXTRA_ELEMENTS = [...ELEMENTS_BLOCK, ...ELEMENTS_MIXED, ...CONTROL_ELEMENTS];
 const BODY_ELEMENTS_INHERITED = BOX_ELEMENTS.reduce(

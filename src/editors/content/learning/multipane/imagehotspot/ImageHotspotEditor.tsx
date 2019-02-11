@@ -1,7 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { ImageHotspot as ImageHotspotType } from 'data/content/workbook/multipanel/image_hotspot';
+import {
+  ImageHotspot as ImageHotspotType, HotspotVisibility,
+} from 'data/content/workbook/multipanel/image_hotspot';
 import { Hotspot } from 'data/content/workbook/multipanel/hotspot';
 import { AppContext } from 'editors/common/AppContext';
 import { StyledComponentProps } from 'types/component';
@@ -339,7 +341,7 @@ export class ImageHotspotEditor
   }
 
   renderPanelDetails() {
-    const { classes, introPanelRef, panels, onEditIntroPanelRef } = this.props;
+    const { classes, model, introPanelRef, panels, onEditIntroPanelRef, onEdit } = this.props;
 
     return (
       <div className={classes.hotspotDetails}>
@@ -373,6 +375,35 @@ export class ImageHotspotEditor
                 onEditIntroPanelRef(Maybe.just(panel.id));
               }} />
           ))}
+        </Dropdown>
+        <br />
+        Hotspot Visibility:
+        <Dropdown
+          className={classes.hotspotOptionDropdown}
+          label={
+            model.visibility.caseOf({
+              just: visibility => visibility === 'transparent'
+                ? 'Transparent'
+                : 'Visible',
+              nothing: () => 'Select visibility',
+            })
+          }>
+          <DropdownItem
+            key="visible"
+            label="Visible"
+            onClick={() => {
+              onEdit(model.with({
+                visibility: Maybe.just<HotspotVisibility>('visable'),
+              }));
+            }} />
+          <DropdownItem
+            key="transparent"
+            label="Transparent"
+            onClick={() => {
+              onEdit(model.with({
+                visibility: Maybe.just<HotspotVisibility>('transparent'),
+              }));
+            }} />
         </Dropdown>
         <br />
         Select a hotspot to set a target panel and activity page.

@@ -569,7 +569,7 @@ export class InsertToolbar
                     });
 
                 }}
-                disabled={!editMode || !parentSupportsElementType('wb:inline')}>
+                disabled={!editMode || !parentSupportsElementType('activity')}>
                 {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
                 Create summative assessment
                 </ToolbarButtonMenuItem>

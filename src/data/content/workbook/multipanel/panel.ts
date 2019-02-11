@@ -3,7 +3,7 @@ import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 import { ensureIdGuidPresent, setId } from 'data/content/common';
 import {
-  ContentElements, MATERIAL_ELEMENTS, ELEMENTS_MIXED, CONTROL_ELEMENTS,
+  ContentElements, CONTROL_ELEMENTS, INLINE_ELEMENTS,
 } from 'data/content/common/elements';
 
 export type PanelParams = {
@@ -20,7 +20,7 @@ const defaults = (params: Partial<PanelParams> = {}) => ({
   id: params.id || createGuid(),
   title: params.title || Maybe.nothing(),
   content: params.content || ContentElements.fromText(
-    '', createGuid(), [...MATERIAL_ELEMENTS, ...ELEMENTS_MIXED, ...CONTROL_ELEMENTS]),
+    '', createGuid(), [...INLINE_ELEMENTS, ...CONTROL_ELEMENTS]),
 });
 
 export class Panel extends Immutable.Record(defaults()) {
@@ -56,7 +56,7 @@ export class Panel extends Immutable.Record(defaults()) {
       content: ContentElements.fromPersistence(
         item,
         createGuid(),
-        [...MATERIAL_ELEMENTS, ...ELEMENTS_MIXED, ...CONTROL_ELEMENTS],
+        [...INLINE_ELEMENTS, ...CONTROL_ELEMENTS],
         null,
         notify,
       ),

@@ -14,7 +14,7 @@ export type ImageHotspotParams = {
   alt: string,
   width: number,
   height: number,
-  hotspotVisibility: HotspotVisibility,
+  visibility: Maybe<HotspotVisibility>,
   hotspots: Immutable.OrderedMap<string, Hotspot>,
 };
 
@@ -27,7 +27,7 @@ const defaults = (params: Partial<ImageHotspotParams> = {}) => ({
   alt: params.alt || '',
   width: params.width || 600,
   height: params.height || 400,
-  hotspotVisibility: params.hotspotVisibility || 'transparent',
+  visibility: params.visibility || 'transparent',
   hotspots: params.hotspots || Immutable.OrderedMap<string, Hotspot>(),
 });
 
@@ -41,7 +41,7 @@ export class ImageHotspot extends Immutable.Record(defaults()) {
   alt: string;
   width: number;
   height: number;
-  hotspotVisibility: HotspotVisibility;
+  visibility: Maybe<HotspotVisibility>;
   hotspots: Immutable.OrderedMap<string, Hotspot>;
 
   constructor(params?: Partial<ImageHotspotParams>) {
@@ -81,7 +81,8 @@ export class ImageHotspot extends Immutable.Record(defaults()) {
     }
     if (q['@hotspots'] !== undefined) {
       model = model.with({
-        hotspotVisibility: q['@hotspots'] === 'transparent' ? 'transparent' : 'visable',
+        visibility: Maybe.just<HotspotVisibility>(q['@hotspots'] === 'transparent'
+          ? 'transparent' : 'visable'),
       });
     }
 
@@ -110,7 +111,10 @@ export class ImageHotspot extends Immutable.Record(defaults()) {
         '@alt': this.alt,
         '@width': `${this.width}`,
         '@height': `${this.height}`,
-        '@hotspots': this.hotspotVisibility,
+        ...this.visibility.caseOf({
+          just: visibility => ({ '@hotspots':  visibility }),
+          nothing: () => ({}),
+        }),
         '#array': this.hotspots.toArray().map(c => c.toPersistence()),
       },
     };
