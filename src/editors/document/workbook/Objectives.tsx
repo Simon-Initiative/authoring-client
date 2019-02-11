@@ -20,7 +20,7 @@ export interface ObjectivesState {
 
 function toObjArray(
   ids: Immutable.List<string>,
-  objs: Immutable.OrderedMap<string, contentTypes.LearningObjective>) : ObjTitle[] {
+  objs: Immutable.OrderedMap<string, contentTypes.LearningObjective>): ObjTitle[] {
 
   return ids
     .toArray()
@@ -74,7 +74,7 @@ export class Objectives
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const options = this.props.context.objectives
       .toArray()

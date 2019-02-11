@@ -7,6 +7,66 @@
   display: flex;
   flex-direction: column;
 
+  .insert-new {
+    cursor: pointer;
+    background-color: #E2E4E6;
+    font-size: 80%;
+    border-radius: 0 0 3px 3px;
+    padding: 8px 10px;
+    flex: 0 0 auto;
+  }
+
+  a.insert-new:not([href]):not([tabindex]):hover {
+    color: darken(#3f4446, 20%);
+    text-decoration: underline;
+    background-color: darken(#edeff0, 10%);
+  }
+
+  a.insert-new:not([href]):not([tabindex]) {
+    color: #3f4446;
+  }
+
+  .insert-popup {
+    background-color: #E2E4E6;
+    font-size: 80%;
+    max-height: 100%;
+    width: 100%;
+    transition: max-height .4s;
+    overflow: hidden;
+    flex: 0 0 auto;
+
+    &.collapsed {
+      max-height: 0;
+    }
+
+    a.dropdown-item {
+      &:hover {
+        background-color: #f8f9fa;
+      }
+      &:active {
+        background-color: #f8f9fa;
+      }
+      cursor: pointer;
+    }
+  }
+
+
+  .bibliography {
+    color: #666666;
+    padding-top: 20px;
+    margin-top: 75px;
+    margin-bottom: 75px;
+    border-top: 1px solid #cccccc;
+  }
+
+  .inline {
+    display: 'inline';
+  }
+
+  .wbLabel {
+    color: #666666;
+  }
+
   .title-row {
     margin: 10px 0;
   }
