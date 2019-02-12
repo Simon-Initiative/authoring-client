@@ -391,6 +391,12 @@ export class ObjectiveSkillView
       destinationType: LegacyTypes.inline,
     });
 
+    // fetch workbook page to inline assessment edges
+    const fetchWorkbookPageToSummativeEdges = persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.workbook_page,
+      destinationType: LegacyTypes.assessment2,
+    });
+
     // fetch summative assessment to pool edges
     const fetchSummativeToPoolEdges = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.assessment2,
@@ -432,6 +438,7 @@ export class ObjectiveSkillView
     Promise.all([
       fetchAllOrgResources,
       fetchWorkbookPageToInlineEdges,
+      fetchWorkbookPageToSummativeEdges,
       fetchSummativeToPoolEdges,
       fetchFormativeRefs,
       fetchSummativeRefs,
@@ -439,13 +446,18 @@ export class ObjectiveSkillView
     ]).then(([
       orgDocs,
       workbookPageToInlineEdges,
+      workbookPageToSummativeEdges,
       summativeToPoolEdges,
       skillFormativeQuestionRefs,
       skillSummativeQuestionRefs,
       skillPoolQuestionRefs,
     ]) => {
       // compute org resources map
-      const combinedEdges = [...workbookPageToInlineEdges, ...summativeToPoolEdges];
+      const combinedEdges = [
+        ...workbookPageToInlineEdges,
+        ...workbookPageToSummativeEdges,
+        ...summativeToPoolEdges,
+      ];
       const organizationResourceMap = orgDocs.reduce(
         (orgAcc, orgDoc) => {
           const org = orgDoc.model as models.OrganizationModel;
