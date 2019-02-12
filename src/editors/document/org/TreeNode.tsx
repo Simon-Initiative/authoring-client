@@ -124,6 +124,8 @@ export class TreeNode
         switch (type) {
           case LegacyTypes.assessment2:
             return <i className="fa fa-check" />;
+          case LegacyTypes.feedback:
+            return <i className="fa fa-clipboard" />;
           case LegacyTypes.workbook_page:
             return <i className="fa fa-file" />;
           default:

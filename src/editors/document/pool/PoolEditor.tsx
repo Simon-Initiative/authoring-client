@@ -291,7 +291,6 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     return (
       <React.Fragment>
-        {console.log('here')}
         <div className={`insert-popup ${collapseInsertPopup ? 'collapsed' : ''}`}>
           <AddQuestion
             editMode={editMode}

@@ -12,12 +12,18 @@ import { getLabelForFeedbackQuestion } from 'data/models/feedback';
 import '../common.scss';
 import { TabOptionControl } from 'editors/content/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 
 export interface Props extends AbstractContentEditorProps<FeedbackOpenResponse> {
   canRemove: boolean;
   onRemove: () => void;
   onDuplicate: () => void;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface State extends AbstractContentEditorState {
@@ -38,13 +44,14 @@ export class FeedbackOpenResponseEditor extends
   }
 
   renderSidebar() {
-    return null;
+    return <SidebarContent title="Open-Ended Question" />;
   }
 
   renderToolbar() {
-    return null;
+    return <ToolbarGroup label="Open-Ended Question"
+      columns={3} highlightColor={CONTENT_COLORS.Feedback}>
+    </ToolbarGroup>;
   }
-
   renderQuestionTitle = () => {
     const { model, canRemove, onRemove, editMode, onDuplicate } = this.props;
 
@@ -61,20 +68,14 @@ export class FeedbackOpenResponseEditor extends
   }
 
   renderMain() {
-    const { editMode, services, context, model } = this.props;
+    const { model } = this.props;
 
     return (
       <div className="feedback-question-editor">
         {this.renderQuestionTitle()}
         <div className="question-body" key="question">
           <ContentContainer
-            activeContentGuid={this.props.activeContentGuid}
-            hover={this.props.hover}
-            onUpdateHover={this.props.onUpdateHover}
-            onFocus={this.props.onFocus}
-            editMode={editMode}
-            services={services}
-            context={context}
+            {...this.props}
             model={model.prompt.content}
             onEdit={this.onPromptEdit} />
           <br />

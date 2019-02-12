@@ -15,11 +15,18 @@ import '../common.scss';
 import './LikertSeriesEditor.scss';
 import { QuestionTable } from './QuestionTable';
 import { LikertScale } from 'data/content/feedback/likert_scale';
+import { ContentElement } from 'data/content/common/interfaces';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 export interface Props extends AbstractContentEditorProps<LikertSeries> {
   canRemove: boolean;
   onRemove: () => void;
   onDuplicate: () => void;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface State extends AbstractContentEditorState {
@@ -28,31 +35,33 @@ export interface State extends AbstractContentEditorState {
 
 export class LikertSeriesEditor extends AbstractContentEditor<LikertSeries, Props, State> {
 
-  onEditPrompt = (content: ContentElements) => {
+  onEditPrompt = (content: ContentElements, src: ContentElement) => {
     const { onEdit, model } = this.props;
-    onEdit(model.with({ prompt: model.prompt.with({ content }) }), null);
+    onEdit(model.with({ prompt: model.prompt.with({ content }) }), src);
   }
 
-  onEditItems = (items: Immutable.OrderedMap<string, LikertItem>) => {
+  onEditItems = (items: Immutable.OrderedMap<string, LikertItem>, src: ContentElement) => {
     const { onEdit, model } = this.props;
-    onEdit(model.with({ items }), null);
+    onEdit(model.with({ items }), src);
   }
 
-  onEditScale = (scale: LikertScale) => {
+  onEditScale = (scale: LikertScale, src: ContentElement) => {
     const { onEdit, model } = this.props;
-    onEdit(model.with({ scale }));
-  }
-
-  renderToolbar() {
-    return null;
+    onEdit(model.with({ scale }), src);
   }
 
   renderSidebar() {
-    return null;
+    return <SidebarContent title="Question Series" />;
+  }
+
+  renderToolbar() {
+    return <ToolbarGroup label="Question Series"
+      columns={3} highlightColor={CONTENT_COLORS.Feedback}>
+    </ToolbarGroup>;
   }
 
   renderMain() {
-    const { editMode, services, context, model, onDuplicate, canRemove, onRemove } = this.props;
+    const { editMode, model, onDuplicate, canRemove, onRemove } = this.props;
 
     return (
       <div className="feedback-question-editor">
@@ -66,20 +75,14 @@ export class LikertSeriesEditor extends AbstractContentEditor<LikertSeries, Prop
           helpPopover={null} />
         <div className="question-body" key="question">
           <ContentContainer
-            activeContentGuid={this.props.activeContentGuid}
-            hover={this.props.hover}
-            onUpdateHover={this.props.onUpdateHover}
-            onFocus={this.props.onFocus}
-            editMode={editMode}
-            services={services}
-            context={context}
+            {...this.props}
             model={model.prompt.content}
             onEdit={this.onEditPrompt} />
           <br />
           <QuestionTable
-            editMode={editMode}
-            scale={model.scale}
-            items={model.items}
+            {...this.props}
+            // scale={model.scale}
+            // items={model.items}
             onEditItems={this.onEditItems}
             onEditScale={this.onEditScale}
           />

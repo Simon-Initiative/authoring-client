@@ -39,7 +39,12 @@ export class LikertScale extends Immutable.Record(defaultLikertScaleParams) {
   }
 
   clone(): LikertScale {
-    return ensureIdGuidPresent(this);
+    return ensureIdGuidPresent(this.with({
+      labels: this.labels.mapEntries(([_, v]) => {
+        const clone: LikertLabel = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, LikertLabel>,
+    }));
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): LikertScale {

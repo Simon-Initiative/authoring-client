@@ -15,17 +15,21 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { Select } from 'editors/content/common/Select';
 import { TabOptionControl } from 'editors/content/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { onEditScaleSize, onEditLabelText } from 'editors/content/feedback/utils';
+import { onEditScaleSize } from 'editors/content/feedback/utils';
 import { LikertScale } from 'data/content/feedback/likert_scale';
-import { DynaDropLabel } from 'editors/content/learning/dynadragdrop/DynaDropLabel';
-import { ContiguousText } from 'data/content/learning/contiguous';
 
 import './LikertEditor.scss';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 
 export interface Props extends AbstractContentEditorProps<Likert> {
   canRemove: boolean;
   onRemove: () => void;
   onDuplicate: () => void;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface State extends AbstractContentEditorState {
@@ -38,9 +42,9 @@ export class LikertEditor extends AbstractContentEditor<Likert, Props, State> {
     onEdit(model.with({ prompt: model.prompt.with({ content }) }), src);
   }
 
-  onEditScale = (scale: LikertScale) => {
+  onEditScale = (scale: LikertScale, src: ContentElement) => {
     const { onEdit, model } = this.props;
-    onEdit(model.with({ scale }));
+    onEdit(model.with({ scale }), src);
   }
 
   onToggleRequired = () => {
@@ -49,15 +53,17 @@ export class LikertEditor extends AbstractContentEditor<Likert, Props, State> {
   }
 
   renderSidebar() {
-    return null;
+    return <SidebarContent title="Single Question" />;
   }
 
   renderToolbar() {
-    return null;
+    return <ToolbarGroup label="Single Question"
+      columns={3} highlightColor={CONTENT_COLORS.Feedback}>
+    </ToolbarGroup>;
   }
 
   renderMain() {
-    const { editMode, services, canRemove, onRemove, context, onDuplicate, model } = this.props;
+    const { editMode, canRemove, onRemove, onDuplicate, model } = this.props;
 
     const scaleOptions = [1, 3, 5, 7]
       .map(n => <option key={n} value={n}>{n}</option>);
@@ -74,13 +80,7 @@ export class LikertEditor extends AbstractContentEditor<Likert, Props, State> {
           helpPopover={null} />
         <div className="question-body" key="question">
           <ContentContainer
-            activeContentGuid={this.props.activeContentGuid}
-            hover={this.props.hover}
-            onUpdateHover={this.props.onUpdateHover}
-            onFocus={this.props.onFocus}
-            editMode={editMode}
-            services={services}
-            context={context}
+            {...this.props}
             model={model.prompt.content}
             onEdit={this.onEditPrompt} />
           <br />
@@ -106,17 +106,18 @@ export class LikertEditor extends AbstractContentEditor<Likert, Props, State> {
                         {scaleOptions}
                       </Select></td>
                     {model.scale.labels.toArray().map((label =>
-                      <DynaDropLabel
-                        key={label.guid}
-                        id={label.guid}
-                        className="label"
-                        canToggleType={false}
-                        onToggleType={null}
-                        editMode={editMode}
-                        text={(label.text.content.first() as ContiguousText)
-                          .extractPlainText().valueOr('')}
-                        onEdit={text =>
-                          onEditLabelText(text, label, model.scale, this.onEditScale)} />))}
+                      <td>
+                        <ContentContainer
+                          {...this.props}
+                          hideSingleDecorator
+                          model={label.text}
+                          onEdit={(text, source) => this.onEditScale(
+                            model.scale.with({
+                              labels: model.scale.labels.set(label.guid, label.with({ text })),
+                            }),
+                            source)} />
+                      </td>
+                    ))}
                   </tr>
                 </thead>
               </table>

@@ -483,7 +483,7 @@ export class ContextAwareSidebar
     }
   }
 
-  renderSidebarContent(contentRenderer, contentModel) {
+  renderSidebarContent(contentRenderer, contentElement) {
     return (
       <div>
         {contentRenderer}
@@ -495,7 +495,7 @@ export class ContextAwareSidebar
     const {
       classes, className, content, container, show, sidebarContent, onEdit } = this.props;
 
-    const contentModel = content.caseOf({
+    const contentElement = content.caseOf({
       just: c => c,
       nothing: () => undefined,
     });
@@ -506,10 +506,10 @@ export class ContextAwareSidebar
     });
 
     let contentRenderer: JSX.Element;
-    if (contentParent && contentModel) {
+    if (contentParent && contentElement) {
       const props: AbstractContentEditorProps<any> = {
         renderContext: RenderContext.Sidebar,
-        model: contentModel,
+        model: contentElement,
         onEdit,
         parent: contentParent,
         activeContentGuid: contentParent.props.activeContentGuid,
@@ -522,7 +522,7 @@ export class ContextAwareSidebar
       };
 
       contentRenderer = React.createElement(
-        getEditorByContentType((contentModel as any).contentType), props);
+        getEditorByContentType((contentElement as any).contentType), props);
 
     }
 
@@ -542,7 +542,7 @@ export class ContextAwareSidebar
               {sidebarContent
                 ? sidebarContent
                 : contentRenderer
-                  ? this.renderSidebarContent(contentRenderer, contentModel)
+                  ? this.renderSidebarContent(contentRenderer, contentElement)
                   : this.renderPageDetails()}
             </div>
           </div>

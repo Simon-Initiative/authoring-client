@@ -40,7 +40,7 @@ export class LikertLabel extends Immutable.Record(defaultLikertLabelParams) {
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): LikertLabel {
-    let model = new LikertLabel();
+    let model = new LikertLabel({ guid });
 
     const o = json.label;
 

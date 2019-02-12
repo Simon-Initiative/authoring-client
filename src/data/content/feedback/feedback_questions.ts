@@ -7,6 +7,7 @@ import createGuid from 'utils/guid';
 import { getChildren, augment } from '../common';
 import { getKey } from 'data/common';
 import { ensureIdGuidPresent } from 'data/content/common';
+import { createLikertSeries } from 'editors/content/question/addquestion/questionFactories';
 
 export type FeedbackQuestion =
   LikertSeries
@@ -86,7 +87,7 @@ export class FeedbackQuestions extends Immutable.Record(defaultFeedbackQuestions
 
   toPersistence(): Object {
     const children = this.questions.size === 0
-      ? [(new LikertSeries()).toPersistence()]
+      ? [createLikertSeries().toPersistence()]
       : this.questions.toArray().map(item => item.toPersistence());
 
     return {

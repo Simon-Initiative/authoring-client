@@ -11,10 +11,9 @@ import guid from 'utils/guid';
 import {
   locateNextOfKin, findNodeByGuid,
 } from 'editors/document/assessment/utils';
-import { Collapse } from 'editors/content/common/Collapse';
 import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
 import { AssessmentNodeRenderer } from 'editors/document/common/questions';
-import { getChildren, Outline, setChildren, EditDetails }
+import { getChildren, Outline, setChildren }
   from 'editors/document/assessment/outline/Outline';
 import { updateNode, removeNode } from 'data/utils/tree';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
@@ -25,15 +24,15 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import * as Messages from 'types/messages';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
+import { FeedbackQuestion } from 'data/content/feedback/feedback_questions';
 
 import './FeedbackEditor.scss';
-import { FeedbackQuestion } from 'data/content/feedback/feedback_questions';
 
 interface Props extends AbstractEditorProps<models.FeedbackModel> {
   activeContext: ActiveContext;
-  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: string, content: ContentElement, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -61,8 +60,10 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
       || this.props.expanded !== nextProps.expanded
       || this.props.editMode !== nextProps.editMode
       || this.props.hover !== nextProps.hover
+      || this.props.currentNode !== nextProps.currentNode
       || this.state.undoStackSize !== nextState.undoStackSize
-      || this.state.redoStackSize !== nextState.redoStackSize;
+      || this.state.redoStackSize !== nextState.redoStackSize
+      || this.state.collapseInsertPopup !== nextState.collapseInsertPopup;
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -76,12 +77,11 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
     // for instance, from an undo/redo
     const { activeContext, onSetCurrentNode, currentNode, model } = this.props;
 
-    if (this.props.currentNode === nextProps.currentNode &&
-      this.props.model !== nextProps.model) {
+    if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
 
       const documentId = activeContext.documentId.valueOr(null);
 
-      findNodeByGuid(this.allNodes(), currentNode.guid)
+      findNodeByGuid(this.allNodes(nextProps.model), currentNode.guid)
         .caseOf({
           just: currentNode => Maybe.just(onSetCurrentNode(documentId, currentNode)),
           nothing: () => locateNextOfKin(model.questions, currentNode.guid)
@@ -105,17 +105,16 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
   }
 
   onEditNode = (guid: string, node: FeedbackQuestion, src: ContentElement) => {
-
     const { activeContext, context, model, onUpdateContent, onSetCurrentNode } = this.props;
 
-    const nodes = model.questions.questions as Immutable.OrderedMap<string, Node>;
+    const nodes = model.questions.questions;
 
-    onUpdateContent(context.documentId, src);
     onSetCurrentNode(activeContext.documentId.valueOr(null), node);
+    onUpdateContent(context.documentId, src);
 
     this.handleEdit(model.with({
       questions: model.questions.with({
-        questions: updateNode<Node>(
+        questions: updateNode(
           guid, node, nodes, getChildren,
           setChildren) as Immutable.OrderedMap<string, FeedbackQuestion>,
       }),
@@ -123,9 +122,8 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
   }
 
   // This handles updates from the outline component, which are only reorders
-  onEditNodes(
-    questions: Immutable.OrderedMap<string, models.FeedbackQuestionNode>,
-    editDetails: EditDetails) {
+  onEditNodes = (
+    questions: Immutable.OrderedMap<string, models.FeedbackQuestionNode>) => {
 
     const { model } = this.props;
 
@@ -136,12 +134,12 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
     }));
   }
 
-  onChangeExpansion(nodes: Immutable.Set<string>) {
+  onChangeExpansion = (nodes: Immutable.Set<string>) => {
     // Nothing to do here, as we are not allowing changing the
     // expanded state of nodes in the outline
   }
 
-  onSelect(selectedNode: contentTypes.Node) {
+  onSelect = (selectedNode: contentTypes.Node) => {
     const { activeContext, onSetCurrentNode } = this.props;
 
     const documentId = activeContext.documentId.valueOr(null);
@@ -149,12 +147,12 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
     onSetCurrentNode(documentId, selectedNode);
   }
 
-  canRemoveNode() {
-    return this.allNodes().size > 1;
+  allNodes(model: models.FeedbackModel = this.props.model): Immutable.OrderedMap<string, Node> {
+    return model.questions.questions;
   }
 
-  allNodes(): Immutable.OrderedMap<string, Node> {
-    return this.props.model.questions.questions;
+  canRemoveNode() {
+    return this.allNodes().size > 1;
   }
 
   onNodeRemove = (guid: string) => {
@@ -172,16 +170,17 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
       onSetCurrentNode(documentId, node);
     });
 
-    this.handleEdit(model.with({
-      questions:
-        model.questions.with({
-          questions: removeNode(guid, this.allNodes(), getChildren, setChildren) as
-            Immutable.OrderedMap<string, models.FeedbackQuestionNode>,
-        }),
-    }));
+    this.handleEdit(
+      model.with({
+        questions:
+          model.questions.with({
+            questions: removeNode(guid, this.allNodes(), getChildren, setChildren) as
+              Immutable.OrderedMap<string, models.FeedbackQuestionNode>,
+          }),
+      }));
   }
 
-  // item : AssessmentNode
+  // item : FeedbackQuestion
   onAddQuestion = (item) => {
     if (!this.props.editMode) return;
 
@@ -228,30 +227,6 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
     // do nothing
   }
 
-  onTypeChange = (type: string) => {
-    const { model } = this.props;
-
-    this.handleEdit(model.with({
-      resource:
-        model.resource.with({
-          type,
-        }),
-    }));
-  }
-
-  renderSettings() {
-    return (
-      <Collapse caption="No Settings">
-        <div style={{ marginLeft: '25px' }}>
-          {/* <form>
-            <div className="form-group row"></div>
-            <div className="form-group row"></div>
-          </form> */}
-        </div>
-      </Collapse>
-    );
-  }
-
   renderAdd() {
     const { editMode } = this.props;
     const { collapseInsertPopup } = this.state;
@@ -269,7 +244,8 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
     );
   }
 
-  onFocus = (model: Object, parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
+  onFocus = (
+    model: ContentElement, parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
     this.props.onUpdateContentSelection(
       this.props.context.documentId, model, parent, textSelection);
   }
@@ -332,9 +308,9 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
                 nodes={this.props.model.questions.questions}
                 expandedNodes={expanded}
                 selected={currentNode.guid}
-                onEdit={this.onEditNodes.bind(this)}
-                onChangeExpansion={this.onChangeExpansion.bind(this)}
-                onSelect={this.onSelect.bind(this)}
+                onEdit={this.onEditNodes}
+                onChangeExpansion={this.onChangeExpansion}
+                onSelect={this.onSelect}
                 course={course}>
                 {this.renderAdd()}
               </Outline>
@@ -343,8 +319,8 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
                 allSkills={this.props.context.skills}
                 activeContentGuid={activeContentGuid}
                 model={currentNode}
-                onEdit={(c: Node, src: ContentElement) => this.onEditNode(
-                  currentNode.guid, c as FeedbackQuestion, src)}
+                onEdit={(c: FeedbackQuestion, src: ContentElement) => this.onEditNode(
+                  currentNode.guid, c, src)}
                 onRemove={this.onNodeRemove}
                 onFocus={this.onFocus}
                 canRemove={this.canRemoveNode()}

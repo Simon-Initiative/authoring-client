@@ -24,10 +24,10 @@ const defaultLikertItemParams = {
 export class LikertItem extends Immutable.Record(defaultLikertItemParams) {
   contentType: 'LikertItem';
   elementType: 'item';
-  guid?: string;
-  id?: string;
-  prompt?: FeedbackPrompt;
-  required?: boolean;
+  guid: string;
+  id: string;
+  prompt: FeedbackPrompt;
+  required: boolean;
 
   constructor(params?: LikertItemParams) {
     super(augment(params, true));

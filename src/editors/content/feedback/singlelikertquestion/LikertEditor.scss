@@ -1,9 +1,9 @@
 .likert-table.single {
-    td {
-        line-height: 40px;
-    }
+    td:nth-child(1) {
+        vertical-align: middle;
 
-    td:nth-child(1):hover {
-        background-color: inherit;
+        &:hover {
+            background-color: inherit;
+        }
     }
 }

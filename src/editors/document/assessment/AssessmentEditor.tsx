@@ -37,9 +37,9 @@ import { Node } from 'data/content/assessment/node';
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
   activeContext: ActiveContext;
-  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: string, content: ContentElement, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -253,7 +253,6 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
   }
 
   onEditNode = (guid: string, node: models.Node, src: ContentElement) => {
-
     const { activeContext, context, model, onSetCurrentNodeOrPage, onUpdateContent } = this.props;
 
     const nodes = this.getCurrentPage(this.props).nodes;
@@ -515,7 +514,8 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     );
   }
 
-  onFocus = (model: Object, parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
+  onFocus = (
+    model: ContentElement, parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
     this.props.onUpdateContentSelection(
       this.props.context.documentId, model, parent, textSelection);
   }

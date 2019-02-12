@@ -22,6 +22,9 @@ export interface Props extends AbstractContentEditorProps<FeedbackMultipleChoice
   canRemove: boolean;
   onRemove: () => void;
   onDuplicate: () => void;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface State extends AbstractContentEditorState {
@@ -78,21 +81,20 @@ export class FeedbackMultipleChoiceEditor extends
 
   renderToolbar() {
     return (
-      <ToolbarGroup label="Multiple Choice" columns={3} highlightColor={CONTENT_COLORS.Activity}>
+      <ToolbarGroup label="Multiple Choice" columns={3} highlightColor={CONTENT_COLORS.Feedback}>
       </ToolbarGroup>
     );
   }
 
   renderMain() {
-    const { editMode, services, context, model, activeContentGuid, hover,
-      onUpdateHover, onFocus, onDuplicate, canRemove, onRemove } = this.props;
+    const { editMode, model, onDuplicate, canRemove, onRemove } = this.props;
 
     const choices = new ContentElements().with({
       content: model.choices,
       supportedElements: Immutable.List(['choice']),
     });
 
-    const getLabel = (e, i) => <span>{'Choice ' + (i + 1)}</span>;
+    const getLabel = (_, i) => <span>{'Choice ' + (i + 1)}</span>;
     const labels = {};
     model.choices.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
     const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
@@ -110,13 +112,7 @@ export class FeedbackMultipleChoiceEditor extends
             helpPopover={null} />
           <div className="question-body" key="question">
             <ContentContainer
-              activeContentGuid={activeContentGuid}
-              hover={hover}
-              onUpdateHover={onUpdateHover}
-              onFocus={onFocus}
-              editMode={editMode}
-              services={services}
-              context={context}
+              {...this.props}
               model={model.prompt.content}
               onEdit={this.onEditPrompt} />
             <br />
@@ -131,8 +127,8 @@ export class FeedbackMultipleChoiceEditor extends
               <ContentContainer
                 {...this.props}
                 model={choices}
-                bindProperties={bindLabel}
                 onEdit={this.onEditChoice}
+                bindProperties={bindLabel}
                 overrideRemove={(model: ContentElements, childModel) => model.size < 2}
               />
               <button type="button"

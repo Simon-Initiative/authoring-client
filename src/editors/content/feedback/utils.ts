@@ -3,9 +3,11 @@ import guid from 'utils/guid';
 import { LikertLabel } from 'data/content/feedback/likert_label';
 import { TEXT_ELEMENTS, ContentElements } from 'data/content/common/elements';
 import { LikertScale } from 'data/content/feedback/likert_scale';
+import { ContentElement } from 'data/content/common/interfaces';
 
 export function onEditScaleSize(
-  scaleSize: string, scale: LikertScale, onEditScale: (scale: LikertScale) => void) {
+  scaleSize: string, scale: LikertScale,
+  onEditScale: (scale: LikertScale, src: ContentElement) => void) {
 
   const newSize = Number.parseInt(scaleSize);
   const oldSize = Number.parseInt(scale.scaleSize);
@@ -28,12 +30,12 @@ export function onEditScaleSize(
       scaleCenter: String(Math.ceil(newSize / 2)),
       labels,
     }),
-  );
+    scale);
 }
 
 function newLabels(size: number): Immutable.OrderedMap<string, LikertLabel> {
   const label = (i: number) => new LikertLabel({
-    text: ContentElements.fromText('Label', guid(), TEXT_ELEMENTS),
+    text: ContentElements.fromText('Scale Label', guid(), TEXT_ELEMENTS),
     value: i.toString(),
   });
   const labels: LikertLabel[] = [];
@@ -44,12 +46,3 @@ function newLabels(size: number): Immutable.OrderedMap<string, LikertLabel> {
   return Immutable.OrderedMap<string, LikertLabel>(labels.map(label => [label.guid, label]));
 }
 
-export function onEditLabelText(
-  text: string, label: LikertLabel, scale: LikertScale, onEditScale: (scale: LikertScale) => void) {
-
-  onEditScale(scale.with({
-    labels: scale.labels.set(label.guid, label.with({
-      text: ContentElements.fromText(text, guid(), TEXT_ELEMENTS),
-    })).toOrderedMap(),
-  }));
-}

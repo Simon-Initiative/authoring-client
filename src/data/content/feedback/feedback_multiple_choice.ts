@@ -4,6 +4,7 @@ import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { FeedbackChoice } from './feedback_choice';
 import { FeedbackPrompt } from './feedback_prompt';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 type FeedbackMultipleChoiceParams = {
   guid?: string;
@@ -22,9 +23,7 @@ const defaultFeedbackMultipleChoiceParams = {
   id: '',
   prompt: new FeedbackPrompt(),
   required: false,
-  choices: Immutable.OrderedMap<string, FeedbackChoice>([
-    [createGuid(), new FeedbackChoice()],
-  ]),
+  choices: Immutable.OrderedMap<string, FeedbackChoice>(),
 };
 
 export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMultipleChoiceParams) {
@@ -47,6 +46,10 @@ export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMult
   clone(): FeedbackMultipleChoice {
     return ensureIdGuidPresent(this.with({
       prompt: this.prompt.clone(),
+      choices: this.choices.mapEntries(([_, v]) => {
+        const clone: FeedbackChoice = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, FeedbackChoice>,
     }));
   }
 
@@ -95,7 +98,9 @@ export class FeedbackMultipleChoice extends Immutable.Record(defaultFeedbackMult
     const children = [
       this.prompt.toPersistence(),
       ...this.choices.size === 0
-        ? [(new FeedbackChoice()).toPersistence()]
+        ? [(new FeedbackChoice({
+          text: ContentElements.fromText(' ', '', TEXT_ELEMENTS),
+        })).toPersistence()]
         : this.choices.toArray().map(item => item.toPersistence()),
     ];
 

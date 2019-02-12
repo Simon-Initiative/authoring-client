@@ -1,28 +1,31 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import guid from 'utils/guid';
-
 import { Button } from 'editors/content/common/Button';
 import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 import { LikertScale } from 'data/content/feedback/likert_scale';
 import { LikertItem } from 'data/content/feedback/likert_item';
 import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
-import { DynaDropLabel } from 'editors/content/learning/dynadragdrop/DynaDropLabel';
-import { ContiguousText } from 'data/content/learning/contiguous';
-import { ContentElements, TEXT_ELEMENTS, INLINE_ELEMENTS } from 'data/content/common/elements';
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Select } from 'editors/content/common/Select';
 import { onEditScaleSize } from '../utils';
-import { onEditLabelText } from 'editors/content/feedback/utils';
+import { LikertSeries } from 'data/content/feedback/likert_series';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { ContentElement } from 'data/content/common/interfaces';
+import { AbstractContentEditorProps } from 'editors/content/common/AbstractContentEditor';
 
 import './QuestionTable.scss';
 
-// Adapted from HTMLTableEditor
-export interface Props {
+enum Direction {
+  Up,
+  Down,
+}
+
+// Adapted from TableEditor
+export interface Props extends AbstractContentEditorProps<LikertSeries> {
   editMode: boolean;
-  scale: LikertScale;
-  onEditScale: (scale: LikertScale) => void;
-  items: Immutable.OrderedMap<string, LikertItem>;
-  onEditItems: (items: Immutable.OrderedMap<string, LikertItem>) => void;
+  onEditScale: (scale: LikertScale, src: ContentElement) => void;
+  onEditItems: (items: Immutable.OrderedMap<string, LikertItem>, src: ContentElement) => void;
 }
 
 export interface State { }
@@ -30,7 +33,9 @@ export interface State { }
 export class QuestionTable extends React.PureComponent<Props, State> {
 
   onAddRow(index: number) {
-    const { items, onEditItems } = this.props;
+    const { model, onEditItems } = this.props;
+
+    const items = model.items;
 
     const item = new LikertItem({
       prompt: new FeedbackPrompt({
@@ -39,30 +44,43 @@ export class QuestionTable extends React.PureComponent<Props, State> {
     });
 
     onEditItems(
-      Immutable.OrderedMap<string, LikertItem>(
-        items.take(index)
-          .concat(Immutable.OrderedMap<string, LikertItem>([[item.guid, item]]))
-          .concat(items.skip(index))));
+      items.take(index)
+        .concat(Immutable.OrderedMap([[item.guid, item]]))
+        .concat(items.skip(index))
+        .toOrderedMap(),
+      item);
   }
 
   onRemoveRow(index: number) {
-    const { items, onEditItems } = this.props;
+    const { model, onEditItems } = this.props;
+    const items = model.items;
 
-    onEditItems(items.take(index).concat(items.skip(index + 1)).toOrderedMap());
+    onEditItems(items.take(index).concat(items.skip(index + 1)).toOrderedMap(), null);
   }
 
-  onEditItemText(text: string, item: LikertItem) {
-    const { items, onEditItems } = this.props;
+  onMoveRow(index: number, dir: Direction) {
+    const { model, onEditItems } = this.props;
+    const items = model.items;
 
-    onEditItems(items.set(item.guid, item.with({
-      prompt: item.prompt.with({
-        content: ContentElements.fromText(text, guid(), TEXT_ELEMENTS),
-      }),
-    })));
+    const reordered = dir === Direction.Up
+      ? items.take(index - 1)
+        .concat(items.skip(index).take(1))
+        .concat(items.skip(index - 1).take(1))
+        .concat(items.skip(index + 1))
+        .toOrderedMap()
+      : items.take(index)
+        .concat(items.skip(index + 1).take(1))
+        .concat(items.skip(index).take(1))
+        .concat(items.skip(index + 1))
+        .toOrderedMap();
+
+    onEditItems(reordered, null);
   }
 
   renderDropdown(
-    index: number, onInsert: (index: number) => void,
+    index: number,
+    onMove: (index: number, dir: Direction) => void,
+    onInsert: (index: number) => void,
     onRemove: (index: number) => void,
     term: string, showOnRight: boolean) {
 
@@ -73,7 +91,23 @@ export class QuestionTable extends React.PureComponent<Props, State> {
           size={ToolbarDropdownSize.Tiny}
           hideArrow
           positionMenuOnRight={showOnRight}
-          label={<i className={'fa fa-ellipsis-v dropdown-label more-label'} />} >
+          label={<i className={'fa fa-ellipsis-v dropdown-label more-label'} />}>
+          {index > 0 ?
+            <button className="dropdown-item"
+              disabled={!editMode}
+              onClick={() => onMove(index, Direction.Up)}>
+              {`Move ${term} up`}
+            </button>
+            : null}
+          {index < this.props.model.items.size - 1
+            ? <button className="dropdown-item"
+              disabled={!editMode}
+              onClick={() => onMove(index, Direction.Down)}>
+              {`Move ${term} down`}
+            </button>
+            : null
+          }
+          <hr />
           <button className="dropdown-item"
             disabled={!editMode}
             onClick={() => onInsert(index)}>
@@ -95,30 +129,31 @@ export class QuestionTable extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { editMode, scale, items, onEditScale } = this.props;
+    const { editMode, model, onEditScale, onEditItems } = this.props;
+    const { scale, items } = model;
 
-    const renderTableRow = (item: LikertItem, index) => {
+    const renderTableRow = (item: LikertItem, index: number) => {
       return (
         <tr key={item.guid}>
           <td>
             {this.renderDropdown(
               index,
+              (index, dir) => this.onMoveRow(index, dir),
               index => this.onAddRow(index),
               index => this.onRemoveRow(index),
               'row',
               false,
             )}
           </td>
-          <DynaDropLabel
-            key={item.guid}
-            id={item.guid}
-            className="item-prompt"
-            canToggleType={false}
-            onToggleType={null}
-            editMode={editMode}
-            text={(item.prompt.content.content.first() as ContiguousText)
-              .extractPlainText().valueOr('')}
-            onEdit={value => this.onEditItemText(value, item)} />
+          <td>
+            <ContentContainer
+              {...this.props}
+              hideSingleDecorator
+              model={item.prompt.content}
+              onEdit={(content, source) => onEditItems(
+                items.set(item.guid, item.with({ prompt: item.prompt.with({ content }) })),
+                source)} />
+          </td>
           {Array(Number.parseInt(scale.scaleSize))
             .fill(null).map(_ => <td className="question-table-radio">
               <input name=""
@@ -149,16 +184,16 @@ export class QuestionTable extends React.PureComponent<Props, State> {
                 {scaleOptions}
               </Select></th>
               {scale.labels.toArray().map((label =>
-                <DynaDropLabel
-                  key={label.guid}
-                  id={label.guid}
-                  className="label"
-                  canToggleType={false}
-                  onToggleType={null}
-                  editMode={editMode}
-                  text={(label.text.content.first() as ContiguousText)
-                    .extractPlainText().valueOr('')}
-                  onEdit={text => onEditLabelText(text, label, scale, onEditScale)} />))}
+                <td>
+                  <ContentContainer
+                    {...this.props}
+                    hideSingleDecorator
+                    model={label.text}
+                    onEdit={(text, source) => onEditScale(
+                      scale.with({ labels: scale.labels.set(label.guid, label.with({ text })) }),
+                      source)} />
+                </td>
+              ))}
             </tr>
           </thead>
           <tbody>

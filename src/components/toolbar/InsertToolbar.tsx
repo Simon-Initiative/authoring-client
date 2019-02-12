@@ -29,6 +29,7 @@ import { findNodes } from 'data/models/utils/workbook';
 import { getContentIcon, insertableContentTypes } from 'editors/content/utils/content';
 import { Message } from 'types/messages';
 import { selectTargetElement } from 'components/message/selection';
+import { FeedbackModel } from 'data/models/feedback';
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -552,6 +553,56 @@ export class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('wb:inline')}>
                 {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
                 Create summative assessment
+                </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuDivider />
+
+              <ToolbarButtonMenuItem
+                onClick={() => onDisplayModal(
+                  <ResourceSelection
+                    filterPredicate={(res: Resource): boolean =>
+                      res.type === LegacyTypes.feedback
+                      && res.resourceState !== ResourceState.DELETED}
+                    courseId={context.courseId}
+                    onInsert={(resource) => {
+                      onDismissModal();
+                      const resources = context.courseModel.resources.toArray();
+                      const found = resources.find(r => r.id === resource.id);
+                      if (found !== undefined) {
+                        onInsert(new contentTypes.Activity().with({
+                          idref: resource.id,
+                          purpose: Maybe.just(contentTypes.PurposeTypes.MyResponse),
+                        }));
+                      }
+                    }}
+                    onCancel={onDismissModal}
+                  />)
+                }
+                disabled={!editMode || !parentSupportsElementType('activity')}>
+                {getContentIcon(insertableContentTypes.Feedback, { width: 22 })}
+                Insert feedback assessment
+                </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  const model = FeedbackModel.createNew(
+                    guid(),
+                    'New Feedback Assessment',
+                    'This is a course feedback assessment',
+                  );
+
+                  onCreateNew(model)
+                    .then((resource) => {
+                      onInsert(new contentTypes.Activity().with({
+                        idref: resource.id,
+                        purpose: Maybe.just(contentTypes.PurposeTypes.MyResponse),
+                      }));
+                    });
+
+                }}
+                disabled={!editMode || !parentSupportsElementType('activity')}>
+                {getContentIcon(insertableContentTypes.Feedback, { width: 22 })}
+                Create feedback assessment
                 </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider />

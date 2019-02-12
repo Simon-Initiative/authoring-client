@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import { ContentElements, TEXT_ELEMENTS } from '../common/elements';
 import { getChildren, augment } from '../common';
 import { ensureIdGuidPresent } from 'data/content/common';
+import createGuid from 'utils/guid';
 
 type FeedbackChoiceParams = {
   guid?: string;
@@ -45,7 +46,8 @@ export class FeedbackChoice extends Immutable.Record(defaultFeedbackChoiceParams
 
     model = model.with({ id: o['@id'] });
 
-    const text = ContentElements.fromPersistence(getChildren(o), '', TEXT_ELEMENTS, null, notify);
+    const text = ContentElements.fromPersistence(
+      getChildren(o), createGuid(), TEXT_ELEMENTS, null, notify);
     model = model.with({ text });
 
     return model;

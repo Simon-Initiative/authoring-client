@@ -45,6 +45,10 @@ export class LikertSeries extends Immutable.Record(defaultLikertSeriesParams) {
     return ensureIdGuidPresent(this.with({
       prompt: this.prompt.clone(),
       scale: this.scale.clone(),
+      items: this.items.mapEntries(([_, v]) => {
+        const clone: LikertItem = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, LikertItem>,
     }));
   }
 
@@ -82,6 +86,7 @@ export class LikertSeries extends Immutable.Record(defaultLikertSeriesParams) {
   }
 
   toPersistence(): Object {
+
     const children = [
       this.prompt.toPersistence(),
       this.scale.toPersistence(),

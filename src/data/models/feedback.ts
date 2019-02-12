@@ -43,8 +43,7 @@ const defaultFeedbackModelParams = {
   questions: new FeedbackQuestions(),
 };
 
-export class FeedbackModel
-  extends Immutable.Record(defaultFeedbackModelParams) {
+export class FeedbackModel extends Immutable.Record(defaultFeedbackModelParams) {
   modelType: 'FeedbackModel';
   resource: contentTypes.Resource;
   guid: string;
@@ -69,6 +68,10 @@ export class FeedbackModel
       title: this.title.clone(),
       description: this.description.clone(),
       questions: this.questions.clone(),
+      objrefs: this.objrefs.mapEntries(([_, v]) => {
+        const clone: ObjRef = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, ObjRef>,
     }));
   }
 
@@ -147,6 +150,7 @@ export class FeedbackModel
   }
 
   toPersistence(): Object {
+
     const children = [
       this.title.toPersistence(),
     ];
