@@ -28,7 +28,7 @@ import {
 } from 'data/content/common/elements';
 import guid from 'utils/guid';
 import { TextInput } from 'editors/content/common/controls';
-import { collectInlines } from 'utils/course';
+import { collectInlinesNested } from 'utils/course';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
 import { ResourceState } from 'data/content/resource';
@@ -350,7 +350,7 @@ export class MultipanelEditor
   onSelectInlineActivity() {
     const { model, context, documentModel, onDisplayModal, onDismissModal, onEdit } = this.props;
 
-    const existingInlines = collectInlines(documentModel);
+    const existingInlines = collectInlinesNested(documentModel);
 
     return onDisplayModal(
       <ResourceSelection
@@ -360,6 +360,14 @@ export class MultipanelEditor
           && res.resourceState !== ResourceState.DELETED
           && !existingInlines.has(res.id)}
         courseId={context.courseId}
+        noResourcesMessage={
+          <React.Fragment>
+            No assessments are available for this activity.
+            <br/>
+            Please create a new formative assessment or remove an existing
+            reference from this page before adding another one.
+          </React.Fragment>
+        }
         onInsert={(resource) => {
           onDismissModal();
           const resources = context.courseModel.resources.toArray();

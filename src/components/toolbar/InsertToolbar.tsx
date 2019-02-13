@@ -24,7 +24,7 @@ import { styles } from 'components/toolbar/InsertToolbar.style';
 import { Resource, ResourceState } from 'data/content/resource';
 import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
-import { collectInlines } from 'utils/course';
+import { collectInlines, collectInlinesNested } from 'utils/course';
 import { getContentIcon, insertableContentTypes } from 'editors/content/utils/content';
 import { Message } from 'types/messages';
 import { selectTargetElement } from 'components/message/selection';
@@ -591,7 +591,7 @@ export class InsertToolbar
                 onClick={() => {
                   requestLatestModel()
                     .then((model) => {
-                      const existingInlines = collectInlines(model);
+                      const existingInlines = collectInlinesNested(model);
 
                       return onDisplayModal(
                         <ResourceSelection
@@ -601,6 +601,14 @@ export class InsertToolbar
                             && res.resourceState !== ResourceState.DELETED
                             && !existingInlines.has(res.id)}
                           courseId={context.courseId}
+                          noResourcesMessage={
+                            <React.Fragment>
+                              No assessments are available for this activity.
+                              <br/>
+                              Please create a new formative assessment or remove an existing
+                              reference from this page before adding another one.
+                            </React.Fragment>
+                          }
                           onInsert={(resource) => {
                             onDismissModal();
                             const resources = context.courseModel.resources.toArray();

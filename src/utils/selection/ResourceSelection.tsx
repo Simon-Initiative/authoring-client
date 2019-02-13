@@ -8,12 +8,14 @@ import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import * as models from 'data/models';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
+import { caseOf } from 'utils/utils';
 
 export interface ResourceSelectionProps {
   timeSkewInMs: number;
   course: models.CourseModel;
   courseId: string;
   title? :string;
+  noResourcesMessage?: string | JSX.Element;
   filterPredicate: (res: Resource) => boolean;
   onInsert: (item: Resource) => void;
   onCancel: () => void;
@@ -147,12 +149,27 @@ export default class ResourceSelection
               onChange={searchText => this.filterBySearchText(searchText)}
             />
           </div>
-          <SortableTable
-            rowRenderer={rowRenderer}
-            model={rows}
-            columnComparators={comparators}
-            columnRenderers={columnRenderers}
-            columnLabels={labels} />
+          {rows.length > 0
+            ? (
+              <SortableTable
+                rowRenderer={rowRenderer}
+                model={rows}
+                columnComparators={comparators}
+                columnRenderers={columnRenderers}
+                columnLabels={labels} />
+            )
+          : this.state.searchText !== ''
+            ? (
+            <div className="no-resources-msg">
+              No resources match the search criteria
+            </div>
+            )
+          : (
+            <div className="no-resources-msg">
+              {this.props.noResourcesMessage || 'No resources found'}
+            </div>
+          )
+          }
         </ModalSelection>
       </div>
     );
