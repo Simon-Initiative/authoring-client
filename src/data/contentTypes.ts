@@ -110,6 +110,7 @@ export { Head } from 'data/content/workbook/head';
 export { Section as WorkbookSection } from 'data/content/workbook/section';
 export { WbInline } from 'data/content/workbook/wbinline';
 export { Xref } from 'data/content/workbook/xref';
+export { Multipanel } from 'data/content/workbook/multipanel/multipanel';
 
 // Resource level
 export { FileNode } from 'data/content/file_node';
