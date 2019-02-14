@@ -43,10 +43,8 @@ const blockHandlers = {
 
 const inlineTerminalTags = {};
 
-// The following ones simply use one or two spaces
+// The following ones simply use one space
 const singleSpace = (item, provider) => ' ';
-const twoSpaces = (item, provider) => '  ';
-
 inlineTerminalTags['m:math'] = singleSpace;
 inlineTerminalTags['#math'] = singleSpace;
 inlineTerminalTags['image'] = singleSpace;
