@@ -384,6 +384,15 @@ export class InsertToolbar
               </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
+
+                const theorem = new contentTypes.Theorem();
+                onInsert(theorem);
+              }}
+              disabled={!editMode || !parentSupportsElementType('theorem')}>
+              <i style={{ width: 22 }} className={'fa fa-university'} /> Theorem
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
                 const speakerId = guid();
                 const lineId = guid();
 

@@ -7,6 +7,7 @@ import {
 import { Select, TextInput } from 'editors/content/common/controls';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
+
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -16,6 +17,7 @@ import {
 } from 'components/message/selection';
 import '../common/draft/decorators/styles.scss';
 import { IdentifiableContentElement } from 'data/content/common/interfaces';
+
 import { caseOf } from 'utils/utils';
 import { Button } from 'components/common/Button';
 import { Maybe } from 'tsmonad';
@@ -143,6 +145,7 @@ export default class CommandEditor
       });
   }
 
+
   onEditCuePoint(text: string, cuepoint: 'startcuepoint' | 'endcuepoint') {
     const { model } = this.props;
     const { startCuePoint, endCuePoint } = parseCommandMessageText(model.message.text);
@@ -167,6 +170,7 @@ export default class CommandEditor
     this.onMessageEdit(messageText);
   }
 
+
   renderMain() {
 
     const linkOrButton = this.props.model.style === CommandStyle.Button
@@ -186,6 +190,7 @@ export default class CommandEditor
     const { editMode, model, onEdit } = this.props;
 
     let targetDisplay;
+
     type MessageType = 'Media' | 'Other';
     let messageType: MessageType = 'Other';
 
@@ -195,6 +200,7 @@ export default class CommandEditor
       targetDisplay = <div>Unknown</div>;
     } else {
       targetDisplay = <div>{this.state.targetRequest.element.contentType}</div>;
+
       messageType = caseOf<MessageType>(this.state.targetRequest.element.contentType)({
         Video: 'Media',
         Audio: 'Media',

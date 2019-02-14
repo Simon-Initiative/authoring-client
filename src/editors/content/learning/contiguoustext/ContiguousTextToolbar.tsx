@@ -336,6 +336,7 @@ export default class ContiguousTextToolbar
             onClick={() => {
 
               const selectionSnapshot = selection;
+
               model.extractParagraphSelectedText(selection).lift((title) => {
                 selectTargetElement()
                   .then((e) => {
