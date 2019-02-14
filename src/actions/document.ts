@@ -337,9 +337,10 @@ export function mapAndSave(fn: MapFn, documentId: string) {
   return function (dispatch, getState) {
     const editedDocument: EditedDocument = getState().documents.get(documentId);
     const model = rawMap(fn, ((editedDocument.document.model as any) as ContentElement));
-    dispatch(save(documentId, (model as any) as models.ContentModel));
+    return dispatch(save(documentId, (model as any) as models.ContentModel));
   };
 }
+
 
 export function save(documentId: string, model: models.ContentModel, isUndoRedo?: boolean) {
   return function (dispatch, getState) {

@@ -43,12 +43,16 @@ const blockHandlers = {
 
 const inlineTerminalTags = {};
 
-// The following ones simply use a space.
+// The following ones simply use one or two spaces
 const singleSpace = (item, provider) => ' ';
+const twoSpaces = (item, provider) => '  ';
+
 inlineTerminalTags['m:math'] = singleSpace;
 inlineTerminalTags['#math'] = singleSpace;
 inlineTerminalTags['image'] = singleSpace;
 inlineTerminalTags['sym'] = singleSpace;
+inlineTerminalTags['cite'] = twoSpaces;
+
 inlineTerminalTags['command'] = (item, provider) => {
 
   const arr = item['command']['#array'];
@@ -73,9 +77,6 @@ inlineTerminalTags['input_ref'] = (item, provider) => {
   }
   return ' Unknown ';
 };
-
-const inlineTagsDefaultContent = {};
-inlineTagsDefaultContent['cite'] = ' ';
 
 
 type ParsingContext = {
@@ -111,7 +112,7 @@ function getInlineHandlers() {
       undefined, 'MUTABLE',
       common.EntityTypes.link, 'link', registeredTypes['link']),
     cite: insertDataDrivenEntity.bind(
-      undefined, 'MUTABLE',
+      undefined, 'IMMUTABLE',
       common.EntityTypes.cite, 'cite', registeredTypes['cite']),
     extra: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
@@ -400,16 +401,6 @@ function processInline(
           processInline(subItem, context, blockContext, backingTextProvider);
         }
       });
-
-      // If a tag's children provided no additional content,
-      // set the default content for that tag, if one is defined.
-      // This exists primarily to support empty 'cite' tags
-      // that have to have at least a space to be able to render,
-      // and thus be preserved
-      if (blockContext.fullText === blockBeforeChildren.fullText
-        && inlineTagsDefaultContent[key]) {
-        blockContext.fullText += inlineTagsDefaultContent[key];
-      }
 
     }
 

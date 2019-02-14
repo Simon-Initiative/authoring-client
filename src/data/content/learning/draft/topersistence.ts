@@ -37,6 +37,8 @@ inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
 inlineTerminalTags['sym'] = true;
 inlineTerminalTags['command'] = true;
+inlineTerminalTags['cite'] = true;
+
 
 
 type Container = Object[];
@@ -337,7 +339,6 @@ function isLinkRange(er: common.RawEntity): boolean {
     case common.EntityTypes.link:
     case common.EntityTypes.xref:
     case common.EntityTypes.quote:
-    case common.EntityTypes.cite:
       return true;
     default:
       return false;

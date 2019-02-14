@@ -8,6 +8,7 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { modalActions } from 'actions/modal';
 import { Resource } from 'data/content/resource';
 import { CourseModel } from 'data/models/course';
+import { addEntry } from 'actions/bibliography';
 
 interface StateProps {
   selection: TextSelection;
@@ -18,6 +19,7 @@ interface StateProps {
 interface DispatchProps {
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
+  onAddEntry: (e, documentId) => Promise<void>;
 }
 
 interface OwnProps extends AbstractContentEditorProps<ContiguousText> {
@@ -34,9 +36,10 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   return {
     courseModel,
     resource,
-    selection: activeContext.textSelection.caseOf({ just: s => s, nothing: () => {
-      return TextSelection.createEmpty('');
-    },
+    selection: activeContext.textSelection.caseOf({
+      just: s => s, nothing: () => {
+        return TextSelection.createEmpty('');
+      },
     }),
   };
 };
@@ -45,6 +48,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
+    onAddEntry: (e, documentId) => dispatch(addEntry(e, documentId)),
   };
 };
 

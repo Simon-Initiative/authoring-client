@@ -8,11 +8,16 @@ import {
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarGroup, ToolbarLayout, determineBaseUrl }
   from 'components/toolbar/ContextAwareToolbar';
+import {
+  ToolbarNarrowMenu,
+  ToolbarButtonMenuItem,
+} from 'components/toolbar/ToolbarButtonMenu';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { entryInstances } from 'editors/content/learning/bibliography/utils';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 import { selectImage } from 'editors/content/learning/ImageEditor';
@@ -22,6 +27,7 @@ import {
   selectTargetElement,
 } from 'components/message/selection';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
+import createGuid from 'utils/guid';
 import { styles } from './ContiguousText.styles';
 
 export interface ContiguousTextToolbarProps
@@ -30,6 +36,7 @@ export interface ContiguousTextToolbarProps
   resource: Resource;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
+  onAddEntry: (e, documentId) => Promise<void>;
   selection: TextSelection;
 }
 
@@ -88,6 +95,43 @@ export default class ContiguousTextToolbar
     return <SidebarContent title="Text Block" />;
   }
 
+  renderEntryOptions(selection) {
+
+    const addBibEntry = (e) => {
+
+      const withId = e.with({ id: createGuid() });
+
+      this.props.onAddEntry(withId, this.props.context.documentId);
+
+      // This is a hack - but I was having problems bridging the onEdit based mutation
+      // with the dispatched based mutation
+      setTimeout(
+        () => {
+          this.props.onEdit(this.props.model.addEntity(
+            EntityTypes.cite, true, new contentTypes.Cite().with({ entry: withId.id }), selection));
+        },
+        100);
+
+
+    };
+
+    const buttons = Object.keys(entryInstances).map((key) => {
+      return (
+        <ToolbarButtonMenuItem
+          disabled={false}
+          onClick={() => addBibEntry(entryInstances[key])}>
+          {key}
+        </ToolbarButtonMenuItem>
+      );
+    });
+
+    return (
+      <div style={{ backgroundColor: 'white', margin: '8px' }}>
+        {buttons}
+      </div>
+    );
+  }
+
   renderToolbar() {
 
     const { model, onEdit, editMode, selection } = this.props;
@@ -119,7 +163,7 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={12.4}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={13.4}>
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
@@ -212,17 +256,6 @@ export default class ContiguousTextToolbar
             tooltip="Quotation">
             <i className={'fa fa-quote-right'} />
           </ToolbarButton>
-          {/* <ToolbarButton
-            onClick={
-              () => {
-                onEdit(model.addEntity(
-                  EntityTypes.cite, true, new contentTypes.Cite(), selection));
-              }
-            }
-            disabled={!supports('cite') || !rangeEntitiesEnabled}
-            tooltip="Citation">
-            <i className={'fa fa-asterisk'} />
-          </ToolbarButton> */}
           <ToolbarButton
             onClick={
               () => {
@@ -347,7 +380,13 @@ export default class ContiguousTextToolbar
 
             {getContentIcon(insertableContentTypes.Command)}
           </ToolbarButton>
+          <ToolbarNarrowMenu
+            icon={<i className={'fa fa-asterisk'} />}
+            label={''}
+            disabled={!supports('cite') || !pointEntitiesEnabled}>
 
+            {this.renderEntryOptions(selection)}
+          </ToolbarNarrowMenu>
         </ToolbarLayout.Inline>
       </ToolbarGroup>
     );

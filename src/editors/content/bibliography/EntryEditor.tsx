@@ -18,6 +18,7 @@ import { styles } from './EntryEditor.styles';
 export interface EntryEditorProps
   extends AbstractContentEditorProps<contentTypes.Entry> {
   onShowSidebar: () => void;
+  label: any;
 }
 
 export interface EntryEditorState {
@@ -283,12 +284,13 @@ export default class EntryEditor
   }
 
   renderMain() {
-    const { classes } = this.props;
+    const { classes, label } = this.props;
 
     return (
       <div className={classNames([classes.entry])}>
+
         <div className={classNames([classes.entryLabel])}>
-          {toFriendlyLabel(this.props.model.contentType)}
+          {label}. {toFriendlyLabel(this.props.model.contentType)}
         </div>
         <table style={{ width: '100%' }}>
           <tbody>

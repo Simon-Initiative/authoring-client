@@ -12,14 +12,20 @@ import { ContentElements } from 'data/content/common/elements';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { Objectives } from 'editors/document/workbook/Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
+
+import { EntityTypes } from 'data/content/learning/common';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import * as Messages from 'types/messages';
 import { buildMissingObjectivesMessage } from 'utils/error';
 import { DEFAULT_OBJECTIVE_TITLE } from 'data/models/objective';
+import { entryInstances } from 'editors/content/learning/bibliography/utils';
+import createGuid from 'utils/guid';
+import { map } from 'data/utils/map';
 
 import './WorkbookPageEditor.scss';
+import { ContentElement } from 'data/content/common/interfaces';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: string) => void;
@@ -33,6 +39,7 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  setOrderedIds: (ids: Immutable.Map<string, number>) => void;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {
@@ -44,23 +51,23 @@ function hasMissingResource(): boolean {
   return false;
 }
 
-const entryInstances = {
-  Article: new contentTypes.Article(),
-  Book: new contentTypes.Book(),
-  Booklet: new contentTypes.Booklet(),
-  Conference: new contentTypes.Conference(),
-  InBook: new contentTypes.InBook(),
-  InCollection: new contentTypes.InCollection(),
-  InProceedings: new contentTypes.InProceedings(),
-  Manual: new contentTypes.Manual(),
-  MastersThesis: new contentTypes.MastersThesis(),
-  PhdThesis: new contentTypes.PhdThesis(),
-  Proceedings: new contentTypes.Proceedings(),
-  TechReport: new contentTypes.TechReport(),
-  Misc: new contentTypes.Misc(),
-  Unpublished: new contentTypes.Unpublished(),
-};
 
+function toOrderedIds(bib: contentTypes.Bibliography): Immutable.Map<string, number> {
+  return Immutable.Map(bib.bibEntries.toArray().map((e, i) => [e.id, i]));
+}
+
+function isStructurallyDifferent(bib1: contentTypes.Bibliography, bib2: contentTypes.Bibliography) {
+  if (bib1.bibEntries.size !== bib2.bibEntries.size) {
+    return true;
+  }
+  const arr1 = bib1.bibEntries.toArray();
+  bib1.bibEntries.toArray().forEach((c, i) => {
+    if (arr1[i].id !== c.id) {
+      return true;
+    }
+  });
+  return false;
+}
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, WorkbookPageEditorState> {
@@ -107,7 +114,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       this.noObjectivesMessage = buildMissingObjectivesMessage(courseId);
       showMessage(this.noObjectivesMessage);
     }
+
+    this.props.setOrderedIds(toOrderedIds(this.props.model.bibliography));
   }
+
+
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
     if (this.props.context.objectives.size <= 1 &&
@@ -121,6 +132,10 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         nextProps.model.head.objrefs, nextProps.context.objectives)) {
         nextProps.services.refreshObjectives(nextProps.context.courseId);
       }
+    }
+
+    if (isStructurallyDifferent(this.props.model.bibliography, nextProps.model.bibliography)) {
+      this.props.setOrderedIds(toOrderedIds(nextProps.model.bibliography));
     }
   }
 
@@ -151,8 +166,37 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const bibliography = this.props.model.bibliography.with({
       bibEntries: Immutable.OrderedMap<string, contentTypes.Entry>(items),
     });
+    let model = this.props.model.with({ bibliography });
 
-    const model = this.props.model.with({ bibliography });
+    if (bibliography.bibEntries.size < this.props.model.bibliography.bibEntries.size) {
+      // Find the item that was removed, and remove the citations
+      // that reference it
+      const updated = bibliography.bibEntries.toArray().reduce(
+        (p, e) => {
+          p[e.guid] = e;
+          return p;
+        },
+        {},
+      );
+
+      const remove = (id, e) => {
+        if ('ContiguousText' === e.contentType) {
+          const ct = e as ContiguousText;
+          const citations = ct.getEntitiesByType(EntityTypes.cite);
+          const matched = citations.filter(c => c.entity.data.entry === id);
+          return matched.length > 0
+            ? ct.removeEntity(matched[0].entityKey)
+            : ct;
+        }
+        return e;
+      };
+      this.props.model.bibliography.bibEntries.toArray().forEach((e) => {
+        if (updated[e.guid] === undefined) {
+          model = map(remove.bind(undefined, e.id), (model as any) as ContentElement) as any;
+        }
+      });
+
+    }
 
     this.handleEdit(model);
   }
@@ -199,7 +243,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     );
   }
 
-  addEntry(e) {
+  addEntry(rawEntry) {
+
+    const e = rawEntry.with({ id: createGuid() });
     const bibEntries = this.props.model.bibliography.bibEntries.set(e.guid, e);
     const bibliography = this.props.model.bibliography.with({ bibEntries });
     const model = this.props.model.with({ bibliography });
@@ -227,6 +273,18 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       content: model.bibliography.bibEntries,
     });
 
+
+    const getLabel = (e, i) => (i + 1);
+
+    const labels = {};
+
+    model.bibliography.bibEntries.toArray().map((e, i) => {
+      labels[e.guid]
+        = <span style={{ display: 'inline-block', minWidth: '12px' }}>{getLabel(e, i)}</span>;
+    });
+
+    const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
+
     const containerOrNone = model.bibliography.bibEntries.size > 0
       ? <ContentContainer
         parent={null}
@@ -235,6 +293,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         onUpdateHover={onUpdateHover}
         onFocus={this.onFocus.bind(this)}
         editMode={this.props.editMode}
+        bindProperties={bindLabel}
         services={this.props.services}
         context={this.props.context}
         model={elements}
