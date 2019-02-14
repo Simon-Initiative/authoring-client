@@ -8,7 +8,6 @@ import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import * as models from 'data/models';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
-import { caseOf } from 'utils/utils';
 
 export interface ResourceSelectionProps {
   timeSkewInMs: number;
