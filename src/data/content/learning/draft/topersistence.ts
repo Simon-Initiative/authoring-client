@@ -37,8 +37,6 @@ inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
 inlineTerminalTags['sym'] = true;
 inlineTerminalTags['command'] = true;
-inlineTerminalTags['cite'] = true;
-
 
 
 type Container = Object[];

@@ -5,6 +5,7 @@ import { EntityTypes } from '../../../../../data/content/learning/common';
 import { Cite as CiteData } from 'data/content/learning/cite';
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
+import { StyledInlineEntity } from './StyledInlineEntity';
 
 import './styles.scss';
 
@@ -20,16 +21,29 @@ class Cite extends React.Component<{ orderedIds, entityKey, offsetKey, contentSt
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
 
     const entry = (data as CiteData).entry;
-    let position = this.props.orderedIds.has(entry)
-      ? this.props.orderedIds.get(entry) + 1
-      : '  ';
-    if ((position + '').length === 1) {
-      position = ' ' + position;
+
+    let toDisplay = (
+      <StyledInlineEntity
+        offsetKey={this.props.offsetKey}
+        className="entity-hyperlink"
+        tooltip="Citation">
+        {this.props.children}
+      </StyledInlineEntity>
+    );
+
+    if (entry !== '') {
+
+      let position = this.props.orderedIds.has(entry)
+        ? this.props.orderedIds.get(entry) + 1
+        : '  ';
+      if ((position + '').length === 1) {
+        position = ' ' + position;
+      }
+      toDisplay = <span className="cite">{position}</span>;
     }
-    const cite = <span className="cite">{position}</span>;
 
     return (
-      <span data-offset-key={this.props.offsetKey}>{cite}</span>
+      <span data-offset-key={this.props.offsetKey}>{toDisplay}</span>
     );
   }
 }

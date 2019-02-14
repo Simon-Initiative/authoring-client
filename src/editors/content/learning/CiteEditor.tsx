@@ -32,36 +32,14 @@ export default class CiteEditor
   }
 
   renderSidebar() {
-    const { editMode, model, onEdit } = this.props;
-
     return (
-      <SidebarContent title="Citation">
-        <SidebarGroup label="">
-          <SidebarRow label="Entry">
-            <TextInput
-              editMode={editMode}
-              width="100%"
-              label=""
-              value={model.entry}
-              type="string"
-              onEdit={entry => onEdit(model.with({ entry }))}
-            />
-          </SidebarRow>
-        </SidebarGroup>
-      </SidebarContent>
+      <SidebarContent title="Citation" />
     );
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
-
     return (
-      <ToolbarGroup label="Citation" columns={3} highlightColor={CONTENT_COLORS.Cite}>
-        <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders" /></div>
-          <div>Details</div>
-        </ToolbarButton>
-      </ToolbarGroup>
+      <ToolbarGroup label="Citation" highlightColor={CONTENT_COLORS.Cite} />
     );
   }
 

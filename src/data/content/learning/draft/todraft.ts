@@ -51,7 +51,6 @@ inlineTerminalTags['m:math'] = singleSpace;
 inlineTerminalTags['#math'] = singleSpace;
 inlineTerminalTags['image'] = singleSpace;
 inlineTerminalTags['sym'] = singleSpace;
-inlineTerminalTags['cite'] = twoSpaces;
 
 inlineTerminalTags['command'] = (item, provider) => {
 
@@ -275,6 +274,7 @@ function imageInline(
   };
 }
 
+
 function formulaInline(
   offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock,
@@ -404,7 +404,18 @@ function processInline(
 
     }
 
-    const text = blockContext.fullText.substring(offset);
+    let text = blockContext.fullText.substring(offset);
+
+    // Cite elements are unique in that they may or may not have
+    // backing text present (<cite>Thanks to Joe</cite>) or <cite entry="3"/>)
+    // This special case below checks for the latter case and appends
+    // two spaces that will be necessary to display up to two-digit long
+    // bibliography entry when rendered
+    if (key === 'cite' && text.length === 0) {
+      blockContext.fullText += '  ';
+      text = blockContext.fullText.substring(offset);
+    }
+
     const handler = getInlineHandler(key);
     handler(
       offset, text.length, item, context,

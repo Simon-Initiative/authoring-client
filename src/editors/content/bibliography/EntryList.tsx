@@ -16,27 +16,18 @@ function buildEntryDesc(entry: contentTypes.Entry, index) {
 
   const attrs = Object.keys((entry as any).toJSON()).filter(key => !ignoredAttributes[key]);
 
-  return attrs.reduce(
+  return index + '. ' + attrs.reduce(
     (p, key) => {
       const value = entry[key];
       if (value === undefined) {
         return p;
       }
       if (key === 'authorEditor') {
-        if (value.has('author')) {
-          return p + value.get('author') + '. ';
-        }
-        return p + value.get('editor') + '. ';
+        return p + value.first() + '. ';
       }
       if (key === 'volumeNumber') {
-        if (value.has('volume')) {
-          return p + value.get('volume').caseOf({
-            just: v => 'Volume ' + v + '. ',
-            nothing: () => '',
-          });
-        }
-        return p + value.get('number').caseOf({
-          just: v => 'Number ' + v + '. ',
+        return p + value.caseOf({
+          just: v => v.first(),
           nothing: () => '',
         });
       }
