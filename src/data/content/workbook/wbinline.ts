@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
-
 import createGuid from '../../../utils/guid';
-import { augment, getChildren, ensureIdGuidPresent } from '../common';
+import { getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { Param } from '../learning/param';
 import { Maybe } from 'tsmonad';
@@ -16,19 +15,19 @@ export type WbInlineParams = {
   guid?: string,
 };
 
-const defaultContent = {
+const defaults = (params: Partial<WbInlineParams> = {}) => ({
   contentType: 'WbInline',
   elementType: 'wb:inline',
-  idref: '',
-  src: '',
-  width: '',
-  height: '',
-  purpose: Maybe.just('learnbydoing'),
-  params: Immutable.OrderedMap<string, Param>(),
-  guid: '',
-};
+  guid: params.guid || createGuid(),
+  idref: params.idref || '',
+  src: params.src || '',
+  width: params.width || '',
+  height: params.height || '',
+  purpose: params.purpose || Maybe.just('learnbydoing'),
+  params: params.params || Immutable.OrderedMap<string, Param>(),
+});
 
-export class WbInline extends Immutable.Record(defaultContent) {
+export class WbInline extends Immutable.Record(defaults()) {
 
   contentType: 'WbInline';
   elementType: 'wb:inline';
@@ -41,7 +40,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: WbInlineParams) {
-    super(augment(params));
+    super(defaults(params));
   }
 
   with(values: WbInlineParams) {

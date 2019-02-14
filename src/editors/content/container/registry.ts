@@ -5,6 +5,7 @@ import AlternativesEditor from 'editors/content/learning/AlternativesEditor';
 import AnswerEditor from 'editors/content/learning/AnswerEditor';
 import AppletEditor from 'editors/content/learning/AppletEditor';
 import AudioEditor from 'editors/content/learning/AudioEditor';
+import EntryEditor from 'editors/content/bibliography/EntryEditor';
 import BlockCodeEditor from 'editors/content/learning/blockcode/BlockCodeEditor';
 import BlockFormulaEditor from 'editors/content/learning/blockformula/BlockFormulaEditor';
 import BlockQuoteEditor from 'editors/content/learning/blockquote/BlockQuoteEditor';
@@ -39,6 +40,7 @@ import MaterialsEditor from 'editors/content/learning/MaterialsEditor';
 import MathEditor from 'editors/content/learning/MathEditor';
 import MathematicaEditor from 'editors/content/learning/MathematicaEditor';
 import MeaningEditor from 'editors/content/learning/MeaningEditor';
+import { MultipanelEditor } from 'editors/content/learning/multipane/MultipanelEditor.controller';
 import OrderedListEditor from 'editors/content/learning/OrderedListEditor';
 import PanoptoEditor from 'editors/content/learning/PanoptoEditor';
 import ParamEditor from 'editors/content/learning/ParamEditor';
@@ -134,6 +136,7 @@ function init() {
   registry['Math'] = connectEditor(MathEditor);
   registry['Mathematica'] = connectEditor(MathematicaEditor);
   registry['Meaning'] = connectEditor(MeaningEditor);
+  registry['Multipanel'] = connectEditor(MultipanelEditor);
   registry['Ol'] = connectEditor(OrderedListEditor);
   registry['Panopto'] = connectEditor(PanoptoEditor);
   registry['Param'] = connectEditor(ParamEditor);
@@ -151,4 +154,22 @@ function init() {
   registry['WbInline'] = connectEditor(WbInlineEditor);
   registry['Xref'] = connectEditor(XrefEditor);
   registry['YouTube'] = connectEditor(YouTubeEditor);
+
+  // The bib entry content types mappings are special as they
+  // all map to the generalized EntryEditor
+
+  registry['Article'] = connectEditor(EntryEditor);
+  registry['Book'] = connectEditor(EntryEditor);
+  registry['Booklet'] = connectEditor(EntryEditor);
+  registry['Conference'] = connectEditor(EntryEditor);
+  registry['InBook'] = connectEditor(EntryEditor);
+  registry['InCollection'] = connectEditor(EntryEditor);
+  registry['InProceedings'] = connectEditor(EntryEditor);
+  registry['Manual'] = connectEditor(EntryEditor);
+  registry['Misc'] = connectEditor(EntryEditor);
+  registry['MastersThesis'] = connectEditor(EntryEditor);
+  registry['PhdThesis'] = connectEditor(EntryEditor);
+  registry['Proceedings'] = connectEditor(EntryEditor);
+  registry['TechReport'] = connectEditor(EntryEditor);
+  registry['Unpublished'] = connectEditor(EntryEditor);
 }

@@ -1,23 +1,31 @@
 import * as React from 'react';
+import { classNames } from 'styles/jss';
 
 export type DropdownItemProps = {
-  onClick: (e?: any) => void,
+  className?: string
   label?: string,
   children?: any,
+  onClick: (e?: any) => void,
 };
 
 export type DropdownProps = {
+  className?: string
   children?: any,
   label: string,
 };
 
 export const DropdownItem = (props: DropdownItemProps) => {
-  return <a onClick={props.onClick} className="dropdown-item">{props.children || props.label}</a>;
+  return (
+    <a className={classNames([props.className, 'dropdown-item'])}
+      onClick={props.onClick}>
+      {props.children || props.label}
+    </a>
+  );
 };
 
 export const Dropdown = (props: DropdownProps) => {
   return (
-    <div className="dropdown" style={{ display: 'inline' }}>
+    <div className={classNames([props.className, 'dropdown'])}>
       <button
         className="btn btn-secondary btn-link dropdown-toggle"
         type="button"
@@ -32,5 +40,3 @@ export const Dropdown = (props: DropdownProps) => {
     </div>
   );
 };
-
-

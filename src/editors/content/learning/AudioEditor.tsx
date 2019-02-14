@@ -7,7 +7,7 @@ import {
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { adjustPath } from 'editors/content/media/utils';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -24,7 +24,7 @@ import { determineMimeTypeFromFilename } from 'utils/mime';
 import { ModalMessage } from 'utils/ModalMessage';
 
 import './Media.scss';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
   onShowSidebar: () => void;
@@ -151,10 +151,12 @@ export default class AudioEditor
     return (
       <SidebarContent title="Audio">
         <SidebarGroup label="Controls">
+          <SidebarRow>
           <ToggleSwitch
             checked={this.props.model.controls}
             onClick={this.onControlEdit}
             label="Display audio controls" />
+          </SidebarRow>
         </SidebarGroup>
         <MediaMetadataEditor
           {...this.props}
@@ -187,7 +189,10 @@ export default class AudioEditor
   }
 
   renderMain(): JSX.Element {
-
+    const {
+      editMode, activeContentGuid, context, parent, services, onFocus, hover,
+      onUpdateHover, model,
+    } = this.props;
     const { sources, controls } = this.props.model;
 
     let fullSrc = '';
@@ -203,13 +208,18 @@ export default class AudioEditor
     return (
       <div className="audioEditor">
         <audio src={fullSrc} controls={controls} />
-        <div className="captionEditor">
-          <div className="captionHeader">Caption</div>
-          <ContentContainer
-            {...this.props}
-            onEdit={this.onCaptionEdit}
-            model={this.props.model.caption.content} />
-        </div>
+
+        <CaptionTextEditor
+          editMode={editMode}
+          activeContentGuid={activeContentGuid}
+          context={context}
+          parent={parent}
+          services={services}
+          onFocus={onFocus}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onEdit={this.onCaptionEdit}
+          model={model.caption.content} />
       </div>
     );
   }

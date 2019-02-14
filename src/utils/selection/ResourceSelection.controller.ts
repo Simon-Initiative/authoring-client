@@ -16,6 +16,8 @@ interface OwnProps {
   onInsert: (item: Resource) => void;
   onCancel: () => void;
   courseId: string;
+  title? :string;
+  noResourcesMessage?: string | JSX.Element;
   filterPredicate: (res: Resource) => boolean;
 }
 

@@ -107,6 +107,7 @@ export { Head } from 'data/content/workbook/head';
 export { Section as WorkbookSection } from 'data/content/workbook/section';
 export { WbInline } from 'data/content/workbook/wbinline';
 export { Xref } from 'data/content/workbook/xref';
+export { Multipanel } from 'data/content/workbook/multipanel/multipanel';
 
 // Resource level
 export { FileNode } from 'data/content/file_node';
@@ -150,6 +151,25 @@ export { LearningObjective } from 'data/content/objectives/objective';
 export { ObjectiveSkills } from 'data/content/objectives/objective_skills';
 export { Skill } from 'data/content/objectives/skill';
 export { Item as QuestionItem } from 'data/content/assessment/question';
+
+// Bibliography
+export { Bibliography } from 'data/content/bibtek/bibliography';
+export { Entry } from 'data/content/bibtek/entry';
+export { Article } from 'data/content/bibtek/article';
+export { Book } from 'data/content/bibtek/book';
+export { Booklet } from 'data/content/bibtek/booklet';
+export { Conference } from 'data/content/bibtek/conference';
+export { InBook } from 'data/content/bibtek/inbook';
+export { InCollection } from 'data/content/bibtek/incollection';
+export { InProceedings } from 'data/content/bibtek/inproceedings';
+export { Manual } from 'data/content/bibtek/manual';
+export { MastersThesis } from 'data/content/bibtek/mastersthesis';
+export { Misc } from 'data/content/bibtek/misc';
+export { PhdThesis } from 'data/content/bibtek/phdthesis';
+export { Proceedings } from 'data/content/bibtek/proceedings';
+export { TechReport } from 'data/content/bibtek/techreport';
+export { Unpublished } from 'data/content/bibtek/unpublished';
+
 
 // Media
 import { Applet } from 'data/content/learning/applet';
