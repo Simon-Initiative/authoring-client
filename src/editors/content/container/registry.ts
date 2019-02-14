@@ -40,6 +40,7 @@ import MaterialsEditor from 'editors/content/learning/MaterialsEditor';
 import MathEditor from 'editors/content/learning/MathEditor';
 import MathematicaEditor from 'editors/content/learning/MathematicaEditor';
 import MeaningEditor from 'editors/content/learning/MeaningEditor';
+import { MultipanelEditor } from 'editors/content/learning/multipane/MultipanelEditor.controller';
 import OrderedListEditor from 'editors/content/learning/OrderedListEditor';
 import PanoptoEditor from 'editors/content/learning/PanoptoEditor';
 import ParamEditor from 'editors/content/learning/ParamEditor';
@@ -122,6 +123,7 @@ function init() {
   registry['Math'] = connectEditor(MathEditor);
   registry['Mathematica'] = connectEditor(MathematicaEditor);
   registry['Meaning'] = connectEditor(MeaningEditor);
+  registry['Multipanel'] = connectEditor(MultipanelEditor);
   registry['Ol'] = connectEditor(OrderedListEditor);
   registry['Panopto'] = connectEditor(PanoptoEditor);
   registry['Param'] = connectEditor(ParamEditor);

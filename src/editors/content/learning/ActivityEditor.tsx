@@ -11,7 +11,7 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import { injectSheet } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 
 import { styles } from 'editors/content/learning/Activity.styles';
@@ -127,14 +127,16 @@ export default class ActivityEditor
       ? resource.title
       : 'Loading...';
 
+    const iconStyle = { color: CONTENT_COLORS.Activity };
+
     return (
-      <div className={classes.activity}>
-        <h5>{titleOrPlaceholder}</h5>
+      <div className={classNames(['ActivityEditor', classes.activity])}>
+        <h5><i className="fa fa-check" style={iconStyle}/> {titleOrPlaceholder}</h5>
         <button
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit Activity
+          Edit Summative Assessment
         </button>
       </div>
     );
