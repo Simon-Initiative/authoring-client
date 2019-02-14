@@ -10,6 +10,7 @@ export const CONTENT_COLORS = {
   Applet: flatui.greenSea,
   Audio: flatui.pumpkin,
   Answer: flatui.wetAsphalt,
+  Bibliography: flatui.turquoise,
   BlockCode: flatui.concrete,
   BlockFormula: colors.pink,
   BlockQuote: distinct.distinctLavender,
@@ -29,6 +30,21 @@ export const CONTENT_COLORS = {
   Dt: flatui.orange,
   Dialog: distinct.distinctTeal,
   Director: flatui.greenSea,
+  Entry: distinct.distinctGreen,
+  Article: distinct.distinctGreen,
+  Book: distinct.distinctGreen,
+  Booklet: distinct.distinctGreen,
+  Conference: distinct.distinctGreen,
+  InBook: distinct.distinctGreen,
+  InCollection: distinct.distinctGreen,
+  InProceedings: distinct.distinctGreen,
+  Manual: distinct.distinctGreen,
+  MastersThesis: distinct.distinctGreen,
+  PhdThesis: distinct.distinctGreen,
+  Proceedings: distinct.distinctGreen,
+  TechReport: distinct.distinctGreen,
+  Unpublished: distinct.distinctGreen,
+  Misc: distinct.distinctGreen,
   Example: flatui.turquoise,
   Figure: flatui.greenSea,
   Flash: flatui.greenSea,
@@ -76,6 +92,9 @@ export enum insertableContentTypes {
   Ol, Panopto, Param, Pronunciation, Proof, Pullout,
   Section, Speaker, Statement, Sym, Table, Theorem, Translation,
   Ul, Unity, Video, WbInline, YouTube,
+  Bibliography, Entry,
+  Article, Book, Booklet, Conference, InBook, InCollection, InProceedings, Manual,
+  MastersThesis, PhdThesis, Proceedings, TechReport, Unpublished, Misc,
 }
 
 const i = insertableContentTypes;
@@ -88,6 +107,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Answer: return <i style={style} className={'fa fa-exclamation'} />;
     case i.Applet: return <i style={style} className={'fa fa-coffee'} />;
     case i.Audio: return <i style={style} className={'fa fa-volume-up'} />;
+    case i.Bibliography: return <i style={style} className={'fa fa-bookmark'} />;
     case i.BlockCode: return <i style={style} className={'fa fa-code'} />;
     case i.BlockFormula: return <i style={style} className="unicode-icon">∑</i>;
     case i.BlockQuote: return <i style={style} className={'fa fa-quote-right'} />;
@@ -105,6 +125,21 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Dt: return <i style={style} className={'fa fa-book'} />;
     case i.Dialog: return <i style={style} className={'fa fa-comments'} />;
     case i.Director: return <i style={style} className={'fa fa-compass'} />;
+    case i.Entry: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.Article: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.Book: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.InBook: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.InProceedings: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.Booklet: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.Conference: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.InCollection: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.Manual: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.MastersThesis: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.PhdThesis: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.Proceedings: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.TechReport: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.Unpublished: return <i style={style} className={'fa fa-bookmark-o'} />;
+    case i.Misc: return <i style={style} className={'fa fa-bookmark-o'} />;
     case i.Example: return <i style={style} className={'fa fa-bar-chart'} />;
     case i.Figure: return <i style={style} className={'fa fa-address-card'} />;
     case i.Flash: return <i style={style} className={'fa fa-bolt'} />;

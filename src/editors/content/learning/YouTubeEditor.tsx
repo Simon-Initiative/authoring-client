@@ -6,7 +6,7 @@ import {
 import { ContentElements } from 'data/content/common/elements';
 import { TextInput } from 'editors/content/common/TextInput';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -20,7 +20,7 @@ import { getQueryVariableFromString } from 'utils/params';
 import './YouTube.scss';
 
 import './Media.scss';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
   onShowSidebar: () => void;
@@ -68,29 +68,35 @@ export default class YouTubeEditor
   }
 
   renderSidebar(): JSX.Element {
+    const { editMode } = this.props;
     const { src } = this.props.model;
 
     return (
       <SidebarContent title="YouTube">
         <SidebarGroup label="Video URL">
           <Discoverable id={DiscoverableId.YouTubeEditorSourceURL} focusChild="input">
-            <div className="input-group">
-              <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
+            <div className="input-group input-group-sm mb-3">
+              <div className="input-group-prepend">
+                <span
+                  className="input-group-text"
+                  id="inputGroup-sizing-sm">youtube.com/watch?v=</span>
+              </div>
               <TextInput
-                {...this.props}
-                width="100%"
+                editMode={editMode}
                 type="text"
-                label=""
+                label="Paste URL here"
                 value={src}
                 onEdit={this.onSrcEdit} />
             </div>
           </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Controls">
-          <ToggleSwitch
-            checked={this.props.model.controls}
-            onClick={this.onControlEdit}
-            label="Display YouTube controls" />
+          <SidebarRow>
+            <ToggleSwitch
+              checked={this.props.model.controls}
+              onClick={this.onControlEdit}
+              label="Display YouTube controls" />
+          </SidebarRow>
         </SidebarGroup>
         <MediaWidthHeightEditor
           width={this.props.model.width}
@@ -112,6 +118,7 @@ export default class YouTubeEditor
       </SidebarContent>
     );
   }
+
   renderToolbar(): JSX.Element {
     const { onShowSidebar, onDiscover } = this.props;
 
@@ -139,20 +146,28 @@ export default class YouTubeEditor
   }
 
   renderMain(): JSX.Element {
-    const { src, height, width } = this.props.model;
+    const {
+      model, editMode, activeContentGuid, context, services, hover, onFocus, onUpdateHover,
+      parent,
+    } = this.props;
+    const { src, height, width } = model;
     const fullSrc = 'https://www.youtube.com/embed/'
       + (src === '' ? 'zHIIzcWqsP0' : src);
 
     return (
       <div className="youtubeEditor">
         <iframe src={fullSrc} height={height} width={width} />
-        <div className="captionEditor">
-          <div className="captionHeader">Caption</div>
-          <ContentContainer
-            {...this.props}
-            onEdit={this.onCaptionEdit}
-            model={this.props.model.caption.content} />
-        </div>
+        <CaptionTextEditor
+          editMode={editMode}
+          activeContentGuid={activeContentGuid}
+          context={context}
+          parent={parent}
+          services={services}
+          onFocus={onFocus}
+          hover={hover}
+          onUpdateHover={onUpdateHover}
+          onEdit={this.onCaptionEdit}
+          model={model.caption.content} />
       </div>
     );
   }

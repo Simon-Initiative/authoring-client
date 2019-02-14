@@ -65,7 +65,14 @@ export default class ContiguousTextToolbar
       onFocus: (c, p) => true,
       model: data,
       onEdit: (updated) => {
-        const updatedModel = this.props.model.updateEntity(key, updated);
+
+        // We special case the command entity updates as they need
+        // to update both the data backing the entity and the text
+        // that is displayed
+        const updatedModel = updated.contentType === 'Command'
+          ? this.props.model.replaceEntity(key, EntityTypes.command, false, updated, updated.title)
+          : this.props.model.updateEntity(key, updated);
+
         this.props.onEdit(updatedModel, updated);
       },
     };
@@ -330,13 +337,17 @@ export default class ContiguousTextToolbar
 
               const selectionSnapshot = selection;
 
-              selectTargetElement()
-                .then((e) => {
-                  e.lift((element) => {
-                    const command = new contentTypes.Command().with({ target: element.id });
-                    onEdit(model.addEntity(EntityTypes.command, false, command, selectionSnapshot));
+              model.extractParagraphSelectedText(selection).lift((title) => {
+                selectTargetElement()
+                  .then((e) => {
+                    e.lift((element) => {
+                      const command = new contentTypes.Command()
+                        .with({ target: element.id, title });
+                      onEdit(model.addEntity(
+                        EntityTypes.command, false, command, selectionSnapshot));
+                    });
                   });
-                });
+              });
 
             }}
             tooltip="Insert Command"

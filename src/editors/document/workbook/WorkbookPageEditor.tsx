@@ -8,6 +8,7 @@ import { Resource } from 'data/content/resource';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
+import { ContentElements } from 'data/content/common/elements';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { Objectives } from 'editors/document/workbook/Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -34,12 +35,31 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
   dismissMessage: (message: Messages.Message) => void;
 }
 
-interface WorkbookPageEditorState extends AbstractEditorState {}
+interface WorkbookPageEditorState extends AbstractEditorState {
+  collapseInsertPopup: boolean;
+}
 
-function hasMissingResource() : boolean {
+function hasMissingResource(): boolean {
   // TODO restore post wb fix
   return false;
 }
+
+const entryInstances = {
+  Article: new contentTypes.Article(),
+  Book: new contentTypes.Book(),
+  Booklet: new contentTypes.Booklet(),
+  Conference: new contentTypes.Conference(),
+  InBook: new contentTypes.InBook(),
+  InCollection: new contentTypes.InCollection(),
+  InProceedings: new contentTypes.InProceedings(),
+  Manual: new contentTypes.Manual(),
+  MastersThesis: new contentTypes.MastersThesis(),
+  PhdThesis: new contentTypes.PhdThesis(),
+  Proceedings: new contentTypes.Proceedings(),
+  TechReport: new contentTypes.TechReport(),
+  Misc: new contentTypes.Misc(),
+  Unpublished: new contentTypes.Unpublished(),
+};
 
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
@@ -48,13 +68,15 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   noObjectivesMessage: Messages.Message;
 
   constructor(props: WorkbookPageEditorProps) {
-    super(props, {});
+    super(props, { collapseInsertPopup: true });
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onModelEdit = this.onModelEdit.bind(this);
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.unFocus = this.unFocus.bind(this);
+    this.addEntry = this.addEntry.bind(this);
+    this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
@@ -63,6 +85,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     if (hasMissingResource()) {
       props.services.refreshCourse(props.context.courseId);
     }
+
   }
 
   hasMissingObjective(
@@ -80,7 +103,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const { objectives, courseId } = context;
 
     if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE ||
-        objectives.size < 1) {
+      objectives.size < 1) {
       this.noObjectivesMessage = buildMissingObjectivesMessage(courseId);
       showMessage(this.noObjectivesMessage);
     }
@@ -88,14 +111,14 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
     if (this.props.context.objectives.size <= 1 &&
-        nextProps.context.objectives.size > 1 &&
-        this.noObjectivesMessage !== undefined) {
+      nextProps.context.objectives.size > 1 &&
+      this.noObjectivesMessage !== undefined) {
       this.props.dismissMessage(this.noObjectivesMessage);
     }
 
     if (nextProps.model !== this.props.model) {
       if (this.hasMissingObjective(
-          nextProps.model.head.objrefs, nextProps.context.objectives)) {
+        nextProps.model.head.objrefs, nextProps.context.objectives)) {
         nextProps.services.refreshObjectives(nextProps.context.courseId);
       }
     }
@@ -109,9 +132,27 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(model);
   }
 
-  onBodyEdit(content : any, source: Object) {
+  onBodyEdit(content: any, source: Object) {
     const model = this.props.model.with({ body: content });
     this.props.onUpdateContent(this.props.context.documentId, source);
+
+    this.handleEdit(model);
+  }
+
+  onEntryEdit(elements: ContentElements, src) {
+
+    this.props.onUpdateContent(this.props.context.documentId, src);
+
+    const items = elements
+      .content
+      .toArray()
+      .map(e => [e.guid, e]);
+
+    const bibliography = this.props.model.bibliography.with({
+      bibEntries: Immutable.OrderedMap<string, contentTypes.Entry>(items),
+    });
+
+    const model = this.props.model.with({ bibliography });
 
     this.handleEdit(model);
   }
@@ -151,10 +192,83 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         {...this.props}
         activeContentGuid={null}
         hover={null}
-        onUpdateHover={() => {}}
+        onUpdateHover={() => { }}
         model={this.props.model.head.objrefs}
-        onFocus={() => {}}
-        onEdit={this.onObjectivesEdit}/>
+        onFocus={() => { }}
+        onEdit={this.onObjectivesEdit} />
+    );
+  }
+
+  addEntry(e) {
+    const bibEntries = this.props.model.bibliography.bibEntries.set(e.guid, e);
+    const bibliography = this.props.model.bibliography.with({ bibEntries });
+    const model = this.props.model.with({ bibliography });
+
+    this.handleEdit(model);
+  }
+
+
+  collapseInsertPopup() {
+    this.setState({
+      collapseInsertPopup: !this.state.collapseInsertPopup,
+    });
+  }
+
+  renderBibliography() {
+
+    const { model, hover, onUpdateHover } = this.props;
+
+    const activeGuid = this.props.activeContext.activeChild.caseOf({
+      just: c => (c as any).guid,
+      nothing: () => '',
+    });
+
+    const elements = new ContentElements().with({
+      content: model.bibliography.bibEntries,
+    });
+
+    const containerOrNone = model.bibliography.bibEntries.size > 0
+      ? <ContentContainer
+        parent={null}
+        activeContentGuid={activeGuid}
+        hover={hover}
+        onUpdateHover={onUpdateHover}
+        onFocus={this.onFocus.bind(this)}
+        editMode={this.props.editMode}
+        services={this.props.services}
+        context={this.props.context}
+        model={elements}
+        onEdit={this.onEntryEdit.bind(this)}
+      />
+      : null;
+
+    const entryChoices = Object.keys(entryInstances).map((key) => {
+      return (
+        <a onClick={(e) => { e.preventDefault(); this.addEntry(entryInstances[key]); }}
+          className="dropdown-item">{key}</a>
+      );
+    });
+
+    return (
+      <div className="bibliography">
+        <div>
+          <span className="wbLabel inline">Bibliography</span>&nbsp;&nbsp;
+          <span className="badge badge-primary">
+            {this.props.model.bibliography.bibEntries.size}
+          </span>
+          <button className="btn btn-link" type="button" data-toggle="collapse"
+            data-target="#bibContent" aria-expanded="false" aria-controls="bibContent">
+            Show / Hide
+          </button>
+        </div>
+        <div className="collapse" id="bibContent">
+          {containerOrNone}
+          <div className={`insert-popup ${this.state.collapseInsertPopup ? 'collapsed' : ''}`}>
+            {entryChoices}
+          </div>
+          <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
+        </div>
+      </div>
     );
   }
 
@@ -184,6 +298,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
             {this.renderObjectives()}
 
+            <span className="wbLabel">Content</span>
+
             <ContentContainer
               parent={null}
               activeContentGuid={activeGuid}
@@ -195,6 +311,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               context={this.props.context}
               model={this.props.model.body}
               onEdit={(c, s) => this.onBodyEdit(c, s)} />
+
+            {this.renderBibliography()}
+
           </div>
           <ContextAwareSidebar
             context={context}
