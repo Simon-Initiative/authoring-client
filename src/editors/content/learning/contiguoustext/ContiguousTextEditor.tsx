@@ -37,8 +37,8 @@ export interface ContiguousTextEditorState {
  */
 @injectSheet(styles)
 export default class ContiguousTextEditor
-    extends AbstractContentEditor<contentTypes.ContiguousText,
-    StyledComponentProps<ContiguousTextEditorProps>, ContiguousTextEditorState> {
+  extends AbstractContentEditor<contentTypes.ContiguousText,
+  StyledComponentProps<ContiguousTextEditorProps>, ContiguousTextEditorState> {
 
   selectionState: any;
 
@@ -49,7 +49,6 @@ export default class ContiguousTextEditor
   }
 
   shouldComponentUpdate(nextProps: StyledComponentProps<ContiguousTextEditorProps>) {
-
     return nextProps.model !== this.props.model;
   }
 
@@ -101,7 +100,7 @@ export default class ContiguousTextEditor
     this.props.onFocus(model, parent, Maybe.just(textSelection));
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model, parent, editMode, viewOnly,
       hideBorder = false, editorStyles } = this.props;
@@ -116,21 +115,21 @@ export default class ContiguousTextEditor
           !editMode && classes.disabled,
           viewOnly && classes.viewOnly, className])}>
 
-          <DraftWrapper
-            onEntitySelected={this.props.onEntitySelected}
-            onInsertParsedContent={o =>
-              this.props.onInsertParsedContent(this.props.context.resourcePath, o)}
-            singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
-            parentProps={this.props}
-            parent={this}
-            editorStyles={Object.assign({}, editorStyles)}
-            onSelectionChange={(selection, keypress) =>
-              this.draftDrivenFocus(model, parent, selection, keypress)}
-            services={this.props.services}
-            context={this.props.context}
-            content={this.props.model}
-            locked={!editMode || viewOnly}
-            onEdit={(c, s) => this.props.onEdit(c, s === undefined ? c : s)} />
+        <DraftWrapper
+          onEntitySelected={this.props.onEntitySelected}
+          onInsertParsedContent={o =>
+            this.props.onInsertParsedContent(this.props.context.resourcePath, o)}
+          singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
+          parentProps={this.props}
+          parent={this}
+          editorStyles={Object.assign({}, editorStyles)}
+          onSelectionChange={(selection, keypress) =>
+            this.draftDrivenFocus(model, parent, selection, keypress)}
+          services={this.props.services}
+          context={this.props.context}
+          content={this.props.model}
+          locked={!editMode || viewOnly}
+          onEdit={(c, s) => this.props.onEdit(c, s === undefined ? c : s)} />
 
       </div>
     );
