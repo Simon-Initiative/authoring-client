@@ -29,6 +29,10 @@ import {
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
 import createGuid from 'utils/guid';
 import { styles } from './ContiguousText.styles';
+import { Maybe } from 'tsmonad';
+import { ContentElement } from 'data/content/common/interfaces';
+import EntryList from 'editors/content/bibliography/EntryList';
+import ModalSelection from 'utils/selection/ModalSelection';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -37,11 +41,33 @@ export interface ContiguousTextToolbarProps
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
   onAddEntry: (e, documentId) => Promise<void>;
+  onFetchContentElementByPredicate: (documentId, predicate) => Promise<Maybe<ContentElement>>;
   selection: TextSelection;
 }
 
 export interface ContiguousTextToolbarState {
 
+}
+
+function selectBibEntry(bib: contentTypes.Bibliography, display, dismiss)
+  : Promise<Maybe<contentTypes.Entry>> {
+  return new Promise((resolve, reject) => {
+
+    const selected = { entry: Maybe.nothing() };
+
+    const bibPicker = (
+      <ModalSelection title="Select a bibliography entry"
+        onInsert={() => { dismiss(); resolve(selected.entry as Maybe<contentTypes.Entry>); }}
+        onCancel={() => { dismiss(); resolve(Maybe.nothing()); }}>
+        <EntryList
+          model={bib.bibEntries.toList()}
+          onSelectEntry={e => selected.entry = Maybe.just(e)}
+        />
+      </ModalSelection>
+    );
+
+    display(bibPicker);
+  });
 }
 
 /**
@@ -97,7 +123,28 @@ export default class ContiguousTextToolbar
 
   renderEntryOptions(selection) {
 
-    const addBibEntry = (e) => {
+    const addCitationWithEntry = (id) => {
+      this.props.onEdit(this.props.model.addEntity(
+        EntityTypes.cite, true, new contentTypes.Cite().with({ entry: id }), selection));
+    };
+
+    const createCitationForExistingEntry = () => {
+      this.props.onFetchContentElementByPredicate(
+        this.props.context.documentId,
+        e => e.contentType === 'Bibliography')
+        .then((maybeBib) => {
+          maybeBib.lift((bib) => {
+            selectBibEntry(
+              bib as contentTypes.Bibliography,
+              this.props.onDisplayModal, this.props.onDismissModal)
+              .then((maybeEntry) => {
+                maybeEntry.lift(e => addCitationWithEntry(e.id));
+              });
+          });
+        });
+    };
+
+    const addNewBibEntry = (e) => {
 
       const withId = e.with({ id: createGuid() });
 
@@ -119,7 +166,7 @@ export default class ContiguousTextToolbar
       return (
         <ToolbarButtonMenuItem
           disabled={false}
-          onClick={() => addBibEntry(entryInstances[key])}>
+          onClick={() => addNewBibEntry(entryInstances[key])}>
           {key}
         </ToolbarButtonMenuItem>
       );
@@ -127,6 +174,13 @@ export default class ContiguousTextToolbar
 
     return (
       <div style={{ backgroundColor: 'white', margin: '8px' }}>
+        <ToolbarButtonMenuItem
+          disabled={false}
+          onClick={() => createCitationForExistingEntry()}>
+          Cite existing entry...
+        </ToolbarButtonMenuItem>
+        <div className="dropdown-divider"></div>
+        <h6 className="dropdown-header">Cite new entry</h6>
         {buttons}
       </div>
     );

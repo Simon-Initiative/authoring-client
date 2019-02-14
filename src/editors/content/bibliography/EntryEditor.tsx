@@ -13,6 +13,7 @@ import { Maybe } from 'tsmonad';
 import {
   makeVolume, makeNumber, makeAuthor, makeEditor,
 } from 'data/content/bibtek/common';
+import { ignoredAttributes } from './common';
 import { styles } from './EntryEditor.styles';
 
 export interface EntryEditorProps
@@ -24,14 +25,6 @@ export interface EntryEditorProps
 export interface EntryEditorState {
 
 }
-
-const ignoredAttributes = {
-  id: true,
-  guid: true,
-  key: true,
-  contentType: true,
-  elementType: true,
-};
 
 function toFriendlyLabel(key: string) {
   if (key === '') return '';
