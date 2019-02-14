@@ -170,7 +170,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     if (bibliography.bibEntries.size < this.props.model.bibliography.bibEntries.size) {
       // Find the item that was removed, and remove the citations
-      // that reference it
+      // that reference it. There can be zero, one, or many citations
+      // that reference a specific entry.
       const updated = bibliography.bibEntries.toArray().reduce(
         (p, e) => {
           p[e.guid] = e;
@@ -184,9 +185,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
           const ct = e as ContiguousText;
           const citations = ct.getEntitiesByType(EntityTypes.cite);
           const matched = citations.filter(c => c.entity.data.entry === id);
-          return matched.length > 0
-            ? ct.removeEntity(matched[0].entityKey)
-            : ct;
+
+          return matched.reduce(
+            (ct, e) => ct.removeEntity(e.entityKey),
+            ct,
+          );
         }
         return e;
       };
