@@ -5,7 +5,7 @@ import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 
 export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>,
-  S extends AbstractContentEditorState> {}
+  S extends AbstractContentEditorState> { }
 
 export enum RenderContext {
   MainEditor,
@@ -31,15 +31,15 @@ export interface AbstractContentEditorProps<ModelType> {
   onHandleClick?: (e) => void;
 }
 
-export interface AbstractContentEditorState {}
+export interface AbstractContentEditorState { }
 
 /**
  * The abstract content editor.
  */
 export abstract class
   AbstractContentEditor
-    <ModelType, P extends AbstractContentEditorProps<ModelType>,
-    S extends AbstractContentEditorState> extends React.Component<P, S> {
+  <ModelType, P extends AbstractContentEditorProps<ModelType>,
+  S extends AbstractContentEditorState> extends React.Component<P, S> {
 
   constructor(props) {
     super(props);
@@ -54,11 +54,11 @@ export abstract class
       || this.props.hover !== nextProps.hover;
   }
 
-  abstract renderMain() : JSX.Element;
+  abstract renderMain(): JSX.Element;
 
-  abstract renderToolbar() : JSX.Element;
+  abstract renderToolbar(): JSX.Element;
 
-  abstract renderSidebar() : JSX.Element;
+  abstract renderSidebar(): JSX.Element;
 
   handleOnFocus(e) {
 
@@ -83,7 +83,7 @@ export abstract class
 
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const renderContext = this.props.renderContext === undefined
       ? RenderContext.MainEditor

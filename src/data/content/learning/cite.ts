@@ -80,7 +80,7 @@ export class Cite extends Immutable.Record(defaultContent) {
     };
 
     if (this.entry.trim() !== '') {
-      o['@entry'] = this.entry;
+      o.cite['@entry'] = this.entry;
     }
 
     return o;
