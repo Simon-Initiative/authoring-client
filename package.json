@@ -61,9 +61,10 @@
     "typescript": "2.6.2",
     "uglifyjs-webpack-plugin": "^1.1.6",
     "underscore-template-loader": "^1.0.0",
+    "upath": "^1.1.0",
     "webpack": "^4.5.0",
     "webpack-dev-middleware": "^3.1.2",
-    "webpack-dev-server": "^3.1.1",
+    "webpack-dev-server": "^3.1.14",
     "webpack-hot-middleware": "^2.21.2",
     "whatwg-fetch": "^2.0.2",
     "xml-beautifier": "^0.3.0"

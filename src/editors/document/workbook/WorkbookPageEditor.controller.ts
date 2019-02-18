@@ -28,7 +28,7 @@ interface DispatchProps {
   dismissMessage: (message: Messages.Message) => void;
 }
 
-interface OwnProps extends AbstractEditorProps<WorkbookPageModel> {}
+interface OwnProps extends AbstractEditorProps<WorkbookPageModel> { }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
@@ -43,7 +43,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
     fetchObjectives: (courseId: string) => {
-      return dispatch(fetchObjectives(courseId));
+      return dispatch(fetchObjectives(courseId) as any);
     },
     onUpdateContent: (documentId: string, content: ContentElement) => {
       return dispatch(activeActions.updateContent(documentId, content));

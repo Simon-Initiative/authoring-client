@@ -43,18 +43,18 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
   return {
     onLoadCourseMediaNextPage: (mimeFilter, searchText, orderBy, order) => {
       return dispatch(fetchCourseMediaNextPage(
-        ownProps.courseModel.guid, mimeFilter, searchText, orderBy, order));
+        ownProps.courseModel.guid, mimeFilter, searchText, orderBy, order) as any);
     },
     onResetMedia: () => {
       dispatch(resetMedia(ownProps.courseModel.guid));
     },
     onLoadMediaItemByPath: (path: string) => (
-      dispatch(fetchMediaItemByPath(ownProps.courseModel.guid, path))
+      dispatch(fetchMediaItemByPath(ownProps.courseModel.guid, path) as any)
     ),
   };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(MediaManager);
+  (mapStateToProps, mapDispatchToProps)(MediaManager);
 
 export { controller as MediaManager };

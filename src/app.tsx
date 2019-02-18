@@ -139,8 +139,8 @@ function main() {
 
   window.addEventListener('beforeunload', (event) => {
     if (store !== null) {
-      store.dispatch(releaseAll());
-      store.dispatch(clearHeldLocks());
+      store.dispatch(releaseAll() as any);
+      store.dispatch(clearHeldLocks() as any);
     }
   });
 }

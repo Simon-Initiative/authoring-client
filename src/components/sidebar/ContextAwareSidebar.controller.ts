@@ -76,8 +76,8 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onInsert: content => dispatch(insert(content)),
-    onEdit: content => dispatch(edit(content)),
+    onInsert: content => dispatch(insert(content) as any),
+    onEdit: content => dispatch(edit(content) as any),
     onHide: () => dispatch(showSidebar(false)),
     onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: Node | string) =>
       dispatch(setCurrentNodeOrPage(documentId, nodeOrPageId)),

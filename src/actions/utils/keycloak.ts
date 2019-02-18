@@ -8,18 +8,18 @@ export type LoginSuccessCallback =
   (profile: UserProfile, logoutUrl: string, managementUrl: string) => void;
 
 const keycloakConfig = {
-  url: configuration.protocol + configuration.hostname + '/auth',
+  url: 'http://dev.local/auth',
   realm: 'oli_security',
   clientId: 'content_client',
 };
 
 let kc = null;
 let onLoginFailure = null;
-let onLoginSuccess : LoginSuccessCallback = null;
+let onLoginSuccess: LoginSuccessCallback = null;
 let redirectUri = null;
 
 export function initialize(
-  onLoginSuccessFunc : LoginSuccessCallback, onLoginFailureFunc, redirectUriStr) {
+  onLoginSuccessFunc: LoginSuccessCallback, onLoginFailureFunc, redirectUriStr) {
 
   onLoginFailure = onLoginFailureFunc;
   onLoginSuccess = onLoginSuccessFunc;
@@ -76,7 +76,7 @@ function continuallyRefreshToken() {
 
 const WITHIN_FIVE_SECONDS = 5;
 
-export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS) : Promise<any> {
+export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS): Promise<any> {
 
   if (kc.isTokenExpired(within)) {
     return new Promise((resolve, reject) => {
@@ -97,7 +97,7 @@ export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS) : Pr
   return Promise.resolve(true);
 }
 
-export function hasRole(role: string) : boolean {
+export function hasRole(role: string): boolean {
   const WITHIN_FIVE_SECONDS = 5;
   if (kc.isTokenExpired(WITHIN_FIVE_SECONDS)) {
     return false;
