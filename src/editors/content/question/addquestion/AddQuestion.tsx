@@ -45,8 +45,6 @@ const SUMMATIVE_OPTIONS: AddOption[] = [
   'ShortAnswer',
   'Essay',
   'Multipart',
-  'DragAndDrop',
-  'ImageHotspot',
   'Separator',
 ];
 
