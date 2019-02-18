@@ -607,7 +607,7 @@ export class InsertToolbar
                   />)
                 }
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                {getContentIcon(insertableContentTypes.Feedback, { width: 22 })}
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
                 Insert feedback assessment
                 </ToolbarButtonMenuItem>
 
@@ -616,7 +616,7 @@ export class InsertToolbar
                   const model = FeedbackModel.createNew(
                     guid(),
                     'New Feedback Assessment',
-                    'This is a course feedback assessment',
+                    '',
                   );
 
                   onCreateNew(model)
@@ -629,7 +629,7 @@ export class InsertToolbar
 
                 }}
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                {getContentIcon(insertableContentTypes.Feedback, { width: 22 })}
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
                 Create feedback assessment
                 </ToolbarButtonMenuItem>
 
@@ -663,7 +663,7 @@ export class InsertToolbar
                           noResourcesMessage={
                             <React.Fragment>
                               No assessments are available for this activity.
-                              <br/>
+                              <br />
                               Please create a new formative assessment or remove an existing
                               reference from this page before adding another one.
                             </React.Fragment>
@@ -684,7 +684,7 @@ export class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('multipanel')}>
                 {getContentIcon(insertableContentTypes.Multipanel, { width: 22 })}
                 {' Image hotspot activity'}
-                </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">

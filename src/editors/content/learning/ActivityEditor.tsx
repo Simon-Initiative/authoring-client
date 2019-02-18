@@ -46,6 +46,13 @@ export default class ActivityEditor
     return this.props.model !== nextProps.model;
   }
 
+  isFeedback() {
+    return this.props.model.purpose.caseOf({
+      just: p => p === contentTypes.PurposeTypes.MyResponse,
+      nothing: () => false,
+    });
+  }
+
   onPurposeEdit(purpose: string): void {
     const model = this.props.model.with({
       purpose: purpose === '' ? Maybe.nothing() : Maybe.just(purpose),
@@ -83,11 +90,6 @@ export default class ActivityEditor
       .filter(p => p.value !== contentTypes.PurposeTypes.MyResponse);
     purposeTypesWithEmpty.unshift({ value: '', label: '' });
 
-    const isFeedback = this.props.model.purpose.caseOf({
-      just: p => p === contentTypes.PurposeTypes.MyResponse,
-      nothing: () => false,
-    });
-
     const activitySelect = options => <SidebarGroup label="Assessment">
       <Select
         editMode={this.props.editMode}
@@ -97,8 +99,8 @@ export default class ActivityEditor
       </Select>
     </SidebarGroup>;
 
-    if (isFeedback) {
-      return <SidebarContent title="Activity">
+    if (this.isFeedback()) {
+      return <SidebarContent title="Feedback">
         {activitySelect(feedbacks)}
       </SidebarContent>;
     }
@@ -128,15 +130,15 @@ export default class ActivityEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Activity" highlightColor={CONTENT_COLORS.Activity} columns={3}>
+      <ToolbarGroup label={this.isFeedback() ? 'Feedback' : 'Activity'}
+        highlightColor={CONTENT_COLORS.Activity} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
-      </ToolbarGroup>
-    );
+      </ToolbarGroup>);
   }
 
   renderMain() {
@@ -152,12 +154,12 @@ export default class ActivityEditor
 
     return (
       <div className={classNames(['ActivityEditor', classes.activity])}>
-        <h5><i className="fa fa-check" style={iconStyle}/> {titleOrPlaceholder}</h5>
+        <h5><i className="fa fa-check" style={iconStyle} /> {titleOrPlaceholder}</h5>
         <button
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit Summative Assessment
+          Edit {this.isFeedback() ? 'Feedback' : 'Summative'} Assessment
         </button>
       </div>
     );
