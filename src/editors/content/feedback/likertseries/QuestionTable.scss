@@ -1,0 +1,98 @@
+@import "oli/colors";
+
+.likert-table {
+    table {
+        width: 100%;
+        border-collapse: inherit;
+
+        thead {
+            text-align: center;
+            vertical-align: bottom;
+
+            // screw table validation :)
+            td {
+                font-size: 14px;
+            }
+
+            th {
+                &:nth-child(1) {
+                    width: 34px;
+                }
+
+                &:nth-child(2) {
+                    width: 300px;
+                    padding-bottom: 15px;
+                }
+            }
+
+            label {
+                margin: 0;
+                float: right;
+                font-weight: 600;
+                font-size: 13px;
+                color: #606060;
+
+                select {
+                    width: 50px;
+                }
+            }
+        }
+
+        tbody {
+            td {
+                font-size: 14px;
+                padding: 0px 5px;
+
+                button {
+                    justify-content: center;
+                    border-radius: 5px;
+                    color: #666;
+                }
+
+                i {
+                    color: #666;
+                }
+            }
+
+            .question-table-radio {
+                border-top: 10px solid #f3f3f4;
+                border-bottom: 10px solid #f3f3f4;
+                border-radius: 15px;
+                text-align: center;
+                vertical-align: middle;
+                background-color: #eee;
+            }
+        }
+
+        .show-on-right {
+            float: 'right';
+        }
+    }
+
+    .add-row {
+        margin-left: 18px;
+        border-bottom: 2px dashed #cccccc;
+        border-left: 2px dashed #cccccc;
+        border-right: 2px dashed #cccccc;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        padding: 5px 5px 5px 15px;
+
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            // Override bootstrap button underline
+            &.btn.btn-link:hover:not([disabled]),
+            &.btn.btn-inline-link:hover:not([disabled]) {
+                text-decoration: none;
+            }
+
+            i {
+                padding-right: 8px;
+                font-size: 1.5em;
+            }
+        }
+    }
+}

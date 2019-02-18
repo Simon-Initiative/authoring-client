@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { LikertLabel } from './likert_label';
-import { getChildren } from 'data/content/common';
+import { getChildren, augment, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 
@@ -13,7 +13,9 @@ type LikertScaleParams = {
   scaleCenter?: string,
 };
 
-const defaultLikertScaleParams: LikertScaleParams = {
+const defaultLikertScaleParams = {
+  contentType: 'LikertScale',
+  elementType: 'likert_scale',
   guid: '',
   labels: Immutable.OrderedMap<string, LikertLabel>(),
   scaleSize: '',
@@ -21,17 +23,28 @@ const defaultLikertScaleParams: LikertScaleParams = {
 };
 
 export class LikertScale extends Immutable.Record(defaultLikertScaleParams) {
+  contentType: 'LikertScale';
+  elementType: 'likert_scale';
   guid: string;
   labels: Immutable.OrderedMap<string, LikertLabel>;
   scaleSize: string;
   scaleCenter: string;
 
   constructor(params?: LikertScaleParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: LikertScaleParams): LikertScale {
     return this.merge(values) as this;
+  }
+
+  clone(): LikertScale {
+    return ensureIdGuidPresent(this.with({
+      labels: this.labels.mapEntries(([_, v]) => {
+        const clone: LikertLabel = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, LikertLabel>,
+    }));
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): LikertScale {

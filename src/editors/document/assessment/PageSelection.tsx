@@ -20,54 +20,47 @@ export interface PageSelectionProps {
   services: AppServices;
 }
 
-export interface PageSelection {
-
-}
-
 export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
-
-  constructor(props) {
-    super(props);
-  }
 
   onChange = (page: contentTypes.Page) => {
     this.props.onChangeCurrent(page.guid);
   }
 
   onTitleEdit = (page: contentTypes.Page, text: string) => {
-    this.props.onEdit(page.with({ title: new contentTypes.Title({
-      text: ContentElements.fromText(text, '', TEXT_ELEMENTS) }) }));
+    this.props.onEdit(page.with({
+      title: new contentTypes.Title({
+        text: ContentElements.fromText(text, '', TEXT_ELEMENTS),
+      }),
+    }));
   }
 
   renderPage(page: contentTypes.Page, pageNumber: number) {
     return (
       <tr key={page.guid}>
 
-        <td style={ { minWidth: '75px', border: 'none' } } key="label">
+        <td style={{ minWidth: '75px', border: 'none' }} key="label">
           <Button
             editMode={true}
             onClick={() => this.onChange(page)}
             type="link">
-              <span style={{ fontWeight: page === this.props.current ? 'bolder' : 'normal' }}>
-                Page {pageNumber}
-              </span>
+            <span style={{ fontWeight: page === this.props.current ? 'bolder' : 'normal' }}>
+              Page {pageNumber}
+            </span>
           </Button>
         </td>
 
-        <td style={ { width: '100%', border: 'none' } } key="title">
-
+        <td style={{ width: '100%', border: 'none' }} key="title">
           <ContentContainer
             {...this.props}
             activeContentGuid={null}
             hover={null}
-            onUpdateHover={() => {}}
+            onUpdateHover={() => { }}
             parent={null}
             onFocus={this.props.onFocus}
             model={page.title.text}
             editMode={this.props.editMode}
             onEdit={text => this.onTitleEdit(page, text.extractPlainText().valueOr(''))}
           />
-
         </td>
 
         <td key="remove" style={{ border: 'none' }}>
@@ -95,7 +88,5 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
       </table>
     );
   }
-
 }
 
-export default PageSelection;

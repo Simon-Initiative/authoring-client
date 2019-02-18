@@ -15,12 +15,12 @@ export type PurposeType = {
 
 // tslint:disable-next-line
 export const PurposeTypes: PurposeType[] = [
+  { value: 'myresponse', label: 'My response' },
   { value: 'checkpoint', label: 'Checkpoint' },
   { value: 'lab', label: 'Lab' },
   { value: 'learnbydoing', label: 'Learn by doing' },
   { value: 'learnmore', label: 'Learn more' },
   { value: 'manystudentswonder', label: 'Many students wonder' },
-  { value: 'myresponse', label: 'My response' },
   { value: 'quiz', label: 'Quiz' },
   { value: 'simulation', label: 'Simulation' },
   { value: 'walkthrough', label: 'Walkthrough' },

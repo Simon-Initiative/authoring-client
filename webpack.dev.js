@@ -28,7 +28,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dev'),
-        filename: '[name].[hash].js'
+        filename: 'bundle.js'
     },
     externals: {
     },
@@ -66,35 +66,39 @@ module.exports = {
             { test: /\.html$/, loader: 'underscore-template-loader' },
             { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
-              test: /\.scss$/,
-              use: [
-                  { loader: 'style-loader'},
-                  { loader: 'css-loader'},
-                  { loader: 'sass-loader',
-                    options: {
-                        includePaths: [
-                            path.join(__dirname, 'src/stylesheets'),
-                        ],
-                        sourceMap: true
-                    }
-                }]
+                test: /\.scss$/,
+                use: [
+                    { loader: 'style-loader' },
+                    { loader: 'css-loader' },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            includePaths: [
+                                path.join(__dirname, 'src/stylesheets'),
+                            ],
+                            sourceMap: true
+                        }
+                    }]
             },
             { test: /\.(png|gif|jpg|jpeg|svg)$/, use: 'file-loader' },
-            { test: /\.ts$/, use: [ 'babel-loader', 'ts-loader'], exclude: /node_modules/ },
-            { test: /\.tsx$/, use: [
-                { loader: 'babel-loader',
-                    options: {
-                        // This is a feature of `babel-loader` for webpack (not Babel itself).
-                        // It enables caching results in ./node_modules/.cache/babel-loader/
-                        // directory for faster rebuilds.
-                        cacheDirectory: true,
-                        plugins: [
-                        'react-hot-loader/babel'
-                        ]
+            { test: /\.ts$/, use: ['babel-loader', 'ts-loader'], exclude: /node_modules/ },
+            {
+                test: /\.tsx$/, use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            // This is a feature of `babel-loader` for webpack (not Babel itself).
+                            // It enables caching results in ./node_modules/.cache/babel-loader/
+                            // directory for faster rebuilds.
+                            cacheDirectory: true,
+                            plugins: [
+                                'react-hot-loader/babel'
+                            ]
+                        },
                     },
-                },
-                { loader: 'ts-loader'}
-            ], exclude: /node_modules/ }
+                    { loader: 'ts-loader' }
+                ], exclude: /node_modules/
+            }
         ]
     },
     plugins: [

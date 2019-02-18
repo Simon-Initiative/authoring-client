@@ -4,8 +4,10 @@ import { Likert } from './likert';
 import { FeedbackMultipleChoice } from './feedback_multiple_choice';
 import { FeedbackOpenResponse } from './feedback_open_response';
 import createGuid from 'utils/guid';
-import { getChildren } from '../common';
+import { getChildren, augment } from '../common';
 import { getKey } from 'data/common';
+import { ensureIdGuidPresent } from 'data/content/common';
+import { createLikertSeries } from 'editors/content/question/addquestion/questionFactories';
 
 export type FeedbackQuestion =
   LikertSeries
@@ -18,21 +20,29 @@ type FeedbackQuestionsParams = {
   questions?: Immutable.OrderedMap<string, FeedbackQuestion>;
 };
 
-const defaultFeedbackQuestionsParams: FeedbackQuestionsParams = {
+const defaultFeedbackQuestionsParams = {
+  contentType: 'FeedbackQuestions',
+  elementType: 'questions',
   guid: '',
   questions: Immutable.OrderedMap<string, FeedbackQuestion>(),
 };
 
 export class FeedbackQuestions extends Immutable.Record(defaultFeedbackQuestionsParams) {
+  contentType: 'FeedbackQuestions';
+  elementType: 'questions';
   guid: string;
   questions: Immutable.OrderedMap<string, FeedbackQuestion>;
 
   constructor(params?: FeedbackQuestionsParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackQuestionsParams): FeedbackQuestions {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackQuestions {
+    return ensureIdGuidPresent(this);
   }
 
   static fromPersistence(
@@ -77,7 +87,7 @@ export class FeedbackQuestions extends Immutable.Record(defaultFeedbackQuestions
 
   toPersistence(): Object {
     const children = this.questions.size === 0
-      ? [(new LikertSeries()).toPersistence()]
+      ? [createLikertSeries().toPersistence()]
       : this.questions.toArray().map(item => item.toPersistence());
 
     return {

@@ -33,7 +33,7 @@ export const getUrlParams = (search: string): Map<string, string> =>
     },
     Map<string, string>(),
   )
-  : Map<string, string>();
+    : Map<string, string>();
 
 export const stringifyUrlParams = (urlParams: Map<string, string>): string =>
   urlParams.keySeq().reduce(

@@ -91,6 +91,7 @@ const getOrderedObjectiveQuestions = (
 ) => {
   // because we are reducing on an ordered list of skills, the result
   // will automatically be sorted by skill which is what we want
+
   const questionRefs: Map<string, QuestionRef> = (
     skill
       ? skillQuestionRefs
@@ -432,7 +433,7 @@ export class Objective
     return orderedObjectiveQuestionRefs.length > 0
       ? (
         <div className={classes.skillGridHeader}>
-          <div className="flex-spacer"/>
+          <div className="flex-spacer" />
           <div style={{ height: SKILL_GRID_HEADER_HEIGHT }}>
             <svg
               width={(35 * orderedObjectiveQuestionRefs.length) + SKILL_GRID_HEADER_HEIGHT}
@@ -492,7 +493,7 @@ export class Objective
     const orderedObjectiveQuestions = getOrderedObjectiveQuestions(skills, skillQuestionRefs);
 
     const skillContainsFormativeQuestion = (
-        skill: contentTypes.Skill, question: QuestionRef) =>
+      skill: contentTypes.Skill, question: QuestionRef) =>
       skillQuestionRefs.caseOf({
         just: questionRefs => questionRefs.has(skill.id)
           && !!questionRefs.get(skill.id)
@@ -501,7 +502,7 @@ export class Objective
       });
 
     const skillContainsSummativeQuestion = (
-        skill: contentTypes.Skill, question: QuestionRef) =>
+      skill: contentTypes.Skill, question: QuestionRef) =>
       skillQuestionRefs.caseOf({
         just: questionRefs => questionRefs.has(skill.id)
           && !!questionRefs.get(skill.id)
@@ -510,7 +511,7 @@ export class Objective
       });
 
     const skillContainsPoolQuestion = (
-        skill: contentTypes.Skill, question: QuestionRef) =>
+      skill: contentTypes.Skill, question: QuestionRef) =>
       skillQuestionRefs.caseOf({
         just: questionRefs => questionRefs.has(skill.id)
           && !!questionRefs.get(skill.id)
@@ -536,29 +537,29 @@ export class Objective
                       </div>
                     </Tooltip>
                   )
-                : skillContainsSummativeQuestion(skill, question)
-                  ? (
-                    <Tooltip title="Summative" distance={15}
-                      size="small" arrowSize="small">
-                      <div key={question.key} className={classes.skillGridCell}>
-                        <i className={classNames(['fa fa-check',
-                          classes.summativeColor, classes.gridAssessmentIcon])} />
-                      </div>
-                    </Tooltip>
-                  )
-                : skillContainsPoolQuestion(skill, question)
-                  ? (
-                    <Tooltip title="Question Pool" distance={15}
-                      size="small" arrowSize="small">
-                      <div key={question.key} className={classes.skillGridCell}>
-                        <i className={classNames(['fa fa-shopping-basket',
-                          classes.poolColor, classes.gridAssessmentIcon])} />
-                      </div>
-                    </Tooltip>
-                  )
-                : (
-                  <div key={question.key} className={classes.skillGridCell}/>
-                )
+                  : skillContainsSummativeQuestion(skill, question)
+                    ? (
+                      <Tooltip title="Summative" distance={15}
+                        size="small" arrowSize="small">
+                        <div key={question.key} className={classes.skillGridCell}>
+                          <i className={classNames(['fa fa-check',
+                            classes.summativeColor, classes.gridAssessmentIcon])} />
+                        </div>
+                      </Tooltip>
+                    )
+                    : skillContainsPoolQuestion(skill, question)
+                      ? (
+                        <Tooltip title="Question Pool" distance={15}
+                          size="small" arrowSize="small">
+                          <div key={question.key} className={classes.skillGridCell}>
+                            <i className={classNames(['fa fa-shopping-basket',
+                              classes.poolColor, classes.gridAssessmentIcon])} />
+                          </div>
+                        </Tooltip>
+                      )
+                      : (
+                        <div key={question.key} className={classes.skillGridCell} />
+                      )
               ))}
             </div>
           ))}
@@ -630,49 +631,50 @@ export class Objective
           <div className={classes.quadLeft}>
             <div className={classes.pageSection}>
               <h3>
-              {checkModelResults.getIssue(Issue.AT_LEAST_1_PAGE).caseOf({
-                just: issue => (
-                  <IssueTooltip>
-                    {issue.description}
-                  </IssueTooltip>
-                ),
-                nothing: () => undefined,
-              })}
-              <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
-              Pages
+                {checkModelResults.getIssue(Issue.AT_LEAST_1_PAGE).caseOf({
+                  just: issue => (
+                    <IssueTooltip>
+                      {issue.description}
+                    </IssueTooltip>
+                  ),
+                  nothing: () => undefined,
+                })}
+                <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
+                Pages
               {workbookPageRefs.caseOf({
                 just: refs => (
-                  <span className={classNames(['badge badge-light', classes.countBadge])}>
-                    {refs.size}
-                  </span>
-                ),
+                    <span className={classNames(['badge badge-light', classes.countBadge])}>
+                      {refs.size}
+                    </span>
+                  ),
                 nothing: () => null,
               })}
               </h3>
               {workbookPageRefs.caseOf({
                 just: (refs) => {
                   return refs.size > 0
-                  ? (
-                    <div className={classes.pageList}>
-                      {refs.map(refGuid => (
-                        <div key={refGuid} className={classes.pageTitle}>
-                          <a href={`./#${getRefGuidFromRefId(refGuid)}-${course.guid}`}>
-                          <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
-                          {getWBPTitleFromRefId(refGuid)}
-                          </a>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                  : (
-                    <div className={classes.noPagesMsg}>
-                      <span>This objective is not referenced by any workbook pages.</span>
-                    </div>
-                  );
+                    ? (
+                      <div className={classes.pageList}>
+                        {refs.map(refGuid => (
+                          <div key={refGuid} className={classes.pageTitle}>
+                            <a href={`./#${getRefGuidFromRefId(refGuid)}-${course.guid}`}>
+                              <i className={classNames(
+                                ['fa fa-file-o', classes.detailsSectionIcon])} />
+                              {getWBPTitleFromRefId(refGuid)}
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                    : (
+                      <div className={classes.noPagesMsg}>
+                        <span>This objective is not referenced by any workbook pages.</span>
+                      </div>
+                    );
                 },
                 nothing: () => (
-                <div className={classes.loading}>
-                  <i className="fa fa-circle-o-notch fa-spin fa-fw"/> Loading...
+                  <div className={classes.loading}>
+                    <i className="fa fa-circle-o-notch fa-spin fa-fw" /> Loading...
                 </div>
                 ),
               })}
@@ -708,7 +710,7 @@ export class Objective
                   onClick={() => onAddNewSkill(objective)}>
                   Create New Skill
                 </Button>
-                <div className="flex-spacer"/>
+                <div className="flex-spacer" />
                 {skills.size > 0 && orderedObjectiveAssessments.length < 1 &&
                   <div style={{ color: colors.gray, fontWeight: 400 }}>
                     These skills are not referenced by any assessments
@@ -818,7 +820,7 @@ export class Objective
                   .length,
                 0,
               );
-
+              
               const summativeCount = skills.reduce(
                 (sum, skill) => sum +
                   getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill)
@@ -840,8 +842,8 @@ export class Objective
                     className={classNames([
                       classes.detailsOverviewSeparator, classes.formativeColor])}>
                     {`${formativeCount} `}
-                    <i className="fa fa-flask"/>
-                    </span>
+                    <i className="fa fa-flask" />
+                  </span>
                   <span
                     className={classNames([
                       classes.detailsOverviewSeparator, classes.summativeColor])}>
@@ -858,7 +860,7 @@ export class Objective
     );
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
     const {
       className, classes, editMode, objective, isExpanded, onEdit, loading, onRemove,
       onBeginExternalEdit, highlightText,
@@ -874,7 +876,7 @@ export class Objective
     const actionButtons = mouseOver && editMode
       ? (
         <React.Fragment>
-          <div className="flex-spacer"/>
+          <div className="flex-spacer" />
           <Button
             editMode={editMode && !loading}
             type="secondary"
@@ -912,7 +914,7 @@ export class Objective
         <div
           className={classNames([classes.title, highlightText !== '' && classes.expandDisable])}
           onClick={() => this.onToggleDetails()}>
-          <div><i className="fa fa-graduation-cap"/></div>
+          <div><i className="fa fa-graduation-cap" /></div>
           <div className={classNames([classes.titleText])}>
             <div className="flex-spacer">
               <InlineEdit
@@ -926,9 +928,9 @@ export class Objective
                   onEdit(objective.with({ title: value }));
                 }}
                 onCancel={() =>
-                this.setState({
-                  isEditingTitle: false,
-                })}
+                  this.setState({
+                    isEditingTitle: false,
+                  })}
                 editMode={editMode && !loading}
                 value={displayedTitle} />
             </div>

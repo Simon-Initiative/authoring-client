@@ -1,27 +1,39 @@
 import * as Immutable from 'immutable';
 import createGuid from 'utils/guid';
 import { INLINE_ELEMENTS, ContentElements } from '../common/elements';
+import { augment } from '../common';
+import { ensureIdGuidPresent } from 'data/content/common';
 
 type FeedbackPromptParams = {
   guid?: string;
   content?: ContentElements;
 };
 
-const defaultFeedbackPromptParams: FeedbackPromptParams = {
+const defaultFeedbackPromptParams = {
+  contentType: 'FeedbackPrompt',
+  elementType: 'prompt',
   guid: '',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
 };
 
 export class FeedbackPrompt extends Immutable.Record(defaultFeedbackPromptParams) {
+  contentType: 'FeedbackPrompt';
+  elementType: 'prompt';
   guid: string;
   content: ContentElements;
 
   constructor(params?: FeedbackPromptParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackPromptParams): FeedbackPrompt {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackPrompt {
+    return ensureIdGuidPresent(this.with({
+      content: this.content.clone(),
+    }));
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): FeedbackPrompt {
@@ -38,9 +50,19 @@ export class FeedbackPrompt extends Immutable.Record(defaultFeedbackPromptParams
   }
 
   toPersistence(): Object {
+    const serialized = this.content.toPersistence();
+    const content = serialized.length === 0
+      ? [{
+        p: {
+          '#text': ' ',
+          '@id': createGuid(),
+        },
+      }]
+      : serialized;
+
     return {
       prompt: {
-        '#array': this.content.toPersistence(),
+        '#array': content,
       },
     };
   }

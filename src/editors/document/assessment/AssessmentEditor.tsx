@@ -14,10 +14,10 @@ import {
   handleBranchingReordering, handleBranchingDeletion,
 } from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
-import { AddQuestion } from 'editors/content/question/AddQuestion';
-import { renderAssessmentNode } from 'editors/document/common/questions';
+import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
+import { AssessmentNodeRenderer } from 'editors/document/common/questions';
 import { getChildren, Outline, setChildren, EditDetails }
-  from 'editors/document/assessment/Outline';
+  from 'editors/document/assessment/outline/Outline';
 import { updateNode, removeNode } from 'data/utils/tree';
 import { hasUnknownSkill } from 'utils/skills';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
@@ -30,15 +30,16 @@ import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
 import './AssessmentEditor.scss';
-import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
+import { ContentElement } from 'data/content/common/interfaces';
 import { RouterState } from 'reducers/router';
+import { Node } from 'data/content/assessment/node';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
   activeContext: ActiveContext;
-  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: string, content: ContentElement, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -57,56 +58,23 @@ interface AssessmentEditorState extends AbstractEditorState {
   collapseInsertPopup: boolean;
 }
 
-class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
+export default class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps,
-  AssessmentEditorState>  {
+  AssessmentEditorState> {
 
-  noSkillsMessage: Messages.Message;
-  supportedElements: Immutable.List<string>;
+  state: AssessmentEditorState = {
+    ...this.state,
+    collapseInsertPopup: true,
+  };
 
-  constructor(props: AssessmentEditorProps) {
-    super(props, ({ collapseInsertPopup: true } as AssessmentEditorState));
-
-    this.onTitleEdit = this.onTitleEdit.bind(this);
-    this.onAddContent = this.onAddContent.bind(this);
-    this.onAddPool = this.onAddPool.bind(this);
-    this.onSelectPool = this.onSelectPool.bind(this);
-    this.onCancelSelectPool = this.onCancelSelectPool.bind(this);
-    this.onInsertPool = this.onInsertPool.bind(this);
-    this.onPageEdit = this.onPageEdit.bind(this);
-
-    this.getCurrentPage = this.getCurrentPage.bind(this);
-    this.onTypeChange = this.onTypeChange.bind(this);
-    this.onNodeRemove = this.onNodeRemove.bind(this);
-    this.onEditNode = this.onEditNode.bind(this);
-    this.onDuplicateQuestion = this.onDuplicateQuestion.bind(this);
-    this.onFocus = this.onFocus.bind(this);
-    this.unFocus = this.unFocus.bind(this);
-    this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
-
-    this.supportedElements = Immutable.List<string>();
-
-    if (hasUnknownSkill(props.model, props.context.skills)) {
-      props.onFetchSkills(props.context.courseId);
-    }
+  componentWillMount() {
+    this.fetchSkillsIfMissing(this.props);
   }
 
   componentDidMount() {
     super.componentDidMount();
-    // We have no direct access to a skills list through props.context since
-    // skills cannot be deleted. Looking at skills attached to objectives
-    // will show the banner if skills are present in the course but 'deleted',
-    // aka removed from an associated objective.
-    const hasNoskills = this.props.context.objectives.reduce(
-      (bool, obj) => bool && obj.skills.size === 0,
-      true);
 
-    if (hasNoskills) {
-      this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
-      this.props.showMessage(this.noSkillsMessage);
-    }
-
-    this.selectRoutedOrDefaultNode(this.props.router);
+    this.showMissingSkillsMessage();
   }
 
   shouldComponentUpdate(
@@ -129,26 +97,40 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
-    if (this.props.context.skills.size <= 0 &&
-      nextProps.context.skills.size > 0 &&
-      this.noSkillsMessage !== undefined) {
+
+    if (this.wasSkillAdded(nextProps)) {
       this.props.dismissMessage(this.noSkillsMessage);
     }
 
+    this.checkActiveNodeStillExists(nextProps);
+  }
+
+  noSkillsMessage: Messages.Message;
+  supportedElements: Immutable.List<string> = Immutable.List<string>();
+
+  wasSkillAdded = (nextProps: AssessmentEditorProps) => {
+    return this.props.context.skills.size <= 0 &&
+      nextProps.context.skills.size > 0 &&
+      this.noSkillsMessage !== undefined;
+  }
+
+  checkActiveNodeStillExists = (nextProps: AssessmentEditorProps) => {
+    // Handle the case that the current node has changed externally,
+    // for instance, from an undo/redo
     if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
 
       const currentPage = this.getCurrentPage(nextProps);
       const { activeContext, onSetCurrentNodeOrPage } = this.props;
       const documentId = activeContext.documentId.valueOr(null);
 
-      // Handle the case that the current node has changed externally,
-      // for instance, from an undo/redo
       findNodeByGuid(currentPage.nodes, this.props.currentNode.guid)
         .caseOf({
-
+          // If the node is still part of the current page, select the same node as active
           just: (currentNode) => {
             onSetCurrentNodeOrPage(documentId, currentNode);
           },
+          // Else there was some sort of external change, and an adjacent node needs to be
+          // selected as active
           nothing: () => {
             locateNextOfKin(
               this.getCurrentPage(this.props).nodes, this.props.currentNode.guid).lift(node =>
@@ -209,26 +191,44 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
-  getCurrentPage(props) {
+  getCurrentPage = (props: AssessmentEditorProps) => {
     return props.model.pages.get(this.props.currentPage)
       || props.model.pages.first();
   }
 
-  onPageEdit(page: contentTypes.Page) {
-    const pages = this.props.model.pages.set(page.guid, page);
-    this.handleEdit(this.props.model.with({ pages }));
+  fetchSkillsIfMissing = (props: AssessmentEditorProps) => {
+    if (hasUnknownSkill(props.model, props.context.skills)) {
+      props.onFetchSkills(props.context.courseId);
+    }
   }
 
-  onTitleEdit(ct: ContiguousText, src) {
-    const t = ct.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
+  showMissingSkillsMessage() {
+    // We have no direct access to a skills list through props.context since
+    // skills cannot be deleted. Looking at skills attached to objectives
+    // will show the banner if skills are present in the course but 'deleted',
+    // aka removed from an associated objective.
+    const hasNoskills = this.props.context.objectives.reduce(
+      (bool, obj) => bool && obj.skills.size === 0,
+      true);
 
-    const resource = this.props.model.resource.with({ title: t });
+    if (hasNoskills) {
+      this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
+      this.props.showMessage(this.noSkillsMessage);
+    }
+  }
 
-    const content = this.props.model.title.text.content.set(ct.guid, ct);
-    const text = this.props.model.title.text.with({ content });
-    const title = this.props.model.title.with({ text });
+  onTitleEdit = (ct: ContiguousText, src: ContentElement) => {
+    const { model, onEdit } = this.props;
+    const t = ct.extractPlainText().valueOr('');
 
-    this.props.onEdit(this.props.model.with({ title, resource }));
+    onEdit(model.with({
+      title: model.title.with({
+        text: model.title.text.with({
+          content: model.title.text.content.set(ct.guid, ct),
+        }),
+      }),
+      resource: model.resource.with({ title: t }),
+    }));
   }
 
   detectPoolAdditions(
@@ -252,47 +252,42 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
-  onEditNode(guid: string, node: models.Node, src) {
-
-    const { activeContext, onSetCurrentNodeOrPage } = this.props;
+  onEditNode = (guid: string, node: models.Node, src: ContentElement) => {
+    const { activeContext, context, model, onSetCurrentNodeOrPage, onUpdateContent } = this.props;
 
     const nodes = this.getCurrentPage(this.props).nodes;
 
     this.detectPoolAdditions(node, nodes);
 
     onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node);
-    this.props.onUpdateContent(this.props.context.documentId, src);
+    onUpdateContent(context.documentId, src);
 
-    const updatedNodes = updateNode(guid, node, nodes, getChildren, setChildren);
+    const page = this.getCurrentPage(this.props).with({
+      nodes: updateNode(guid, node, nodes, getChildren, setChildren),
+    });
 
-    let page = this.getCurrentPage(this.props);
-    page = page.with({ nodes: updatedNodes });
-
-    const pages = this.props.model.pages.set(page.guid, page);
-    this.handleEdit(this.props.model.with({ pages }));
-
+    this.handleEdit(model.with({
+      pages: model.pages.set(page.guid, page),
+    }));
   }
 
   // This handles updates from the outline component, which are only reorders
   onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>, editDetails: EditDetails) {
 
-    if (this.props.model.branching) {
-      const pages = handleBranchingReordering(
-        this.props.model.resource.id, this.props.model.pages, nodes);
-      this.handleEdit(this.props.model.with({ pages }));
+    const { model } = this.props;
+    let pages;
 
-      findNodeByGuid(nodes, editDetails.sourceModel.guid).caseOf({
-        just: node => this.onSelect(node),
-        nothing: () => null,
-      });
-
+    if (model.branching) {
+      pages = handleBranchingReordering(model.resource.id, model.pages, nodes);
+      findNodeByGuid(nodes, editDetails.sourceModel.guid).lift(node => this.onSelect(node));
     } else {
-      let page = this.getCurrentPage(this.props);
-      page = page.with({ nodes });
-
-      const pages = this.props.model.pages.set(page.guid, page);
-      this.handleEdit(this.props.model.with({ pages }));
+      const page = this.getCurrentPage(this.props).with({ nodes });
+      pages = model.pages.set(page.guid, page);
     }
+
+    this.handleEdit(model.with({
+      pages,
+    }));
   }
 
   onChangeExpansion(nodes: Immutable.Set<string>) {
@@ -319,13 +314,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   canRemoveNode() {
-    const isQuestionOrPool = node =>
+    const isQuestionOrPool = (node: models.Node) =>
       node.contentType === 'Question' || node.contentType === 'Selection';
 
     return this.allNodes().filter(isQuestionOrPool).size > 1;
   }
 
-  onNodeRemove(guid: string) {
+  onNodeRemove = (guid: string) => {
     // Find the node to be removed, remove it, and set an adjacent node to be active.
     // Branching assessments are handled as a special case since they must remove
     // edges when a linked-to node is deleted.
@@ -354,38 +349,18 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.handleEdit(model.with({ pages }));
   }
 
-  onAddContent() {
+  // item : AssessmentNode
+  onAddQuestion = (item) => {
     if (!this.props.editMode) return;
 
-    let content = contentTypes.Content.fromText('', '');
-    content = content.with({ guid: guid() });
-    this.addNode(content);
+    const node = item.with({ guid: guid() });
+    this.addNode(node);
     this.setState({
       collapseInsertPopup: true,
     });
   }
 
-  addQuestion(question: contentTypes.Question) {
-    if (!this.props.editMode) return;
-
-    const content = question.with({ guid: guid() });
-    this.addNode(content);
-    this.setState({
-      collapseInsertPopup: true,
-    });
-  }
-
-  onAddPool() {
-    if (!this.props.editMode) return;
-
-    const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
-    this.addNode(pool);
-    this.setState({
-      collapseInsertPopup: true,
-    });
-  }
-
-  addNode(node) {
+  addNode(node: models.Node) {
     const { model, activeContext, onSetCurrentNodeOrPage } = this.props;
 
     // Branching assessments place each question on a separate page
@@ -395,10 +370,10 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     page = page.with({ nodes: page.nodes.set(node.guid, node) });
 
-    const pages = model.pages.set(page.guid, page);
-
     onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node);
-    this.handleEdit(model.with({ pages }));
+    this.handleEdit(model.with({
+      pages: model.pages.set(page.guid, page),
+    }));
   }
 
   onRemove() {
@@ -426,33 +401,38 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // do nothing
   }
 
-  onTypeChange(type) {
-    const resource = this.props.model.resource.with({ type });
-    const model = this.props.model.with({ resource });
+  onTypeChange = (type: string) => {
+    const { model } = this.props;
 
-    this.handleEdit(model);
+    this.handleEdit(model.with({
+      resource:
+        model.resource.with({
+          type,
+        }),
+    }));
   }
 
-  onSelectPool() {
-    if (!this.props.editMode) return;
+  onSelectPool = () => {
+    const { editMode, services, context } = this.props;
+    if (!editMode) return;
 
     const predicate = (res: Resource): boolean =>
       res.type === LegacyTypes.assessment2_pool
       && res.resourceState !== ResourceState.DELETED;
 
-    this.props.services.displayModal(
+    services.displayModal(
       <ResourceSelection
         filterPredicate={predicate}
-        courseId={this.props.context.courseId}
+        courseId={context.courseId}
         onInsert={this.onInsertPool}
         onCancel={this.onCancelSelectPool} />);
   }
 
-  onCancelSelectPool() {
+  onCancelSelectPool = () => {
     this.props.services.dismissModal();
   }
 
-  onInsertPool(resource) {
+  onInsertPool = (resource: Resource) => {
     this.props.services.dismissModal();
 
     // Handle case where Insert is clicked after no pool selection is made
@@ -512,43 +492,35 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   renderAdd() {
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
 
-    const { editMode } = this.props;
+    const { editMode, model } = this.props;
     const { collapseInsertPopup } = this.state;
 
     const questionPoolOrNothing = editMode && !isInline
       ? <a className="dropdown-item" onClick={this.onSelectPool}>Question Pool</a>
       : null;
 
-    const embeddedPoolOrNothing = editMode && !isInline
-      ? <a className="dropdown-item" onClick={this.onAddPool}>Embedded Pool</a>
-      : null;
-
     return (
       <React.Fragment>
         <div className={`insert-popup ${collapseInsertPopup ? 'collapsed' : ''}`}>
           <AddQuestion
-            editMode={this.props.editMode}
-            onQuestionAdd={this.addQuestion.bind(this)}
-            isSummative={this.props.model.type === LegacyTypes.assessment2} />
-          {/* Branching assessments must have supporting content inline */}
-          {this.props.model.branching
-            ? null
-            : <div><ToolbarButtonMenuDivider />
-              <a className="dropdown-item" onClick={this.onAddContent}>Supporting Content</a></div>}
+            editMode={editMode}
+            onQuestionAdd={this.onAddQuestion}
+            assessmentType={model.type}
+            isBranching={model.branching} />
           {questionPoolOrNothing}
-          {embeddedPoolOrNothing}
         </div>
-        <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
+        <a onClick={this.toggleInsertPopup} className="insert-new">Insert new...</a>
       </React.Fragment>
     );
   }
 
-  onFocus(model: Object, parent, textSelection) {
+  onFocus = (
+    model: ContentElement, parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
     this.props.onUpdateContentSelection(
       this.props.context.documentId, model, parent, textSelection);
   }
 
-  unFocus() {
+  unFocus = () => {
     this.props.onUpdateContentSelection(
       this.props.context.documentId, null, null, Maybe.nothing());
   }
@@ -561,15 +533,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   }
 
-  onDuplicateQuestion() {
-
+  onDuplicateQuestion = () => {
     if (this.props.currentNode.contentType === 'Question') {
       const duplicated = this.props.currentNode.clone();
       this.addNode(duplicated);
     }
   }
 
-  collapseInsertPopup() {
+  toggleInsertPopup = () => {
     this.setState({
       collapseInsertPopup: !this.state.collapseInsertPopup,
     });
@@ -585,15 +556,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
 
     const activeContentGuid = this.props.activeContext.activeChild.caseOf({
-      just: c => (c as any).guid,
+      just: c => c.guid,
       nothing: () => '',
     });
-
-    const assessmentNodeProps = {
-      ...this.props,
-      skills: this.props.context.skills,
-      activeContentGuid,
-    };
 
     return (
       <div className="assessment-editor">
@@ -611,27 +576,33 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               editorStyles={{ fontSize: 32 }} />
 
             <div className="outline-and-node-container">
-              <div className="outline-container">
-                <Outline
-                  editMode={this.props.editMode}
-                  nodes={model.branching
-                    ? this.allNodes()
-                    : page.nodes}
-                  expandedNodes={expanded}
-                  selected={currentNode.guid}
-                  onEdit={this.onEditNodes.bind(this)}
-                  onChangeExpansion={this.onChangeExpansion.bind(this)}
-                  onSelect={this.onSelect}
-                  course={course}
-                />
+              <Outline
+                editMode={this.props.editMode}
+                nodes={model.branching
+                  ? this.allNodes()
+                  : page.nodes}
+                expandedNodes={expanded}
+                selected={currentNode.guid}
+                onEdit={this.onEditNodes.bind(this)}
+                onChangeExpansion={this.onChangeExpansion.bind(this)}
+                onSelect={this.onSelect}
+                course={course}>
                 {this.renderAdd()}
-              </div>
-              <div className="node-container">
-                {renderAssessmentNode(
-                  currentNode, assessmentNodeProps, this.onEditNode,
-                  this.onNodeRemove, this.onFocus, this.canRemoveNode(),
-                  this.onDuplicateQuestion, this, false)}
-              </div>
+              </Outline>
+              <AssessmentNodeRenderer
+                {...this.props}
+                allSkills={this.props.context.skills}
+                activeContentGuid={activeContentGuid}
+                model={currentNode}
+                onEdit={(c: Node, src: ContentElement) => this.onEditNode(currentNode.guid, c, src)}
+                onRemove={this.onNodeRemove}
+                onFocus={this.onFocus}
+                canRemove={this.canRemoveNode()}
+                onDuplicate={this.onDuplicateQuestion}
+                nodeParentModel={model}
+                parent={this}
+                isQuestionPool={false}
+              />
             </div>
           </div>
           <ContextAwareSidebar
@@ -642,9 +613,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             onEditModel={onEdit} />
         </div>
       </div>);
-
   }
-
 }
 
-export default AssessmentEditor;

@@ -66,25 +66,46 @@ export default class ActivityEditor
   }
 
   renderSidebar() {
-    const activityOptions = this.props.context.courseModel.resources
+    const summatives = this.props.context.courseModel.resources
       .toArray()
       .filter(r => r.type === LegacyTypes.assessment2 && r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
-    // A purpose is not required, so we need to add an option for an empty type
-    const purposeTypesWithEmpty = PurposeTypes.slice();
+    const feedbacks = this.props.context.courseModel.resources
+      .toArray()
+      .filter(r => r.type === LegacyTypes.feedback && r.resourceState !== ResourceState.DELETED)
+      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+
+    // A purpose is not required, so we need to add an option for an empty type.
+    // My Response is specifically for feedback activities, so they cannot be chosen by
+    // non-feedback assessments.
+    const purposeTypesWithEmpty = PurposeTypes.slice()
+      .filter(p => p.value !== contentTypes.PurposeTypes.MyResponse);
     purposeTypesWithEmpty.unshift({ value: '', label: '' });
 
+    const isFeedback = this.props.model.purpose.caseOf({
+      just: p => p === contentTypes.PurposeTypes.MyResponse,
+      nothing: () => false,
+    });
+
+    const activitySelect = options => <SidebarGroup label="Assessment">
+      <Select
+        editMode={this.props.editMode}
+        value={this.props.model.idref}
+        onChange={this.onAssessmentChange}>
+        {options}
+      </Select>
+    </SidebarGroup>;
+
+    if (isFeedback) {
+      return <SidebarContent title="Activity">
+        {activitySelect(feedbacks)}
+      </SidebarContent>;
+    }
+
     return (
-      <SidebarContent title="Activity">
-        <SidebarGroup label="Assessment">
-          <Select
-            editMode={this.props.editMode}
-            value={this.props.model.idref}
-            onChange={this.onAssessmentChange}>
-            {activityOptions}
-          </Select>
-        </SidebarGroup>
+      <SidebarContent title="Activity" >
+        {activitySelect(summatives)}
 
         <SidebarGroup label="Purpose">
           <Select
