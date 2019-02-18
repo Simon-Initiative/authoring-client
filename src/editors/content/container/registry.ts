@@ -102,7 +102,6 @@ function init() {
   registry['CellData'] = connectEditor(CellEditor);
   registry['CellHeader'] = connectEditor(CellEditor);
   registry['Cite'] = connectEditor(CiteEditor);
-  registry['Choice'] = connectEditor(FeedbackChoiceEditor);
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
   registry['Command'] = connectEditor(CommandEditor);
   registry['Composite'] = connectEditor(CompositeEditor);
