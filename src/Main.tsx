@@ -100,7 +100,7 @@ const resources = {
     (resource: Resource) => resource.type === LegacyTypes.feedback
       && resource.resourceState !== ResourceState.DELETED,
     (courseId, title, type) => models.FeedbackModel.createNew(
-      guid(), title, 'This is a course feedback assessment'),
+      guid(), title, ''),
   ),
   pages: res(
     'Workbook Pages',
