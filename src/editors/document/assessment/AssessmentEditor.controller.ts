@@ -27,7 +27,7 @@ interface StateProps {
 
 interface DispatchProps {
   onFetchSkills: (courseId: string) => any;
-  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;

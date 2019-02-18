@@ -50,7 +50,6 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   }
 
   static createNew(id: string, title: string, body: string) {
-
     return new WorkbookPageModel({
       head: new contentTypes.Head({
         title:

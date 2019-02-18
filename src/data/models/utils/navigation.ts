@@ -88,6 +88,8 @@ export function getChildren<NodeType extends HasGuid>(
       return Maybe.nothing();
     case 'Section':
       return Maybe.just((node as contentTypes.WorkbookSection).body.content as any);
+    case 'Bibliography':
+      return Maybe.just((node as contentTypes.Bibliography).bibEntries as any);
     case 'Material':
       return Maybe.just((node as contentTypes.Material).content.content as any);
     case 'Alternatives':

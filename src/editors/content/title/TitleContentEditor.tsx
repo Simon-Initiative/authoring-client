@@ -7,20 +7,18 @@ import {
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 import './TitleContentEditor.scss';
+import { ContentElement } from 'data/content/common/interfaces';
+import { ContentElements } from 'data/content/common/elements';
+import { JSSStyles } from 'styles/jss';
 
 export interface TitleContentEditorProps extends AbstractContentEditorProps<contentTypes.Title> {
-  styles?: Object;
+  styles?: JSSStyles;
 }
 
 export class TitleContentEditor
   extends AbstractContentEditor<contentTypes.Title, TitleContentEditorProps, {}> {
 
-  constructor(props) {
-    super(props);
-
-  }
-
-  onTitleEdit(text, source) {
+  onTitleEdit = (text: ContentElements, source: ContentElement) => {
     const updatedContent = this.props.model.with({ text });
     this.props.onEdit(updatedContent, source);
   }
@@ -32,15 +30,14 @@ export class TitleContentEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     return <ContentContainer
       {...this.props}
       activeContentGuid={null}
       hover={null}
-      onUpdateHover={() => {}}
+      onUpdateHover={() => { }}
       model={this.props.model.text}
-      onEdit={this.onTitleEdit.bind(this)}
+      onEdit={this.onTitleEdit}
     />;
   }
-
 }

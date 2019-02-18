@@ -51,8 +51,8 @@ export class ContentEditor
   }
 
   onBodyEdit(body: ContentElements, src) {
-    const concept = this.props.model.with({ body });
-    this.props.onEdit(concept, src);
+    const content = this.props.model.with({ body });
+    this.props.onEdit(content, src);
   }
 
   onAvailability(availability: string, src) {
@@ -109,7 +109,7 @@ export class ContentEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     return (
       <div className="content-editor">

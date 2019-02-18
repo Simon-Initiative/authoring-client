@@ -3,9 +3,11 @@ import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
+import { ContentElement } from 'data/content/common/interfaces';
+import { JSSStyles } from 'styles/jss';
 
 export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>,
-  S extends AbstractContentEditorState> {}
+  S extends AbstractContentEditorState> { }
 
 export enum RenderContext {
   MainEditor,
@@ -16,7 +18,7 @@ export enum RenderContext {
 export interface AbstractContentEditorProps<ModelType> {
   model: ModelType;
   parent?: ParentContainer;
-  onEdit: (updated: ModelType, source?: Object) => void;
+  onEdit: (updated: ModelType, source?: ContentElement) => void;
   onFocus: (
     model: any, parent: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
@@ -24,28 +26,28 @@ export interface AbstractContentEditorProps<ModelType> {
   services: AppServices;
   editMode: boolean;
   renderContext?: RenderContext;
-  styles?: any;
+  styles?: JSSStyles;
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
-  onHandleClick?: (e) => void;
+  onHandleClick?: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
-export interface AbstractContentEditorState {}
+export interface AbstractContentEditorState { }
 
 /**
  * The abstract content editor.
  */
 export abstract class
   AbstractContentEditor
-    <ModelType, P extends AbstractContentEditorProps<ModelType>,
-    S extends AbstractContentEditorState> extends React.Component<P, S> {
+  <ModelType, P extends AbstractContentEditorProps<ModelType>,
+  S extends AbstractContentEditorState> extends React.Component<P, S> {
 
-  constructor(props) {
+  constructor(props: P) {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: AbstractContentEditorProps<ModelType>, nextState) {
+  shouldComponentUpdate(nextProps: P, nextState: S) {
     return this.props.model !== nextProps.model
       || this.props.parent !== nextProps.parent
       || this.props.editMode !== nextProps.editMode
@@ -54,13 +56,13 @@ export abstract class
       || this.props.hover !== nextProps.hover;
   }
 
-  abstract renderMain() : JSX.Element;
+  abstract renderMain(): JSX.Element;
 
-  abstract renderToolbar() : JSX.Element;
+  abstract renderToolbar(): JSX.Element;
 
-  abstract renderSidebar() : JSX.Element;
+  abstract renderSidebar(): JSX.Element;
 
-  handleOnFocus(e) {
+  handleOnFocus(e: React.FocusEvent<HTMLElement>) {
 
     e.stopPropagation();
 
@@ -68,7 +70,7 @@ export abstract class
     onFocus(model, parent, Maybe.nothing());
   }
 
-  handleOnClick(e) {
+  handleOnClick(e: React.MouseEvent<HTMLElement>) {
 
     if (this.props.onHandleClick !== undefined) {
       this.props.onHandleClick(e);
@@ -83,7 +85,7 @@ export abstract class
 
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const renderContext = this.props.renderContext === undefined
       ? RenderContext.MainEditor
@@ -96,7 +98,8 @@ export abstract class
       return this.renderSidebar();
     }
     return (
-      <div onFocus={e => this.handleOnFocus(e)} onClick={e => this.handleOnClick(e)}>
+      <div onFocus={(e: React.FocusEvent<HTMLDivElement>) => this.handleOnFocus(e)}
+        onClick={e => this.handleOnClick(e)}>
         {this.renderMain()}
       </div>
     );

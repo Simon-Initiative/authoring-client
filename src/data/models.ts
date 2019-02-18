@@ -2,7 +2,7 @@ import * as types from './types';
 
 import { PoolModel } from './models/pool';
 import { AssessmentModel } from './models/assessment';
-// import { FeedbackModel } from './models/feedback';
+import { FeedbackModel } from './models/feedback';
 import { CourseModel } from './models/course';
 import { MediaModel } from './models/media';
 import { LearningObjectivesModel } from './models/objective';
@@ -11,10 +11,10 @@ import { SkillsModel } from './models/skill';
 import { WorkbookPageModel } from './models/workbook';
 
 
-export { Node } from './content/assessment/node';
+export { Node, AssessmentNode, FeedbackQuestionNode } from './content/assessment/node';
 export { PoolModel } from './models/pool';
 export { AssessmentModel } from './models/assessment';
-// export { FeedbackModel } from './models/feedback';
+export { FeedbackModel } from './models/feedback';
 export { CourseModel } from './models/course';
 export { DefaultModel } from './models/default';
 export { MediaModel } from './models/media';
@@ -31,6 +31,7 @@ export enum ModelTypes {
   CourseModel = 'CourseModel',
   WorkbookPageModel = 'WorkbookPageModel',
   AssessmentModel = 'AssessmentModel',
+  FeedbackModel = 'FeedbackModel',
   MediaModel = 'MediaModel',
   OrganizationModel = 'OrganizationModel',
   LearningObjectiveModel = 'LearningObjectiveModel',
@@ -55,6 +56,8 @@ export function createModel(object: any, notify: () => void = () => null): Conte
       return AssessmentModel.fromPersistence(object, notify);
     case types.LegacyTypes.inline:
       return AssessmentModel.fromPersistence(object, notify);
+    case types.LegacyTypes.feedback:
+      return FeedbackModel.fromPersistence(object, notify);
     case types.LegacyTypes.organization:
       return OrganizationModel.fromPersistence(object, notify);
     case types.LegacyTypes.learning_objectives:
@@ -78,6 +81,7 @@ export function createModel(object: any, notify: () => void = () => null): Conte
 
 export type ContentModel =
   AssessmentModel |
+  FeedbackModel |
   CourseModel |
   MediaModel |
   WorkbookPageModel |

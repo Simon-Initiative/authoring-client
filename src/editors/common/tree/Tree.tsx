@@ -70,18 +70,12 @@ export interface TreeProps<NodeType extends Types.HasGuid> {
 export class Tree<NodeType extends Types.HasGuid>
   extends React.PureComponent<TreeProps<NodeType>, {}> {
 
-  constructor(props) {
-    super(props);
-
-    this.onDrop = this.onDrop.bind(this);
-  }
-
-  onDrop(
+  onDrop = (
     sourceModel: NodeType,
     sourceParent: Maybe<NodeType>,
     targetParent: Maybe<NodeType>,
     originalIndex: number,
-    newIndex: number) {
+    newIndex: number) => {
 
     const { nodes, getChildren, setChildren, onEdit } = this.props;
     const id = sourceModel.guid;

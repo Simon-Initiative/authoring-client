@@ -23,6 +23,7 @@ import { activeContext, ActiveContextState } from 'reducers/active';
 import { router, RouterState } from 'reducers/router';
 import { clipboard, ClipboardState } from 'reducers/clipboard';
 import { XrefState, xref } from 'reducers/xref';
+import { BibliographyState, orderedIds } from 'reducers/bibliography';
 
 export interface State {
   activeContext: ActiveContextState;
@@ -40,6 +41,7 @@ export interface State {
   messages: MessageState;
   modal: ModalState;
   objectives: ObjectiveState;
+  orderedIds: BibliographyState;
   requests: RequestsState;
   router: RouterState;
   server: ServerState;
@@ -66,8 +68,9 @@ const reducers = combineReducers({
   messages,       // Active application messages
   modal,          // modal display state
   objectives,     // The current learning objectives
+  orderedIds,     // Mapping of ids to their ordinal position, used for bibliography
   requests,       // the current pending async requests
-  router,          // current application route information
+  router,         // current application route information
   server,         // server specific info (time skew, etc)
   skills,         // all known skills for the current course
   user,           // Information about current user, null if not logged in

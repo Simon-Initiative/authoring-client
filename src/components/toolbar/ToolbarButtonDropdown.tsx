@@ -11,6 +11,7 @@ export interface ToolbarButtonDropdownProps {
   disabled?: boolean;
   selected?: boolean;
   tooltip?: string;
+  isWide?: boolean;
 }
 
 export interface ToolbarButtonDropdownState {
@@ -33,15 +34,17 @@ export class ToolbarButtonDropdown
   render() {
     const {
       className, classes, disabled, selected,
-      tooltip,
+      tooltip, isWide = true,
     } = this.props;
+
+    const size = isWide ? ToolbarButtonSize.Wide : ToolbarButtonSize.Small;
 
     const button = (
       <button
         type="button"
         className={
           classNames([classes.toolbarButton,
-            ToolbarButtonSize.Wide, className, selected ? 'selected' : ''])}
+            size, className, selected ? 'selected' : ''])}
         onClick={this.onClick.bind(this)}
         disabled={disabled}>
         {this.props.label}
@@ -52,17 +55,17 @@ export class ToolbarButtonDropdown
 
     const component = this.state.shown
       ?
-        <Autohider onLoseFocus={() => this.setState({ shown: false })}>
-          <div style={ { position: 'absolute', zIndex: 10000 } }>
-           {React.Children.map(this.props.children, c => React.cloneElement(c as any, { onHide }))}
-          </div>
-        </Autohider>
+      <Autohider onLoseFocus={() => this.setState({ shown: false })}>
+        <div style={{ position: 'absolute', zIndex: 10000 }}>
+          {React.Children.map(this.props.children, c => React.cloneElement(c as any, { onHide }))}
+        </div>
+      </Autohider>
       : null;
 
     return tooltip ?
       (
         <Tooltip title={tooltip} delay={1000} distance={5} style={{ display: 'inline-block' }}
-            size="small" arrowSize="small">
+          size="small" arrowSize="small">
           {button}
           {component}
         </Tooltip>

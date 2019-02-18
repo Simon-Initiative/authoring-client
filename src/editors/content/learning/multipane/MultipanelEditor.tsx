@@ -31,6 +31,7 @@ import { TextInput } from 'editors/content/common/controls';
 import { collectInlinesNested } from 'utils/course';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
+import { ContentElement } from 'data/content/common/interfaces';
 import { ResourceState } from 'data/content/resource';
 
 const BORDER_STYLE = '1px solid #ced4da';
@@ -363,7 +364,7 @@ export class MultipanelEditor
         noResourcesMessage={
           <React.Fragment>
             No assessments are available for this activity.
-            <br/>
+            <br />
             Please create a new formative assessment or remove an existing
             reference from this page before adding another one.
           </React.Fragment>
@@ -451,41 +452,41 @@ export class MultipanelEditor
             </Button>
           </div>
         </div>
-          {currentPanel && (
-            <div className={classes.tabContent}>
-              <div className={classes.contentTitle}>
-                <div className={classes.contentTitleLabel}>
-                  Title:
+        {currentPanel && (
+          <div className={classes.tabContent}>
+            <div className={classes.contentTitle}>
+              <div className={classes.contentTitleLabel}>
+                Title:
                 </div>
-                <TextInput
-                  editMode={editMode}
-                  label="Enter a title for this panel"
-                  type="text"
-                  value={currentPanel.title.valueOr('')}
-                  onEdit={text =>
-                    this.onPanelEdit(
-                      currentPanel.with({
-                        title: Maybe.maybe(text as string),
-                      }),
+              <TextInput
+                editMode={editMode}
+                label="Enter a title for this panel"
+                type="text"
+                value={currentPanel.title.valueOr('')}
+                onEdit={text =>
+                  this.onPanelEdit(
+                    currentPanel.with({
+                      title: Maybe.maybe(text as string),
+                    }),
                   )} />
-              </div>
-              <div className={classes.content}>
-                <ContentContainer
-                  activeContentGuid={null}
-                  hover={null}
-                  onUpdateHover={() => { }}
-                  {...this.props}
-                  model={currentPanel.content}
-                  onEdit={(updated, src) =>
-                    this.onPanelEdit(
-                      currentPanel.with({
-                        content: updated,
-                      }),
-                      src,
-                  )} />
-              </div>
             </div>
-          )}
+            <div className={classes.content}>
+              <ContentContainer
+                activeContentGuid={null}
+                hover={null}
+                onUpdateHover={() => { }}
+                {...this.props}
+                model={currentPanel.content}
+                onEdit={(updated, src) =>
+                  this.onPanelEdit(
+                    currentPanel.with({
+                      content: updated,
+                    }),
+                    src,
+                  )} />
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -522,8 +523,8 @@ export class MultipanelEditor
               panels={model.panels}
               context={context}
               services={services}
-              onEdit={(imageHotspot, src?: Object) =>
-                onEdit(model.with({ imageHotspot }), src)
+              onEdit={(imageHotspot, src) =>
+                onEdit(model.with({ imageHotspot }), src as ContentElement)
               }
               onEditIntroPanelRef={introPanelRef =>
                 onEdit(model.with({ introPanelRef }))
@@ -539,7 +540,7 @@ export class MultipanelEditor
           <div className={classes.wbinline}>
             <h5><i
               className="fa fa-flask"
-              style={{ color: CONTENT_COLORS.WbInline }}/> {title}</h5>
+              style={{ color: CONTENT_COLORS.WbInline }} /> {title}</h5>
             <div className={classes.wbinlineButtons}>
               <button
                 onClick={() => {

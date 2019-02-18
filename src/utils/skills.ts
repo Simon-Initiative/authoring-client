@@ -6,8 +6,8 @@ import { Skill } from 'types/course';
 // Does an assessment or standalone pool contain at least one
 // question that has a skill that we do no know about?
 export function hasUnknownSkill(
-  model : AssessmentModel | PoolModel,
-  knownSkills: Immutable.OrderedMap<string, Skill>) : boolean {
+  model: AssessmentModel | PoolModel,
+  knownSkills: Immutable.OrderedMap<string, Skill>): boolean {
 
   const questions = model.modelType === 'AssessmentModel'
     ? collectAssessmentQuestions(model)
@@ -18,7 +18,7 @@ export function hasUnknownSkill(
 }
 
 // Find every question in every page and in every embedded pool
-function collectAssessmentQuestions(model: AssessmentModel) : Question[] {
+function collectAssessmentQuestions(model: AssessmentModel): Question[] {
 
   return model.pages.reduce(
     (questions, page) => {
@@ -44,8 +44,8 @@ function collectAssessmentQuestions(model: AssessmentModel) : Question[] {
 
 
 function doesPartHaveUnknownSkill(
-  part : Part,
-  knownSkills: Immutable.OrderedMap<string, Skill>) : boolean {
+  part: Part,
+  knownSkills: Immutable.OrderedMap<string, Skill>): boolean {
 
   return part.skills.toArray().some(c => !knownSkills.has(c));
 }
