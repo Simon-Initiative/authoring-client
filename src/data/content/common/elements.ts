@@ -13,6 +13,7 @@ const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe', 'applet',
 const ELEMENTS_BLOCK = ['codeblock', 'p'];
 const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
 
+
 export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign', 'sym',
   'term', 'var', '#math'];
 
@@ -23,7 +24,7 @@ export const INLINE_ELEMENTS = [
 ];
 
 const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
-  'dialog', 'figure', 'conjugation', 'inquiry'];
+  'dialog', 'figure', 'conjugation', 'inquiry', 'theorem'];
 
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
