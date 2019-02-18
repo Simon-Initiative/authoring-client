@@ -98,22 +98,19 @@
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-
     gtag('config', 'UA-5145430-2');
-  </script>
-
-  <script type="text/javascript" src="http://localhost:9000/vendor.js">
-  </script>
-
-  <script type="text/javascript" src="http://localhost:9000/app.js">
   </script>
 
   <% if (htmlWebpackPlugin.options.devServer) { %>
   <script src="<%= htmlWebpackPlugin.options.devServer%>/webpack-dev-server.js"></script>
+  <script src="http://localhost:9000/vendor.js"></script>
+  <script src="http://localhost:9000/app.js"></script>
+  <% } else { %>
+  <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+  <script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
+  <% } %>
   <% } %>
 
 </body>
-
-</html>
 
 </html>

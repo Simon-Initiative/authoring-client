@@ -1,5 +1,6 @@
 const protocol = window.location.protocol + '//';
-const hostname = window.location.host;
+const hostname = window.location.host.indexOf(':9000') > -1
+  ? 'dev.local' : window.location.host;
 const prefix = 'content-service/api/v1';
 const baseUrl = protocol + hostname + '/' + prefix;
 
@@ -16,7 +17,7 @@ export type Configuration = {
   prefix: string,
 };
 
-export const configuration : Configuration = {
+export const configuration: Configuration = {
   protocol,
   baseUrl,
   hostname,
@@ -25,6 +26,6 @@ export const configuration : Configuration = {
   prefix,
 };
 
-export function relativeToAbsolute(relativeURL: string, database: string) : string {
+export function relativeToAbsolute(relativeURL: string, database: string): string {
   return configuration.baseUrl + '/' + database + '/' + relativeURL;
 }
