@@ -2,40 +2,118 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import * as models from 'data/models';
-import * as contentTypes from 'data/contentTypes';
 import { Skill } from 'types/course';
-import { AppContext } from '../../common/AppContext';
-import { AppServices } from '../../common/AppServices';
-import { QuestionEditor } from '../../content/question/QuestionEditor';
+import { QuestionEditor } from '../../content/question/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { LegacyTypes } from '../../../data/types';
-import { ParentContainer } from 'types/active';
+import { LikertSeriesEditor } from 'editors/content/feedback/likertseries/LikertSeriesEditor';
+import { LikertEditor } from 'editors/content/feedback/singlelikertquestion/LikertEditor';
+import { FeedbackMultipleChoiceEditor }
+  from 'editors/content/feedback/multiplechoice/FeedbackMultipleChoiceEditor';
+import { FeedbackOpenResponseEditor }
+  from 'editors/content/feedback/openresponse/FeedbackOpenResponse';
+import './questions.scss';
+import { AbstractContentEditorProps } from 'editors/content/common/AbstractContentEditor';
+import { Node } from 'data/content/assessment/node';
+import { AssessmentModel } from 'data/models/assessment';
+import { PoolModel } from 'data/models/pool';
+import { FeedbackModel } from 'data/models/feedback';
 
-export type Props = {
-  model: models.AssessmentModel | models.PoolModel,
-  editMode: boolean,
-  context: AppContext,
-  services: AppServices,
-  skills: Immutable.OrderedMap<string, Skill>,
-  activeContentGuid: string;
-  hover: string;
-  onUpdateHover: (hover: string) => void;
+export interface Props extends AbstractContentEditorProps<Node> {
+  nodeParentModel: AssessmentModel | PoolModel | FeedbackModel;
+  allSkills: Immutable.OrderedMap<string, Skill>;
   currentPage?: string;
-};
-
-export type EditHandler = (guid: string, node: contentTypes.Node, src) => void;
+  onRemove: RemoveHandler;
+  canRemove: boolean;
+  onDuplicate: DuplicateHandler;
+  isQuestionPool: boolean;
+}
 
 export type RemoveHandler = (guid: string) => void;
 
 export type DuplicateHandler = () => void;
 
-export type FocusHandler = (child: Object, parent: any, textSelection) => void;
+export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
+  render() {
+    const { currentPage, onRemove, onDuplicate, model, nodeParentModel, editMode } = this.props;
+    const isParentAssessmentGraded = nodeParentModel.resource.type !== LegacyTypes.inline;
 
-function getBranchingQuestionNumbers(props: Props): number[] {
-  const pages = (props.model as models.AssessmentModel).pages.keySeq();
+    const sharedProps = {
+      ...this.props,
+      key: model.guid,
+      onRemove: () => onRemove(model.guid),
+      onDuplicate: editMode ? onDuplicate : undefined,
+    };
+
+    const isFeedback = model.contentType === 'FeedbackMultipleChoice' ||
+      model.contentType === 'FeedbackOpenResponse' ||
+      model.contentType === 'Likert' ||
+      model.contentType === 'LikertSeries';
+
+    let content: JSX.Element;
+
+    if (model.contentType === 'Question') {
+      content = <QuestionEditor
+        {...sharedProps}
+        isParentAssessmentGraded={isParentAssessmentGraded}
+        model={model}
+        // onDuplicate={this.props.editMode ? onDuplicate : undefined}
+        branchingQuestions={
+          nodeParentModel instanceof models.AssessmentModel && nodeParentModel.branching
+            ? Maybe.just(getBranchingQuestionNumbers(nodeParentModel, currentPage))
+            : Maybe.nothing()}
+      />;
+    }
+    if (model.contentType === 'Content') {
+      content = <ContentEditor
+        {...sharedProps}
+        model={model}
+      />;
+    }
+    if (model.contentType === 'Selection') {
+      content = <SelectionEditor
+        {...sharedProps}
+        model={model}
+      />;
+    }
+    if (model.contentType === 'LikertSeries') {
+      content = <LikertSeriesEditor
+        {...sharedProps}
+        model={model}
+      />;
+    }
+    if (model.contentType === 'Likert') {
+      content = <LikertEditor
+        {...sharedProps}
+        model={model}
+      />;
+    }
+    if (model.contentType === 'FeedbackMultipleChoice') {
+      content = <FeedbackMultipleChoiceEditor
+        {...sharedProps}
+        model={model}
+      />;
+    }
+    if (model.contentType === 'FeedbackOpenResponse') {
+      content = <FeedbackOpenResponseEditor
+        {...sharedProps}
+        model={model}
+      />;
+    }
+
+    return (
+      <div className={`node-container ${isFeedback ? 'feedback-question' : ''}`}>
+        {content}
+      </div>
+    );
+  }
+}
+
+function getBranchingQuestionNumbers(model: models.AssessmentModel, currentPage: string): number[] {
+  const pages = model.pages.keySeq();
   const pagesAfterCount = Math.max(
-    pages.skipUntil(p => p === props.currentPage).toArray().length - 1,
+    pages.skipUntil(p => p === currentPage).toArray().length - 1,
     0);
   const questionNumbers = [];
   for (let i = pages.size; i > pages.size - pagesAfterCount; i -= 1) {
@@ -43,75 +121,4 @@ function getBranchingQuestionNumbers(props: Props): number[] {
   }
 
   return questionNumbers.reverse();
-}
-
-export function renderAssessmentNode(
-  n: models.Node, props: Props, onEdit: EditHandler,
-  onRemove: RemoveHandler, onFocus: FocusHandler,
-  canRemove: boolean,
-  onDuplicate: DuplicateHandler,
-  parent: ParentContainer, isQuestionPool: boolean) {
-
-  const isParentAssessmentGraded = props.model.resource.type !== LegacyTypes.inline;
-
-  if (n.contentType === 'Question') {
-    return <QuestionEditor
-      key={n.guid}
-      parent={parent}
-      onFocus={onFocus}
-      isQuestionPool={isQuestionPool}
-      isParentAssessmentGraded={isParentAssessmentGraded}
-      editMode={props.editMode}
-      services={props.services}
-      allSkills={props.skills}
-      context={props.context}
-      activeContentGuid={props.activeContentGuid}
-      hover={props.hover}
-      onUpdateHover={props.onUpdateHover}
-      model={n}
-      onDuplicate={props.editMode ? onDuplicate : undefined}
-      onEdit={(c, src) => onEdit(n.guid, c, src)}
-      canRemove={canRemove}
-      onRemove={() => onRemove(n.guid)}
-      branchingQuestions={
-        props.model instanceof models.AssessmentModel && props.model.branching
-          ? Maybe.just(getBranchingQuestionNumbers(props))
-          : Maybe.nothing()}
-    />;
-  }
-  if (n.contentType === 'Content') {
-    return <ContentEditor
-      parent={parent}
-      key={n.guid}
-      onFocus={onFocus}
-      editMode={props.editMode}
-      services={props.services}
-      context={props.context}
-      activeContentGuid={props.activeContentGuid}
-      hover={props.hover}
-      onUpdateHover={props.onUpdateHover}
-      model={n}
-      onEdit={(c, src) => onEdit(n.guid, c, src)}
-      onRemove={() => onRemove(n.guid)}
-    />;
-  }
-  if (n.contentType === 'Selection') {
-    return <SelectionEditor
-      parent={parent}
-      key={n.guid}
-      onFocus={onFocus}
-      isParentAssessmentGraded={isParentAssessmentGraded}
-      editMode={props.editMode}
-      services={props.services}
-      context={props.context}
-      activeContentGuid={props.activeContentGuid}
-      hover={props.hover}
-      onUpdateHover={props.onUpdateHover}
-      allSkills={props.skills}
-      model={n}
-      canRemove={canRemove}
-      onEdit={(c, src) => onEdit(n.guid, c, src)}
-      onRemove={() => onRemove(n.guid)}
-    />;
-  }
 }

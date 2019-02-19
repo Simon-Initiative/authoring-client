@@ -96,10 +96,14 @@ export const documents = (
         document: action.document,
         persistence: action.persistence,
         editingAllowed: action.editingAllowed,
-        currentPage: action.document.model.modelType === ModelTypes.AssessmentModel ?
-          Maybe.just(action.document.model.pages.first().guid) : Maybe.nothing(),
-        currentNode: action.document.model.modelType === ModelTypes.AssessmentModel ?
-          Maybe.just(action.document.model.pages.first().nodes.first()) : Maybe.nothing(),
+        currentPage: action.document.model.modelType === ModelTypes.AssessmentModel
+          ? Maybe.just(action.document.model.pages.first().guid)
+          : Maybe.nothing(),
+        currentNode: action.document.model.modelType === ModelTypes.AssessmentModel
+          ? Maybe.just(action.document.model.pages.first().nodes.first())
+          : action.document.model.modelType === ModelTypes.FeedbackModel
+            ? Maybe.just(action.document.model.questions.questions.first())
+            : Maybe.nothing(),
       }));
 
     case documentActions.DOCUMENT_FAILED:

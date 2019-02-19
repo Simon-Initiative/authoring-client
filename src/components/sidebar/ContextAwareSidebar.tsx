@@ -17,7 +17,8 @@ import {
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { PageSelection } from 'editors/document/assessment/PageSelection';
-import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
+import { createMultipleChoiceQuestion }
+  from 'editors/content/question/addquestion/questionFactories';
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
 import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
@@ -447,12 +448,42 @@ export class ContextAwareSidebar
             </SidebarGroup>
           </SidebarContent>
         );
+      case ModelTypes.FeedbackModel:
+        return (
+          <SidebarContent title="Feedback Assessment" onHide={this.props.onHide}>
+            <SidebarGroup label="General">
+              <SidebarRow>
+                <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  Created {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+              <SidebarRow>
+                <Tooltip title={dateFormatted(adjusted(resource.dateUpdated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  Updated {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+            </SidebarGroup>
+            <SidebarGroup label="Advanced">
+              <SidebarRow>
+                <Button
+                  className={classes.deleteButton}
+                  onClick={this.showDeleteModal}
+                  editMode={editMode}
+                  type="outline-danger">
+                  Delete this Assessment
+              </Button>
+              </SidebarRow>
+            </SidebarGroup>
+          </SidebarContent>
+        );
       default:
         return null;
     }
   }
 
-  renderSidebarContent(contentRenderer, contentModel) {
+  renderSidebarContent(contentRenderer, contentElement) {
     return (
       <div>
         {contentRenderer}
@@ -464,7 +495,7 @@ export class ContextAwareSidebar
     const {
       classes, className, content, container, show, sidebarContent, onEdit } = this.props;
 
-    const contentModel = content.caseOf({
+    const contentElement = content.caseOf({
       just: c => c,
       nothing: () => undefined,
     });
@@ -475,10 +506,10 @@ export class ContextAwareSidebar
     });
 
     let contentRenderer: JSX.Element;
-    if (contentParent && contentModel) {
+    if (contentParent && contentElement) {
       const props: AbstractContentEditorProps<any> = {
         renderContext: RenderContext.Sidebar,
-        model: contentModel,
+        model: contentElement,
         onEdit,
         parent: contentParent,
         activeContentGuid: contentParent.props.activeContentGuid,
@@ -491,7 +522,7 @@ export class ContextAwareSidebar
       };
 
       contentRenderer = React.createElement(
-        getEditorByContentType((contentModel as any).contentType), props);
+        getEditorByContentType((contentElement as any).contentType), props);
 
     }
 
@@ -511,7 +542,7 @@ export class ContextAwareSidebar
               {sidebarContent
                 ? sidebarContent
                 : contentRenderer
-                  ? this.renderSidebarContent(contentRenderer, contentModel)
+                  ? this.renderSidebarContent(contentRenderer, contentElement)
                   : this.renderPageDetails()}
             </div>
           </div>

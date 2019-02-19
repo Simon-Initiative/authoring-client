@@ -67,6 +67,13 @@ import {
 } from 'editors/content/learning/contiguoustext/ContiguousTextEditor.controller';
 import { CustomEditor } from 'editors/content/learning/CustomEditor';
 import { connectEditor, connectPopupEditor } from 'editors/content/container/connectEditor';
+import { FeedbackChoiceEditor } from 'editors/content/feedback/multiplechoice/FeedbackChoiceEditor';
+import { LikertEditor } from 'editors/content/feedback/singlelikertquestion/LikertEditor';
+import { LikertSeriesEditor } from 'editors/content/feedback/likertseries/LikertSeriesEditor';
+import { FeedbackMultipleChoiceEditor }
+  from 'editors/content/feedback/multiplechoice/FeedbackMultipleChoiceEditor';
+import { FeedbackOpenResponseEditor }
+  from 'editors/content/feedback/openresponse/FeedbackOpenResponse';
 
 let registry = null;
 
@@ -110,6 +117,9 @@ function init() {
   registry['Dt'] = connectEditor(DtEditor);
   registry['Example'] = connectEditor(ExampleEditor);
   registry['Extra'] = connectPopupEditor(ExtraDefinitionEditor);
+  registry['FeedbackChoice'] = connectEditor(FeedbackChoiceEditor);
+  registry['FeedbackMultipleChoice'] = connectEditor(FeedbackMultipleChoiceEditor);
+  registry['FeedbackOpenResponse'] = connectEditor(FeedbackOpenResponseEditor);
   registry['Figure'] = connectEditor(FigureEditor);
   registry['Flash'] = connectEditor(FlashEditor);
   registry['Hint'] = HintEditor;
@@ -119,6 +129,8 @@ function init() {
   registry['InquiryQuestion'] = connectEditor(InquiryQuestionEditor);
   registry['Instructions'] = connectEditor(InstructionsEditor);
   registry['Li'] = connectEditor(ListItemEditor);
+  registry['Likert'] = connectEditor(LikertEditor);
+  registry['LikertSeries'] = connectEditor(LikertSeriesEditor);
   registry['Line'] = connectEditor(LineEditor);
   registry['Link'] = connectEditor(LinkEditor);
   registry['Material'] = connectEditor(MaterialEditor);

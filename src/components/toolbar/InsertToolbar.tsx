@@ -28,10 +28,10 @@ import { collectInlines, collectInlinesNested } from 'utils/course';
 import { getContentIcon, insertableContentTypes } from 'editors/content/utils/content';
 import { Message } from 'types/messages';
 import { selectTargetElement } from 'components/message/selection';
+import { FeedbackModel } from 'data/models/feedback';
 import { ImageHotspot } from 'data/content/workbook/multipanel/image_hotspot';
 import { Hotspot } from 'data/content/workbook/multipanel/hotspot';
 import { Panel } from 'data/content/workbook/multipanel/panel';
-
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -586,6 +586,56 @@ export class InsertToolbar
               <ToolbarButtonMenuDivider />
 
               <ToolbarButtonMenuItem
+                onClick={() => onDisplayModal(
+                  <ResourceSelection
+                    filterPredicate={(res: Resource): boolean =>
+                      res.type === LegacyTypes.feedback
+                      && res.resourceState !== ResourceState.DELETED}
+                    courseId={context.courseId}
+                    onInsert={(resource) => {
+                      onDismissModal();
+                      const resources = context.courseModel.resources.toArray();
+                      const found = resources.find(r => r.id === resource.id);
+                      if (found !== undefined) {
+                        onInsert(new contentTypes.Activity().with({
+                          idref: resource.id,
+                          purpose: Maybe.just(contentTypes.PurposeTypes.MyResponse),
+                        }));
+                      }
+                    }}
+                    onCancel={onDismissModal}
+                  />)
+                }
+                disabled={!editMode || !parentSupportsElementType('activity')}>
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
+                Insert feedback assessment
+                </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  const model = FeedbackModel.createNew(
+                    guid(),
+                    'New Feedback Assessment',
+                    '',
+                  );
+
+                  onCreateNew(model)
+                    .then((resource) => {
+                      onInsert(new contentTypes.Activity().with({
+                        idref: resource.id,
+                        purpose: Maybe.just(contentTypes.PurposeTypes.MyResponse),
+                      }));
+                    });
+
+                }}
+                disabled={!editMode || !parentSupportsElementType('activity')}>
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
+                Create feedback assessment
+                </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuDivider />
+
+              <ToolbarButtonMenuItem
                 onClick={() => {
                   const composite = new contentTypes.Composite({
                     title: Maybe.just(Title.fromText('Title')),
@@ -613,7 +663,7 @@ export class InsertToolbar
                           noResourcesMessage={
                             <React.Fragment>
                               No assessments are available for this activity.
-                              <br/>
+                              <br />
                               Please create a new formative assessment or remove an existing
                               reference from this page before adding another one.
                             </React.Fragment>
@@ -634,7 +684,7 @@ export class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('multipanel')}>
                 {getContentIcon(insertableContentTypes.Multipanel, { width: 22 })}
                 {' Image hotspot activity'}
-                </ToolbarButtonMenuItem>
+              </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">

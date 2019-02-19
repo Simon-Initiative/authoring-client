@@ -13,24 +13,18 @@ import { Maybe } from 'tsmonad';
 import {
   makeVolume, makeNumber, makeAuthor, makeEditor,
 } from 'data/content/bibtek/common';
+import { ignoredAttributes } from './common';
 import { styles } from './EntryEditor.styles';
 
 export interface EntryEditorProps
   extends AbstractContentEditorProps<contentTypes.Entry> {
   onShowSidebar: () => void;
+  label: any;
 }
 
 export interface EntryEditorState {
 
 }
-
-const ignoredAttributes = {
-  id: true,
-  guid: true,
-  key: true,
-  contentType: true,
-  elementType: true,
-};
 
 function toFriendlyLabel(key: string) {
   if (key === '') return '';
@@ -283,12 +277,13 @@ export default class EntryEditor
   }
 
   renderMain() {
-    const { classes } = this.props;
+    const { classes, label } = this.props;
 
     return (
       <div className={classNames([classes.entry])}>
+
         <div className={classNames([classes.entryLabel])}>
-          {toFriendlyLabel(this.props.model.contentType)}
+          {label}. {toFriendlyLabel(this.props.model.contentType)}
         </div>
         <table style={{ width: '100%' }}>
           <tbody>

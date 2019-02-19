@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { getChildren } from 'data/content/common';
+import { getChildren, augment, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { FeedbackPrompt } from './feedback_prompt';
@@ -14,7 +14,9 @@ type LikertParams = {
   required?: boolean;
 };
 
-const defaultLikertParams: LikertParams = {
+const defaultLikertParams = {
+  contentType: 'Likert',
+  elementType: 'likert',
   guid: '',
   id: '',
   prompt: new FeedbackPrompt(),
@@ -23,6 +25,8 @@ const defaultLikertParams: LikertParams = {
 };
 
 export class Likert extends Immutable.Record(defaultLikertParams) {
+  contentType: 'Likert';
+  elementType: 'likert';
   guid: string;
   id: string;
   prompt: FeedbackPrompt;
@@ -30,11 +34,18 @@ export class Likert extends Immutable.Record(defaultLikertParams) {
   required: boolean;
 
   constructor(params?: LikertParams) {
-    super(params);
+    super(augment(params, true));
   }
 
   with(values: LikertParams): Likert {
     return this.merge(values) as this;
+  }
+
+  clone(): Likert {
+    return ensureIdGuidPresent(this.with({
+      prompt: this.prompt.clone(),
+      scale: this.scale.clone(),
+    }));
   }
 
   static fromPersistence(json: any, guid: string, notify: () => void = () => null): Likert {

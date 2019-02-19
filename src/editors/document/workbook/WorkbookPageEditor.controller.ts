@@ -1,5 +1,6 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
+import * as Immutable from 'immutable';
 import WorkbookPageEditor from 'editors/document/workbook/WorkbookPageEditor';
 import { fetchObjectives } from 'actions/objectives';
 import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
@@ -11,6 +12,7 @@ import * as activeActions from 'actions/active';
 import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
+import { setOrderedIds } from 'actions/bibliography';
 
 interface StateProps {
   activeContext: any;
@@ -26,6 +28,7 @@ interface DispatchProps {
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  setOrderedIds: (ids: Immutable.Map<string, number>) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<WorkbookPageModel> { }
@@ -62,6 +65,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     },
     dismissMessage: (message: Messages.Message) => {
       dispatch(dismissSpecificMessage(message));
+    },
+    setOrderedIds: (ids: Immutable.Map<string, number>) => {
+      dispatch(setOrderedIds(ids));
     },
   };
 };

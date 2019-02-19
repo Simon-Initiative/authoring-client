@@ -7,9 +7,14 @@ import { FeedbackQuestion, FeedbackQuestions } from '../content/feedback/feedbac
 import { FeedbackDescription } from '../content/feedback/feedback_description';
 import { Title } from '../content/learning/title';
 import { ObjRef } from '../content/learning/objref';
-import { LikertSeries } from '../content/feedback/likert_series';
 import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
+import { augment, ensureIdGuidPresent } from 'data/content/common';
+import {
+  ContentElements, TEXT_ELEMENTS, MATERIAL_ELEMENTS,
+} from 'data/content/common/elements';
+import guid from 'utils/guid';
+import { createLikertSeries } from 'editors/content/question/addquestion/questionFactories';
 
 // oli_feedback_1_2.dtd
 export type FeedbackModelParams = {
@@ -35,15 +40,10 @@ const defaultFeedbackModelParams = {
   shortTitle: Maybe.nothing<string>(),
   objrefs: Immutable.OrderedMap<string, ObjRef>(),
   description: new FeedbackDescription(),
-  questions: new FeedbackQuestions({
-    questions: Immutable.OrderedMap<string, FeedbackQuestion>([
-      [createGuid(), new LikertSeries()],
-    ]),
-  }),
+  questions: new FeedbackQuestions(),
 };
 
-export class FeedbackModel
-  extends Immutable.Record(defaultFeedbackModelParams) {
+export class FeedbackModel extends Immutable.Record(defaultFeedbackModelParams) {
   modelType: 'FeedbackModel';
   resource: contentTypes.Resource;
   guid: string;
@@ -53,14 +53,45 @@ export class FeedbackModel
   shortTitle: Maybe<string>;
   objrefs: Immutable.OrderedMap<string, ObjRef>;
   description: FeedbackDescription;
-  questions: Immutable.OrderedMap<string, FeedbackQuestion>;
+  questions: FeedbackQuestions;
 
   constructor(params?: FeedbackModelParams) {
-    super(params);
+    super(augment(params));
   }
 
   with(values: FeedbackModelParams): FeedbackModel {
     return this.merge(values) as this;
+  }
+
+  clone(): FeedbackModel {
+    return ensureIdGuidPresent(this.with({
+      title: this.title.clone(),
+      description: this.description.clone(),
+      questions: this.questions.clone(),
+      objrefs: this.objrefs.mapEntries(([_, v]) => {
+        const clone: ObjRef = v.clone();
+        return [clone.guid, clone];
+      }).toOrderedMap() as Immutable.OrderedMap<string, ObjRef>,
+    }));
+  }
+
+  static createNew(id: string, title: string, description: string) {
+    const series = createLikertSeries();
+    return new FeedbackModel({
+      title: new contentTypes.Title({
+        text: ContentElements.fromText(title, guid(), TEXT_ELEMENTS),
+      }),
+      resource: new contentTypes.Resource({ id, title }),
+      guid: id,
+      description: new FeedbackDescription({
+        content: ContentElements.fromText(description, '', MATERIAL_ELEMENTS),
+      }),
+      questions: new FeedbackQuestions({
+        questions: Immutable.OrderedMap<string, FeedbackQuestion>([
+          [series.guid, series],
+        ]),
+      }),
+    });
   }
 
   static fromPersistence(json: any, notify: () => void = () => null): FeedbackModel {
@@ -119,6 +150,7 @@ export class FeedbackModel
   }
 
   toPersistence(): Object {
+
     const children = [
       this.title.toPersistence(),
     ];
@@ -126,8 +158,9 @@ export class FeedbackModel
     this.shortTitle.lift(item => children.push({ short_title: item }));
 
     children.push(
-      ...this.objrefs.toArray().map(item => item.toPersistence()), this.description.toPersistence(),
-      ...this.questions.toArray().map(item => item.toPersistence()),
+      ...this.objrefs.toArray().map(item => item.toPersistence()),
+      this.description.toPersistence(),
+      this.questions.toPersistence(),
     );
 
     const doc = [{
@@ -142,5 +175,21 @@ export class FeedbackModel
     };
 
     return Object.assign({}, this.resource, root, this.lock.toPersistence());
+  }
+}
+
+
+export function getLabelForFeedbackQuestion(model: FeedbackQuestion) {
+  switch (model.contentType) {
+    case 'LikertSeries':
+      return 'Question Series with Scale';
+    case 'Likert':
+      return 'Question with Scale';
+    case 'FeedbackMultipleChoice':
+      return 'Multiple Choice Question';
+    case 'FeedbackOpenResponse':
+      return 'Open-Ended Question';
+    default:
+      return 'Question';
   }
 }

@@ -37,14 +37,15 @@ interface ResourceViewState {
 export default class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
   viewActions: any;
 
-  constructor(props) {
-    super(props);
+  state = {
+    ...this.state,
+    selected: undefined,
+    searchText: '',
+    resources: this.getFilteredRows(this.props),
+  };
 
-    this.state = {
-      selected: undefined,
-      searchText: '',
-      resources: this.getFilteredRows(props),
-    };
+  componentDidMount() {
+    logResourceDetails(this.state.resources);
   }
 
   componentWillReceiveProps(nextProps: ResourceViewProps): void {
@@ -56,52 +57,17 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     }
   }
 
-  componentDidMount() {
-    this.logResourceDetails(this.state.resources);
-  }
-
   getFilteredRows(props: ResourceViewProps): Resource[] {
     return props.course.resources
       .toArray()
       .filter(props.filterFn);
   }
 
-  logResourceDetails(resources: Resource[]) {
-    logger.group(
-      LogLevel.INFO,
-      LogTag.DEFAULT,
-      `Resource Details:`,
-      (logger) => {
-        resources.forEach((resource) => {
-          logger
-            .setVisibility(LogAttribute.TAG, false)
-            .setVisibility(LogAttribute.DATE, false)
-            .info(LogTag.DEFAULT, `${resource.title} (id: ${resource.id})`)
-            .groupCollapsed(
-              LogLevel.INFO,
-              LogTag.DEFAULT,
-              'Details',
-              (logger) => {
-                logger
-                  .setVisibility(LogAttribute.TAG, false)
-                  .setVisibility(LogAttribute.DATE, false)
-                  .info(LogTag.DEFAULT, `Type: ${resource.type}`)
-                  .info(LogTag.DEFAULT, `FilePath: ${resource
-                    .fileNode
-                    .pathTo
-                    .replace(/\.json/, '.xml')}`);
-              });
-        });
-      },
-      LogStyle.HEADER + LogStyle.BLUE,
-    );
-  }
-
-  clickResource(id) {
+  onClickResource(id) {
     this.props.dispatch(viewActions.viewDocument(id, this.props.course.guid));
   }
 
-  createResource(e) {
+  onCreateResource = (e) => {
     const { dispatch } = this.props;
 
     e.preventDefault();
@@ -123,12 +89,12 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         dispatch(updateCourseResources(updated));
 
         // update component state and keep current search
-        this.filterBySearchText(this.state.searchText);
+        this.onFilterBySearchText(this.state.searchText);
       });
   }
 
   // Filter resources shown based on title and id
-  filterBySearchText(searchText: string): void {
+  onFilterBySearchText = (searchText: string): void => {
     const text = searchText.trim().toLowerCase();
     const filterFn = (r: Resource): boolean => {
       const { title, id } = r;
@@ -176,7 +142,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         : highlightMatches(prop, r, this.state.searchText);
 
     const link = resource => span =>
-      <button onClick={this.clickResource.bind(this, resource.guid)}
+      <button onClick={this.onClickResource.bind(this, resource.guid)}
         className="btn btn-link title-btn">{span}</button>;
 
     const columnRenderers = [
@@ -210,7 +176,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         <SearchBar
           className="inlineSearch"
           placeholder="Search by Title or Unique ID"
-          onChange={searchText => this.filterBySearchText(searchText)}
+          onChange={this.onFilterBySearchText}
         />
         <div className="input-group">
           <div className="flex-spacer" />
@@ -219,7 +185,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
               disabled={!course.editable}
               className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
               placeholder="New Title"></input>
-            <button onClick={this.createResource.bind(this)}
+            <button onClick={this.onCreateResource}
               disabled={!course.editable}
               className="btn btn-primary">Create
           </button>
@@ -246,7 +212,6 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       </div>
     );
   }
-
 }
 
 export function safeCompare(primaryK: string, secondaryK: string, direction: SortDirection, a, b) {
@@ -269,4 +234,35 @@ export function safeCompare(primaryK: string, secondaryK: string, direction: Sor
   return direction === SortDirection.Ascending
     ? a[primaryK].localeCompare(b[primaryK])
     : b[primaryK].localeCompare(a[primaryK]);
+}
+
+function logResourceDetails(resources: Resource[]) {
+  logger.group(
+    LogLevel.INFO,
+    LogTag.DEFAULT,
+    `Resource Details:`,
+    (logger) => {
+      resources.forEach((resource) => {
+        logger
+          .setVisibility(LogAttribute.TAG, false)
+          .setVisibility(LogAttribute.DATE, false)
+          .info(LogTag.DEFAULT, `${resource.title} (id: ${resource.id})`)
+          .groupCollapsed(
+            LogLevel.INFO,
+            LogTag.DEFAULT,
+            'Details',
+            (logger) => {
+              logger
+                .setVisibility(LogAttribute.TAG, false)
+                .setVisibility(LogAttribute.DATE, false)
+                .info(LogTag.DEFAULT, `Type: ${resource.type}`)
+                .info(LogTag.DEFAULT, `FilePath: ${resource
+                  .fileNode
+                  .pathTo
+                  .replace(/\.json/, '.xml')}`);
+            });
+      });
+    },
+    LogStyle.HEADER + LogStyle.BLUE,
+  );
 }
