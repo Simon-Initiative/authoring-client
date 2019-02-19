@@ -8,7 +8,7 @@ export type LoginSuccessCallback =
   (profile: UserProfile, logoutUrl: string, managementUrl: string) => void;
 
 const keycloakConfig = {
-  url: 'http://dev.local/auth',
+  url: configuration.protocol + configuration.hostname + '/auth',
   realm: 'oli_security',
   clientId: 'content_client',
 };
