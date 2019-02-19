@@ -43,12 +43,13 @@ const blockHandlers = {
 
 const inlineTerminalTags = {};
 
-// The following ones simply use a space.
+// The following ones simply use one space
 const singleSpace = (item, provider) => ' ';
 inlineTerminalTags['m:math'] = singleSpace;
 inlineTerminalTags['#math'] = singleSpace;
 inlineTerminalTags['image'] = singleSpace;
 inlineTerminalTags['sym'] = singleSpace;
+
 inlineTerminalTags['command'] = (item, provider) => {
 
   const arr = item['command']['#array'];
@@ -73,9 +74,6 @@ inlineTerminalTags['input_ref'] = (item, provider) => {
   }
   return ' Unknown ';
 };
-
-const inlineTagsDefaultContent = {};
-inlineTagsDefaultContent['cite'] = ' ';
 
 
 type ParsingContext = {
@@ -111,7 +109,7 @@ function getInlineHandlers() {
       undefined, 'MUTABLE',
       common.EntityTypes.link, 'link', registeredTypes['link']),
     cite: insertDataDrivenEntity.bind(
-      undefined, 'MUTABLE',
+      undefined, 'IMMUTABLE',
       common.EntityTypes.cite, 'cite', registeredTypes['cite']),
     extra: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
@@ -274,6 +272,7 @@ function imageInline(
   };
 }
 
+
 function formulaInline(
   offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock,
@@ -401,19 +400,20 @@ function processInline(
         }
       });
 
-      // If a tag's children provided no additional content,
-      // set the default content for that tag, if one is defined.
-      // This exists primarily to support empty 'cite' tags
-      // that have to have at least a space to be able to render,
-      // and thus be preserved
-      if (blockContext.fullText === blockBeforeChildren.fullText
-        && inlineTagsDefaultContent[key]) {
-        blockContext.fullText += inlineTagsDefaultContent[key];
-      }
-
     }
 
-    const text = blockContext.fullText.substring(offset);
+    let text = blockContext.fullText.substring(offset);
+
+    // Cite elements are unique in that they may or may not have
+    // backing text present (<cite>Thanks to Joe</cite>) or <cite entry="3"/>)
+    // This special case below checks for the latter case and appends
+    // two spaces that will be necessary to display up to two-digit long
+    // bibliography entry when rendered
+    if (key === 'cite' && text.length === 0) {
+      blockContext.fullText += '  ';
+      text = blockContext.fullText.substring(offset);
+    }
+
     const handler = getInlineHandler(key);
     handler(
       offset, text.length, item, context,

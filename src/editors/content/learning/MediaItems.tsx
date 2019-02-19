@@ -55,23 +55,29 @@ export class MediaWidthHeightEditor extends React.PureComponent
     return (
       <SidebarGroup label="Size">
         <SidebarRow label="Width">
-          <div className="input-group input-group-sm">
-            <TextInput width="100%" label=""
+          <div className="input-group input-group-sm mb-3">
+            <TextInput
+              type="number"
+              label="Enter width"
               editMode={this.props.editMode}
               value={this.props.width}
-              type="number"
               onEdit={this.props.onEditWidth} />
-            <span className="input-group-addon ">pixels</span>
+            <div className="input-group-append">
+              <span className="input-group-text" id="basic-addon2">pixels</span>
+            </div>
           </div>
         </SidebarRow>
         <SidebarRow label="Height">
-          <div className="input-group input-group-sm">
-            <TextInput width="100%" label=""
+          <div className="input-group input-group-sm mb-3">
+            <TextInput
+              type="number"
+              label="Enter height"
               editMode={this.props.editMode}
               value={this.props.height}
-              type="number"
               onEdit={this.props.onEditHeight} />
-            <span className="input-group-addon " id="basic-addon2">pixels</span>
+            <div className="input-group-append">
+              <span className="input-group-text" id="basic-addon2">pixels</span>
+            </div>
           </div>
         </SidebarRow>
       </SidebarGroup>
@@ -129,7 +135,7 @@ export class MediaMetadataEditor
   onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({ text });
     const model: contentTypes.MediaItem = (this.props.model as MediaType).with({ titleContent });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model);
   }
 
   // onCitationTitleEdit(title: string) {
@@ -173,7 +179,8 @@ export class MediaMetadataEditor
               label="Enabled" />
           </SidebarRow>
           <SidebarRow>
-            <TextInput width="100%" label="Content"
+            <TextInput
+              label="Enter Popout content"
               editMode={this.props.editMode}
               value={popout.content}
               type="text"

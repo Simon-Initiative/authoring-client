@@ -46,6 +46,7 @@ export function registerContentTypes() {
   registerType('math', ct.Math.fromPersistence);
   registerType('mathematica', ct.Mathematica.fromPersistence);
   registerType('meaning', ct.Meaning.fromPersistence);
+  registerType('multipanel', ct.Multipanel.fromPersistence);
   registerType('objref', ct.ObjRef.fromPersistence);
   registerType('ol', ct.Ol.fromPersistence);
   registerType('panopto', ct.Panopto.fromPersistence);
@@ -54,16 +55,19 @@ export function registerContentTypes() {
   registerType('pref:label', ct.PrefLabel.fromPersistence);
   registerType('pref:value', ct.PrefValue.fromPersistence);
   registerType('pronunciation', ct.Pronunciation.fromPersistence);
+  registerType('proof', ct.Proof.fromPersistence);
   registerType('pullout', ct.Pullout.fromPersistence);
   registerType('question', ct.InquiryQuestion.fromPersistence);
   registerType('quote', ct.BlockQuote.fromPersistence);
   registerType('section', ct.WorkbookSection.fromPersistence);
   registerType('source', ct.Source.fromPersistence);
   registerType('speaker', ct.Speaker.fromPersistence);
+  registerType('statement', ct.Statement.fromPersistence);
   registerType('sym', ct.Sym.fromPersistence);
   registerType('table', ct.Table.fromPersistence);
   registerType('td', ct.CellData.fromPersistence);
   registerType('th', ct.CellHeader.fromPersistence);
+  registerType('theorem', ct.Theorem.fromPersistence);
   registerType('title', ct.Title.fromPersistence);
   registerType('tr', ct.Row.fromPersistence);
   registerType('track', ct.Track.fromPersistence);

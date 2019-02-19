@@ -25,18 +25,18 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
     reject();
   }
 
-  description() : string {
+  description(): string {
     return 'Assessment';
   }
 
   execute(
     org: models.OrganizationModel,
-    parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
-    context, services) : Promise<models.OrganizationModel> {
+    parent: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section | t.Item | t.Include,
+    context, services): Promise<models.OrganizationModel> {
 
     const predicate = (res: Resource): boolean =>
       res.type === LegacyTypes.assessment2
-        && res.resourceState !== ResourceState.DELETED;
+      && res.resourceState !== ResourceState.DELETED;
 
     return new Promise((resolve, reject) => {
       services.displayModal(
@@ -44,7 +44,7 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
           filterPredicate={predicate}
           courseId={context.courseId}
           onInsert={assessment => this.onInsert(org, parent, services, resolve, assessment)}
-          onCancel={() => this.onCancel(services, reject)}/>);
+          onCancel={() => this.onCancel(services, reject)} />);
     });
   }
 }

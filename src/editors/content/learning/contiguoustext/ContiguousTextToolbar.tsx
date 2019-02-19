@@ -8,11 +8,16 @@ import {
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarGroup, ToolbarLayout, determineBaseUrl }
   from 'components/toolbar/ContextAwareToolbar';
+import {
+  ToolbarNarrowMenu,
+  ToolbarButtonMenuItem,
+} from 'components/toolbar/ToolbarButtonMenu';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { entryInstances } from 'editors/content/learning/bibliography/utils';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 import { selectImage } from 'editors/content/learning/ImageEditor';
@@ -22,7 +27,12 @@ import {
   selectTargetElement,
 } from 'components/message/selection';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
+import createGuid from 'utils/guid';
 import { styles } from './ContiguousText.styles';
+import { Maybe } from 'tsmonad';
+import { ContentElement } from 'data/content/common/interfaces';
+import EntryList from 'editors/content/bibliography/EntryList';
+import ModalSelection from 'utils/selection/ModalSelection';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -30,11 +40,34 @@ export interface ContiguousTextToolbarProps
   resource: Resource;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
+  onAddEntry: (e, documentId) => Promise<void>;
+  onFetchContentElementByPredicate: (documentId, predicate) => Promise<Maybe<ContentElement>>;
   selection: TextSelection;
 }
 
 export interface ContiguousTextToolbarState {
 
+}
+
+function selectBibEntry(bib: contentTypes.Bibliography, display, dismiss)
+  : Promise<Maybe<contentTypes.Entry>> {
+  return new Promise((resolve, reject) => {
+
+    const selected = { entry: Maybe.nothing() };
+
+    const bibPicker = (
+      <ModalSelection title="Select a bibliography entry"
+        onInsert={() => { dismiss(); resolve(selected.entry as Maybe<contentTypes.Entry>); }}
+        onCancel={() => { dismiss(); resolve(Maybe.nothing()); }}>
+        <EntryList
+          model={bib.bibEntries.toList()}
+          onSelectEntry={e => selected.entry = Maybe.just(e)}
+        />
+      </ModalSelection>
+    );
+
+    display(bibPicker);
+  });
 }
 
 /**
@@ -65,7 +98,14 @@ export default class ContiguousTextToolbar
       onFocus: (c, p) => true,
       model: data,
       onEdit: (updated) => {
-        const updatedModel = this.props.model.updateEntity(key, updated);
+
+        // We special case the command entity updates as they need
+        // to update both the data backing the entity and the text
+        // that is displayed
+        const updatedModel = updated.contentType === 'Command'
+          ? this.props.model.replaceEntity(key, EntityTypes.command, false, updated, updated.title)
+          : this.props.model.updateEntity(key, updated);
+
         this.props.onEdit(updatedModel, updated);
       },
     };
@@ -86,6 +126,71 @@ export default class ContiguousTextToolbar
       return this.renderActiveEntity(entity);
     }
     return <SidebarContent title="Text Block" />;
+  }
+
+  renderEntryOptions(selection) {
+
+    const addCitationWithEntry = (id) => {
+      this.props.onEdit(this.props.model.addEntity(
+        EntityTypes.cite, true, new contentTypes.Cite().with({ entry: id }), selection));
+    };
+
+    const createCitationForExistingEntry = () => {
+      this.props.onFetchContentElementByPredicate(
+        this.props.context.documentId,
+        e => e.contentType === 'Bibliography')
+        .then((maybeBib) => {
+          maybeBib.lift((bib) => {
+            selectBibEntry(
+              bib as contentTypes.Bibliography,
+              this.props.onDisplayModal, this.props.onDismissModal)
+              .then((maybeEntry) => {
+                maybeEntry.lift(e => addCitationWithEntry(e.id));
+              });
+          });
+        });
+    };
+
+    const addNewBibEntry = (e) => {
+
+      const withId = e.with({ id: createGuid() });
+
+      this.props.onAddEntry(withId, this.props.context.documentId);
+
+      // This is a hack - but I was having problems bridging the onEdit based mutation
+      // with the dispatched based mutation
+      setTimeout(
+        () => {
+          this.props.onEdit(this.props.model.addEntity(
+            EntityTypes.cite, true, new contentTypes.Cite().with({ entry: withId.id }), selection));
+        },
+        100);
+
+
+    };
+
+    const buttons = Object.keys(entryInstances).map((key) => {
+      return (
+        <ToolbarButtonMenuItem
+          disabled={false}
+          onClick={() => addNewBibEntry(entryInstances[key])}>
+          {key}
+        </ToolbarButtonMenuItem>
+      );
+    });
+
+    return (
+      <div style={{ backgroundColor: 'white', margin: '8px' }}>
+        <ToolbarButtonMenuItem
+          disabled={false}
+          onClick={() => createCitationForExistingEntry()}>
+          Cite existing entry...
+        </ToolbarButtonMenuItem>
+        <div className="dropdown-divider"></div>
+        <h6 className="dropdown-header">Cite new entry</h6>
+        {buttons}
+      </div>
+    );
   }
 
   renderToolbar() {
@@ -119,7 +224,7 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={12.4}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={13.4}>
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
@@ -212,17 +317,6 @@ export default class ContiguousTextToolbar
             tooltip="Quotation">
             <i className={'fa fa-quote-right'} />
           </ToolbarButton>
-          {/* <ToolbarButton
-            onClick={
-              () => {
-                onEdit(model.addEntity(
-                  EntityTypes.cite, true, new contentTypes.Cite(), selection));
-              }
-            }
-            disabled={!supports('cite') || !rangeEntitiesEnabled}
-            tooltip="Citation">
-            <i className={'fa fa-asterisk'} />
-          </ToolbarButton> */}
           <ToolbarButton
             onClick={
               () => {
@@ -330,13 +424,17 @@ export default class ContiguousTextToolbar
 
               const selectionSnapshot = selection;
 
-              selectTargetElement()
-                .then((e) => {
-                  e.lift((element) => {
-                    const command = new contentTypes.Command().with({ target: element.id });
-                    onEdit(model.addEntity(EntityTypes.command, false, command, selectionSnapshot));
+              model.extractParagraphSelectedText(selection).lift((title) => {
+                selectTargetElement()
+                  .then((e) => {
+                    e.lift((element) => {
+                      const command = new contentTypes.Command()
+                        .with({ target: element.id, title });
+                      onEdit(model.addEntity(
+                        EntityTypes.command, false, command, selectionSnapshot));
+                    });
                   });
-                });
+              });
 
             }}
             tooltip="Insert Command"
@@ -347,7 +445,13 @@ export default class ContiguousTextToolbar
 
             {getContentIcon(insertableContentTypes.Command)}
           </ToolbarButton>
+          <ToolbarNarrowMenu
+            icon={<i className={'fa fa-asterisk'} />}
+            label={''}
+            disabled={!supports('cite') || !pointEntitiesEnabled}>
 
+            {this.renderEntryOptions(selection)}
+          </ToolbarNarrowMenu>
         </ToolbarLayout.Inline>
       </ToolbarGroup>
     );

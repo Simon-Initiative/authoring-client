@@ -4,10 +4,22 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+
+            table {
+              tr {
+                cursor: pointer;
+              }
+            }
         }
     }
 
     .searchBarContainer {
         margin-bottom: 15px;
+    }
+
+    .no-resources-msg {
+      margin: 20px;
+      text-align: center;
+      padding: 0 20%;
     }
 }

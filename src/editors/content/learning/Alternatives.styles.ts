@@ -5,6 +5,6 @@ export const styles: JSSStyles = {
 
   },
   alternative: {
-    paddingLeft: '20px',
+    marginTop: '20px',
   },
 };

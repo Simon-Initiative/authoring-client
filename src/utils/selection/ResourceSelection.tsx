@@ -12,10 +12,12 @@ import { highlightMatches } from 'components/common/SearchBarLogic';
 export interface ResourceSelectionProps {
   timeSkewInMs: number;
   course: models.CourseModel;
+  courseId: string;
+  title? :string;
+  noResourcesMessage?: string | JSX.Element;
+  filterPredicate: (res: Resource) => boolean;
   onInsert: (item: Resource) => void;
   onCancel: () => void;
-  courseId: string;
-  filterPredicate: (res: Resource) => boolean;
 }
 
 export interface ResourceSelectionState {
@@ -136,7 +138,7 @@ export default class ResourceSelection
     return (
       <div className="resourceSelection">
         <ModalSelection
-          title="Select Resource"
+          title={this.props.title || 'Select Resource'}
           onCancel={this.props.onCancel}
           onInsert={() => this.props.onInsert(this.state.selected)}
           disableInsert={this.state.selected === undefined}>
@@ -146,12 +148,27 @@ export default class ResourceSelection
               onChange={searchText => this.filterBySearchText(searchText)}
             />
           </div>
-          <SortableTable
-            rowRenderer={rowRenderer}
-            model={rows}
-            columnComparators={comparators}
-            columnRenderers={columnRenderers}
-            columnLabels={labels} />
+          {rows.length > 0
+            ? (
+              <SortableTable
+                rowRenderer={rowRenderer}
+                model={rows}
+                columnComparators={comparators}
+                columnRenderers={columnRenderers}
+                columnLabels={labels} />
+            )
+          : this.state.searchText !== ''
+            ? (
+            <div className="no-resources-msg">
+              No resources match the search criteria
+            </div>
+            )
+          : (
+            <div className="no-resources-msg">
+              {this.props.noResourcesMessage || 'No resources found'}
+            </div>
+          )
+          }
         </ModalSelection>
       </div>
     );

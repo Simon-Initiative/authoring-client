@@ -1,4 +1,9 @@
 .wbinline {
   min-height: 50px;
-	padding: 5px;
+  padding: 5px;
+
+  background-color: rgba(60, 180, 75, 0.1);
+  border: 1px solid rgba(60, 180, 75, 1.0);
+  border-left: 4px solid rgba(60, 180, 75, 1.0);
+  border-radius: 4px;
 }

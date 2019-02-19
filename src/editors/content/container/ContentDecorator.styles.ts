@@ -16,7 +16,6 @@ export const styles: JSSStyles = {
   },
   hover: {
     '& > $handle': {
-      // display: 'flex',
       left: -18,
       opacity: 1,
       cursor: 'pointer',
@@ -37,13 +36,12 @@ export const styles: JSSStyles = {
     color: 'rgba(0,0,0,.2)',
     borderLeft: '2px solid transparent',
     padding: [0, 2, 2, 2],
-    // display: 'none',         // switch opacity to diplay to disable invisible handle grab
+    // display: 'none',         // switch opacity to display to disable invisible handle grab
     display: 'flex',
     opacity: 0,
     backgroundColor: '#f1f1f1',
 
     '&.active-content': {
-      // display: 'flex',
       opacity: 1,
       left: -22,
       width: 22,
@@ -91,8 +89,19 @@ export const styles: JSSStyles = {
   },
   content: {
     flex: 1,
+    width: '100%',
 
-    '&.active-content .contiguousTextEditor': {
+    '&.active-content > div > .contiguousTextEditor': {
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+    },
+
+    '&.active-content > div > .wbinline': {
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+    },
+
+    '&.active-content > div > .ActivityEditor': {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
     },

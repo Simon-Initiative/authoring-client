@@ -20,6 +20,17 @@ export enum LegacyTypes {
   assessment2_pool = 'x-oli-assessment2-pool',
 }
 
+export type FormativeAssessment = LegacyTypes.inline;
+export type SummativeAssessment = LegacyTypes.assessment2;
+export type FeedbackAssessment = LegacyTypes.feedback;
+export type QuestionPool = LegacyTypes.assessment2_pool;
+
+export type AssessmentType =
+  FormativeAssessment |
+  SummativeAssessment |
+  FeedbackAssessment |
+  QuestionPool;
+
 export interface HasGuid {
   guid: string;
 }

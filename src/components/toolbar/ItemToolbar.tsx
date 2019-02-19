@@ -9,6 +9,7 @@ import { styles } from './ItemToolbar.styles';
 import { loadFromLocalStorage } from 'utils/localstorage';
 import { ContentElement } from 'data/content/common/interfaces';
 import { CourseModel } from 'data/models';
+import { nonMoveableTypes } from 'data/content/restrictions';
 
 export interface ItemToolbarProps {
   context: AppContext;
@@ -78,11 +79,13 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
 
   render() {
     const {
-      classes, editMode, onCut, onCopy, onPaste, onRemove, parentSupportsElementType,
+      classes, editMode, onCut, onCopy, onPaste, onRemove, parentSupportsElementType, activeContext,
     } = this.props;
 
-    const canMoveUp = true;
-    const canMoveDown = true;
+    const canMove = activeContext.activeChild.caseOf({
+      just: c => !nonMoveableTypes[c.contentType],
+      nothing: () => false,
+    });
 
     const clipboardItem: any = loadFromLocalStorage('clipboard');
     // saveToLocalStorage handles saving contiguous text as a special
@@ -91,8 +94,8 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
 
     if (clipboardItem !== null) {
       clipboardElementType = clipboardItem.isContiguousText
-      ? '#text'
-      : Object.keys(clipboardItem)[0];
+        ? '#text'
+        : Object.keys(clipboardItem)[0];
     }
 
     return (
@@ -137,14 +140,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             onClick={() => this.getContainer().onMoveUp(this.getItem())}
             tooltip="Move Item Up"
             size={ToolbarButtonSize.Small}
-            disabled={!editMode || !(this.hasSelection() && canMoveUp)}>
+            disabled={!editMode || !(this.hasSelection() && canMove)}>
             <i className="fa fa-long-arrow-up" />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => this.getContainer().onMoveDown(this.getItem())}
             tooltip="Move Item Down"
             size={ToolbarButtonSize.Small}
-            disabled={!editMode || !(this.hasSelection() && canMoveDown)}>
+            disabled={!editMode || !(this.hasSelection() && canMove)}>
             <i className="fa fa-long-arrow-down" />
           </ToolbarButton>
         </ToolbarLayout.Column>

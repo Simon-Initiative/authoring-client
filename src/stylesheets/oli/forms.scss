@@ -76,3 +76,7 @@
 .form-control-sm {
 	font-size: .8rem;
 }
+
+input::placeholder {
+  color: $gray-light;
+}

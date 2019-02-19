@@ -8,7 +8,6 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { buildUrl } from 'utils/path';
 import { RectangleEditor } from 'editors/content/question/imagehotspot/RectangleEditor';
 import { CircleEditor } from 'editors/content/question/imagehotspot/CircleEditor';
-
 import { styles } from 'editors/content/question/imagehotspot/ImageHotspotEditor.styles';
 import { Hotspot } from 'data/content/assessment/image_hotspot/hotspot';
 import guid from 'utils/guid';
@@ -147,11 +146,36 @@ export class ImageHotspotEditor
       })),
     )
     .then(({ src, width, height }) => {
+      // reposition hotspots so they are guaranteed to be in the image
+      const hotspots = model.hotspots.map(hotspot =>
+        hotspot.shape === 'rect'
+          ? hotspot.with({
+            coords: Immutable.List<number>([
+              Math.floor(width / 2) - 50,
+              Math.floor(height / 2) - 50,
+              Math.floor(width / 2) + 50,
+              Math.floor(height / 2) + 50,
+            ]),
+          })
+        : hotspot.shape === 'circle'
+          ? hotspot.with({
+            coords: Immutable.List<number>([
+              Math.floor(width / 2),
+              Math.floor(height / 2),
+              100,
+            ]),
+          })
+        // TODO: handle case when hotspot is a polygon
+        : hotspot
+        ,
+      ).toOrderedMap();
+
       onEdit(
         model.with({
           src,
           width,
           height,
+          hotspots,
         }),
         partModel,
       );

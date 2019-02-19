@@ -94,6 +94,14 @@ const resources = {
       type,
       title: contentTypes.Title.fromText(title),
     })),
+  feedbackassessments: res(
+    'Feedback Assessments',
+    LegacyTypes.feedback,
+    (resource: Resource) => resource.type === LegacyTypes.feedback
+      && resource.resourceState !== ResourceState.DELETED,
+    (courseId, title, type) => models.FeedbackModel.createNew(
+      guid(), title, ''),
+  ),
   pages: res(
     'Workbook Pages',
     LegacyTypes.workbook_page,

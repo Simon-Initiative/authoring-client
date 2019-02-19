@@ -20,15 +20,18 @@ import { selectVideo } from 'editors/content/learning/VideoEditor';
 import { selectFile } from 'editors/content/learning/file';
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
-import { ContentElement } from 'data/content/common/interfaces';
 import { styles } from 'components/toolbar/InsertToolbar.style';
 import { Resource, ResourceState } from 'data/content/resource';
 import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
-import { findNodes } from 'data/models/utils/workbook';
+import { collectInlines, collectInlinesNested } from 'utils/course';
 import { getContentIcon, insertableContentTypes } from 'editors/content/utils/content';
 import { Message } from 'types/messages';
 import { selectTargetElement } from 'components/message/selection';
+import { FeedbackModel } from 'data/models/feedback';
+import { ImageHotspot } from 'data/content/workbook/multipanel/image_hotspot';
+import { Hotspot } from 'data/content/workbook/multipanel/hotspot';
+import { Panel } from 'data/content/workbook/multipanel/panel';
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -61,21 +64,38 @@ export interface InsertToolbarState {
   isWorkbookPage: boolean;
 }
 
-function collectInlines(model: ContentModel): Immutable.Map<string, ContentElement> {
+const createMultipanel = (inline) => {
+  let defaultImageHotspot = new ImageHotspot().with({
+    src: 'NO_IMAGE_SELECTED',
+  });
+  const defaultPanel = new Panel();
+  const defaultHotspot = new Hotspot().with({
+    shape: 'rect',
+    activityRef: '1',
+    panelRef: defaultPanel.id,
+    coords: Immutable.List<number>([
+      Math.floor(defaultImageHotspot.width / 2) - 50,
+      Math.floor(defaultImageHotspot.height / 2) - 50,
+      Math.floor(defaultImageHotspot.width / 2) + 50,
+      Math.floor(defaultImageHotspot.height / 2) + 50,
+    ]),
+  });
+  defaultImageHotspot = defaultImageHotspot.with({
+    hotspots: defaultImageHotspot.hotspots.set(
+      defaultHotspot.guid,
+      defaultHotspot,
+    ),
+  });
 
-  if (model.modelType === 'WorkbookPageModel') {
+  const multipanel = new contentTypes.Multipanel({
+    title: Maybe.just(Title.fromText('New Hotspot Activity')),
+    inline: new contentTypes.WbInline().with({ idref: inline.id }),
+    imageHotspot: defaultImageHotspot,
+    panels: Immutable.List<Panel>().push(defaultPanel),
+  });
 
-    const found = findNodes(model, (n) => {
-      return n.contentType === 'WbInline';
-    })
-      .map(e => [e.idref, e]);
-
-    return Immutable.Map<string, ContentElement>(found);
-  }
-  return Immutable.Map<string, ContentElement>();
-}
-
-
+  return multipanel;
+};
 
 /**
  * InsertToolbar React Component
@@ -364,6 +384,15 @@ export class InsertToolbar
               </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
+
+                const theorem = new contentTypes.Theorem();
+                onInsert(theorem);
+              }}
+              disabled={!editMode || !parentSupportsElementType('theorem')}>
+              <i style={{ width: 22 }} className={'fa fa-university'} /> Theorem
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
                 const speakerId = guid();
                 const lineId = guid();
 
@@ -549,9 +578,59 @@ export class InsertToolbar
                     });
 
                 }}
-                disabled={!editMode || !parentSupportsElementType('wb:inline')}>
+                disabled={!editMode || !parentSupportsElementType('activity')}>
                 {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
                 Create summative assessment
+                </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuDivider />
+
+              <ToolbarButtonMenuItem
+                onClick={() => onDisplayModal(
+                  <ResourceSelection
+                    filterPredicate={(res: Resource): boolean =>
+                      res.type === LegacyTypes.feedback
+                      && res.resourceState !== ResourceState.DELETED}
+                    courseId={context.courseId}
+                    onInsert={(resource) => {
+                      onDismissModal();
+                      const resources = context.courseModel.resources.toArray();
+                      const found = resources.find(r => r.id === resource.id);
+                      if (found !== undefined) {
+                        onInsert(new contentTypes.Activity().with({
+                          idref: resource.id,
+                          purpose: Maybe.just(contentTypes.PurposeTypes.MyResponse),
+                        }));
+                      }
+                    }}
+                    onCancel={onDismissModal}
+                  />)
+                }
+                disabled={!editMode || !parentSupportsElementType('activity')}>
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
+                Insert feedback assessment
+                </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  const model = FeedbackModel.createNew(
+                    guid(),
+                    'New Feedback Assessment',
+                    '',
+                  );
+
+                  onCreateNew(model)
+                    .then((resource) => {
+                      onInsert(new contentTypes.Activity().with({
+                        idref: resource.id,
+                        purpose: Maybe.just(contentTypes.PurposeTypes.MyResponse),
+                      }));
+                    });
+
+                }}
+                disabled={!editMode || !parentSupportsElementType('activity')}>
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
+                Create feedback assessment
                 </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider />
@@ -566,6 +645,46 @@ export class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('composite_activity')}>
                 {getContentIcon(insertableContentTypes.Composite, { width: 22 })} Composite activity
                 </ToolbarButtonMenuItem>
+
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  requestLatestModel()
+                    .then((model) => {
+                      const existingInlines = collectInlinesNested(model);
+
+                      return onDisplayModal(
+                        <ResourceSelection
+                          title="Select an Assessment for Hotspot Activity"
+                          filterPredicate={(res: Resource): boolean =>
+                            res.type === LegacyTypes.inline
+                            && res.resourceState !== ResourceState.DELETED
+                            && !existingInlines.has(res.id)}
+                          courseId={context.courseId}
+                          noResourcesMessage={
+                            <React.Fragment>
+                              No assessments are available for this activity.
+                              <br />
+                              Please create a new formative assessment or remove an existing
+                              reference from this page before adding another one.
+                            </React.Fragment>
+                          }
+                          onInsert={(resource) => {
+                            onDismissModal();
+                            const resources = context.courseModel.resources.toArray();
+                            const found = resources.find(r => r.id === resource.id);
+                            if (found !== undefined) {
+                              const multipanel = createMultipanel(found);
+                              onInsert(multipanel);
+                            }
+                          }}
+                          onCancel={onDismissModal}
+                        />);
+                    });
+                }}
+                disabled={!editMode || !parentSupportsElementType('multipanel')}>
+                {getContentIcon(insertableContentTypes.Multipanel, { width: 22 })}
+                {' Image hotspot activity'}
+              </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">

@@ -210,7 +210,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     const anchorOffset = selection.getAnchorOffset(); // anchor offset from beginning
     const focusKey = selection.getFocusKey(); // key of ending ContentBlock
     const focusOffset = selection.getFocusOffset(); // focus offset from beginning
-    const blocks : Immutable.OrderedMap<string, ContentBlock> = this.content.getBlockMap();
+    const blocks: Immutable.OrderedMap<string, ContentBlock> = this.content.getBlockMap();
 
     // want blocks from anchorKey to focusKey, or focusKey to anchorKey if rev
     const startKey = rev ? focusKey : anchorKey;
@@ -240,8 +240,8 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     });
 
     let content = allStyled
-        ? Modifier.removeInlineStyle(this.content, selection.getRawSelectionState(), style)
-        : Modifier.applyInlineStyle(this.content, selection.getRawSelectionState(), style);
+      ? Modifier.removeInlineStyle(this.content, selection.getRawSelectionState(), style)
+      : Modifier.applyInlineStyle(this.content, selection.getRawSelectionState(), style);
 
     // handle contradictory styling
     if (!allStyled && (style === InlineStyles.Subscript || style === InlineStyles.Superscript)) {
@@ -259,6 +259,41 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       entityEditCount: this.entityEditCount + 1,
       mode: this.mode,
     });
+  }
+
+  // Replaces an entity's data and it's corresponding
+  // block text.
+  replaceEntity(key: string, type: string, mutable: boolean, data: Object, text: string) {
+
+    // Remove the current entity
+    let model = this.removeEntity(key);
+
+    // Find the entity in question
+    const matched = getAllEntities(this.content).filter(e => e.entityKey === key);
+    if (matched.length === 1) {
+
+      // Now update the text
+      const rawSelection = new SelectionState({
+        anchorKey: matched[0].range.contentBlock.key,
+        focusKey: matched[0].range.contentBlock.key,
+        anchorOffset: matched[0].range.start,
+        focusOffset: matched[0].range.end,
+      });
+      let selection = new TextSelection(rawSelection);
+      model = model.with({ content: Modifier.replaceText(model.content, rawSelection, text) });
+
+      // Adjust the selection to account for potential differences the length of
+      // the original vs replacement text.
+      const originalLength = (matched[0].range.end - matched[0].range.start);
+      selection = selection.merge({
+        focusOffset:
+          selection.getFocusOffset() - (originalLength - text.length),
+      });
+
+      // Now apply the entity as a new one with the updated text in place
+      return model.addEntity(type, mutable, data, selection);
+    }
+
   }
 
   cloneEntity(info: EntityInfo) {
@@ -492,5 +527,45 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return Maybe.nothing();
   }
 
+  // Accesses the plain text from a selection with a single
+  // paragraph of continguous text.  If the selection spans
+  // multiple content blocks (i.e. paragraphs) we return Nothing. If
+  // the block is not found or the selection offsets exceed the
+  // length of the raw text for the block, we return nothing.
+  // Otherwise, we return just the raw underlying text substring.
 
+  extractParagraphSelectedText(selection: TextSelection): Maybe<string> {
+    // Return nothing if the selection spans multiple blocks
+    if (selection.getAnchorKey() !== selection.getFocusKey()) {
+      return Maybe.nothing();
+    }
+
+    // Return nothing if there is no selection
+    if (selection.getAnchorOffset() === selection.getFocusOffset()) {
+      return Maybe.nothing();
+    }
+
+    // Return nothing if we somehow cannot find this block
+    const block = this.content.getBlockForKey(selection.getAnchorKey());
+    if (block === undefined) {
+      return Maybe.nothing();
+    }
+
+    const text: string = block.text;
+    // >= is correct here instead of >, since the focus offset value is exclusive
+    if (text.length >= selection.getAnchorOffset() && text.length >= selection.getFocusOffset()) {
+
+      // We must be careful to handle reverse selections
+      const begin = selection.getAnchorOffset() < selection.getFocusOffset()
+        ? selection.getAnchorOffset() : selection.getFocusOffset();
+      const end = selection.getAnchorOffset() > selection.getFocusOffset()
+        ? selection.getAnchorOffset() : selection.getFocusOffset();
+
+      return Maybe.just(text.substring(begin, end));
+    }
+
+    // Return nothing if somehow one or both of the offsets exceeds the
+    // length of the backing block text
+    return Maybe.nothing();
+  }
 }

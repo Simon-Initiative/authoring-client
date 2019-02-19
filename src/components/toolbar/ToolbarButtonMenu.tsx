@@ -81,6 +81,63 @@ export class ToolbarButtonMenuItem
   }
 }
 
+
+@injectSheet(styles)
+export class ToolbarNarrowMenu
+  extends React.PureComponent<ToolbarWideMenuProps & JSSProps> {
+
+  id: string;
+
+  constructor(props) {
+    super(props);
+    this.id = guid();
+  }
+
+  render() {
+    const {
+      className, classes, disabled, icon, label,
+    } = this.props;
+
+    const style: any = { position: 'relative', width: '32px', maxWidth: '32px' };
+
+    const button = (
+      <button
+        type="button"
+        data-toggle="dropdown"
+        data-boundary="window"
+        style={style}
+        id={this.id}
+        data-offset="0,0"
+        className={
+          classNames([classes.toolbarNarrowButtonMenu, className,
+            'btn', 'btn-sm', 'dropdown-toggle'])}
+        disabled={disabled}>
+        {icon} {label}
+      </button>
+    );
+
+    const onHide = () => {
+      const jq = (window as any).jQuery;
+      jq('#' + this.id).dropdown('toggle');
+    };
+
+    const dropdown = (
+      <div
+        className={
+          classNames([classes.narrowMenu, 'dropdown', className])}>
+        {button}
+        <div className="dropdown-menu">
+          {React.Children.map(this.props.children, c => React.cloneElement(c as any, { onHide }))}
+        </div>
+      </div>
+    );
+
+    return dropdown;
+
+  }
+}
+
+
 @injectSheet(styles)
 export class ToolbarWideMenu
   extends React.PureComponent<ToolbarWideMenuProps & JSSProps> {
@@ -97,7 +154,7 @@ export class ToolbarWideMenu
       className, classes, disabled, icon, label,
     } = this.props;
 
-    const style : any = { position: 'relative' };
+    const style: any = { position: 'relative' };
 
     const button = (
       <button
@@ -122,7 +179,7 @@ export class ToolbarWideMenu
     const dropdown = (
       <div
         className={
-        classNames([classes.wideMenu, 'dropdown', className])}>
+          classNames([classes.wideMenu, 'dropdown', className])}>
         {button}
         <div className="dropdown-menu">
           {React.Children.map(this.props.children, c => React.cloneElement(c as any, { onHide }))}
@@ -134,6 +191,7 @@ export class ToolbarWideMenu
 
   }
 }
+
 
 
 @injectSheet(styles)
@@ -152,7 +210,8 @@ export class ToolbarQuadMenu
 
     const dropdown = (
       <div
-        className={classNames([classes.quadDropdown,
+        className={classNames([
+          classes.quadDropdown,
           disabled && classes.quadDropdownDisabled, 'dropdown'])}>
         <button
           className={classNames([classes.quadButton, 'dropdown-toggle'])}
@@ -160,11 +219,11 @@ export class ToolbarQuadMenu
           data-toggle="dropdown"
           data-boundary="window"
           data-offset="-75,0"
-          >
+        >
           <span className="sr-only">Toggle Dropdown</span>
         </button>
         <div
-          style={ { marginTop: '-9px' } }
+          style={{ marginTop: '-9px' }}
           className="dropdown-menu">
           {this.props.children}
         </div>

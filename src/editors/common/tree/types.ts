@@ -3,12 +3,10 @@ import { Maybe } from 'tsmonad';
 import { HasGuid, NodeId } from 'data/utils/tree';
 export { ChildrenAccessor, ChildrenMutator, HasGuid, NodeId, Nodes } from 'data/utils/tree';
 
-
 export enum TreeType {
   DIV,
   TABLE, // Not supported yet
 }
-
 
 export type RenderedNode<NodeType extends HasGuid> = {
   nodeId: NodeId,
@@ -42,10 +40,10 @@ export type CanDropHandler<NodeType extends HasGuid> = (
   newIndex: number) => boolean;
 
 // A client supplied node renderer
-export type NodeRenderer<NodeType extends HasGuid>
-  = (node: NodeType,
-     nodeState: NodeState<NodeType>,
-     handlers: Handlers) => JSX.Element;
+export type NodeRenderer<NodeType extends HasGuid> = (
+  node: NodeType,
+  nodeState: NodeState<NodeType>,
+  handlers: Handlers) => JSX.Element;
 
 
 
@@ -76,5 +74,5 @@ export type TreeRenderer<NodeType extends HasGuid> = {
     parentModelId: Maybe<string>,
     isBottom: boolean,
     editMode: boolean,
-    ) => JSX.Element,
+  ) => JSX.Element,
 };

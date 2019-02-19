@@ -19,6 +19,9 @@ export function findNodes(
 
   visitNodes(visitor, model.body.content, getChildren);
 
+  visitor(model.bibliography);
+  visitNodes(visitor, model.bibliography, getChildren);
+
   return matching;
 }
 

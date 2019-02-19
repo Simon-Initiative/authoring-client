@@ -1,0 +1,12 @@
+.outline-container {
+  display: flex;
+  overflow-y: auto;
+  flex: 0 0 300px;
+  flex-direction: column;
+  margin-right: 2px;
+
+  .tree-container, .tree-list {
+    padding-right: 6px;
+    overflow-y: auto;
+  }
+}
