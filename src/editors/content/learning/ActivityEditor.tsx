@@ -100,7 +100,7 @@ export default class ActivityEditor
     </SidebarGroup>;
 
     if (this.isFeedback()) {
-      return <SidebarContent title="Feedback">
+      return <SidebarContent title="Survey">
         {activitySelect(feedbacks)}
       </SidebarContent>;
     }
@@ -130,7 +130,7 @@ export default class ActivityEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label={this.isFeedback() ? 'Feedback' : 'Activity'}
+      <ToolbarGroup label={this.isFeedback() ? 'Survey' : 'Activity'}
         highlightColor={CONTENT_COLORS.Activity} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
@@ -159,7 +159,7 @@ export default class ActivityEditor
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit {this.isFeedback() ? 'Feedback' : 'Summative'} Assessment
+          Edit {this.isFeedback() ? 'Survey' : 'Summative Assessment'}
         </button>
       </div>
     );

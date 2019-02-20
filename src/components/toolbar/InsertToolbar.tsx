@@ -608,14 +608,14 @@ export class InsertToolbar
                 }
                 disabled={!editMode || !parentSupportsElementType('activity')}>
                 {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
-                Insert feedback assessment
+                Insert survey
                 </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuItem
                 onClick={() => {
                   const model = FeedbackModel.createNew(
                     guid(),
-                    'New Feedback Assessment',
+                    'New Survey',
                     '',
                   );
 
@@ -630,7 +630,7 @@ export class InsertToolbar
                 }}
                 disabled={!editMode || !parentSupportsElementType('activity')}>
                 {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
-                Create feedback assessment
+                Create survey
                 </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider />
