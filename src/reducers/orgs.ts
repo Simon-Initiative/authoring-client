@@ -1,18 +1,20 @@
 
 import {
-  RECEIVE_COMBINATIONS, RECEIVE_PERMUTATIONS,
-  ReceiveCombinations, ReceivePermutations
+  ORG_REQUESTED, ORG_LOADED, ORG_FAILED, OrgFailedAction,
+  OrgLoadedAction, OrgRequestedAction,
 } from 'actions/orgs';
 import { OtherAction } from './utils';
-import * as models from 'data/models';
+import { Document } from 'data/persistence';
 import { Maybe } from 'tsmonad';
 
-type ActionTypes = ReceiveCombinations | ReceivePermutations | OtherAction;
+type ActionTypes = OrgFailedAction | OrgLoadedAction | OrgRequestedAction | OtherAction;
 
-export type OrgsState = Maybe<models.OrganizationModel>;
+export type OrgsState = {
+  activeOrg: Maybe<Document>,
+};
 
 const initialState = {
-  activeOrg: Maybe.nothing(),
+  activeOrg: Maybe.nothing<Document>(),
 };
 
 export const orgs = (
@@ -20,16 +22,12 @@ export const orgs = (
   action: ActionTypes,
 ): OrgsState => {
   switch (action.type) {
-    case RECEIVE_COMBINATIONS:
-      return Object.assign(
-        {},
-        state,
-        { combinations: state.combinations.set(action.comboNum, action.combinations) });
-    case RECEIVE_PERMUTATIONS:
-      return Object.assign(
-        {},
-        state,
-        { permutations: state.permutations.set(action.comboNum, action.permutations) });
+    case ORG_REQUESTED:
+      return state;
+    case ORG_LOADED:
+      return Object.assign({}, state, { activeOrg: Maybe.just(action.document) });
+    case ORG_FAILED:
+      return state;
     default:
       return state;
   }
