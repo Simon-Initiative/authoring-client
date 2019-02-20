@@ -33,7 +33,6 @@ module.exports = {
     },
     devtool: 'source-map',
     devServer: {
-        writeToDisk: true,
         contentBase: __dirname,
         historyApiFallback: true,
         hot: true,
