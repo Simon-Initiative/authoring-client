@@ -24,11 +24,11 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onLoadDocument: (courseId, documentId) => dispatch(load(courseId, documentId)),
+    onLoadDocument: (courseId, documentId) => dispatch(load(courseId, documentId) as any),
   };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(WritelockModal);
+  (mapStateToProps, mapDispatchToProps)(WritelockModal);
 
 export { controller as WritelockModal };

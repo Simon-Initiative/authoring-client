@@ -24,7 +24,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onLoadDocument: (courseId, documentId) => dispatch(load(courseId, documentId)),
+    onLoadDocument: (courseId, documentId) => dispatch(load(courseId, documentId) as any),
   };
 };
 

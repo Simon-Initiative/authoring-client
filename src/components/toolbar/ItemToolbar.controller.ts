@@ -32,10 +32,10 @@ const mapStateToProps = (state: State): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
   return {
-    onCut: (item, page) => dispatch(cut(item, page)),
-    onCopy: (item, page) => dispatch(copy(item, page)),
-    onPaste: () => dispatch(paste()),
-    onRemove: item => dispatch(remove(item)),
+    onCut: (item, page) => dispatch(cut(item, page) as any),
+    onCopy: (item, page) => dispatch(copy(item, page) as any),
+    onPaste: () => dispatch(paste() as any),
+    onRemove: item => dispatch(remove(item) as any),
   };
 };
 

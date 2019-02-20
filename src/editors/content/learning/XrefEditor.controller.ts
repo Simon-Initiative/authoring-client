@@ -39,7 +39,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
     displayModal: component => dispatch(modalActions.display(component)),
     dismissModal: () => dispatch(modalActions.dismiss()),
     updateTarget: (targetId: string, documentId: string) =>
-      dispatch(fetchAndSetTargetNode(targetId, documentId)),
+      dispatch(fetchAndSetTargetNode(targetId, documentId) as any),
   };
 };
 

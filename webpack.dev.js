@@ -27,8 +27,7 @@ module.exports = {
         ]
     },
     output: {
-        path: path.resolve(__dirname, 'dev'),
-        filename: 'bundle.js'
+        filename: '[name].js'
     },
     externals: {
     },
