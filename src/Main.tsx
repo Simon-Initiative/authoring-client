@@ -95,7 +95,7 @@ const resources = {
       title: contentTypes.Title.fromText(title),
     })),
   feedbackassessments: res(
-    'Feedback Assessments',
+    'Surveys',
     LegacyTypes.feedback,
     (resource: Resource) => resource.type === LegacyTypes.feedback
       && resource.resourceState !== ResourceState.DELETED,
