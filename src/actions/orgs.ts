@@ -67,9 +67,7 @@ export const modelUpdated = (model: models.OrganizationModel)
 
 
 export function load(courseId: string, organizationId: string) {
-  return function (dispatch, getState): Promise<persistence.Document> {
-
-    const userName = getState().user.profile.username;
+  return function (dispatch): Promise<persistence.Document> {
 
     const holder = { changeMade: false };
     const notifyChangeMade = () => holder.changeMade = true;
