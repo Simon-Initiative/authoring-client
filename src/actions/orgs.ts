@@ -98,8 +98,6 @@ export function save(model: models.OrganizationModel) {
     getState().orgs.activeOrg.lift((doc) => {
       persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
         .then((result) => {
-          console.log('org save completed');
-          console.log(result);
           // dispatch(orgLoaded(document));
         })
         .catch((err) => {
