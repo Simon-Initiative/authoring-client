@@ -7,7 +7,6 @@ import { undo, redo, documentEditingEnable } from 'actions/document';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
 import { modalActions } from 'actions/modal';
-import { OrgsState } from 'reducers/orgs';
 
 interface StateProps {
   canUndo: boolean;

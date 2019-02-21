@@ -1,22 +1,7 @@
-import * as React from 'react';
-import * as Immutable from 'immutable';
+
 import * as persistence from 'data/persistence';
-import * as contentTypes from 'data/contentTypes';
-import { Resource } from 'data/content/resource';
 import * as models from 'data/models';
 import createGuid from 'utils/guid';
-import * as Messages from 'types/messages';
-import { showMessage, dismissScopedMessages, dismissSpecificMessage } from 'actions/messages';
-import { modalActions } from 'actions/modal';
-import { buildPersistenceFailureMessage } from 'utils/error';
-import { buildReadOnlyMessage } from 'utils/lock';
-import { Maybe } from 'tsmonad';
-import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
-import { MapFn, map as rawMap } from 'data/utils/map';
-
-import { ConflictModal } from 'components/ConflictModal.controller';
-import { State } from 'reducers';
-import { ContentElement } from 'data/content/common/interfaces';
 
 export type ORG_REQUESTED = 'orgs/ORG_REQUESTED';
 export const ORG_REQUESTED: ORG_REQUESTED = 'orgs/ORG_REQUESTED';
