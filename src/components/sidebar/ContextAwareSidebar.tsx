@@ -450,7 +450,7 @@ export class ContextAwareSidebar
         );
       case ModelTypes.FeedbackModel:
         return (
-          <SidebarContent title="Feedback Assessment" onHide={this.props.onHide}>
+          <SidebarContent title="Survey" onHide={this.props.onHide}>
             <SidebarGroup label="General">
               <SidebarRow>
                 <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}
@@ -472,7 +472,7 @@ export class ContextAwareSidebar
                   onClick={this.showDeleteModal}
                   editMode={editMode}
                   type="outline-danger">
-                  Delete this Assessment
+                  Delete this Survey
               </Button>
               </SidebarRow>
             </SidebarGroup>

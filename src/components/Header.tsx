@@ -105,7 +105,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
             Summative
           </MenuItem>
           <MenuItem action={v.viewFeedbackAssessments.bind(undefined, id)}>
-            Feedback
+            Surveys
           </MenuItem>
           <MenuItem action={v.viewPools.bind(undefined, id)}>
             Question Pools
