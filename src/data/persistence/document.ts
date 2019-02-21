@@ -248,13 +248,14 @@ export function persistDocument(doc: Document): Promise<Document> {
 }
 
 
-export function persistRevisionBasedDocument(doc: Document): Promise<Document> {
+export function persistRevisionBasedDocument(
+  doc: Document, nextRevision: string): Promise<Document> {
 
-  const baseRevision = (doc as any).model.revision.guid;
-  const url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}/${baseRevision}`;
+  const br = (doc as any).model.resource.lastRevisionGuid;
+  const url
+    = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}/${br}/${nextRevision}`;
 
   try {
-
     const toPersist = doc.model.toPersistence();
     const body = JSON.stringify(toPersist);
     const method = 'PUT';

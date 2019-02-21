@@ -4,6 +4,7 @@ import * as persistence from 'data/persistence';
 import * as contentTypes from 'data/contentTypes';
 import { Resource } from 'data/content/resource';
 import * as models from 'data/models';
+import createGuid from 'utils/guid';
 import * as Messages from 'types/messages';
 import { showMessage, dismissScopedMessages, dismissSpecificMessage } from 'actions/messages';
 import { modalActions } from 'actions/modal';
@@ -102,10 +103,21 @@ export function load(courseId: string, organizationId: string) {
 
 export function save(model: models.OrganizationModel) {
   return function (dispatch, getState) {
-    getState().orgs.lift((doc) => {
-      persistence.persistRevisionBasedDocument(doc.with({ model }))
-        .then((result) => {
 
+    const nextRevision = createGuid();
+    const resource = model.resource.with({
+      previousRevisionGuid: model.resource.lastRevisionGuid,
+      lastRevisionGuid: nextRevision,
+    });
+    const nextModel = model.with({ resource });
+    dispatch(modelUpdated(nextModel));
+
+    getState().orgs.activeOrg.lift((doc) => {
+      persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
+        .then((result) => {
+          console.log('org save completed');
+          console.log(result);
+          // dispatch(orgLoaded(document));
         })
         .catch((err) => {
 

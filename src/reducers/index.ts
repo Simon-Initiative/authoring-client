@@ -24,8 +24,10 @@ import { router, RouterState } from 'reducers/router';
 import { clipboard, ClipboardState } from 'reducers/clipboard';
 import { XrefState, xref } from 'reducers/xref';
 import { BibliographyState, orderedIds } from 'reducers/bibliography';
+import { orgs, OrgsState } from 'reducers/orgs';
 
 export interface State {
+  orgs: OrgsState;
   activeContext: ActiveContextState;
   documents: DocumentsState;
   choices: ChoicesState;
@@ -53,6 +55,7 @@ export interface State {
 }
 
 const reducers = combineReducers({
+  orgs,           // The organization global state
   activeContext,  // The active editing context - aka: what is being edited
   documents,      // The current state and models of documents under edit
   choices,        // Supporting data for choices
