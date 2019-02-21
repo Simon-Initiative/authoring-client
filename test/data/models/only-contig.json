@@ -4,6 +4,17 @@
   "id": "workbook",
   "type": "x-oli-workbook_page",
   "title": "This is the title",
+  "lastRevision": {
+    "rev": 0,
+    "guid": "d98f2aeaa7ba404aae91d6d690dba5d3",
+    "revisionNumber": 17,
+    "previousRevision": "2b5091113974410b90c9c9cf93173ccc",
+    "md5": "3bb097cc20247872debfce4e8e6ea83f",
+    "author": "manager",
+    "revisionType": "SYSTEM",
+    "dateCreated": "Jan 25, 2019 10:16:08 PM",
+    "dateUpdated": "Jan 25, 2019 10:16:08 PM"
+  },
   "shortTitle": null,
   "doc": {
     "workbook_page": {

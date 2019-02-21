@@ -246,3 +246,32 @@ export function persistDocument(doc: Document): Promise<Document> {
     return Promise.reject(err);
   }
 }
+
+
+export function persistRevisionBasedDocument(
+  doc: Document, nextRevision: string): Promise<Document> {
+
+  const br = (doc as any).model.resource.lastRevisionGuid;
+  const url
+    = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}/${br}/${nextRevision}`;
+
+  try {
+    const toPersist = doc.model.toPersistence();
+    const body = JSON.stringify(toPersist);
+    const method = 'PUT';
+
+    return (authenticatedFetch({ url, body, method }) as any)
+      .then((json) => {
+        const newDocument = new Document({
+          _courseId: doc._courseId,
+          _id: json.guid,
+          _rev: json.rev,
+          model: doc.model,
+        });
+
+        return newDocument;
+      });
+  } catch (err) {
+    return Promise.reject(err);
+  }
+}
