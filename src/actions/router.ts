@@ -63,7 +63,7 @@ export const getRouteFromPath = (path: string, search: string) => {
   };
 
   const { route, courseId, resourceId, orgId } = (() => {
-    switch (parseRootPath(path).split('/')[0]) {
+    switch (parseRootPath(path).split('-')[0]) {
       case '':
         return {
           route: ROUTE.ROOT,

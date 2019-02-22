@@ -38,7 +38,7 @@ import * as messageActions from 'actions/messages';
 import './Main.scss';
 import Preview from 'components/Preview';
 import { caseOf } from 'utils/utils';
-import { NavigationPanel } from 'components/NavigationPanel';
+import { NavigationPanel } from 'components/NavigationPanel.controller';
 
 type ResourceList = {
   title: string,
@@ -322,7 +322,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                       }
 
                       const res = c.resources.get(resourceId);
-                      if (res.type === LegacyTypes.organization) {
+                      if (res && res.type === LegacyTypes.organization) {
                         return (
                           <DocumentView
                             onLoad={(docId: string) => onLoadOrg(c.guid, docId)}
