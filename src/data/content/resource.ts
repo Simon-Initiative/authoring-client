@@ -99,9 +99,12 @@ export class Resource extends Immutable.Record(
       id: a.id,
       type: a.type,
       title: a.title || '',
-      lastRevisionGuid: a.lastRevision.guid,
-      previousRevisionGuid: a.lastRevision.previousRevision,
-      lastRevisionNumber: a.lastRevision.revisionNumber,
+      lastRevisionGuid: a.lastRevision !== undefined && a.lastRevision !== null
+        ? a.lastRevision.guid : '',
+      previousRevisionGuid: a.lastRevision !== undefined && a.lastRevision !== null
+        ? a.lastRevision.previousRevision : '',
+      lastRevisionNumber: a.lastRevision !== undefined && a.lastRevision !== null
+        ? a.lastRevision.revisionNumber : '',
       dateCreated: a.dateCreated === undefined || a.dateCreate === null
         ? new Date() : parseDate(a.dateCreated),
       dateUpdated: a.dateUpdated === undefined || a.dateUpdated === null

@@ -8,7 +8,6 @@ import {
 } from 'editors/document/common/AbstractEditor';
 import * as models from 'data/models';
 import { viewDocument } from 'actions/view';
-import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import * as contentTypes from 'data/contentTypes';
 import { Command } from 'editors/document/org/commands/command';
 import { getExpandId, render } from 'editors/document/org/traversal';
@@ -367,19 +366,15 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     };
 
     return (
-      <div className="organization-content">
-        {this.renderActionBar()}
+      <table className="table table-sm">
+        <tbody>
 
-        <table className="table table-sm">
-          <tbody>
+          {render(
+            this.props.model.sequences,
+            isExpanded, renderNode, this.positionsAtLevel)}
 
-            {render(
-              this.props.model.sequences,
-              isExpanded, renderNode, this.positionsAtLevel)}
-
-          </tbody>
-        </table>
-      </div>
+        </tbody>
+      </table>
     );
   }
 
@@ -526,30 +521,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   render() {
-
-    const { canUndo, canRedo, onUndo, onRedo } = this.props;
-    const documentId = this.props.context.documentId;
-
     return (
       <div className="org-editor">
-        <div className="doc-head">
-          <UndoRedoToolbar
-            undoEnabled={canUndo}
-            redoEnabled={canRedo}
-            onUndo={onUndo.bind(this, documentId)}
-            onRedo={onRedo.bind(this, documentId)} />
-
-          <h3>Organization: {this.props.model.title}</h3>
-
-          {this.renderTabs()}
-
-          <div className="active-tab-content">
-            {this.renderActiveTabContent()}
-          </div>
-
-        </div>
-      </div>);
-
+        {this.renderContent()}
+      </div>
+    );
   }
 
 }

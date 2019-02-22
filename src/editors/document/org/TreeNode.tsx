@@ -7,7 +7,6 @@ import { DragHandle } from 'components/common/DragHandle';
 import { DraggableNode } from './DraggableNode';
 import { getExpandId, NodeTypes } from './traversal';
 import { canHandleDrop } from './utils';
-import { EditableCaption } from './EditableCaption';
 import { Caption } from './Caption';
 import { Command } from './commands/command';
 
@@ -99,18 +98,22 @@ export class TreeNode
 
     const hasHiddenChildren =
       <span>
-        <i className="fa fa-caret-right"></i>
+        <i className="toggle fa fa-caret-right"></i>
       </span>;
 
     const hasShownChildren =
       <span>
-        <i className="fa fa-caret-down"></i>
+        <i className="toggle fa fa-caret-down"></i>
       </span>;
 
     const icon = isExpanded ? hasShownChildren : hasHiddenChildren;
 
     const contentType = this.getLabel(this.props.model.contentType);
-    let title;
+
+
+    let titleLabel;
+    let viewableId = null;
+
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
 
       const resource = this.props.context.courseModel.resourcesById.get(
@@ -120,56 +123,32 @@ export class TreeNode
         ? resource.title
         : 'Loading...';
 
-      const resourceIcon = (type: LegacyTypes) => {
-        switch (type) {
-          case LegacyTypes.assessment2:
-            return <i className="fa fa-check" />;
-          case LegacyTypes.workbook_page:
-            return <i className="fa fa-file" />;
-          default:
-            return <i className={'fa fa-question'} />;
-        }
-      };
+      titleLabel = <span>{titleString}</span>;
+      viewableId = this.props.model.resourceref.idref;
 
-      title = (
-        <Caption
-          onViewEdit={() => this.props.onViewEdit(resource.id)}
-          labels={this.props.labels}
-          depth={0}
-          org={this.props.org} context={this.props.context}
-          isHoveredOver={this.state.mouseOver}
-          processCommand={this.props.processCommand}
-          editMode={this.props.editMode}
-          onEdit={this.props.onEdit}
-          model={this.props.model}
-          toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-          {resourceIcon(resource.type as LegacyTypes)}{titleString}
-        </Caption>
-      );
     } else if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
-      title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-        Include</Title>;
+      titleLabel = 'Include';
+      viewableId = this.props.model.idref;
     } else {
-
       const number = this.getAdaptiveNumber();
-
-      title = (
-        <EditableCaption
-          labels={this.props.labels}
-          depth={0}
-          org={this.props.org}
-          context={this.props.context}
-          isHoveredOver={this.state.mouseOver}
-          processCommand={this.props.processCommand}
-          editMode={this.props.editMode}
-          onEdit={this.props.onEdit}
-          model={this.props.model}
-          toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-
-          {icon}{contentType} {number}: {this.props.model.title}
-        </EditableCaption>
-      );
+      titleLabel = <span>{icon}{contentType} {number}: {this.props.model.title}</span>;
+      viewableId = this.props.model.id;
     }
+
+    const title = (
+      <Caption
+        onViewEdit={() => this.props.onViewEdit(viewableId)}
+        depth={0}
+        org={this.props.org} context={this.props.context}
+        isHoveredOver={this.state.mouseOver}
+        processCommand={this.props.processCommand}
+        editMode={this.props.editMode}
+        isSelected={false}
+        model={this.props.model}
+        toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
+        {titleLabel}
+      </Caption>
+    );
 
     const finalDropTarget =
       (indexWithinParent === parentModel.children.size - 1)
@@ -197,7 +176,7 @@ export class TreeNode
               index={indexWithinParent}
               source={model}
               parentModel={parentModel}>
-              <span style={{ marginLeft: (depth * 30) }} />
+              <span style={{ marginLeft: (depth * 20) }} />
               <DragHandle hidden={!editMode || !this.state.mouseOver} />
               {title}
             </DraggableNode>

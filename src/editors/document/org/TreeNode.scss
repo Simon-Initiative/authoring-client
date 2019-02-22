@@ -1,11 +1,5 @@
 .tree-node {
 
-  .caption-btn {
-    i {
-      margin-right: 5px;
-    }
-  }
-
   .content {
     position: relative;
     height: 40px;
@@ -33,24 +27,23 @@
             vertical-align: middle;
             line-height: 40px;
           }
+          .grip {
+            height: 40px;
+          }
+
         }
 
-        .editable-caption, .caption {
+        .caption {
           flex: 1 0 0;
-          margin: 0 10px;
+          margin: 0 0px;
 
           button, span {
             display: inline-block;
             vertical-align: middle;
             line-height: 40px;
             padding: 0px;
-            margin-left: 10px;
+            margin-left: 0px;
 
-            &.remove-btn i {
-              display: inline-block;
-              vertical-align: middle;
-              line-height: 40px;
-            }
           }
         }
       }
