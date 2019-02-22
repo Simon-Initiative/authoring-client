@@ -12,6 +12,7 @@ interface StateProps {
   canUndo: boolean;
   canRedo: boolean;
   course: CourseModel;
+  model: OrganizationModel;
 }
 
 interface DispatchProps {
@@ -30,9 +31,15 @@ interface OwnProps extends AbstractEditorProps<OrganizationModel> {
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   return {
-    canUndo: state.documents.get(ownProps.context.documentId).undoStack.size > 0,
-    canRedo: state.documents.get(ownProps.context.documentId).redoStack.size > 0,
+    // canUndo: state.documents.get(ownProps.context.documentId).undoStack.size > 0,
+    // canRedo: state.documents.get(ownProps.context.documentId).redoStack.size > 0,
+    canUndo: false,
+    canRedo: false,
     course: state.course,
+    model: state.orgs.activeOrg.caseOf({
+      just: d => d.model,
+      nothing: () => null,
+    }),
   };
 };
 

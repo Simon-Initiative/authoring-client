@@ -8,6 +8,7 @@ import { ServerState } from 'reducers/server';
 import { HoverState } from 'reducers/hover';
 import { updateHover } from 'actions/hover';
 import { load, release } from 'actions/document';
+import { load as loadOrg } from 'actions/orgs';
 import * as persistence from 'data/persistence';
 import Main from './Main';
 import { RouterState } from 'reducers/router';
@@ -28,6 +29,8 @@ interface StateProps {
 interface DispatchProps {
   onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
+  onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onReleaseOrg: (documentId: string) => Promise<{}>;
   onSetServerTimeSkew: () => void;
   onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
@@ -63,6 +66,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     onLoad: (courseId: string, documentId: string) => dispatch(load(courseId, documentId)),
     onRelease: (documentId: string) => dispatch(release(documentId)),
+    onLoadOrg: (courseId: string, documentId: string) => dispatch(loadOrg(courseId, documentId)),
+    onReleaseOrg: (documentId: string) => Promise.resolve({}),
     onSetServerTimeSkew: () => dispatch(setServerTimeSkew()),
     onLoadCourse: (courseId: string) => dispatch(loadCourse(courseId)),
     onDispatch: dispatch,

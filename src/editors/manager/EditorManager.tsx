@@ -29,6 +29,7 @@ export interface EditorManagerProps {
   objectives: Immutable.Map<string, LearningObjective>;
   onDispatch: (...args: any[]) => any;
   onSave: (documentId: string, model: models.ContentModel) => any;
+  onSaveOrg: (model: models.OrganizationModel) => any;
 }
 
 export interface EditorManagerState {
@@ -58,9 +59,14 @@ export default class EditorManager
 
   onEdit(model: models.ContentModel) {
 
-    const { onSave, documentId } = this.props;
+    const { onSave, onSaveOrg, documentId } = this.props;
 
-    onSave(documentId, model);
+    if (model.modelType === 'OrganizationModel') {
+      onSaveOrg(model);
+    } else {
+      onSave(documentId, model);
+    }
+
   }
 
   determineBaseUrl(resource: Resource) {

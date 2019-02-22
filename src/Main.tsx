@@ -141,6 +141,8 @@ interface MainProps {
   hover: HoverState;
   onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
+  onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onReleaseOrg: (documentId: string) => Promise<{}>;
   onSetServerTimeSkew: () => void;
   onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
@@ -235,7 +237,8 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   getView(): JSX.Element {
-    const { expanded, user, course, router, onLoad, onRelease, onDispatch } = this.props;
+    const { expanded, user, course, router, onLoad,
+      onLoadOrg, onReleaseOrg, onRelease, onDispatch } = this.props;
 
     switch (router.route) {
       case ROUTE.IMPORT:
@@ -316,6 +319,20 @@ export default class Main extends React.Component<MainProps, MainState> {
                       }
                       if (resources[resourceId] !== undefined) {
                         return this.renderResource(resources[resourceId]);
+                      }
+
+                      const res = c.resources.get(resourceId);
+                      if (res.type === LegacyTypes.organization) {
+                        return (
+                          <DocumentView
+                            onLoad={(docId: string) => onLoadOrg(c.guid, docId)}
+                            onRelease={(docId: string) => onReleaseOrg(docId)}
+                            profile={user.profile}
+                            course={c}
+                            userId={user.userId}
+                            userName={user.user}
+                            documentId={resourceId} />
+                        );
                       }
 
                       return (
