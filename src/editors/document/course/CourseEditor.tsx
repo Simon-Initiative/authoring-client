@@ -557,7 +557,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     return (
       <div className="course-editor" >
         <div className="row info">
-          <div className="col-md-9">
+          <div className="col-md-12">
             <h2>Course Package</h2>
             <div className="infoContain">
               <div className="row">

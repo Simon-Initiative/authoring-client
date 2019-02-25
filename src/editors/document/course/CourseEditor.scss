@@ -3,8 +3,7 @@
 
 .course-editor {
     flex: 1;
-    overflow: auto;
-    padding: 30px 15px 0 15px;
+    padding: 30px 15px;
     margin: 0 20px;
 
     .fa.fa-circle-o-notch.fa-spin.fa-1x.fa-fw {
@@ -20,8 +19,6 @@
     }
 
     h2 {
-        font-size: 20px;
-        font-family: $serif-font;
         padding-bottom: 20px;
     }
 
