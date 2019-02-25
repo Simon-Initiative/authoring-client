@@ -6,19 +6,20 @@ import { Maybe } from 'tsmonad';
 import { map, filter } from 'data/utils/map';
 import { ContentElement } from 'data/content/common/interfaces';
 
-type OrgNode =
+export type OrgNode =
   ct.Sequence | ct.Unit | ct.Module |
   ct.Section |
   ct.Item;
 
-type AnonymousNode =
+export type AnonymousNode =
   ct.Precondition |
   ct.ProgressConstraint |
   ct.Supplement |
   ct.Before |
   ct.Dependency;
 
-type OrgChangeRequest =
+export type OrgChangeRequest =
+  UpdateRootModel |
   UpdateNode |
   AddNode |
   RemoveNode |
@@ -31,29 +32,44 @@ type OrgChangeRequest =
 // org model. Strongly identifiable nodes are nodes that
 // have a unique id (e.g. unit, module, section)
 
-interface UpdateNode {
+export interface UpdateRootModel {
+  type: 'UpdateRootModel';
+  mapper: (model: OrganizationModel) => OrganizationModel;
+}
+
+
+export interface UpdateNode {
   type: 'UpdateNode';
   nodeId: string;
   mapper: (node: OrgNode) => OrgNode;
 }
 
-interface AddNode {
+export interface AddNode {
   type: 'AddNode';
   parentId: string;
   node: OrgNode;
   index: Maybe<number>;
 }
 
-interface RemoveNode {
+export interface RemoveNode {
   type: 'RemoveNode';
   nodeId: string;
 }
 
-interface MoveNode {
+export interface MoveNode {
   type: 'MoveNode';
   node: OrgNode;
   destParentId: string;
   destIndex: number;
+}
+
+
+export function makeUpdateRootModel(
+  mapper: (OrganizationModel) => OrganizationModel): UpdateRootModel {
+  return {
+    type: 'UpdateRootModel',
+    mapper,
+  };
 }
 
 export function makeAddNode(parentId: string, node: OrgNode, index: Maybe<number>): AddNode {
@@ -102,7 +118,7 @@ export function makeUpdateNode(
 // attribute name of the collection that the anonymous node
 // is contained in.
 
-interface SetAnonymousAttribute {
+export interface SetAnonymousAttribute {
   type: 'SetAnonymousAttribute';
   parentId: string;
   previous: AnonymousNode;
@@ -111,14 +127,14 @@ interface SetAnonymousAttribute {
 }
 
 
-interface AddAnonymousNode {
+export interface AddAnonymousNode {
   type: 'AddAnonymousNode';
   parentId: string;
   node: AnonymousNode;
 }
 
 
-interface RemoveAnonymousNode {
+export interface RemoveAnonymousNode {
   type: 'RemoveAnonymousNode';
   parentId: string;
   node: AnonymousNode;
@@ -132,6 +148,9 @@ interface RemoveAnonymousNode {
 export function applyChange(
   model: OrganizationModel, change: OrgChangeRequest): Maybe<OrganizationModel> {
 
+  if (change.type === 'UpdateRootModel') {
+    return updateRootModel(model, change);
+  }
   if (change.type === 'RemoveNode') {
     return removeNode(model, change);
   }
@@ -215,6 +234,13 @@ function addNode(model: OrganizationModel, change: AddNode): Maybe<OrganizationM
 
   const updated = (map(add, (model as any) as ContentElement) as any) as OrganizationModel;
   return succeeded ? Maybe.just(updated) : Maybe.nothing();
+}
+
+
+// Allows updating of the root model. This cannot fail since we always have this model.
+function updateRootModel(
+  model: OrganizationModel, change: UpdateRootModel): Maybe<OrganizationModel> {
+  return Maybe.just(change.mapper(model));
 }
 
 

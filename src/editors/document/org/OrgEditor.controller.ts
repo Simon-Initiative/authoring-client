@@ -25,7 +25,7 @@ interface DispatchProps {
   onEditingEnable: (editable: boolean, documentId: string) => void;
 }
 
-interface OwnProps extends AbstractEditorProps<OrganizationModel> {
+interface OwnProps {
   context: AppContext;
 }
 

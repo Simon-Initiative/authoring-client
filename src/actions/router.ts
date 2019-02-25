@@ -55,36 +55,35 @@ export const getRouteFromPath = (path: string, search: string) => {
 
   const parseCourseResourceIds = (path: string) => {
     const pathParts = parseRootPath(path).split('-');
-    return pathParts.length > 1
-      ? {
-        resourceId: Maybe.just<string>(pathParts[0]),
-        courseId: Maybe.just<string>(pathParts[1]),
-      }
-      : {
-        resourceId: Maybe.nothing<string>(),
-        courseId: Maybe.just<string>(pathParts[1]),
-      };
+    return {
+      resourceId: Maybe.maybe<string>(pathParts[0]),
+      courseId: Maybe.maybe<string>(pathParts[1]),
+      orgId: Maybe.maybe<string>(pathParts[2]),
+    };
   };
 
-  const { route, courseId, resourceId } = (() => {
+  const { route, courseId, resourceId, orgId } = (() => {
     switch (parseRootPath(path).split('-')[0]) {
       case '':
         return {
           route: ROUTE.ROOT,
           courseId: Maybe.nothing<string>(),
           resourceId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'create':
         return {
           route: ROUTE.CREATE,
           courseId: Maybe.nothing<string>(),
           resourceId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'import':
         return {
           route: ROUTE.IMPORT,
           courseId: Maybe.nothing<string>(),
           resourceId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'skills':
         return {
@@ -142,6 +141,7 @@ export const getRouteFromPath = (path: string, search: string) => {
     route,
     courseId,
     resourceId,
+    orgId,
     urlParams,
   });
 };
@@ -156,6 +156,7 @@ export type UpdateRouteAction = {
   search: string,
   courseId: Maybe<string>,
   resourceId: Maybe<string>,
+  orgId: Maybe<string>,
   urlParams: Map<string, string>,
 };
 
@@ -165,6 +166,7 @@ export const updateRoute = (path: string, search: string): UpdateRouteAction => 
     route,
     courseId,
     resourceId,
+    orgId,
     urlParams,
   } = getRouteFromPath(path, search);
 
@@ -175,6 +177,7 @@ export const updateRoute = (path: string, search: string): UpdateRouteAction => 
     search,
     courseId,
     resourceId,
+    orgId,
     urlParams,
   });
 };

@@ -101,12 +101,10 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             template: '!!underscore-template-loader!./index.html',
             inject: false,
             favicon: 'assets/oli-icon.png',
         }),
-        new webpack.HashedModuleIdsPlugin(),
     ]
 };

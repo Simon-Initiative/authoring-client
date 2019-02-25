@@ -4,17 +4,18 @@ import { UserProfile } from 'types/user';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import { configuration } from 'actions/utils/config';
-import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
+import OrgEditor from 'editors/document/org/OrgEditor';
 import { DispatchBasedServices } from 'editors/common/AppServices';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
-import { lookUpByName } from 'editors/manager/registry';
 import { LearningObjective, Skill } from 'data/contentTypes';
+import * as org from 'data/models/utils/org';
 
-import './EditorManager.scss';
+import './OrgEditorManager.scss';
 import { Toast, Severity } from 'components/common/Toast';
+import * as Messages from 'types/messages';
 
-export interface EditorManagerProps {
+export interface OrgEditorManagerProps {
   document: persistence.Document;
   hasFailed: boolean;
   documentId: string;
@@ -28,15 +29,24 @@ export interface EditorManagerProps {
   skills: Immutable.Map<string, Skill>;
   objectives: Immutable.Map<string, LearningObjective>;
   onDispatch: (...args: any[]) => any;
-  onSave: (documentId: string, model: models.ContentModel) => any;
+  onChange: (change: org.OrgChangeRequest) => any;
+  canUndo: boolean;
+  canRedo: boolean;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
+  dismissModal: () => void;
+  displayModal: (c) => void;
+  onUndo: (documentId: string) => void;
+  onRedo: (documentId: string) => void;
+  onEditingEnable: (editable: boolean, documentId: string) => void;
 }
 
-export interface EditorManagerState {
+export interface OrgEditorManagerState {
   waitBufferElapsed: boolean;
 }
 
-export default class EditorManager
-  extends React.PureComponent<EditorManagerProps, EditorManagerState> {
+export default class OrgEditorManager
+  extends React.PureComponent<OrgEditorManagerProps, OrgEditorManagerState> {
 
   waitBufferTimer: any;
 
@@ -56,11 +66,9 @@ export default class EditorManager
       200);
   }
 
-  onEdit(model: models.ContentModel) {
-
-    const { onSave, documentId } = this.props;
-
-    onSave(documentId, model);
+  onEdit(request: org.OrgChangeRequest) {
+    const { onChange } = this.props;
+    onChange(request);
   }
 
   determineBaseUrl(resource: Resource) {
@@ -84,33 +92,33 @@ export default class EditorManager
 
     const courseId = (course as models.CourseModel).guid;
 
-    const childProps: AbstractEditorProps<any> = {
-      model: document.model,
-      expanded: expanded.has(documentId)
-        ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
-        : Maybe.nothing<Immutable.Set<string>>(),
-      context: {
-        documentId,
-        userId,
-        courseId,
-        undoRedoGuid,
-        resourcePath: this.determineBaseUrl((document.model as any).resource),
-        baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
-        courseModel: course,
-        skills: this.props.skills,
-        objectives: this.props.objectives,
-      },
-      dispatch: onDispatch,
-      onEdit: this.onEdit,
-      services: new DispatchBasedServices(
-        onDispatch,
-        course,
-      ),
-      editMode: editingAllowed,
-    };
-
-    const registeredEditor = lookUpByName(document.model.modelType);
-    return React.createElement((registeredEditor.component as any), childProps);
+    return (
+      <OrgEditor
+        {...this.props}
+        model={document.model as models.OrganizationModel}
+        expanded={expanded.has(documentId)
+          ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
+          : Maybe.nothing<Immutable.Set<string>>()}
+        context={{
+          documentId,
+          userId,
+          courseId,
+          undoRedoGuid,
+          resourcePath: this.determineBaseUrl((document.model as any).resource),
+          baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
+          courseModel: course,
+          skills: this.props.skills,
+          objectives: this.props.objectives,
+        }}
+        dispatch={onDispatch}
+        onEdit={this.onEdit}
+        services={new DispatchBasedServices(
+          onDispatch,
+          course,
+        )}
+        editMode={editingAllowed}
+      />
+    );
   }
 
 

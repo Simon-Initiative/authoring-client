@@ -21,7 +21,6 @@ export interface CaptionProps {
   isHoveredOver: boolean;
   isSelected: boolean;
   toggleExpanded: (id) => void;
-  processCommand: (command: Command) => void;
   onViewEdit: () => void;
 }
 

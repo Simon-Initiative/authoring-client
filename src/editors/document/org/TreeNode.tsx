@@ -8,10 +8,9 @@ import { DraggableNode } from './DraggableNode';
 import { getExpandId, NodeTypes } from './traversal';
 import { canHandleDrop } from './utils';
 import { Caption } from './Caption';
-import { Command } from './commands/command';
+import * as org from 'data/models/utils/org';
 
 import './TreeNode.scss';
-import { LegacyTypes } from 'data/types';
 
 export interface TreeNodeProps {
   numberAtLevel: number;      // 1-based position of this node at this level of the tree
@@ -24,11 +23,10 @@ export interface TreeNodeProps {
   isExpanded: boolean;        // Is node expanded or not
   context: AppContext;
   org: models.OrganizationModel;
-  onEdit: (model: NodeTypes) => void;
+  onEdit: (request: org.OrgChangeRequest) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;
   onViewEdit: (id) => void;
-  processCommand: (command: Command) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
@@ -141,7 +139,6 @@ export class TreeNode
         depth={0}
         org={this.props.org} context={this.props.context}
         isHoveredOver={this.state.mouseOver}
-        processCommand={this.props.processCommand}
         editMode={this.props.editMode}
         isSelected={false}
         model={this.props.model}

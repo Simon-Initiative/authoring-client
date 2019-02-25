@@ -1,21 +1,25 @@
 
 import {
-  ORG_REQUESTED, ORG_LOADED, ORG_FAILED, MODEL_UPDATED,
-  OrgFailedAction, OrgLoadedAction, OrgRequestedAction, ModelUpdatedAction,
+  ORG_REQUESTED, ORG_LOADED, ORG_CHANGE_FAILED, MODEL_UPDATED, ORG_CHANGE_SUCCEEDED,
+  OrgChangeSucceededAction,
+  OrgChangeFailedAction, OrgLoadedAction, OrgRequestedAction, ModelUpdatedAction,
 } from 'actions/orgs';
 import { OtherAction } from './utils';
 import { Document } from 'data/persistence';
 import { Maybe } from 'tsmonad';
 
 type ActionTypes =
-  OrgFailedAction | OrgLoadedAction | OrgRequestedAction | ModelUpdatedAction | OtherAction;
+  OrgChangeFailedAction | OrgChangeSucceededAction |
+  OrgLoadedAction | OrgRequestedAction | ModelUpdatedAction | OtherAction;
 
 export type OrgsState = {
   activeOrg: Maybe<Document>,
+  lastChangeSucceeded: boolean,
 };
 
 const initialState = {
   activeOrg: Maybe.nothing<Document>(),
+  lastChangeSucceeded: true,
 };
 
 export const orgs = (
@@ -33,8 +37,10 @@ export const orgs = (
       return state;
     case ORG_LOADED:
       return Object.assign({}, state, { activeOrg: Maybe.just(action.document) });
-    case ORG_FAILED:
-      return state;
+    case ORG_CHANGE_FAILED:
+      return Object.assign({}, state, { lastChangeSucceeded: false });
+    case ORG_CHANGE_SUCCEEDED:
+      return Object.assign({}, state, { lastChangeSucceeded: true });
     default:
       return state;
   }

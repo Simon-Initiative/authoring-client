@@ -1,19 +1,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import {
-  AbstractEditor,
-  AbstractEditorProps,
-  AbstractEditorState,
-} from 'editors/document/common/AbstractEditor';
 import * as models from 'data/models';
 import { viewDocument } from 'actions/view';
 import * as contentTypes from 'data/contentTypes';
-import { Command } from 'editors/document/org/commands/command';
 import { getExpandId, render } from 'editors/document/org/traversal';
 import { collapseNodes, expandNodes } from 'actions/expand';
 import { SourceNodeType } from 'editors/content/org/drag/utils';
-import { insertNode, removeNode, updateNode } from 'editors/document/org/utils';
 import { TreeNode } from 'editors/document/org/TreeNode';
 import { Actions } from 'editors/document/org/Actions.controller';
 import { Details } from 'editors/document/org/Details';
@@ -23,6 +16,11 @@ import { duplicateOrganization } from 'actions/models';
 import { containsUnitsOnly } from './utils';
 import { ModalMessage } from 'utils/ModalMessage';
 import * as Messages from 'types/messages';
+import * as org from 'data/models/utils/org';
+
+import { AppServices } from 'editors/common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
+import { Maybe } from 'tsmonad';
 
 import './OrgEditor.scss';
 
@@ -147,8 +145,15 @@ function identifyNewNodes(last: string[], current: string[]): string[] {
   return current.filter(c => lastMap[c] === undefined);
 }
 
-export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
-  onUpdateTitle: (title: Title) => void;
+export interface OrgEditorProps {
+
+  model: models.OrganizationModel;
+  onEdit: (request: org.OrgChangeRequest) => void;
+  services: AppServices;
+  context: AppContext;
+  editMode: boolean;
+  dispatch: any;
+  expanded: Maybe<Immutable.Set<string>>;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
   dismissModal: () => void;
@@ -168,13 +173,14 @@ const enum TABS {
   Actions = 3,
 }
 
-interface OrgEditorState extends AbstractEditorState {
+interface OrgEditorState {
   currentTab: TABS;
   highlightedNodes: Immutable.Set<string>;
+  undoStackSize: number;
+  redoStackSize: number;
 }
 
-class OrgEditor extends AbstractEditor<models.OrganizationModel,
-  OrgEditorProps,
+class OrgEditor extends React.Component<OrgEditorProps,
   OrgEditorState>  {
 
   unitsMessageDisplayed: boolean;
@@ -185,10 +191,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   parentMap: Object;
 
   constructor(props: OrgEditorProps) {
-    super(props, ({
-      currentTab: TABS.Content,
-      highlightedNodes: Immutable.Set<string>(),
-    } as OrgEditorState));
+    super(props);
 
     this.unitsMessageDisplayed = false;
     this.onLabelsEdit = this.onLabelsEdit.bind(this);
@@ -209,6 +212,13 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     if (hasMissingResource(props.model, props.context.courseModel)) {
       props.services.refreshCourse(props.context.courseId);
     }
+
+    this.state = {
+      currentTab: TABS.Content,
+      highlightedNodes: Immutable.Set<string>(),
+      undoStackSize: 0,
+      redoStackSize: 0,
+    };
 
     this.updateUnitsMessage(props);
   }
@@ -244,11 +254,10 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       }
     }
 
-    const removed = removeNode(this.props.model, (sourceNode as any).guid);
-    const inserted = insertNode(removed, targetModel.guid, sourceNode, adjustedIndex);
+    const request = org.makeMoveNode(sourceNode as org.OrgNode, targetModel.id, adjustedIndex);
+    this.props.onEdit(request);
 
     this.highlightNode(sourceNode as any);
-    this.handleEdit(inserted);
 
   }
 
@@ -264,18 +273,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     });
 
     this.props.dispatch(action(this.props.context.documentId, [guid]));
-  }
-
-  processCommand(model, command: Command) {
-    const reEnable = () => this.props.onEditingEnable(true, this.props.context.documentId);
-    this.props.onEditingEnable(false, this.props.context.documentId);
-    const delay = () =>
-      command.execute(this.props.model, model, this.props.context, this.props.services)
-        .then(org => this.handleEdit(org))
-        .then(reEnable)
-        .catch(reEnable);
-
-    setImmediate(delay);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -334,8 +331,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       .then(guid => this.props.dispatch(viewDocument(guid, this.props.context.courseId)));
   }
 
-  onNodeEdit(node) {
-    this.handleEdit(updateNode(this.props.model, node));
+  onNodeEdit(request: org.OrgChangeRequest) {
+    this.props.onEdit(request);
   }
 
   renderContent() {
@@ -357,7 +354,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         parentModel={parent}
         onEdit={this.onNodeEdit}
         editMode={this.props.editMode}
-        processCommand={this.processCommand.bind(this, node)}
         toggleExpanded={this.toggleExpanded.bind(this)}
         isExpanded={isExpanded(getExpandId(node))}
         onReposition={this.onReposition.bind(this)}
@@ -395,13 +391,15 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         <Details
           editMode={this.props.editMode}
           model={this.props.model}
-          onEdit={model => this.handleEdit(model)} />
+          onEdit={this.props.onEdit}
+        />
       </div>
     );
   }
 
   onLabelsEdit(labels) {
-    this.handleEdit(this.props.model.with({ labels }));
+    const update = org.makeUpdateRootModel(m => m.with({ labels }));
+    this.props.onEdit(update);
   }
 
   renderLabels() {
@@ -446,12 +444,17 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   onAddSequence() {
-    const s: contentTypes.Sequence = new contentTypes.Sequence()
-      .with({ title: 'New ' + this.props.model.labels.sequence });
-    const sequences = this.props.model.sequences
-      .with({ children: this.props.model.sequences.children.set(s.guid, s) });
 
-    this.handleEdit(this.props.model.with({ sequences }));
+    const mapper = (model) => {
+      const s: contentTypes.Sequence = new contentTypes.Sequence()
+        .with({ title: 'New ' + model.labels.sequence });
+      const sequences = model.sequences
+        .with({ children: model.sequences.children.set(s.guid, s) });
+
+      return model.with({ sequences });
+    };
+
+    this.props.onEdit(org.makeUpdateRootModel(mapper));
   }
 
   onExpand() {

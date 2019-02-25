@@ -75,7 +75,7 @@ it('tests setting an attr', () => {
   // Tests setting the title of a unit
   expect((model.sequences.children.first() as contentTypes.Sequence).children.size).toBe(1);
   const result = org.applyChange(
-    model, org.makeUpdateNode('lesson1', e => e.with({ title: 'ok' })));
+    model, org.makeUpdateNode('lesson1', (e: any) => e.with({ title: 'ok' })));
 
   result.caseOf({
     just: (m) => {

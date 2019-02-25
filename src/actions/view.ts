@@ -53,7 +53,7 @@ export type ViewActions = {
   viewCreateCourse: () => void,
   viewImportCourse: () => void,
   viewAllCourses: () => void,
-  viewDocument: (documentId: string, courseId: string) => void,
+  viewDocument: (documentId: string, courseId: string, orgId?: string) => void,
   viewSkills: (courseId: string) => void,
   viewObjectives: (courseId: string) => void,
   viewOrganizations: (courseId: string) => void,
@@ -74,9 +74,13 @@ export function viewImportCourse() {
   return transitionApplicationView.bind(undefined, '/import');
 }
 
-export function viewDocument(documentId: string, courseId: string) {
+export function viewDocument(documentId: string, courseId: string, orgId?: string) {
   return transitionCourseView
-    .bind(undefined, '/' + documentId + '-' + courseId, courseId);
+    .bind(
+      undefined,
+      '/' + documentId + '-' + courseId + (orgId ? '-' + orgId : ''),
+      courseId,
+    );
 }
 
 export function viewSkills(courseId: string) {
