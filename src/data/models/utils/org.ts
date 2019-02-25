@@ -19,7 +19,7 @@ type AnonymousNode =
   ct.Dependency;
 
 type OrgChangeRequest =
-  SetAttribute |
+  UpdateNode |
   AddNode |
   RemoveNode |
   MoveNode |
@@ -31,11 +31,10 @@ type OrgChangeRequest =
 // org model. Strongly identifiable nodes are nodes that
 // have a unique id (e.g. unit, module, section)
 
-interface SetAttribute {
-  type: 'SetAttribute';
+interface UpdateNode {
+  type: 'UpdateNode';
   nodeId: string;
-  attributeName: string;
-  value: any;
+  mapper: (node: OrgNode) => OrgNode;
 }
 
 interface AddNode {
@@ -85,15 +84,13 @@ export function makeMoveNode(
   };
 }
 
-export function makeSetAttribute(
+export function makeUpdateNode(
   nodeId: string,
-  attributeName: string,
-  value: any): SetAttribute {
+  mapper: (node: OrgNode) => OrgNode): UpdateNode {
   return {
-    type: 'SetAttribute',
+    type: 'UpdateNode',
     nodeId,
-    attributeName,
-    value,
+    mapper,
   };
 }
 
@@ -144,8 +141,8 @@ export function applyChange(
   if (change.type === 'MoveNode') {
     return moveNode(model, change);
   }
-  if (change.type === 'SetAttribute') {
-    return setAttribute(model, change);
+  if (change.type === 'UpdateNode') {
+    return updateNode(model, change);
   }
   if (change.type === 'AddAnonymousNode') {
 
@@ -221,23 +218,24 @@ function addNode(model: OrganizationModel, change: AddNode): Maybe<OrganizationM
 }
 
 
-// Sets an attribute of a strongly identifiable node. Can fail if
+// Allows updating of a strongly identifiable node. Can fail if
 // the node cannot be found.
-function setAttribute(model: OrganizationModel, change: SetAttribute): Maybe<OrganizationModel> {
+function updateNode(model: OrganizationModel, change: UpdateNode): Maybe<OrganizationModel> {
 
   // Assume that the operation will fail
   let succeeded = false;
 
-  const setAttr = (e) => {
+  const wrappedMapper = (e) => {
     const c = e as any;
     if (c.id !== undefined && c.id === change.nodeId) {
       succeeded = true;
-      return c.with({ [change.attributeName]: change.value });
+      return change.mapper(e);
     }
     return e;
   };
 
-  const updated = (map(setAttr, (model as any) as ContentElement) as any) as OrganizationModel;
+  const updated
+    = (map(wrappedMapper, (model as any) as ContentElement) as any) as OrganizationModel;
   return succeeded ? Maybe.just(updated) : Maybe.nothing();
 }
 

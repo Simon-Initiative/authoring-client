@@ -67,14 +67,15 @@ it('tests removing nodes', () => {
 
 });
 
-it('tests settings an attr', () => {
+it('tests setting an attr', () => {
 
   const orgData = require('./sample.json');
   const model = OrganizationModel.fromPersistence(orgData, () => null);
 
   // Tests setting the title of a unit
   expect((model.sequences.children.first() as contentTypes.Sequence).children.size).toBe(1);
-  const result = org.applyChange(model, org.makeSetAttribute('lesson1', 'title', 'ok'));
+  const result = org.applyChange(
+    model, org.makeUpdateNode('lesson1', e => e.with({ title: 'ok' })));
 
   result.caseOf({
     just: (m) => {
