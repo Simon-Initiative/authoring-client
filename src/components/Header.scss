@@ -59,12 +59,11 @@
   }
 
   .header-logo {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
   }
 
   .header-content {
-    flex: 1 1 auto;
-    position: relative;/* need this to position inner content */
+
   }
 
   .header-logout {

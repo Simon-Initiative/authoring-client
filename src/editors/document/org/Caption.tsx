@@ -2,9 +2,6 @@ import * as React from 'react';
 import * as t from '../../../data/contentTypes';
 import { AppContext } from '../../common/AppContext';
 import * as models from '../../../data/models';
-import { getExpandId } from './traversal';
-import { Command } from './commands/command';
-import { Remove } from './Remove';
 
 import './Caption.scss';
 
@@ -14,17 +11,14 @@ export interface Caption {
 }
 
 export interface CaptionProps {
-  labels: t.Labels;
-  model: t.Item;
+  model: t.Sequence | t.Unit | t.Module | t.Section | t.Include | t.Item;
   org: models.OrganizationModel;
   context: AppContext;
   depth: number;
   editMode: boolean;
   isHoveredOver: boolean;
-  onEdit: (model: t.Sequence | t.Unit | t.Module | t.Section) => void;
-  toggleExpanded: (id) => void;
-  processCommand: (command: Command) => void;
-  onViewEdit: () => void;
+  isSelected: boolean;
+  onClick: () => void;
 }
 
 export interface CaptionState {
@@ -48,31 +42,18 @@ export class Caption
       return 'Resource';
     }
 
-    return this.props.labels[contentType.toLowerCase()];
+    return this.props.org.labels[contentType.toLowerCase()];
   }
 
-  onClick(model) {
-    this.props.toggleExpanded(getExpandId(model));
-    this.props.onViewEdit();
+  onClick() {
+    this.props.onClick();
   }
 
   render(): JSX.Element {
 
-    const { model } = this.props;
-
-    const buttons = this.props.isHoveredOver
-      ? [<Remove key="remove" editMode={this.props.editMode}
-          processCommand={this.props.processCommand} />]
-      : null;
     return (
-      <div className="caption">
-        <button
-          className="caption-btn btn btn-link"
-          onClick={() => this.onClick(model)}
-          type="button">{this.props.children}
-        </button>
-
-        {buttons}
+      <div className="caption" onClick={this.onClick}>
+        {this.props.children}
       </div>
     );
 

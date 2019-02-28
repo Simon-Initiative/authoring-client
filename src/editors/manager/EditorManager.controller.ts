@@ -34,6 +34,7 @@ interface OwnProps {
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   const { expanded, skills, objectives, documents, course } = state;
+
   const ed = documents.get(ownProps.documentId);
 
   let document = null;

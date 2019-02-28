@@ -5,16 +5,15 @@ import * as models from '../../../data/models';
 import { renderDropTarget } from '../../content/org/drag/utils';
 import { DragHandle } from 'components/common/DragHandle';
 import { DraggableNode } from './DraggableNode';
-import { getExpandId, NodeTypes } from './traversal';
+import { NodeTypes } from './traversal';
 import { canHandleDrop } from './utils';
-import { EditableCaption } from './EditableCaption';
 import { Caption } from './Caption';
-import { Command } from './commands/command';
+import * as org from 'data/models/utils/org';
 
 import './TreeNode.scss';
-import { LegacyTypes } from 'data/types';
 
 export interface TreeNodeProps {
+  isSelected: boolean;
   numberAtLevel: number;      // 1-based position of this node at this level of the tree
   highlighted: boolean;       // Whether the node is highlighted or not
   labels: contentTypes.Labels; // Current state of custom labels
@@ -25,11 +24,9 @@ export interface TreeNodeProps {
   isExpanded: boolean;        // Is node expanded or not
   context: AppContext;
   org: models.OrganizationModel;
-  onEdit: (model: NodeTypes) => void;
+  onEdit: (request: org.OrgChangeRequest) => void;
   editMode: boolean;
-  toggleExpanded: (id) => void;
-  onViewEdit: (id) => void;
-  processCommand: (command: Command) => void;
+  onClick: (model: NodeTypes) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
@@ -94,23 +91,26 @@ export class TreeNode
 
   render(): JSX.Element {
 
-    const { model, parentModel, indexWithinParent,
+    const { model, parentModel, indexWithinParent, isSelected, highlighted,
       depth, editMode, onReposition, isExpanded } = this.props;
 
     const hasHiddenChildren =
       <span>
-        <i className="fa fa-caret-right"></i>
+        <i className="toggle fa fa-caret-right"></i>
       </span>;
 
     const hasShownChildren =
       <span>
-        <i className="fa fa-caret-down"></i>
+        <i className="toggle fa fa-caret-down"></i>
       </span>;
 
     const icon = isExpanded ? hasShownChildren : hasHiddenChildren;
 
     const contentType = this.getLabel(this.props.model.contentType);
-    let title;
+
+
+    let titleLabel;
+
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
 
       const resource = this.props.context.courseModel.resourcesById.get(
@@ -120,56 +120,27 @@ export class TreeNode
         ? resource.title
         : 'Loading...';
 
-      const resourceIcon = (type: LegacyTypes) => {
-        switch (type) {
-          case LegacyTypes.assessment2:
-            return <i className="fa fa-check" />;
-          case LegacyTypes.workbook_page:
-            return <i className="fa fa-file" />;
-          default:
-            return <i className={'fa fa-question'} />;
-        }
-      };
+      titleLabel = <span>{titleString}</span>;
 
-      title = (
-        <Caption
-          onViewEdit={() => this.props.onViewEdit(resource.id)}
-          labels={this.props.labels}
-          depth={0}
-          org={this.props.org} context={this.props.context}
-          isHoveredOver={this.state.mouseOver}
-          processCommand={this.props.processCommand}
-          editMode={this.props.editMode}
-          onEdit={this.props.onEdit}
-          model={this.props.model}
-          toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-          {resourceIcon(resource.type as LegacyTypes)}{titleString}
-        </Caption>
-      );
     } else if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
-      title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-        Include</Title>;
+      titleLabel = 'Include';
     } else {
-
       const number = this.getAdaptiveNumber();
-
-      title = (
-        <EditableCaption
-          labels={this.props.labels}
-          depth={0}
-          org={this.props.org}
-          context={this.props.context}
-          isHoveredOver={this.state.mouseOver}
-          processCommand={this.props.processCommand}
-          editMode={this.props.editMode}
-          onEdit={this.props.onEdit}
-          model={this.props.model}
-          toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-
-          {icon}{contentType} {number}: {this.props.model.title}
-        </EditableCaption>
-      );
+      titleLabel = <span>{icon}{contentType} {number}: {this.props.model.title}</span>;
     }
+
+    const title = (
+      <Caption
+        onClick={() => this.props.onClick(this.props.model)}
+        depth={0}
+        org={this.props.org} context={this.props.context}
+        isHoveredOver={this.state.mouseOver}
+        editMode={this.props.editMode}
+        isSelected={this.props.isSelected}
+        model={this.props.model}>
+        {titleLabel}
+      </Caption>
+    );
 
     const finalDropTarget =
       (indexWithinParent === parentModel.children.size - 1)
@@ -180,7 +151,7 @@ export class TreeNode
 
     return (
       <tr
-        className={`tree-node ${this.props.highlighted ? 'table-info' : ''}`}
+        className={`tree-node ${highlighted ? 'table-info' : ''} ${isSelected ? 'selected' : ''}`}
         key={model.guid}
         onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}>
         <td className="content">
@@ -197,7 +168,7 @@ export class TreeNode
               index={indexWithinParent}
               source={model}
               parentModel={parentModel}>
-              <span style={{ marginLeft: (depth * 30) }} />
+              <span style={{ marginLeft: (depth * 20) }} />
               <DragHandle hidden={!editMode || !this.state.mouseOver} />
               {title}
             </DraggableNode>

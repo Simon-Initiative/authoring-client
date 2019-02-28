@@ -35,6 +35,7 @@ export {
   listenToDocument,
   createDocument,
   persistDocument,
+  persistRevisionBasedDocument,
 } from './persistence/document';
 
 export {
