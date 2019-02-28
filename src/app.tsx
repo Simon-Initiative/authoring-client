@@ -54,7 +54,7 @@ Available Commands:
 };
 
 const logger = createLogger({
-  predicate: () => reduxLoggingEnabled,
+  predicate: () => true,
 });
 
 const middleware = nodeEnv === 'production'

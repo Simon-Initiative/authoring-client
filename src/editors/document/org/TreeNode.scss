@@ -1,10 +1,12 @@
-.tree-node {
+@import 'oli/colors';
 
-  .caption-btn {
-    i {
-      margin-right: 5px;
-    }
-  }
+.selected {
+  background: $selection;
+  border-color: $selection;
+  color: $white;
+}
+
+.tree-node {
 
   .content {
     position: relative;
@@ -33,24 +35,23 @@
             vertical-align: middle;
             line-height: 40px;
           }
+          .grip {
+            height: 40px;
+          }
+
         }
 
-        .editable-caption, .caption {
+        .caption {
           flex: 1 0 0;
-          margin: 0 10px;
+          margin: 0 0px;
 
           button, span {
             display: inline-block;
             vertical-align: middle;
             line-height: 40px;
             padding: 0px;
-            margin-left: 10px;
+            margin-left: 0px;
 
-            &.remove-btn i {
-              display: inline-block;
-              vertical-align: middle;
-              line-height: 40px;
-            }
           }
         }
       }

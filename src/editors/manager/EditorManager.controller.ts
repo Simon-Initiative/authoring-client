@@ -2,11 +2,10 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import { Document } from 'data/persistence';
 import EditorManager from './EditorManager';
-import { ContentModel, OrganizationModel } from 'data/models';
+import { ContentModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
 import { save } from 'actions/document';
-import { save as saveOrg } from 'actions/orgs';
 import { State } from 'reducers';
 
 interface StateProps {
@@ -21,7 +20,6 @@ interface StateProps {
 
 interface DispatchProps {
   onSave: (documentId: string, model: ContentModel) => any;
-  onSaveOrg: (model: OrganizationModel) => any;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -35,7 +33,7 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { expanded, skills, objectives, documents, course, orgs } = state;
+  const { expanded, skills, objectives, documents, course } = state;
 
   const ed = documents.get(ownProps.documentId);
 
@@ -49,14 +47,6 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     undoRedoGuid = ed.undoRedoGuid;
     editingAllowed = ed.editingAllowed && course.editable;
     hasFailed = ed.hasFailed;
-  } else {
-    document = orgs.activeOrg.caseOf({
-      just: o => o,
-      nothing: () => null,
-    });
-    undoRedoGuid = '';
-    editingAllowed = course.editable;
-    hasFailed = false;
   }
 
   return {
@@ -74,9 +64,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     onSave: (documentId: string, model: ContentModel) => {
       dispatch(save(documentId, model));
-    },
-    onSaveOrg: (model: OrganizationModel) => {
-      dispatch(saveOrg(model));
     },
     onDispatch: dispatch,
   };

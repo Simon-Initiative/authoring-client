@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as models from 'data/models';
 import { TextInput } from 'editors/content/common/TextInput';
 import { Maybe } from 'tsmonad';
+import * as org from 'data/models/utils/org';
 
 export interface Details {
 
@@ -10,7 +11,7 @@ export interface Details {
 export interface DetailsProps {
   model: models.OrganizationModel;
   editMode: boolean;
-  onEdit: (model: models.OrganizationModel) => void;
+  onEdit: (request: org.OrgChangeRequest) => void;
 }
 
 export interface DetailsState {
@@ -32,24 +33,25 @@ export class Details
 
   onTitleEdit(title: string) {
     const resource = this.props.model.resource.with({ title });
-    this.props.onEdit(this.props.model.with({ title, resource }));
+    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ title, resource })));
   }
 
   onAudienceEdit(audience: string) {
-    this.props.onEdit(this.props.model.with({ audience }));
+    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ audience })));
   }
 
   onDescEdit(description: string) {
-    this.props.onEdit(this.props.model.with({ description }));
+    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ description })));
   }
 
   onVersionEdit(version: string) {
-    this.props.onEdit(this.props.model.with({ version }));
+    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ version })));
   }
 
   onProductEdit(product: string) {
     const spacesStripped = product.replace(/\s+/g, '');
-    this.props.onEdit(this.props.model.with({ product: Maybe.just<string>(spacesStripped) }));
+    this.props.onEdit(org.makeUpdateRootModel(
+      m => m.with({ product: Maybe.just<string>(spacesStripped) })));
   }
 
   render() {
@@ -63,7 +65,7 @@ export class Details
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.title}
-              onEdit={this.onTitleEdit} type="text"/>
+              onEdit={this.onTitleEdit} type="text" />
           </div>
         </div>
         <div className="form-group row">
@@ -71,7 +73,7 @@ export class Details
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.description}
-              onEdit={this.onDescEdit} type="text"/>
+              onEdit={this.onDescEdit} type="text" />
           </div>
         </div>
         <div className="form-group row">
@@ -79,7 +81,7 @@ export class Details
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.audience}
-              onEdit={this.onAudienceEdit} type="text"/>
+              onEdit={this.onAudienceEdit} type="text" />
           </div>
         </div>
         <div className="form-group row">
@@ -87,7 +89,7 @@ export class Details
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.version}
-              onEdit={this.onVersionEdit} type="text"/>
+              onEdit={this.onVersionEdit} type="text" />
           </div>
         </div>
         <div className="form-group row">
@@ -95,7 +97,7 @@ export class Details
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={product}
-              onEdit={this.onProductEdit} type="text"/>
+              onEdit={this.onProductEdit} type="text" />
           </div>
         </div>
       </div>

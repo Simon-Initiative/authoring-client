@@ -4,17 +4,18 @@ import { UserProfile } from 'types/user';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import { configuration } from 'actions/utils/config';
-import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
+import OrgEditor from 'editors/document/org/OrgEditor';
 import { DispatchBasedServices } from 'editors/common/AppServices';
 import { Resource } from 'data/content/resource';
-import { Maybe } from 'tsmonad';
-import { lookUpByName } from 'editors/manager/registry';
 import { LearningObjective, Skill } from 'data/contentTypes';
+import * as org from 'data/models/utils/org';
+import { Maybe } from 'tsmonad';
+import { NavigationItem } from 'types/navigation';
 
-import './EditorManager.scss';
-import { Toast, Severity } from 'components/common/Toast';
+import './OrgEditorManager.scss';
+import * as Messages from 'types/messages';
 
-export interface EditorManagerProps {
+export interface OrgEditorManagerProps {
   document: persistence.Document;
   hasFailed: boolean;
   documentId: string;
@@ -28,15 +29,25 @@ export interface EditorManagerProps {
   skills: Immutable.Map<string, Skill>;
   objectives: Immutable.Map<string, LearningObjective>;
   onDispatch: (...args: any[]) => any;
-  onSave: (documentId: string, model: models.ContentModel) => any;
+  onChange: (change: org.OrgChangeRequest) => any;
+  canUndo: boolean;
+  canRedo: boolean;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
+  dismissModal: () => void;
+  displayModal: (c) => void;
+  onUndo: (documentId: string) => void;
+  onRedo: (documentId: string) => void;
+  onEditingEnable: (editable: boolean, documentId: string) => void;
+  selectedItem: Maybe<NavigationItem>;
 }
 
-export interface EditorManagerState {
+export interface OrgEditorManagerState {
   waitBufferElapsed: boolean;
 }
 
-export default class EditorManager
-  extends React.PureComponent<EditorManagerProps, EditorManagerState> {
+export default class OrgEditorManager
+  extends React.PureComponent<OrgEditorManagerProps, OrgEditorManagerState> {
 
   waitBufferTimer: any;
 
@@ -56,11 +67,9 @@ export default class EditorManager
       200);
   }
 
-  onEdit(model: models.ContentModel) {
-
-    const { onSave, documentId } = this.props;
-
-    onSave(documentId, model);
+  onEdit(request: org.OrgChangeRequest) {
+    const { onChange } = this.props;
+    onChange(request);
   }
 
   determineBaseUrl(resource: Resource) {
@@ -84,48 +93,42 @@ export default class EditorManager
 
     const courseId = (course as models.CourseModel).guid;
 
-    const childProps: AbstractEditorProps<any> = {
-      model: document.model,
-      expanded: expanded.has(documentId)
-        ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
-        : Maybe.nothing<Immutable.Set<string>>(),
-      context: {
-        documentId,
-        userId,
-        courseId,
-        undoRedoGuid,
-        resourcePath: this.determineBaseUrl((document.model as any).resource),
-        baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
-        courseModel: course,
-        skills: this.props.skills,
-        objectives: this.props.objectives,
-      },
-      dispatch: onDispatch,
-      onEdit: this.onEdit,
-      services: new DispatchBasedServices(
-        onDispatch,
-        course,
-      ),
-      editMode: editingAllowed,
-    };
-
-    const registeredEditor = lookUpByName(document.model.modelType);
-    return React.createElement((registeredEditor.component as any), childProps);
+    return (
+      <OrgEditor
+        {...this.props}
+        selectedItem={this.props.selectedItem}
+        model={document.model as models.OrganizationModel}
+        expanded={expanded.has(documentId)
+          ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
+          : Maybe.nothing<Immutable.Set<string>>()}
+        context={{
+          documentId,
+          userId,
+          courseId,
+          undoRedoGuid,
+          resourcePath: this.determineBaseUrl((document.model as any).resource),
+          baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
+          courseModel: course,
+          skills: this.props.skills,
+          objectives: this.props.objectives,
+        }}
+        dispatch={onDispatch}
+        onEdit={this.onEdit}
+        services={new DispatchBasedServices(
+          onDispatch,
+          course,
+        )}
+        editMode={editingAllowed}
+      />
+    );
   }
 
 
   renderLoading() {
     const waitingIcon = <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />;
-    const waitingHeading = 'Please wait';
-    const waitingContent = <p>We're loading the course material.</p>;
     return (
       <div className="waiting-notification scale-in-center">
-        <Toast
-          style={{ width: 600 }}
-          icon={waitingIcon}
-          heading={waitingHeading}
-          content={waitingContent}
-          severity={Severity.Waiting} />
+        {waitingIcon}
       </div>
     );
   }
@@ -148,7 +151,7 @@ export default class EditorManager
     }
 
     return (
-      <div className="editor-manager">
+      <div className="org-editor-manager">
         {component}
       </div>
     );

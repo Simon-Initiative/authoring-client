@@ -1,21 +1,33 @@
 
 import {
-  ORG_REQUESTED, ORG_LOADED, ORG_FAILED, MODEL_UPDATED,
-  OrgFailedAction, OrgLoadedAction, OrgRequestedAction, ModelUpdatedAction,
+  ORG_REQUESTED, ORG_LOADED, ORG_CHANGE_FAILED, MODEL_UPDATED,
+  ORG_CHANGE_SUCCEEDED, CHANGE_SELECTED_ITEM,
+  ChangeSelectedItemAction,
+  OrgChangeSucceededAction,
+  OrgChangeFailedAction, OrgLoadedAction, OrgRequestedAction, ModelUpdatedAction,
 } from 'actions/orgs';
 import { OtherAction } from './utils';
 import { Document } from 'data/persistence';
 import { Maybe } from 'tsmonad';
+import { NavigationItem, makePackageOverview } from 'types/navigation';
 
 type ActionTypes =
-  OrgFailedAction | OrgLoadedAction | OrgRequestedAction | ModelUpdatedAction | OtherAction;
+  OrgChangeFailedAction | OrgChangeSucceededAction |
+  OrgLoadedAction | OrgRequestedAction | ModelUpdatedAction |
+  ChangeSelectedItemAction | OtherAction;
 
 export type OrgsState = {
   activeOrg: Maybe<Document>,
+  lastChangeSucceeded: boolean,
+  documentId: Maybe<string>,
+  selectedItem: NavigationItem,
 };
 
 const initialState = {
   activeOrg: Maybe.nothing<Document>(),
+  lastChangeSucceeded: true,
+  documentId: Maybe.nothing<string>(),
+  selectedItem: makePackageOverview(),
 };
 
 export const orgs = (
@@ -23,6 +35,8 @@ export const orgs = (
   action: ActionTypes,
 ): OrgsState => {
   switch (action.type) {
+    case CHANGE_SELECTED_ITEM:
+      return Object.assign({}, state, { selectedItem: action.selectedItem });
     case MODEL_UPDATED:
       const activeOrg = state.activeOrg.caseOf({
         just: d => Maybe.just(d.with({ model: action.model })),
@@ -30,11 +44,13 @@ export const orgs = (
       });
       return Object.assign({}, state, { activeOrg });
     case ORG_REQUESTED:
-      return state;
+      return Object.assign({}, state, { documentId: Maybe.just(action.orgId) });
     case ORG_LOADED:
       return Object.assign({}, state, { activeOrg: Maybe.just(action.document) });
-    case ORG_FAILED:
-      return state;
+    case ORG_CHANGE_FAILED:
+      return Object.assign({}, state, { lastChangeSucceeded: false });
+    case ORG_CHANGE_SUCCEEDED:
+      return Object.assign({}, state, { lastChangeSucceeded: true });
     default:
       return state;
   }

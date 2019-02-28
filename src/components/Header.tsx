@@ -4,6 +4,8 @@ import { CourseModel } from 'data/models';
 import { UserState } from 'reducers/user';
 import { Maybe } from 'tsmonad';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { buildFeedbackFromCurrent } from 'utils/feedback';
+import { getVersion } from 'utils/buildinfo';
 
 import './Header.scss';
 
@@ -46,10 +48,11 @@ const Menu: React.StatelessComponent<MenuProps> = ({
 }) => (
     <div className="dropdown show header-dropdown">
       <a className="header-link dropdown-toggle" href="#"
+        target="_blank"
         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         {label}
       </a>
-      <div className="dropdown-menu">
+      <div className="dropdown-menu dropdown-menu-right">
         {children}
       </div>
     </div>
@@ -57,16 +60,15 @@ const Menu: React.StatelessComponent<MenuProps> = ({
 
 
 type MenuItemProps = {
-  action: any,
+  url: string,
   children: any,
 };
 
 const MenuItem: React.StatelessComponent<MenuItemProps> = ({
-  action,
+  url,
   children,
 }) => (
-    <a className="dropdown-item" href="#"
-      onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
+    <a className="dropdown-item" href={url}>{children}</a>
   );
 
 
@@ -81,37 +83,26 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     this.timer = null;
   }
 
-  renderPackageActions() {
+  renderAbout() {
 
-    const v = this.props.viewActions;
-    const id = this.props.course.guid;
+    const name = this.props.user.profile.username;
+    const email = this.props.user.profile.email;
+    const formUrl = buildFeedbackFromCurrent(name, email);
+    const QUICK_START_GUIDE_URL
+      = 'https://docs.google.com/document/d/1B_AQpFRn2zue6-'
+      + 'nW6h8z6bOGfHWYqAjI7WCZ-WQMrf4/edit?usp=sharing';
 
     return (
       <React.Fragment>
-        <a className="header-link course-link" href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            v.viewDocument(id, id);
-          }}>{this.props.course.title}</a>
-
-        <Link action={v.viewObjectives.bind(undefined, id)}>Objectives</Link>
-        <Link action={v.viewOrganizations.bind(undefined, id)}>Organizations</Link>
-        <Link action={v.viewPages.bind(undefined, id)}>Pages</Link>
-        <Menu label="Assessments">
-          <MenuItem action={v.viewFormativeAssessments.bind(undefined, id)}>
-            Formative
+        <Menu label="About">
+          <h6 className="dropdown-header">Course Author v{getVersion()}</h6>
+          <MenuItem url={QUICK_START_GUIDE_URL}>
+            Quick Start Guide
           </MenuItem>
-          <MenuItem action={v.viewSummativeAssessments.bind(undefined, id)}>
-            Summative
-          </MenuItem>
-          <MenuItem action={v.viewFeedbackAssessments.bind(undefined, id)}>
-            Surveys
-          </MenuItem>
-          <MenuItem action={v.viewPools.bind(undefined, id)}>
-            Question Pools
+          <MenuItem url={formUrl}>
+            Help / Feedback
           </MenuItem>
         </Menu>
-
       </React.Fragment>
     );
   }
@@ -138,10 +129,6 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     }
   }
 
-  renderApplicationLabel() {
-    return <span>OLI Course Authoring</span>;
-  }
-
   renderSaveNotification() {
 
     const lastSucceeded
@@ -159,6 +146,26 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     return null;
   }
 
+  renderPackageTitle() {
+
+    const v = this.props.viewActions;
+    const id = this.props.course.guid;
+
+    return (
+      <React.Fragment>
+        <a className="header-link" href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            v.viewDocument(id, id);
+          }}>{this.props.course.title}</a>
+      </React.Fragment>
+    );
+  }
+
+  renderApplicationLabel() {
+    return <span>OLI Course Authoring</span>;
+  }
+
   render() {
 
     return (
@@ -168,15 +175,16 @@ class Header extends React.Component<HeaderProps, HeaderState> {
             <img src={OLI_ICON} width="30" height="30"
               className="d-inline-block align-top" alt="" />
           </Link>
-        </div>
-        <div className="header-content">
-          {this.props.course ? this.renderPackageActions() : this.renderApplicationLabel()}
+
+          {this.props.course ? this.renderPackageTitle() : this.renderApplicationLabel()}
+
         </div>
         <ReactCSSTransitionGroup transitionName="saving"
           transitionEnterTimeout={250} transitionLeaveTimeout={500}>
           {this.renderSaveNotification()}
         </ReactCSSTransitionGroup>
         <div className="header-logout">
+          {this.renderAbout()}
           <a className="header-link" href={this.props.user.logoutUrl}>Logout</a>
         </div>
       </div>
