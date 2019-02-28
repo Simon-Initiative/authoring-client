@@ -24,6 +24,7 @@ interface DispatchProps {
   dismissMessage: (message: Messages.Message) => void;
   dismissModal: () => void;
   displayModal: (c) => void;
+  onDispatch: (a) => void;
 }
 
 interface OwnProps {
@@ -60,6 +61,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     displayModal: (c) => {
       dispatch(modalActions.display(c));
+    },
+    onDispatch: (a) => {
+      dispatch(a);
     },
   };
 };
