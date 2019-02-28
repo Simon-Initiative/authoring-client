@@ -48,6 +48,9 @@ export class Bibliography extends Immutable.Record(defaultContent) {
 
     const bib = (root as any)['bib:file'];
 
+    // handle case where bib is an empty element
+    if (Object.keys(bib).length === 0) return new Bibliography();
+
     const entries = getChildren(bib).map((item) => {
       const entry = entryFromPersistence(item, createGuid(), notify);
       return [entry.guid, entry];
