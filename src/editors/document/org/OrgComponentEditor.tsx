@@ -9,6 +9,7 @@ import { Maybe } from 'tsmonad';
 import { map } from 'data/utils/map';
 import * as commands from './commands/map';
 import { Command } from './commands/command';
+import { RemoveCommand } from './commands/remove';
 import './OrgComponent.scss';
 
 export interface OrgComponentEditorProps {
@@ -180,12 +181,23 @@ export class OrgComponentEditor
   renderActionBar(model: t.Sequence | t.Unit | t.Module | t.Section) {
     return this.props.org.caseOf({
       just: (org) => {
+
+        const removeCommand = new RemoveCommand();
+        const remove = (
+          <button
+            className="btn btn-link btn-sm" key="remove"
+            disabled={!removeCommand.precondition(org, model) || !this.props.editMode}
+            onClick={() => processor(removeCommand)}>{removeCommand.description(org.labels)}
+          </button>
+        );
+
         const processor = this.processCommand.bind(this, org, model);
         return (
           <div>
             {[
               ...this.renderInsertNew(org, model, processor),
-              ...this.renderInsertExisting(org, model, processor)]}
+              ...this.renderInsertExisting(org, model, processor),
+              remove]}
           </div>
         );
       },
