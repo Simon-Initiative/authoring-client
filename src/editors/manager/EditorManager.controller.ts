@@ -42,10 +42,12 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   let editingAllowed = course.editable;
   let hasFailed = false;
 
-  document = ed.document;
-  undoRedoGuid = ed.undoRedoGuid;
-  editingAllowed = ed.editingAllowed && course.editable;
-  hasFailed = ed.hasFailed;
+  if (ed !== undefined) {
+    document = ed.document;
+    undoRedoGuid = ed.undoRedoGuid;
+    editingAllowed = ed.editingAllowed && course.editable;
+    hasFailed = ed.hasFailed;
+  }
 
   return {
     expanded,

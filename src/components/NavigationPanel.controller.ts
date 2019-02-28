@@ -7,6 +7,7 @@ import { RouterState } from 'reducers/router';
 import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
 import { Document } from 'data/persistence';
+import { UserProfile } from 'types/user';
 
 interface StateProps {
   course: CourseModel;
@@ -19,6 +20,9 @@ interface DispatchProps {
 }
 
 interface OwnProps {
+  profile: UserProfile;
+  userId: string;
+  userName: string;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

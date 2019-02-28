@@ -13,7 +13,6 @@ import * as models from 'data/models';
 import guid from 'utils/guid';
 import { LegacyTypes } from 'data/types';
 import Header from 'components/Header.controller';
-import Footer from 'components/Footer';
 import { CoursesViewSearchable } from './components/CoursesViewSearchable.controller';
 import DocumentView from 'components/DocumentView';
 import ResourceView from 'components/ResourceView';
@@ -34,6 +33,7 @@ import { ROUTE } from 'actions/router';
 import { ResourceLoading } from 'components/ResourceLoading';
 import * as Msg from 'types/messages';
 import * as messageActions from 'actions/messages';
+import OrgComponentEditor from 'editors/document/org/OrgComponent.controller';
 
 import './Main.scss';
 import Preview from 'components/Preview';
@@ -184,11 +184,11 @@ export default class Main extends React.Component<MainProps, MainState> {
     // Fire off the async request to determine server time skew
     onSetServerTimeSkew();
 
-    this.loadCourseIfNecessary();
+    this.loadCourseIfNecessary(this.props);
   }
 
-  loadCourseIfNecessary() {
-    const { course, router, onLoadCourse } = this.props;
+  loadCourseIfNecessary(props) {
+    const { course, router, onLoadCourse } = props;
 
     router.courseId.lift((courseId) => {
       const courseGuid = course.caseOf({
@@ -204,7 +204,7 @@ export default class Main extends React.Component<MainProps, MainState> {
 
   componentWillReceiveProps(nextProps: MainProps) {
     if (this.props.router !== nextProps.router) {
-      this.loadCourseIfNecessary();
+      this.loadCourseIfNecessary(nextProps);
     }
   }
 
@@ -238,7 +238,7 @@ export default class Main extends React.Component<MainProps, MainState> {
 
   getView(): JSX.Element {
     const { expanded, user, course, router, onLoad,
-      onLoadOrg, onReleaseOrg, onRelease, onDispatch } = this.props;
+      onRelease, onDispatch } = this.props;
 
     switch (router.route) {
       case ROUTE.IMPORT:
@@ -273,7 +273,10 @@ export default class Main extends React.Component<MainProps, MainState> {
       default: {
         return (
           <div className="main-splitview">
-            <NavigationPanel />
+            <NavigationPanel
+              profile={user.profile}
+              userId={user.userId}
+              userName={user.user} />
             <div className="main-splitview-content">
               {caseOf<JSX.Element>(router.route)({
                 [ROUTE.OBJECTIVES]: (
@@ -322,16 +325,13 @@ export default class Main extends React.Component<MainProps, MainState> {
                       }
 
                       const res = c.resources.get(resourceId);
-                      if (res && res.type === LegacyTypes.organization) {
+
+                      if (res === undefined) {
                         return (
-                          <DocumentView
-                            onLoad={(docId: string) => onLoadOrg(c.guid, docId)}
-                            onRelease={(docId: string) => onReleaseOrg(docId)}
-                            profile={user.profile}
-                            course={c}
-                            userId={user.userId}
-                            userName={user.user}
-                            documentId={resourceId} />
+                          <OrgComponentEditor
+                            componentId={resourceId}
+                            editMode={c.editable}
+                          />
                         );
                       }
 
@@ -408,9 +408,6 @@ export default class Main extends React.Component<MainProps, MainState> {
         </div>
         <div className="main-content">
           {this.getView()}
-        </div>
-        <div className="main-footer">
-          <Footer name={user.profile.username} email={user.profile.email} />
         </div>
         {modalDisplay}
       </div>

@@ -1,6 +1,5 @@
 import { connect } from 'react-redux';
 import OrgEditor from './OrgEditor';
-import { AbstractEditorProps } from '../common/AbstractEditor';
 import { OrganizationModel, CourseModel } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { undo, redo, documentEditingEnable } from 'actions/document';

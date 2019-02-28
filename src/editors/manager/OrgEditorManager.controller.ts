@@ -12,6 +12,8 @@ import { undo, redo, documentEditingEnable } from 'actions/document';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
 import { modalActions } from 'actions/modal';
+import { Maybe } from 'tsmonad';
+import { NavigationItem } from 'types/navigation';
 
 interface StateProps {
   expanded: any;
@@ -43,14 +45,12 @@ interface OwnProps {
   userId: string;
   userName: string;
   profile: UserProfile;
-
+  selectedItem: Maybe<NavigationItem>;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { expanded, skills, objectives, documents, course, orgs } = state;
-
-  const ed = documents.get(ownProps.documentId);
+  const { expanded, skills, objectives, course, orgs } = state;
 
   let document = null;
   let undoRedoGuid = 'Loading';

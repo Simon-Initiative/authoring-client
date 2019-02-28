@@ -2,8 +2,6 @@ import * as React from 'react';
 import * as t from '../../../data/contentTypes';
 import { AppContext } from '../../common/AppContext';
 import * as models from '../../../data/models';
-import { getExpandId } from './traversal';
-import { Command } from './commands/command';
 
 import './Caption.scss';
 
@@ -20,8 +18,7 @@ export interface CaptionProps {
   editMode: boolean;
   isHoveredOver: boolean;
   isSelected: boolean;
-  toggleExpanded: (id) => void;
-  onViewEdit: () => void;
+  onClick: () => void;
 }
 
 export interface CaptionState {
@@ -48,15 +45,14 @@ export class Caption
     return this.props.org.labels[contentType.toLowerCase()];
   }
 
-  onClick(model) {
-    this.props.toggleExpanded(getExpandId(model));
-    this.props.onViewEdit();
+  onClick() {
+    this.props.onClick();
   }
 
   render(): JSX.Element {
 
     return (
-      <div className="caption">
+      <div className="caption" onClick={this.onClick}>
         {this.props.children}
       </div>
     );

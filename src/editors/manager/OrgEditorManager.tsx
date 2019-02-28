@@ -7,12 +7,12 @@ import { configuration } from 'actions/utils/config';
 import OrgEditor from 'editors/document/org/OrgEditor';
 import { DispatchBasedServices } from 'editors/common/AppServices';
 import { Resource } from 'data/content/resource';
-import { Maybe } from 'tsmonad';
 import { LearningObjective, Skill } from 'data/contentTypes';
 import * as org from 'data/models/utils/org';
+import { Maybe } from 'tsmonad';
+import { NavigationItem } from 'types/navigation';
 
 import './OrgEditorManager.scss';
-import { Toast, Severity } from 'components/common/Toast';
 import * as Messages from 'types/messages';
 
 export interface OrgEditorManagerProps {
@@ -39,6 +39,7 @@ export interface OrgEditorManagerProps {
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
   onEditingEnable: (editable: boolean, documentId: string) => void;
+  selectedItem: Maybe<NavigationItem>;
 }
 
 export interface OrgEditorManagerState {
@@ -95,6 +96,7 @@ export default class OrgEditorManager
     return (
       <OrgEditor
         {...this.props}
+        selectedItem={this.props.selectedItem}
         model={document.model as models.OrganizationModel}
         expanded={expanded.has(documentId)
           ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
@@ -124,16 +126,9 @@ export default class OrgEditorManager
 
   renderLoading() {
     const waitingIcon = <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />;
-    const waitingHeading = 'Please wait';
-    const waitingContent = <p>We're loading the course material.</p>;
     return (
       <div className="waiting-notification scale-in-center">
-        <Toast
-          style={{ width: 600 }}
-          icon={waitingIcon}
-          heading={waitingHeading}
-          content={waitingContent}
-          severity={Severity.Waiting} />
+        {waitingIcon}
       </div>
     );
   }
@@ -156,7 +151,7 @@ export default class OrgEditorManager
     }
 
     return (
-      <div className="editor-manager">
+      <div className="org-editor-manager">
         {component}
       </div>
     );

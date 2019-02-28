@@ -1,3 +1,11 @@
+@import 'oli/colors';
+
+.selected {
+  background: $selection;
+  border-color: $selection;
+  color: $white;
+}
+
 .tree-node {
 
   .content {

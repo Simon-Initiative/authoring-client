@@ -3,7 +3,23 @@ import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as org from 'data/models/utils/org';
 import createGuid from 'utils/guid';
-import { Maybe } from 'tsmonad';
+import { NavigationItem } from 'types/navigation';
+
+
+export type CHANGE_SELECTED_ITEM = 'orgs/CHANGE_SELECTED_ITEM';
+export const CHANGE_SELECTED_ITEM: CHANGE_SELECTED_ITEM = 'orgs/CHANGE_SELECTED_ITEM';
+
+export type ChangeSelectedItemAction = {
+  type: CHANGE_SELECTED_ITEM,
+  selectedItem: NavigationItem,
+};
+
+export const changeSelectedItem = (selectedItem: NavigationItem): ChangeSelectedItemAction => ({
+  type: CHANGE_SELECTED_ITEM,
+  selectedItem,
+});
+
+
 
 export type ORG_REQUESTED = 'orgs/ORG_REQUESTED';
 export const ORG_REQUESTED: ORG_REQUESTED = 'orgs/ORG_REQUESTED';

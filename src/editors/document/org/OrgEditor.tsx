@@ -4,14 +4,13 @@ import * as Immutable from 'immutable';
 import * as models from 'data/models';
 import { viewDocument } from 'actions/view';
 import * as contentTypes from 'data/contentTypes';
-import { getExpandId, render } from 'editors/document/org/traversal';
+import { getExpandId, render, NodeTypes } from 'editors/document/org/traversal';
 import { collapseNodes, expandNodes } from 'actions/expand';
 import { SourceNodeType } from 'editors/content/org/drag/utils';
 import { TreeNode } from 'editors/document/org/TreeNode';
 import { Actions } from 'editors/document/org/Actions.controller';
 import { Details } from 'editors/document/org/Details';
 import { LabelsEditor } from 'editors/content/org/LabelsEditor';
-import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
 import { containsUnitsOnly } from './utils';
 import { ModalMessage } from 'utils/ModalMessage';
@@ -21,6 +20,7 @@ import * as org from 'data/models/utils/org';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { Maybe } from 'tsmonad';
+import { NavigationItem } from 'types/navigation';
 
 import './OrgEditor.scss';
 
@@ -146,7 +146,7 @@ function identifyNewNodes(last: string[], current: string[]): string[] {
 }
 
 export interface OrgEditorProps {
-
+  selectedItem: Maybe<NavigationItem>;
   model: models.OrganizationModel;
   onEdit: (request: org.OrgChangeRequest) => void;
   services: AppServices;
@@ -199,7 +199,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.onAddSequence = this.onAddSequence.bind(this);
     this.onCollapse = this.onCollapse.bind(this);
     this.onExpand = this.onExpand.bind(this);
-    this.onViewEdit = this.onViewEdit.bind(this);
+    this.onClickComponent = this.onClickComponent.bind(this);
 
     this.pendingHighlightedNodes = null;
 
@@ -326,9 +326,32 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
   }
 
-  onViewEdit(id) {
-    this.props.services.fetchGuidById(id)
-      .then(guid => this.props.dispatch(viewDocument(guid, this.props.context.courseId)));
+  onClickComponent(model: NodeTypes) {
+
+    if (model.contentType === 'Item') {
+      this.props.services.fetchGuidById(model.resourceref.idref)
+        .then(guid => this.props.dispatch(
+          viewDocument(guid, this.props.context.courseId, this.props.model.guid)));
+    } else {
+      const id = this.props.selectedItem.caseOf({
+        just: (item) => {
+          if (item.type === 'OrganizationItem') {
+            return item.id;
+          }
+          return null;
+        },
+        nothing: () => null,
+      });
+
+      const componentId = (model as any).id;
+      if (componentId === id) {
+        this.toggleExpanded(componentId);
+      } else {
+        this.props.dispatch(
+          viewDocument(componentId, this.props.context.courseId, this.props.model.guid));
+      }
+
+    }
   }
 
   onNodeEdit(request: org.OrgChangeRequest) {
@@ -336,15 +359,38 @@ class OrgEditor extends React.Component<OrgEditorProps,
   }
 
   renderContent() {
+
+    const { selectedItem } = this.props;
     const isExpanded = guid => this.props.expanded.caseOf({
       just: v => v.has(guid),
       nothing: () => false,
     });
 
+    // This id will either be a resource guid or the id of a unit, module, section
+    const id = selectedItem.caseOf({
+      just: (item) => {
+        if (item.type === 'OrganizationItem') {
+          return item.id;
+        }
+        return null;
+      },
+      nothing: () => null,
+    });
+
     const renderNode = (node, parent, index, depth, numberAtLevel) => {
+
+      let isSelected = false;
+      if (node.contentType === 'Item') {
+        isSelected = this.props.context.courseModel
+          .resourcesById.get(node.resourceref.idref).guid === id;
+      } else {
+        isSelected = node.id === id;
+      }
+
       return <TreeNode
+        isSelected={isSelected}
         key={node.guid}
-        onViewEdit={this.onViewEdit}
+        onClick={this.onClickComponent}
         numberAtLevel={numberAtLevel}
         highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}
@@ -354,7 +400,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
         parentModel={parent}
         onEdit={this.onNodeEdit}
         editMode={this.props.editMode}
-        toggleExpanded={this.toggleExpanded.bind(this)}
         isExpanded={isExpanded(getExpandId(node))}
         onReposition={this.onReposition.bind(this)}
         indexWithinParent={index}
@@ -375,8 +420,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
   }
 
   componentDidMount() {
-    super.componentDidMount();
-
     // If the page has not been viewed yet or custom expand/collapse state has not been set by the
     // user, expand all of the nodes as a default state
     this.props.expanded.caseOf({

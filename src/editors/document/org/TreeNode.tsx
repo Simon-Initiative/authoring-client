@@ -5,7 +5,7 @@ import * as models from '../../../data/models';
 import { renderDropTarget } from '../../content/org/drag/utils';
 import { DragHandle } from 'components/common/DragHandle';
 import { DraggableNode } from './DraggableNode';
-import { getExpandId, NodeTypes } from './traversal';
+import { NodeTypes } from './traversal';
 import { canHandleDrop } from './utils';
 import { Caption } from './Caption';
 import * as org from 'data/models/utils/org';
@@ -13,6 +13,7 @@ import * as org from 'data/models/utils/org';
 import './TreeNode.scss';
 
 export interface TreeNodeProps {
+  isSelected: boolean;
   numberAtLevel: number;      // 1-based position of this node at this level of the tree
   highlighted: boolean;       // Whether the node is highlighted or not
   labels: contentTypes.Labels; // Current state of custom labels
@@ -25,8 +26,7 @@ export interface TreeNodeProps {
   org: models.OrganizationModel;
   onEdit: (request: org.OrgChangeRequest) => void;
   editMode: boolean;
-  toggleExpanded: (id) => void;
-  onViewEdit: (id) => void;
+  onClick: (model: NodeTypes) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
@@ -91,7 +91,7 @@ export class TreeNode
 
   render(): JSX.Element {
 
-    const { model, parentModel, indexWithinParent,
+    const { model, parentModel, indexWithinParent, isSelected, highlighted,
       depth, editMode, onReposition, isExpanded } = this.props;
 
     const hasHiddenChildren =
@@ -110,7 +110,6 @@ export class TreeNode
 
 
     let titleLabel;
-    let viewableId = null;
 
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
 
@@ -122,27 +121,23 @@ export class TreeNode
         : 'Loading...';
 
       titleLabel = <span>{titleString}</span>;
-      viewableId = this.props.model.resourceref.idref;
 
     } else if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
       titleLabel = 'Include';
-      viewableId = this.props.model.idref;
     } else {
       const number = this.getAdaptiveNumber();
       titleLabel = <span>{icon}{contentType} {number}: {this.props.model.title}</span>;
-      viewableId = this.props.model.id;
     }
 
     const title = (
       <Caption
-        onViewEdit={() => this.props.onViewEdit(viewableId)}
+        onClick={() => this.props.onClick(this.props.model)}
         depth={0}
         org={this.props.org} context={this.props.context}
         isHoveredOver={this.state.mouseOver}
         editMode={this.props.editMode}
-        isSelected={false}
-        model={this.props.model}
-        toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
+        isSelected={this.props.isSelected}
+        model={this.props.model}>
         {titleLabel}
       </Caption>
     );
@@ -156,7 +151,7 @@ export class TreeNode
 
     return (
       <tr
-        className={`tree-node ${this.props.highlighted ? 'table-info' : ''}`}
+        className={`tree-node ${highlighted ? 'table-info' : ''} ${isSelected ? 'selected' : ''}`}
         key={model.guid}
         onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}>
         <td className="content">

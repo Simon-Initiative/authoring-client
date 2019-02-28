@@ -3,6 +3,8 @@ import * as models from 'data/models';
 import { dismissScopedMessages } from './messages';
 import { Scope } from 'types/messages';
 import * as courseActions from 'actions/course';
+import * as orgActions from 'actions/orgs';
+import { LegacyTypes } from 'data/types';
 
 function isDifferentCourse(getState, courseId): boolean {
   const course: models.CourseModel = getState().course;
@@ -129,13 +131,35 @@ export function viewAllCourses() {
 
 
 export function viewCourse(courseId: string) {
-  return function (dispatch) {
+  return function (dispatch, getState) {
     dispatch(courseActions.loadCourse(courseId)).then((c) => {
 
       // This ensures that we wipe any messages displayed from
       // another course
       dispatch(dismissScopedMessages(Scope.Package));
-      dispatch(viewDocument(courseId, courseId));
+
+      // Make sure we have an org active and that it pertains to
+      // this course
+      const model: models.CourseModel = c as models.CourseModel;
+      const orgs = model.resources.toArray().filter(r => r.type === LegacyTypes.organization);
+
+      getState().orgs.documentId.caseOf({
+        just: (documentId) => {
+          // Do not use this org if it doesn't belong to this course
+          const currentOrFirst = model.resources.has(documentId) ? documentId : orgs[0].guid;
+          if (currentOrFirst !== documentId) {
+            dispatch(orgActions.load(courseId, currentOrFirst));
+          }
+          dispatch(viewDocument(courseId, courseId, currentOrFirst));
+
+        },
+        nothing: () => {
+          dispatch(orgActions.load(courseId, orgs[0].guid));
+          dispatch(viewDocument(courseId, courseId, orgs[0].guid));
+        },
+      });
+
+
     });
   };
 }

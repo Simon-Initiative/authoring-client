@@ -5,10 +5,14 @@ import { Maybe } from 'tsmonad';
 import colors from 'styles/colors';
 import * as viewActions from 'actions/view';
 import { CourseModel, OrganizationModel } from 'data/models';
+import { UserProfile } from 'types/user';
 import { RouterState } from 'reducers/router';
 import { ROUTE } from 'actions/router';
 import { disableSelect } from 'styles/mixins';
 import { Document } from 'data/persistence';
+import * as nav from 'types/navigation';
+import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
+
 
 const DEFAULT_WIDTH_PX = 300;
 
@@ -114,11 +118,7 @@ export const styles: JSSStyles = {
   },
   orgTree: {
     flex: 1,
-
-    /** TODO: remove these temnporary styles */
-    color: colors.gray,
-    textAlign: 'center',
-    paddingTop: 50,
+    overflowY: 'scroll',
   },
 };
 
@@ -128,6 +128,9 @@ export interface NavigationPanelProps {
   viewActions: viewActions.ViewActions;
   router: RouterState;
   activeOrg: Maybe<Document>;
+  profile: UserProfile;
+  userId: string;
+  userName: string;
 }
 
 export interface NavigationPanelState {
@@ -141,8 +144,8 @@ export interface NavigationPanelState {
  */
 @injectSheet(styles)
 export class NavigationPanel
-    extends React.PureComponent<StyledComponentProps<NavigationPanelProps>,
-    NavigationPanelState> {
+  extends React.PureComponent<StyledComponentProps<NavigationPanelProps>,
+  NavigationPanelState> {
 
   constructor(props) {
     super(props);
@@ -182,6 +185,23 @@ export class NavigationPanel
   render() {
     const { className, classes, viewActions, course, router, activeOrg } = this.props;
     const { showOrgDropdown } = this.state;
+
+    const orgDocumentId = router.orgId.caseOf({
+      just: id => id,
+      nothing: () => null,
+    });
+
+    let selectedItem: Maybe<nav.NavigationItem> = Maybe.just(nav.makePackageOverview());
+    if (router.route === ROUTE.OBJECTIVES) {
+      selectedItem = Maybe.just(nav.makeLearningObjectives());
+    } else if (router.route === ROUTE.RESOURCE) {
+      selectedItem = router.resourceId.caseOf({
+        just: id => Maybe.just(nav.makeOrganizationItem(id)),
+        nothing: () => Maybe.nothing<nav.NavigationItem>(),
+      });
+    }
+
+    console.log(selectedItem);
 
     return course && (
       <div
@@ -228,17 +248,20 @@ export class NavigationPanel
           </div>
           <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
             {course.resources.valueSeq().filter(r => r.type === 'x-oli-organization').map(org => (
-                <a key={org.guid}
-                  className={classNames(['dropdown-item'])}
-                  onClick={() => { /** Set Active Org */}}>
-                  {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
-                </a>
+              <a key={org.guid}
+                className={classNames(['dropdown-item'])}
+                onClick={() => { /** Set Active Org */ }}>
+                {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
+              </a>
             ))}
           </div>
         </div>
         <div className={classes.orgTree}>
-          {/** TODO: replace with org viewer  */}
-          [Replace with Organization Viewer]
+          <OrgEditorManager
+            documentId={orgDocumentId}
+            selectedItem={selectedItem}
+            {...this.props}
+          />
         </div>
       </div>
     );

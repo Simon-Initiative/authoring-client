@@ -34,7 +34,7 @@ export const skillModelRules: ModelCheckerRule<contentTypes.Skill, ModelRuleData
     const { formativeCount } = aux;
     return formativeCount < 3;
   },
-},{
+}, {
   id: Issue.AT_LEAST_3_SUMMATIVE,
   name: 'Skill',
   requirementType: RequirementType.Should,
@@ -120,8 +120,8 @@ export interface SkillState {
  */
 @injectSheet(styles)
 export class Skill
-    extends React.PureComponent<StyledComponentProps<SkillProps>,
-    SkillState> {
+  extends React.PureComponent<StyledComponentProps<SkillProps>,
+  SkillState> {
 
   constructor(props) {
     super(props);
@@ -167,15 +167,15 @@ export class Skill
 
     const formativeTooltip = <div style={{ textAlign: 'left' }}>
       <b><i className="fa fa-flask" /> Formative Question Coverage</b>
-      <br/>
+      <br />
       This is the number of low stakes, practice questions that are associated with this skill.
     </div>;
     const summativeTooltip = <div style={{ textAlign: 'left' }}>
       <b><i className="fa fa-check" /> Summative Question Coverage</b>
-      <br/>
+      <br />
       This is the number of high stakes, graded questions that are associated with this skill.
-      <br/>
-      <br/>
+      <br />
+      <br />
       This includes the number of pool questions associated with this skill that a student is
       guaranteed to receive.
     </div>;
@@ -184,59 +184,59 @@ export class Skill
       skill, skillModelRules, { formativeCount, summativeCount: guaranteedSummativeCount });
 
     return (
-        <div className={classes.skillBadges}>
-          {checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
-            || checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE)
-            ? (
-              <IssueTooltip
-                show={checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
-                  || checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE)}>
-                  Skills should {checkModelResults.getIssue(Issue.AT_LEAST_3_FORMATIVE).caseOf({
-                    just: issue => issue.rule.requirement,
-                    nothing: () => null,
-                  })}
-                  {checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
-                    && checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE) && ' and '}
-                  {checkModelResults.getIssue(Issue.AT_LEAST_3_SUMMATIVE).caseOf({
-                    just: issue => issue.rule.requirement,
-                    nothing: () => null,
-                  })}
-                  <br/>
-                  <a href={SKILLS_HELP_LINK}
-                    target="_blank">Learn more about skills</a>.
+      <div className={classes.skillBadges}>
+        {checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
+          || checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE)
+          ? (
+            <IssueTooltip
+              show={checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
+                || checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE)}>
+              Skills should {checkModelResults.getIssue(Issue.AT_LEAST_3_FORMATIVE).caseOf({
+                just: issue => issue.rule.requirement,
+                nothing: () => null,
+              })}
+              {checkModelResults.hasIssue(Issue.AT_LEAST_3_FORMATIVE)
+                && checkModelResults.hasIssue(Issue.AT_LEAST_3_SUMMATIVE) && ' and '}
+              {checkModelResults.getIssue(Issue.AT_LEAST_3_SUMMATIVE).caseOf({
+                just: issue => issue.rule.requirement,
+                nothing: () => null,
+              })}
+              <br />
+              <a href={SKILLS_HELP_LINK}
+                target="_blank">Learn more about skills</a>.
               </IssueTooltip>
-            )
-            : undefined
-          }
-          <Tooltip html={formativeTooltip} distance={10}
-            size="small" arrowSize="small">
-            <span className={classNames(['badge badge-light', classes.skillBadge])}
-              style={{
-                color: flatui.nephritis,
-                borderRight: 'none',
-                marginRight: 0,
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
-              }}>
-              {formativeCount} <i className={classNames([
-                'fa fa-flask', classes.skillCountBadgeIcon])}/>
-            </span>
-          </Tooltip>
-          <Tooltip html={summativeTooltip} distance={10}
-            size="small" arrowSize="small">
-            <span
-              className={classNames(['badge badge-light', classes.skillBadge])}
-              style={{
-                color: flatui.amethyst,
-                marginLeft: 0,
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-              }}>
-              {guaranteedSummativeCount} <i className={classNames([
-                'fa fa-check', classes.skillCountBadgeIcon])}/>
-            </span>
-          </Tooltip>
-        </div>
+          )
+          : undefined
+        }
+        <Tooltip html={formativeTooltip} distance={10}
+          size="small" arrowSize="small">
+          <span className={classNames(['badge badge-light', classes.skillBadge])}
+            style={{
+              color: flatui.nephritis,
+              borderRight: 'none',
+              marginRight: 0,
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+            }}>
+            {formativeCount} <i className={classNames([
+              'fa fa-flask', classes.skillCountBadgeIcon])} />
+          </span>
+        </Tooltip>
+        <Tooltip html={summativeTooltip} distance={10}
+          size="small" arrowSize="small">
+          <span
+            className={classNames(['badge badge-light', classes.skillBadge])}
+            style={{
+              color: flatui.amethyst,
+              marginLeft: 0,
+              borderTopLeftRadius: 0,
+              borderBottomLeftRadius: 0,
+            }}>
+            {guaranteedSummativeCount} <i className={classNames([
+              'fa fa-check', classes.skillCountBadgeIcon])} />
+          </span>
+        </Tooltip>
+      </div>
     );
   }
 
