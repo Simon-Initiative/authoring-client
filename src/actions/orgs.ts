@@ -135,7 +135,7 @@ function applyChange(
       lastRevisionGuid: nextRevision,
     });
 
-    dispatch(modelUpdated(m.with({ resource })));
+    dispatch(modelUpdated(model.with({ resource })));
 
     persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
       .then(() => {
