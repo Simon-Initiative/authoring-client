@@ -120,13 +120,15 @@ export class TreeNode
         ? resource.title
         : 'Loading...';
 
-      titleLabel = <span>{titleString}</span>;
+      titleLabel = <span className="title-label">{titleString}</span>;
 
     } else if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
       titleLabel = 'Include';
     } else {
       const number = this.getAdaptiveNumber();
-      titleLabel = <span>{icon}{contentType} {number}: {this.props.model.title}</span>;
+      titleLabel = <span className="title-label">
+        {icon}{contentType} {number}: {this.props.model.title}
+      </span>;
     }
 
     const title = (

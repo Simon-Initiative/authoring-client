@@ -14,7 +14,7 @@ import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 
 
-const DEFAULT_WIDTH_PX = 300;
+const DEFAULT_WIDTH_PX = 400;
 
 export const styles: JSSStyles = {
   NavigationPanel: {
@@ -161,6 +161,9 @@ export const styles: JSSStyles = {
   orgTree: {
     flex: 1,
     overflowY: 'scroll',
+    borderTop: [1, 'solid', colors.grayLighter],
+    borderBottom: [1, 'solid', colors.grayLighter],
+    margin: [5, 0],
   },
 };
 
@@ -307,6 +310,46 @@ export class NavigationPanel
             selectedItem={selectedItem}
             {...this.props}
           />
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.PAGES && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewPages(course.guid, currentOrg.guid)}>
+          <i className="fa fa-files-o" /> Pages
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.FORMATIVE && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewFormativeAssessments(course.guid, currentOrg.guid)}>
+          <i className="fa fa-flask" /> Formatives
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.SUMMATIVE && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewSummativeAssessments(course.guid, currentOrg.guid)}>
+          <i className="fa fa-check" /> Summatives
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.FEEDBACK && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewFeedbackAssessments(course.guid, currentOrg.guid)}>
+          <i className="fa fa-check-square-o" /> Surveys
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.POOLS && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewPools(course.guid, currentOrg.guid)}>
+          <i className="fa fa-shopping-basket" /> Question Pools
         </div>
       </div>
     );

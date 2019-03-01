@@ -42,7 +42,7 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
       onEdit, onChangeExpansion, course, children } = this.props;
 
     return (
-      <div className="outline-container">
+      <div className="assessment-outline-container">
         <Tree.Component
           editMode={editMode}
           treeType={Tree.TreeType.DIV}

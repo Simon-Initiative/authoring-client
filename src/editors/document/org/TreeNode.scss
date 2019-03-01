@@ -1,12 +1,12 @@
 @import 'oli/colors';
 
-.selected {
-  background: $selection;
-  border-color: $selection;
-  color: $white;
-}
-
 .tree-node {
+
+  &.selected {
+    background: $selection;
+    border-color: $selection;
+    color: $white;
+  }
 
   .content {
     position: relative;
@@ -44,6 +44,13 @@
         .caption {
           flex: 1 0 0;
           margin: 0 0px;
+
+          .title-label {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 0 10px;
+          }
 
           button, span {
             display: inline-block;
