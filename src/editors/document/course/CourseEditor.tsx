@@ -18,9 +18,10 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { TextInput } from 'editors/content/common/controls';
 import { isNullOrUndefined } from 'util';
 import { CCLicenseTypes } from 'data/content/learning/common';
+import { Tooltip } from 'utils/tooltip';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
-const CC_LICENSES = require('../../../assets/cclicenses.png');
+const CC_LICENSES = require('../../../../assets/cclicenses.png');
 
 export interface CourseEditorProps {
   model: models.CourseModel;
@@ -506,6 +507,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     return (
       <React.Fragment>
         <Select
+          className="licenseSelect"
           editMode={this.props.editMode}
           value={license}
           onChange={this.onLicenseChange}>
@@ -516,7 +518,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  onLicenseChange(license: string) {
+  onLicenseChange = (license: string) => {
     const model = this.props.model.with({ metadata: this.props.model.metadata.with({ license }) });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -636,8 +638,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 <div className="col-9">{model.version}</div>
               </div>
               <div className="row">
-                <div className="col-3">License <HelpPopover><img src={CC_LICENSES} />
-                </HelpPopover></div>
+                <div className="col-3">License <HelpPopover activateOnClick>
+                  <img src={CC_LICENSES} /></HelpPopover>
+                </div>
                 <div className="col-9">{this.renderLicenseSelect()}</div>
               </div>
               <div className="row">
