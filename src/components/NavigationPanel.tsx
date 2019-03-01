@@ -62,10 +62,52 @@ export const styles: JSSStyles = {
         border: [1, 'solid', colors.grayLighter],
         borderLeft: 'none',
       },
+
+      '&$selectedNavItem': {
+        '& $dropdownText': {
+          border: [1, 'solid', colors.selection],
+        },
+        '& $dropdownToggle': {
+          border: [1, 'solid', colors.selection],
+        },
+      },
     },
 
     '&:focus': {
       outline: 'none',
+    },
+
+    '&$selectedNavItem': {
+      color: 'inherit',
+      backgroundColor: 'inherit',
+      borderColor: 'inherit',
+
+      '&:hover': {
+        backgroundColor: 'inherit',
+        borderColor: 'inherit',
+      },
+
+      '& $dropdownText': {
+        color: colors.white,
+        backgroundColor: colors.selection,
+        borderColor: colors.selection,
+
+        '&:hover': {
+          backgroundColor: colors.selection,
+          borderColor: colors.selection,
+        },
+      },
+
+      '& $dropdownToggle': {
+        borderColor: colors.selection,
+        color: colors.selection,
+
+        '&:hover': {
+          backgroundColor: colors.selection,
+          color: colors.white,
+          borderLeft: [1, 'solid', colors.white, '!important'],
+        },
+      },
     },
   },
   dropdownText: {
@@ -229,7 +271,13 @@ export class NavigationPanel
           <i className="fa fa-graduation-cap" /> Objectives
         </div>
         <div className="dropdown">
-          <div className={classNames([classes.navItemDropdown])}>
+          <div className={classNames([
+            classes.navItemDropdown,
+            router.resourceId.caseOf({
+              just: id => id === currentOrg.guid && classes.selectedNavItem,
+              nothing: () => null,
+            }),
+          ])}>
             <div className={classes.dropdownText}
               onClick={() =>
                 viewActions.viewDocument(currentOrg.guid, course.guid, currentOrg.guid)}>

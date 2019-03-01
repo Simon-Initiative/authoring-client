@@ -2,16 +2,17 @@ import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames, JSSStyles } from 'styles/jss';
 import { disableSelect } from 'styles/mixins';
-
+import * as models from 'data/models';
 
 export const styles: JSSStyles = {
   OrgDetailsEditor: {
     extend: [disableSelect],
+    padding: [30, 15],
   },
 };
 
 export interface OrgDetailsEditorProps {
-
+  model: models.OrganizationModel;
 }
 
 export interface OrgDetailsEditorState {
@@ -31,11 +32,11 @@ export class OrgDetailsEditor
   }
 
   render() {
-    const { className, classes, children } = this.props;
+    const { className, classes, children, model } = this.props;
 
     return (
       <div className={classNames(['OrgDetailsEditor', classes.OrgDetailsEditor, className])}>
-        {children}
+        <h2>{model.title}</h2>
       </div>
     );
   }

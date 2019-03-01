@@ -45,10 +45,6 @@ export const stringifyUrlParams = (urlParams: Map<string, string>): string =>
 
 export const getRouteFromPath = (path: string, search: string) => {
   const parseRootPath = (path: string) => {
-    if (path && path.startsWith('state')) {
-      return '';
-    }
-
     const matches = /^\/?([^\?]*)/.exec(path);
     return matches && matches[1] || '';
   };
@@ -67,23 +63,17 @@ export const getRouteFromPath = (path: string, search: string) => {
       case '':
         return {
           route: ROUTE.ROOT,
-          courseId: Maybe.nothing<string>(),
-          resourceId: Maybe.nothing<string>(),
-          orgId: Maybe.nothing<string>(),
+          ...parseCourseResourceIds(path),
         };
       case 'create':
         return {
           route: ROUTE.CREATE,
-          courseId: Maybe.nothing<string>(),
-          resourceId: Maybe.nothing<string>(),
-          orgId: Maybe.nothing<string>(),
+          ...parseCourseResourceIds(path),
         };
       case 'import':
         return {
           route: ROUTE.IMPORT,
-          courseId: Maybe.nothing<string>(),
-          resourceId: Maybe.nothing<string>(),
-          orgId: Maybe.nothing<string>(),
+          ...parseCourseResourceIds(path),
         };
       case 'skills':
         return {

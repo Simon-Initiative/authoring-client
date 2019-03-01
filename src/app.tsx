@@ -125,7 +125,12 @@ function main() {
     });
 
   // respond to url changes
-  history.listen(({ pathname, search }) => store.dispatch(updateRoute(pathname, search)));
+  history.listen(({ pathname, search }) => {
+    // ignore paths that start with /state
+    if (pathname && pathname.startsWith('/state')) return;
+
+    store.dispatch(updateRoute(pathname, search));
+  });
 
   function clearHeldLocks() {
     return function (dispatch: Dispatch<State>, getState: () => State) {
