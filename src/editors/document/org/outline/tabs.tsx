@@ -157,12 +157,12 @@ class Tab extends React.PureComponent<TabProperties, {}> {
 
           <div className="d-flex w-100 flex-row justify-content-between">
             <div className="d-flex w-100 flex-column justify-content-between">
-              <small className="content">
-                {previewText}
-              </small>
               <div className="info d-flex justify-content-between">
                 <Label {...this.props}>{label}</Label>
               </div>
+              <small className="content">
+                {previewText}
+              </small>
             </div>
             {buildRemove(course.editable, node, commandProcessor)}
           </div>

@@ -13,11 +13,6 @@ export interface LabelsEditorProps {
   editMode: boolean;
 }
 
-const labelMapper = (toApply: Object, m: models.OrganizationModel) => {
-  const labels = m.labels.with(toApply);
-  return m.with({ labels });
-};
-
 export interface LabelsEditorState {
 
 }
@@ -28,38 +23,58 @@ export class LabelsEditor
   constructor(props) {
     super(props);
 
-    this.onUpdate = this.onUpdate.bind(this);
   }
 
-
-  onUpdate(attr, value) {
-    const update = {
-      [attr]: value,
-    };
-    const cr = org.makeUpdateRootModel(labelMapper.bind(undefined, update));
+  onSequenceEdit(sequence: string) {
+    const cr = org.makeUpdateRootModel((m) => {
+      return m.with({ labels: m.labels.with({ sequence }) });
+    });
     this.props.onEdit(cr);
   }
 
-  renderRow(model, attr: string) {
+  onUnitEdit(unit: string) {
+    this.props.onEdit(
+      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ unit }) })));
+  }
+
+  onModuleEdit(module: string) {
+    this.props.onEdit(
+      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ module }) })));
+  }
+
+  onSectionEdit(section: string) {
+    this.props.onEdit(
+      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ section }) })));
+  }
+
+
+  renderEditor(attr: string, update) {
+    const model = this.props.model.labels;
+    return (
+      <Title
+        title={model[attr]}
+        editMode={this.props.editMode}
+        onBeginExternallEdit={() => true}
+        requiresExternalEdit={false}
+        isHoveredOver={true}
+        onEdit={update}
+        loading={false}
+        disableRemoval={true}
+        editWording="Edit"
+        onRemove={() => false}
+      >
+        {model[attr]}
+      </Title>
+    );
+  }
+
+  renderRow(attr: string, update) {
     const label = attr.substr(0, 1).toUpperCase() + attr.substr(1);
     return (
       <div className="form-group row">
         <label className="col-2 col-form-label">{label}</label>
         <div className="col-2">
-          <Title
-            title={model.labels[attr]}
-            editMode={this.props.editMode}
-            onBeginExternallEdit={() => true}
-            requiresExternalEdit={false}
-            isHoveredOver={true}
-            onEdit={this.onUpdate.bind(this, attr)}
-            loading={false}
-            disableRemoval={true}
-            editWording="Edit"
-            onRemove={() => false}
-          >
-            {model.labels[attr]}
-          </Title>
+          {this.renderEditor(attr, update)}
         </div>
       </div>
     );
@@ -67,9 +82,13 @@ export class LabelsEditor
 
   render() {
 
-    const rows = ['sequence', 'unit', 'module', 'section'].map((attr) => {
-      return this.renderRow(this.props.model, attr);
-    });
+    const rows = [
+      ['sequence', this.onSequenceEdit.bind(this)],
+      ['unit', this.onUnitEdit.bind(this)],
+      ['module', this.onModuleEdit.bind(this)],
+      ['section', this.onSectionEdit.bind(this)]].map((attr) => {
+        return this.renderRow(attr[0], attr[1]);
+      });
 
     return (
       <div className="labels-editor">

@@ -17,6 +17,7 @@ export type SequencesParams = {
 };
 
 const defaultContent = {
+  id: 'sequences',
   contentType: types.ContentTypes.Sequences,
   elementType: 'sequences',
   progressConstraints: Maybe.nothing<ProgressConstraints>(),
@@ -30,6 +31,7 @@ export class Sequences extends Immutable.Record(defaultContent) {
   elementType: 'sequences';
   progressConstraints: Maybe<ProgressConstraints>;
   children: Immutable.OrderedMap<string, Sequence | Include>;
+  id: string; // Ephemeral - exists only to be able to identify this unique node
   guid: string;
 
   constructor(params?: SequencesParams) {
@@ -71,9 +73,9 @@ export class Sequences extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
-    const children : Object[] = [];
+    const children: Object[] = [];
 
     this.progressConstraints.lift(p => children.push(p.toPersistence()));
     this.children.toArray().forEach(c => children.push(c.toPersistence()));

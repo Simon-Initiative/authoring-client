@@ -2,7 +2,6 @@ import WorkbookPageEditor from 'editors/document/workbook/WorkbookPageEditor.con
 import AssessmentEditor from 'editors/document/assessment/AssessmentEditor.controller';
 import FeedbackEditor from 'editors/document/feedback/FeedbackEditor.controller';
 import CourseEditor from 'editors/document/course/CourseEditor.controller';
-import { OrgDetailsEditor } from 'editors/document/org/OrgDetailsEditor.controller';
 import PoolEditor from 'editors/document/pool/PoolEditor.controller';
 import {
   DeferredPersistenceStrategy,
@@ -40,13 +39,6 @@ export default function initEditorRegistry() {
   register({
     name: ModelTypes.FeedbackModel,
     component: FeedbackEditor,
-    persistenceStrategyFactory: () => new DeferredPersistenceStrategy(),
-    listeningApproach: ListeningApproach.WhenReadOnly,
-    protected: true,
-  });
-  register({
-    name: ModelTypes.OrganizationModel,
-    component: OrgDetailsEditor,
     persistenceStrategyFactory: () => new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true,
