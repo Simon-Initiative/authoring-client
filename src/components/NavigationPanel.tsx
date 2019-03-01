@@ -201,8 +201,6 @@ export class NavigationPanel
       });
     }
 
-    console.log(selectedItem);
-
     return course && (
       <div
         className={classNames(['NavigationPanel', classes.NavigationPanel, className])}
@@ -216,20 +214,20 @@ export class NavigationPanel
               nothing: () => undefined,
             }),
           ])}
-          onClick={() => viewActions.viewDocument(course.guid, course.guid)}>
+          onClick={() => viewActions.viewDocument(course.guid, course.guid, orgDocumentId)}>
           <i className="fa fa-book" /> Overview
         </div>
         <div className={classNames([
           classes.navItem,
           router.route === ROUTE.OBJECTIVES && classes.selectedNavItem,
         ])}
-          onClick={() => viewActions.viewObjectives(course.guid)}>
+          onClick={() => viewActions.viewObjectives(course.guid, orgDocumentId)}>
           <i className="fa fa-graduation-cap" /> Objectives
         </div>
         <div className="dropdown">
           <div className={classNames([classes.navItemDropdown])}>
             <div className={classes.dropdownText}
-              onClick={() => viewActions.viewOrganizations(course.guid)}>
+              onClick={() => viewActions.viewOrganizations(course.guid, orgDocumentId)}>
               <i className="fa fa-th-list" /> {activeOrg.caseOf({
                 just: org => (org.model as OrganizationModel).title,
                 nothing: () => Maybe.maybe(course.resources.first()).caseOf({

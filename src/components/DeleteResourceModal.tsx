@@ -14,8 +14,9 @@ import { Severity, Toast } from 'components/common/Toast';
 export interface DeleteResourceModalProps {
   resource: Resource;
   course: CourseModel;
-  onDeleteResource: (resource: Resource, course: CourseModel) => void;
+  onDeleteResource: (resource: Resource, course: CourseModel, orgId: string) => void;
   onDismissModal: () => void;
+  orgId: string;
 }
 
 interface DeleteResourceModalState {
@@ -73,10 +74,10 @@ export default class DeleteResourceModal extends
   }
 
   onDelete() {
-    const { course, resource, onDeleteResource } = this.props;
+    const { course, resource, onDeleteResource, orgId } = this.props;
 
     persistence.deleteResource(course.guid, resource.guid)
-      .then(_ => onDeleteResource(resource, course));
+      .then(_ => onDeleteResource(resource, course, orgId));
   }
 
   prettyPrintResourceType(type: LegacyTypes): string {
@@ -138,8 +139,8 @@ export default class DeleteResourceModal extends
 
     const link = (edge: Edge) => (text: string) =>
       <a onClick={this.props.onDismissModal}
-         href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
-         className="btn btn-link">
+        href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
+        className="btn btn-link">
         {text}
       </a>;
 
@@ -159,7 +160,7 @@ export default class DeleteResourceModal extends
       <p>
         Are you sure you want to delete '{resource.title}'?
         <Toast
-          icon={<i className="fa fa-exclamation-triangle"/>}
+          icon={<i className="fa fa-exclamation-triangle" />}
           heading="Warning"
           content={<p>This action cannot be undone</p>}
           severity={Severity.Warning} />

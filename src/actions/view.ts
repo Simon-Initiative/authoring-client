@@ -55,15 +55,15 @@ export type ViewActions = {
   viewCreateCourse: () => void,
   viewImportCourse: () => void,
   viewAllCourses: () => void,
-  viewDocument: (documentId: string, courseId: string, orgId?: string) => void,
-  viewSkills: (courseId: string) => void,
-  viewObjectives: (courseId: string) => void,
-  viewOrganizations: (courseId: string) => void,
-  viewPages: (courseId: string) => void,
-  viewFormativeAssessments: (courseId: string) => void,
-  viewSummativeAssessments: (courseId: string) => void,
-  viewFeedbackAssessments: (courseId: string) => void,
-  viewPools: (courseId: string) => void,
+  viewDocument: (documentId: string, courseId: string, orgId: string) => void,
+  viewSkills: (courseId: string, orgId: string) => void,
+  viewObjectives: (courseId: string, orgId: string) => void,
+  viewOrganizations: (courseId: string, orgId: string) => void,
+  viewPages: (courseId: string, orgId: string) => void,
+  viewFormativeAssessments: (courseId: string, orgId: string) => void,
+  viewSummativeAssessments: (courseId: string, orgId: string) => void,
+  viewFeedbackAssessments: (courseId: string, orgId: string) => void,
+  viewPools: (courseId: string, orgId: string) => void,
 };
 
 // The view transition actions:
@@ -85,44 +85,44 @@ export function viewDocument(documentId: string, courseId: string, orgId?: strin
     );
 }
 
-export function viewSkills(courseId: string) {
+export function viewSkills(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/skills-' + courseId, courseId);
+    .bind(undefined, '/skills-' + courseId + '-' + orgId, courseId);
 }
 
-export function viewPages(courseId: string) {
+export function viewPages(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/pages-' + courseId, courseId);
+    .bind(undefined, '/pages-' + courseId + '-' + orgId, courseId);
 }
 
-export function viewFormativeAssessments(courseId: string) {
+export function viewFormativeAssessments(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/formativeassessments-' + courseId, courseId);
+    .bind(undefined, '/formativeassessments-' + courseId + '-' + orgId, courseId);
 }
 
-export function viewSummativeAssessments(courseId: string) {
+export function viewSummativeAssessments(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/summativeassessments-' + courseId, courseId);
+    .bind(undefined, '/summativeassessments-' + courseId + '-' + orgId, courseId);
 }
 
-export function viewFeedbackAssessments(courseId: string) {
+export function viewFeedbackAssessments(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/feedbackassessments-' + courseId, courseId);
+    .bind(undefined, '/feedbackassessments-' + courseId + '-' + orgId, courseId);
 }
 
-export function viewOrganizations(courseId: string) {
+export function viewOrganizations(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/organizations-' + courseId, courseId);
+    .bind(undefined, '/organizations-' + courseId + '-' + orgId, courseId);
 }
 
-export function viewObjectives(courseId: string) {
+export function viewObjectives(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/objectives-' + courseId, courseId);
+    .bind(undefined, '/objectives-' + courseId + '-' + orgId, courseId);
 }
 
-export function viewPools(courseId: string) {
+export function viewPools(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/pools-' + courseId, courseId);
+    .bind(undefined, '/pools-' + courseId + '-' + orgId, courseId);
 }
 
 export function viewAllCourses() {
