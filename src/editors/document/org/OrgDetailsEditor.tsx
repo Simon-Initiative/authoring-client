@@ -32,7 +32,7 @@ export class OrgDetailsEditor
   }
 
   render() {
-    const { className, classes, children, model } = this.props;
+    const { className, classes, model } = this.props;
 
     return (
       <div className={classNames(['OrgDetailsEditor', classes.OrgDetailsEditor, className])}>

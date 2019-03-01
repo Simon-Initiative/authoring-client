@@ -4,7 +4,7 @@ import { injectSheet, classNames, JSSStyles } from 'styles/jss';
 import { Maybe } from 'tsmonad';
 import colors from 'styles/colors';
 import * as viewActions from 'actions/view';
-import { CourseModel, OrganizationModel } from 'data/models';
+import { CourseModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { RouterState } from 'reducers/router';
 import { ROUTE } from 'actions/router';
@@ -225,7 +225,7 @@ export class NavigationPanel
   }
 
   render() {
-    const { className, classes, viewActions, course, router, activeOrg } = this.props;
+    const { className, classes, viewActions, course, router } = this.props;
     const { showOrgDropdown } = this.state;
 
     // course may not be loaded before first render. wait for it to load before rendering
