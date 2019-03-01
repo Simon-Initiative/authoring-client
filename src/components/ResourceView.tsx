@@ -185,6 +185,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
           <div className="flex-spacer" />
           <form className="form-inline">
             <input type="text" ref="title"
+              style={{ width: 300 }}
               disabled={!course.editable}
               className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
               placeholder="New Title"></input>

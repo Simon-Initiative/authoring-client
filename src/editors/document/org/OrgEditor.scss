@@ -6,9 +6,12 @@
   display: flex;
   flex-direction: column;
   padding: 0 0px;
-  width: 350px;
-  max-width: 350px;
   height: 100%;
+
+  .table {
+    table-layout: fixed;
+    margin-bottom: 0;
+  }
 
   .btn {
     i {

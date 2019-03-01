@@ -163,6 +163,7 @@ export const styles: JSSStyles = {
     overflowY: 'scroll',
     borderTop: [1, 'solid', colors.grayLighter],
     borderBottom: [1, 'solid', colors.grayLighter],
+    margin: [5, 0],
   },
 };
 
