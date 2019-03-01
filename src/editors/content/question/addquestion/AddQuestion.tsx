@@ -36,6 +36,8 @@ const FORMATIVE_OPTIONS: AddOption[] = [
   'Ordering',
   'ShortAnswer',
   'Multipart',
+  'DragAndDrop',
+  'ImageHotspot',
 ];
 
 const SUMMATIVE_OPTIONS: AddOption[] = [
