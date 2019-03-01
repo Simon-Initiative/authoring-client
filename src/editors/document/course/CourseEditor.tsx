@@ -639,7 +639,14 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               </div>
               <div className="row">
                 <div className="col-3">License <HelpPopover activateOnClick>
-                  <img src={CC_LICENSES} /></HelpPopover>
+                  <div><img src={CC_LICENSES} />
+                    <br /><br />
+                    <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                      target="_blank">
+                      More information
+                    </a>
+                  </div>
+                </HelpPopover>
                 </div>
                 <div className="col-9">{this.renderLicenseSelect()}</div>
               </div>
