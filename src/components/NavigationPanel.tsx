@@ -195,10 +195,6 @@ export class NavigationPanel
       nothing: () => course.resources.find(r => r.type === 'x-oli-organization'),
     });
 
-    console.log('router.orgId', router.orgId)
-    console.log('currentOrg', currentOrg)
-    console.log('course.resources', course.resources)
-
     let selectedItem: Maybe<nav.NavigationItem> = Maybe.just(nav.makePackageOverview());
     if (router.route === ROUTE.OBJECTIVES) {
       selectedItem = Maybe.just(nav.makeLearningObjectives());
