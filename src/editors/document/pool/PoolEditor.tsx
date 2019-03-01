@@ -94,7 +94,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       true);
 
     if (hasNoskills) {
-      this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
+      this.noSkillsMessage = buildMissingSkillsMessage(
+        this.props.context.courseId,
+        this.props.context.orgId);
       this.props.showMessage(this.noSkillsMessage);
     }
 
