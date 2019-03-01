@@ -15,6 +15,7 @@ import './EditorManager.scss';
 import { Toast, Severity } from 'components/common/Toast';
 
 export interface EditorManagerProps {
+  orgId: string;
   document: persistence.Document;
   hasFailed: boolean;
   documentId: string;
@@ -90,6 +91,7 @@ export default class EditorManager
         ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
         : Maybe.nothing<Immutable.Set<string>>(),
       context: {
+        orgId: this.props.orgId,
         documentId,
         userId,
         courseId,

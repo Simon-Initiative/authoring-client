@@ -2,7 +2,6 @@ import * as persistence from 'data/persistence';
 import * as Immutable from 'immutable';
 import { Resource } from 'data/contentTypes';
 import * as Messages from 'types/messages';
-import * as viewActions from 'actions/view';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
 import { EditedDocument } from 'types/document';
@@ -75,20 +74,9 @@ export function quickPreview(courseId: string, resource: Resource) {
   };
 }
 
-function buildEditOrgAction(
-  courseId: string, label: string): Messages.MessageAction {
-  return {
-    label,
-    enabled: true,
-    execute: (message: Messages.Message, dispatch) => {
-      dispatch(viewActions.viewOrganizations(courseId));
-    },
-  };
-}
-
 function buildMissingFromOrgMessage(courseId) {
 
-  const actions = [buildEditOrgAction(courseId, 'Edit Org')];
+  const actions = [];
 
   const content = new Messages.TitledContent().with({
     title: 'Cannot preview.',

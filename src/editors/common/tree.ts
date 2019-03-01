@@ -1,5 +1,5 @@
 
-export { Tree as Component } from './tree/Tree';
+export { Tree as Component, TreeEditDetails } from './tree/Tree';
 
 export { isSameNode } from './tree/utils';
 

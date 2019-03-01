@@ -10,6 +10,8 @@ import { map } from 'data/utils/map';
 import * as commands from './commands/map';
 import { Command } from './commands/command';
 import { RemoveCommand } from './commands/remove';
+import { Outline } from './outline/Outline';
+import * as viewActions from 'actions/view';
 import './OrgComponent.scss';
 
 export interface OrgComponentEditorProps {
@@ -61,7 +63,7 @@ export class OrgComponentEditor
     super(props);
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
-
+    this.onView = this.onView.bind(this);
     this.state = { model: Maybe.nothing() };
   }
 
@@ -97,6 +99,15 @@ export class OrgComponentEditor
     this.props.onEdit(org.makeUpdateNode(model.id, n => (n as any).with({ title })));
   }
 
+  onView(componentOrResourceId: string) {
+
+    this.props.org.lift((o) => {
+      this.props.onDispatch(
+        viewActions.viewDocument(componentOrResourceId, this.props.course.guid, o.guid));
+    });
+
+  }
+
   getLabel(model: t.Sequence | t.Unit | t.Module | t.Section) {
     return this.props.org.caseOf({
       just: (o) => {
@@ -122,26 +133,42 @@ export class OrgComponentEditor
 
     const { editMode } = this.props;
 
-    return (
-      <div className="org-component-editor">
-        <Title
-          title={model.title}
-          editMode={editMode}
-          onBeginExternallEdit={() => true}
-          requiresExternalEdit={false}
-          isHoveredOver={true}
-          onEdit={this.onTitleEdit.bind(this, model)}
-          loading={false}
-          disableRemoval={true}
-          editWording="Edit"
-          onRemove={() => false}
-          size={Size.Large}
-        >
-          <span style={{ fontSize: '25pt' }}>{this.getLabel(model) + ': ' + model.title}</span>
-        </Title>
-        {this.renderActionBar(model)}
-      </div>
-    );
+    return this.props.org.caseOf({
+      just: (org) => {
+        return (
+          <div className="org-component-editor">
+            <Title
+              title={model.title}
+              editMode={editMode}
+              onBeginExternallEdit={() => true}
+              requiresExternalEdit={false}
+              isHoveredOver={true}
+              onEdit={this.onTitleEdit.bind(this, model)}
+              loading={false}
+              disableRemoval={true}
+              editWording="Edit"
+              onRemove={() => false}
+              size={Size.Large}
+            >
+              <span style={{ fontSize: '25pt' }}>{this.getLabel(model) + ': ' + model.title}</span>
+            </Title>
+            {this.renderActionBar(model)}
+            <Outline
+              onView={this.onView}
+              editMode={this.props.editMode}
+              onEdit={this.props.onEdit}
+              nodes={model.children}
+              parentNodeId={model.id}
+              course={this.props.course}
+              commandProcessor={this.processCommand.bind(this, org)}
+            />
+          </div>
+        );
+      },
+      nothing: () => null,
+    });
+
+
 
   }
 
@@ -182,16 +209,17 @@ export class OrgComponentEditor
     return this.props.org.caseOf({
       just: (org) => {
 
+        const processor = this.processCommand.bind(this, org, model);
+
         const removeCommand = new RemoveCommand();
         const remove = (
           <button
+            style={{ float: 'right' }}
             className="btn btn-link btn-sm" key="remove"
             disabled={!removeCommand.precondition(org, model) || !this.props.editMode}
             onClick={() => processor(removeCommand)}>{removeCommand.description(org.labels)}
           </button>
         );
-
-        const processor = this.processCommand.bind(this, org, model);
         return (
           <div>
             {[
