@@ -55,6 +55,20 @@ export const styles: JSSStyles = {
     borderRadius: 6,
 
     '&:hover': {
+      border: [1, 'solid', colors.grayLighter],
+    },
+  },
+  navItemDropdownSeperated: {
+    background: 'transparent',
+    display: 'flex',
+    flexDirection: 'row',
+    border: 'none',
+    width: '100%',
+    fontSize: '1.2em',
+    fontWeight: 500,
+    borderRadius: 6,
+
+    '&:hover': {
       '& $dropdownText': {
         border: [1, 'solid', colors.grayLighter],
       },
@@ -161,6 +175,8 @@ export const styles: JSSStyles = {
   orgTree: {
     flex: 1,
     overflowY: 'scroll',
+    borderTop: [1, 'solid', colors.grayLighter],
+    borderBottom: [1, 'solid', colors.grayLighter],
   },
 };
 
@@ -272,7 +288,7 @@ export class NavigationPanel
         </div>
         <div className="dropdown">
           <div className={classNames([
-            classes.navItemDropdown,
+            classes.navItemDropdownSeperated,
             router.resourceId.caseOf({
               just: id => id === currentOrg.guid && classes.selectedNavItem,
               nothing: () => null,
@@ -307,6 +323,46 @@ export class NavigationPanel
             selectedItem={selectedItem}
             {...this.props}
           />
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.PAGES && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewPages(course.guid, currentOrg.guid)}>
+          <i className="fa fa-files-o" /> Pages
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.FORMATIVE && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewFormativeAssessments(course.guid, currentOrg.guid)}>
+          <i className="fa fa-flask" /> Formatives
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.SUMMATIVE && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewSummativeAssessments(course.guid, currentOrg.guid)}>
+          <i className="fa fa-check" /> Summatives
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.FEEDBACK && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewFeedbackAssessments(course.guid, currentOrg.guid)}>
+          <i className="fa fa-check-square-o" /> Surveys
+        </div>
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.POOLS && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewPools(course.guid, currentOrg.guid)}>
+          <i className="fa fa-shopping-basket" /> Question Pools
         </div>
       </div>
     );

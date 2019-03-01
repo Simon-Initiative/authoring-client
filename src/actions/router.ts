@@ -15,6 +15,7 @@ export enum ROUTE {
   PAGES = 'pages',
   FORMATIVE = 'formative',
   SUMMATIVE = 'summative',
+  FEEDBACK = 'feedbackassessments',
   POOLS = 'pools',
   ORGANIZATIONS = 'organizations',
   OBJECTIVES = 'objectives',
@@ -93,6 +94,11 @@ export const getRouteFromPath = (path: string, search: string) => {
       case 'summativeassessments':
         return {
           route: ROUTE.SUMMATIVE,
+          ...parseCourseResourceIds(path),
+        };
+      case 'feedbackassessments':
+        return {
+          route: ROUTE.FEEDBACK,
           ...parseCourseResourceIds(path),
         };
       case 'pools':

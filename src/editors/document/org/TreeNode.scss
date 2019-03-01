@@ -1,12 +1,12 @@
 @import 'oli/colors';
 
-.selected {
-  background: $selection;
-  border-color: $selection;
-  color: $white;
-}
-
 .tree-node {
+
+  &.selected {
+    background: $selection;
+    border-color: $selection;
+    color: $white;
+  }
 
   .content {
     position: relative;

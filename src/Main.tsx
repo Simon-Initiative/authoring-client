@@ -309,6 +309,9 @@ export default class Main extends React.Component<MainProps, MainState> {
                 [ROUTE.SUMMATIVE]: (
                   this.renderResource(resources.summativeassessments)
                 ),
+                [ROUTE.FEEDBACK]: (
+                  this.renderResource(resources.feedbackassessments)
+                ),
                 [ROUTE.POOLS]: (
                   this.renderResource(resources.pools)
                 ),
