@@ -1,10 +1,10 @@
-import history from 'utils/history';
 import * as models from 'data/models';
 import { dismissScopedMessages } from './messages';
 import { Scope } from 'types/messages';
 import * as courseActions from 'actions/course';
 import * as orgActions from 'actions/orgs';
 import { LegacyTypes } from 'data/types';
+import * as router from 'actions/router';
 
 function isDifferentCourse(getState, courseId): boolean {
   const course: models.CourseModel = getState().course;
@@ -35,11 +35,11 @@ function transitionCourseView(destination, courseId, dispatch, getState) {
     dispatch(dismissScopedMessages(Scope.Package));
 
     dispatch(courseActions.loadCourse(courseId)).then((c) => {
-      history.push(destination);
+      router.push(destination);
     });
   } else {
     dispatch(dismissScopedMessages(Scope.Resource));
-    history.push(destination);
+    router.push(destination);
   }
 
 }
@@ -47,7 +47,7 @@ function transitionCourseView(destination, courseId, dispatch, getState) {
 function transitionApplicationView(destination, dispatch) {
   dispatch(dismissScopedMessages(Scope.Application));
   dispatch(enterApplicationView());
-  history.push(destination);
+  router.push(destination);
 }
 
 

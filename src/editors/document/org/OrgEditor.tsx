@@ -358,7 +358,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
     });
 
     // This id will either be a resource guid or the id of a unit, module, section
-    const id = selectedItem.caseOf({
+    const id = selectedItem && selectedItem.caseOf({
       just: (item) => {
         if (item.type === 'OrganizationItem') {
           return item.id;
