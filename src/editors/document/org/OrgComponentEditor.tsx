@@ -7,6 +7,9 @@ import { Title, Size } from 'components/objectives/Title';
 import * as Messages from 'types/messages';
 import { Maybe } from 'tsmonad';
 import { map } from 'data/utils/map';
+import * as commands from './commands/map';
+import { Command } from './commands/command';
+import { RemoveCommand } from './commands/remove';
 import './OrgComponent.scss';
 
 export interface OrgComponentEditorProps {
@@ -21,10 +24,34 @@ export interface OrgComponentEditorProps {
   dismissMessage: (message: Messages.Message) => void;
   dismissModal: () => void;
   displayModal: (c) => void;
+  onDispatch: (c) => void;
 }
 
 export interface OrgComponentEditorState {
   model: Maybe<t.Sequence | t.Unit | t.Module | t.Section>;
+}
+
+function buildCommandButtons(
+  prefix, commands, org, model,
+  labels, processCommand, editMode): Object[] {
+
+  const slash: any = {
+    fontFamily: 'sans-serif',
+    position: 'relative',
+    color: '#606060',
+  };
+
+  const buttons = commands[model.contentType].map(commandClass => new commandClass())
+    .map(command => [<button
+      className="btn btn-link btn-sm" key={prefix + command.description(labels)}
+      disabled={!command.precondition(org, model) || !editMode}
+      onClick={() => processCommand(command)}>{command.description(labels)}</button>,
+    <span key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
+    .reduce((p, c) => p.concat(c), []);
+
+  buttons.pop();
+
+  return buttons;
 }
 
 export class OrgComponentEditor
@@ -112,15 +139,84 @@ export class OrgComponentEditor
         >
           <span style={{ fontSize: '25pt' }}>{this.getLabel(model) + ': ' + model.title}</span>
         </Title>
+        {this.renderActionBar(model)}
       </div>
     );
 
+  }
+
+  renderInsertExisting(org, model, processor) {
+    if (commands.ADD_EXISTING_COMMANDS[model.contentType].length > 0) {
+      const buttons = buildCommandButtons(
+        'addexisting',
+        commands.ADD_EXISTING_COMMANDS,
+        org, model, org.labels,
+        processor, this.props.editMode);
+
+      return [
+        <span key="add-existing" className="label">Add existing:</span>,
+        ...buttons,
+      ];
+    }
+
+    return [];
+  }
+
+  renderInsertNew(org, model, processor) {
+
+    if (commands.ADD_NEW_COMMANDS[model.contentType].length > 0) {
+      return [
+        <span key="add-new" className="label">Add new:</span>,
+        ...buildCommandButtons(
+          'addnew',
+          commands.ADD_NEW_COMMANDS,
+          org, model, org.labels,
+          processor, this.props.editMode)];
+
+    }
+
+    return [];
+  }
+
+  renderActionBar(model: t.Sequence | t.Unit | t.Module | t.Section) {
+    return this.props.org.caseOf({
+      just: (org) => {
+
+        const removeCommand = new RemoveCommand();
+        const remove = (
+          <button
+            className="btn btn-link btn-sm" key="remove"
+            disabled={!removeCommand.precondition(org, model) || !this.props.editMode}
+            onClick={() => processor(removeCommand)}>{removeCommand.description(org.labels)}
+          </button>
+        );
+
+        const processor = this.processCommand.bind(this, org, model);
+        return (
+          <div>
+            {[
+              ...this.renderInsertNew(org, model, processor),
+              ...this.renderInsertExisting(org, model, processor),
+              remove]}
+          </div>
+        );
+      },
+      nothing: () => null,
+    });
   }
 
   renderWaiting() {
     return null;
   }
 
+  processCommand(org, model, command: Command) {
+    command.execute(
+      org, model, this.props.course,
+      this.props.displayModal, this.props.dismissModal, this.props.onDispatch)
+      .then((cr) => {
+        this.props.onEdit(cr);
+      });
+  }
 
 
   render(): JSX.Element {

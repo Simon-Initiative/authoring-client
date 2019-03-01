@@ -21,6 +21,24 @@ export function buildReportProblemAction(
   };
 }
 
+
+export function buildConflictMessage() {
+
+  const content = new Messages.TitledContent().with({
+    title: 'Cannot save',
+    message: 'Another user\'s change conflicted with yours. Please retry.',
+  });
+  return new Messages.Message().with({
+    content,
+    guid: 'PersistenceConflict',
+    scope: Messages.Scope.Package,
+    severity: Messages.Severity.Error,
+    canUserDismiss: true,
+    actions: Immutable.List(),
+  });
+
+}
+
 export function buildPersistenceFailureMessage(reason: string, user: UserProfile) {
 
   const name = user.firstName + ' ' + user.lastName;
