@@ -6,6 +6,7 @@ export type AppContext = {
   userId: string;
   courseId: string;
   documentId: string;
+  orgId: string;
   baseUrl: string;
   resourcePath: string;
   courseModel: models.CourseModel;

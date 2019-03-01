@@ -4,7 +4,6 @@ import {
   Include, Item, Module, Resource, Section, Sequence, Sequences, Unit,
 } from 'data/contentTypes';
 import * as persistence from 'data//persistence';
-import { viewOrganizations } from 'actions/view';
 import { updateCourseResources } from 'actions/course';
 import guid from 'utils/guid';
 import { LegacyTypes } from 'data/types';
@@ -40,7 +39,7 @@ type OrgNode = Sequences | Sequence | Unit | Module | Section | Include | Item;
 
 // Recursive (through dupeChildren) duplication of immutable org tree,
 // careful to change all the guids and ids
-function dupe(v: OrgNode) : OrgNode {
+function dupe(v: OrgNode): OrgNode {
 
   const id = guid();
 
@@ -95,8 +94,6 @@ export function duplicateOrganization(
           const resources = Immutable.OrderedMap<string, Resource>(
             [[doc.model.resource.guid, doc.model.resource]]);
           dispatch(updateCourseResources(resources));
-
-          dispatch(viewOrganizations(courseId));
         }
 
 

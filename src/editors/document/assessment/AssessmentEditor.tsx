@@ -212,7 +212,9 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
       true);
 
     if (hasNoskills) {
-      this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
+      this.noSkillsMessage = buildMissingSkillsMessage(
+        this.props.context.courseId,
+        this.props.context.orgId);
       this.props.showMessage(this.noSkillsMessage);
     }
   }

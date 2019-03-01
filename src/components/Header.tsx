@@ -147,19 +147,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
   }
 
   renderPackageTitle() {
-
-    const v = this.props.viewActions;
-    const id = this.props.course.guid;
-
-    return (
-      <React.Fragment>
-        <a className="header-link" href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            v.viewDocument(id, id);
-          }}>{this.props.course.title}</a>
-      </React.Fragment>
-    );
+    return <span>{this.props.course.title}</span>;
   }
 
   renderApplicationLabel() {
