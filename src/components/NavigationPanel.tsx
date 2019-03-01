@@ -55,20 +55,6 @@ export const styles: JSSStyles = {
     borderRadius: 6,
 
     '&:hover': {
-      border: [1, 'solid', colors.grayLighter],
-    },
-  },
-  navItemDropdownSeperated: {
-    background: 'transparent',
-    display: 'flex',
-    flexDirection: 'row',
-    border: 'none',
-    width: '100%',
-    fontSize: '1.2em',
-    fontWeight: 500,
-    borderRadius: 6,
-
-    '&:hover': {
       '& $dropdownText': {
         border: [1, 'solid', colors.grayLighter],
       },
@@ -288,7 +274,7 @@ export class NavigationPanel
         </div>
         <div className="dropdown">
           <div className={classNames([
-            classes.navItemDropdownSeperated,
+            classes.navItemDropdown,
             router.resourceId.caseOf({
               just: id => id === currentOrg.guid && classes.selectedNavItem,
               nothing: () => null,
