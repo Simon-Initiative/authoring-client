@@ -380,8 +380,9 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
       let isSelected = false;
       if (node.contentType === 'Item') {
-        isSelected = this.props.context.courseModel
-          .resourcesById.get(node.resourceref.idref).guid === id;
+        const res = this.props.context.courseModel
+          .resourcesById.get(node.resourceref.idref);
+        isSelected = res !== undefined ? res.guid === id : false;
       } else {
         isSelected = node.id === id;
       }
