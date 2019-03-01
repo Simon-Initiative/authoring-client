@@ -62,6 +62,7 @@ export interface TreeProps<NodeType extends Types.HasGuid> {
 
   // Called by the tree when a potential drop is initiated.
   canHandleDrop: Types.CanDropHandler<NodeType>;
+
 }
 
 /**
