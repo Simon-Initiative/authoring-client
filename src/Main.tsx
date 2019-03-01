@@ -188,7 +188,7 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   loadCourseIfNecessary(props) {
-    const { course, router, onLoadCourse } = props;
+    const { course, router, onLoadCourse, onLoadOrg } = props;
 
     router.courseId.lift((courseId) => {
       const courseGuid = course.caseOf({
@@ -198,6 +198,9 @@ export default class Main extends React.Component<MainProps, MainState> {
 
       if (courseGuid !== courseId) {
         onLoadCourse(courseId);
+        router.orgId.lift((orgId) => {
+          onLoadOrg(courseId, orgId);
+        });
       }
     });
   }
@@ -205,6 +208,7 @@ export default class Main extends React.Component<MainProps, MainState> {
   componentWillReceiveProps(nextProps: MainProps) {
     if (this.props.router !== nextProps.router) {
       this.loadCourseIfNecessary(nextProps);
+
     }
   }
 
