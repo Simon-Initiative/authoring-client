@@ -566,11 +566,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
   }
 
   render() {
-    console.log(this.props.expanded.caseOf({
-      just: e => '' + e.size,
-      nothing: () => 'nothing',
-    }));
-
     return (
       <div className="org-editor">
         {this.renderContent()}
