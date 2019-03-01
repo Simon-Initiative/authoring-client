@@ -14,7 +14,7 @@ export class MetaData extends Immutable.Record({
 
   contentType: 'MetaData';
   authors: any;
-  license: string;
+  license: string; // a URL to the specific license used by the course
   copyright: string;
   keywords: string;
 

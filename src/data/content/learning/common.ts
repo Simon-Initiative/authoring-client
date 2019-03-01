@@ -27,6 +27,40 @@ export const PurposeTypes: PurposeType[] = [
   { value: 'didigetthis', label: 'Did I get this?' },
 ];
 
+export type CCLicenseType = { acronym: string, description: string, url: string };
+export const CCLicenseTypes: CCLicenseType[] = [
+  {
+    acronym: 'CCBy',
+    description: 'CC BY: Attribtion',
+    url: 'https://creativecommons.org/licenses/by/3.0/',
+  },
+  {
+    acronym: 'CCBySA',
+    description: 'CC BY-SA: Attribution-ShareAlike',
+    url: 'https://creativecommons.org/licenses/by-sa/3.0/',
+  },
+  {
+    acronym: 'CCByND',
+    description: 'CC BY-ND: Attribution-NoDerivatives',
+    url: 'https://creativecommons.org/licenses/by-nd/3.0/',
+  },
+  {
+    acronym: 'CCByNC',
+    description: 'CC BY-NC: Attribution-NonCommercial',
+    url: 'https://creativecommons.org/licenses/by-nc/3.0/',
+  },
+  {
+    acronym: 'CCByNCSA',
+    description: 'CC BY-NC-SA: Attribution-NonCommercial-ShareAlike',
+    url: 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+  },
+  {
+    acronym: 'CCByNCND',
+    description: 'CC BY-NC-ND: Attribution-NonCommercial-NoDerivatives',
+    url: 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+  },
+];
+
 export enum EntityTypes {
 
   // Inline sentinels
