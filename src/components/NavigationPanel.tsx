@@ -14,7 +14,7 @@ import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 
 
-const DEFAULT_WIDTH_PX = 300;
+const DEFAULT_WIDTH_PX = 400;
 
 export const styles: JSSStyles = {
   NavigationPanel: {
