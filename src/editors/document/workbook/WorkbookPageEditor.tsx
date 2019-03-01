@@ -111,7 +111,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE ||
       objectives.size < 1) {
-      this.noObjectivesMessage = buildMissingObjectivesMessage(courseId);
+      this.noObjectivesMessage = buildMissingObjectivesMessage(courseId, context.orgId);
       showMessage(this.noObjectivesMessage);
     }
 

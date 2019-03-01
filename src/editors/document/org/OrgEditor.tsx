@@ -294,7 +294,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
       const newNodes = identifyNewNodes(lastAllNodes, this.allNodeIds);
       if (newNodes.length > 0) {
-
         if (this.pendingHighlightedNodes === null) {
           this.pendingHighlightedNodes
             = Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid));

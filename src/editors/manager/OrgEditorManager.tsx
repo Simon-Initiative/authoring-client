@@ -102,6 +102,7 @@ export default class OrgEditorManager
           ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
           : Maybe.nothing<Immutable.Set<string>>()}
         context={{
+          orgId: documentId,
           documentId,
           userId,
           courseId,

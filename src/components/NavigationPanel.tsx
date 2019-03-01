@@ -218,14 +218,14 @@ export class NavigationPanel
               nothing: () => undefined,
             }),
           ])}
-          onClick={() => viewActions.viewDocument(course.guid, course.guid)}>
+          onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
           <i className="fa fa-book" /> Overview
         </div>
         <div className={classNames([
           classes.navItem,
           router.route === ROUTE.OBJECTIVES && classes.selectedNavItem,
         ])}
-          onClick={() => viewActions.viewObjectives(course.guid)}>
+          onClick={() => viewActions.viewObjectives(course.guid, currentOrg.guid)}>
           <i className="fa fa-graduation-cap" /> Objectives
         </div>
         <div className="dropdown">

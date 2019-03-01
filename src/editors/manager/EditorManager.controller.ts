@@ -16,6 +16,7 @@ interface StateProps {
   undoRedoGuid: string;
   editingAllowed: boolean;
   hasFailed: boolean;
+  orgId: string;
 }
 
 interface DispatchProps {
@@ -33,7 +34,7 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { expanded, skills, objectives, documents, course } = state;
+  const { expanded, skills, objectives, documents, course, router } = state;
 
   const ed = documents.get(ownProps.documentId);
 
@@ -49,7 +50,13 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     hasFailed = ed.hasFailed;
   }
 
+  const orgId = router.orgId.caseOf({
+    just: s => s,
+    nothing: () => '',
+  });
+
   return {
+    orgId,
     expanded,
     skills,
     objectives,
