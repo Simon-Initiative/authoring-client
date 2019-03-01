@@ -58,7 +58,7 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
       course, children, onView, commandProcessor } = this.props;
 
     return (
-      <div className="outline-container">
+      <div className="org-outline-container">
         <Tree.Component
           editMode={editMode}
           treeType={Tree.TreeType.DIV}

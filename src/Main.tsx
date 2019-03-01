@@ -213,7 +213,7 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   renderResource(resource: ResourceList) {
-    const { onDispatch, server, course } = this.props;
+    const { onDispatch, server, course, router } = this.props;
 
     const orgHelpPopover = (
       <HelpPopover activateOnClick>
@@ -222,18 +222,27 @@ export default class Main extends React.Component<MainProps, MainState> {
     );
 
     return course.caseOf({
-      just: c => (
-        <ResourceView
-          serverTimeSkewInMs={server.timeSkewInMs}
-          course={c}
-          title={resource.title}
-          resourceType={resource.resourceType}
-          filterFn={resource.filterFn}
-          createResourceFn={resource.createResourceFn}
-          dispatch={onDispatch}
-          helpPopover={resource.resourceType === LegacyTypes.organization ? orgHelpPopover : null}
-        />
-      ),
+      just: (c) => {
+        // get org id from router or select the first organization
+        const currentOrg = router.orgId.caseOf({
+          just: guid => c.resources.find(r => r.guid === guid),
+          nothing: () => c.resources.find(r => r.type === 'x-oli-organization'),
+        });
+
+        return (
+          <ResourceView
+            serverTimeSkewInMs={server.timeSkewInMs}
+            course={c}
+            currentOrg={currentOrg.guid}
+            title={resource.title}
+            resourceType={resource.resourceType}
+            filterFn={resource.filterFn}
+            createResourceFn={resource.createResourceFn}
+            dispatch={onDispatch}
+            helpPopover={resource.resourceType === LegacyTypes.organization ? orgHelpPopover : null}
+          />
+        );
+      },
       nothing: () => (
         <ResourceLoading />
       ),

@@ -21,6 +21,7 @@ export interface ResourceViewProps {
   serverTimeSkewInMs: number;
   title: string;
   resourceType: LegacyTypes;
+  currentOrg: string;
   filterFn: (resource: Resource) => boolean;
   createResourceFn: (
     courseId: string,
@@ -64,7 +65,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   onClickResource(id) {
-    this.props.dispatch(viewActions.viewDocument(id, this.props.course.guid));
+    const { course, currentOrg, dispatch } = this.props;
+
+    dispatch(viewActions.viewDocument(id, course.guid, currentOrg));
   }
 
   onCreateResource = (e) => {
