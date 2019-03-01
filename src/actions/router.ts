@@ -64,17 +64,23 @@ export const getRouteFromPath = (path: string, search: string) => {
       case '':
         return {
           route: ROUTE.ROOT,
-          ...parseCourseResourceIds(path),
+          resourceId: Maybe.nothing<string>(),
+          courseId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'create':
         return {
           route: ROUTE.CREATE,
-          ...parseCourseResourceIds(path),
+          resourceId: Maybe.nothing<string>(),
+          courseId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'import':
         return {
           route: ROUTE.IMPORT,
-          ...parseCourseResourceIds(path),
+          resourceId: Maybe.nothing<string>(),
+          courseId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'skills':
         return {

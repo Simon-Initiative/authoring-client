@@ -17,8 +17,10 @@ import { Title } from 'components/objectives/Title';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { TextInput } from 'editors/content/common/controls';
 import { isNullOrUndefined } from 'util';
+import { CCLicenseTypes } from 'data/content/learning/common';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
+const CC_LICENSES = require('../../../../assets/cclicenses.png');
 
 export interface CourseEditorProps {
   model: models.CourseModel;
@@ -497,6 +499,36 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       });
   }
 
+  renderLicenseSelect() {
+    const license = this.props.model.metadata.license;
+    const licenseOptions = CCLicenseTypes
+      .map(cc => <option key={cc.acronym} value={cc.url}>{cc.description}</option>);
+    return (
+      <React.Fragment>
+        <Select
+          className="licenseSelect"
+          editMode={this.props.editMode}
+          value={license}
+          onChange={this.onLicenseChange}>
+          {licenseOptions}
+        </Select> <a title="License Summary" href={license} target="_blank">
+          <i className="fa fa-external-link" /></a>
+      </React.Fragment>
+    );
+  }
+
+  onLicenseChange = (license: string) => {
+    const model = this.props.model.with({ metadata: this.props.model.metadata.with({ license }) });
+    this.props.courseChanged(model);
+    const doc = new Document().with({
+      _courseId: model.guid,
+      _id: model.id,
+      _rev: model.rev.toString(),
+      model,
+    });
+    persistence.persistDocument(doc);
+  }
+
   render() {
     const { model } = this.props;
 
@@ -603,6 +635,19 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               <div className="row">
                 <div className="col-3">Version</div>
                 <div className="col-9">{model.version}</div>
+              </div>
+              <div className="row">
+                <div className="col-3">License <HelpPopover activateOnClick>
+                  <div><img src={CC_LICENSES} />
+                    <br /><br />
+                    <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                      target="_blank">
+                      More information
+                    </a>
+                  </div>
+                </HelpPopover>
+                </div>
+                <div className="col-9">{this.renderLicenseSelect()}</div>
               </div>
               <div className="row">
                 <div className="col-3">Status</div>
