@@ -23,6 +23,7 @@ interface OwnProps {
   profile: UserProfile;
   userId: string;
   userName: string;
+  onCreateOrg: () => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
