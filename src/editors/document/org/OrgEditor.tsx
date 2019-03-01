@@ -8,10 +8,6 @@ import { getExpandId, render, NodeTypes } from 'editors/document/org/traversal';
 import { collapseNodes, expandNodes } from 'actions/expand';
 import { SourceNodeType } from 'editors/content/org/drag/utils';
 import { TreeNode } from 'editors/document/org/TreeNode';
-import { Actions } from 'editors/document/org/Actions.controller';
-import { Details } from 'editors/document/org/Details';
-import { LabelsEditor } from 'editors/content/org/LabelsEditor';
-import { duplicateOrganization } from 'actions/models';
 import { containsUnitsOnly } from './utils';
 import { ModalMessage } from 'utils/ModalMessage';
 import * as Messages from 'types/messages';
@@ -194,11 +190,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
     super(props);
 
     this.unitsMessageDisplayed = false;
-    this.onLabelsEdit = this.onLabelsEdit.bind(this);
     this.onNodeEdit = this.onNodeEdit.bind(this);
-    this.onAddSequence = this.onAddSequence.bind(this);
-    this.onCollapse = this.onCollapse.bind(this);
-    this.onExpand = this.onExpand.bind(this);
     this.onClickComponent = this.onClickComponent.bind(this);
 
     this.pendingHighlightedNodes = null;
@@ -419,152 +411,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
     );
   }
 
-  componentDidMount() {
-    // If the page has not been viewed yet or custom expand/collapse state has not been set by the
-    // user, expand all of the nodes as a default state
-    this.props.expanded.caseOf({
-      just: expandedNodes => null,
-      nothing: () => this.onExpand(),
-    });
-  }
-
-  renderDetails() {
-    return (
-      <div className="org-tab">
-        <Details
-          editMode={this.props.editMode}
-          model={this.props.model}
-          onEdit={this.props.onEdit}
-        />
-      </div>
-    );
-  }
-
-  onLabelsEdit(labels) {
-    const update = org.makeUpdateRootModel(m => m.with({ labels }));
-    this.props.onEdit(update);
-  }
-
-  renderLabels() {
-    return (
-      <div className="org-tab">
-        <LabelsEditor
-          {...this.props}
-          activeContentGuid={null}
-          hover={null}
-          onUpdateHover={() => { }}
-          parent={null}
-          onFocus={this.onFocus.bind(this)}
-          onEdit={this.onLabelsEdit} model={this.props.model.labels} />
-      </div>
-    );
-  }
-
-  onFocus(child, parent) {
-
-  }
-
-  renderConstraints() {
-    return <p>TBD Constraint Editor</p>;
-  }
-
-  renderActionBar() {
-    return (
-      <div className="action-bar">
-        <button key="add" className="btn btn-link"
-          disabled={!this.props.editMode} onClick={this.onAddSequence}>
-          <i className="fa fa-plus" />Add {this.props.model.labels.sequence}
-        </button>
-        <button key="expand" className="btn btn-link" onClick={this.onExpand}>
-          <i className="fa fa-chevron-down" />Expand All
-        </button>
-        <button key="collapse" className="btn btn-link"
-          onClick={this.onCollapse}>
-          <i className="fa fa-chevron-up" />Collapse All
-        </button>
-      </div>
-    );
-  }
-
-  onAddSequence() {
-
-    const mapper = (model) => {
-      const s: contentTypes.Sequence = new contentTypes.Sequence()
-        .with({ title: 'New ' + model.labels.sequence });
-      const sequences = model.sequences
-        .with({ children: model.sequences.children.set(s.guid, s) });
-
-      return model.with({ sequences });
-    };
-
-    this.props.onEdit(org.makeUpdateRootModel(mapper));
-  }
-
-  onExpand() {
-    this.props.dispatch(
-      expandNodes(this.props.context.documentId, this.allNodeIds));
-  }
-
-  onCollapse() {
-    this.props.dispatch(
-      collapseNodes(this.props.context.documentId, this.allNodeIds));
-  }
-
-  onTabClick(index: number) {
-    this.setState({ currentTab: index });
-  }
-
-  renderTabs() {
-
-    const tabs = ['Content', 'Details', 'Labels', 'Actions']
-      .map((title, index) => {
-        const active = index === this.state.currentTab ? 'active' : '';
-        const classes = 'nav-link ' + active;
-        return (
-          <a
-            key={title}
-            className={classes}
-            onClick={this.onTabClick.bind(this, index)}>
-            {title}
-          </a>
-        );
-      });
-
-    return (
-      <ul className="nav nav-tabs">
-        {tabs}
-      </ul>
-    );
-  }
-
-  renderActions() {
-    const { dispatch, model, context } = this.props;
-
-    const dupe = () => dispatch(
-      duplicateOrganization(
-        context.courseId,
-        model, context.courseModel));
-
-    return (
-      <Actions
-        onDuplicate={dupe}
-        org={model}
-        course={this.props.course}
-      />);
-  }
-
-  renderActiveTabContent() {
-    switch (this.state.currentTab) {
-      case TABS.Content:
-        return this.renderContent();
-      case TABS.Details:
-        return this.renderDetails();
-      case TABS.Labels:
-        return this.renderLabels();
-      case TABS.Actions:
-        return this.renderActions();
-    }
-  }
 
   render() {
     return (

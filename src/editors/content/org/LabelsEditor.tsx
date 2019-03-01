@@ -1,16 +1,22 @@
 import * as React from 'react';
-import { TextInput } from '../../content/common/TextInput';
-import * as contentTypes from '../../../data/contentTypes';
-
-import { AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import * as models from 'data/models';
+import * as org from 'data/models/utils/org';
+import { Title } from 'components/objectives/Title';
 
 export interface LabelsEditor {
 
 }
 
-export interface LabelsEditorProps extends AbstractContentEditorProps<contentTypes.Labels> {
-
+export interface LabelsEditorProps {
+  onEdit: (cr: org.OrgChangeRequest) => void;
+  model: models.OrganizationModel;
+  editMode: boolean;
 }
+
+const labelMapper = (toApply: Object, m: models.OrganizationModel) => {
+  const labels = m.labels.with(toApply);
+  return m.with({ labels });
+};
 
 export interface LabelsEditorState {
 
@@ -22,67 +28,53 @@ export class LabelsEditor
   constructor(props) {
     super(props);
 
-    this.onSequenceEdit = this.onSequenceEdit.bind(this);
-    this.onUnitEdit = this.onUnitEdit.bind(this);
-    this.onModuleEdit = this.onModuleEdit.bind(this);
-    this.onSectionEdit = this.onSectionEdit.bind(this);
+    this.onUpdate = this.onUpdate.bind(this);
   }
 
-  onSequenceEdit(sequence) {
-    this.props.onEdit(this.props.model.with({ sequence }));
+
+  onUpdate(attr, value) {
+    const update = {
+      [attr]: value,
+    };
+    const cr = org.makeUpdateRootModel(labelMapper.bind(undefined, update));
+    this.props.onEdit(cr);
   }
 
-  onUnitEdit(unit) {
-    this.props.onEdit(this.props.model.with({ unit }));
-  }
-
-  onModuleEdit(module) {
-    this.props.onEdit(this.props.model.with({ module }));
-  }
-
-  onSectionEdit(section) {
-    this.props.onEdit(this.props.model.with({ section }));
+  renderRow(model, attr: string) {
+    const label = attr.substr(0, 1).toUpperCase() + attr.substr(1);
+    return (
+      <div className="form-group row">
+        <label className="col-2 col-form-label">{label}</label>
+        <div className="col-2">
+          <Title
+            title={model.labels[attr]}
+            editMode={this.props.editMode}
+            onBeginExternallEdit={() => true}
+            requiresExternalEdit={false}
+            isHoveredOver={true}
+            onEdit={this.onUpdate.bind(this, attr)}
+            loading={false}
+            disableRemoval={true}
+            editWording="Edit"
+            onRemove={() => false}
+          >
+            {model.labels[attr]}
+          </Title>
+        </div>
+      </div>
+    );
   }
 
   render() {
 
+    const rows = ['sequence', 'unit', 'module', 'section'].map((attr) => {
+      return this.renderRow(this.props.model, attr);
+    });
+
     return (
       <div className="labels-editor">
-
         <p>Enter custom labels to use in place of the following organization components:</p>
-
-        <div className="form-group row">
-          <label className="col-2 col-form-label">Sequence</label>
-          <div className="col-2">
-            <TextInput editMode={this.props.editMode}
-              width="100%" label="" value={this.props.model.sequence}
-              onEdit={this.onSequenceEdit} type="text"/>
-          </div>
-        </div>
-        <div className="form-group row">
-          <label className="col-2 col-form-label">Unit</label>
-          <div className="col-2">
-            <TextInput editMode={this.props.editMode}
-              width="100%" label="" value={this.props.model.unit}
-              onEdit={this.onUnitEdit} type="text"/>
-          </div>
-        </div>
-        <div className="form-group row">
-          <label className="col-2 col-form-label">Module</label>
-          <div className="col-2">
-            <TextInput editMode={this.props.editMode}
-              width="100%" label="" value={this.props.model.module}
-              onEdit={this.onModuleEdit} type="text"/>
-          </div>
-        </div>
-        <div className="form-group row">
-          <label className="col-2 col-form-label">Section</label>
-          <div className="col-2">
-            <TextInput editMode={this.props.editMode}
-              width="100%" label="" value={this.props.model.section}
-              onEdit={this.onSectionEdit} type="text"/>
-          </div>
-        </div>
+        {rows}
       </div>
     );
   }
