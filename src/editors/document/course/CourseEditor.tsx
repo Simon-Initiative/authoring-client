@@ -18,7 +18,6 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { TextInput } from 'editors/content/common/controls';
 import { isNullOrUndefined } from 'util';
 import { CCLicenseTypes } from 'data/content/learning/common';
-import { Tooltip } from 'utils/tooltip';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
