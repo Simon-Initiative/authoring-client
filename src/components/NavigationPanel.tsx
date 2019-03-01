@@ -186,10 +186,18 @@ export class NavigationPanel
     const { className, classes, viewActions, course, router, activeOrg } = this.props;
     const { showOrgDropdown } = this.state;
 
-    const orgDocumentId = router.orgId.caseOf({
-      just: id => id,
-      nothing: () => null,
+    // course may not be loaded before first render. wait for it to load before rendering
+    if (!course) return null;
+
+    // get org id from router or select the first organization
+    const currentOrg = router.orgId.caseOf({
+      just: guid => course.resources.find(r => r.guid === guid),
+      nothing: () => course.resources.find(r => r.type === 'x-oli-organization'),
     });
+
+    console.log('router.orgId', router.orgId)
+    console.log('currentOrg', currentOrg)
+    console.log('course.resources', course.resources)
 
     let selectedItem: Maybe<nav.NavigationItem> = Maybe.just(nav.makePackageOverview());
     if (router.route === ROUTE.OBJECTIVES) {
@@ -201,9 +209,7 @@ export class NavigationPanel
       });
     }
 
-    console.log(selectedItem);
-
-    return course && (
+    return (
       <div
         className={classNames(['NavigationPanel', classes.NavigationPanel, className])}
         style={{ width: this.getWidth() }}>
@@ -229,14 +235,9 @@ export class NavigationPanel
         <div className="dropdown">
           <div className={classNames([classes.navItemDropdown])}>
             <div className={classes.dropdownText}
-              onClick={() => viewActions.viewOrganizations(course.guid)}>
-              <i className="fa fa-th-list" /> {activeOrg.caseOf({
-                just: org => (org.model as OrganizationModel).title,
-                nothing: () => Maybe.maybe(course.resources.first()).caseOf({
-                  just: org => org.title,
-                  nothing: () => 'Select an Organization',
-                }),
-              })}
+              onClick={() =>
+                viewActions.viewDocument(currentOrg.guid, course.guid, currentOrg.guid)}>
+              <i className="fa fa-th-list" /> {currentOrg.title}
             </div>
             <div className={classes.dropdownToggle}
               onClick={(e) => {
@@ -250,7 +251,7 @@ export class NavigationPanel
             {course.resources.valueSeq().filter(r => r.type === 'x-oli-organization').map(org => (
               <a key={org.guid}
                 className={classNames(['dropdown-item'])}
-                onClick={() => { /** Set Active Org */ }}>
+                onClick={() => viewActions.viewDocument(org.guid, course.guid, org.guid)}>
                 {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
               </a>
             ))}
@@ -258,7 +259,7 @@ export class NavigationPanel
         </div>
         <div className={classes.orgTree}>
           <OrgEditorManager
-            documentId={orgDocumentId}
+            documentId={currentOrg.id}
             selectedItem={selectedItem}
             {...this.props}
           />
