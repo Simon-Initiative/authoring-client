@@ -300,7 +300,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         renderMenuItemChildren={this.renderMenuItemChildren}
         onChange={this.onEditDevelopers}
         options={developers}
-        labelKey={d => `${d.firstName} ${d.lastName}`}
+        labelKey={(d: UserInfo) => `${d.firstName} ${d.lastName} (${d.email})`}
         selected={this.state.selectedDevelopers}
       />
     );
