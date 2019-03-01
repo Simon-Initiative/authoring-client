@@ -15,7 +15,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onDeleteResource: (resource: Resource, course: CourseModel) => void;
+  onDeleteResource: (resource: Resource, course: CourseModel, orgId: string) => void;
 }
 
 interface OwnProps {
@@ -25,14 +25,19 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
+  const { orgs } = state;
+  const orgId = orgs.activeOrg.caseOf({
+    just: org => org.model.guid,
+    nothing: () => null,
+  });
   return {
-
+    orgId,
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onDeleteResource: (resource: Resource, course: CourseModel) => {
+    onDeleteResource: (resource: Resource, course: CourseModel, orgId: string) => {
       const updatedResource = resource.with({ resourceState: ResourceState.DELETED });
       const resources = Immutable.OrderedMap<string, Resource>([[
         updatedResource.guid, updatedResource,
@@ -41,19 +46,19 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
 
       switch (resource.type as LegacyTypes) {
         case 'x-oli-workbook_page':
-          dispatch(viewActions.viewPages(course.guid));
+          dispatch(viewActions.viewPages(course.guid, orgId));
           break;
         case 'x-oli-inline-assessment':
-          dispatch(viewActions.viewFormativeAssessments(course.guid));
+          dispatch(viewActions.viewFormativeAssessments(course.guid, orgId));
           break;
         case 'x-oli-assessment2':
-          dispatch(viewActions.viewSummativeAssessments(course.guid));
+          dispatch(viewActions.viewSummativeAssessments(course.guid, orgId));
           break;
         case 'x-oli-assessment2-pool':
-          dispatch(viewActions.viewPools(course.guid));
+          dispatch(viewActions.viewPools(course.guid, orgId));
           break;
         case 'x-oli-organization':
-          dispatch(viewActions.viewOrganizations(course.guid));
+          dispatch(viewActions.viewOrganizations(course.guid, orgId));
           break;
         default:
           break;

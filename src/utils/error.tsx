@@ -70,12 +70,13 @@ function buildModalMessageAction(label, text): Messages.MessageAction {
   };
 }
 
-function goToObjectivesPage(label: string, courseId: string): Messages.MessageAction {
+function goToObjectivesPage(
+  label: string, courseId: string, orgId: string): Messages.MessageAction {
   return {
     label,
     enabled: true,
     execute: (message: Messages.Message, dispatch) => {
-      dispatch(viewObjectives(courseId));
+      dispatch(viewObjectives(courseId, orgId));
     },
   };
 }
@@ -93,11 +94,11 @@ const missingObjectivesDetails =
   </React.Fragment>;
 // tslint:enable:max-line-length
 
-export function buildMissingObjectivesMessage(courseId: string) {
+export function buildMissingObjectivesMessage(courseId: string, orgId: string) {
 
   const actions = [
     buildModalMessageAction('Learn', missingObjectivesDetails),
-    goToObjectivesPage('Create', courseId),
+    goToObjectivesPage('Create', courseId, orgId),
   ];
 
   const content = new Messages.TitledContent().with({
@@ -128,11 +129,11 @@ const missingSkillsDetails =
   </React.Fragment>;
 // tslint:enable:max-line-length
 
-export function buildMissingSkillsMessage(courseId: string) {
+export function buildMissingSkillsMessage(courseId: string, orgId: string) {
 
   const actions = [
     buildModalMessageAction('Learn', missingSkillsDetails),
-    goToObjectivesPage('Create', courseId),
+    goToObjectivesPage('Create', courseId, orgId),
   ];
 
   const content = new Messages.TitledContent().with({

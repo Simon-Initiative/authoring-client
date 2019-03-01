@@ -294,7 +294,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
       const newNodes = identifyNewNodes(lastAllNodes, this.allNodeIds);
       if (newNodes.length > 0) {
-
+        console.log('new nodes ');
         if (this.pendingHighlightedNodes === null) {
           this.pendingHighlightedNodes
             = Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid));
@@ -567,6 +567,13 @@ class OrgEditor extends React.Component<OrgEditorProps,
   }
 
   render() {
+    console.log('org editor render');
+
+    console.log(this.props.expanded.caseOf({
+      just: e => '' + e.size,
+      nothing: () => 'nothing',
+    }));
+
     return (
       <div className="org-editor">
         {this.renderContent()}
