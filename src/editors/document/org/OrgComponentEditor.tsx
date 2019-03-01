@@ -78,7 +78,8 @@ export class OrgComponentEditor
   findComponentModel(props: OrgComponentEditorProps) {
     props.org.caseOf({
       just: (org) => {
-        // Find the component
+        // Find the component, use sequences as the default
+        this.setState({ model: Maybe.just(org.sequences as any) });
         map(
           (e) => {
             if (e.id === props.componentId) {
@@ -133,25 +134,31 @@ export class OrgComponentEditor
 
     const { editMode } = this.props;
 
+    const titleEditor = model.title !== undefined
+      ? (
+        <Title
+          title={model.title}
+          editMode={editMode}
+          onBeginExternallEdit={() => true}
+          requiresExternalEdit={false}
+          isHoveredOver={true}
+          onEdit={this.onTitleEdit.bind(this, model)}
+          loading={false}
+          disableRemoval={true}
+          editWording="Edit"
+          onRemove={() => false}
+          size={Size.Large}
+        >
+          <span style={{ fontSize: '25pt' }}>{this.getLabel(model) + ': ' + model.title}</span>
+        </Title>
+      )
+      : null;
+
     return this.props.org.caseOf({
       just: (org) => {
         return (
           <div className="org-component-editor">
-            <Title
-              title={model.title}
-              editMode={editMode}
-              onBeginExternallEdit={() => true}
-              requiresExternalEdit={false}
-              isHoveredOver={true}
-              onEdit={this.onTitleEdit.bind(this, model)}
-              loading={false}
-              disableRemoval={true}
-              editWording="Edit"
-              onRemove={() => false}
-              size={Size.Large}
-            >
-              <span style={{ fontSize: '25pt' }}>{this.getLabel(model) + ': ' + model.title}</span>
-            </Title>
+            {titleEditor}
             {this.renderActionBar(model)}
             <Outline
               onView={this.onView}

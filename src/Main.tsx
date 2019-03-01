@@ -34,7 +34,7 @@ import { ResourceLoading } from 'components/ResourceLoading';
 import * as Msg from 'types/messages';
 import * as messageActions from 'actions/messages';
 import OrgComponentEditor from 'editors/document/org/OrgComponent.controller';
-
+import { controller as OrgDetailsEditor } from 'editors/document/org/OrgDetailsEditor.controller';
 import './Main.scss';
 import Preview from 'components/Preview';
 import { caseOf } from 'utils/utils';
@@ -329,6 +329,8 @@ export default class Main extends React.Component<MainProps, MainState> {
                 course.caseOf({
                   just: c => router.resourceId.caseOf({
                     just: (resourceId) => {
+
+                      // Course editor
                       if (resourceId === c.guid) {
                         return (
                           <CourseEditor
@@ -336,12 +338,20 @@ export default class Main extends React.Component<MainProps, MainState> {
                             editMode={c.editable} />
                         );
                       }
-                      if (resources[resourceId] !== undefined) {
-                        return this.renderResource(resources[resourceId]);
+
+                      const orgId = router.orgId.caseOf({
+                        just: o => o,
+                        nothing: () => null,
+                      });
+
+                      // Org editor
+                      if (resourceId === orgId) {
+                        return <OrgDetailsEditor />;
                       }
 
                       const res = c.resources.get(resourceId);
 
+                      // Org component
                       if (res === undefined) {
                         return (
                           <OrgComponentEditor
@@ -351,6 +361,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                         );
                       }
 
+                      // Regular resource
                       return (
                         <DocumentView
                           onLoad={(docId: string) => onLoad(c.guid, docId)}
