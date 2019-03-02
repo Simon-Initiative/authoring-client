@@ -39,6 +39,7 @@ import './Main.scss';
 import Preview from 'components/Preview';
 import { caseOf } from 'utils/utils';
 import { NavigationPanel } from 'components/NavigationPanel.controller';
+import * as viewActions from 'actions/view';
 
 type ResourceList = {
   title: string,
@@ -147,6 +148,8 @@ interface MainProps {
   onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
+  onUpdateCourseResources: (updated) => void;
+  viewActions: viewActions.ViewActions;
 }
 
 interface MainState {
@@ -211,6 +214,27 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     }
   }
+
+  onCreateOrg = () => {
+    const { course, onUpdateCourseResources, viewActions } = this.props;
+
+    course.lift((c) => {
+      const title = 'New Organization';
+      const type = LegacyTypes.organization;
+      const resource = resources.organizations.createResourceFn(c.guid, title, type);
+
+      persistence.createDocument(c.guid, resource)
+        .then((result) => {
+          const r = (result as any).model.resource;
+
+          const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
+          onUpdateCourseResources(updated);
+
+          viewActions.viewDocument(r.guid, c.guid, r.guid);
+        });
+    });
+  }
+
 
   renderResource(resource: ResourceList) {
     const { onDispatch, server, course, router } = this.props;
@@ -288,6 +312,7 @@ export default class Main extends React.Component<MainProps, MainState> {
           <div className="main-splitview">
             <NavigationPanel
               profile={user.profile}
+              onCreateOrg={this.onCreateOrg}
               userId={user.userId}
               userName={user.user} />
             <div className="main-splitview-content">

@@ -176,6 +176,7 @@ export interface NavigationPanelProps {
   profile: UserProfile;
   userId: string;
   userName: string;
+  onCreateOrg: () => void;
 }
 
 export interface NavigationPanelState {
@@ -228,7 +229,7 @@ export class NavigationPanel
   }
 
   render() {
-    const { className, classes, viewActions, course, router } = this.props;
+    const { className, classes, viewActions, course, router, onCreateOrg } = this.props;
     const { showOrgDropdown } = this.state;
 
     // course may not be loaded before first render. wait for it to load before rendering
@@ -302,6 +303,12 @@ export class NavigationPanel
                 {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
               </a>
             ))}
+            <div className="dropdown-divider" />
+            <a key="create-org"
+              className={classNames(['dropdown-item'])}
+              onClick={() => onCreateOrg()}>
+              <i className={'fa fa-plus-circle'} /> Create New Organization
+            </a>
           </div>
         </div>
         <div className={classes.orgTree}>
