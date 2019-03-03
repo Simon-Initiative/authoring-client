@@ -401,11 +401,9 @@ class OrgEditor extends React.Component<OrgEditorProps,
     return (
       <table className="table table-sm">
         <tbody>
-
           {render(
             this.props.model.sequences,
             isExpanded, renderNode, this.positionsAtLevel)}
-
         </tbody>
       </table>
     );

@@ -26,7 +26,7 @@ export const styles: JSSStyles = {
     padding: [10, 0],
   },
   navItem: {
-    fontSize: '1.2em',
+    fontSize: '1.0em',
     fontWeight: 500,
     margin: [2, 5],
     padding: [5, 10],
@@ -50,7 +50,7 @@ export const styles: JSSStyles = {
     flexDirection: 'row',
     border: 'none',
     width: '100%',
-    fontSize: '1.2em',
+    fontSize: '1.0em',
     fontWeight: 500,
     borderRadius: 6,
 
