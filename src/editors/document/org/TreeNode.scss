@@ -1,25 +1,37 @@
 @import 'oli/colors';
 
-.tree-node {
+
+.content {
+  height: 36px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 10px;
+  vertical-align: middle;
+  font-size: 1.0em;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
 
   &.selected {
-    background: $selection;
+    background-color: $selection;
     border-color: $selection;
     color: $white;
   }
 
-  .content {
-    height: 40px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 0 10px;
-    vertical-align: center;
-    font-size: 1.0em;
-    font-weight: 500;
+  &:hover {
+    background-color: $gray-lightest;
+    border-color: $gray-lightest;
 
-    .toggle {
-      margin-right: 5px;
+    &.selected {
+      background-color: $selection;
+      border-color: $selection;
+      color: $white;
     }
+  }
+
+  .toggle {
+    margin-right: 5px;
   }
 }

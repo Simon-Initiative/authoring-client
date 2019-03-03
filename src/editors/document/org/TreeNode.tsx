@@ -97,14 +97,16 @@ export class TreeNode
     const { highlighted, isSelected, depth, model } = this.props;
     return (
       <tr
-        className={`tree-node ${highlighted ? 'table-info' : ''} ${isSelected ? 'selected' : ''}`}
+        className={`${highlighted ? 'table-info' : ''}`}
         key={model.guid}>
-        <td className="content" onClick={() => this.props.onClick(model)}>
-          <span style={{ marginLeft: (depth * 20) }}>
-            {this.renderTitle()}
-          </span>
+        <td onClick={() => this.props.onClick(model)}>
+          <div className={`content ${isSelected ? 'selected' : ''}`}>
+            <span style={{ marginLeft: (depth * 20) }}>
+              {this.renderTitle()}
+            </span>
+          </div>
         </td>
-      </tr>
+      </tr >
     );
   }
 

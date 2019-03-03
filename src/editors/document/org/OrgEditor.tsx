@@ -215,6 +215,38 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.updateUnitsMessage(props);
   }
 
+  componentDidMount() {
+
+    // If the page has not been viewed yet or custom expand/collapse state has not been set by the
+    // user, expand the top-level nodes
+    this.props.expanded.caseOf({
+      just: expandedNodes => null,
+      nothing: () => this.expandFirstTwoLevels(),
+    });
+  }
+
+  expandFirstTwoLevels() {
+    const ids = [];
+    this.props.model.sequences.children.toArray().forEach(
+      (c) => {
+        const id = (c as any).id;
+        if (id !== undefined) {
+          ids.push(id);
+          const children = (c as any).children;
+          if (children !== undefined) {
+            children.toArray().forEach((s) => {
+              const id = (s as any).id;
+              if (id !== undefined) {
+                ids.push(id);
+              }
+            });
+          }
+        }
+      });
+    this.props.dispatch(
+      expandNodes(this.props.context.documentId, ids));
+  }
+
   updateUnitsMessage(props: OrgEditorProps) {
 
     const containsOnly = containsUnitsOnly(props.model);
