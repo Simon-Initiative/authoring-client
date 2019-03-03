@@ -455,8 +455,8 @@ export default class Main extends React.Component<MainProps, MainState> {
     return (
       <div className="main" onMouseOver={() => hover && onUpdateHover(null)}>
         <div className="main-header">
-          <Messages />
           <Header />
+          <Messages />
         </div>
         <div className="main-content">
           {this.getView()}

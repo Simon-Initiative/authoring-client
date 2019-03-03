@@ -153,7 +153,7 @@ export class TreeNode
 
     return (
       <tr
-        className={`tree-node ${highlighted ? 'table-info' : ''} ${isSelected ? 'selected' : ''}`}
+        className={`tree-node ${highlighted ? 'highlighted' : ''} ${isSelected ? 'selected' : ''}`}
         key={model.guid}
         onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}>
         <td className="content">

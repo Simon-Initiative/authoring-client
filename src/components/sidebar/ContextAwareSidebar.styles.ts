@@ -1,6 +1,7 @@
 import { JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
+import * as chroma from 'chroma-js';
 
 export const SIDEBAR_WIDTH = 310;
 export const SIDEBAR_CLOSE_ANIMATION_DURATION_MS = 200;
@@ -14,7 +15,7 @@ export const styles: JSSStyles = {
     width: SIDEBAR_WIDTH,
     overflow: 'hidden',
     height: '100%',
-    backgroundColor: '#fafafa',
+    backgroundColor: colors.white,
     borderLeft: [[1, 'solid', colors.grayLight]],
   },
 

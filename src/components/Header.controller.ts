@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import Header from 'components/Header';
 import { Maybe } from 'tsmonad';
 import * as viewActions from 'actions/view';
+import { RouterState } from 'reducers/router';
 
 interface StateProps {
   course: any;
@@ -10,6 +11,7 @@ interface StateProps {
   isSaveInProcess: boolean;
   lastRequestSucceeded: Maybe<boolean>;
   saveCount: number;
+  router: RouterState;
 }
 
 interface DispatchProps {
@@ -24,6 +26,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
     course,
     user,
     documents,
+    router,
   } = state;
 
   const doc =  documents.toArray().length > 0
@@ -39,6 +42,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
     isSaveInProcess,
     lastRequestSucceeded,
     saveCount,
+    router,
   };
 };
 

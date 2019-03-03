@@ -12,9 +12,10 @@ import { disableSelect } from 'styles/mixins';
 import { Document } from 'data/persistence';
 import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
-
+import * as chroma from 'chroma-js';
 
 const DEFAULT_WIDTH_PX = 400;
+const hoverBackground = chroma(colors.pageBackground).darken(0.3).hex();
 
 export const styles: JSSStyles = {
   NavigationPanel: {
@@ -41,7 +42,7 @@ export const styles: JSSStyles = {
 
     '&:hover': {
       backgroundColor: colors.grayLighter,
-      borderColor: colors.grayLighter,
+      borderColor: hoverBackground,
     },
   },
   navItemDropdown: {
@@ -56,10 +57,10 @@ export const styles: JSSStyles = {
 
     '&:hover': {
       '& $dropdownText': {
-        border: [1, 'solid', colors.grayLighter],
+        border: [1, 'solid', hoverBackground],
       },
       '& $dropdownToggle': {
-        border: [1, 'solid', colors.grayLighter],
+        border: [1, 'solid', hoverBackground],
         borderLeft: 'none',
       },
 
@@ -129,7 +130,7 @@ export const styles: JSSStyles = {
     },
 
     '&:hover': {
-      backgroundColor: colors.grayLighter,
+      backgroundColor: hoverBackground,
     },
   },
   dropdownToggle: {
@@ -145,7 +146,7 @@ export const styles: JSSStyles = {
     },
 
     '&:hover': {
-      backgroundColor: colors.grayLighter,
+      backgroundColor: hoverBackground,
     },
   },
   selectedNavItem: {
@@ -161,8 +162,8 @@ export const styles: JSSStyles = {
   orgTree: {
     flex: 1,
     overflowY: 'scroll',
-    borderTop: [1, 'solid', colors.grayLighter],
-    borderBottom: [1, 'solid', colors.grayLighter],
+    borderTop: [1, 'solid', hoverBackground],
+    borderBottom: [1, 'solid', hoverBackground],
     margin: [5, 0],
   },
 };
