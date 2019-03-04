@@ -94,9 +94,9 @@ export class TreeNode
         key={model.guid}>
         <td onClick={() => this.props.onClick(model)}>
           <div className={`treenode-content ${isSelected ? 'selected' : ''}`}>
-            <span className="treenode-title" style={{ marginLeft: (depth * 20) }}>
+            <div className="treenode-title" style={{ marginLeft: (depth * 20) }}>
               {this.renderTitle()}
-            </span>
+            </div>
           </div>
         </td>
       </tr >
