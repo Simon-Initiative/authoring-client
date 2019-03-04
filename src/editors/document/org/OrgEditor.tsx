@@ -316,24 +316,31 @@ class OrgEditor extends React.Component<OrgEditorProps,
       this.positionsAtLevel = calculatePositionsAtLevel(
         nextProps.model, this.allNodeIds, this.idMap, this.parentMap);
 
-      const newNodes = identifyNewNodes(lastAllNodes, this.allNodeIds);
-      if (newNodes.length > 0) {
-        if (this.pendingHighlightedNodes === null) {
-          this.pendingHighlightedNodes
-            = Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid));
-        } else {
-          this.pendingHighlightedNodes = this.pendingHighlightedNodes
-            .union(Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid)));
-        }
+      // As long as we are still using the same actual document, indentify
+      // newly added nodes so that we can highlight them:
 
-        // As long as the new nodes were not the result of an undo or redo,
-        // expand their parent node so that the new nodes are visible
-        if (this.props.context.undoRedoGuid === nextProps.context.undoRedoGuid) {
-          this.props.dispatch(
-            expandNodes(this.props.context.documentId, newNodes
-              .map(id => this.parentMap[this.idMap[id].guid].id)));
+      if (this.props.model.guid === nextProps.model.guid) {
+        const newNodes = identifyNewNodes(lastAllNodes, this.allNodeIds);
+        if (newNodes.length > 0) {
+          if (this.pendingHighlightedNodes === null) {
+            this.pendingHighlightedNodes
+              = Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid));
+          } else {
+            this.pendingHighlightedNodes = this.pendingHighlightedNodes
+              .union(Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid)));
+          }
+
+          // As long as the new nodes were not the result of an undo or redo,
+          // expand their parent node so that the new nodes are visible
+          if (this.props.context.undoRedoGuid === nextProps.context.undoRedoGuid) {
+            this.props.dispatch(
+              expandNodes(this.props.context.documentId, newNodes
+                .map(id => this.parentMap[this.idMap[id].guid].id)));
+          }
         }
       }
+
+
     }
 
     if (this.pendingHighlightedNodes !== null) {
