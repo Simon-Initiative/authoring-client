@@ -47,7 +47,10 @@ export const SidebarToggle = injectSheetSFC<SidebarToggleProps>(styles)(({
   return !editorSidebar.show && (
     <div
       className={classNames(['SidebarToggle', classes.SidebarToggle, className])}
-      onClick={() => onToggleSidebar(!editorSidebar.show)}>
+      onClick={(e) => {
+        onToggleSidebar(!editorSidebar.show);
+        e.stopPropagation();
+      }}>
       <i className="fa fa-angle-double-left" />
     </div>
   );
