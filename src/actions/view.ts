@@ -148,12 +148,14 @@ export function viewCourse(courseId: string) {
           // Do not use this org if it doesn't belong to this course
           const currentOrFirst = model.resources.has(documentId) ? documentId : orgs[0].guid;
           if (currentOrFirst !== documentId) {
+            dispatch(orgActions.releaseOrg());
             dispatch(orgActions.load(courseId, currentOrFirst));
           }
           dispatch(viewDocument(courseId, courseId, currentOrFirst));
 
         },
         nothing: () => {
+          dispatch(orgActions.releaseOrg());
           dispatch(orgActions.load(courseId, orgs[0].guid));
           dispatch(viewDocument(courseId, courseId, orgs[0].guid));
         },
