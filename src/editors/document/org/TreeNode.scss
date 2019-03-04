@@ -15,7 +15,11 @@
   cursor: pointer;
 
   .treenode-title {
-    vertical-align: -webkit-baseline-middle;
+    vertical-align: middle;
+    margin: 4px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   &.selected {
