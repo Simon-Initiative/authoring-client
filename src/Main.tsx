@@ -19,15 +19,13 @@ import ResourceView from 'components/ResourceView';
 import CreateCourseView from 'components/CreateCourseView';
 import ObjectiveSkillView from 'components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from 'components/ImportCourseView';
-import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
 import Messages from 'components/message/Messages.controller';
-import { Resource, ResourceState } from 'data/content/resource';
+import { Resource } from 'data/content/resource';
 import { GlobalError } from 'components/GlobalError';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import CourseEditor from 'editors/document/course/CourseEditor.controller';
-import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { RouterState } from 'reducers/router';
 import { ROUTE } from 'actions/router';
 import { ResourceLoading } from 'components/ResourceLoading';
@@ -162,12 +160,6 @@ export default class Main extends React.Component<MainProps, MainState> {
 
   renderResources() {
     const { onDispatch, server, course, router } = this.props;
-
-    const orgHelpPopover = (
-      <HelpPopover activateOnClick>
-        <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
-      </HelpPopover>
-    );
 
     return course.caseOf({
       just: (c) => {
