@@ -15,7 +15,6 @@ export interface TitleProps {
   onBeginExternallEdit: () => void;
   loading: boolean;
   onRemove: () => void;
-  onToggleExpanded?: () => void;
   disableRemoval?: boolean;
   editWording?: string;
   size?: Size;
@@ -137,10 +136,7 @@ export class Title
 
     return (
       <React.Fragment>
-        <button
-          key="itemClick"
-          onClick={this.props.onToggleExpanded ? this.props.onToggleExpanded : null}
-          type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
+        <span style={linkStyle}>{this.props.children}</span>
         {actionButtons}
       </React.Fragment>
     );

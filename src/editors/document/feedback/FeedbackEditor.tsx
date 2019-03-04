@@ -27,6 +27,7 @@ import { Node } from 'data/content/assessment/node';
 import { FeedbackQuestion } from 'data/content/feedback/feedback_questions';
 
 import './FeedbackEditor.scss';
+import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 
 interface Props extends AbstractEditorProps<models.FeedbackModel> {
   activeContext: ActiveContext;
@@ -268,7 +269,24 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
     this.addNode(duplicated);
   }
 
-  collapseInsertPopup = () => {
+  collapseInsertPopupFn = (e) => {
+    if (e.originator !== 'insertPopupToggle') {
+      this.setState({
+        collapseInsertPopup: true,
+      });
+      window.removeEventListener('click', this.collapseInsertPopupFn);
+    }
+  }
+
+  collapseInsertPopup = (e) => {
+    (e.nativeEvent as any).originator = 'insertPopupToggle';
+
+    if (this.state.collapseInsertPopup) {
+      window.addEventListener('click', this.collapseInsertPopupFn);
+    } else {
+      window.removeEventListener('click', this.collapseInsertPopupFn);
+    }
+
     this.setState({
       collapseInsertPopup: !this.state.collapseInsertPopup,
     });
@@ -292,6 +310,7 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
         <ContextAwareToolbar editMode={editMode} context={context} model={model} />
         <div className="feedback-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
+            <SidebarToggle />
 
             <TitleTextEditor
               context={context}

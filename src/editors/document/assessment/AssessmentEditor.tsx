@@ -33,6 +33,7 @@ import './AssessmentEditor.scss';
 import { ContentElement } from 'data/content/common/interfaces';
 import { RouterState } from 'reducers/router';
 import { Node } from 'data/content/assessment/node';
+import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
@@ -531,14 +532,33 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     }
   }
 
-  toggleInsertPopup = () => {
+  collapseInsertPopupFn = (e) => {
+    if (e.originator !== 'insertPopupToggle') {
+      this.setState({
+        collapseInsertPopup: true,
+      });
+      window.removeEventListener('click', this.collapseInsertPopupFn);
+    }
+  }
+
+  toggleInsertPopup = (e) => {
+    (e.nativeEvent as any).originator = 'insertPopupToggle';
+
+    if (this.state.collapseInsertPopup) {
+      window.addEventListener('click', this.collapseInsertPopupFn);
+    } else {
+      window.removeEventListener('click', this.collapseInsertPopupFn);
+    }
+
     this.setState({
       collapseInsertPopup: !this.state.collapseInsertPopup,
     });
   }
 
   render() {
-    const { context, services, editMode, model, course, currentNode, onEdit } = this.props;
+    const {
+      context, services, editMode, model, course, currentNode, onEdit,
+    } = this.props;
 
     const page = this.getCurrentPage(this.props);
 
@@ -556,6 +576,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
         <ContextAwareToolbar editMode={editMode} context={this.props.context} model={model} />
         <div className="assessment-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
+            <SidebarToggle />
 
             <TitleTextEditor
               context={context}

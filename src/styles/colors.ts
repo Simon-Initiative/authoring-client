@@ -1,5 +1,4 @@
 import * as chroma from 'chroma-js';
-import flatui from 'styles/palettes/flatui';
 
 // Base Colors
 export default {
@@ -22,19 +21,20 @@ export default {
   youtubeRed: '#ff0000',
 
   // Indication Colors
-  primary: '#2780E3',
+  primary: '#608AD8',
   secondary: '#a3b8cc',
   success: '#3FB618',
   info: '#9954BB',
   warning: '#FFC118',
   danger: '#da3232',
+  pageBackground: '#F8F9Fa',
 
   // Action Colors
   get remove() { return this.danger; },
   get add() { return chroma(this.primary).darken().hex(); },
 
-  selection: flatui.peterRiver,
-  get hover() { return chroma(this.selection).darken().hex(); },
+  selection: '#608AD8',
+  get hover() { return chroma(this.selection).brighten().hex(); },
   get active() { return chroma(this.selection).darken(2).hex(); },
 
   contentSelection: '#eca037',

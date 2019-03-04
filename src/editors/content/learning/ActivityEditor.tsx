@@ -161,19 +161,23 @@ export default class ActivityEditor
     const iconStyle = { color: CONTENT_COLORS.Activity };
 
     let activityType = '';
+    let activityIcon = 'fa fa-check';
     if (this.isFeedback()) {
       activityType = 'Survey';
+      activityIcon = 'fa fa-check-square-o';
     }
     if (resource.type === LegacyTypes.workbook_page) {
       activityType = 'Workbook Page';
+      activityIcon = 'fa fa-file-o';
     }
     if (resource.type === LegacyTypes.assessment2) {
       activityType = 'Summative Assessment';
+      activityIcon = 'fa fa-check';
     }
 
     return (
       <div className={classNames(['ActivityEditor', classes.activity])}>
-        <h5><i className="fa fa-check" style={iconStyle} /> {titleOrPlaceholder}</h5>
+        <h5><i className={activityIcon} style={iconStyle} /> {titleOrPlaceholder}</h5>
         <button
           onClick={this.onClick}
           type="button"
