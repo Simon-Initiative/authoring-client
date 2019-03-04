@@ -19,15 +19,13 @@ import ResourceView from 'components/ResourceView';
 import CreateCourseView from 'components/CreateCourseView';
 import ObjectiveSkillView from 'components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from 'components/ImportCourseView';
-import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
 import Messages from 'components/message/Messages.controller';
-import { Resource, ResourceState } from 'data/content/resource';
+import { Resource } from 'data/content/resource';
 import { GlobalError } from 'components/GlobalError';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import CourseEditor from 'editors/document/course/CourseEditor.controller';
-import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { RouterState } from 'reducers/router';
 import { ROUTE } from 'actions/router';
 import { ResourceLoading } from 'components/ResourceLoading';
@@ -40,22 +38,6 @@ import Preview from 'components/Preview';
 import { caseOf } from 'utils/utils';
 import { NavigationPanel } from 'components/NavigationPanel.controller';
 import * as viewActions from 'actions/view';
-
-type ResourceList = {
-  title: string,
-  resourceType: LegacyTypes,
-  filterFn: any,
-  createResourceFn: any,
-};
-
-function res(title, resourceType, filterFn, createResourceFn): ResourceList {
-  return {
-    title,
-    resourceType,
-    filterFn,
-    createResourceFn,
-  };
-}
 
 const createOrg = (courseId, title, type) => {
   const g = guid();
@@ -70,66 +52,6 @@ const createOrg = (courseId, title, type) => {
     resource: new contentTypes.Resource().with({ title, id, guid: id }),
     version: '1.0',
   });
-};
-
-const resources = {
-  organizations: res(
-    'Organizations',
-    LegacyTypes.organization,
-    (resource: Resource) => resource.type === LegacyTypes.organization
-      && resource.resourceState !== ResourceState.DELETED,
-    createOrg),
-  formativeassessments: res(
-    'Formative Assessments',
-    LegacyTypes.inline,
-    (resource: Resource) => resource.type === LegacyTypes.inline
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => new models.AssessmentModel({
-      type,
-      title: contentTypes.Title.fromText(title),
-    })),
-  summativeassessments: res(
-    'Summative Assessments',
-    LegacyTypes.assessment2,
-    (resource: Resource) => resource.type === LegacyTypes.assessment2
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => new models.AssessmentModel({
-      type,
-      title: contentTypes.Title.fromText(title),
-    })),
-  feedbackassessments: res(
-    'Surveys',
-    LegacyTypes.feedback,
-    (resource: Resource) => resource.type === LegacyTypes.feedback
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => models.FeedbackModel.createNew(
-      guid(), title, ''),
-  ),
-  pages: res(
-    'Workbook Pages',
-    LegacyTypes.workbook_page,
-    (resource: Resource) => resource.type === LegacyTypes.workbook_page
-      && resource.id !== PLACEHOLDER_ITEM_ID
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => models.WorkbookPageModel.createNew(
-      guid(), title, 'This is a new page with empty content'),
-  ),
-  pools: res(
-    'Question Pools',
-    LegacyTypes.assessment2_pool,
-    (resource: Resource) => resource.type === LegacyTypes.assessment2_pool
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => {
-      const q = new contentTypes.Question();
-      const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
-      return new models.PoolModel({
-        type,
-        pool: new contentTypes.Pool({
-          questions, id: guid(),
-          title: contentTypes.Title.fromText(title),
-        }),
-      });
-    }),
 };
 
 interface MainProps {
@@ -221,7 +143,7 @@ export default class Main extends React.Component<MainProps, MainState> {
     course.lift((c) => {
       const title = 'New Organization';
       const type = LegacyTypes.organization;
-      const resource = resources.organizations.createResourceFn(c.guid, title, type);
+      const resource = createOrg(c.guid, title, type);
 
       persistence.createDocument(c.guid, resource)
         .then((result) => {
@@ -236,14 +158,8 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
 
-  renderResource(resource: ResourceList) {
+  renderResources() {
     const { onDispatch, server, course, router } = this.props;
-
-    const orgHelpPopover = (
-      <HelpPopover activateOnClick>
-        <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
-      </HelpPopover>
-    );
 
     return course.caseOf({
       just: (c) => {
@@ -258,12 +174,7 @@ export default class Main extends React.Component<MainProps, MainState> {
             serverTimeSkewInMs={server.timeSkewInMs}
             course={c}
             currentOrg={currentOrg.guid}
-            title={resource.title}
-            resourceType={resource.resourceType}
-            filterFn={resource.filterFn}
-            createResourceFn={resource.createResourceFn}
             dispatch={onDispatch}
-            helpPopover={resource.resourceType === LegacyTypes.organization ? orgHelpPopover : null}
           />
         );
       },
@@ -310,7 +221,7 @@ export default class Main extends React.Component<MainProps, MainState> {
           userId={user.userId} />
       ),
     })(
-      // if no routes matched above, render navigationpane/resource view
+      // if no routes matched above, render navigation panel with editor
       <div className="main-splitview">
         <NavigationPanel
           profile={user.profile}
@@ -333,26 +244,11 @@ export default class Main extends React.Component<MainProps, MainState> {
                 ),
               })
             ),
-            [ROUTE.ORGANIZATIONS]: (
-              this.renderResource(resources.organizations)
-            ),
-            [ROUTE.PAGES]: (
-              this.renderResource(resources.pages)
-            ),
-            [ROUTE.FORMATIVE]: (
-              this.renderResource(resources.formativeassessments)
-            ),
-            [ROUTE.SUMMATIVE]: (
-              this.renderResource(resources.summativeassessments)
-            ),
-            [ROUTE.FEEDBACK]: (
-              this.renderResource(resources.feedbackassessments)
-            ),
-            [ROUTE.POOLS]: (
-              this.renderResource(resources.pools)
+            [ROUTE.ALL_RESOURCES]: (
+              this.renderResources()
             ),
           })(
-            // if no routes matched above, render default view
+            // if no routes matched above, render default editor
             course.caseOf({
               just: c => router.resourceId.caseOf({
                 just: (resourceId) => {

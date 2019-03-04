@@ -4,7 +4,6 @@ import { State } from 'reducers';
 import DeleteResourceModal from './DeleteResourceModal';
 import { Resource } from 'data/contentTypes';
 import { CourseModel } from 'data/models';
-import { LegacyTypes } from 'data/types';
 import { ResourceState } from 'data/content/resource';
 import { updateCourseResources } from 'actions/course';
 import * as viewActions from 'actions/view';
@@ -43,26 +42,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
         updatedResource.guid, updatedResource,
       ]]);
       dispatch(updateCourseResources(resources));
-
-      switch (resource.type as LegacyTypes) {
-        case 'x-oli-workbook_page':
-          dispatch(viewActions.viewPages(course.guid, orgId));
-          break;
-        case 'x-oli-inline-assessment':
-          dispatch(viewActions.viewFormativeAssessments(course.guid, orgId));
-          break;
-        case 'x-oli-assessment2':
-          dispatch(viewActions.viewSummativeAssessments(course.guid, orgId));
-          break;
-        case 'x-oli-assessment2-pool':
-          dispatch(viewActions.viewPools(course.guid, orgId));
-          break;
-        case 'x-oli-organization':
-          dispatch(viewActions.viewOrganizations(course.guid, orgId));
-          break;
-        default:
-          break;
-      }
+      dispatch(viewActions.viewAllResources(course.guid, orgId));
       dispatch(modalActions.dismiss());
     },
   };

@@ -381,6 +381,17 @@ export class NavigationPanel
           </div>
         </Tooltip>
 
+        <Tooltip disabled={!collapsed} title="All Resources" position="right">
+          <div
+            className={classNames([
+              classes.navItem,
+              router.route === ROUTE.ALL_RESOURCES && classes.selectedNavItem,
+            ])}
+            onClick={() => viewActions.viewAllResources(course.guid, currentOrg.guid)}>
+            <i className="fa fa-files-o" />{!collapsed && ' All Resources'}
+          </div>
+        </Tooltip>
+
         <div className="dropdown">
           <div className={classNames([
             classes.navItemDropdown,
@@ -466,60 +477,6 @@ export class NavigationPanel
           }
         </div>
 
-        <Tooltip disabled={!collapsed} title="Pages" position="right">
-          <div
-            className={classNames([
-              classes.navItem,
-              router.route === ROUTE.PAGES && classes.selectedNavItem,
-            ])}
-            onClick={() => viewActions.viewPages(course.guid, currentOrg.guid)}>
-            <i className="fa fa-files-o" />{!collapsed && ' Pages'}
-          </div>
-        </Tooltip>
-
-        <Tooltip disabled={!collapsed} title="Formatives" position="right">
-          <div
-            className={classNames([
-              classes.navItem,
-              router.route === ROUTE.FORMATIVE && classes.selectedNavItem,
-            ])}
-            onClick={() => viewActions.viewFormativeAssessments(course.guid, currentOrg.guid)}>
-            <i className="fa fa-flask" />{!collapsed && ' Formatives'}
-          </div>
-        </Tooltip>
-
-        <Tooltip disabled={!collapsed} title="Summatives" position="right">
-          <div
-            className={classNames([
-              classes.navItem,
-              router.route === ROUTE.SUMMATIVE && classes.selectedNavItem,
-            ])}
-            onClick={() => viewActions.viewSummativeAssessments(course.guid, currentOrg.guid)}>
-            <i className="fa fa-check" />{!collapsed && ' Summatives'}
-          </div>
-        </Tooltip>
-
-        <Tooltip disabled={!collapsed} title="Surveys" position="right">
-          <div
-            className={classNames([
-              classes.navItem,
-              router.route === ROUTE.FEEDBACK && classes.selectedNavItem,
-            ])}
-            onClick={() => viewActions.viewFeedbackAssessments(course.guid, currentOrg.guid)}>
-            <i className="fa fa-check-square-o" />{!collapsed && ' Surveys'}
-          </div>
-        </Tooltip>
-
-        <Tooltip disabled={!collapsed} title="Question Pools" position="right">
-          <div
-            className={classNames([
-              classes.navItem,
-              router.route === ROUTE.POOLS && classes.selectedNavItem,
-            ])}
-            onClick={() => viewActions.viewPools(course.guid, currentOrg.guid)}>
-            <i className="fa fa-shopping-basket" />{!collapsed && ' Question Pools'}
-          </div>
-        </Tooltip>
       </div>
     );
   }
