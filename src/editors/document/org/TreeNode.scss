@@ -1,74 +1,41 @@
 @import 'oli/colors';
 
-.tree-node {
+
+.treenode-content {
+  height: 36px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 10px;
+  vertical-align: middle;
+  font-size: 1.0em;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  .treenode-title {
+    vertical-align: -webkit-baseline-middle;
+  }
 
   &.selected {
-    background: $selection;
+    background-color: $selection;
     border-color: $selection;
     color: $white;
   }
 
-  .content {
-    position: relative;
-    height: 40px;
-    display: block;
-    padding: 0px;
+  &:hover {
+    background-color: $gray-lightest;
+    border-color: $gray-lightest;
 
-    .top-drop {
-      position: absolute;
-      top: -5;
-      height: 10px;
-      width: 100%;
+    &.selected {
+      background-color: $selection;
+      border-color: $selection;
+      color: $white;
     }
+  }
 
-    .node {
-      flex: 1 0 0;
-      height: 40px;
-
-      .draggable-node {
-        display: flex;
-        flex-direction: row;
-        height: 40px;
-
-        .dragHandleGrab {
-          i {
-            vertical-align: middle;
-            line-height: 40px;
-          }
-          .grip {
-            height: 40px;
-          }
-
-        }
-
-        .caption {
-          flex: 1 0 0;
-          margin: 0 0px;
-
-          .title-label {
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            padding: 0 10px;
-          }
-
-          button, span {
-            display: inline-block;
-            vertical-align: middle;
-            line-height: 40px;
-            padding: 0px;
-            margin-left: 0px;
-
-          }
-        }
-      }
-    }
-
-    .bottom-drop {
-      position: absolute;
-      top: 35;
-      height: 10px;
-      width: 100%;
-    }
+  .toggle {
+    margin-right: 5px;
   }
 }
