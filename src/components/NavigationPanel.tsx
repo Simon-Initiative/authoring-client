@@ -13,6 +13,7 @@ import { Document } from 'data/persistence';
 import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
+import { Tooltip } from 'utils/tooltip';
 
 const DEFAULT_WIDTH_PX = 400;
 const COLLAPSED_WIDTH_PX = 80;
@@ -75,7 +76,7 @@ export const styles: JSSStyles = {
       },
       '& $dropdownToggle': {
         border: [1, 'solid', colors.grayLighter],
-        borderLeft: 'none',
+        borderLeft: [1, 'solid', 'transparent'],
       },
 
       '&$selectedNavItem': {
@@ -353,25 +354,32 @@ export class NavigationPanel
         ])}
         style={{ width: this.getWidth() }}>
         <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown} />
-        <div
-          className={classNames([
+
+        <Tooltip disabled={!collapsed} title="Overview" position="right">
+          <div
+            className={classNames([
+              classes.navItem,
+              Maybe.sequence({ courseId: router.courseId, resourceId: router.resourceId }).caseOf({
+                just: ({ courseId, resourceId }) => courseId === course.guid
+                  && resourceId === course.guid && classes.selectedNavItem,
+                nothing: () => undefined,
+              }),
+            ])}
+            onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
+            <i className="fa fa-book" />{!collapsed && ' Overview'}
+          </div>
+        </Tooltip>
+
+        <Tooltip disabled={!collapsed} title="Objectives" position="right">
+          <div className={classNames([
             classes.navItem,
-            Maybe.sequence({ courseId: router.courseId, resourceId: router.resourceId }).caseOf({
-              just: ({ courseId, resourceId }) => courseId === course.guid
-                && resourceId === course.guid && classes.selectedNavItem,
-              nothing: () => undefined,
-            }),
+            router.route === ROUTE.OBJECTIVES && classes.selectedNavItem,
           ])}
-          onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
-          <i className="fa fa-book" />{!collapsed && ' Overview'}
-        </div>
-        <div className={classNames([
-          classes.navItem,
-          router.route === ROUTE.OBJECTIVES && classes.selectedNavItem,
-        ])}
-          onClick={() => viewActions.viewObjectives(course.guid, currentOrg.guid)}>
-          <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
-        </div>
+            onClick={() => viewActions.viewObjectives(course.guid, currentOrg.guid)}>
+            <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
+          </div>
+        </Tooltip>
+
         <div className="dropdown">
           <div className={classNames([
             classes.navItemDropdown,
@@ -380,14 +388,21 @@ export class NavigationPanel
               nothing: () => null,
             }),
           ])}>
-            <div className={classNames([
-              classes.dropdownText,
-              collapsed && classes.dropdownTextCollapsed,
-            ])}
-              onClick={() =>
-                viewActions.viewDocument(currentOrg.guid, course.guid, currentOrg.guid)}>
-              <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
-            </div>
+            <Tooltip
+              disabled={!collapsed}
+              title={currentOrg.title}
+              position="right"
+              distance={32}
+              style={{ overflow: 'hidden' }}>
+              <div className={classNames([
+                classes.dropdownText,
+                collapsed && classes.dropdownTextCollapsed,
+              ])}
+                onClick={() =>
+                  viewActions.viewDocument(currentOrg.guid, course.guid, currentOrg.guid)}>
+                <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
+              </div>
+            </Tooltip>
             <div className={classNames([
               classes.dropdownToggle,
               collapsed && classes.dropdownToggleCollapsed,
@@ -415,7 +430,8 @@ export class NavigationPanel
             </a>
           </div>
         </div>
-          <div className={classes.orgTree}>
+
+        <div className={classes.orgTree}>
         {collapsed
           ? (
             <div
@@ -444,46 +460,61 @@ export class NavigationPanel
           )
         }
         </div>
-        <div
-          className={classNames([
-            classes.navItem,
-            router.route === ROUTE.PAGES && classes.selectedNavItem,
-          ])}
-          onClick={() => viewActions.viewPages(course.guid, currentOrg.guid)}>
-          <i className="fa fa-files-o" />{!collapsed && ' Pages'}
-        </div>
-        <div
-          className={classNames([
-            classes.navItem,
-            router.route === ROUTE.FORMATIVE && classes.selectedNavItem,
-          ])}
-          onClick={() => viewActions.viewFormativeAssessments(course.guid, currentOrg.guid)}>
-          <i className="fa fa-flask" />{!collapsed && ' Formatives'}
-        </div>
-        <div
-          className={classNames([
-            classes.navItem,
-            router.route === ROUTE.SUMMATIVE && classes.selectedNavItem,
-          ])}
-          onClick={() => viewActions.viewSummativeAssessments(course.guid, currentOrg.guid)}>
-          <i className="fa fa-check" />{!collapsed && ' Summatives'}
-        </div>
-        <div
-          className={classNames([
-            classes.navItem,
-            router.route === ROUTE.FEEDBACK && classes.selectedNavItem,
-          ])}
-          onClick={() => viewActions.viewFeedbackAssessments(course.guid, currentOrg.guid)}>
-          <i className="fa fa-check-square-o" />{!collapsed && ' Surveys'}
-        </div>
-        <div
-          className={classNames([
-            classes.navItem,
-            router.route === ROUTE.POOLS && classes.selectedNavItem,
-          ])}
-          onClick={() => viewActions.viewPools(course.guid, currentOrg.guid)}>
-          <i className="fa fa-shopping-basket" />{!collapsed && ' Question Pools'}
-        </div>
+
+        <Tooltip disabled={!collapsed} title="Pages" position="right">
+          <div
+            className={classNames([
+              classes.navItem,
+              router.route === ROUTE.PAGES && classes.selectedNavItem,
+            ])}
+            onClick={() => viewActions.viewPages(course.guid, currentOrg.guid)}>
+            <i className="fa fa-files-o" />{!collapsed && ' Pages'}
+          </div>
+        </Tooltip>
+
+        <Tooltip disabled={!collapsed} title="Formatives" position="right">
+          <div
+            className={classNames([
+              classes.navItem,
+              router.route === ROUTE.FORMATIVE && classes.selectedNavItem,
+            ])}
+            onClick={() => viewActions.viewFormativeAssessments(course.guid, currentOrg.guid)}>
+            <i className="fa fa-flask" />{!collapsed && ' Formatives'}
+          </div>
+        </Tooltip>
+
+        <Tooltip disabled={!collapsed} title="Summatives" position="right">
+          <div
+            className={classNames([
+              classes.navItem,
+              router.route === ROUTE.SUMMATIVE && classes.selectedNavItem,
+            ])}
+            onClick={() => viewActions.viewSummativeAssessments(course.guid, currentOrg.guid)}>
+            <i className="fa fa-check" />{!collapsed && ' Summatives'}
+          </div>
+        </Tooltip>
+
+        <Tooltip disabled={!collapsed} title="Surveys" position="right">
+          <div
+            className={classNames([
+              classes.navItem,
+              router.route === ROUTE.FEEDBACK && classes.selectedNavItem,
+            ])}
+            onClick={() => viewActions.viewFeedbackAssessments(course.guid, currentOrg.guid)}>
+            <i className="fa fa-check-square-o" />{!collapsed && ' Surveys'}
+          </div>
+        </Tooltip>
+
+        <Tooltip disabled={!collapsed} title="Question Pools" position="right">
+          <div
+            className={classNames([
+              classes.navItem,
+              router.route === ROUTE.POOLS && classes.selectedNavItem,
+            ])}
+            onClick={() => viewActions.viewPools(course.guid, currentOrg.guid)}>
+            <i className="fa fa-shopping-basket" />{!collapsed && ' Question Pools'}
+          </div>
+        </Tooltip>
       </div>
     );
   }
