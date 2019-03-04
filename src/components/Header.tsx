@@ -9,7 +9,6 @@ import { getVersion } from 'utils/buildinfo';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
-import flatui from 'styles/palettes/flatui';
 import * as chroma from 'chroma-js';
 import { RouterState } from 'reducers/router';
 import { ROUTE } from 'actions/router';

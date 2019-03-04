@@ -1,7 +1,6 @@
 import { JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
-import * as chroma from 'chroma-js';
 
 export const TOOLBAR_HIDE_ANIMATION_DURATION_MS = 200;
 
