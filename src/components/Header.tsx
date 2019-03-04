@@ -64,7 +64,7 @@ const styles: JSSStyles = {
   },
 
   version: {
-    color: chroma.mix(colors.white, colors.primary, 0.5).hex(),
+    color: chroma.mix(colors.white, colors.primary, 0.3).hex(),
     marginLeft: 5,
     fontSize: '0.8em',
   },

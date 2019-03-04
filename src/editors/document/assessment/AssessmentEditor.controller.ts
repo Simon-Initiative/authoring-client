@@ -42,7 +42,7 @@ interface DispatchProps {
 interface OwnProps extends AbstractEditorProps<AssessmentModel> { }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
-  const { activeContext, hover, documents, course, router } = state;
+  const { activeContext, hover, documents, course, router, editorSidebar } = state;
 
   return {
     activeContext,

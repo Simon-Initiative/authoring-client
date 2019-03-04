@@ -11,6 +11,10 @@
   .table {
     table-layout: fixed;
     margin-bottom: 0;
+
+    .caption {
+      cursor: pointer;
+    }
   }
 
   .btn {

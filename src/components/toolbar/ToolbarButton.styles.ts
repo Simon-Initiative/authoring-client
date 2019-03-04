@@ -13,7 +13,7 @@ export const styles: JSSStyles = {
     cursor: 'pointer',
 
     '&:hover': {
-      color: colors.hover,
+      color: colors.selection,
       border: `1px solid ${colors.grayLighter}`,
     },
     '&:active': {

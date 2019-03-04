@@ -12,10 +12,11 @@ import { disableSelect } from 'styles/mixins';
 import { Document } from 'data/persistence';
 import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
-import * as chroma from 'chroma-js';
+import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 
 const DEFAULT_WIDTH_PX = 400;
-const hoverBackground = chroma(colors.pageBackground).darken(0.3).hex();
+const COLLAPSED_WIDTH_PX = 80;
+const COLLAPSE_SETPOINT_PX = 150;
 
 export const styles: JSSStyles = {
   NavigationPanel: {
@@ -25,6 +26,16 @@ export const styles: JSSStyles = {
     backgroundColor: colors.grayLightest,
     borderRight: [1, 'solid', colors.grayLight],
     padding: [10, 0],
+    position: 'relative',
+  },
+  collapsed: {
+    '&$navItem': {
+      textAlign: 'center',
+    },
+
+    '& $navItem i': {
+      width: '100%',
+    },
   },
   navItem: {
     fontSize: '1.2em',
@@ -34,6 +45,9 @@ export const styles: JSSStyles = {
     borderRadius: 6,
     border: [1, 'solid', 'transparent'],
     cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
 
     '& i': {
       width: 40,
@@ -42,7 +56,7 @@ export const styles: JSSStyles = {
 
     '&:hover': {
       backgroundColor: colors.grayLighter,
-      borderColor: hoverBackground,
+      borderColor: colors.grayLighter,
     },
   },
   navItemDropdown: {
@@ -57,10 +71,10 @@ export const styles: JSSStyles = {
 
     '&:hover': {
       '& $dropdownText': {
-        border: [1, 'solid', hoverBackground],
+        border: [1, 'solid', colors.grayLighter],
       },
       '& $dropdownToggle': {
-        border: [1, 'solid', hoverBackground],
+        border: [1, 'solid', colors.grayLighter],
         borderLeft: 'none',
       },
 
@@ -130,8 +144,11 @@ export const styles: JSSStyles = {
     },
 
     '&:hover': {
-      backgroundColor: hoverBackground,
+      backgroundColor: colors.grayLighter,
     },
+  },
+  dropdownTextCollapsed: {
+    paddingRight: 0,
   },
   dropdownToggle: {
     margin: [2, 5, 2, 0],
@@ -146,8 +163,12 @@ export const styles: JSSStyles = {
     },
 
     '&:hover': {
-      backgroundColor: hoverBackground,
+      backgroundColor: colors.grayLighter,
     },
+  },
+  dropdownToggleCollapsed: {
+    padding: [8, 2],
+    fontSize: 14,
   },
   selectedNavItem: {
     color: colors.white,
@@ -162,9 +183,18 @@ export const styles: JSSStyles = {
   orgTree: {
     flex: 1,
     overflowY: 'scroll',
-    borderTop: [1, 'solid', hoverBackground],
-    borderBottom: [1, 'solid', hoverBackground],
+    borderTop: [1, 'solid', colors.grayLighter],
+    borderBottom: [1, 'solid', colors.grayLighter],
     margin: [5, 0],
+  },
+  resizeHandle: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    width: 5,
+    cursor: 'ew-resize',
+    zIndex: 1000,
   },
 };
 
@@ -182,8 +212,11 @@ export interface NavigationPanelProps {
 
 export interface NavigationPanelState {
   collapsed: boolean;
-  maybeWidth: Maybe<number>;
   showOrgDropdown: boolean;
+  isResizing: boolean;
+  resizeStart: number;
+  width: Maybe<number>;
+  newWidth: Maybe<number>;
 }
 
 /**
@@ -199,19 +232,31 @@ export class NavigationPanel
 
     this.state = {
       collapsed: false,
-      maybeWidth: Maybe.nothing(),
       showOrgDropdown: false,
+      isResizing: false,
+      resizeStart: 0,
+      width: Maybe.nothing<number>(),
+      newWidth: Maybe.nothing<number>(),
     };
   }
 
   componentDidMount() {
+    const { profile } = this.props;
+
     // register global mouse listeners
     window.addEventListener('click', this.onGlobalClick);
+    window.addEventListener('mouseup', this.onGlobalMouseup);
+
+    this.setState({
+      width: Maybe.maybe(loadFromLocalStorage('navbar_width_' + profile.username)),
+      collapsed: !!loadFromLocalStorage('navbar_collapsed_' + profile.username),
+    });
   }
 
   componentWillUnmount() {
     // unregister global mouse listeners
     window.removeEventListener('click', this.onGlobalClick);
+    window.removeEventListener('mouseup', this.onGlobalMouseup);
   }
 
   onGlobalClick = (e) => {
@@ -222,16 +267,62 @@ export class NavigationPanel
     }
   }
 
+  onGlobalMouseup = (e) => {
+    const { profile } = this.props;
+    const { isResizing, collapsed, newWidth } = this.state;
+
+    if (isResizing) {
+      window.removeEventListener('mousemove', this.handleResize);
+
+      this.setState({
+        isResizing: false,
+        width: newWidth,
+        newWidth: Maybe.nothing<number>(),
+      });
+
+      // save to local storage
+      this.updatePersistentPrefs(profile.username, newWidth.valueOr(DEFAULT_WIDTH_PX), collapsed);
+    }
+  }
+
+  onResizeHandleMousedown = (e) => {
+    this.setState({
+      isResizing: true,
+      resizeStart: e.nativeEvent.clientX,
+    });
+
+    window.addEventListener('mousemove', this.handleResize);
+  }
+
+  handleResize = (e) => {
+    const { width } = this.state;
+
+    let newSize = width.valueOr(DEFAULT_WIDTH_PX) + (e.clientX - this.state.resizeStart);
+    newSize = newSize < COLLAPSE_SETPOINT_PX ? COLLAPSED_WIDTH_PX : newSize;
+
+    this.setState({
+      newWidth: Maybe.just(newSize),
+      collapsed: newSize < COLLAPSE_SETPOINT_PX,
+    });
+  }
+
+  updatePersistentPrefs = (username: string, width: number, collapsed: boolean) => {
+    saveToLocalStorage(
+      'navbar_width_' + username, `${width}`);
+    saveToLocalStorage(
+      'navbar_collapsed_' + username, `${collapsed}`);
+  }
+
   getWidth = () => {
-    const { collapsed, maybeWidth } = this.state;
+    const { collapsed, width, newWidth } = this.state;
     return collapsed
-      ? 80
-      : maybeWidth.valueOr(DEFAULT_WIDTH_PX);
+      ? COLLAPSED_WIDTH_PX
+      : newWidth.valueOr(width.valueOr(DEFAULT_WIDTH_PX));
   }
 
   render() {
-    const { className, classes, viewActions, course, router, onCreateOrg } = this.props;
-    const { showOrgDropdown } = this.state;
+    const { className, classes, viewActions, course, router, profile, onCreateOrg } = this.props;
+    const { showOrgDropdown, collapsed } = this.state;
 
     // course may not be loaded before first render. wait for it to load before rendering
     if (!course) return null;
@@ -254,8 +345,14 @@ export class NavigationPanel
 
     return (
       <div
-        className={classNames(['NavigationPanel', classes.NavigationPanel, className])}
+        className={classNames([
+          'NavigationPanel',
+          classes.NavigationPanel,
+          collapsed && classes.collapsed,
+          className,
+        ])}
         style={{ width: this.getWidth() }}>
+        <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown} />
         <div
           className={classNames([
             classes.navItem,
@@ -266,14 +363,14 @@ export class NavigationPanel
             }),
           ])}
           onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
-          <i className="fa fa-book" /> Overview
+          <i className="fa fa-book" />{!collapsed && ' Overview'}
         </div>
         <div className={classNames([
           classes.navItem,
           router.route === ROUTE.OBJECTIVES && classes.selectedNavItem,
         ])}
           onClick={() => viewActions.viewObjectives(course.guid, currentOrg.guid)}>
-          <i className="fa fa-graduation-cap" /> Objectives
+          <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
         </div>
         <div className="dropdown">
           <div className={classNames([
@@ -283,12 +380,18 @@ export class NavigationPanel
               nothing: () => null,
             }),
           ])}>
-            <div className={classes.dropdownText}
+            <div className={classNames([
+              classes.dropdownText,
+              collapsed && classes.dropdownTextCollapsed,
+            ])}
               onClick={() =>
                 viewActions.viewDocument(currentOrg.guid, course.guid, currentOrg.guid)}>
-              <i className="fa fa-th-list" /> {currentOrg.title}
+              <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
             </div>
-            <div className={classes.dropdownToggle}
+            <div className={classNames([
+              classes.dropdownToggle,
+              collapsed && classes.dropdownToggleCollapsed,
+            ])}
               onClick={(e) => {
                 (e.nativeEvent as any).originator = 'OrgDropdownToggle';
                 this.setState({ showOrgDropdown: !showOrgDropdown });
@@ -312,12 +415,34 @@ export class NavigationPanel
             </a>
           </div>
         </div>
-        <div className={classes.orgTree}>
-          <OrgEditorManager
-            documentId={currentOrg.id}
-            selectedItem={selectedItem}
-            {...this.props}
-          />
+          <div className={classes.orgTree}>
+        {collapsed
+          ? (
+            <div
+              className={classNames([
+                classes.navItem,
+              ])}
+              onClick={() => {
+                this.setState({
+                  width: Maybe.just(DEFAULT_WIDTH_PX),
+                  collapsed: false,
+                });
+                this.updatePersistentPrefs(
+                  profile.username,
+                  DEFAULT_WIDTH_PX,
+                  false,
+                );
+              }}>
+              <i className="fa fa-angle-double-right" />
+            </div>
+          )
+          : (
+            <OrgEditorManager
+              documentId={currentOrg.id}
+              selectedItem={selectedItem}
+              {...this.props} />
+          )
+        }
         </div>
         <div
           className={classNames([
@@ -325,7 +450,7 @@ export class NavigationPanel
             router.route === ROUTE.PAGES && classes.selectedNavItem,
           ])}
           onClick={() => viewActions.viewPages(course.guid, currentOrg.guid)}>
-          <i className="fa fa-files-o" /> Pages
+          <i className="fa fa-files-o" />{!collapsed && ' Pages'}
         </div>
         <div
           className={classNames([
@@ -333,7 +458,7 @@ export class NavigationPanel
             router.route === ROUTE.FORMATIVE && classes.selectedNavItem,
           ])}
           onClick={() => viewActions.viewFormativeAssessments(course.guid, currentOrg.guid)}>
-          <i className="fa fa-flask" /> Formatives
+          <i className="fa fa-flask" />{!collapsed && ' Formatives'}
         </div>
         <div
           className={classNames([
@@ -341,7 +466,7 @@ export class NavigationPanel
             router.route === ROUTE.SUMMATIVE && classes.selectedNavItem,
           ])}
           onClick={() => viewActions.viewSummativeAssessments(course.guid, currentOrg.guid)}>
-          <i className="fa fa-check" /> Summatives
+          <i className="fa fa-check" />{!collapsed && ' Summatives'}
         </div>
         <div
           className={classNames([
@@ -349,7 +474,7 @@ export class NavigationPanel
             router.route === ROUTE.FEEDBACK && classes.selectedNavItem,
           ])}
           onClick={() => viewActions.viewFeedbackAssessments(course.guid, currentOrg.guid)}>
-          <i className="fa fa-check-square-o" /> Surveys
+          <i className="fa fa-check-square-o" />{!collapsed && ' Surveys'}
         </div>
         <div
           className={classNames([
@@ -357,7 +482,7 @@ export class NavigationPanel
             router.route === ROUTE.POOLS && classes.selectedNavItem,
           ])}
           onClick={() => viewActions.viewPools(course.guid, currentOrg.guid)}>
-          <i className="fa fa-shopping-basket" /> Question Pools
+          <i className="fa fa-shopping-basket" />{!collapsed && ' Question Pools'}
         </div>
       </div>
     );
