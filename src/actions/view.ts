@@ -11,6 +11,13 @@ function isDifferentCourse(getState, courseId): boolean {
   return course === null || course.guid !== courseId;
 }
 
+function isDifferentOrg(getState, orgId): boolean {
+  return getState().router.orgId.caseOf({
+    just: id => orgId !== id,
+    nothing: () => true,
+  });
+}
+
 
 export type ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
 export const ENTER_APPLICATION_VIEW: ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
@@ -28,15 +35,20 @@ function enterApplicationView(): EnterApplicationViewAction {
 // Helpers for defining async view actions that dismiss
 // the appropriately scoped messages:
 
-function transitionCourseView(destination, courseId, dispatch, getState) {
+function transitionCourseView(destination, courseId, orgId, dispatch, getState) {
 
   if (isDifferentCourse(getState, courseId)) {
 
     dispatch(dismissScopedMessages(Scope.Package));
 
     dispatch(courseActions.loadCourse(courseId)).then((c) => {
+      dispatch(orgActions.releaseOrg());
       router.push(destination);
     });
+  } else if (isDifferentOrg(getState, orgId)) {
+    dispatch(orgActions.releaseOrg());
+    dispatch(orgActions.load(courseId, orgId));
+    router.push(destination);
   } else {
     dispatch(dismissScopedMessages(Scope.Resource));
     router.push(destination);
@@ -81,48 +93,48 @@ export function viewDocument(documentId: string, courseId: string, orgId?: strin
     .bind(
       undefined,
       '/' + documentId + '-' + courseId + (orgId ? '-' + orgId : ''),
-      courseId,
+      courseId, orgId,
     );
 }
 
 export function viewSkills(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/skills-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/skills-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewPages(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/pages-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/pages-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewFormativeAssessments(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/formativeassessments-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/formativeassessments-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewSummativeAssessments(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/summativeassessments-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/summativeassessments-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewFeedbackAssessments(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/feedbackassessments-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/feedbackassessments-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewOrganizations(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/organizations-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/organizations-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewObjectives(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/objectives-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/objectives-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewPools(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/pools-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/pools-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewAllCourses() {
@@ -143,7 +155,7 @@ export function viewCourse(courseId: string) {
       const model: models.CourseModel = c as models.CourseModel;
       const orgs = model.resources.toArray().filter(r => r.type === LegacyTypes.organization);
 
-      getState().orgs.documentId.caseOf({
+      getState().router.orgId.caseOf({
         just: (documentId) => {
           // Do not use this org if it doesn't belong to this course
           const currentOrFirst = model.resources.has(documentId) ? documentId : orgs[0].guid;
