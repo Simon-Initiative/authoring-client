@@ -30,6 +30,10 @@ export interface ActivityEditorProps {
 
 }
 
+// An activity is one of several types of resources embedded into a workbook page or organization.
+// Activities can be summative assessments, feedback (surveys), or workbook pages. We show the
+// right wording in the ActivityEditor simply by switching on the resource type.
+
 @injectSheet(styles)
 export default class ActivityEditor
   extends AbstractContentEditor<contentTypes.Activity,
@@ -53,6 +57,11 @@ export default class ActivityEditor
     });
   }
 
+  isPage() {
+    return this.props.context.courseModel.resourcesById.get(this.props.model.idref).type
+      === LegacyTypes.workbook_page;
+  }
+
   onPurposeEdit(purpose: string): void {
     const model = this.props.model.with({
       purpose: purpose === '' ? Maybe.nothing() : Maybe.just(purpose),
@@ -73,15 +82,14 @@ export default class ActivityEditor
   }
 
   renderSidebar() {
-    const summatives = this.props.context.courseModel.resources
+    const resources = (type: LegacyTypes) => this.props.context.courseModel.resources
       .toArray()
-      .filter(r => r.type === LegacyTypes.assessment2 && r.resourceState !== ResourceState.DELETED)
+      .filter(r => r.type === type && r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
-    const feedbacks = this.props.context.courseModel.resources
-      .toArray()
-      .filter(r => r.type === LegacyTypes.feedback && r.resourceState !== ResourceState.DELETED)
-      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+    const summatives = resources(LegacyTypes.assessment2);
+    const feedbacks = resources(LegacyTypes.feedback);
+    const pages = resources(LegacyTypes.workbook_page);
 
     // A purpose is not required, so we need to add an option for an empty type.
     // My Response is specifically for feedback activities, so they cannot be chosen by
@@ -90,7 +98,7 @@ export default class ActivityEditor
       .filter(p => p.value !== contentTypes.PurposeTypes.MyResponse);
     purposeTypesWithEmpty.unshift({ value: '', label: '' });
 
-    const activitySelect = options => <SidebarGroup label="Assessment">
+    const activitySelect = options => <SidebarGroup label={this.isPage() ? 'Page' : 'Assessment'}>
       <Select
         editMode={this.props.editMode}
         value={this.props.model.idref}
@@ -106,8 +114,8 @@ export default class ActivityEditor
     }
 
     return (
-      <SidebarContent title="Activity" >
-        {activitySelect(summatives)}
+      <SidebarContent title="Activity">
+        {activitySelect(this.isPage() ? pages : summatives)}
 
         <SidebarGroup label="Purpose">
           <Select
@@ -152,6 +160,17 @@ export default class ActivityEditor
 
     const iconStyle = { color: CONTENT_COLORS.Activity };
 
+    let activityType = '';
+    if (this.isFeedback()) {
+      activityType = 'Survey';
+    }
+    if (resource.type === LegacyTypes.workbook_page) {
+      activityType = 'Workbook Page';
+    }
+    if (resource.type === LegacyTypes.assessment2) {
+      activityType = 'Summative Assessment';
+    }
+
     return (
       <div className={classNames(['ActivityEditor', classes.activity])}>
         <h5><i className="fa fa-check" style={iconStyle} /> {titleOrPlaceholder}</h5>
@@ -159,7 +178,7 @@ export default class ActivityEditor
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit {this.isFeedback() ? 'Survey' : 'Summative Assessment'}
+          Edit {activityType}
         </button>
       </div>
     );

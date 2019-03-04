@@ -32,6 +32,7 @@ import { FeedbackModel } from 'data/models/feedback';
 import { ImageHotspot } from 'data/content/workbook/multipanel/image_hotspot';
 import { Hotspot } from 'data/content/workbook/multipanel/hotspot';
 import { Panel } from 'data/content/workbook/multipanel/panel';
+import { PurposeTypes } from 'data/content/org/types';
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -541,6 +542,32 @@ export class InsertToolbar
                 </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuDivider />
+
+              <ToolbarButtonMenuItem
+                onClick={() => onDisplayModal(
+                  <ResourceSelection
+                    filterPredicate={(res: Resource): boolean =>
+                      res.type === LegacyTypes.workbook_page
+                      && res.resourceState !== ResourceState.DELETED}
+                    courseId={context.courseId}
+                    onInsert={(resource) => {
+                      onDismissModal();
+                      const resources = context.courseModel.resources.toArray();
+                      const found = resources.find(r => r.id === resource.id);
+                      if (found !== undefined) {
+                        onInsert(new contentTypes.Activity().with({
+                          idref: found.id,
+                          purpose: Maybe.just(PurposeTypes.ManyStudentsWonder),
+                        }));
+                      }
+                    }}
+                    onCancel={onDismissModal}
+                  />)
+                }
+                disabled={!editMode || !parentSupportsElementType('activity')}>
+                {getContentIcon(insertableContentTypes.Activity, { width: 22 })}
+                Insert workbook page
+                </ToolbarButtonMenuItem>
 
               <ToolbarButtonMenuItem
                 onClick={() => onDisplayModal(
