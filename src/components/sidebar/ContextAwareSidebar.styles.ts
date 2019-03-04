@@ -14,7 +14,7 @@ export const styles: JSSStyles = {
     width: SIDEBAR_WIDTH,
     overflow: 'hidden',
     height: '100%',
-    backgroundColor: '#fafafa',
+    backgroundColor: colors.white,
     borderLeft: [[1, 'solid', colors.grayLight]],
   },
 

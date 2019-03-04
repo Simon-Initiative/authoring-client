@@ -1,12 +1,13 @@
 import * as Immutable from 'immutable';
 import { FileNode } from './file_node';
 import { isNullOrUndefined } from 'util';
+import { LegacyTypes } from 'data/types';
 
 export type ResourceParams = {
   rev?: number,
   guid?: string,
   id?: string,
-  type?: string,
+  type?: LegacyTypes,
   title?: string,
   lastRevisionGuid?: string;
   previousRevisionGuid?: string;
