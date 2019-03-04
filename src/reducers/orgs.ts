@@ -1,9 +1,9 @@
 
 import {
   ORG_REQUESTED, ORG_LOADED, ORG_CHANGE_FAILED, MODEL_UPDATED,
-  ORG_CHANGE_SUCCEEDED, CHANGE_SELECTED_ITEM,
+  ORG_CHANGE_SUCCEEDED, CHANGE_SELECTED_ITEM, RELEASE_ORG,
   ChangeSelectedItemAction,
-  OrgChangeSucceededAction,
+  OrgChangeSucceededAction, ReleaseOrgAction,
   OrgChangeFailedAction, OrgLoadedAction, OrgRequestedAction, ModelUpdatedAction,
 } from 'actions/orgs';
 import { OtherAction } from './utils';
@@ -12,7 +12,7 @@ import { Maybe } from 'tsmonad';
 import { NavigationItem, makePackageOverview } from 'types/navigation';
 
 type ActionTypes =
-  OrgChangeFailedAction | OrgChangeSucceededAction |
+  OrgChangeFailedAction | OrgChangeSucceededAction | ReleaseOrgAction |
   OrgLoadedAction | OrgRequestedAction | ModelUpdatedAction |
   ChangeSelectedItemAction | OtherAction;
 
@@ -35,6 +35,8 @@ export const orgs = (
   action: ActionTypes,
 ): OrgsState => {
   switch (action.type) {
+    case RELEASE_ORG:
+      return Object.assign({}, state, { activeOrg: Maybe.nothing() });
     case CHANGE_SELECTED_ITEM:
       return Object.assign({}, state, { selectedItem: action.selectedItem });
     case MODEL_UPDATED:

@@ -209,6 +209,7 @@ export interface NavigationPanelProps {
   userId: string;
   userName: string;
   onCreateOrg: () => void;
+  onReleaseOrg: () => void;
 }
 
 export interface NavigationPanelState {
@@ -429,7 +430,11 @@ export class NavigationPanel
             {course.resources.valueSeq().filter(r => r.type === 'x-oli-organization').map(org => (
               <a key={org.guid}
                 className={classNames(['dropdown-item'])}
-                onClick={() => viewActions.viewDocument(org.guid, course.guid, org.guid)}>
+                onClick={() => {
+                  this.props.onReleaseOrg();
+                  viewActions.viewDocument(org.guid, course.guid, org.guid);
+
+                }}>
                 {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
               </a>
             ))}
@@ -443,33 +448,33 @@ export class NavigationPanel
         </div>
 
         <div className={classes.orgTree}>
-        {collapsed
-          ? (
-            <div
-              className={classNames([
-                classes.navItem,
-              ])}
-              onClick={() => {
-                this.setState({
-                  width: Maybe.just(DEFAULT_WIDTH_PX),
-                  collapsed: false,
-                });
-                this.updatePersistentPrefs(
-                  profile.username,
-                  DEFAULT_WIDTH_PX,
-                  false,
-                );
-              }}>
-              <i className="fa fa-angle-double-right" />
-            </div>
-          )
-          : (
-            <OrgEditorManager
-              documentId={currentOrg.id}
-              selectedItem={selectedItem}
-              {...this.props} />
-          )
-        }
+          {collapsed
+            ? (
+              <div
+                className={classNames([
+                  classes.navItem,
+                ])}
+                onClick={() => {
+                  this.setState({
+                    width: Maybe.just(DEFAULT_WIDTH_PX),
+                    collapsed: false,
+                  });
+                  this.updatePersistentPrefs(
+                    profile.username,
+                    DEFAULT_WIDTH_PX,
+                    false,
+                  );
+                }}>
+                <i className="fa fa-angle-double-right" />
+              </div>
+            )
+            : (
+              <OrgEditorManager
+                documentId={currentOrg.guid}
+                selectedItem={selectedItem}
+                {...this.props} />
+            )
+          }
         </div>
 
       </div>

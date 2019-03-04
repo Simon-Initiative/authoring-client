@@ -24,6 +24,19 @@ export const changeSelectedItem = (selectedItem: NavigationItem): ChangeSelected
 
 
 
+export type RELEASE_ORG = 'orgs/RELEASE_ORG';
+export const RELEASE_ORG: RELEASE_ORG = 'orgs/RELEASE_ORG';
+
+export type ReleaseOrgAction = {
+  type: RELEASE_ORG,
+};
+
+export const releaseOrg = (): ReleaseOrgAction => ({
+  type: RELEASE_ORG,
+});
+
+
+
 export type ORG_REQUESTED = 'orgs/ORG_REQUESTED';
 export const ORG_REQUESTED: ORG_REQUESTED = 'orgs/ORG_REQUESTED';
 
