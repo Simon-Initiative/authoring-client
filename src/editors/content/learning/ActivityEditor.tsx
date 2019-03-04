@@ -164,10 +164,10 @@ export default class ActivityEditor
     if (this.isFeedback()) {
       activityType = 'Survey';
     }
-    if (resource.type === 'x-oli-workbook_page') {
+    if (resource.type === LegacyTypes.workbook_page) {
       activityType = 'Workbook Page';
     }
-    if (resource.type === 'x-oli-assessment2') {
+    if (resource.type === LegacyTypes.assessment2) {
       activityType = 'Summative Assessment';
     }
 
