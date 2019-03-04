@@ -11,27 +11,55 @@ import { LogAttribute, LogLevel, LogStyle, LogTag, logger } from 'utils/logger';
 import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
-import { LegacyTypes } from 'data/types';
-
+import { AssessmentType, LegacyTypes } from 'data/types';
+import * as contentTypes from 'data/contentTypes';
 import './ResourceView.scss';
+import { caseOf } from 'utils/utils';
+import { Maybe } from 'tsmonad';
+import guid from 'utils/guid';
+
+type TitleIcon = {
+  name: string,
+  icon: JSX.Element,
+};
+
+export const getNameAndIconByType = (type: string) => caseOf<TitleIcon>(type)({
+  [LegacyTypes.inline]: {
+    name: 'Formative Assessment',
+    icon: <i className="title-icon fa fa-flask" />,
+  },
+  [LegacyTypes.assessment2]: {
+    name: 'Summative Assessment',
+    icon: <i className="title-icon fa fa-check" />,
+  },
+  [LegacyTypes.assessment2_pool]: {
+    name: 'Question Pool',
+    icon: <i className="title-icon fa fa-shopping-basket" />,
+  },
+  [LegacyTypes.feedback]: {
+    name: 'Survey',
+    icon: <i className="title-icon fa fa-check-square-o" />,
+  },
+  [LegacyTypes.workbook_page]: {
+    name: 'Workbook Page',
+    icon: <i className="title-icon fa fa-file-o" />,
+  },
+})({
+  name: 'Unknown',
+  icon: <i className="title-icon fa fa-question" />,
+});
 
 export interface ResourceViewProps {
   course: models.CourseModel;
   dispatch: any;
   serverTimeSkewInMs: number;
-  title: string;
-  resourceType: LegacyTypes;
   currentOrg: string;
-  filterFn: (resource: Resource) => boolean;
-  createResourceFn: (
-    courseId: string,
-    title: string, type: string) => models.ContentModel;
-  helpPopover?: JSX.Element;
 }
 
 interface ResourceViewState {
   selected: Resource;
   searchText: string;
+  newItemTitle: string;
   resources: Resource[];
 }
 
@@ -42,26 +70,52 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     ...this.state,
     selected: undefined,
     searchText: '',
-    resources: this.getFilteredRows(this.props),
+    newItemTitle: '',
+    resources: this.getRows(),
   };
 
-  componentDidMount() {
-    logResourceDetails(this.state.resources);
-  }
-
   componentWillReceiveProps(nextProps: ResourceViewProps): void {
-    if (nextProps.resourceType !== this.props.resourceType &&
-      nextProps.title !== this.props.title) {
+    if (nextProps.course.resources !== this.props.course.resources) {
       this.setState({
-        resources: this.getFilteredRows(nextProps),
+        resources: this.state.searchText !== ''
+          ? this.getRowsFilteredBySearch(this.state.searchText)
+          : this.getRows(),
       });
     }
   }
 
-  getFilteredRows(props: ResourceViewProps): Resource[] {
-    return props.course.resources
-      .toArray()
-      .filter(props.filterFn);
+  getRows(): Resource[] {
+    const { course } = this.props;
+
+    return course.resources.toArray().filter(r =>
+        r.type === LegacyTypes.inline
+        || r.type === LegacyTypes.assessment2
+        || r.type === LegacyTypes.assessment2_pool
+        || r.type === LegacyTypes.feedback
+        || r.type === LegacyTypes.workbook_page,
+    );
+  }
+
+  // Filter resources shown based on title and id
+  getRowsFilteredBySearch = (searchText: string): Resource[] => {
+    const text = searchText.trim().toLowerCase();
+    const filterFn = (r: Resource): boolean => {
+      const { title, id } = r;
+      const titleLower = title ? title.toLowerCase() : '';
+      const idLower = id ? id.toLowerCase() : '';
+
+      return text === '' ||
+        titleLower.indexOf(text) > -1 ||
+        idLower.indexOf(text) > -1;
+    };
+
+    return this.getRows().filter(filterFn);
+  }
+
+  onNewItemTitleChange = (newItemTitle: string) => {
+    this.setState({
+      newItemTitle,
+    });
   }
 
   onClickResource(id) {
@@ -70,19 +124,46 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     dispatch(viewActions.viewDocument(id, course.guid, currentOrg));
   }
 
-  onCreateResource = (e) => {
+  onCreateResource = (type: LegacyTypes) => {
     const { dispatch } = this.props;
+    const { newItemTitle } = this.state;
 
-    e.preventDefault();
-    const title = (this.refs['title'] as any).value;
-    if (isNullOrUndefined(title) || title === '') {
+    if (!newItemTitle) {
       return;
     }
-    const type = this.props.resourceType;
-    const resource = this.props.createResourceFn(
-      this.props.course.guid, title, type);
+    const title = newItemTitle;
 
-    (this.refs['title'] as any).value = '';
+    const resource = caseOf<models.ContentModel>(type)({
+      [LegacyTypes.inline]: new models.AssessmentModel({
+        type: type as AssessmentType,
+        title: contentTypes.Title.fromText(title),
+      }),
+      [LegacyTypes.assessment2]: new models.AssessmentModel({
+        type: type as AssessmentType,
+        title: contentTypes.Title.fromText(title),
+      }),
+      [LegacyTypes.assessment2_pool]: () => {
+        const q = new contentTypes.Question();
+        const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
+
+        return new models.PoolModel({
+          type,
+          id: guid(),
+          pool: new contentTypes.Pool({
+            questions,
+            id: guid(),
+            title: contentTypes.Title.fromText(title),
+          }),
+        });
+      },
+      [LegacyTypes.feedback]: models.FeedbackModel.createNew(guid(), title, ''),
+      [LegacyTypes.workbook_page]: models.WorkbookPageModel.createNew(
+        guid(), title, 'This is a new page with empty content'),
+    })(null);
+
+    this.setState({
+      newItemTitle: '',
+    });
 
     persistence.createDocument(this.props.course.guid, resource)
       .then((result) => {
@@ -96,33 +177,21 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       });
   }
 
-  // Filter resources shown based on title and id
   onFilterBySearchText = (searchText: string): void => {
-    const text = searchText.trim().toLowerCase();
-    const filterFn = (r: Resource): boolean => {
-      const { title, id } = r;
-      const titleLower = title ? title.toLowerCase() : '';
-      const idLower = id ? id.toLowerCase() : '';
-
-      return text === '' ||
-        titleLower.indexOf(text) > -1 ||
-        idLower.indexOf(text) > -1;
-    };
-
     // searchText state is used for highlighting matches, and resources state creates
     // one row in the table for each resource present
     this.setState({
       searchText,
-      resources: this.getFilteredRows(this.props).filter(filterFn),
+      resources: this.getRowsFilteredBySearch(searchText),
     });
   }
 
   renderResources() {
-    const creationTitle = <h2>{this.props.title}  {this.props.helpPopover}</h2>;
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
 
     const labels = [
       'Title',
+      'Type',
       'Unique ID',
       'Created',
       'Last Updated',
@@ -130,6 +199,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     const comparators = [
       (direction, a, b) => safeCompare('title', 'id', direction, a, b),
+      (direction, a, b) => safeCompare('type', 'title', direction, a, b),
       (direction, a, b) => safeCompare('id', 'title', direction, a, b),
       (direction, a, b) => direction === SortDirection.Ascending
         ? compareDates(a.dateCreated, b.dateCreated)
@@ -139,10 +209,16 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         : compareDates(b.dateUpdated, a.dateUpdated),
     ];
 
-    const highlightedColumnRenderer = (prop: string, r: Resource) =>
-      this.state.searchText.length < 3
-        ? <span>{r[prop]}</span>
+    const highlightedColumnRenderer = (prop: string, r: Resource) => {
+      const maybeHighlighted = this.state.searchText.length < 3
+        ? r[prop]
         : highlightMatches(prop, r, this.state.searchText);
+
+      return prop === 'title'
+          ? <span>{getNameAndIconByType(r.type).icon} {maybeHighlighted}</span>
+          : <span>{maybeHighlighted}</span>;
+
+    };
 
     const link = resource => span =>
       <button onClick={this.onClickResource.bind(this, resource.guid)}
@@ -150,6 +226,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     const columnRenderers = [
       r => link(r)(highlightedColumnRenderer('title', r)),
+      r => <span>{getNameAndIconByType(r.type).name}</span>,
       r => highlightedColumnRenderer('id', r),
       r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
@@ -159,7 +236,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     return (
       <div className="">
-        {creationTitle}
+        <h2>All Resources</h2>
+
         {this.renderCreation()}
 
         <SortableTable
@@ -173,6 +251,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   renderCreation() {
     const { course } = this.props;
+    const { newItemTitle } = this.state;
 
     return (
       <div className="table-toolbar">
@@ -183,17 +262,49 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         />
         <div className="input-group">
           <div className="flex-spacer" />
-          <form className="form-inline">
-            <input type="text" ref="title"
+          <div className="btn-group">
+            <input type="text"
               style={{ width: 300 }}
+              value={newItemTitle}
               disabled={!course.editable}
               className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
-              placeholder="New Title"></input>
-            <button onClick={this.onCreateResource}
-              disabled={!course.editable}
-              className="btn btn-primary">Create
-          </button>
-          </form>
+              onChange={({ target: { value } }) => this.setState({ newItemTitle: value })}
+              placeholder="Enter title for new resource"/>
+            <div className="dropdown">
+              <button
+                disabled={!course.editable || !newItemTitle}
+                className="btn btn-primary dropdown-toggle"
+                data-toggle="dropdown">Create
+              </button>
+              <div className="dropdown-menu dropdown-menu-right">
+                <button
+                  className="dropdown-item"
+                  onClick={() => this.onCreateResource(LegacyTypes.workbook_page)}>
+                  New Workbook Page
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => this.onCreateResource(LegacyTypes.inline)}>
+                  New Formative Assessment
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => this.onCreateResource(LegacyTypes.assessment2)}>
+                  New Summative Assessment
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => this.onCreateResource(LegacyTypes.assessment2_pool)}>
+                  New Question Pool
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => this.onCreateResource(LegacyTypes.feedback)}>
+                  New Survey
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -238,35 +349,4 @@ export function safeCompare(primaryK: string, secondaryK: string, direction: Sor
   return direction === SortDirection.Ascending
     ? a[primaryK].localeCompare(b[primaryK])
     : b[primaryK].localeCompare(a[primaryK]);
-}
-
-function logResourceDetails(resources: Resource[]) {
-  logger.group(
-    LogLevel.INFO,
-    LogTag.DEFAULT,
-    `Resource Details:`,
-    (logger) => {
-      resources.forEach((resource) => {
-        logger
-          .setVisibility(LogAttribute.TAG, false)
-          .setVisibility(LogAttribute.DATE, false)
-          .info(LogTag.DEFAULT, `${resource.title} (id: ${resource.id})`)
-          .groupCollapsed(
-            LogLevel.INFO,
-            LogTag.DEFAULT,
-            'Details',
-            (logger) => {
-              logger
-                .setVisibility(LogAttribute.TAG, false)
-                .setVisibility(LogAttribute.DATE, false)
-                .info(LogTag.DEFAULT, `Type: ${resource.type}`)
-                .info(LogTag.DEFAULT, `FilePath: ${resource
-                  .fileNode
-                  .pathTo
-                  .replace(/\.json/, '.xml')}`);
-            });
-      });
-    },
-    LogStyle.HEADER + LogStyle.BLUE,
-  );
 }

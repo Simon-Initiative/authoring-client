@@ -103,14 +103,14 @@ describe('getRouteFromPath', () => {
     expect(route.urlParams.toJS()).toEqual({});
   });
 
-  it('should return pages route with filter param', () => {
-    const path = 'pages-2c92808866d069100166d0a014a70006';
+  it('should return resources route with filter param', () => {
+    const path = 'resources-2c92808866d069100166d0a014a70006';
     const search = '?filter=id';
 
     const route = getRouteFromPath(path, search);
-    expect(route.route).toEqual(ROUTE.PAGES);
+    expect(route.route).toEqual(ROUTE.ALL_RESOURCES);
     expect(route.courseId.valueOr('NOTHING')).toEqual('2c92808866d069100166d0a014a70006');
-    expect(route.resourceId.valueOr('NOTHING')).toEqual('pages');
+    expect(route.resourceId.valueOr('NOTHING')).toEqual('resources');
     expect(route.urlParams.toJS()).toEqual({ filter: 'id' });
   });
 

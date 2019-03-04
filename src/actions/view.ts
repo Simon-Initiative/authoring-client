@@ -59,11 +59,7 @@ export type ViewActions = {
   viewSkills: (courseId: string, orgId: string) => void,
   viewObjectives: (courseId: string, orgId: string) => void,
   viewOrganizations: (courseId: string, orgId: string) => void,
-  viewPages: (courseId: string, orgId: string) => void,
-  viewFormativeAssessments: (courseId: string, orgId: string) => void,
-  viewSummativeAssessments: (courseId: string, orgId: string) => void,
-  viewFeedbackAssessments: (courseId: string, orgId: string) => void,
-  viewPools: (courseId: string, orgId: string) => void,
+  viewAllResources: (courseId: string, orgId: string) => void,
 };
 
 // The view transition actions:
@@ -90,24 +86,9 @@ export function viewSkills(courseId: string, orgId: string) {
     .bind(undefined, '/skills-' + courseId + '-' + orgId, courseId);
 }
 
-export function viewPages(courseId: string, orgId: string) {
+export function viewAllResources(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/pages-' + courseId + '-' + orgId, courseId);
-}
-
-export function viewFormativeAssessments(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/formativeassessments-' + courseId + '-' + orgId, courseId);
-}
-
-export function viewSummativeAssessments(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/summativeassessments-' + courseId + '-' + orgId, courseId);
-}
-
-export function viewFeedbackAssessments(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/feedbackassessments-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/resources-' + courseId + '-' + orgId, courseId);
 }
 
 export function viewOrganizations(courseId: string, orgId: string) {
@@ -118,11 +99,6 @@ export function viewOrganizations(courseId: string, orgId: string) {
 export function viewObjectives(courseId: string, orgId: string) {
   return transitionCourseView
     .bind(undefined, '/objectives-' + courseId + '-' + orgId, courseId);
-}
-
-export function viewPools(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/pools-' + courseId + '-' + orgId, courseId);
 }
 
 export function viewAllCourses() {

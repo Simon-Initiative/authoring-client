@@ -12,11 +12,7 @@ export enum ROUTE {
   IMPORT = 'import',
   PREVIEW = 'preview',
   SKILLS = 'skills',
-  PAGES = 'pages',
-  FORMATIVE = 'formative',
-  SUMMATIVE = 'summative',
-  FEEDBACK = 'feedbackassessments',
-  POOLS = 'pools',
+  ALL_RESOURCES = 'resources',
   ORGANIZATIONS = 'organizations',
   OBJECTIVES = 'objectives',
 }
@@ -87,29 +83,9 @@ export const getRouteFromPath = (path: string, search: string) => {
           route: ROUTE.SKILLS,
           ...parseCourseResourceIds(path),
         };
-      case 'pages':
+      case 'resources':
         return {
-          route: ROUTE.PAGES,
-          ...parseCourseResourceIds(path),
-        };
-      case 'formativeassessments':
-        return {
-          route: ROUTE.FORMATIVE,
-          ...parseCourseResourceIds(path),
-        };
-      case 'summativeassessments':
-        return {
-          route: ROUTE.SUMMATIVE,
-          ...parseCourseResourceIds(path),
-        };
-      case 'feedbackassessments':
-        return {
-          route: ROUTE.FEEDBACK,
-          ...parseCourseResourceIds(path),
-        };
-      case 'pools':
-        return {
-          route: ROUTE.POOLS,
+          route: ROUTE.ALL_RESOURCES,
           ...parseCourseResourceIds(path),
         };
       case 'organizations':
