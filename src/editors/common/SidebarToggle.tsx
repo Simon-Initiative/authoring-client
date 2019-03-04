@@ -19,6 +19,7 @@ const styles: JSSStyles = {
     paddingRight: 3,
     textAlign: 'center',
     cursor: 'pointer',
+    boxShadow: [2, 3, 10, -2, 'rgba(148,148,148,1)'],
 
     '& i': {
       fontWeight: 600,
