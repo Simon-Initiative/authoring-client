@@ -39,7 +39,7 @@ export const styles: JSSStyles = {
     // display: 'none',         // switch opacity to display to disable invisible handle grab
     display: 'flex',
     opacity: 0,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: colors.pageBackground,
 
     '&.active-content': {
       opacity: 1,
