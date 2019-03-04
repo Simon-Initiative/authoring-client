@@ -100,7 +100,7 @@ export function viewSkills(courseId: string, orgId: string) {
 
 export function viewAllResources(courseId: string, orgId: string) {
   return transitionCourseView
-    .bind(undefined, '/resources-' + courseId + '-' + orgId, courseId);
+    .bind(undefined, '/resources-' + courseId + '-' + orgId, courseId, orgId);
 }
 
 export function viewOrganizations(courseId: string, orgId: string) {
