@@ -71,15 +71,8 @@ export class TreeNode
       return 'Include';
     }
 
-    const hasHiddenChildren =
-      <span>
-        <i className="toggle fa fa-caret-right"></i>
-      </span>;
-
-    const hasShownChildren =
-      <span>
-        <i className="toggle fa fa-caret-down"></i>
-      </span>;
+    const hasHiddenChildren = <i className="toggle fa fa-caret-right"></i>;
+    const hasShownChildren = <i className="toggle fa fa-caret-down"></i>;
 
     const toggle = isExpanded ? hasShownChildren : hasHiddenChildren;
     const contentType = this.getLabel(this.props.model.contentType);
@@ -100,8 +93,8 @@ export class TreeNode
         className={`${highlighted ? 'table-info' : ''}`}
         key={model.guid}>
         <td onClick={() => this.props.onClick(model)}>
-          <div className={`content ${isSelected ? 'selected' : ''}`}>
-            <span style={{ marginLeft: (depth * 20) }}>
+          <div className={`treenode-content ${isSelected ? 'selected' : ''}`}>
+            <span className="treenode-title" style={{ marginLeft: (depth * 20) }}>
               {this.renderTitle()}
             </span>
           </div>

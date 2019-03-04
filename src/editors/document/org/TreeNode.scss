@@ -1,7 +1,7 @@
 @import 'oli/colors';
 
 
-.content {
+.treenode-content {
   height: 36px;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -13,6 +13,10 @@
   border-radius: 6px;
   border: 1px solid transparent;
   cursor: pointer;
+
+  .treenode-title {
+    vertical-align: -webkit-baseline-middle;
+  }
 
   &.selected {
     background-color: $selection;
