@@ -403,17 +403,6 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     // do nothing
   }
 
-  onTypeChange = (type: string) => {
-    const { model } = this.props;
-
-    this.handleEdit(model.with({
-      resource:
-        model.resource.with({
-          type,
-        }),
-    }));
-  }
-
   onSelectPool = () => {
     const { editMode, services, context } = this.props;
     if (!editMode) return;
