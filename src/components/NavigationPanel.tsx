@@ -394,7 +394,7 @@ export class NavigationPanel
               title={currentOrg.title}
               position="right"
               distance={32}
-              style={{ overflow: 'hidden', flex: 1 }}>
+              style={{ overflow: 'hidden', flex: 1, display: 'flex' }}>
               <div className={classNames([
                 classes.dropdownText,
                 collapsed && classes.dropdownTextCollapsed,
