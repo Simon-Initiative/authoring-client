@@ -34,8 +34,6 @@ import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
 import SearchBar from 'components/common/SearchBar';
 import { Edge, PathElement } from 'types/edge';
-import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
-import colors from 'styles/colors';
 import { ConfirmModal } from 'components/ConfirmModal';
 
 import './ObjectiveSkillView.scss';
@@ -272,6 +270,7 @@ export interface ObjectiveSkillViewProps {
   showMessage: (message: Messages.Message) => void;
   registerLocks: RegisterLocks;
   unregisterLocks: UnregisterLocks;
+  selectedOrganization: Maybe<models.OrganizationModel>;
   dismissMessage: (message: Messages.Message) => void;
   displayModal: (component: any) => void;
   dismissModal: () => void;
@@ -289,7 +288,6 @@ interface ObjectiveSkillViewState {
   organizationResourceMap: Maybe<Immutable.Map<string, Immutable.List<string>>>;
   skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
   searchText: string;
-  selectedOrganization: Maybe<string>;
 }
 
 // The Learning Objectives and Skills documents require specialized handling
@@ -323,7 +321,6 @@ export class ObjectiveSkillView
       organizationResourceMap: Maybe.nothing(),
       skillQuestionRefs: Maybe.nothing(),
       searchText: '',
-      selectedOrganization: Maybe.nothing(),
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
@@ -477,7 +474,6 @@ export class ObjectiveSkillView
 
       this.setState({
         organizationResourceMap: Maybe.just(organizationResourceMap),
-        selectedOrganization: Maybe.maybe(organizationResourceMap.keySeq().first()),
         skillQuestionRefs: Maybe.just(
           skills.reduce(
             (acc, skill) => acc.set(
@@ -1130,74 +1126,64 @@ export class ObjectiveSkillView
     });
   }
 
-  getFilteredQuestionRefs(organizationId: string) {
-    const {
-      skillQuestionRefs, organizationResourceMap,
-    } = this.state;
-
-    return organizationResourceMap.bind(
-      orgResources => skillQuestionRefs.lift(skillQuestionRefs =>
-        skillQuestionRefs.map(questionRefs =>
-          questionRefs.filter(questionRef => orgResources.first() &&
-            orgResources.get(organizationId).contains(questionRef.assessmentId)).toList(),
-        ).toMap(),
-      ),
-    );
-  }
-
   renderObjectives() {
-    const { onPushRoute } = this.props;
-    const { overrideExpanded, searchText, selectedOrganization } = this.state;
-    const skillQuestionRefs = selectedOrganization.bind(selectedOrg =>
-      this.getFilteredQuestionRefs(selectedOrg));
+    const { onPushRoute, selectedOrganization } = this.props;
+    const { overrideExpanded, searchText, skillQuestionRefs, organizationResourceMap } = this.state;
 
-    const rows = [];
+    return selectedOrganization.caseOf({
+      just: (organization) => {
+        const rows = [];
 
-    const isExpanded = (guid) => {
-      if (overrideExpanded) return true;
+        const isExpanded = (guid) => {
+          if (overrideExpanded) return true;
 
-      if (this.props.expanded.has('objectives')) {
-        const set = this.props.expanded.get('objectives');
-        return set.includes(guid);
-      }
+          if (this.props.expanded.has('objectives')) {
+            const set = this.props.expanded.get('objectives');
+            return set.includes(guid);
+          }
 
-      return false;
-    };
+          return false;
+        };
 
-    const objectives = this.state.filteredObjectives.caseOf({
-      just: fos => fos,
-      nothing: () => this.state.objectives.objectives,
+        const objectives = this.state.filteredObjectives.caseOf({
+          just: fos => fos,
+          nothing: () => this.state.objectives.objectives,
+        });
+
+        objectives
+          .toArray()
+          .forEach((objective: contentTypes.LearningObjective) => {
+
+            rows.push(
+              <Objective
+                key={objective.id}
+                course={this.props.course}
+                onAddExistingSkill={this.onAddExistingSkill}
+                onRemove={obj => this.removeObjective(obj)}
+                onRemoveSkill={skill => this.removeSkill(objective, skill)}
+                onAddNewSkill={this.onAddNewSkill}
+                onBeginExternalEdit={this.onBeginExternalEdit}
+                onPushRoute={onPushRoute}
+                skillQuestionRefs={skillQuestionRefs}
+                organizationResourceMap={organizationResourceMap}
+                objective={objective}
+                organization={organization}
+                highlightText={searchText}
+                skills={objective.skills.filter(string => this.props.skills.has(string))
+                  .map(string => this.props.skills.get(string)).toList()}
+                isExpanded={isExpanded(objective.id)}
+                onToggleExpanded={this.onToggleExpanded}
+                editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
+                onEdit={this.onObjectiveEdit}
+                onEditSkill={this.onSkillEdit}
+                loading={this.state.loading} />,
+            );
+          });
+
+        return rows;
+      },
+      nothing: () => undefined,
     });
-
-    objectives
-      .toArray()
-      .forEach((objective: contentTypes.LearningObjective) => {
-
-        rows.push(
-          <Objective
-            key={objective.id}
-            course={this.props.course}
-            onAddExistingSkill={this.onAddExistingSkill}
-            onRemove={obj => this.removeObjective(obj)}
-            onRemoveSkill={skill => this.removeSkill(objective, skill)}
-            onAddNewSkill={this.onAddNewSkill}
-            onBeginExternalEdit={this.onBeginExternalEdit}
-            onPushRoute={onPushRoute}
-            skillQuestionRefs={skillQuestionRefs}
-            objective={objective}
-            highlightText={searchText}
-            skills={objective.skills.filter(string => this.props.skills.has(string))
-              .map(string => this.props.skills.get(string)).toList()}
-            isExpanded={isExpanded(objective.id)}
-            onToggleExpanded={this.onToggleExpanded}
-            editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
-            onEdit={this.onObjectiveEdit}
-            onEditSkill={this.onSkillEdit}
-            loading={this.state.loading} />,
-        );
-      });
-
-    return rows;
   }
 
   createNew(title: string) {
@@ -1282,39 +1268,22 @@ export class ObjectiveSkillView
   }
 
   renderFilterbar() {
-    const { course } = this.props;
-    const { organizationResourceMap, selectedOrganization } = this.state;
+    const { course, selectedOrganization } = this.props;
 
-    const organizations = organizationResourceMap.caseOf({
-      just: orgResources => orgResources.keySeq().reduce(
-        (map, orgId) => map.set(orgId, course.resourcesById.get(orgId) as contentTypes.Resource),
-        Immutable.Map<string, contentTypes.Resource>(),
-      ).toMap(),
-      nothing: () => Immutable.Map<string, contentTypes.Resource>(),
-    });
-
-    return (
-      <div className="filter-bar table-toolbar">
-        <div className="input-group">
-          <span style={{ padding: '6px 0' }} >Organization:</span>
-          <Dropdown label={selectedOrganization.caseOf({
-            just: orgId => organizations.get(orgId).title,
-            nothing: () => 'Loading Organizations...',
-          })}>
-            {organizations.valueSeq().map(org => (
-              <DropdownItem
-                key={org.guid}
-                onClick={() => this.setState({
-                  selectedOrganization: Maybe.just(org.id),
-                })}>
-                  {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
-                </DropdownItem>
-            ))}
-          </Dropdown>
-          <div className="flex-spacer" />
+    return selectedOrganization.caseOf({
+      just: org => (
+        <div className="filter-bar table-toolbar">
+          <div className="selected-org-info">
+            Metrics shown are based on the selected organization: <a href={
+              `#${org.guid}-${course.guid}-${org.guid}`}>
+              {org.title}
+            </a>
+            <div className="flex-spacer" />
+          </div>
         </div>
-      </div>
-    );
+      ),
+      nothing: () => undefined,
+    });
   }
 
   renderTitle() {

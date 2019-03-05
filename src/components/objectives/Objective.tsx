@@ -11,7 +11,7 @@ import { disableSelect } from 'styles/mixins';
 import * as persistence from 'data/persistence';
 import { LegacyTypes } from 'data/types';
 import { InlineEdit } from './InlineEdit';
-import { CourseModel } from 'data/models';
+import { CourseModel, OrganizationModel } from 'data/models';
 import { stringFormat } from 'utils/format';
 import flatui from 'styles/palettes/flatui';
 import { Tooltip } from 'utils/tooltip';
@@ -35,13 +35,6 @@ enum Issue {
 }
 
 export const objectiveModelRules: ModelCheckerRule<LearningObjective, RuleData>[] = [{
-  id: Issue.AT_LEAST_3_SKILLS,
-  name: 'Objective',
-  requirementType: RequirementType.Should,
-  requirement: 'have at least 3 skills',
-  isIssue: (data: LearningObjective, aux) =>
-    data.skills.size < 3,
-}, {
   id: Issue.AT_LEAST_1_PAGE,
   name: 'Objective',
   requirementType: RequirementType.Should,
@@ -321,7 +314,9 @@ export interface ObjectiveProps {
   skills: List<contentTypes.Skill>;
   loading: boolean;
   skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
+  organizationResourceMap: Maybe<Map<string, List<string>>>;
   highlightText?: string;
+  organization: OrganizationModel;
   onToggleExpanded: (id) => void;
   onEdit: (model: contentTypes.LearningObjective) => void;
   onEditSkill: (model: contentTypes.Skill) => void;
@@ -423,12 +418,43 @@ export class Objective
     this.props.onRemoveSkill(model);
   }
 
+  getOrgWorkbookPageRefs(organization: OrganizationModel) {
+    const { organizationResourceMap } = this.props;
+    const { workbookPageRefs } = this.state;
+    const organizationId = organization.resource.id;
+
+    return organizationResourceMap.bind(
+      orgResources => workbookPageRefs.lift(workbookPageRefs =>
+          workbookPageRefs.filter(pageRef => orgResources.get(organizationId)
+            && orgResources.get(organizationId).contains(pageRef),
+        ).toList(),
+      ),
+    );
+  }
+
+  getOrgQuestionRefs(organization: OrganizationModel) {
+    const { skillQuestionRefs, organizationResourceMap } = this.props;
+    const organizationId = organization.resource.id;
+
+    return organizationResourceMap.bind(
+      orgResources => skillQuestionRefs.lift(skillQuestionRefs =>
+        skillQuestionRefs.map(questionRefs =>
+          questionRefs.filter(questionRef => orgResources.get(organizationId)
+            && orgResources.get(organizationId).contains(questionRef.assessmentId)).toList(),
+        ).toMap(),
+      ),
+    );
+  }
+
   renderSkillGridHeader() {
-    const { classes, course, onPushRoute, skills, skillQuestionRefs } = this.props;
+    const {
+      classes, course, onPushRoute, skills, organization,
+    } = this.props;
 
     const LEFT_OFFSET = 20;
     const diagonalDist = (height: number) => Math.sqrt(2 * (height * height));
-    const orderedObjectiveQuestionRefs = getOrderedObjectiveQuestions(skills, skillQuestionRefs);
+    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
+    const orderedObjectiveQuestionRefs = getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs);
 
     return orderedObjectiveQuestionRefs.length > 0
       ? (
@@ -464,6 +490,7 @@ export class Objective
                       transform="translate(10, 2)"
                       onClick={() => onPushRoute(
                         `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
+                        + `-${organization.guid}`
                         + `?questionId=${question.id}`)}>
                       {stringFormat.ellipsizePx(
                         question.title.valueOr(
@@ -486,15 +513,15 @@ export class Objective
   }
 
   renderSkillGrid() {
-    const {
-      classes, skills, skillQuestionRefs,
-    } = this.props;
+    const { classes, skills, organization } = this.props;
 
-    const orderedObjectiveQuestions = getOrderedObjectiveQuestions(skills, skillQuestionRefs);
+    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
+
+    const orderedObjectiveQuestions = getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs);
 
     const skillContainsFormativeQuestion = (
       skill: contentTypes.Skill, question: QuestionRef) =>
-      skillQuestionRefs.caseOf({
+      orgSkillQuestionRefs.caseOf({
         just: questionRefs => questionRefs.has(skill.id)
           && !!questionRefs.get(skill.id)
             .find(r => r.id === question.id && r.assessmentType === LegacyTypes.inline),
@@ -503,7 +530,7 @@ export class Objective
 
     const skillContainsSummativeQuestion = (
       skill: contentTypes.Skill, question: QuestionRef) =>
-      skillQuestionRefs.caseOf({
+      orgSkillQuestionRefs.caseOf({
         just: questionRefs => questionRefs.has(skill.id)
           && !!questionRefs.get(skill.id)
             .find(r => r.id === question.id && r.assessmentType === LegacyTypes.assessment2),
@@ -512,7 +539,7 @@ export class Objective
 
     const skillContainsPoolQuestion = (
       skill: contentTypes.Skill, question: QuestionRef) =>
-      skillQuestionRefs.caseOf({
+      orgSkillQuestionRefs.caseOf({
         just: questionRefs => questionRefs.has(skill.id)
           && !!questionRefs.get(skill.id)
             .find(r => r.id === question.id && r.assessmentType === LegacyTypes.assessment2_pool),
@@ -570,9 +597,11 @@ export class Objective
 
   renderSkills() {
     const {
-      skills, editMode, loading, onEditSkill, highlightText, skillQuestionRefs,
+      skills, editMode, loading, onEditSkill, highlightText, organization,
     } = this.props;
     const { skillEdits } = this.state;
+
+    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
 
     return skills.map(skill => (
       <Skill
@@ -582,7 +611,7 @@ export class Objective
         loading={loading}
         highlightText={highlightText}
         isEditing={skillEdits.get(skill.guid)}
-        skillQuestionRefs={getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill)}
+        skillQuestionRefs={getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs, skill)}
         onEnterEditMode={() => this.setState({
           skillEdits: skillEdits.set(skill.guid, true),
         })}
@@ -597,17 +626,20 @@ export class Objective
   renderDetails() {
     const {
       classes, course, editMode, objective, loading, onAddNewSkill, onAddExistingSkill,
-      skills, skillQuestionRefs,
+      skills, organization,
     } = this.props;
-    const { workbookPageRefs } = this.state;
 
-    const pageCount = workbookPageRefs.caseOf({
+    const orgWorkbookPageRefs = this.getOrgWorkbookPageRefs(organization);
+    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
+
+    const pageCount = orgWorkbookPageRefs.caseOf({
       just: refs => refs.size,
       nothing: () => null,
     });
 
     const checkModelResults = checkModel(
-      objective, objectiveModelRules, { pageCount, skills, skillQuestionRefs });
+      objective, objectiveModelRules, {
+        pageCount, skills, skillQuestionRefs: orgSkillQuestionRefs });
 
     const getRefGuidFromRefId = (id: string) =>
       Maybe.maybe(course.resourcesById.get(id)).caseOf({
@@ -620,7 +652,7 @@ export class Objective
         nothing: () => '[Error loading page title]',
       });
 
-    const orderedObjectiveAssessments = getOrderedObjectiveQuestions(skills, skillQuestionRefs);
+    const orderedObjectiveAssessments = getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs);
 
     const RIGHT_QUAD_WIDTH = (orderedObjectiveAssessments.length * 35)
       + (SKILL_GRID_HEADER_HEIGHT);
@@ -641,7 +673,7 @@ export class Objective
                 })}
                 <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
                 Pages
-              {workbookPageRefs.caseOf({
+              {orgWorkbookPageRefs.caseOf({
                 just: refs => (
                     <span className={classNames(['badge badge-light', classes.countBadge])}>
                       {refs.size}
@@ -650,14 +682,15 @@ export class Objective
                 nothing: () => null,
               })}
               </h3>
-              {workbookPageRefs.caseOf({
+              {orgWorkbookPageRefs.caseOf({
                 just: (refs) => {
                   return refs.size > 0
                     ? (
                       <div className={classes.pageList}>
                         {refs.map(refGuid => (
                           <div key={refGuid} className={classes.pageTitle}>
-                            <a href={`./#${getRefGuidFromRefId(refGuid)}-${course.guid}`}>
+                            <a href={`#${getRefGuidFromRefId(refGuid)}-${course.guid}`
+                                + `-${organization.guid}`}>
                               <i className={classNames(
                                 ['fa fa-file-o', classes.detailsSectionIcon])} />
                               {getWBPTitleFromRefId(refGuid)}
@@ -764,17 +797,19 @@ export class Objective
 
   renderAggregateDetails() {
     const {
-      classes, skills, skillQuestionRefs, objective,
+      classes, skills, objective, organization,
     } = this.props;
-    const { workbookPageRefs } = this.state;
 
-    const pageCount = workbookPageRefs.caseOf({
+    const orgWorkbookPageRefs = this.getOrgWorkbookPageRefs(organization);
+    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
+
+    const pageCount = orgWorkbookPageRefs.caseOf({
       just: refs => refs.size,
       nothing: () => null,
     });
     const checkModelResults = checkModel(
       objective, objectiveModelRules,
-      { pageCount, skills, skillQuestionRefs });
+      { pageCount, skills, skillQuestionRefs: orgSkillQuestionRefs });
     const skillCount = skills.size;
 
     return (
@@ -811,19 +846,19 @@ export class Objective
             }),
           })}
           {skillCount} {addPluralS('Skill', skillCount)}
-          {skillQuestionRefs.caseOf({
+          {orgSkillQuestionRefs.caseOf({
             just: (questionRefs) => {
               const formativeCount = skills.reduce(
                 (sum, skill) => sum +
-                  getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill)
+                  getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs, skill)
                   .filter(r => r.assessmentType === LegacyTypes.inline)
                   .length,
                 0,
               );
-              
+
               const summativeCount = skills.reduce(
                 (sum, skill) => sum +
-                  getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill)
+                  getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs, skill)
                   .filter(r => r.assessmentType === LegacyTypes.assessment2)
                   .length,
                 0,
@@ -831,7 +866,7 @@ export class Objective
 
               const guaranteedSummativeCount = skills.reduce(
                 (sum, skill) => sum + calculateGuaranteedSummativeCount(
-                  getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill), 0),
+                  getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs, skill), 0),
                 summativeCount,
               );
 
