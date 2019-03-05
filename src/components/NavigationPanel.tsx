@@ -431,8 +431,11 @@ export class NavigationPanel
               <a key={org.guid}
                 className={classNames(['dropdown-item'])}
                 onClick={() => {
-                  this.props.onReleaseOrg();
-                  viewActions.viewDocument(org.guid, course.guid, org.guid);
+
+                  if (org.id !== currentOrg.id) {
+                    this.props.onReleaseOrg();
+                    viewActions.viewDocument(org.guid, course.guid, org.guid);
+                  }
 
                 }}>
                 {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
