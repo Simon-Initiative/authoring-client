@@ -43,7 +43,17 @@ export const stringifyUrlParams = (urlParams: Map<string, string>): string =>
 export const getRouteFromPath = (path: string, search: string) => {
   const parseRootPath = (path: string) => {
     const matches = /^\/?([^\?]*)/.exec(path);
-    return matches && matches[1] || '';
+
+    if (matches && matches[1]) {
+      if (matches[1].startsWith('&state')) {
+        // handle special case where keycloak redirect contains garbage metadata &state
+        return '';
+      }
+
+      return matches[1];
+    }
+
+    return '';
   };
 
   const parseCourseResourceIds = (path: string) => {
