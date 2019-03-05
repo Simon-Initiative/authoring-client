@@ -18,7 +18,7 @@ const defaultContent = {
   elementType: 'include',
   title: Maybe.nothing<string>(),
   idref: '',
-  organziation: '',
+  organization: '',
   version: '',
   grainSize: Maybe.nothing<types.GrainSizes>(),
   guid: '',
@@ -78,7 +78,7 @@ export class Include extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const s = {
       include: {
