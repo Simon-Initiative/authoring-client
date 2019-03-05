@@ -17,8 +17,8 @@ describe('router reducer', () => {
     expect(updatedState.path)
       .toEqual('resourceId-courseId-orgId');
     expect(updatedState.search).toEqual('');
-    expect(updatedState.resourceId.valueOr('NOTHING')).toEqual('resourceId');
     expect(updatedState.courseId.valueOr('NOTHING')).toEqual('courseId');
+    expect(updatedState.resourceId.valueOr('NOTHING')).toEqual('resourceId');
     expect(updatedState.orgId.valueOr('NOTHING')).toEqual('orgId');
     expect(updatedState.urlParams.toJS()).toEqual({});
   });
@@ -34,8 +34,8 @@ describe('router reducer', () => {
     expect(updatedState.path)
       .toEqual('resource-Id-dashes-courseId-orgId');
     expect(updatedState.search).toEqual('');
-    expect(updatedState.resourceId.valueOr('NOTHING')).toEqual('resource-Id-dashes');
     expect(updatedState.courseId.valueOr('NOTHING')).toEqual('courseId');
+    expect(updatedState.resourceId.valueOr('NOTHING')).toEqual('resource-Id-dashes');
     expect(updatedState.orgId.valueOr('NOTHING')).toEqual('orgId');
     expect(updatedState.urlParams.toJS()).toEqual({});
   });
@@ -51,8 +51,8 @@ describe('router reducer', () => {
     expect(updatedState.path)
       .toEqual('resourceId-courseId-orgId');
     expect(updatedState.search).toEqual('?questionId=some_question_id&filter=id');
-    expect(updatedState.resourceId.valueOr('NOTHING')).toEqual('resourceId');
     expect(updatedState.courseId.valueOr('NOTHING')).toEqual('courseId');
+    expect(updatedState.resourceId.valueOr('NOTHING')).toEqual('resourceId');
     expect(updatedState.orgId.valueOr('NOTHING')).toEqual('orgId');
     expect(updatedState.urlParams.toJS()).toEqual({ questionId: 'some_question_id', filter: 'id' });
   });
