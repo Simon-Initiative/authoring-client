@@ -59,7 +59,8 @@ export default class WbInlineEditor
     const guid = this.props.context.courseModel.resourcesById
       .get(this.props.model.idref).guid;
 
-    this.props.services.viewDocument(guid, this.props.context.courseId);
+    this.props.services.viewDocument(
+      guid, this.props.context.courseId, this.props.context.orgId);
   }
 
   renderSidebar() {
@@ -122,7 +123,7 @@ export default class WbInlineEditor
 
     return (
       <div className="wbinline">
-        <h5><i className="fa fa-flask" style={iconStyle}/> {title}</h5>
+        <h5><i className="fa fa-flask" style={iconStyle} /> {title}</h5>
         <button
           onClick={this.onClick}
           type="button"

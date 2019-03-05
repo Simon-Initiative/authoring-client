@@ -78,7 +78,8 @@ export default class ActivityEditor
     const guid = this.props.context.courseModel.resourcesById
       .get(this.props.model.idref).guid;
 
-    this.props.services.viewDocument(guid, this.props.context.courseId);
+    this.props.services.viewDocument(
+      guid, this.props.context.courseId, this.props.context.orgId);
   }
 
   renderSidebar() {
