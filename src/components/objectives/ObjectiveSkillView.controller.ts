@@ -43,7 +43,7 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state: State): StateProps => {
-  const { skills, user, router, orgs } = state;
+  const { skills, user, orgs } = state;
 
   return {
     skills,
