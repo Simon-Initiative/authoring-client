@@ -84,7 +84,7 @@ export function viewImportCourse() {
   return transitionApplicationView.bind(undefined, '/import');
 }
 
-export function viewDocument(documentId: string, courseId: string, orgId?: string) {
+export function viewDocument(documentId: string, courseId: string, orgId: string) {
   return transitionCourseView
     .bind(
       undefined,
