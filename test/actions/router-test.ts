@@ -61,7 +61,7 @@ describe('getRouteFromPath', () => {
   });
 
   it('should return resource route', () => {
-    const path = 'resourceId-courseId';
+    const path = 'resourceId-courseId-orgId';
     const search = '';
 
     const route = getRouteFromPath(path, search);
