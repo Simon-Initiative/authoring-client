@@ -165,10 +165,10 @@ export default class Main extends React.Component<MainProps, MainState> {
       just: (c) => {
         // get org id from router or select the first organization
         const currentOrg = router.orgId.caseOf({
-          just: guid => c.resources.find(r => r.guid === guid),
+          just: guid => c.resources.find(r => r.guid === guid) ||
+            c.resources.find(r => r.type === 'x-oli-organization'),
           nothing: () => c.resources.find(r => r.type === 'x-oli-organization'),
         });
-
         return (
           <ResourceView
             serverTimeSkewInMs={server.timeSkewInMs}

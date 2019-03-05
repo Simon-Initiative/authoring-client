@@ -47,11 +47,13 @@ export const getRouteFromPath = (path: string, search: string) => {
   };
 
   const parseCourseResourceIds = (path: string) => {
+    // resourceIds might contain '-', so we parse from the back. The resource id
+    // is everything before the last two hyphen-separated strings.
     const pathParts = parseRootPath(path).split('-');
     return {
-      resourceId: Maybe.maybe<string>(pathParts[0]),
-      courseId: Maybe.maybe<string>(pathParts[1]),
-      orgId: Maybe.maybe<string>(pathParts[2]),
+      resourceId: Maybe.maybe<string>(pathParts.slice(0, pathParts.length - 2).join('-')),
+      courseId: Maybe.maybe<string>(pathParts[pathParts.length - 2]),
+      orgId: Maybe.maybe<string>(pathParts[pathParts.length - 1]),
     };
   };
 
