@@ -27,7 +27,7 @@ import { fetchObjectives } from 'actions//objectives';
 export interface AppServices {
 
   // Request to view a document with the specified document id.
-  viewDocument: (documentId: types.DocumentId, courseId: string) => void;
+  viewDocument: (documentId: types.DocumentId, courseId: string, orgId: string) => void;
 
   displayMessage: (message: Messages.Message) => void;
 
@@ -94,8 +94,8 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(messageActions.dismissSpecificMessage(message));
   }
 
-  viewDocument(documentId: string, courseId: string) {
-    this.dispatch(view.viewDocument(documentId, courseId));
+  viewDocument(documentId: string, courseId: string, orgId: string) {
+    this.dispatch(view.viewDocument(documentId, courseId, orgId));
   }
 
   createWorkbookPage(title: string, courseId: string): Promise<persistence.Document> {

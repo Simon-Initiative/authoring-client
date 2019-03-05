@@ -43,11 +43,11 @@ export class PoolRefEditor
   fetchTitlePoolById(id) {
 
     this.props.services.fetchAttributesBy(['title', 'guid'], 'id', id)
-    .then((o) => {
-      const { title, guid } = o;
-      this.guid = guid;
-      this.setState({ title });
-    });
+      .then((o) => {
+        const { title, guid } = o;
+        this.guid = guid;
+        this.setState({ title });
+      });
   }
 
   componentDidMount() {
@@ -84,31 +84,32 @@ export class PoolRefEditor
     this.props.services.dismissModal();
 
     this.props.services.fetchIdByGuid(resource.guid)
-    .then((idref) => {
-      this.props.onEdit(this.props.model.with({ idref }));
-    });
+      .then((idref) => {
+        this.props.onEdit(this.props.model.with({ idref }));
+      });
   }
 
   onViewPool() {
     if (this.guid !== null) {
       this.props.services.viewDocument(
         this.guid,
-        this.props.context.courseId);
+        this.props.context.courseId,
+        this.props.context.orgId);
     }
   }
 
   onClick() {
 
-    const predicate = (res: Resource) : boolean =>
+    const predicate = (res: Resource): boolean =>
       res.type === LegacyTypes.assessment2_pool
-        && res.resourceState !== ResourceState.DELETED;
+      && res.resourceState !== ResourceState.DELETED;
 
     this.props.services.displayModal(
-        <ResourceSelection
-          filterPredicate={predicate}
-          courseId={this.props.context.courseId}
-          onInsert={this.onInsert}
-          onCancel={this.onCancel}/>);
+      <ResourceSelection
+        filterPredicate={predicate}
+        courseId={this.props.context.courseId}
+        onInsert={this.onInsert}
+        onCancel={this.onCancel} />);
   }
 
   renderSidebar() {
@@ -118,7 +119,7 @@ export class PoolRefEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     let details;
     if (this.props.model.idref === '') {

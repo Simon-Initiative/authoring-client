@@ -546,7 +546,8 @@ export class MultipanelEditor
                 onClick={() => {
                   const guid = context.courseModel.resourcesById
                     .get(model.inline.idref).guid;
-                  services.viewDocument(guid, this.props.context.courseId);
+                  services.viewDocument(
+                    guid, this.props.context.courseId, this.props.context.orgId);
                 }}
                 type="button"
                 style={{ colors: flatui.emerald }}
