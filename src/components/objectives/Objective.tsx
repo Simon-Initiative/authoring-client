@@ -331,7 +331,8 @@ export interface ObjectiveProps {
 export interface ObjectiveState {
   mouseOver: boolean;
   skillEdits: Map<string, boolean>;
-  workbookPageRefs: Maybe<List<string>>;
+  orgWorkbookPageRefs: Maybe<List<string>>;
+  orgSkillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
   hasRequestedRefs: boolean;
   isEditingTitle: boolean;
 }
@@ -351,7 +352,8 @@ export class Objective
     this.state = {
       mouseOver: false,
       skillEdits: Map<string, boolean>(),
-      workbookPageRefs: Maybe.nothing<List<string>>(),
+      orgWorkbookPageRefs: Maybe.nothing<List<string>>(),
+      orgSkillQuestionRefs: Maybe.nothing<Map<string, List<QuestionRef>>>(),
       hasRequestedRefs: false,
       isEditingTitle: false,
     };
@@ -370,7 +372,7 @@ export class Objective
   }
 
   loadReferences = () => {
-    const { course, objective } = this.props;
+    const { course, objective, organization, skillQuestionRefs } = this.props;
 
     this.setState({
       hasRequestedRefs: true,
@@ -383,9 +385,16 @@ export class Objective
       destinationId: objective.id,
     }).then((edges) => {
       this.setState({
-        workbookPageRefs: Maybe.just(edges.reduce(
-          (acc, edge) => acc.push(edge.sourceId.split(':')[2]),
-          List<string>()),
+        orgWorkbookPageRefs: this.getOrgWorkbookPageRefs(
+          organization,
+          Maybe.just(edges.reduce(
+            (acc, edge) => acc.push(edge.sourceId.split(':')[2]),
+            List<string>(),
+          )),
+        ),
+        orgSkillQuestionRefs: this.getOrgQuestionRefs(
+          organization,
+          skillQuestionRefs,
         ),
       });
     });
@@ -418,9 +427,11 @@ export class Objective
     this.props.onRemoveSkill(model);
   }
 
-  getOrgWorkbookPageRefs(organization: OrganizationModel) {
+  getOrgWorkbookPageRefs(
+    organization: OrganizationModel,
+    workbookPageRefs: Maybe<List<string>>,
+  ): Maybe<List<string>> {
     const { organizationResourceMap } = this.props;
-    const { workbookPageRefs } = this.state;
     const organizationId = organization.resource.id;
 
     return organizationResourceMap.bind(
@@ -432,8 +443,11 @@ export class Objective
     );
   }
 
-  getOrgQuestionRefs(organization: OrganizationModel) {
-    const { skillQuestionRefs, organizationResourceMap } = this.props;
+  getOrgQuestionRefs(
+    organization: OrganizationModel,
+    skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>,
+  ): Maybe<Map<string, List<QuestionRef>>> {
+    const { organizationResourceMap } = this.props;
     const organizationId = organization.resource.id;
 
     return organizationResourceMap.bind(
@@ -450,10 +464,10 @@ export class Objective
     const {
       classes, course, onPushRoute, skills, organization,
     } = this.props;
+    const { orgSkillQuestionRefs } = this.state;
 
     const LEFT_OFFSET = 20;
     const diagonalDist = (height: number) => Math.sqrt(2 * (height * height));
-    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
     const orderedObjectiveQuestionRefs = getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs);
 
     return orderedObjectiveQuestionRefs.length > 0
@@ -513,9 +527,8 @@ export class Objective
   }
 
   renderSkillGrid() {
-    const { classes, skills, organization } = this.props;
-
-    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
+    const { classes, skills } = this.props;
+    const { orgSkillQuestionRefs } = this.state;
 
     const orderedObjectiveQuestions = getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs);
 
@@ -597,11 +610,9 @@ export class Objective
 
   renderSkills() {
     const {
-      skills, editMode, loading, onEditSkill, highlightText, organization,
+      skills, editMode, loading, onEditSkill, highlightText,
     } = this.props;
-    const { skillEdits } = this.state;
-
-    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
+    const { skillEdits, orgSkillQuestionRefs } = this.state;
 
     return skills.map(skill => (
       <Skill
@@ -628,9 +639,7 @@ export class Objective
       classes, course, editMode, objective, loading, onAddNewSkill, onAddExistingSkill,
       skills, organization,
     } = this.props;
-
-    const orgWorkbookPageRefs = this.getOrgWorkbookPageRefs(organization);
-    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
+    const { orgWorkbookPageRefs, orgSkillQuestionRefs } = this.state;
 
     const pageCount = orgWorkbookPageRefs.caseOf({
       just: refs => refs.size,
@@ -797,11 +806,9 @@ export class Objective
 
   renderAggregateDetails() {
     const {
-      classes, skills, objective, organization,
+      classes, skills, objective,
     } = this.props;
-
-    const orgWorkbookPageRefs = this.getOrgWorkbookPageRefs(organization);
-    const orgSkillQuestionRefs = this.getOrgQuestionRefs(organization);
+    const { orgWorkbookPageRefs, orgSkillQuestionRefs } = this.state;
 
     const pageCount = orgWorkbookPageRefs.caseOf({
       just: refs => refs.size,
