@@ -10,10 +10,14 @@ import * as lockActions from 'actions/locks';
 import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
 import { modalActions } from 'actions/modal';
 import { push } from 'actions/router';
+import { State } from 'reducers';
+import { Maybe } from 'tsmonad';
+import * as models from 'data/models';
 
 interface StateProps {
   skills: any;
   user: any;
+  selectedOrganization: Maybe<models.OrganizationModel>;
 }
 
 interface DispatchProps {
@@ -38,12 +42,14 @@ interface OwnProps {
   expanded: any;
 }
 
-const mapStateToProps = (state): StateProps => {
-  const { skills, user } = state;
+const mapStateToProps = (state: State): StateProps => {
+  const { skills, user, orgs } = state;
 
   return {
     skills,
     user,
+    selectedOrganization: orgs.activeOrg.lift(doc =>
+      (doc.model as models.OrganizationModel)),
   };
 };
 

@@ -32,8 +32,22 @@ export interface ModelCheckerResults<T, K> {
   getIssue: (id: string) => Maybe<ModelCheckerResult<T, K>>;
 }
 
+export interface CheckModelOptions {
+  disabled?: boolean;
+}
+
 export function checkModel<T, K>(
-  data: T, rules: ModelCheckerRule<T, K>[], aux?: K): ModelCheckerResults<T, K> {
+  data: T, rules: ModelCheckerRule<T, K>[], aux?: K, options?: CheckModelOptions,
+): ModelCheckerResults<T, K> {
+  if (options && options.disabled) {
+    return {
+      results: List<ModelCheckerResult<T, K>>(),
+      issues: Map<string, ModelCheckerResult<T, K>>(),
+      hasIssue: (id: string) => false,
+      getIssue: (id: string) => Maybe.nothing(),
+    };
+  }
+
   const results = rules.reduce(
     (acc: ModelCheckerResults<T, K>, rule) => {
       const isIssue = rule.isIssue(data, aux);
