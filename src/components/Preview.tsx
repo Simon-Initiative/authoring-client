@@ -35,26 +35,6 @@ function buildPreviewMessage() {
   });
 }
 
-function buildAccountMessage(email: string) {
-  const content = new Messages.TitledContent().with({
-    title: 'Preview',
-    message: 'To preview your content, sign in to your Preview (dev-01.oli.cmu.edu) '
-      + 'account. If you have never signed in to your Preview '
-      + 'account, please check your ' + email
-      + ' email for instructions.',
-  });
-  return new Messages.Message().with({
-    content,
-    guid: 'PreviewAccountMessage',
-    scope: Messages.Scope.Resource,
-    severity: Messages.Severity.Information,
-    canUserDismiss: true,
-    actions: Immutable.List([]),
-  });
-}
-
-
-
 export default class Preview extends React.PureComponent<PreviewProps, PreviewState> {
 
   timerId: Maybe<number>;
@@ -95,8 +75,6 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
       nothing: () => true,
       just: url => this.props.shouldRefresh,
     });
-
-    this.props.showMessage(buildAccountMessage(this.props.email));
 
     if (needsRefresh) {
       this.props.showMessage(buildPreviewMessage());
