@@ -503,6 +503,12 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const license = this.props.model.metadata.license;
     const licenseOptions = PackageLicenseTypes
       .map(l => <option key={l.acronym} value={l.url}>{l.description}</option>);
+
+    const urls = PackageLicenseTypes.map(l => l.url);
+    // Only show a link to the license if it's a CC license url, which
+    // appears after the 'default' license type in the PackageLicenseTypes list
+    const isCCUrl = urls.indexOf(license) > 0;
+
     return (
       <React.Fragment>
         <Select
@@ -511,7 +517,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           value={license}
           onChange={this.onLicenseChange}>
           {licenseOptions}
-        </Select> {license ? <a title="License Summary" href={license} target="_blank">
+        </Select> {isCCUrl ? <a title="License Summary" href={license} target="_blank">
           <i className="fa fa-external-link" /></a> : null}
       </React.Fragment>
     );
