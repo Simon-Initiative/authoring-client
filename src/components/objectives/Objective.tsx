@@ -333,7 +333,7 @@ export interface ObjectiveState {
   skillEdits: Map<string, boolean>;
   orgWorkbookPageRefs: Maybe<List<string>>;
   orgSkillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
-  hasRequestedRefs: boolean;
+  hasRequestedWorkbookPageRefs: boolean;
   isEditingTitle: boolean;
 }
 
@@ -354,28 +354,29 @@ export class Objective
       skillEdits: Map<string, boolean>(),
       orgWorkbookPageRefs: Maybe.nothing<List<string>>(),
       orgSkillQuestionRefs: Maybe.nothing<Map<string, List<QuestionRef>>>(),
-      hasRequestedRefs: false,
+      hasRequestedWorkbookPageRefs: false,
       isEditingTitle: false,
     };
   }
 
-  componentDidMount() {
-    this.loadReferences();
-  }
-
   componentWillReceiveProps(nextProps: ObjectiveProps) {
-    const { hasRequestedRefs } = this.state;
+    const { hasRequestedWorkbookPageRefs } = this.state;
 
-    if (nextProps.isExpanded && !hasRequestedRefs) {
-      this.loadReferences();
+    if (nextProps.isExpanded && !hasRequestedWorkbookPageRefs) {
+      // requires a network request, only load once
+      this.loadWorkbookPageRefs();
+    }
+    if (nextProps.skillQuestionRefs !== this.props.skillQuestionRefs) {
+      // if skillQuestionRefs changes, we should recompute orgSkillQuestionRefs state
+      this.loadSkillQuestionRefs();
     }
   }
 
-  loadReferences = () => {
-    const { course, objective, organization, skillQuestionRefs } = this.props;
+  loadWorkbookPageRefs = () => {
+    const { course, objective, organization } = this.props;
 
     this.setState({
-      hasRequestedRefs: true,
+      hasRequestedWorkbookPageRefs: true,
     });
 
     // fetch all workbookpage edges to build workbookpage refs list
@@ -392,21 +393,23 @@ export class Objective
             List<string>(),
           )),
         ),
-        orgSkillQuestionRefs: this.getOrgQuestionRefs(
-          organization,
-          skillQuestionRefs,
-        ),
       });
     });
   }
 
-  onToggleDetails = () => {
-    const { objective, isExpanded, onToggleExpanded } = this.props;
-    const { hasRequestedRefs } = this.state;
+  loadSkillQuestionRefs = () => {
+    const { organization, skillQuestionRefs } = this.props;
 
-    if (!isExpanded && !hasRequestedRefs) {
-      this.loadReferences();
-    }
+    this.setState({
+      orgSkillQuestionRefs: this.getOrgQuestionRefs(
+        organization,
+        skillQuestionRefs,
+      ),
+    });
+  }
+
+  onToggleDetails = () => {
+    const { objective, onToggleExpanded } = this.props;
 
     onToggleExpanded(objective.id);
   }
@@ -609,9 +612,7 @@ export class Objective
   }
 
   renderSkills() {
-    const {
-      skills, editMode, loading, onEditSkill, highlightText,
-    } = this.props;
+    const { skills, editMode, loading, onEditSkill, highlightText } = this.props;
     const { skillEdits, orgSkillQuestionRefs } = this.state;
 
     return skills.map(skill => (
@@ -647,8 +648,11 @@ export class Objective
     });
 
     const checkModelResults = checkModel(
-      objective, objectiveModelRules, {
-        pageCount, skills, skillQuestionRefs: orgSkillQuestionRefs });
+      objective,
+      objectiveModelRules,
+      { pageCount, skills, skillQuestionRefs: orgSkillQuestionRefs },
+      { disabled: orgSkillQuestionRefs.caseOf({ just: () => false , nothing: () => true }) },
+    );
 
     const getRefGuidFromRefId = (id: string) =>
       Maybe.maybe(course.resourcesById.get(id)).caseOf({
@@ -709,9 +713,15 @@ export class Objective
                       </div>
                     )
                     : (
-                      <div className={classes.noPagesMsg}>
-                        <span>This objective is not referenced by any workbook pages.</span>
-                      </div>
+                      orgWorkbookPageRefs.caseOf({
+                        just: () => (
+                          // orgWorkbookPageRefs data is loaded, so we know there arent any refs
+                          <div className={classes.noPagesMsg}>
+                            <span>This objective is not referenced by any workbook pages.</span>
+                          </div>
+                        ),
+                        nothing: () => undefined,
+                      })
                     );
                 },
                 nothing: () => (
@@ -753,11 +763,16 @@ export class Objective
                   Create New Skill
                 </Button>
                 <div className="flex-spacer" />
-                {skills.size > 0 && orderedObjectiveAssessments.length < 1 &&
-                  <div style={{ color: colors.gray, fontWeight: 400 }}>
-                    These skills are not referenced by any assessments
-                  </div>
-                }
+                {orgSkillQuestionRefs.caseOf({
+                  just: () => (
+                    // orgSkillQuestionRefs data is loaded, so we know there arent any refs
+                    skills.size > 0 && orderedObjectiveAssessments.length < 1 &&
+                      <div style={{ color: colors.gray, fontWeight: 400 }}>
+                        These skills are not referenced by any assessments
+                      </div>
+                  ),
+                  nothing: () => undefined,
+                })}
               </h3>
             </div>
           </div>
@@ -805,18 +820,20 @@ export class Objective
   }
 
   renderAggregateDetails() {
-    const {
-      classes, skills, objective,
-    } = this.props;
+    const { classes, skills, objective } = this.props;
     const { orgWorkbookPageRefs, orgSkillQuestionRefs } = this.state;
 
     const pageCount = orgWorkbookPageRefs.caseOf({
       just: refs => refs.size,
       nothing: () => null,
     });
+
     const checkModelResults = checkModel(
       objective, objectiveModelRules,
-      { pageCount, skills, skillQuestionRefs: orgSkillQuestionRefs });
+      { pageCount, skills, skillQuestionRefs: orgSkillQuestionRefs },
+      { disabled: orgSkillQuestionRefs.caseOf({ just: () => false , nothing: () => true }) },
+    );
+
     const skillCount = skills.size;
 
     return (

@@ -145,6 +145,8 @@ export const stringFormat = {
 
   /**
    * Returns a truncated version of a string with ellipsis.
+   * Maximum string length is 500 characters. Larger strings will be truncated
+   * to prevent the JavaScript event loop from locking up.
    *
    * WARNING: This might be an expensive call, as it renders the text into a canvas
    * element to measure it
@@ -152,6 +154,7 @@ export const stringFormat = {
   ellipsizePx: (
     text: string, maxWidth: number, fontFamily: string,
     fontSize: number, fontWeight?: number, fontStyle?: string) => {
+    const MAX_TEXT_LENGTH = 500;
     const ellipsizeWidth = measureTextWidth({
       text: '...', fontFamily, fontSize, fontWeight, fontStyle });
     const textWidth = measureTextWidth({
@@ -166,12 +169,13 @@ export const stringFormat = {
       return '...';
     }
 
-    const findLargestString = (str: string) =>
-      measureTextWidth({
+    const findLargestString = (str: string) => {
+      return measureTextWidth({
         text: `${str}...`, fontFamily, fontSize, fontWeight, fontStyle }) <= maxWidth
         ? str
         : findLargestString(str.substr(0, str.length - 1));
+    };
 
-    return findLargestString(text) + '...';
+    return findLargestString(text.substr(0, MAX_TEXT_LENGTH)) + '...';
   },
 };
