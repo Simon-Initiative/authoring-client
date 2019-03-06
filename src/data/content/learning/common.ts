@@ -30,6 +30,11 @@ export const PurposeTypes: PurposeType[] = [
 export type PackageLicenseType = { acronym: string, description: string, url: string };
 export const PackageLicenseTypes: PackageLicenseType[] = [
   {
+    acronym: '',
+    description: 'Non-CC / Copyrighted / Other',
+    url: '',
+  },
+  {
     acronym: 'CCBy',
     description: 'CC BY: Attribtion',
     url: 'https://creativecommons.org/licenses/by/3.0/',
@@ -58,11 +63,6 @@ export const PackageLicenseTypes: PackageLicenseType[] = [
     acronym: 'CCByNCND',
     description: 'CC BY-NC-ND: Attribution-NonCommercial-NoDerivatives',
     url: 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
-  },
-  {
-    acronym: '',
-    description: 'Non-CC / Copyrighted / Other',
-    url: '',
   },
 ];
 
