@@ -333,7 +333,6 @@ export interface ObjectiveState {
   skillEdits: Map<string, boolean>;
   orgWorkbookPageRefs: Maybe<List<string>>;
   orgSkillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
-  hasRequestedWorkbookPageRefs: boolean;
   isEditingTitle: boolean;
 }
 
@@ -354,18 +353,16 @@ export class Objective
       skillEdits: Map<string, boolean>(),
       orgWorkbookPageRefs: Maybe.nothing<List<string>>(),
       orgSkillQuestionRefs: Maybe.nothing<Map<string, List<QuestionRef>>>(),
-      hasRequestedWorkbookPageRefs: false,
       isEditingTitle: false,
     };
   }
 
-  componentWillReceiveProps(nextProps: ObjectiveProps) {
-    const { hasRequestedWorkbookPageRefs } = this.state;
+  componentWillMount() {
+    // requires a network request, only load once
+    this.loadWorkbookPageRefs();
+  }
 
-    if (nextProps.isExpanded && !hasRequestedWorkbookPageRefs) {
-      // requires a network request, only load once
-      this.loadWorkbookPageRefs();
-    }
+  componentWillReceiveProps(nextProps: ObjectiveProps) {
     if (nextProps.skillQuestionRefs !== this.props.skillQuestionRefs) {
       // if skillQuestionRefs changes, we should recompute orgSkillQuestionRefs state
       this.loadSkillQuestionRefs();
@@ -374,10 +371,6 @@ export class Objective
 
   loadWorkbookPageRefs = () => {
     const { course, objective, organization } = this.props;
-
-    this.setState({
-      hasRequestedWorkbookPageRefs: true,
-    });
 
     // fetch all workbookpage edges to build workbookpage refs list
     persistence.fetchEdges(course.guid, {
