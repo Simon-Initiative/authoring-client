@@ -27,8 +27,8 @@ export const PurposeTypes: PurposeType[] = [
   { value: 'didigetthis', label: 'Did I get this?' },
 ];
 
-export type CCLicenseType = { acronym: string, description: string, url: string };
-export const CCLicenseTypes: CCLicenseType[] = [
+export type PackageLicenseType = { acronym: string, description: string, url: string };
+export const PackageLicenseTypes: PackageLicenseType[] = [
   {
     acronym: 'CCBy',
     description: 'CC BY: Attribtion',
@@ -58,6 +58,11 @@ export const CCLicenseTypes: CCLicenseType[] = [
     acronym: 'CCByNCND',
     description: 'CC BY-NC-ND: Attribution-NonCommercial-NoDerivatives',
     url: 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+  },
+  {
+    acronym: '',
+    description: 'Non-CC / Copyrighted / Other',
+    url: '',
   },
 ];
 
