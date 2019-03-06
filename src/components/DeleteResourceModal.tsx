@@ -140,7 +140,8 @@ export default class DeleteResourceModal extends
     const link = (edge: Edge) => (text: string) =>
       <a onClick={this.props.onDismissModal}
         href={`/#${this.edgeResource(
-          this.edgeResourceId(edge)).guid}-${course.guid}-${this.props.orgId}`}
+          this.edgeResourceId(edge)).guid}-${course.guid}-${this.edgeResource(
+            this.edgeResourceId(edge)).guid}`}
         className="btn btn-link">
         {text}
       </a>;
