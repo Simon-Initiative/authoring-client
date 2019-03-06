@@ -12,10 +12,7 @@ export enum ROUTE {
   IMPORT = 'import',
   PREVIEW = 'preview',
   SKILLS = 'skills',
-  PAGES = 'pages',
-  FORMATIVE = 'formative',
-  SUMMATIVE = 'summative',
-  POOLS = 'pools',
+  ALL_RESOURCES = 'resources',
   ORGANIZATIONS = 'organizations',
   OBJECTIVES = 'objectives',
 }
@@ -45,70 +42,62 @@ export const stringifyUrlParams = (urlParams: Map<string, string>): string =>
 
 export const getRouteFromPath = (path: string, search: string) => {
   const parseRootPath = (path: string) => {
-    if (path && path.startsWith('state')) {
-      return '';
+    const matches = /^\/?([^\?]*)/.exec(path);
+
+    if (matches && matches[1]) {
+      if (matches[1].startsWith('&state')) {
+        // handle special case where keycloak redirect contains garbage metadata &state
+        return '';
+      }
+
+      return matches[1];
     }
 
-    const matches = /^\/?([^\?]*)/.exec(path);
-    return matches && matches[1] || '';
+    return '';
   };
 
   const parseCourseResourceIds = (path: string) => {
+    // resourceIds might contain '-', so we parse from the back. The resource id
+    // is everything before the last two hyphen-separated strings.
     const pathParts = parseRootPath(path).split('-');
-    return pathParts.length > 1
-      ? {
-        resourceId: Maybe.just<string>(pathParts[0]),
-        courseId: Maybe.just<string>(pathParts[1]),
-      }
-      : {
-        resourceId: Maybe.nothing<string>(),
-        courseId: Maybe.just<string>(pathParts[1]),
-      };
+    return {
+      resourceId: Maybe.maybe<string>(pathParts.slice(0, pathParts.length - 2).join('-')),
+      courseId: Maybe.maybe<string>(pathParts[pathParts.length - 2]),
+      orgId: Maybe.maybe<string>(pathParts[pathParts.length - 1]),
+    };
   };
 
-  const { route, courseId, resourceId } = (() => {
+  const { route, courseId, resourceId, orgId } = (() => {
     switch (parseRootPath(path).split('-')[0]) {
       case '':
         return {
           route: ROUTE.ROOT,
-          courseId: Maybe.nothing<string>(),
           resourceId: Maybe.nothing<string>(),
+          courseId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'create':
         return {
           route: ROUTE.CREATE,
-          courseId: Maybe.nothing<string>(),
           resourceId: Maybe.nothing<string>(),
+          courseId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'import':
         return {
           route: ROUTE.IMPORT,
-          courseId: Maybe.nothing<string>(),
           resourceId: Maybe.nothing<string>(),
+          courseId: Maybe.nothing<string>(),
+          orgId: Maybe.nothing<string>(),
         };
       case 'skills':
         return {
           route: ROUTE.SKILLS,
           ...parseCourseResourceIds(path),
         };
-      case 'pages':
+      case 'resources':
         return {
-          route: ROUTE.PAGES,
-          ...parseCourseResourceIds(path),
-        };
-      case 'formativeassessments':
-        return {
-          route: ROUTE.FORMATIVE,
-          ...parseCourseResourceIds(path),
-        };
-      case 'summativeassessments':
-        return {
-          route: ROUTE.SUMMATIVE,
-          ...parseCourseResourceIds(path),
-        };
-      case 'pools':
-        return {
-          route: ROUTE.POOLS,
+          route: ROUTE.ALL_RESOURCES,
           ...parseCourseResourceIds(path),
         };
       case 'organizations':
@@ -142,6 +131,7 @@ export const getRouteFromPath = (path: string, search: string) => {
     route,
     courseId,
     resourceId,
+    orgId,
     urlParams,
   });
 };
@@ -156,6 +146,7 @@ export type UpdateRouteAction = {
   search: string,
   courseId: Maybe<string>,
   resourceId: Maybe<string>,
+  orgId: Maybe<string>,
   urlParams: Map<string, string>,
 };
 
@@ -165,6 +156,7 @@ export const updateRoute = (path: string, search: string): UpdateRouteAction => 
     route,
     courseId,
     resourceId,
+    orgId,
     urlParams,
   } = getRouteFromPath(path, search);
 
@@ -175,6 +167,7 @@ export const updateRoute = (path: string, search: string): UpdateRouteAction => 
     search,
     courseId,
     resourceId,
+    orgId,
     urlParams,
   });
 };

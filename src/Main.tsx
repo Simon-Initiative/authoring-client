@@ -13,46 +13,31 @@ import * as models from 'data/models';
 import guid from 'utils/guid';
 import { LegacyTypes } from 'data/types';
 import Header from 'components/Header.controller';
-import Footer from 'components/Footer';
 import { CoursesViewSearchable } from './components/CoursesViewSearchable.controller';
 import DocumentView from 'components/DocumentView';
 import ResourceView from 'components/ResourceView';
 import CreateCourseView from 'components/CreateCourseView';
 import ObjectiveSkillView from 'components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from 'components/ImportCourseView';
-import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
 import Messages from 'components/message/Messages.controller';
-import { Resource, ResourceState } from 'data/content/resource';
+import { Resource } from 'data/content/resource';
 import { GlobalError } from 'components/GlobalError';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import CourseEditor from 'editors/document/course/CourseEditor.controller';
-import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { RouterState } from 'reducers/router';
 import { ROUTE } from 'actions/router';
 import { ResourceLoading } from 'components/ResourceLoading';
 import * as Msg from 'types/messages';
 import * as messageActions from 'actions/messages';
-
+import OrgComponentEditor from 'editors/document/org/OrgComponent.controller';
+import { controller as OrgDetailsEditor } from 'editors/document/org/OrgDetailsEditor.controller';
 import './Main.scss';
 import Preview from 'components/Preview';
-
-type ResourceList = {
-  title: string,
-  resourceType: LegacyTypes,
-  filterFn: any,
-  createResourceFn: any,
-};
-
-function res(title, resourceType, filterFn, createResourceFn): ResourceList {
-  return {
-    title,
-    resourceType,
-    filterFn,
-    createResourceFn,
-  };
-}
+import { caseOf } from 'utils/utils';
+import { NavigationPanel } from 'components/NavigationPanel.controller';
+import * as viewActions from 'actions/view';
 
 const createOrg = (courseId, title, type) => {
   const g = guid();
@@ -69,66 +54,6 @@ const createOrg = (courseId, title, type) => {
   });
 };
 
-const resources = {
-  organizations: res(
-    'Organizations',
-    LegacyTypes.organization,
-    (resource: Resource) => resource.type === LegacyTypes.organization
-      && resource.resourceState !== ResourceState.DELETED,
-    createOrg),
-  formativeassessments: res(
-    'Formative Assessments',
-    LegacyTypes.inline,
-    (resource: Resource) => resource.type === LegacyTypes.inline
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => new models.AssessmentModel({
-      type,
-      title: contentTypes.Title.fromText(title),
-    })),
-  summativeassessments: res(
-    'Summative Assessments',
-    LegacyTypes.assessment2,
-    (resource: Resource) => resource.type === LegacyTypes.assessment2
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => new models.AssessmentModel({
-      type,
-      title: contentTypes.Title.fromText(title),
-    })),
-  feedbackassessments: res(
-    'Surveys',
-    LegacyTypes.feedback,
-    (resource: Resource) => resource.type === LegacyTypes.feedback
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => models.FeedbackModel.createNew(
-      guid(), title, ''),
-  ),
-  pages: res(
-    'Workbook Pages',
-    LegacyTypes.workbook_page,
-    (resource: Resource) => resource.type === LegacyTypes.workbook_page
-      && resource.id !== PLACEHOLDER_ITEM_ID
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => models.WorkbookPageModel.createNew(
-      guid(), title, 'This is a new page with empty content'),
-  ),
-  pools: res(
-    'Question Pools',
-    LegacyTypes.assessment2_pool,
-    (resource: Resource) => resource.type === LegacyTypes.assessment2_pool
-      && resource.resourceState !== ResourceState.DELETED,
-    (courseId, title, type) => {
-      const q = new contentTypes.Question();
-      const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
-      return new models.PoolModel({
-        type,
-        pool: new contentTypes.Pool({
-          questions, id: guid(),
-          title: contentTypes.Title.fromText(title),
-        }),
-      });
-    }),
-};
-
 interface MainProps {
   user: UserState;
   modal: ModalState;
@@ -139,10 +64,14 @@ interface MainProps {
   hover: HoverState;
   onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
+  onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onReleaseOrg: (documentId: string) => Promise<{}>;
   onSetServerTimeSkew: () => void;
   onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
+  onUpdateCourseResources: (updated) => void;
+  viewActions: viewActions.ViewActions;
 }
 
 interface MainState {
@@ -180,11 +109,11 @@ export default class Main extends React.Component<MainProps, MainState> {
     // Fire off the async request to determine server time skew
     onSetServerTimeSkew();
 
-    this.loadCourseIfNecessary();
+    this.loadCourseIfNecessary(this.props);
   }
 
-  loadCourseIfNecessary() {
-    const { course, router, onLoadCourse } = this.props;
+  loadCourseIfNecessary(props) {
+    const { course, router, onLoadCourse, onLoadOrg } = props;
 
     router.courseId.lift((courseId) => {
       const courseGuid = course.caseOf({
@@ -194,38 +123,61 @@ export default class Main extends React.Component<MainProps, MainState> {
 
       if (courseGuid !== courseId) {
         onLoadCourse(courseId);
+        router.orgId.lift((orgId) => {
+          onLoadOrg(courseId, orgId);
+        });
       }
     });
   }
 
   componentWillReceiveProps(nextProps: MainProps) {
     if (this.props.router !== nextProps.router) {
-      this.loadCourseIfNecessary();
+      this.loadCourseIfNecessary(nextProps);
+
     }
   }
 
-  renderResource(resource: ResourceList) {
-    const { onDispatch, server, course } = this.props;
+  onCreateOrg = () => {
+    const { course, onUpdateCourseResources, viewActions } = this.props;
 
-    const orgHelpPopover = (
-      <HelpPopover activateOnClick>
-        <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
-      </HelpPopover>
-    );
+    course.lift((c) => {
+      const title = 'New Organization';
+      const type = LegacyTypes.organization;
+      const resource = createOrg(c.guid, title, type);
+
+      persistence.createDocument(c.guid, resource)
+        .then((result) => {
+          const r = (result as any).model.resource;
+
+          const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
+          onUpdateCourseResources(updated);
+
+          viewActions.viewDocument(r.guid, c.guid, r.guid);
+        });
+    });
+  }
+
+
+  renderResources() {
+    const { onDispatch, server, course, router } = this.props;
 
     return course.caseOf({
-      just: c => (
-        <ResourceView
-          serverTimeSkewInMs={server.timeSkewInMs}
-          course={c}
-          title={resource.title}
-          resourceType={resource.resourceType}
-          filterFn={resource.filterFn}
-          createResourceFn={resource.createResourceFn}
-          dispatch={onDispatch}
-          helpPopover={resource.resourceType === LegacyTypes.organization ? orgHelpPopover : null}
-        />
-      ),
+      just: (c) => {
+        // get org id from router or select the first organization
+        const currentOrg = router.orgId.caseOf({
+          just: guid => c.resources.find(r => r.guid === guid) ||
+            c.resources.find(r => r.type === 'x-oli-organization'),
+          nothing: () => c.resources.find(r => r.type === 'x-oli-organization'),
+        });
+        return (
+          <ResourceView
+            serverTimeSkewInMs={server.timeSkewInMs}
+            course={c}
+            currentOrg={currentOrg.guid}
+            dispatch={onDispatch}
+          />
+        );
+      },
       nothing: () => (
         <ResourceLoading />
       ),
@@ -233,14 +185,17 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   getView(): JSX.Element {
-    const { expanded, user, course, router, onLoad, onRelease, onDispatch } = this.props;
+    const { expanded, user, course, router, onLoad,
+      onRelease, onDispatch } = this.props;
 
-    switch (router.route) {
-      case ROUTE.IMPORT:
-        return <ImportCourseView dispatch={onDispatch} />;
-      case ROUTE.CREATE:
-        return <CreateCourseView dispatch={onDispatch} />;
-      case ROUTE.PREVIEW: {
+    return caseOf<JSX.Element>(router.route)({
+      [ROUTE.IMPORT]: (
+        <ImportCourseView dispatch={onDispatch} />
+      ),
+      [ROUTE.CREATE]: (
+        <CreateCourseView dispatch={onDispatch} />
+      ),
+      [ROUTE.PREVIEW]: () => {
         const documentId = router.resourceId;
         const courseId = router.courseId;
         const shouldRefresh = router.urlParams.get('refresh') === 'true';
@@ -259,79 +214,104 @@ export default class Main extends React.Component<MainProps, MainState> {
           previewUrl={maybePreviewUrl}
           documentId={documentId.valueOrThrow(new Error('document id must be defined for preview'))}
           courseId={courseId.valueOrThrow(new Error('course id must be defined for preview'))} />;
-      }
-      case ROUTE.ROOT:
-        return <CoursesViewSearchable
+      },
+      [ROUTE.ROOT]: (
+        <CoursesViewSearchable
           serverTimeSkewInMs={this.props.server.timeSkewInMs}
-          userId={user.userId} />;
-      case ROUTE.OBJECTIVES:
-        return course.caseOf({
-          just: c => (
-            <ObjectiveSkillView
-              course={c}
-              dispatch={onDispatch}
-              expanded={expanded}
-              userName={user.user} />
-          ),
-          nothing: () => (
-            <ResourceLoading />
-          ),
-        });
-      case ROUTE.ORGANIZATIONS: {
-        return this.renderResource(resources.organizations);
-      }
-      case ROUTE.PAGES: {
-        return this.renderResource(resources.pages);
-      }
-      case ROUTE.FORMATIVE: {
-        return this.renderResource(resources.formativeassessments);
-      }
-      case ROUTE.SUMMATIVE: {
-        return this.renderResource(resources.summativeassessments);
-      }
-      case ROUTE.POOLS: {
-        return this.renderResource(resources.pools);
-      }
-      default: {
-        return course.caseOf({
-          just: c => router.resourceId.caseOf({
-            just: (resourceId) => {
-              if (resourceId === c.guid) {
-                return (
-                  <CourseEditor
-                    model={c}
-                    editMode={c.editable} />
-                );
-              }
-              if (resources[resourceId] !== undefined) {
-                return this.renderResource(resources[resourceId]);
-              }
+          userId={user.userId} />
+      ),
+    })(
+      // if no routes matched above, render navigation panel with editor
+      <div className="main-splitview">
+        <NavigationPanel
+          profile={user.profile}
+          onCreateOrg={this.onCreateOrg}
+          userId={user.userId}
+          userName={user.user} />
+        <div className="main-splitview-content">
+          {caseOf<JSX.Element>(router.route)({
+            [ROUTE.OBJECTIVES]: (
+              course.caseOf({
+                just: c => (
+                  <ObjectiveSkillView
+                    course={c}
+                    dispatch={onDispatch}
+                    expanded={expanded}
+                    userName={user.user} />
+                ),
+                nothing: () => (
+                  <ResourceLoading />
+                ),
+              })
+            ),
+            [ROUTE.ALL_RESOURCES]: (
+              this.renderResources()
+            ),
+          })(
+            // if no routes matched above, render default editor
+            course.caseOf({
+              just: c => router.resourceId.caseOf({
+                just: (resourceId) => {
 
-              return (
-                <DocumentView
-                  onLoad={(docId: string) => onLoad(c.guid, docId)}
-                  onRelease={(docId: string) => onRelease(docId)}
-                  profile={user.profile}
-                  course={c}
-                  userId={user.userId}
-                  userName={user.user}
-                  documentId={resourceId} />
-              );
-            },
-            nothing: () => {
-              return (
-                <CourseEditor
-                  model={c}
-                  editMode={c.editable} />
-              );
-            },
-          }),
-          nothing: () => (
-            <ResourceLoading />
-          ),
-        });
-      }
-    }
+                  // Course editor
+                  if (resourceId === c.guid) {
+                    return (
+                      <CourseEditor
+                        model={c}
+                        editMode={c.editable} />
+                    );
+                  }
+
+                  const orgId = router.orgId.caseOf({
+                    just: o => o,
+                    nothing: () => null,
+                  });
+
+                  // Org editor
+                  if (resourceId === orgId) {
+                    return <OrgDetailsEditor />;
+                  }
+
+                  const res = c.resources.get(resourceId);
+
+                  // Org component
+                  if (res === undefined) {
+                    return (
+                      <OrgComponentEditor
+                        componentId={resourceId}
+                        editMode={c.editable}
+                      />
+                    );
+                  }
+
+                  // Regular resource
+                  return (
+                    <DocumentView
+                      onLoad={(docId: string) => onLoad(c.guid, docId)}
+                      onRelease={(docId: string) => onRelease(docId)}
+                      profile={user.profile}
+                      course={c}
+                      userId={user.userId}
+                      userName={user.user}
+                      documentId={resourceId} />
+                  );
+                },
+                nothing: () => {
+                  return (
+                    <CourseEditor
+                      model={c}
+                      editMode={c.editable} />
+                  );
+                },
+              }),
+              nothing: () => (
+                <ResourceLoading />
+              ),
+            }))
+          }
+        </div>
+      </div>,
+    );
   }
 
 
@@ -371,14 +351,11 @@ export default class Main extends React.Component<MainProps, MainState> {
     return (
       <div className="main" onMouseOver={() => hover && onUpdateHover(null)}>
         <div className="main-header">
-          <Messages />
           <Header />
+          <Messages />
         </div>
         <div className="main-content">
           {this.getView()}
-        </div>
-        <div className="main-footer">
-          <Footer name={user.profile.username} email={user.profile.email} />
         </div>
         {modalDisplay}
       </div>

@@ -4,24 +4,26 @@ import * as t from 'data/contentTypes';
 import createGuid from 'utils/guid';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { Resource, ResourceState } from 'data/content/resource';
-import { insertNode } from '../../utils';
 import { LegacyTypes } from 'data/types';
+import * as o from 'data/models/utils/org';
+import { Maybe } from 'tsmonad';
 
 export class AddExistingAssessmentCommand extends AbstractCommand {
 
-  onInsert(org, parent, services, resolve, assessment: Resource) {
+  onInsert(org, parent, dismissModal, resolve, assessment: Resource) {
 
-    services.dismissModal();
+    dismissModal();
 
     const id = createGuid();
     const resourceref = new t.ResourceRef().with({ idref: assessment.id });
     const item = new t.Item().with({ resourceref, id });
 
-    resolve(insertNode(org, parent.guid, item, parent.children.size));
+    const cr = o.makeAddNode(parent.id, item, Maybe.nothing());
+    resolve(cr);
   }
 
-  onCancel(services, reject) {
-    services.dismissModal();
+  onCancel(dismissModal, reject) {
+    dismissModal();
     reject();
   }
 
@@ -31,20 +33,22 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
 
   execute(
     org: models.OrganizationModel,
-    parent: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section | t.Item | t.Include,
-    context, services): Promise<models.OrganizationModel> {
+    parent: t.Sequence | t.Unit | t.Module | t.Section | t.Item,
+    courseModel: models.CourseModel,
+    displayModal: (c) => void,
+    dismissModal: () => void, dispatch): Promise<o.OrgChangeRequest> {
 
     const predicate = (res: Resource): boolean =>
       res.type === LegacyTypes.assessment2
       && res.resourceState !== ResourceState.DELETED;
 
     return new Promise((resolve, reject) => {
-      services.displayModal(
+      displayModal(
         <ResourceSelection
           filterPredicate={predicate}
-          courseId={context.courseId}
-          onInsert={assessment => this.onInsert(org, parent, services, resolve, assessment)}
-          onCancel={() => this.onCancel(services, reject)} />);
+          courseId={courseModel.guid}
+          onInsert={assessment => this.onInsert(org, parent, dismissModal, resolve, assessment)}
+          onCancel={() => this.onCancel(dismissModal, reject)} />);
     });
   }
 }

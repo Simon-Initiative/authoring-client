@@ -8,12 +8,15 @@ import { ServerState } from 'reducers/server';
 import { HoverState } from 'reducers/hover';
 import { updateHover } from 'actions/hover';
 import { load, release } from 'actions/document';
+import { load as loadOrg } from 'actions/orgs';
 import * as persistence from 'data/persistence';
 import Main from './Main';
 import { RouterState } from 'reducers/router';
 import { setServerTimeSkew } from 'actions/server';
-import { loadCourse } from 'actions/course';
+import { loadCourse, updateCourseResources } from 'actions/course';
+import * as viewActions from 'actions/view';
 import * as models from 'data/models';
+import { bindActionCreators } from 'redux';
 
 interface StateProps {
   user: UserState;
@@ -28,10 +31,14 @@ interface StateProps {
 interface DispatchProps {
   onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
+  onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onReleaseOrg: (documentId: string) => Promise<{}>;
   onSetServerTimeSkew: () => void;
   onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
+  onUpdateCourseResources: (updated) => void;
+  viewActions: viewActions.ViewActions;
 }
 
 interface OwnProps {
@@ -60,15 +67,26 @@ const mapStateToProps = (state): StateProps => {
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
+  const actions = Object.keys(viewActions).reduce(
+    (p, c) => {
+      p[c] = viewActions[c];
+      return p;
+    },
+    {});
+
   return {
     onLoad: (courseId: string, documentId: string) => dispatch(load(courseId, documentId)),
     onRelease: (documentId: string) => dispatch(release(documentId)),
+    onLoadOrg: (courseId: string, documentId: string) => dispatch(loadOrg(courseId, documentId)),
+    onReleaseOrg: (documentId: string) => Promise.resolve({}),
     onSetServerTimeSkew: () => dispatch(setServerTimeSkew()),
     onLoadCourse: (courseId: string) => dispatch(loadCourse(courseId)),
     onDispatch: dispatch,
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));
     },
+    onUpdateCourseResources: updated => dispatch(updateCourseResources(updated)),
+    viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
   };
 };
 

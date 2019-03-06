@@ -46,18 +46,18 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
       dispatch(showSidebar(true));
     },
     onQuickPreview: (courseId: string, resource: Resource) => {
-      return dispatch(quickPreview(courseId, resource));
+      return dispatch(quickPreview(courseId, resource) as any);
     },
     onUndo: (documentId: string) => {
-      return dispatch(undo(documentId));
+      return dispatch(undo(documentId) as any);
     },
     onRedo: (documentId: string) => {
-      return dispatch(redo(documentId));
+      return dispatch(redo(documentId) as any);
     },
   };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(ActionsToolbar);
+  (mapStateToProps, mapDispatchToProps)(ActionsToolbar);
 
 export { controller as ActionsToolbar };

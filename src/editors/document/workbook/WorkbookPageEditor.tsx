@@ -23,9 +23,9 @@ import { DEFAULT_OBJECTIVE_TITLE } from 'data/models/objective';
 import { entryInstances } from 'editors/content/learning/bibliography/utils';
 import createGuid from 'utils/guid';
 import { map } from 'data/utils/map';
-
-import './WorkbookPageEditor.scss';
 import { ContentElement } from 'data/content/common/interfaces';
+import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
+import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: string) => void;
@@ -111,7 +111,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE ||
       objectives.size < 1) {
-      this.noObjectivesMessage = buildMissingObjectivesMessage(courseId);
+      this.noObjectivesMessage = buildMissingObjectivesMessage(courseId, context.orgId);
       showMessage(this.noObjectivesMessage);
     }
 
@@ -256,8 +256,24 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(model);
   }
 
+  collapseInsertPopupFn = (e) => {
+    if (e.originator !== 'insertPopupToggle') {
+      this.setState({
+        collapseInsertPopup: true,
+      });
+      window.removeEventListener('click', this.collapseInsertPopupFn);
+    }
+  }
 
-  collapseInsertPopup() {
+  collapseInsertPopup(e) {
+    (e.nativeEvent as any).originator = 'insertPopupToggle';
+
+    if (this.state.collapseInsertPopup) {
+      window.addEventListener('click', this.collapseInsertPopupFn);
+    } else {
+      window.removeEventListener('click', this.collapseInsertPopupFn);
+    }
+
     this.setState({
       collapseInsertPopup: !this.state.collapseInsertPopup,
     });
@@ -348,6 +364,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         <ContextAwareToolbar editMode={editMode} context={context} model={model} />
         <div className="wb-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
+            <SidebarToggle />
 
             <TitleTextEditor
               context={context}

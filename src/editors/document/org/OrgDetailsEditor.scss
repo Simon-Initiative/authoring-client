@@ -1,0 +1,53 @@
+@import 'oli/colors';
+@import 'oli/typography';
+
+.org-details-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  height: 100%;
+
+  .btn {
+    i {
+      margin-right: 8px;
+    }
+  }
+
+  .org-tab {
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+
+	.doc-head {
+    flex: 1;
+    overflow: auto;
+
+    .action-bar {
+      .btn {
+        padding: 5px 20px;
+        position: relative;
+        top: -6px;
+
+        &:hover {
+          border: 0px solid $blue;
+          color: $blue;
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .active-tab-content {
+      margin-top: 30px;
+
+      .dragHandleGrab .grip {
+        margin-top: 8px;
+      }
+    }
+
+    .nav-link {
+      cursor: pointer;
+    }
+  }
+
+}

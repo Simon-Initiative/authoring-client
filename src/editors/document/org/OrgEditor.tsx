@@ -1,29 +1,22 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import {
-  AbstractEditor,
-  AbstractEditorProps,
-  AbstractEditorState,
-} from 'editors/document/common/AbstractEditor';
 import * as models from 'data/models';
 import { viewDocument } from 'actions/view';
-import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import * as contentTypes from 'data/contentTypes';
-import { Command } from 'editors/document/org/commands/command';
-import { getExpandId, render } from 'editors/document/org/traversal';
+import { getExpandId, render, NodeTypes } from 'editors/document/org/traversal';
 import { collapseNodes, expandNodes } from 'actions/expand';
 import { SourceNodeType } from 'editors/content/org/drag/utils';
-import { insertNode, removeNode, updateNode } from 'editors/document/org/utils';
 import { TreeNode } from 'editors/document/org/TreeNode';
-import { Actions } from 'editors/document/org/Actions.controller';
-import { Details } from 'editors/document/org/Details';
-import { LabelsEditor } from 'editors/content/org/LabelsEditor';
-import { Title } from 'types/course';
-import { duplicateOrganization } from 'actions/models';
 import { containsUnitsOnly } from './utils';
 import { ModalMessage } from 'utils/ModalMessage';
 import * as Messages from 'types/messages';
+import * as org from 'data/models/utils/org';
+
+import { AppServices } from 'editors/common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
+import { Maybe } from 'tsmonad';
+import { NavigationItem } from 'types/navigation';
 
 import './OrgEditor.scss';
 
@@ -148,8 +141,15 @@ function identifyNewNodes(last: string[], current: string[]): string[] {
   return current.filter(c => lastMap[c] === undefined);
 }
 
-export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
-  onUpdateTitle: (title: Title) => void;
+export interface OrgEditorProps {
+  selectedItem: Maybe<NavigationItem>;
+  model: models.OrganizationModel;
+  onEdit: (request: org.OrgChangeRequest) => void;
+  services: AppServices;
+  context: AppContext;
+  editMode: boolean;
+  dispatch: any;
+  expanded: Maybe<Immutable.Set<string>>;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
   dismissModal: () => void;
@@ -169,13 +169,14 @@ const enum TABS {
   Actions = 3,
 }
 
-interface OrgEditorState extends AbstractEditorState {
+interface OrgEditorState {
   currentTab: TABS;
   highlightedNodes: Immutable.Set<string>;
+  undoStackSize: number;
+  redoStackSize: number;
 }
 
-class OrgEditor extends AbstractEditor<models.OrganizationModel,
-  OrgEditorProps,
+class OrgEditor extends React.Component<OrgEditorProps,
   OrgEditorState>  {
 
   unitsMessageDisplayed: boolean;
@@ -186,18 +187,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   parentMap: Object;
 
   constructor(props: OrgEditorProps) {
-    super(props, ({
-      currentTab: TABS.Content,
-      highlightedNodes: Immutable.Set<string>(),
-    } as OrgEditorState));
+    super(props);
 
     this.unitsMessageDisplayed = false;
-    this.onLabelsEdit = this.onLabelsEdit.bind(this);
     this.onNodeEdit = this.onNodeEdit.bind(this);
-    this.onAddSequence = this.onAddSequence.bind(this);
-    this.onCollapse = this.onCollapse.bind(this);
-    this.onExpand = this.onExpand.bind(this);
-    this.onViewEdit = this.onViewEdit.bind(this);
+    this.onClickComponent = this.onClickComponent.bind(this);
 
     this.pendingHighlightedNodes = null;
 
@@ -211,7 +205,46 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       props.services.refreshCourse(props.context.courseId);
     }
 
+    this.state = {
+      currentTab: TABS.Content,
+      highlightedNodes: Immutable.Set<string>(),
+      undoStackSize: 0,
+      redoStackSize: 0,
+    };
+
     this.updateUnitsMessage(props);
+  }
+
+  componentDidMount() {
+
+    // If the page has not been viewed yet or custom expand/collapse state has not been set by the
+    // user, expand the top-level nodes
+    this.props.expanded.caseOf({
+      just: expandedNodes => null,
+      nothing: () => this.expandFirstTwoLevels(),
+    });
+  }
+
+  expandFirstTwoLevels() {
+    const ids = [];
+    this.props.model.sequences.children.toArray().forEach(
+      (c) => {
+        const id = (c as any).id;
+        if (id !== undefined) {
+          ids.push(id);
+          const children = (c as any).children;
+          if (children !== undefined) {
+            children.toArray().forEach((s) => {
+              const id = (s as any).id;
+              if (id !== undefined) {
+                ids.push(id);
+              }
+            });
+          }
+        }
+      });
+    this.props.dispatch(
+      expandNodes(this.props.context.documentId, ids));
   }
 
   updateUnitsMessage(props: OrgEditorProps) {
@@ -245,11 +278,10 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       }
     }
 
-    const removed = removeNode(this.props.model, (sourceNode as any).guid);
-    const inserted = insertNode(removed, targetModel.guid, sourceNode, adjustedIndex);
+    const request = org.makeMoveNode(sourceNode as org.OrgNode, targetModel.id, adjustedIndex);
+    this.props.onEdit(request);
 
     this.highlightNode(sourceNode as any);
-    this.handleEdit(inserted);
 
   }
 
@@ -265,18 +297,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     });
 
     this.props.dispatch(action(this.props.context.documentId, [guid]));
-  }
-
-  processCommand(model, command: Command) {
-    const reEnable = () => this.props.onEditingEnable(true, this.props.context.documentId);
-    this.props.onEditingEnable(false, this.props.context.documentId);
-    const delay = () =>
-      command.execute(this.props.model, model, this.props.context, this.props.services)
-        .then(org => this.handleEdit(org))
-        .then(reEnable)
-        .catch(reEnable);
-
-    setImmediate(delay);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -296,25 +316,31 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       this.positionsAtLevel = calculatePositionsAtLevel(
         nextProps.model, this.allNodeIds, this.idMap, this.parentMap);
 
-      const newNodes = identifyNewNodes(lastAllNodes, this.allNodeIds);
-      if (newNodes.length > 0) {
+      // As long as we are still using the same actual document, indentify
+      // newly added nodes so that we can highlight them:
 
-        if (this.pendingHighlightedNodes === null) {
-          this.pendingHighlightedNodes
-            = Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid));
-        } else {
-          this.pendingHighlightedNodes = this.pendingHighlightedNodes
-            .union(Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid)));
-        }
+      if (this.props.model.guid === nextProps.model.guid) {
+        const newNodes = identifyNewNodes(lastAllNodes, this.allNodeIds);
+        if (newNodes.length > 0) {
+          if (this.pendingHighlightedNodes === null) {
+            this.pendingHighlightedNodes
+              = Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid));
+          } else {
+            this.pendingHighlightedNodes = this.pendingHighlightedNodes
+              .union(Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid)));
+          }
 
-        // As long as the new nodes were not the result of an undo or redo,
-        // expand their parent node so that the new nodes are visible
-        if (this.props.context.undoRedoGuid === nextProps.context.undoRedoGuid) {
-          this.props.dispatch(
-            expandNodes(this.props.context.documentId, newNodes
-              .map(id => this.parentMap[this.idMap[id].guid].id)));
+          // As long as the new nodes were not the result of an undo or redo,
+          // expand their parent node so that the new nodes are visible
+          if (this.props.context.undoRedoGuid === nextProps.context.undoRedoGuid) {
+            this.props.dispatch(
+              expandNodes(this.props.context.documentId, newNodes
+                .map(id => this.parentMap[this.idMap[id].guid].id)));
+          }
         }
       }
+
+
     }
 
     if (this.pendingHighlightedNodes !== null) {
@@ -330,25 +356,72 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
   }
 
-  onViewEdit(id) {
-    this.props.services.fetchGuidById(id)
-      .then(guid => this.props.dispatch(viewDocument(guid, this.props.context.courseId)));
+  onClickComponent(model: NodeTypes) {
+
+    if (model.contentType === 'Item') {
+      this.props.services.fetchGuidById(model.resourceref.idref)
+        .then(guid => this.props.dispatch(
+          viewDocument(guid, this.props.context.courseId, this.props.model.guid)));
+    } else {
+      const id = this.props.selectedItem.caseOf({
+        just: (item) => {
+          if (item.type === 'OrganizationItem') {
+            return item.id;
+          }
+          return null;
+        },
+        nothing: () => null,
+      });
+
+      const componentId = (model as any).id;
+      if (componentId === id) {
+        this.toggleExpanded(componentId);
+      } else {
+        this.props.dispatch(
+          viewDocument(componentId, this.props.context.courseId, this.props.model.guid));
+      }
+
+    }
   }
 
-  onNodeEdit(node) {
-    this.handleEdit(updateNode(this.props.model, node));
+  onNodeEdit(request: org.OrgChangeRequest) {
+    this.props.onEdit(request);
   }
 
   renderContent() {
+
+    const { selectedItem } = this.props;
     const isExpanded = guid => this.props.expanded.caseOf({
       just: v => v.has(guid),
       nothing: () => false,
     });
 
+    // This id will either be a resource guid or the id of a unit, module, section
+    const id = selectedItem && selectedItem.caseOf({
+      just: (item) => {
+        if (item.type === 'OrganizationItem') {
+          return item.id;
+        }
+        return null;
+      },
+      nothing: () => null,
+    });
+
     const renderNode = (node, parent, index, depth, numberAtLevel) => {
+
+      let isSelected = false;
+      if (node.contentType === 'Item') {
+        const res = this.props.context.courseModel
+          .resourcesById.get(node.resourceref.idref);
+        isSelected = res !== undefined ? res.guid === id : false;
+      } else {
+        isSelected = node.id === id;
+      }
+
       return <TreeNode
+        isSelected={isSelected}
         key={node.guid}
-        onViewEdit={this.onViewEdit}
+        onClick={this.onClickComponent}
         numberAtLevel={numberAtLevel}
         highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}
@@ -358,8 +431,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         parentModel={parent}
         onEdit={this.onNodeEdit}
         editMode={this.props.editMode}
-        processCommand={this.processCommand.bind(this, node)}
-        toggleExpanded={this.toggleExpanded.bind(this)}
         isExpanded={isExpanded(getExpandId(node))}
         onReposition={this.onReposition.bind(this)}
         indexWithinParent={index}
@@ -367,189 +438,23 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     };
 
     return (
-      <div className="organization-content">
-        {this.renderActionBar()}
-
-        <table className="table table-sm">
-          <tbody>
-
-            {render(
-              this.props.model.sequences,
-              isExpanded, renderNode, this.positionsAtLevel)}
-
-          </tbody>
-        </table>
-      </div>
+      <table className="table table-sm">
+        <tbody>
+          {render(
+            this.props.model.sequences,
+            isExpanded, renderNode, this.positionsAtLevel)}
+        </tbody>
+      </table>
     );
   }
 
-  componentDidMount() {
-    super.componentDidMount();
-
-    // If the page has not been viewed yet or custom expand/collapse state has not been set by the
-    // user, expand all of the nodes as a default state
-    this.props.expanded.caseOf({
-      just: expandedNodes => null,
-      nothing: () => this.onExpand(),
-    });
-  }
-
-  renderDetails() {
-    return (
-      <div className="org-tab">
-        <Details
-          editMode={this.props.editMode}
-          model={this.props.model}
-          onEdit={model => this.handleEdit(model)} />
-      </div>
-    );
-  }
-
-  onLabelsEdit(labels) {
-    this.handleEdit(this.props.model.with({ labels }));
-  }
-
-  renderLabels() {
-    return (
-      <div className="org-tab">
-        <LabelsEditor
-          {...this.props}
-          activeContentGuid={null}
-          hover={null}
-          onUpdateHover={() => { }}
-          parent={null}
-          onFocus={this.onFocus.bind(this)}
-          onEdit={this.onLabelsEdit} model={this.props.model.labels} />
-      </div>
-    );
-  }
-
-  onFocus(child, parent) {
-
-  }
-
-  renderConstraints() {
-    return <p>TBD Constraint Editor</p>;
-  }
-
-  renderActionBar() {
-    return (
-      <div className="action-bar">
-        <button key="add" className="btn btn-link"
-          disabled={!this.props.editMode} onClick={this.onAddSequence}>
-          <i className="fa fa-plus" />Add {this.props.model.labels.sequence}
-        </button>
-        <button key="expand" className="btn btn-link" onClick={this.onExpand}>
-          <i className="fa fa-chevron-down" />Expand All
-        </button>
-        <button key="collapse" className="btn btn-link"
-          onClick={this.onCollapse}>
-          <i className="fa fa-chevron-up" />Collapse All
-        </button>
-      </div>
-    );
-  }
-
-  onAddSequence() {
-    const s: contentTypes.Sequence = new contentTypes.Sequence()
-      .with({ title: 'New ' + this.props.model.labels.sequence });
-    const sequences = this.props.model.sequences
-      .with({ children: this.props.model.sequences.children.set(s.guid, s) });
-
-    this.handleEdit(this.props.model.with({ sequences }));
-  }
-
-  onExpand() {
-    this.props.dispatch(
-      expandNodes(this.props.context.documentId, this.allNodeIds));
-  }
-
-  onCollapse() {
-    this.props.dispatch(
-      collapseNodes(this.props.context.documentId, this.allNodeIds));
-  }
-
-  onTabClick(index: number) {
-    this.setState({ currentTab: index });
-  }
-
-  renderTabs() {
-
-    const tabs = ['Content', 'Details', 'Labels', 'Actions']
-      .map((title, index) => {
-        const active = index === this.state.currentTab ? 'active' : '';
-        const classes = 'nav-link ' + active;
-        return (
-          <a
-            key={title}
-            className={classes}
-            onClick={this.onTabClick.bind(this, index)}>
-            {title}
-          </a>
-        );
-      });
-
-    return (
-      <ul className="nav nav-tabs">
-        {tabs}
-      </ul>
-    );
-  }
-
-  renderActions() {
-    const { dispatch, model, context } = this.props;
-
-    const dupe = () => dispatch(
-      duplicateOrganization(
-        context.courseId,
-        model, context.courseModel));
-
-    return (
-      <Actions
-        onDuplicate={dupe}
-        org={model}
-        course={this.props.course}
-      />);
-  }
-
-  renderActiveTabContent() {
-    switch (this.state.currentTab) {
-      case TABS.Content:
-        return this.renderContent();
-      case TABS.Details:
-        return this.renderDetails();
-      case TABS.Labels:
-        return this.renderLabels();
-      case TABS.Actions:
-        return this.renderActions();
-    }
-  }
 
   render() {
-
-    const { canUndo, canRedo, onUndo, onRedo } = this.props;
-    const documentId = this.props.context.documentId;
-
     return (
       <div className="org-editor">
-        <div className="doc-head">
-          <UndoRedoToolbar
-            undoEnabled={canUndo}
-            redoEnabled={canRedo}
-            onUndo={onUndo.bind(this, documentId)}
-            onRedo={onRedo.bind(this, documentId)} />
-
-          <h3>Organization: {this.props.model.title}</h3>
-
-          {this.renderTabs()}
-
-          <div className="active-tab-content">
-            {this.renderActiveTabContent()}
-          </div>
-
-        </div>
-      </div>);
-
+        {this.renderContent()}
+      </div>
+    );
   }
 
 }

@@ -16,7 +16,7 @@ export const connectEditor = (component) => {
       onShowSidebar: () => dispatch(showSidebar(true)),
       onHideSidebar: () => dispatch(showSidebar(false)),
       onDiscover: (id: DiscoverableId) => {
-        dispatch(discover(id));
+        dispatch(discover(id) as any);
       },
     };
   };
@@ -46,7 +46,7 @@ export const connectPopupEditor = (component) => {
       onShowSidebar: () => dispatch(showSidebar(true)),
       onHideSidebar: () => dispatch(showSidebar(false)),
       onDiscover: (id: DiscoverableId) => {
-        dispatch(discover(id));
+        dispatch(discover(id) as any);
       },
     };
   };

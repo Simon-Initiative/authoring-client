@@ -49,35 +49,38 @@ describe('stringifyUrlParams', () => {
 describe('getRouteFromPath', () => {
 
   it('should return course resource route', () => {
-    const path = '2c92808866d069100166d0a014a70006-2c92808866d069100166d0a014a70006';
+    const path = 'courseId-courseId-orgId';
     const search = '?';
 
     const route = getRouteFromPath(path, search);
     expect(route.route).toEqual(ROUTE.RESOURCE);
-    expect(route.courseId.valueOr('NOTHING')).toEqual('2c92808866d069100166d0a014a70006');
-    expect(route.resourceId.valueOr('NOTHING')).toEqual('2c92808866d069100166d0a014a70006');
+    expect(route.courseId.valueOr('NOTHING')).toEqual('courseId');
+    expect(route.resourceId.valueOr('NOTHING')).toEqual('courseId');
+    expect(route.orgId.valueOr('NOTHING')).toEqual('orgId');
     expect(route.urlParams.toJS()).toEqual({});
   });
 
   it('should return resource route', () => {
-    const path = '2c92808a66ef8e6b0166f54c5eea0000-2c92808866d069100166d0a014a70006';
+    const path = 'resourceId-courseId-orgId';
     const search = '';
 
     const route = getRouteFromPath(path, search);
     expect(route.route).toEqual(ROUTE.RESOURCE);
-    expect(route.courseId.valueOr('NOTHING')).toEqual('2c92808866d069100166d0a014a70006');
-    expect(route.resourceId.valueOr('NOTHING')).toEqual('2c92808a66ef8e6b0166f54c5eea0000');
+    expect(route.courseId.valueOr('NOTHING')).toEqual('courseId');
+    expect(route.resourceId.valueOr('NOTHING')).toEqual('resourceId');
+    expect(route.orgId.valueOr('NOTHING')).toEqual('orgId');
     expect(route.urlParams.toJS()).toEqual({});
   });
 
   it('should return resource route with questionId param', () => {
-    const path = '2c92808a66ef8e6b0166f54c5eea0000-2c92808866d069100166d0a014a70006';
+    const path = 'resourceId-courseId-orgId';
     const search = '?questionId=some_question_id';
 
     const route = getRouteFromPath(path, search);
     expect(route.route).toEqual(ROUTE.RESOURCE);
-    expect(route.courseId.valueOr('NOTHING')).toEqual('2c92808866d069100166d0a014a70006');
-    expect(route.resourceId.valueOr('NOTHING')).toEqual('2c92808a66ef8e6b0166f54c5eea0000');
+    expect(route.courseId.valueOr('NOTHING')).toEqual('courseId');
+    expect(route.resourceId.valueOr('NOTHING')).toEqual('resourceId');
+    expect(route.orgId.valueOr('NOTHING')).toEqual('orgId');
     expect(route.urlParams.toJS()).toEqual({ questionId: 'some_question_id' });
   });
 
@@ -103,15 +106,15 @@ describe('getRouteFromPath', () => {
     expect(route.urlParams.toJS()).toEqual({});
   });
 
-  it('should return pages route with filter param', () => {
-    const path = 'pages-2c92808866d069100166d0a014a70006';
+  it('should return resources route with filter param', () => {
+    const path = 'resources-courseId-orgId';
     const search = '?filter=id';
 
     const route = getRouteFromPath(path, search);
-    expect(route.route).toEqual(ROUTE.PAGES);
-    expect(route.courseId.valueOr('NOTHING')).toEqual('2c92808866d069100166d0a014a70006');
-    expect(route.resourceId.valueOr('NOTHING')).toEqual('pages');
+    expect(route.route).toEqual(ROUTE.ALL_RESOURCES);
+    expect(route.courseId.valueOr('NOTHING')).toEqual('courseId');
+    expect(route.resourceId.valueOr('NOTHING')).toEqual('resources');
+    expect(route.orgId.valueOr('NOTHING')).toEqual('orgId');
     expect(route.urlParams.toJS()).toEqual({ filter: 'id' });
   });
-
 });

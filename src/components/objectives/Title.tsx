@@ -1,6 +1,11 @@
 import * as React from 'react';
 import { Remove } from 'components/common/Remove';
 
+export enum Size {
+  Normal,
+  Large,
+}
+
 export interface TitleProps {
   requiresExternalEdit: boolean;
   title: string;
@@ -10,9 +15,9 @@ export interface TitleProps {
   onBeginExternallEdit: () => void;
   loading: boolean;
   onRemove: () => void;
-  onToggleExpanded?: () => void;
   disableRemoval?: boolean;
   editWording?: string;
+  size?: Size;
 }
 
 export interface TitleState {
@@ -73,11 +78,19 @@ export class Title
 
   render(): JSX.Element {
     if (this.state.isEditing) {
+
+      const style = { width: '50%', paddingTop: '2px' };
+      const size = this.props.size === undefined
+        ? Size.Normal : this.props.size;
+      if (size === Size.Large) {
+        (style as any).fontSize = '25pt';
+      }
+
       return (
         <div style={{ display: 'inline', marginLeft: this.props.disableRemoval ? '0' : '40px' }}>
           <input ref={a => this.titleInput = a} type="text" onKeyUp={this.onKeyUp}
             onChange={this.onTextChange}
-            value={this.state.title} style={{ width: '50%', paddingTop: '2px' }} />
+            value={this.state.title} style={style} />
           <button
             key="save"
             onClick={this.onTitleEdit}
@@ -123,10 +136,7 @@ export class Title
 
     return (
       <React.Fragment>
-        <button
-          key="itemClick"
-          onClick={this.props.onToggleExpanded ? this.props.onToggleExpanded : null}
-          type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
+        <span style={linkStyle}>{this.props.children}</span>
         {actionButtons}
       </React.Fragment>
     );

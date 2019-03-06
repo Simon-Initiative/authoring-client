@@ -1,4 +1,3 @@
-import * as Immutable from 'immutable';
 
 import { AbstractCommand } from '../command';
 import * as models from 'data/models';
@@ -6,71 +5,61 @@ import * as t from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import createGuid from 'utils/guid';
-import { AppContext } from 'editors/common/AppContext';
-import { AppServices } from 'editors/common/AppServices';
-import { insertNode } from '../../utils';
 import { Resource, ResourceState } from 'data/content/resource';
+import * as o from 'data/models/utils/org';
+import { Maybe } from 'tsmonad';
 
 export class AddExistingWorkbookPageCommand extends AbstractCommand {
 
-  onInsert(org, parent, context, services, resolve, page: Resource) {
+  onInsert(org, parent, dismissModal, courseModel, resolve, page: Resource) {
 
-    services.dismissModal();
+    dismissModal();
 
-    const resources = context.courseModel.resources.toArray();
+    const resources = courseModel.resources.toArray();
     const found = resources.find(r => r.id === page.id);
 
     const id = createGuid();
     const resourceref = new t.ResourceRef().with({ idref: found.id });
     const item = new t.Item().with({ resourceref, id });
 
-    resolve(insertNode(org, parent.guid, item, parent.children.size));
+    const cr = o.makeAddNode(parent.id, item, Maybe.nothing());
+    resolve(cr);
   }
 
-  onCancel(services, reject) {
-    services.dismissModal();
+  onCancel(dismissModal, reject) {
+    dismissModal();
     reject();
   }
 
-  description() : string {
+  description(): string {
     return 'Page';
   }
 
   execute(
     org: models.OrganizationModel,
-    parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
-    context: AppContext,
-    services: AppServices) : Promise<models.OrganizationModel> {
+    node: t.Sequence | t.Unit | t.Module | t.Section | t.Item,
+    courseModel: models.CourseModel,
+    displayModal: (c) => void,
+    dismissModal: () => void, dispatch): Promise<o.OrgChangeRequest> {
 
-    if (parent.contentType === 'Unit' ||
-      parent.contentType === 'Section' ||
-      parent.contentType === 'Module') {
+    if (node.contentType === 'Unit' ||
+      node.contentType === 'Section' ||
+      node.contentType === 'Module') {
 
-      type children = t.Module | t.Section | t.Item;
-      const resourcesAlreadyInOrg: Immutable.Set<String> = Immutable.Set<String>(
-        (parent.children.toArray() as children[])
-          .filter(child => child.contentType === 'Item')
-          .map(child => context
-                          .courseModel
-                          .resourcesById
-                          .get((child as t.Item).resourceref.idref)
-                          .guid));
-
-      const predicate = (res: Resource) : boolean =>
+      const predicate = (res: Resource): boolean =>
         res.type === LegacyTypes.workbook_page
-          && res.resourceState !== ResourceState.DELETED
-          && !resourcesAlreadyInOrg.has(res.guid);
+        && res.resourceState !== ResourceState.DELETED;
 
       return new Promise((resolve, reject) => {
-        services.displayModal(
+        displayModal(
           <ResourceSelection
             filterPredicate={predicate}
-            courseId={context.courseId}
-            onInsert={page => this.onInsert(org, parent, context, services, resolve, page)}
-            onCancel={() => this.onCancel(services, reject)}/>);
+            courseId={courseModel.guid}
+            onInsert={page => this.onInsert(org, node, dismissModal, courseModel, resolve, page)}
+            onCancel={() => this.onCancel(dismissModal, reject)} />);
       });
     }
 
-    return Promise.resolve(org);
+    return Promise.reject({});
   }
 }

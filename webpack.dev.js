@@ -27,8 +27,7 @@ module.exports = {
         ]
     },
     output: {
-        path: path.resolve(__dirname, 'dev'),
-        filename: 'bundle.js'
+        filename: '[name].js'
     },
     externals: {
     },
@@ -36,7 +35,7 @@ module.exports = {
     devServer: {
         contentBase: __dirname,
         historyApiFallback: true,
-        hot: true,
+        hot: false,
         disableHostCheck: true,
         port: 9000,
         host: '0.0.0.0',
@@ -102,12 +101,10 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             template: '!!underscore-template-loader!./index.html',
             inject: false,
             favicon: 'assets/oli-icon.png',
         }),
-        new webpack.HashedModuleIdsPlugin(),
     ]
 };

@@ -27,6 +27,7 @@ import './PoolEditor.scss';
 import { LegacyTypes } from 'data/types';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
+import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 
 interface PoolEditor {
 
@@ -94,7 +95,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       true);
 
     if (hasNoskills) {
-      this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
+      this.noSkillsMessage = buildMissingSkillsMessage(
+        this.props.context.courseId,
+        this.props.context.orgId);
       this.props.showMessage(this.noSkillsMessage);
     }
 
@@ -302,7 +305,24 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     );
   }
 
-  collapseInsertPopup() {
+  collapseInsertPopupFn = (e) => {
+    if (e.originator !== 'insertPopupToggle') {
+      this.setState({
+        collapseInsertPopup: true,
+      });
+      window.removeEventListener('click', this.collapseInsertPopupFn);
+    }
+  }
+
+  collapseInsertPopup(e) {
+    (e.nativeEvent as any).originator = 'insertPopupToggle';
+
+    if (this.state.collapseInsertPopup) {
+      window.addEventListener('click', this.collapseInsertPopupFn);
+    } else {
+      window.removeEventListener('click', this.collapseInsertPopupFn);
+    }
+
     this.setState({
       collapseInsertPopup: !this.state.collapseInsertPopup,
     });
@@ -325,6 +345,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
         <ContextAwareToolbar editMode={editMode} context={context} model={model} />
         <div className="pool-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
+            <SidebarToggle />
 
             <TitleTextEditor
               context={context}

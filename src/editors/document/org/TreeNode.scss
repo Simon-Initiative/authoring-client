@@ -1,66 +1,45 @@
-.tree-node {
+@import 'oli/colors';
 
-  .caption-btn {
-    i {
-      margin-right: 5px;
+
+.treenode-content {
+  height: 36px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 10px;
+  vertical-align: middle;
+  font-size: 1.0em;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  .treenode-title {
+    vertical-align: middle;
+    margin: 4px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &.selected {
+    background-color: $selection;
+    border-color: $selection;
+    color: $white;
+  }
+
+  &:hover {
+    background-color: $gray-lightest;
+    border-color: $gray-lightest;
+
+    &.selected {
+      background-color: $selection;
+      border-color: $selection;
+      color: $white;
     }
   }
 
-  .content {
-    position: relative;
-    height: 40px;
-    display: block;
-    padding: 0px;
-
-    .top-drop {
-      position: absolute;
-      top: -5;
-      height: 10px;
-      width: 100%;
-    }
-
-    .node {
-      flex: 1 0 0;
-      height: 40px;
-
-      .draggable-node {
-        display: flex;
-        flex-direction: row;
-        height: 40px;
-
-        .dragHandleGrab {
-          i {
-            vertical-align: middle;
-            line-height: 40px;
-          }
-        }
-
-        .editable-caption, .caption {
-          flex: 1 0 0;
-          margin: 0 10px;
-
-          button, span {
-            display: inline-block;
-            vertical-align: middle;
-            line-height: 40px;
-            padding: 0px;
-            margin-left: 10px;
-
-            &.remove-btn i {
-              display: inline-block;
-              vertical-align: middle;
-              line-height: 40px;
-            }
-          }
-        }
-      }
-    }
-
-    .bottom-drop {
-      position: absolute;
-      top: 35;
-      height: 10px;
-      width: 100%;
-    }
+  .toggle {
+    margin-right: 5px;
   }
 }

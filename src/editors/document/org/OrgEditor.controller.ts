@@ -1,6 +1,5 @@
 import { connect } from 'react-redux';
 import OrgEditor from './OrgEditor';
-import { AbstractEditorProps } from '../common/AbstractEditor';
 import { OrganizationModel, CourseModel } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { undo, redo, documentEditingEnable } from 'actions/document';
@@ -12,6 +11,7 @@ interface StateProps {
   canUndo: boolean;
   canRedo: boolean;
   course: CourseModel;
+  model: OrganizationModel;
 }
 
 interface DispatchProps {
@@ -24,15 +24,21 @@ interface DispatchProps {
   onEditingEnable: (editable: boolean, documentId: string) => void;
 }
 
-interface OwnProps extends AbstractEditorProps<OrganizationModel> {
+interface OwnProps {
   context: AppContext;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   return {
-    canUndo: state.documents.get(ownProps.context.documentId).undoStack.size > 0,
-    canRedo: state.documents.get(ownProps.context.documentId).redoStack.size > 0,
+    // canUndo: state.documents.get(ownProps.context.documentId).undoStack.size > 0,
+    // canRedo: state.documents.get(ownProps.context.documentId).redoStack.size > 0,
+    canUndo: false,
+    canRedo: false,
     course: state.course,
+    model: state.orgs.activeOrg.caseOf({
+      just: d => d.model,
+      nothing: () => null,
+    }),
   };
 };
 

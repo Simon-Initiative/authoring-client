@@ -24,7 +24,7 @@ export function map(mapper: MapFn, root: ContentElement) {
           return map(mapper, value);
         }).toOrderedMap();
         v = ce.with({ content: (content as Immutable.OrderedMap<string, any>) });
-      } else if (v.contentType !== undefined) {
+      } else if (v !== null && v.contentType !== undefined) {
         v = map(mapper, v);
       }
 
@@ -105,7 +105,7 @@ export function filter(fn: FilterFn, root: ContentElement) {
           return filter(fn, value);
         }).toOrderedMap();
         v = ce.with({ content: (content as Immutable.OrderedMap<string, any>) });
-      } else if (v.contentType !== undefined) {
+      } else if (v !== null && v.contentType !== undefined) {
         v = filter(fn, v);
       }
 

@@ -14,7 +14,7 @@ interface DispatchProps {
   createCourse: () => any;
   importCourse: () => any;
   onSelect: (string) => any; // the id of the course to be viewed
-  sendMessage: (msg : Messages.Message) => any;
+  sendMessage: (msg: Messages.Message) => any;
 }
 
 interface OwnProps {
@@ -28,14 +28,14 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onSelect: id => dispatch(viewActions.viewCourse(id)),
+    onSelect: id => dispatch(viewActions.viewCourse(id) as any),
     createCourse: () => dispatch(viewActions.viewCreateCourse()),
     importCourse: () => dispatch(viewActions.viewImportCourse()),
-    sendMessage: (msg : Messages.Message) => dispatch(messageActions.showMessage(msg)),
+    sendMessage: (msg: Messages.Message) => dispatch(messageActions.showMessage(msg)),
   };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(CoursesViewSearchable);
+  (mapStateToProps, mapDispatchToProps)(CoursesViewSearchable);
 
 export { controller as CoursesViewSearchable };

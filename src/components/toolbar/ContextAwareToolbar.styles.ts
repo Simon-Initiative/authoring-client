@@ -24,7 +24,7 @@ export const styles: JSSStyles = {
     fontSize: 12,
     color: colors.grayDark,
     borderBottom: [1, 'solid', colors.grayLight],
-    backgroundColor: '#fafafa',
+    backgroundColor: colors.white,
 
     '& .dropdown-item': {
       cursor: 'pointer',

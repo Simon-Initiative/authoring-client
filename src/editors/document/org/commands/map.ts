@@ -2,6 +2,8 @@ import * as t from 'data/contentTypes';
 
 import { AddModuleCommand } from 'editors/document/org/commands/new/module';
 import { AddSectionCommand } from 'editors/document/org/commands/new/section';
+import { AddSequenceCommand } from 'editors/document/org/commands/new/sequence';
+
 import { AddUnitCommand } from 'editors/document/org/commands/new/unit';
 import { CreateNewAssessmentCommand } from 'editors/document/org/commands/new/assessment';
 import { CreateNewWorkbookPageCommand } from 'editors/document/org/commands/new/workbookpage';
@@ -13,6 +15,9 @@ import {
 import { AddExistingAssessmentCommand } from 'editors/document/org/commands/existing/assessment';
 
 export const ADD_EXISTING_COMMANDS = {
+
+  [t.OrganizationContentTypes.Sequences]: [],
+
   [t.OrganizationContentTypes.Sequence]: [],
 
   [t.OrganizationContentTypes.Unit]: [AddExistingWorkbookPageCommand,
@@ -31,6 +36,8 @@ export const ADD_EXISTING_COMMANDS = {
 
 
 export const ADD_NEW_COMMANDS = {
+  [t.OrganizationContentTypes.Sequences]: [AddSequenceCommand],
+
   [t.OrganizationContentTypes.Sequence]: [AddUnitCommand, AddModuleCommand],
 
   [t.OrganizationContentTypes.Unit]: [AddModuleCommand,

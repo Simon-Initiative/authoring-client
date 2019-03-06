@@ -1,13 +1,17 @@
 import * as Immutable from 'immutable';
 import { FileNode } from './file_node';
 import { isNullOrUndefined } from 'util';
+import { LegacyTypes } from 'data/types';
 
 export type ResourceParams = {
   rev?: number,
   guid?: string,
   id?: string,
-  type?: string,
+  type?: LegacyTypes,
   title?: string,
+  lastRevisionGuid?: string;
+  previousRevisionGuid?: string;
+  lastRevisionNumber?: string;
   dateCreated?: Date,
   dateUpdated?: Date,
   fileNode?: FileNode,
@@ -62,6 +66,7 @@ export class Resource extends Immutable.Record(
   {
     contentType: 'Resource', rev: 0, guid: '', id: '', type: '', title: '',
     dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode(),
+    lastRevisionGuid: '', lastRevisionNumber: '', previousRevisionGuid: '',
     resourceState: ResourceState.ACTIVE,
   }) {
 
@@ -71,6 +76,9 @@ export class Resource extends Immutable.Record(
   id: string;
   type: string;
   title: string;
+  lastRevisionGuid: string;
+  previousRevisionGuid: string;
+  lastRevisionNumber: string;
   dateCreated: Date;
   dateUpdated: Date;
   fileNode: FileNode;
@@ -92,6 +100,12 @@ export class Resource extends Immutable.Record(
       id: a.id,
       type: a.type,
       title: a.title || '',
+      lastRevisionGuid: a.lastRevision !== undefined && a.lastRevision !== null
+        ? a.lastRevision.guid : '',
+      previousRevisionGuid: a.lastRevision !== undefined && a.lastRevision !== null
+        ? a.lastRevision.previousRevision : '',
+      lastRevisionNumber: a.lastRevision !== undefined && a.lastRevision !== null
+        ? a.lastRevision.revisionNumber : '',
       dateCreated: a.dateCreated === undefined || a.dateCreate === null
         ? new Date() : parseDate(a.dateCreated),
       dateUpdated: a.dateUpdated === undefined || a.dateUpdated === null
