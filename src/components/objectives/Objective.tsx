@@ -66,11 +66,12 @@ export const objectiveModelRules: ModelCheckerRule<LearningObjective, RuleData>[
         const summativeCount = refs
           .filter(r => r.assessmentType === LegacyTypes.assessment2)
           .length;
+        const guaranteedSummativeCount = calculateGuaranteedSummativeCount(refs, summativeCount);
 
         const checkModelResults = checkModel(
           skill,
           skillModelRules,
-          { formativeCount, summativeCount });
+          { formativeCount, summativeCount: guaranteedSummativeCount });
 
         return acc || checkModelResults.issues.size > 0;
       },

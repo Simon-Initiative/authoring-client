@@ -1,6 +1,6 @@
 import { updateCourseResources } from 'actions/course';
 import * as viewActions from 'actions/view';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 import * as models from 'data/models';
 import * as persistence from 'data/persistence';
 import * as Immutable from 'immutable';
@@ -85,11 +85,14 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     const { course } = this.props;
 
     return course.resources.toArray().filter(r =>
-        r.type === LegacyTypes.inline
-        || r.type === LegacyTypes.assessment2
-        || r.type === LegacyTypes.assessment2_pool
-        || r.type === LegacyTypes.feedback
-        || r.type === LegacyTypes.workbook_page,
+        r.resourceState !== ResourceState.DELETED
+        && (
+          r.type === LegacyTypes.inline
+          || r.type === LegacyTypes.assessment2
+          || r.type === LegacyTypes.assessment2_pool
+          || r.type === LegacyTypes.feedback
+          || r.type === LegacyTypes.workbook_page
+        ),
     );
   }
 
