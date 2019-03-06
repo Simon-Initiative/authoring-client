@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from 'data/content/common';
+import guid from 'utils/guid';
 
 import { TitledContent } from './titled';
 
@@ -22,6 +22,7 @@ export enum Scope {
   Application,
   Package,
   Resource,
+  Organization,
 }
 
 export enum ContentType {
@@ -42,26 +43,26 @@ export type MessageAction = {
 export type MessageContents = TitledContent;
 
 export type MessageParams = {
-  guid?: string,
-  severity?: Severity;
-  priority?: Priority;
-  scope?: Scope;
-  content?: MessageContents;
-  actions?: Immutable.List<MessageAction>;
-  canUserDismiss?: boolean;
+  guid: string,
+  severity: Severity;
+  priority: Priority;
+  scope: Scope;
+  content: MessageContents;
+  actions: Immutable.List<MessageAction>;
+  canUserDismiss: boolean;
 };
 
-const defaultContent = {
-  guid: '',
-  severity: Severity.Error,
-  priority: Priority.Medium,
-  scope: Scope.Resource,
-  content: new TitledContent(),
-  actions: Immutable.List<MessageAction>(),
-  canUserDismiss: false,
-};
+const defaults = (params: Partial<MessageParams> = {}) => ({
+  guid: params.guid || guid(),
+  severity: params.severity || Severity.Error,
+  priority: params.priority || Priority.Medium,
+  scope: params.scope || Scope.Resource,
+  content: params.content || new TitledContent(),
+  actions: params.actions || Immutable.List<MessageAction>(),
+  canUserDismiss: params.canUserDismiss || false,
+});
 
-export class Message extends Immutable.Record(defaultContent) {
+export class Message extends Immutable.Record(defaults()) {
 
   guid: string;
   severity: Severity;
@@ -71,11 +72,11 @@ export class Message extends Immutable.Record(defaultContent) {
   actions: Immutable.List<MessageAction>;
   canUserDismiss: boolean;
 
-  constructor(params?: MessageParams) {
-    super(augment(params));
+  constructor(params?: Partial<MessageParams>) {
+    super(defaults(params));
   }
 
-  with(values: MessageParams) {
+  with(values: Partial<MessageParams>) {
     return this.merge(values) as this;
   }
 
