@@ -137,12 +137,23 @@ export default class DeleteResourceModal extends
       (direction, a, b) => safeCompare('sourceType', direction, a, b),
     ];
 
-    const link = (edge: Edge) => (text: string) =>
-      <a onClick={this.props.onDismissModal}
-        href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
-        className="btn btn-link">
-        {text}
-      </a>;
+    const link = (edge: Edge) => {
+      const edgeResource = this.edgeResource(this.edgeResourceId(edge));
+
+      // All routes must have an organization as context. If the link is to an organization,
+      // use the target as the organization in the route. Otherwise, just use the current
+      // org since the organization doesn't matter in that case.
+      const orgId = edgeResource.type === LegacyTypes.organization
+        ? edgeResource.guid
+        : this.props.orgId;
+
+      return (text: string) =>
+        <a onClick={this.props.onDismissModal}
+          href={`/#${edgeResource.guid}-${course.guid}-${orgId}`}
+          className="btn btn-link">
+          {text}
+        </a>;
+    };
 
     const columnRenderers = [
       (edge: Edge) => link(edge)(this.edgeResourceTitle(this.edgeResourceId(edge))),
