@@ -76,6 +76,9 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     super.componentDidMount();
 
     this.showMissingSkillsMessage();
+
+    // select the routed node
+    this.selectRoutedOrDefaultNode(this.props.router);
   }
 
   shouldComponentUpdate(
