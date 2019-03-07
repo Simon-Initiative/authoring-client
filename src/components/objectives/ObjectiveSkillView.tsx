@@ -171,6 +171,8 @@ const getQuestionRefFromSkillEdge = (
 };
 
 const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<PoolInfo> => {
+  if (!edge) return Maybe.nothing();
+
   const pathInfo = edge.metadata.jsonObject.pathInfo;
   return Maybe.just({
     questionCount,
