@@ -171,6 +171,8 @@ const getQuestionRefFromSkillEdge = (
 };
 
 const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<PoolInfo> => {
+  if (!edge) return Maybe.nothing();
+
   const pathInfo = edge.metadata.jsonObject.pathInfo;
   return Maybe.just({
     questionCount,
@@ -179,6 +181,24 @@ const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<Po
     strategy: pathInfo.parent['@strategy'],
   });
 };
+
+export const reduceObjectiveWorkbookPageRefs = (
+  objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>,
+  workbookpageToObjectiveEdges: Edge[],
+) => objectives.reduce(
+  (acc, objective) => acc.set(
+    objective.id,
+    (acc.get(objective.id) || Immutable.List<string>())
+      .concat(
+        workbookpageToObjectiveEdges
+          // filter out edges that dont point to this objective
+          .filter(edge => edge.destinationId.split(':')[2] === objective.id)
+          // map to workbook page ids
+          .map(edge => edge.sourceId.split(':')[2]),
+      ).toList(),
+  ),
+  Immutable.Map<string, Immutable.List<string>>(),
+);
 
 export const reduceSkillFormativeQuestionRefs = (
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
@@ -287,6 +307,7 @@ interface ObjectiveSkillViewState {
   loading: boolean;
   organizationResourceMap: Maybe<Immutable.Map<string, Immutable.List<string>>>;
   skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
+  workbookPageRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
   searchText: string;
 }
 
@@ -320,6 +341,7 @@ export class ObjectiveSkillView
       loading: false,
       organizationResourceMap: Maybe.nothing(),
       skillQuestionRefs: Maybe.nothing(),
+      workbookPageRefs: Maybe.nothing(),
       searchText: '',
     };
     this.unmounted = false;
@@ -342,10 +364,21 @@ export class ObjectiveSkillView
 
   componentDidMount() {
     this.buildModels();
-    this.fetchAllRefs(this.props.skills);
 
     if (this.props.skills.size === 0) {
       this.fetchSkills();
+    }
+  }
+
+  componentWillUpdate(
+    nextProps: Readonly<ObjectiveSkillViewProps>, nextState: Readonly<ObjectiveSkillViewState>) {
+    // this assumes that aggregateModel, skills, objectives are all set together
+    if (nextState.aggregateModel !== null
+      && nextState.aggregateModel !== this.state.aggregateModel) {
+      this.fetchAllRefs(this.props.skills, nextState.objectives);
+
+    } else if (this.state.aggregateModel !== null && nextProps.skills !== this.props.skills) {
+      this.fetchAllRefs(nextProps.skills, this.state.objectives);
     }
   }
 
@@ -364,23 +397,21 @@ export class ObjectiveSkillView
     }
   }
 
-  componentWillReceiveProps(nextProps: ObjectiveSkillViewProps) {
-    if (nextProps.skills !== this.props.skills) {
-      this.fetchAllRefs(nextProps.skills);
-    }
-  }
-
   fetchSkills() {
     const { course, onFetchSkills } = this.props;
     onFetchSkills(course.id);
   }
 
-  fetchAllRefs(skills) {
+  fetchAllRefs(
+    skills: Immutable.OrderedMap<string, contentTypes.Skill>,
+    objectivesModel: UnifiedObjectivesModel,
+  ) {
     const { course } = this.props;
 
     // fetch all organizations for course
     const fetchAllOrgResources = persistence.bulkFetchDocuments(
       course.guid, [LegacyTypes.organization], 'byTypes');
+
 
     // fetch workbook page to inline assessment edges
     const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.guid, {
@@ -398,6 +429,15 @@ export class ObjectiveSkillView
     const fetchSummativeToPoolEdges = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.assessment2,
       destinationType: LegacyTypes.assessment2_pool,
+    });
+
+    // fetch workbook page to objective refs
+    const fetchWorkbookPageToObjectiveEdges = persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.workbook_page,
+      destinationType: LegacyTypes.learning_objective,
+    }).then((workbookpageToObjectiveEdges) => {
+      return reduceObjectiveWorkbookPageRefs(
+        objectivesModel.objectives, workbookpageToObjectiveEdges);
     });
 
     // fetch all formative assessment edges and build skill-formative refs map
@@ -434,6 +474,7 @@ export class ObjectiveSkillView
 
     Promise.all([
       fetchAllOrgResources,
+      fetchWorkbookPageToObjectiveEdges,
       fetchWorkbookPageToInlineEdges,
       fetchWorkbookPageToSummativeEdges,
       fetchSummativeToPoolEdges,
@@ -442,6 +483,7 @@ export class ObjectiveSkillView
       fetchPoolRefs,
     ]).then(([
       orgDocs,
+      workbookPageRefs,
       workbookPageToInlineEdges,
       workbookPageToSummativeEdges,
       summativeToPoolEdges,
@@ -474,6 +516,7 @@ export class ObjectiveSkillView
 
       this.setState({
         organizationResourceMap: Maybe.just(organizationResourceMap),
+        workbookPageRefs: Maybe.just(workbookPageRefs),
         skillQuestionRefs: Maybe.just(
           skills.reduce(
             (acc, skill) => acc.set(
@@ -1128,7 +1171,10 @@ export class ObjectiveSkillView
 
   renderObjectives() {
     const { onPushRoute, selectedOrganization } = this.props;
-    const { overrideExpanded, searchText, skillQuestionRefs, organizationResourceMap } = this.state;
+    const {
+      overrideExpanded, searchText, skillQuestionRefs, workbookPageRefs,
+      organizationResourceMap,
+    } = this.state;
 
     return selectedOrganization.caseOf({
       just: (organization) => {
@@ -1165,6 +1211,7 @@ export class ObjectiveSkillView
                 onBeginExternalEdit={this.onBeginExternalEdit}
                 onPushRoute={onPushRoute}
                 skillQuestionRefs={skillQuestionRefs}
+                workbookPageRefs={workbookPageRefs}
                 organizationResourceMap={organizationResourceMap}
                 objective={objective}
                 organization={organization}
