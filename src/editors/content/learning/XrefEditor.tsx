@@ -23,6 +23,7 @@ import { MissingTargetId } from 'actions/xref';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 import './XrefEditor.scss';
+import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 
 export interface XrefEditorProps
   extends AbstractContentEditorProps<contentTypes.Xref> {
@@ -84,6 +85,7 @@ export default class XrefEditor
     .toArray()
     .filter(r => r.type === LegacyTypes.workbook_page &&
       r.id !== this.thisId &&
+      r.id !== PLACEHOLDER_ITEM_ID &&
       r.resourceState !== ResourceState.DELETED);
 
   onChangeTarget() {
