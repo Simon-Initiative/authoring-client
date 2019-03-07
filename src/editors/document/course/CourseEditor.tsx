@@ -17,7 +17,7 @@ import { Title } from 'components/objectives/Title';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { TextInput } from 'editors/content/common/controls';
 import { isNullOrUndefined } from 'util';
-import { CCLicenseTypes } from 'data/content/learning/common';
+import { PackageLicenseTypes } from 'data/content/learning/common';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -501,8 +501,14 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   renderLicenseSelect() {
     const license = this.props.model.metadata.license;
-    const licenseOptions = CCLicenseTypes
-      .map(cc => <option key={cc.acronym} value={cc.url}>{cc.description}</option>);
+    const licenseOptions = PackageLicenseTypes
+      .map(l => <option key={l.acronym} value={l.url}>{l.description}</option>);
+
+    const urls = PackageLicenseTypes.map(l => l.url);
+    // Only show a link to the license if it's a CC license url, which
+    // appears after the 'default' license type in the PackageLicenseTypes list
+    const isCCUrl = urls.indexOf(license) > 0;
+
     return (
       <React.Fragment>
         <Select
@@ -511,8 +517,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           value={license}
           onChange={this.onLicenseChange}>
           {licenseOptions}
-        </Select> <a title="License Summary" href={license} target="_blank">
-          <i className="fa fa-external-link" /></a>
+        </Select> {isCCUrl ? <a title="License Summary" href={license} target="_blank">
+          <i className="fa fa-external-link" /></a> : null}
       </React.Fragment>
     );
   }

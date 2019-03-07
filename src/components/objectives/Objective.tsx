@@ -29,12 +29,19 @@ export interface RuleData {
 }
 
 enum Issue {
-  AT_LEAST_3_SKILLS = 'AT_LEAST_3_SKILLS',
+  AT_LEAST_1_SKILL = 'AT_LEAST_1_SKILL',
   AT_LEAST_1_PAGE = 'AT_LEAST_1_PAGE',
   SKILLS_HAVE_3_OF_EACH = 'SKILLS_HAVE_3_OF_EACH',
 }
 
 export const objectiveModelRules: ModelCheckerRule<LearningObjective, RuleData>[] = [{
+  id: Issue.AT_LEAST_1_SKILL,
+  name: 'Objective',
+  requirementType: RequirementType.Should,
+  requirement: 'have at least 1 skill',
+  isIssue: (data: LearningObjective, aux) =>
+    data.skills.size < 1,
+}, {
   id: Issue.AT_LEAST_1_PAGE,
   name: 'Objective',
   requirementType: RequirementType.Should,
@@ -59,11 +66,12 @@ export const objectiveModelRules: ModelCheckerRule<LearningObjective, RuleData>[
         const summativeCount = refs
           .filter(r => r.assessmentType === LegacyTypes.assessment2)
           .length;
+        const guaranteedSummativeCount = calculateGuaranteedSummativeCount(refs, summativeCount);
 
         const checkModelResults = checkModel(
           skill,
           skillModelRules,
-          { formativeCount, summativeCount });
+          { formativeCount, summativeCount: guaranteedSummativeCount });
 
         return acc || checkModelResults.issues.size > 0;
       },
@@ -726,7 +734,7 @@ export class Objective
             </div>
             <div className={classes.skillSection}>
               <h3>
-                {checkModelResults.getIssue(Issue.AT_LEAST_3_SKILLS).caseOf({
+                {checkModelResults.getIssue(Issue.AT_LEAST_1_SKILL).caseOf({
                   just: issue => (
                     <IssueTooltip>
                       {issue.description}
@@ -845,7 +853,7 @@ export class Objective
           {pageCount} {addPluralS('Page', pageCount)}
         </span>
         <span className={classNames(['badge badge-light', classes.detailBadge])}>
-          {checkModelResults.getIssue(Issue.AT_LEAST_3_SKILLS).caseOf({
+          {checkModelResults.getIssue(Issue.AT_LEAST_1_SKILL).caseOf({
             just: issue => (
               <IssueTooltip>
                 {issue.description}

@@ -57,9 +57,21 @@ export const getRouteFromPath = (path: string, search: string) => {
   };
 
   const parseCourseResourceIds = (path: string) => {
-    // resourceIds might contain '-', so we parse from the back. The resource id
-    // is everything before the last two hyphen-separated strings.
+    // resourceIds might contain '-', so we parse from the back if an extra hyphen is
+    // detected. The resource id is everything before the last two hyphen-separated strings.
+
     const pathParts = parseRootPath(path).split('-');
+
+    // Length <= 3 indicates a "normal," well-formed route
+    if (pathParts.length <= 3) {
+      return {
+        resourceId: Maybe.maybe<string>(pathParts[0]),
+        courseId: Maybe.maybe<string>(pathParts[1]),
+        orgId: Maybe.maybe<string>(pathParts[2]),
+      };
+    }
+
+    // Length > 3 indicates an extra hyphen in the resource identifier
     return {
       resourceId: Maybe.maybe<string>(pathParts.slice(0, pathParts.length - 2).join('-')),
       courseId: Maybe.maybe<string>(pathParts[pathParts.length - 2]),
