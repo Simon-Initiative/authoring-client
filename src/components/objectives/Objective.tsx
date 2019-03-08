@@ -8,7 +8,6 @@ import { Button } from 'components/common/Button';
 import { injectSheet, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
-import * as persistence from 'data/persistence';
 import { LegacyTypes } from 'data/types';
 import { InlineEdit } from './InlineEdit';
 import { CourseModel, OrganizationModel } from 'data/models';
@@ -322,6 +321,7 @@ export interface ObjectiveProps {
   skills: List<contentTypes.Skill>;
   loading: boolean;
   skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
+  workbookPageRefs: Maybe<Map<string, List<string>>>;
   organizationResourceMap: Maybe<Map<string, List<string>>>;
   highlightText?: string;
   organization: OrganizationModel;
@@ -339,8 +339,8 @@ export interface ObjectiveProps {
 export interface ObjectiveState {
   mouseOver: boolean;
   skillEdits: Map<string, boolean>;
-  orgWorkbookPageRefs: Maybe<List<string>>;
   orgSkillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
+  orgWorkbookPageRefs: Maybe<List<string>>;
   isEditingTitle: boolean;
 }
 
@@ -359,52 +359,52 @@ export class Objective
     this.state = {
       mouseOver: false,
       skillEdits: Map<string, boolean>(),
-      orgWorkbookPageRefs: Maybe.nothing<List<string>>(),
       orgSkillQuestionRefs: Maybe.nothing<Map<string, List<QuestionRef>>>(),
+      orgWorkbookPageRefs: Maybe.nothing<List<string>>(),
       isEditingTitle: false,
     };
   }
 
-  componentWillMount() {
-    // requires a network request, only load once
-    this.loadWorkbookPageRefs();
-  }
-
   componentWillReceiveProps(nextProps: ObjectiveProps) {
-    if (nextProps.skillQuestionRefs !== this.props.skillQuestionRefs) {
-      // if skillQuestionRefs changes, we should recompute orgSkillQuestionRefs state
-      this.loadSkillQuestionRefs();
+    const hasRequiredData =
+      nextProps.organizationResourceMap.lift(() =>
+        nextProps.skillQuestionRefs.lift(() =>
+          nextProps.workbookPageRefs.lift(() => true))).caseOf({
+            just: () => true,
+            nothing: () => false,
+          });
+
+    if (hasRequiredData) {
+      if (nextProps.skillQuestionRefs !== this.props.skillQuestionRefs) {
+        this.loadSkillQuestionRefs(nextProps);
+      }
+      if (nextProps.workbookPageRefs !== this.props.workbookPageRefs) {
+        this.loadWorkbookPageRefs(nextProps);
+      }
     }
   }
 
-  loadWorkbookPageRefs = () => {
-    const { course, objective, organization } = this.props;
-
-    // fetch all workbookpage edges to build workbookpage refs list
-    persistence.fetchEdges(course.guid, {
-      sourceType: LegacyTypes.workbook_page,
-      destinationType: LegacyTypes.learning_objective,
-      destinationId: objective.id,
-    }).then((edges) => {
-      this.setState({
-        orgWorkbookPageRefs: this.getOrgWorkbookPageRefs(
-          organization,
-          Maybe.just(edges.reduce(
-            (acc, edge) => acc.push(edge.sourceId.split(':')[2]),
-            List<string>(),
-          )),
-        ),
-      });
+  loadWorkbookPageRefs = ({
+    objective, organization, workbookPageRefs, organizationResourceMap,
+  }) => {
+    // build organization specific workbookpage refs list for this objective
+    this.setState({
+      orgWorkbookPageRefs: this.getOrgWorkbookPageRefs(
+        organization,
+        workbookPageRefs.lift(refs => refs.get(objective.id)),
+        organizationResourceMap,
+      ),
     });
   }
 
-  loadSkillQuestionRefs = () => {
-    const { organization, skillQuestionRefs } = this.props;
-
+  loadSkillQuestionRefs = ({
+    organization, skillQuestionRefs, organizationResourceMap,
+  }) => {
     this.setState({
       orgSkillQuestionRefs: this.getOrgQuestionRefs(
         organization,
         skillQuestionRefs,
+        organizationResourceMap,
       ),
     });
   }
@@ -434,13 +434,13 @@ export class Objective
   getOrgWorkbookPageRefs(
     organization: OrganizationModel,
     workbookPageRefs: Maybe<List<string>>,
+    organizationResourceMap: Maybe<Map<string, List<string>>>,
   ): Maybe<List<string>> {
-    const { organizationResourceMap } = this.props;
     const organizationId = organization.resource.id;
 
     return organizationResourceMap.bind(
       orgResources => workbookPageRefs.lift(workbookPageRefs =>
-          workbookPageRefs.filter(pageRef => orgResources.get(organizationId)
+          workbookPageRefs.filter(pageRef => orgResources.has(organizationId)
             && orgResources.get(organizationId).contains(pageRef),
         ).toList(),
       ),
@@ -450,14 +450,14 @@ export class Objective
   getOrgQuestionRefs(
     organization: OrganizationModel,
     skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>,
+    organizationResourceMap: Maybe<Map<string, List<string>>>,
   ): Maybe<Map<string, List<QuestionRef>>> {
-    const { organizationResourceMap } = this.props;
     const organizationId = organization.resource.id;
 
     return organizationResourceMap.bind(
       orgResources => skillQuestionRefs.lift(skillQuestionRefs =>
         skillQuestionRefs.map(questionRefs =>
-          questionRefs.filter(questionRef => orgResources.get(organizationId)
+          questionRefs.filter(questionRef => orgResources.has(organizationId)
             && orgResources.get(organizationId).contains(questionRef.assessmentId)).toList(),
         ).toMap(),
       ),
