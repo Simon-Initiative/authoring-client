@@ -55,9 +55,10 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
 
     persistence.initiatePreview(courseId, documentId, true)
       .then((result) => {
+        this.props.dismissMessage(buildPreviewMessage());
+
         if (result.type === 'PreviewSuccess') {
           if (result.message === '') {
-            this.props.dismissMessage(buildPreviewMessage());
             this.setState({ previewUrl: Maybe.just(result.activityUrl || result.sectionUrl) });
           } else {
             this.timerId = Maybe.just(window.setTimeout(() => this.checkOnProgress(), 10000));

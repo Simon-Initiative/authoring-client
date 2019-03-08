@@ -21,15 +21,13 @@ export enum Priority {
 export enum Scope {
   Application,
   Package,
-  Resource,
   Organization,
+  Resource,
 }
 
 export enum ContentType {
   TitledContent = 'TitledContent',
 }
-
-
 
 export type MessageAction = {
   label: string,
