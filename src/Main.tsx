@@ -39,6 +39,7 @@ import { caseOf } from 'utils/utils';
 import { NavigationPanel } from 'components/NavigationPanel.controller';
 import * as viewActions from 'actions/view';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
+import { loadFromLocalStorage } from 'utils/localstorage';
 
 const createOrg = (courseId, title, courseTitle: string, wbId) => {
   const g = guid();
@@ -142,8 +143,12 @@ export default class Main extends React.Component<MainProps, MainState> {
     this.loadCourseIfNecessary(this.props);
   }
 
+  activeOrgKey = (courseGuid: string, username: string) => {
+    return `active_org__course:${courseGuid}_user:${username}`;
+  }
+
   loadCourseIfNecessary(props) {
-    const { course, router, onLoadCourse, onLoadOrg } = props;
+    const { course, router, onLoadCourse, onLoadOrg, user } = props;
 
     router.courseId.lift((courseId) => {
       const courseGuid = course.caseOf({
@@ -153,8 +158,17 @@ export default class Main extends React.Component<MainProps, MainState> {
 
       if (courseGuid !== courseId) {
         onLoadCourse(courseId);
-        router.orgId.lift((orgId) => {
-          onLoadOrg(courseId, orgId);
+
+        // load org from route, else from local storage, else default
+        router.orgId.caseOf({
+          just: orgId => onLoadOrg(courseId, orgId),
+          nothing: () => {
+            const savedActiveOrg = loadFromLocalStorage(
+              this.activeOrgKey(course.guid, user.profile.username));
+
+            Maybe.maybe(course.resourcesById.get(savedActiveOrg && savedActiveOrg.org))
+              .lift(orgId => onLoadOrg(courseId, orgId));
+          },
         });
       }
     });

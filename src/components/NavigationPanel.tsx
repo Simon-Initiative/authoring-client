@@ -315,6 +315,14 @@ export class NavigationPanel
       'navbar_collapsed_' + username, `${collapsed}`);
   }
 
+  activeOrgKey = (courseGuid: string, username: string) => {
+    return `active_org__course:${courseGuid}_user:${username}`;
+  }
+
+  updateActiveOrgPref = (courseGuid: string, username: string, orgId: string) => {
+    saveToLocalStorage(this.activeOrgKey(courseGuid, username), JSON.stringify({ org: orgId }));
+  }
+
   getWidth = () => {
     const { collapsed, width, newWidth } = this.state;
     return collapsed
@@ -434,6 +442,7 @@ export class NavigationPanel
 
                   if (org.id !== currentOrg.id) {
                     this.props.onReleaseOrg();
+                    this.updateActiveOrgPref(course.guid, profile.username, org.id);
                     viewActions.viewDocument(org.guid, course.guid, org.guid);
                   }
 
