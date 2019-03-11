@@ -5,15 +5,19 @@ import * as courseActions from 'actions/course';
 import * as orgActions from 'actions/orgs';
 import { LegacyTypes } from 'data/types';
 import * as router from 'actions/router';
+import { State } from 'reducers';
 
 function isDifferentCourse(getState, courseId): boolean {
   const course: models.CourseModel = getState().course;
   return course === null || course.guid !== courseId;
 }
 
-function isDifferentOrg(getState, orgId): boolean {
+function isDifferentOrg(getState: () => State, orgId): boolean {
+  const { course } = getState();
   return getState().router.orgId.caseOf({
-    just: id => orgId !== id,
+    just: id => course.resourcesById.has(id)
+      && course.resourcesById.get(id).type === LegacyTypes.organization
+      && orgId !== id,
     nothing: () => true,
   });
 }
@@ -48,6 +52,7 @@ function transitionCourseView(destination, courseId, orgId, dispatch, getState) 
   } else if (isDifferentOrg(getState, orgId)) {
     dispatch(orgActions.releaseOrg());
     dispatch(orgActions.load(courseId, orgId));
+    dispatch(dismissScopedMessages(Scope.Organization));
     router.push(destination);
   } else {
     dispatch(dismissScopedMessages(Scope.Resource));
