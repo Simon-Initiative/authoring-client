@@ -44,7 +44,7 @@ export const courseChanged = (model: CourseModel): CourseChangedAction => ({
 function createPlaceholderPage(courseId: string) {
 
   const resource = WorkbookPageModel.createNew(
-    PLACEHOLDER_ITEM_ID, 'Placeholder', 'This page intentionally left blank');
+    PLACEHOLDER_ITEM_ID, 'Placeholder', 'This is a new page with empty contents.');
 
   persistence.createDocument(courseId, resource);
 

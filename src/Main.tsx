@@ -173,8 +173,7 @@ export default class Main extends React.Component<MainProps, MainState> {
       const title = 'New Organization';
 
       const wbId = guid();
-      const body = 'Welcome to \'' + c.title + '\'.  Please customize this page by adding ' +
-        ' text, multimedia, and other constructs using the toolbar above.';
+      const body = 'This is a new page with empty contents.';
       const wb = models.WorkbookPageModel.createNew(wbId, 'Welcome', body);
 
       persistence.createDocument(c.guid, wb)

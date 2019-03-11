@@ -99,7 +99,8 @@ export class DispatchBasedServices implements AppServices {
   }
 
   createWorkbookPage(title: string, courseId: string): Promise<persistence.Document> {
-    const resource = models.WorkbookPageModel.createNew(guid(), 'New Page', 'Empty contents');
+    const resource = models.WorkbookPageModel.createNew(
+      guid(), 'New Page', 'This is a new page with empty contents.');
     return this.createResource(courseId, resource);
   }
 

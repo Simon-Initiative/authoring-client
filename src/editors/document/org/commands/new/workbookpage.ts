@@ -15,7 +15,8 @@ export class CreateNewWorkbookPageCommand extends AbstractCommand {
     displayModal: (c) => void,
     dismissModal: () => void, dispatch): Promise<o.OrgChangeRequest> {
 
-    const resource = models.WorkbookPageModel.createNew(createGuid(), 'New Page', 'Empty contents');
+    const resource = models.WorkbookPageModel.createNew(
+      createGuid(), 'New Page', 'This is a new page with empty contents.');
 
     return new Promise((resolve, reject) => {
       createResource(courseModel.guid, resource, dispatch)
