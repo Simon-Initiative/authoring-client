@@ -151,16 +151,9 @@ export const orgChangeSucceeded = (orgId: string)
 export type MODEL_UPDATED = 'orgs/MODEL_UPDATED';
 export const MODEL_UPDATED: MODEL_UPDATED = 'orgs/MODEL_UPDATED';
 
-
-// Action to notify when the model has been updated.
-// Optionally, there is an associated undo change request present
-// that triggered the model update. A model update can be
-// triggered without an undo - specifically when updating from
-// a server-side conflict.
 export type ModelUpdatedAction = {
   type: MODEL_UPDATED,
   model: models.OrganizationModel,
-  undo?: org.OrgChangeRequest,
 };
 
 export const modelUpdated = (
