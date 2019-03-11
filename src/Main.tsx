@@ -38,6 +38,7 @@ import Preview from 'components/Preview';
 import { caseOf } from 'utils/utils';
 import { NavigationPanel } from 'components/NavigationPanel.controller';
 import * as viewActions from 'actions/view';
+import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 
 const createOrg = (courseId, title, courseTitle: string, wbId) => {
   const g = guid();
@@ -173,7 +174,7 @@ export default class Main extends React.Component<MainProps, MainState> {
       const title = 'New Organization';
 
       const wbId = guid();
-      const body = 'This is a new page with empty contents.';
+      const body = NEW_PAGE_CONTENT;
       const wb = models.WorkbookPageModel.createNew(wbId, 'Welcome', body);
 
       persistence.createDocument(c.guid, wb)

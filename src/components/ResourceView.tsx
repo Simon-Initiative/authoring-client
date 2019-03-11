@@ -15,6 +15,7 @@ import './ResourceView.scss';
 import { caseOf } from 'utils/utils';
 import guid from 'utils/guid';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
+import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 
 type TitleIcon = {
   name: string,
@@ -165,7 +166,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       },
       [LegacyTypes.feedback]: models.FeedbackModel.createNew(guid(), title, ''),
       [LegacyTypes.workbook_page]: models.WorkbookPageModel.createNew(
-        guid(), title, 'This is a new page with empty content'),
+        guid(), title, NEW_PAGE_CONTENT),
     })(null);
 
     this.setState({

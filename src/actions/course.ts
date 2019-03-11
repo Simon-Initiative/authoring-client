@@ -5,6 +5,7 @@ import * as Immutable from 'immutable';
 import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
+import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -44,7 +45,7 @@ export const courseChanged = (model: CourseModel): CourseChangedAction => ({
 function createPlaceholderPage(courseId: string) {
 
   const resource = WorkbookPageModel.createNew(
-    PLACEHOLDER_ITEM_ID, 'Placeholder', 'This is a new page with empty contents.');
+    PLACEHOLDER_ITEM_ID, 'Placeholder', NEW_PAGE_CONTENT);
 
   persistence.createDocument(courseId, resource);
 
