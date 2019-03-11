@@ -14,6 +14,7 @@ export function registerContentTypes() {
   registerType('audio', ct.Audio.fromPersistence);
   registerType('caption', ct.Caption.fromPersistence);
   registerType('cite', ct.Cite.fromPersistence);
+  registerType('choice', ct.FeedbackChoice.fromPersistence);
   registerType('code', ct.BlockCode.fromPersistence);
   registerType('codeblock', ct.CodeBlock.fromPersistence);
   registerType('command', ct.Command.fromPersistence);
