@@ -3,9 +3,11 @@ import * as Immutable from 'immutable';
 import * as Messages from 'types/messages';
 import { Messages as MessageContainer } from './Messages';
 import { dismissSpecificMessage } from 'actions/messages';
+import { RouterState } from 'reducers/router';
 
 interface StateProps {
   messages: Immutable.OrderedMap<string, Messages.Message>;
+  router: RouterState;
 }
 
 interface DispatchProps {
@@ -19,10 +21,12 @@ interface OwnProps {
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const {
     messages,
+    router,
   } = state;
 
   return {
     messages,
+    router,
   };
 };
 
