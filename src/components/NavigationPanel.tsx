@@ -308,15 +308,15 @@ export class NavigationPanel
     });
   }
 
+  activeOrgKey = (courseGuid: string, username: string) => {
+    return `active_org__course:${courseGuid}_user:${username}`;
+  }
+
   updatePersistentPrefs = (username: string, width: number, collapsed: boolean) => {
     saveToLocalStorage(
       'navbar_width_' + username, `${width}`);
     saveToLocalStorage(
       'navbar_collapsed_' + username, `${collapsed}`);
-  }
-
-  activeOrgKey = (courseGuid: string, username: string) => {
-    return `active_org__course:${courseGuid}_user:${username}`;
   }
 
   updateActiveOrgPref = (courseGuid: string, username: string, orgId: string) => {

@@ -157,19 +157,36 @@ export default class Main extends React.Component<MainProps, MainState> {
       });
 
       if (courseGuid !== courseId) {
-        onLoadCourse(courseId);
+        onLoadCourse(courseId).then((course) => {
+          if (!course) {
+            console.log('no course!')
+            return;
+          }
+          const savedActiveOrg = loadFromLocalStorage(
+            this.activeOrgKey(course.guid, user.profile.username));
+
+          Maybe.maybe(course.resourcesById.get(savedActiveOrg && savedActiveOrg.org))
+            .caseOf({
+              just: org => {
+                console.log('org', org);
+                onLoadOrg(courseId, org.guid);
+              },
+              nothing: () => router.orgId.lift(orgId => onLoadOrg(courseId, orgId)),
+            });
+        });
+
 
         // load org from route, else from local storage, else default
-        router.orgId.caseOf({
-          just: orgId => onLoadOrg(courseId, orgId),
-          nothing: () => {
-            const savedActiveOrg = loadFromLocalStorage(
-              this.activeOrgKey(course.guid, user.profile.username));
+        // router.orgId.caseOf({
+        //   just: orgId => onLoadOrg(courseId, orgId),
+        //   nothing: () => {
+        //     const savedActiveOrg = loadFromLocalStorage(
+        //       this.activeOrgKey(course.guid, user.profile.username));
 
-            Maybe.maybe(course.resourcesById.get(savedActiveOrg && savedActiveOrg.org))
-              .lift(orgId => onLoadOrg(courseId, orgId));
-          },
-        });
+        //     Maybe.maybe(course.resourcesById.get(savedActiveOrg && savedActiveOrg.org))
+        //       .lift(orgId => onLoadOrg(courseId, orgId));
+        //   },
+        // });
       }
     });
   }
@@ -177,7 +194,6 @@ export default class Main extends React.Component<MainProps, MainState> {
   componentWillReceiveProps(nextProps: MainProps) {
     if (this.props.router !== nextProps.router) {
       this.loadCourseIfNecessary(nextProps);
-
     }
   }
 
