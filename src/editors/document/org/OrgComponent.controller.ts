@@ -3,19 +3,21 @@ import { Map } from 'immutable';
 import { OrgComponentEditor } from './OrgComponentEditor';
 import * as models from 'data/models';
 import * as t from 'data/contentTypes';
-import { change } from 'actions/orgs';
 import { State } from 'reducers';
 import * as org from 'data/models/utils/org';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
 import { modalActions } from 'actions/modal';
 import { Maybe } from 'tsmonad';
+import { change, undo, redo } from 'actions/orgs';
 
 interface StateProps {
   skills: Map<string, t.Skill>;
   objectives: Map<string, t.LearningObjective>;
   course: models.CourseModel;
   org: Maybe<models.OrganizationModel>;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 interface DispatchProps {
@@ -25,6 +27,8 @@ interface DispatchProps {
   dismissModal: () => void;
   displayModal: (c) => void;
   onDispatch: (a) => void;
+  onUndo: () => void;
+  onRedo: () => void;
 }
 
 interface OwnProps {
@@ -36,12 +40,17 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   const { skills, objectives, course, orgs } = state;
   const org = orgs.activeOrg.map(v => (v.model as models.OrganizationModel));
+  const { undoStack, redoStack } = orgs;
+  const canUndo = undoStack.size > 0;
+  const canRedo = redoStack.size > 0;
 
   return {
     org,
     skills,
     objectives,
     course,
+    canUndo,
+    canRedo,
   };
 };
 
@@ -65,6 +74,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onDispatch: (a) => {
       dispatch(a);
     },
+    onUndo: () => dispatch(undo() as any),
+    onRedo: () => dispatch(redo() as any),
   };
 };
 

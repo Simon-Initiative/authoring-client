@@ -12,6 +12,7 @@ import { Command } from './commands/command';
 import { RemoveCommand } from './commands/remove';
 import { Outline } from './outline/Outline';
 import * as viewActions from 'actions/view';
+import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import './OrgComponent.scss';
 
 export interface OrgComponentEditorProps {
@@ -27,6 +28,10 @@ export interface OrgComponentEditorProps {
   dismissModal: () => void;
   displayModal: (c) => void;
   onDispatch: (c) => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
 }
 
 export interface OrgComponentEditorState {
@@ -97,7 +102,10 @@ export class OrgComponentEditor
   }
 
   onTitleEdit(model, title) {
-    this.props.onEdit(org.makeUpdateNode(model.id, n => (n as any).with({ title })));
+
+    const original = model.title;
+    const undo = m => m.with({ title: original });
+    this.props.onEdit(org.makeUpdateNode(model.id, n => (n as any).with({ title }), undo));
   }
 
   onView(componentOrResourceId: string) {
@@ -133,6 +141,7 @@ export class OrgComponentEditor
     model: t.Sequence | t.Unit | t.Module | t.Section): JSX.Element {
 
     const { editMode } = this.props;
+    const { canUndo, canRedo, onUndo, onRedo } = this.props;
 
     const titleEditor = model.title !== undefined
       ? (
@@ -158,6 +167,11 @@ export class OrgComponentEditor
       just: (org) => {
         return (
           <div className="org-component-editor">
+            <UndoRedoToolbar
+              undoEnabled={canUndo}
+              redoEnabled={canRedo}
+              onUndo={onUndo.bind(this)}
+              onRedo={onRedo.bind(this)} />
             {titleEditor}
             {this.renderActionBar(model)}
             <Outline

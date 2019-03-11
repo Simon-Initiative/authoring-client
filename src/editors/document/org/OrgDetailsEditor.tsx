@@ -12,6 +12,7 @@ import * as Messages from 'types/messages';
 import * as org from 'data/models/utils/org';
 import { Maybe } from 'tsmonad';
 import { OrgComponentEditor } from './OrgComponentEditor';
+import guid from 'utils/guid';
 
 import './OrgDetailsEditor.scss';
 
@@ -27,6 +28,10 @@ export interface OrgDetailsEditorProps {
   dismissModal: () => void;
   displayModal: (c) => void;
   course: models.CourseModel;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
 }
 
 const enum TABS {
@@ -87,16 +92,25 @@ export class OrgDetailsEditor
 
   onAddSequence() {
 
+    const id = guid();
+
     const mapper = (model) => {
       const s: contentTypes.Sequence = new contentTypes.Sequence()
-        .with({ title: 'New ' + model.labels.sequence });
+        .with({ id, title: 'New ' + model.labels.sequence });
       const sequences = model.sequences
         .with({ children: model.sequences.children.set(s.guid, s) });
 
       return model.with({ sequences });
     };
 
-    this.props.onEdit(org.makeUpdateRootModel(mapper));
+    const undo = (model: models.OrganizationModel) => {
+      const children = model.sequences.children.filter(
+        c => (c as any).id === id).toOrderedMap();
+      const sequences = model.sequences.with({ children });
+      return model.with({ sequences });
+    };
+
+    this.props.onEdit(org.makeUpdateRootModel(mapper, undo));
   }
 
   onTabClick(index: number) {

@@ -1,4 +1,5 @@
 
+import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as org from 'data/models/utils/org';
@@ -8,6 +9,54 @@ import * as viewActions from 'actions/view';
 import { showMessage, dismissSpecificMessage } from 'actions/messages';
 
 import { buildConflictMessage } from 'utils/error';
+
+enum ChangeType {
+  Normal,
+  Undo,
+  Redo,
+}
+
+
+export type CHANGE_PROCESSED = 'orgs/CHANGE_PROCESSED';
+export const CHANGE_PROCESSED: CHANGE_PROCESSED = 'orgs/CHANGE_PROCESSED';
+
+export type ChangeProcessedAction = {
+  type: CHANGE_PROCESSED,
+  cr: org.OrgChangeRequest,
+};
+
+export const changeProcessed = (cr: org.OrgChangeRequest): ChangeProcessedAction => ({
+  type: CHANGE_PROCESSED,
+  cr,
+});
+
+
+export type CHANGE_UNDONE = 'orgs/CHANGE_UNDONE';
+export const CHANGE_UNDONE: CHANGE_UNDONE = 'orgs/CHANGE_UNDONE';
+
+export type ChangeUndoneAction = {
+  type: CHANGE_UNDONE,
+  cr: org.OrgChangeRequest,
+};
+
+export const changeUndone = (cr: org.OrgChangeRequest): ChangeUndoneAction => ({
+  type: CHANGE_UNDONE,
+  cr,
+});
+
+
+export type CHANGE_REDONE = 'orgs/CHANGE_REDONE';
+export const CHANGE_REDONE: CHANGE_REDONE = 'orgs/CHANGE_REDONE';
+
+export type ChangeRedoneAction = {
+  type: CHANGE_REDONE,
+  cr: org.OrgChangeRequest,
+};
+
+export const changeRedone = (cr: org.OrgChangeRequest): ChangeRedoneAction => ({
+  type: CHANGE_REDONE,
+  cr,
+});
 
 export type CHANGE_SELECTED_ITEM = 'orgs/CHANGE_SELECTED_ITEM';
 export const CHANGE_SELECTED_ITEM: CHANGE_SELECTED_ITEM = 'orgs/CHANGE_SELECTED_ITEM';
@@ -102,12 +151,20 @@ export const orgChangeSucceeded = (orgId: string)
 export type MODEL_UPDATED = 'orgs/MODEL_UPDATED';
 export const MODEL_UPDATED: MODEL_UPDATED = 'orgs/MODEL_UPDATED';
 
+
+// Action to notify when the model has been updated.
+// Optionally, there is an associated undo change request present
+// that triggered the model update. A model update can be
+// triggered without an undo - specifically when updating from
+// a server-side conflict.
 export type ModelUpdatedAction = {
   type: MODEL_UPDATED,
   model: models.OrganizationModel,
+  undo?: org.OrgChangeRequest,
 };
 
-export const modelUpdated = (model: models.OrganizationModel)
+export const modelUpdated = (
+  model: models.OrganizationModel)
   : ModelUpdatedAction => ({
     type: MODEL_UPDATED,
     model,
@@ -138,12 +195,15 @@ function applyChange(
   doc: persistence.Document,
   courseId: string,
   change: org.OrgChangeRequest,
-  retriesRemaining: number) {
+  retriesRemaining: number,
+  changeType: ChangeType) {
 
   // Attempt to apply the change
   const m = doc.model as models.OrganizationModel;
   org.applyChange(m, change).caseOf({
-    just: (model) => {
+    just: (ac) => {
+
+      const model = ac.updatedModel;
 
       // Assume this is going to be accepted by the server, so
       // setup our next model revision points appropriately
@@ -153,6 +213,14 @@ function applyChange(
         lastRevisionGuid: nextRevision,
       });
 
+      if (changeType === ChangeType.Undo) {
+        dispatch(changeUndone(ac.undo));
+      } else if (changeType === ChangeType.Redo) {
+        // ac.undo here is correct and not a copy-paste error
+        dispatch(changeRedone(ac.undo));
+      } else {
+        dispatch(changeProcessed(ac.undo));
+      }
       dispatch(modelUpdated(model.with({ resource })));
 
       persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
@@ -171,7 +239,8 @@ function applyChange(
                 // If we have retry attempts remaining, then try applying the change
                 // again.
                 if (retriesRemaining > 0) {
-                  applyChange(dispatch, latestDoc, courseId, change, retriesRemaining - 1);
+                  applyChange(
+                    dispatch, latestDoc, courseId, change, retriesRemaining - 1, changeType);
                 } else {
                   // If no retry attempts remaining, we simply update the model to reflect
                   // the latest from the server's perspective.
@@ -207,14 +276,39 @@ function applyChange(
 
 }
 
-export function change(change: org.OrgChangeRequest) {
+export function change(change: org.OrgChangeRequest, changeType = ChangeType.Normal) {
   return function (dispatch, getState) {
 
     getState().orgs.activeOrg.lift((doc) => {
       const courseId = getState().course.guid;
-      applyChange(dispatch, doc, courseId, change, 1);
+      applyChange(dispatch, doc, courseId, change, 1, changeType);
     });
   };
 
 }
 
+
+export function undo() {
+  return function (dispatch, getState) {
+
+    const undoStack: Immutable.Stack<org.OrgChangeRequest> = getState().orgs.undoStack;
+    const cr = undoStack.peek();
+
+    if (cr) {
+      dispatch(change(cr, ChangeType.Undo));
+    }
+
+  };
+}
+
+export function redo() {
+  return function (dispatch, getState) {
+
+    const redoStack: Immutable.Stack<org.OrgChangeRequest> = getState().orgs.redoStack;
+    const cr = redoStack.peek();
+
+    if (cr) {
+      dispatch(change(cr, ChangeType.Redo));
+    }
+  };
+}
