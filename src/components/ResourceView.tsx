@@ -14,6 +14,8 @@ import * as contentTypes from 'data/contentTypes';
 import './ResourceView.scss';
 import { caseOf } from 'utils/utils';
 import guid from 'utils/guid';
+import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
+import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 
 type TitleIcon = {
   name: string,
@@ -85,14 +87,15 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     const { course } = this.props;
 
     return course.resources.toArray().filter(r =>
-        r.resourceState !== ResourceState.DELETED
-        && (
-          r.type === LegacyTypes.inline
-          || r.type === LegacyTypes.assessment2
-          || r.type === LegacyTypes.assessment2_pool
-          || r.type === LegacyTypes.feedback
-          || r.type === LegacyTypes.workbook_page
-        ),
+      r.id !== PLACEHOLDER_ITEM_ID
+      && r.resourceState !== ResourceState.DELETED
+      && (
+        r.type === LegacyTypes.inline
+        || r.type === LegacyTypes.assessment2
+        || r.type === LegacyTypes.assessment2_pool
+        || r.type === LegacyTypes.feedback
+        || r.type === LegacyTypes.workbook_page
+      ),
     );
   }
 
@@ -100,6 +103,11 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   getRowsFilteredBySearch = (searchText: string): Resource[] => {
     const text = searchText.trim().toLowerCase();
     const filterFn = (r: Resource): boolean => {
+
+      if (r.id === PLACEHOLDER_ITEM_ID) {
+        return false;
+      }
+
       const { title, id } = r;
       const titleLower = title ? title.toLowerCase() : '';
       const idLower = id ? id.toLowerCase() : '';
@@ -158,7 +166,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       },
       [LegacyTypes.feedback]: models.FeedbackModel.createNew(guid(), title, ''),
       [LegacyTypes.workbook_page]: models.WorkbookPageModel.createNew(
-        guid(), title, 'This is a new page with empty content'),
+        guid(), title, NEW_PAGE_CONTENT),
     })(null);
 
     this.setState({
@@ -215,8 +223,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         : highlightMatches(prop, r, this.state.searchText);
 
       return prop === 'title'
-          ? <span>{getNameAndIconByType(r.type).icon} {maybeHighlighted}</span>
-          : <span>{maybeHighlighted}</span>;
+        ? <span>{getNameAndIconByType(r.type).icon} {maybeHighlighted}</span>
+        : <span>{maybeHighlighted}</span>;
 
     };
 
@@ -269,7 +277,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
               disabled={!course.editable}
               className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
               onChange={({ target: { value } }) => this.setState({ newItemTitle: value })}
-              placeholder="Enter title for new resource"/>
+              placeholder="Enter title for new resource" />
             <div className="dropdown">
               <button
                 disabled={!course.editable || !newItemTitle}
