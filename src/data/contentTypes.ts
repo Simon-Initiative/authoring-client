@@ -31,6 +31,7 @@ export { Dl } from 'data/content/learning/dl';
 export { Dt } from 'data/content/learning/dt';
 export { Example } from 'data/content/learning/example';
 export { Extra } from 'data/content/learning/extra';
+export { FeedbackChoice } from 'data/content/feedback/feedback_choice';
 export { Figure } from 'data/content/learning/figure';
 export { Flash } from 'data/content/learning/flash';
 export { Formula } from 'data/content/learning/formula';
