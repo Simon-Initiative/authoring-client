@@ -5,6 +5,7 @@ import createGuid from '../../../../../utils/guid';
 import { createResource } from './create';
 import * as o from 'data/models/utils/org';
 import { Maybe } from 'tsmonad';
+import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 
 export class CreateNewWorkbookPageCommand extends AbstractCommand {
 
@@ -15,7 +16,8 @@ export class CreateNewWorkbookPageCommand extends AbstractCommand {
     displayModal: (c) => void,
     dismissModal: () => void, dispatch): Promise<o.OrgChangeRequest> {
 
-    const resource = models.WorkbookPageModel.createNew(createGuid(), 'New Page', 'Empty contents');
+    const resource = models.WorkbookPageModel.createNew(
+      createGuid(), 'New Page', NEW_PAGE_CONTENT);
 
     return new Promise((resolve, reject) => {
       createResource(courseModel.guid, resource, dispatch)

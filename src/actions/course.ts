@@ -5,6 +5,7 @@ import * as Immutable from 'immutable';
 import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
+import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -44,7 +45,7 @@ export const courseChanged = (model: CourseModel): CourseChangedAction => ({
 function createPlaceholderPage(courseId: string) {
 
   const resource = WorkbookPageModel.createNew(
-        PLACEHOLDER_ITEM_ID, 'Placeholder', 'This is a new page with empty content');
+    PLACEHOLDER_ITEM_ID, 'Placeholder', NEW_PAGE_CONTENT);
 
   persistence.createDocument(courseId, resource);
 
@@ -55,35 +56,35 @@ export function loadCourse(courseId: string) {
   return function (dispatch: any) {
 
     return persistence.retrieveCoursePackage(courseId)
-    .then((document) => {
+      .then((document) => {
 
-      // Notify that the course has changed when a user views a course
-      if (document.model.modelType === ModelTypes.CourseModel) {
+        // Notify that the course has changed when a user views a course
+        if (document.model.modelType === ModelTypes.CourseModel) {
 
-        const courseModel : CourseModel = document.model;
+          const courseModel: CourseModel = document.model;
 
-        if (!document.model.resources.toArray().some(
-          resource => resource.id === PLACEHOLDER_ITEM_ID)) {
+          if (!document.model.resources.toArray().some(
+            resource => resource.id === PLACEHOLDER_ITEM_ID)) {
 
-          const placeholder = createPlaceholderPage(courseId);
-          const updatedModel = courseModel.with(
-            { resources: courseModel.resources.set(PLACEHOLDER_ITEM_ID, placeholder.resource) });
+            const placeholder = createPlaceholderPage(courseId);
+            const updatedModel = courseModel.with(
+              { resources: courseModel.resources.set(PLACEHOLDER_ITEM_ID, placeholder.resource) });
 
-          dispatch(courseChanged(updatedModel));
+            dispatch(courseChanged(updatedModel));
+            dispatch(fetchSkills(courseId));
+            dispatch(fetchObjectives(courseId));
+            return updatedModel;
+
+          }
+
+          dispatch(courseChanged(document.model));
           dispatch(fetchSkills(courseId));
           dispatch(fetchObjectives(courseId));
-          return updatedModel;
-
+          return document.model;
         }
 
-        dispatch(courseChanged(document.model));
-        dispatch(fetchSkills(courseId));
-        dispatch(fetchObjectives(courseId));
-        return document.model;
-      }
-
-    })
-    .catch(err => console.log(err));
+      })
+      .catch(err => console.log(err));
   };
 }
 
