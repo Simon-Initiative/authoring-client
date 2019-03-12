@@ -32,26 +32,38 @@ export class Details
   }
 
   onTitleEdit(title: string) {
+    const original = this.props.model.resource.title;
     const resource = this.props.model.resource.with({ title });
-    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ title, resource })));
+    const undo = m => m.with({ title: original, resource: m.resource.with({ title: original }) });
+    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ title, resource }), undo));
   }
 
   onAudienceEdit(audience: string) {
-    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ audience })));
+    const original = this.props.model.audience;
+    const undo = m => m.with({ audience: original });
+    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ audience }), undo));
   }
 
   onDescEdit(description: string) {
-    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ description })));
+    const original = this.props.model.description;
+    const undo = m => m.with({ description: original });
+    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ description }), undo));
   }
 
   onVersionEdit(version: string) {
-    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ version })));
+    const original = this.props.model.version;
+    const undo = m => m.with({ version: original });
+    this.props.onEdit(org.makeUpdateRootModel(m => m.with({ version }), undo));
   }
 
   onProductEdit(product: string) {
+
+    const original = this.props.model.product;
+    const undo = m => m.with({ product: original });
+
     const spacesStripped = product.replace(/\s+/g, '');
     this.props.onEdit(org.makeUpdateRootModel(
-      m => m.with({ product: Maybe.just<string>(spacesStripped) })));
+      m => m.with({ product: Maybe.just<string>(spacesStripped) }), undo));
   }
 
   renderEditor(attr: string, update) {
