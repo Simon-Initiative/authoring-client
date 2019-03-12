@@ -17,7 +17,7 @@ const defaultContent = {
   contentType: 'Link',
   elementType: 'link',
   target: LinkTarget.New,
-  href: 'www.google.com',
+  href: 'https://oli.cmu.edu',
   internal: false,
   title: '',
   content: Maybe.nothing<Image>(),
@@ -43,13 +43,13 @@ export class Link extends Immutable.Record(defaultContent) {
   }
 
 
-  clone() : Link {
+  clone(): Link {
     return ensureIdGuidPresent(this.with({
       content: this.content.lift(i => i.clone()),
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void) : Link {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Link {
     const t = (root as any).link;
 
     let model = new Link({ guid });
@@ -77,7 +77,7 @@ export class Link extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     const link = {
       link: {
         '@title': this.title,

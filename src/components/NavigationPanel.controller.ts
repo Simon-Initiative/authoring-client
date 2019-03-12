@@ -8,7 +8,7 @@ import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
 import { Document } from 'data/persistence';
 import { UserProfile } from 'types/user';
-import { releaseOrg } from 'actions/orgs';
+import { load as loadOrg, releaseOrg } from 'actions/orgs';
 
 interface StateProps {
   course: CourseModel;
@@ -18,6 +18,7 @@ interface StateProps {
 
 interface DispatchProps {
   viewActions: viewActions.ViewActions;
+  onLoadOrg: (courseId: string, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
 }
 
@@ -49,6 +50,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 
   return {
     viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
+    onLoadOrg: (courseId: string, documentId: string) => dispatch(loadOrg(courseId, documentId)),
     onReleaseOrg: () => dispatch(releaseOrg() as any),
   };
 };
