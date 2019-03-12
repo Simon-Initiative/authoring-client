@@ -95,7 +95,6 @@ interface MainProps {
   onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
   onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
-  onReleaseOrg: (documentId: string) => Promise<{}>;
   onSetServerTimeSkew: () => void;
   onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
