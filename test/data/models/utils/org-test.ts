@@ -15,7 +15,7 @@ it('tests adding nodes', () => {
   const result = org.applyChange(model, org.makeAddNode('sequence1', u, Maybe.nothing()));
 
   result.caseOf({
-    just: m => expect((m.sequences.children.first() as contentTypes.Sequence)
+    just: m => expect((m.updatedModel.sequences.children.first() as contentTypes.Sequence)
       .children.size).toBe(2),
     nothing: () => fail('should have been valid'),
   });
@@ -27,7 +27,7 @@ it('tests adding nodes', () => {
 
   result2.caseOf({
     just: (m) => {
-      const sequence = (m.sequences.children.first() as contentTypes.Sequence);
+      const sequence = (m.updatedModel.sequences.children.first() as contentTypes.Sequence);
       expect(sequence.children.first().title).toBe('inserted unit');
     },
     nothing: () => fail('should have been valid'),
@@ -59,7 +59,7 @@ it('tests removing nodes', () => {
 
   result.caseOf({
     just: (m) => {
-      expect((m.sequences.children.first() as contentTypes.Sequence)
+      expect((m.updatedModel.sequences.children.first() as contentTypes.Sequence)
         .children.size).toBe(0);
     },
     nothing: () => fail('should have been valid'),
@@ -75,11 +75,15 @@ it('tests setting an attr', () => {
   // Tests setting the title of a unit
   expect((model.sequences.children.first() as contentTypes.Sequence).children.size).toBe(1);
   const result = org.applyChange(
-    model, org.makeUpdateNode('lesson1', (e: any) => e.with({ title: 'ok' })));
+    model, org.makeUpdateNode(
+      'lesson1',
+      (e: any) => e.with({ title: 'ok' }),
+      (e: any) => e.with({ title: '' }),
+    ));
 
   result.caseOf({
     just: (m) => {
-      expect((m.sequences.children.first() as contentTypes.Sequence)
+      expect((m.updatedModel.sequences.children.first() as contentTypes.Sequence)
         .children.first().title).toBe('ok');
     },
     nothing: () => fail('should have been valid'),
@@ -103,7 +107,7 @@ it('tests reordering', () => {
 
   result.caseOf({
     just: (m) => {
-      const module = ((((m.sequences.children.first() as contentTypes.Sequence)
+      const module = ((((m.updatedModel.sequences.children.first() as contentTypes.Sequence)
         .children.first()) as contentTypes.Unit).children.first()) as contentTypes.Module;
       const firstItem = module.children.first() as contentTypes.Item;
       const lastItem = module.children.last() as contentTypes.Item;
@@ -118,9 +122,9 @@ it('tests reordering', () => {
 
   result2.caseOf({
     just: (m) => {
-      const item = ((((m.sequences.children.first() as contentTypes.Sequence)
+      const item = ((((m.updatedModel.sequences.children.first() as contentTypes.Sequence)
         .children.first()) as contentTypes.Unit).children.first()) as contentTypes.Item;
-      const module = ((((m.sequences.children.first() as contentTypes.Sequence)
+      const module = ((((m.updatedModel.sequences.children.first() as contentTypes.Sequence)
         .children.first()) as contentTypes.Unit).children.last()) as contentTypes.Module;
       const firstItem = module.children.first() as contentTypes.Item;
 
