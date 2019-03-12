@@ -209,6 +209,7 @@ export interface NavigationPanelProps {
   userId: string;
   userName: string;
   onCreateOrg: () => void;
+  onLoadOrg: (courseId: string, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
 }
 
@@ -434,6 +435,7 @@ export class NavigationPanel
 
                   if (org.id !== currentOrg.id) {
                     this.props.onReleaseOrg();
+                    this.props.onLoadOrg(course.guid, org.guid);
                     viewActions.viewDocument(org.guid, course.guid, org.guid);
                   }
 
