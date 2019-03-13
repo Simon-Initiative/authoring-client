@@ -80,7 +80,8 @@ export class TreeNode
 
     return (
       <React.Fragment>
-        {toggle}{contentType} {number}: {this.props.model.title}
+        {toggle}<span style={{ fontWeight: 600 }}>{contentType} {number}
+        </span>: {this.props.model.title}
       </React.Fragment>
     );
   }
