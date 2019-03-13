@@ -93,8 +93,10 @@ export function paste() {
       });
       if (isSupported) {
 
-        // Remove any inline assessments, as these cannot be duplicated
-        const filtered = filter(e => e.contentType !== 'WbInline', elementToPaste);
+        // Remove any inline assessments or multipanels, as these would introduce
+        // a duplicate inline - which breaks validation
+        const filtered = filter(
+          e => e.contentType !== 'WbInline' && e.contentType !== 'Multipanel', elementToPaste);
         parent.onPaste(filtered, textSelection);
       }
     }
