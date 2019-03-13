@@ -507,7 +507,7 @@ export class NavigationPanel
             onClick={() => this.onPreview()} />&nbsp;&nbsp;
           <HelpPopover>
             You can launch a <strong>full preview</strong> for the complete course package
-          using the selected organization to allow it to be viewed publically.<br /><br />
+          using the active organization to allow it to be viewed publically.<br /><br />
             It may take a few minutes to create the full preview for larger courses.
           </HelpPopover>
         </div>
