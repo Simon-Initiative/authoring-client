@@ -86,10 +86,6 @@ export abstract class ChoiceFeedback
 
     // don't update model when just score or text changes
     if (oldMatch !== response.match) {
-      const generated = getGeneratedResponseItem(updatedModel);
-      const body = generated ? generated.feedback.first().body
-        : this.placeholderResponse.feedback.first().body;
-
       updatedModel = modelWithDefaultFeedback(
         updatedModel,
         choices,
@@ -108,10 +104,6 @@ export abstract class ChoiceFeedback
     let updatedModel = model.with({
       responses: model.responses.delete(response.guid),
     });
-
-    const generated = getGeneratedResponseItem(updatedModel);
-    const body = generated ? generated.feedback.first().body
-      : this.placeholderResponse.feedback.first().body;
 
     updatedModel = modelWithDefaultFeedback(
       updatedModel,
@@ -194,10 +186,6 @@ export abstract class ChoiceFeedback
         }),
       ),
     });
-
-    const generated = getGeneratedResponseItem(updatedPart);
-    const body = generated ? generated.feedback.first().body
-      : this.placeholderResponse.feedback.first().body;
 
     const updatedModel = modelWithDefaultFeedback(
       updatedPart,
