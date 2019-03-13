@@ -102,7 +102,9 @@ export class CaptionTextEditor
                     this.setState({
                       isEditing: false,
                     });
-                  }} />
+                  }}>
+                  Remove Caption
+                </Remove>
               </div>
             )
             : this.renderCreateButton()
