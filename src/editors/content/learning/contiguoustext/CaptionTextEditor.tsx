@@ -48,9 +48,9 @@ export class CaptionTextEditor
   }
 
   renderCreateButton = () => {
-    const { classes } = this.props;
+    const { classes, editMode } = this.props;
 
-    return (
+    return editMode && (
       <div
         className={classes.createCaptionBtn}
         onMouseDown={(e) => {
