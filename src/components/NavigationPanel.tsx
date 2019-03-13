@@ -204,7 +204,6 @@ export interface NavigationPanelProps {
   course: CourseModel;
   viewActions: viewActions.ViewActions;
   router: RouterState;
-  activeOrg: Maybe<Document>;
   profile: UserProfile;
   userId: string;
   userName: string;
@@ -307,10 +306,6 @@ export class NavigationPanel
       newWidth: Maybe.just(newSize),
       collapsed: newSize < COLLAPSE_SETPOINT_PX,
     });
-  }
-
-  activeOrgKey = (courseGuid: string, username: string) => {
-    return `active_org__course:${courseGuid}_user:${username}`;
   }
 
   updatePersistentPrefs = (username: string, width: number, collapsed: boolean) => {

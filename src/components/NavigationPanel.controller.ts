@@ -13,7 +13,6 @@ import { load as loadOrg, releaseOrg } from 'actions/orgs';
 interface StateProps {
   course: CourseModel;
   router: RouterState;
-  activeOrg: Maybe<Document>;
 }
 
 interface DispatchProps {
@@ -35,7 +34,6 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
     course,
     router,
-    activeOrg: orgs.activeOrg,
   };
 };
 
