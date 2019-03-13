@@ -329,7 +329,11 @@ export function release(documentId: string) {
     const editedDocument: EditedDocument = getState().documents.get(documentId);
     dispatch(documentReleased(documentId));
 
-    return editedDocument.persistence.destroy();
+    if (editedDocument.persistence !== null) {
+      return editedDocument.persistence.destroy();
+    }
+
+    return Promise.resolve({});
   };
 }
 
