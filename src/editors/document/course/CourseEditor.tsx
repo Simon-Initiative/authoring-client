@@ -47,7 +47,7 @@ interface CourseEditorState {
 
 interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
 interface RequestButtonState { pending: boolean; successful: boolean; failed: boolean; }
-class RequestButton extends React.Component<RequestButtonProps, RequestButtonState> {
+export class RequestButton extends React.Component<RequestButtonProps, RequestButtonState> {
   constructor(props: RequestButtonProps) {
     super(props);
 
@@ -75,7 +75,7 @@ class RequestButton extends React.Component<RequestButtonProps, RequestButtonSta
     const { pending, successful, failed } = this.state;
 
     return (
-      <div>
+      <span>
         <button
           className={`btn ${className}`}
           onClick={this.onClickWithState()}>
@@ -84,7 +84,7 @@ class RequestButton extends React.Component<RequestButtonProps, RequestButtonSta
         {pending ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : null}
         {successful ? <i className="fa fa-check-circle" /> : null}
         {failed ? <i className="fa fa-times-circle" /> : null}
-      </div>
+      </span>
     );
   }
 }
@@ -110,7 +110,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
     this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
-    this.onPreview = this.onPreview.bind(this);
     this.onRequestDeployment = this.onRequestDeployment.bind(this);
     this.onClickNewVersion = this.onClickNewVersion.bind(this);
     this.validateVersionNumber = this.validateVersionNumber.bind(this);
@@ -384,9 +383,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderActions() {
     const { model } = this.props;
 
-    const previewButton = <RequestButton text="Preview" className="btn-primary previewButton"
-      onClick={() => this.onPreview()} />;
-
     const requestQAButton = (redeploy: boolean) =>
       <RequestButton key="req-qa" text="Request QA" className="btn-secondary actionButton requestQA"
         onClick={() => this.onRequestDeployment(DeployStage.qa, redeploy)} />;
@@ -403,32 +399,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         {org.title}
       </option>;
 
-    const organizationOptions = this.organizations.map(organizationOption);
-
     const actions = [];
-
-    actions.push(
-      <div key="orgSelect">
-        <div><p>Select an organization to preview:</p>
-          <Select
-            {...this.props}
-            className="orgSelect"
-            // Use the selected organization if present, or the first in the list as a default
-            value={this.state.selectedOrganizationId}
-            onChange={orgId => this.setState({ selectedOrganizationId: orgId })}>
-            {organizationOptions}
-          </Select>
-        </div>
-        <br />
-        <p>
-          You can launch a <strong>full preview</strong> for the complete course package
-          using this organization to allow it to be viewed publically.
-          It may take a few minutes to create the full preview for larger courses.
-          </p>
-        {previewButton}
-        <br />
-      </div>,
-    );
 
     switch (model.deploymentStatus) {
       case DeploymentStatus.Development:
@@ -476,17 +447,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     }
 
     return actions;
-  }
-
-  onPreview(redeploy: boolean = true): Promise<void> {
-    const { model, onPreview } = this.props;
-
-    return onPreview(
-      model.guid,
-      this.state.selectedOrganizationId || (this.organizations[0] && this.organizations[0].guid),
-      redeploy)
-      // More robust error handling needs to be built out
-      .catch(err => console.error('Full preview error:', err));
   }
 
   onRequestDeployment(stage: DeployStage, redeploy: boolean) {

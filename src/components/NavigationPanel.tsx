@@ -14,6 +14,9 @@ import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
+import { RequestButton } from 'editors/document/course/CourseEditor';
+import { CourseId } from 'data/types';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 const DEFAULT_WIDTH_PX = 400;
 const COLLAPSED_WIDTH_PX = 80;
@@ -26,7 +29,7 @@ export const styles: JSSStyles = {
     flexDirection: 'column',
     backgroundColor: colors.grayLightest,
     borderRight: [1, 'solid', colors.grayLight],
-    padding: [10, 0],
+    padding: [10, 0, 5, 0],
     position: 'relative',
   },
   collapsed: {
@@ -197,6 +200,9 @@ export const styles: JSSStyles = {
     cursor: 'ew-resize',
     zIndex: 1000,
   },
+  publishActions: {
+    margin: [2, 15],
+  },
 };
 
 export interface NavigationPanelProps {
@@ -211,6 +217,7 @@ export interface NavigationPanelProps {
   onCreateOrg: () => void;
   onLoadOrg: (courseId: string, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
+  onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
 }
 
 export interface NavigationPanelState {
@@ -321,6 +328,19 @@ export class NavigationPanel
     return collapsed
       ? COLLAPSED_WIDTH_PX
       : newWidth.valueOr(width.valueOr(DEFAULT_WIDTH_PX));
+  }
+
+  onPreview(redeploy: boolean = true): Promise<void> {
+    const { router, onPreview } = this.props;
+
+    console.log('courseId', router.courseId.valueOr(''), 'orgId', router.orgId.valueOr(''));
+
+    return onPreview(
+      router.courseId.valueOr(''),
+      router.orgId.valueOr(''),
+      redeploy)
+      // More robust error handling needs to be built out
+      .catch(err => console.error('Full preview error:', err));
   }
 
   render() {
@@ -480,6 +500,16 @@ export class NavigationPanel
                 {...this.props} />
             )
           }
+        </div>
+
+        <div className={classes.publishActions}>
+          <RequestButton text="Preview Course" className="btn-primary previewButton"
+            onClick={() => this.onPreview()} />&nbsp;&nbsp;
+          <HelpPopover>
+            You can launch a <strong>full preview</strong> for the complete course package
+          using this organization to allow it to be viewed publically.<br /><br />
+            It may take a few minutes to create the full preview for larger courses.
+          </HelpPopover>
         </div>
 
       </div>
