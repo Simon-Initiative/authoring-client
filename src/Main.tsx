@@ -231,7 +231,7 @@ export default class Main extends React.Component<MainProps, MainState> {
         <ImportCourseView dispatch={onDispatch} />
       ),
       [ROUTE.CREATE]: (
-        <CreateCourseView dispatch={onDispatch} />
+        <CreateCourseView userName={user.user} dispatch={onDispatch} />
       ),
       [ROUTE.PREVIEW]: () => {
         const documentId = router.resourceId;
