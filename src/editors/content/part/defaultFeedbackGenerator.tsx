@@ -66,7 +66,7 @@ const getFeedbackCombinations =
  */
 export const modelWithDefaultFeedback = (
   model: contentTypes.Part, choices: contentTypes.Choice[], body: ContentElements, score: string,
-  maxGenChoices: number, onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap,
+  onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap,
   lang: string = undefined) => {
   // remove all existing default responses
   const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
@@ -74,7 +74,7 @@ export const modelWithDefaultFeedback = (
   let generatedResponses: contentTypes.Response[];
   if (choices.length <= 1) {
     generatedResponses = [];
-  } else if (choices.length > maxGenChoices) {
+  } else if (choices.length > AUTOGEN_MAX_CHOICES) {
     let feedback = new contentTypes.Feedback({
       body,
     });

@@ -23,34 +23,67 @@ import { LikertScale } from 'data/content/feedback/likert_scale';
 import { FeedbackChoice } from 'data/content/feedback/feedback_choice';
 import { FeedbackPrompt } from 'data/content/feedback/feedback_prompt';
 import { LikertLabel } from 'data/content/feedback/likert_label';
+import { modelWithDefaultFeedback } from 'editors/content/part/defaultFeedbackGenerator';
+import { CombinationsMap, PermutationsMap } from 'types/combinations';
 
-export function createMultipleChoiceQuestion(select: string) {
+export function createMultipleChoiceQuestion(
+  select: string, onGetChoiceCombinations: (comboNum: number) => CombinationsMap,
+) {
   let model = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
   let item = new contentTypes.MultipleChoice();
 
-  const value = select === 'multiple' ? 'A' : guid().replace('-', '');
-  const match = select === 'multiple' ? 'A' : value;
+  const correctValue = select === 'multiple' ? 'A' : guid().replace('-', '');
+  const incorrectValue = select === 'multiple' ? 'B' : guid().replace('-', '');
+  const correctMatch = select === 'multiple' ? 'A' : correctValue;
 
-  const choice = contentTypes.Choice.fromText('', guid()).with({ value });
-  const feedback = contentTypes.Feedback.fromText('', guid());
-  let response = new contentTypes.Response({ match });
-  response = response.with({
+  const correctChoice = contentTypes.Choice.fromText('', guid()).with({ value: correctValue });
+  const incorrectChoice = contentTypes.Choice.fromText('', guid()).with({ value: incorrectValue });
+  const correctFeedback = contentTypes.Feedback.fromText('', guid());
+  let correctResponse = new contentTypes.Response();
+  correctResponse = correctResponse.with({
     guid: guid(),
+    match: correctMatch,
     score: '1',
-    feedback: response.feedback.set(feedback.guid, feedback),
+    feedback: correctResponse.feedback.set(correctFeedback.guid, correctFeedback),
   });
 
-  const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
+  const choices = Immutable.OrderedMap<string, contentTypes.Choice>()
+    .set(correctChoice.guid, correctChoice)
+    .set(incorrectChoice.guid, incorrectChoice);
+
   const responses = Immutable.OrderedMap<string, contentTypes.Response>()
-    .set(response.guid, response);
+    .set(correctResponse.guid, correctResponse);
 
   item = item.with({ guid: guid(), select, choices });
 
   model = model.with({ items: model.items.set(item.guid, item) });
 
-  let part = new contentTypes.Part();
-  part = part.with({ guid: guid(), responses });
+  let part = new contentTypes.Part().with({ guid: guid(), responses });
+
+  if (select === 'single') {
+    const incorrectFeedback = contentTypes.Feedback.fromText('', guid());
+    let incorrectResponse = new contentTypes.Response({ match: incorrectValue });
+    incorrectResponse = incorrectResponse.with({
+      feedback: incorrectResponse.feedback.set(incorrectFeedback.guid, incorrectFeedback) });
+
+    part = part.with({
+      responses: part.responses.set(incorrectResponse.guid, incorrectResponse),
+    });
+  } else {
+    // update part model with default feedback
+    const defaultBody = ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+    part = modelWithDefaultFeedback(
+      part,
+      item.choices.toArray(),
+      defaultBody,
+      '0',
+      onGetChoiceCombinations,
+    );
+  }
+
   model = model.with({ parts: model.parts.set(part.guid, part) });
+
+  console.log('model', model)
 
   return model;
 }
@@ -59,20 +92,25 @@ export function createSupportingContent() {
   return contentTypes.Content.fromText('', guid());
 }
 
-export function createOrdering() {
-  const value = 'A';
+export function createOrdering(onGetChoicePermutations: (comboNum: number) => PermutationsMap) {
+  const firstValue = 'A';
+  const secondValue = 'B';
 
   let question = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
 
-  const choice = contentTypes.Choice.fromText('', guid()).with({ value });
-  const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
+  const correctChoice = contentTypes.Choice.fromText('', guid()).with({ value: firstValue });
+  const incorrectChoice = contentTypes.Choice.fromText('', guid()).with({ value: secondValue });
+  const choices = Immutable.OrderedMap<string, contentTypes.Choice>()
+    .set(correctChoice.guid, correctChoice)
+    .set(incorrectChoice.guid, incorrectChoice);
   const item = new contentTypes.Ordering().with({ choices });
   question = question.with({ items: question.items.set(item.guid, item) });
 
   const feedback = contentTypes.Feedback.fromText('', guid());
-  let response = new contentTypes.Response({ match: value });
+  let response = new contentTypes.Response();
   response = response.with({
     guid: guid(),
+    match: `${firstValue},${secondValue}`,
     score: '1',
     feedback: response.feedback.set(feedback.guid, feedback),
   });
@@ -80,7 +118,18 @@ export function createOrdering() {
   const responses = Immutable.OrderedMap<string, contentTypes.Response>()
     .set(response.guid, response);
 
-  const part = new contentTypes.Part().with({ responses });
+  let part = new contentTypes.Part().with({ responses });
+
+  // update part model with default feedback
+  const defaultBody = ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
+  part = modelWithDefaultFeedback(
+    part,
+    item.choices.toArray(),
+    defaultBody,
+    '0',
+    onGetChoicePermutations,
+  );
+
   return question.with({ parts: question.parts.set(part.guid, part) });
 }
 

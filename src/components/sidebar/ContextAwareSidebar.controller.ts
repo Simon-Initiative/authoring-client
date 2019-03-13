@@ -14,6 +14,8 @@ import { AppServices } from 'editors/common/AppServices';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentModel, CourseModel, Node } from 'data/models';
 import { modalActions } from 'actions/modal';
+import { CombinationsMap } from 'types/combinations';
+import { computeCombinations } from 'actions/choices';
 
 interface StateProps {
   content: Maybe<ContentElement>;
@@ -34,6 +36,7 @@ interface DispatchProps {
   onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: Node | string) => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
+  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
 interface OwnProps {
@@ -83,6 +86,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
       dispatch(setCurrentNodeOrPage(documentId, nodeOrPageId)),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
+    onGetChoiceCombinations: (comboNum: number): CombinationsMap => {
+      return dispatch(computeCombinations(comboNum));
+    },
   };
 };
 

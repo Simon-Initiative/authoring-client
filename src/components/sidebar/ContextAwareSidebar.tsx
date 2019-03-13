@@ -32,6 +32,7 @@ import { Button } from 'editors/content/common/Button';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
+import { CombinationsMap } from 'types/combinations';
 
 interface SidebarRowProps {
   label?: string;
@@ -138,6 +139,7 @@ export interface ContextAwareSidebarProps {
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   timeSkewInMs: number;
+  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
 export interface ContextAwareSidebarState {
@@ -184,14 +186,14 @@ export class ContextAwareSidebar
   }
 
   onAddPage() {
-    const { model, onEditModel } = this.props;
+    const { model, onEditModel, onGetChoiceCombinations } = this.props;
     const assessmentModel = model as AssessmentModel;
 
     const text = 'New Page ' + (assessmentModel.pages.size + 1);
     let page = new contentTypes.Page()
       .with({ title: contentTypes.Title.fromText(text) });
 
-    const question = createMultipleChoiceQuestion('single');
+    const question = createMultipleChoiceQuestion('single', onGetChoiceCombinations);
 
     page = page.with({
       nodes: page.nodes.set(question.guid, question),

@@ -297,7 +297,7 @@ export class MultipleChoice
             onEditChoice={this.onChoiceEdit}
             onEditFeedback={this.onFeedbackEdit}
             onEditScore={this.onScoreEdit}
-            onRemove={this.props.itemModel.choices.size > 1 ?
+            onRemove={this.props.itemModel.choices.size > 2 ?
               choiceId => this.onRemoveChoice(choiceId, response) :
               undefined
             }

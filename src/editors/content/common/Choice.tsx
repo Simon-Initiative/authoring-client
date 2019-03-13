@@ -217,8 +217,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
             {wasLastCorrectChoice ? (
               <div className="message alert alert-warning">
                 <i className="fa fa-exclamation-circle" />
-                {' Correct choices not updated. \
-                  There must be at least one choice'}
+                {' Feedback requires at least one correct choice. Please select a correct choice'}
               </div>
             )
               : null}
