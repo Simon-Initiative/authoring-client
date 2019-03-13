@@ -333,8 +333,6 @@ export class NavigationPanel
   onPreview(redeploy: boolean = true): Promise<void> {
     const { router, onPreview } = this.props;
 
-    console.log('courseId', router.courseId.valueOr(''), 'orgId', router.orgId.valueOr(''));
-
     return onPreview(
       router.courseId.valueOr(''),
       router.orgId.valueOr(''),
