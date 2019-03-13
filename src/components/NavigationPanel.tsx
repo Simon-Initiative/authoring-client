@@ -320,8 +320,53 @@ export class NavigationPanel
       'navbar_collapsed_' + username, `${collapsed}`);
   }
 
-  updateActiveOrgPref = (courseGuid: string, username: string, orgId: string) => {
-    saveToLocalStorage(this.activeOrgKey(courseGuid, username), JSON.stringify({ org: orgId }));
+  updateActiveOrgPref = (courseGuid: string, username: string, organizationGuid: string) => {
+    const key = 'activeOrganization';
+
+    const defaultValueObject = {
+      user: {
+        [username]: {
+          course: {
+            [courseGuid]: {
+              organization: organizationGuid,
+            },
+          },
+        },
+      },
+    };
+
+    Maybe.maybe(loadFromLocalStorage(key))
+      .caseOf({
+        just: (obj) => {
+          if (obj.user) {
+            if (obj.user[username]) {
+              if (obj.user[username].course) {
+                if (obj.user[username].course[courseGuid]) {
+                  obj.user[username].course[courseGuid].organization = organizationGuid;
+                } else {
+                  obj.user[username].course[courseGuid] = { organization: organizationGuid };
+                }
+              } else {
+                obj.user[username].course = { [courseGuid]: { organization: organizationGuid } };
+              }
+            } else {
+              obj.user[username] = { course: { [courseGuid]: { organization: organizationGuid } } };
+            }
+          } else {
+            obj.user = {
+              [username]: {
+                course: {
+                  [courseGuid]: {
+                    organization: organizationGuid,
+                  },
+                },
+              },
+            };
+          }
+          saveToLocalStorage(key, JSON.stringify(obj));
+        },
+        nothing: () => saveToLocalStorage(key, JSON.stringify(defaultValueObject)),
+      });
   }
 
   getWidth = () => {
@@ -443,11 +488,8 @@ export class NavigationPanel
 
                   if (org.id !== currentOrg.id) {
                     this.props.onReleaseOrg();
-<<<<<<< HEAD
-                    this.updateActiveOrgPref(course.guid, profile.username, org.id);
-=======
+                    this.updateActiveOrgPref(course.guid, profile.username, org.guid);
                     this.props.onLoadOrg(course.guid, org.guid);
->>>>>>> SPRINT-0.24.0
                     viewActions.viewDocument(org.guid, course.guid, org.guid);
                   }
 

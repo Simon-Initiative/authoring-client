@@ -6,6 +6,8 @@ import * as orgActions from 'actions/orgs';
 import { LegacyTypes } from 'data/types';
 import * as router from 'actions/router';
 import { State } from 'reducers';
+import { Maybe } from 'tsmonad';
+import { loadFromLocalStorage } from 'utils/localstorage';
 
 function isDifferentCourse(getState, courseId): boolean {
   const course: models.CourseModel = getState().course;
@@ -124,7 +126,7 @@ export function viewAllCourses() {
 
 
 export function viewCourse(courseId: string) {
-  return function (dispatch, getState) {
+  return function (dispatch, getState: () => State) {
     dispatch(courseActions.loadCourse(courseId)).then((c) => {
 
       // This ensures that we wipe any messages displayed from
@@ -149,12 +151,22 @@ export function viewCourse(courseId: string) {
         },
         nothing: () => {
           dispatch(orgActions.releaseOrg());
-          dispatch(orgActions.load(courseId, orgs[0].guid));
-          dispatch(viewDocument(courseId, courseId, orgs[0].guid));
+          let savedOrg;
+          Maybe.maybe(loadFromLocalStorage('activeOrganization'))
+            .lift((obj) => {
+              const username = getState().user.profile.username;
+              if (obj && obj.user && obj.user[username] &&
+                obj.user[username].course && obj.user[username].course[courseId] &&
+                obj.user[username] && obj.user[username].course[courseId].organization) {
+                savedOrg = orgs.find(res => res.guid ===
+                  obj.user[username].course[courseId].organization);
+              }
+            });
+          const orgGuid = savedOrg ? savedOrg.guid : orgs[0].guid;
+          dispatch(orgActions.load(courseId, orgGuid));
+          dispatch(viewDocument(courseId, courseId, orgGuid));
         },
       });
-
-
     });
   };
 }
