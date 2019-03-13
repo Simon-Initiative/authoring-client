@@ -17,6 +17,7 @@ import { Maybe } from 'tsmonad';
 import { NavigationItem } from 'types/navigation';
 
 import './OrgEditor.scss';
+import { Tooltip } from 'utils/tooltip';
 
 function isNumberedNodeType(node: any) {
   return (node.contentType === contentTypes.OrganizationContentTypes.Unit
@@ -361,23 +362,34 @@ class OrgEditor extends React.Component<OrgEditorProps,
         isSelected = node.id === id;
       }
 
-      return <TreeNode
-        isSelected={isSelected}
-        key={node.guid}
-        onClick={this.onClickComponent}
-        numberAtLevel={numberAtLevel}
-        highlighted={this.state.highlightedNodes.has(node.guid)}
-        labels={this.props.model.labels}
-        model={node}
-        org={this.props.model}
-        context={this.props.context}
-        parentModel={parent}
-        onEdit={this.onNodeEdit}
-        editMode={this.props.editMode}
-        isExpanded={isExpanded(getExpandId(node))}
-        onReposition={this.onReposition.bind(this)}
-        indexWithinParent={index}
-        depth={depth} />;
+      return <Tooltip
+        title={node.title}
+        delay={200}
+        offset={30}
+        distance={- depth * 20 - 10}
+        size="regular"
+        position="right"
+        arrow={false}
+        theme="light"
+        style={{ overflow: 'visible' }}>
+        <TreeNode
+          isSelected={isSelected}
+          key={node.guid}
+          onClick={this.onClickComponent}
+          numberAtLevel={numberAtLevel}
+          highlighted={this.state.highlightedNodes.has(node.guid)}
+          labels={this.props.model.labels}
+          model={node}
+          org={this.props.model}
+          context={this.props.context}
+          parentModel={parent}
+          onEdit={this.onNodeEdit}
+          editMode={this.props.editMode}
+          isExpanded={isExpanded(getExpandId(node))}
+          onReposition={this.onReposition.bind(this)}
+          indexWithinParent={index}
+          depth={depth} />
+      </Tooltip>;
     };
 
     return (
