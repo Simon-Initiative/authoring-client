@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
+import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
@@ -26,11 +26,9 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
     this.props.onChangeCurrent(page.guid);
   }
 
-  onTitleEdit = (page: contentTypes.Page, text: string) => {
+  onTitleEdit = (page: contentTypes.Page, text: ContentElements) => {
     this.props.onEdit(page.with({
-      title: new contentTypes.Title({
-        text: ContentElements.fromText(text, '', TEXT_ELEMENTS),
-      }),
+      title: page.title.with({ text }),
     }));
   }
 
@@ -59,7 +57,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
             onFocus={this.props.onFocus}
             model={page.title.text}
             editMode={this.props.editMode}
-            onEdit={text => this.onTitleEdit(page, text.extractPlainText().valueOr(''))}
+            onEdit={text => this.onTitleEdit(page, text)}
           />
         </td>
 
