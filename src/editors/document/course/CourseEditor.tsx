@@ -392,13 +392,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         className="btn-secondary actionButton requestProd"
         onClick={() => this.onRequestDeployment(DeployStage.prod, redeploy)} />;
 
-    const organizationOption = (org: Resource) =>
-      <option
-        key={org.guid}
-        value={org.guid}>
-        {org.title}
-      </option>;
-
     const actions = [];
 
     switch (model.deploymentStatus) {
