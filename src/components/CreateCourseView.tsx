@@ -7,8 +7,10 @@ import * as viewActions from '../actions/view';
 import './CreateCourseView.scss';
 import { Toast, Severity } from 'components/common/Toast';
 import { CourseCreation } from 'components/CourseCreation';
+import { buildAggregateModel } from './objectives/persistence';
 
 export interface CreateCourseViewProps {
+  userName: string;
   dispatch: any;
 }
 
@@ -41,6 +43,8 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
         if (document.model.modelType === models.ModelTypes.CourseModel) {
           this.props.dispatch(viewActions.viewCourse(document._courseId));
         }
+
+        return buildAggregateModel(document._courseId, this.props.userName);
       })
       .catch((err) => {
         this.setState({ waiting: false, error: true });
