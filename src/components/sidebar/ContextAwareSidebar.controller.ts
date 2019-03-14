@@ -87,7 +87,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
     onGetChoiceCombinations: (comboNum: number): CombinationsMap => {
-      return dispatch(computeCombinations(comboNum));
+      return dispatch(computeCombinations(comboNum) as any);
     },
   };
 };

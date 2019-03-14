@@ -31,15 +31,15 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
     onGetChoiceCombinations: (comboNum: number): CombinationsMap => {
-      return dispatch(computeCombinations(comboNum));
+      return dispatch(computeCombinations(comboNum) as any);
     },
     onGetChoicePermutations: (comboNum: number): PermutationsMap => {
-      return dispatch(computePermutations(comboNum));
+      return dispatch(computePermutations(comboNum) as any);
     },
   };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(AddQuestion);
+  (mapStateToProps, mapDispatchToProps)(AddQuestion);
 
 export { controller as AddQuestion };
