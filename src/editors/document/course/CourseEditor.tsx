@@ -71,16 +71,18 @@ export class RequestButton extends React.Component<RequestButtonProps, RequestBu
   }
 
   render() {
-    const { text, className } = this.props;
+    const { text, className, children } = this.props;
     const { pending, successful, failed } = this.state;
 
     return (
       <span>
         <button
+          style={{ marginRight: '5px' }}
           className={`btn ${className}`}
           onClick={this.onClickWithState()}>
           {text}
-        </button>&nbsp;
+          {children}
+        </button>
         {pending ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : null}
         {successful ? <i className="fa fa-check-circle" /> : null}
         {failed ? <i className="fa fa-times-circle" /> : null}

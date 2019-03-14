@@ -202,6 +202,12 @@ export const styles: JSSStyles = {
   },
   publishActions: {
     margin: [2, 15],
+
+    publishAction: {
+      span: {
+        marginRight: 5,
+      },
+    },
   },
 };
 
@@ -501,15 +507,27 @@ export class NavigationPanel
         </div>
 
         <div className={classes.publishActions}>
-          <RequestButton text="Preview Course" className="btn-primary previewButton"
-            onClick={() => this.onPreview()} />&nbsp;&nbsp;
-          <HelpPopover>
-            You can launch a <strong>full preview</strong> for the complete course package
-          using the active organization to allow it to be viewed publically.<br /><br />
-            It may take a few minutes to create the full preview for larger courses.
-          </HelpPopover>
+          {collapsed
+            ? (
+              <RequestButton text="" className="btn-primary previewButton"
+                onClick={() => this.onPreview()}><i className="fa fa-book-reader" /></RequestButton>
+            )
+            : (
+              <div className={classes.publishAction}>
+                <RequestButton text="Preview Course" className="btn-primary previewButton"
+                  onClick={() => this.onPreview()} />
+                {this.getWidth() > 190
+                  ? <HelpPopover>
+                    You can launch a full course preview using the active organization to allow
+                    it to be viewed publically.
+                      <br /><br />
+                    It may take a few minutes for larger courses.
+                    </HelpPopover>
+                  : null}
+              </div>
+            )
+          }
         </div>
-
       </div>
     );
   }
