@@ -37,7 +37,7 @@ export const getNameAndIconByType = (type: string) => caseOf<TitleIcon>(type)({
   },
   [LegacyTypes.feedback]: {
     name: 'Survey',
-    icon: <i className="title-icon far fa-check-square" />,
+    icon: <i className="title-icon fas fa-poll" />,
   },
   [LegacyTypes.workbook_page]: {
     name: 'Workbook Page',

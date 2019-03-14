@@ -165,7 +165,7 @@ export default class ActivityEditor
     let activityIcon = 'fa fa-check';
     if (this.isFeedback()) {
       activityType = 'Survey';
-      activityIcon = 'far fa-check-square';
+      activityIcon = 'fas fa-poll';
     }
     if (resource.type === LegacyTypes.workbook_page) {
       activityType = 'Workbook Page';

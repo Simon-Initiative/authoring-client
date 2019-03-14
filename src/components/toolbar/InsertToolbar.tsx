@@ -636,7 +636,7 @@ export class InsertToolbar
                   />)
                 }
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'far fa-check-square'} />
+                <i style={{ width: 22 }} className={'fas fa-poll'} />
                 Insert survey
                 </ToolbarButtonMenuItem>
 
@@ -658,7 +658,7 @@ export class InsertToolbar
 
                 }}
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'far fa-check-square'} />
+                <i style={{ width: 22 }} className={'fas fa-poll'} />
                 Create survey
                 </ToolbarButtonMenuItem>
 
