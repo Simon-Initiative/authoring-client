@@ -203,7 +203,7 @@ export const styles: JSSStyles = {
     zIndex: 1000,
   },
   publishActions: {
-    margin: [2, 0, 2, 25],
+    margin: [2, 0, 2, 20],
 
     publishAction: {
       span: {
