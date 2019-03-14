@@ -9,7 +9,7 @@ import { State } from 'reducers';
 import { Dispatch } from 'redux';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-
+import { filter } from 'data/utils/map';
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
 
@@ -92,7 +92,12 @@ export function paste() {
         nothing: () => false,
       });
       if (isSupported) {
-        parent.onPaste(elementToPaste, textSelection);
+
+        // Remove any inline assessments or multipanels, as these would introduce
+        // a duplicate inline - which breaks validation
+        const filtered = filter(
+          e => e.contentType !== 'WbInline' && e.contentType !== 'Multipanel', elementToPaste);
+        parent.onPaste(filtered, textSelection);
       }
     }
   };
