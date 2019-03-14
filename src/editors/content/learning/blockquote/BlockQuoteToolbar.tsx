@@ -180,7 +180,8 @@ export default class BlockQuoteToolbar
             onClick={
               () => {
                 onEdit(model.with({
-                  text: model.text.addEntity(EntityTypes.link, true,
+                  text: model.text.addEntity(
+                    EntityTypes.link, true,
                     new contentTypes.Link(), selection),
                 }));
               }
@@ -193,7 +194,8 @@ export default class BlockQuoteToolbar
             onClick={
               () => {
                 onEdit(model.with({
-                  text: model.text.addEntity(EntityTypes.xref, true,
+                  text: model.text.addEntity(
+                    EntityTypes.xref, true,
                     new contentTypes.Xref(), selection),
                 }));
               }

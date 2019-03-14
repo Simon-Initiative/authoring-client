@@ -687,14 +687,16 @@ export class Objective
                 })}
                 <i className={classNames(['far fa-file', classes.detailsSectionIcon])} />
                 Pages
-              {orgWorkbookPageRefs.caseOf({
-                  just: refs => (
-                    <span className={classNames(['badge badge-light', classes.countBadge])}>
-                      {refs.size}
-                    </span>
-                  ),
-                  nothing: () => null,
-                })}
+              {
+                  orgWorkbookPageRefs.caseOf({
+                    just: refs => (
+                      <span className={classNames(['badge badge-light', classes.countBadge])}>
+                        {refs.size}
+                      </span>
+                    ),
+                    nothing: () => null,
+                  })
+                }
               </h3>
               {orgWorkbookPageRefs.caseOf({
                 just: (refs) => {
