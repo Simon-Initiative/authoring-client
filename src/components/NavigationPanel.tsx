@@ -203,11 +203,11 @@ export const styles: JSSStyles = {
     zIndex: 1000,
   },
   publishActions: {
-    margin: [2, 15],
+    margin: [2, 0, 2, 25],
 
     publishAction: {
       span: {
-        marginRight: 5,
+        marginRight: 10,
       },
     },
   },
@@ -355,12 +355,16 @@ export class NavigationPanel
   onPreview(redeploy: boolean = true): Promise<void> {
     const { router, onPreview } = this.props;
 
-    return onPreview(
-      router.courseId.valueOr(''),
-      router.orgId.valueOr(''),
-      redeploy)
-      // More robust error handling needs to be built out
-      .catch(err => console.error('Full preview error:', err));
+    return router.courseId.caseOf({
+      just: courseId =>
+        router.orgId.caseOf({
+          just: orgId =>
+            onPreview(courseId, orgId, redeploy)
+              .catch(err => console.error('Full preview error:', err)),
+          nothing: () => Promise.reject(null),
+        }),
+      nothing: () => Promise.reject(null),
+    });
   }
 
   render() {
@@ -525,24 +529,21 @@ export class NavigationPanel
 
         <div className={classes.publishActions}>
           {collapsed
-            ? (
-              <RequestButton text="" className="btn-primary previewButton"
-                onClick={() => this.onPreview()}><i className="fa fa-book-reader" /></RequestButton>
-            )
-            : (
-              <div className={classes.publishAction}>
-                <RequestButton text="Preview Course" className="btn-primary previewButton"
+            ? <RequestButton text="" className="btn-primary previewButton"
+              onClick={() => this.onPreview()}><i className="fa fa-eye" /></RequestButton>
+            : <div className={classes.publishAction}>
+              {this.getWidth() < 210
+                ? <RequestButton text="Preview" className="btn-primary previewButton"
                   onClick={() => this.onPreview()} />
-                {this.getWidth() > 190
-                  ? <HelpPopover>
-                    You can launch a full course preview using the active organization to allow
-                    it to be viewed publically.
-                      <br /><br />
-                    It may take a few minutes for larger courses.
-                    </HelpPopover>
-                  : null}
-              </div>
-            )
+                : <RequestButton text="Preview Course" className="btn-primary previewButton"
+                  onClick={() => this.onPreview()} />}
+              <HelpPopover>
+                You can launch a full course preview using the active organization to allow
+                it to be viewed publically.
+                <br /><br />
+                It may take a few minutes for larger courses.
+              </HelpPopover>
+            </div>
           }
         </div>
       </div>
