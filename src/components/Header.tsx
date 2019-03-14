@@ -77,7 +77,9 @@ const styles: JSSStyles = {
   },
 
   headerUserProfile: {
-    textAlign: 'right',
+    '& .dropdown-menu.dropdown-menu-right': {
+      textAlign: 'center',
+    },
     headerLink: {
       marginRight: 0,
     },
