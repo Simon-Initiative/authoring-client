@@ -14,6 +14,7 @@ import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
+import { ACTIVE_ORG_STORAGE_KEY, activeOrgUserKey } from 'actions/utils/activeOrganization';
 
 const DEFAULT_WIDTH_PX = 400;
 const COLLAPSED_WIDTH_PX = 80;
@@ -204,7 +205,6 @@ export interface NavigationPanelProps {
   course: CourseModel;
   viewActions: viewActions.ViewActions;
   router: RouterState;
-  activeOrg: Maybe<Document>;
   profile: UserProfile;
   userId: string;
   userName: string;
@@ -314,6 +314,21 @@ export class NavigationPanel
       'navbar_width_' + username, `${width}`);
     saveToLocalStorage(
       'navbar_collapsed_' + username, `${collapsed}`);
+  }
+
+  updateActiveOrgPref = (courseGuid: string, username: string, organizationGuid: string) => {
+
+    const userKey = activeOrgUserKey(username, courseGuid);
+
+    Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
+      .caseOf({
+        just: (prefs) => {
+          prefs[userKey] = organizationGuid;
+          saveToLocalStorage(ACTIVE_ORG_STORAGE_KEY, JSON.stringify(prefs));
+        },
+        nothing: () => saveToLocalStorage(
+          ACTIVE_ORG_STORAGE_KEY, JSON.stringify({ [userKey]: organizationGuid })),
+      });
   }
 
   getWidth = () => {
@@ -435,6 +450,7 @@ export class NavigationPanel
 
                   if (org.id !== currentOrg.id) {
                     this.props.onReleaseOrg();
+                    this.updateActiveOrgPref(course.guid, profile.username, org.guid);
                     this.props.onLoadOrg(course.guid, org.guid);
                     viewActions.viewDocument(org.guid, course.guid, org.guid);
                   }
