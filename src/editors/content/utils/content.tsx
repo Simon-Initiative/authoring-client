@@ -117,7 +117,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.CellData: return <i style={style} className={'fa fa-table'} />;
     case i.CellHeader: return <i style={style} className={'fa fa-table'} />;
     case i.CodeBlock: return <i style={style} className={'fa fa-code'} />;
-    case i.Command: return <i style={style} className={'fa fa-toggle-right'} />;
+    case i.Command: return <i style={style} className={'far fa-caret-square-right'} />;
     case i.Composite: return <i style={style} className={'fa fa-clone'} />;
     case i.Conjugate: return <i style={style} className={'fa fa-language'} />;
     case i.Conjugation: return <i style={style} className={'fa fa-language'} />;
@@ -149,8 +149,8 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Figure: return <i style={style} className={'fa fa-address-card'} />;
     case i.Flash: return <i style={style} className={'fa fa-bolt'} />;
     case i.Hint: return <i style={style} className={'far fa-hand-point-right'} />;
-    case i.IFrame: return <i style={style} className={'fa fa-window-maximize'} />;
-    case i.Inquiry: return <i style={style} className={'far fa-comment-alt'} />;
+    case i.IFrame: return <i style={style} className={'far fa-window-maximize'} />;
+    case i.Inquiry: return <i style={style} className={'fas fa-comment-alt'} />;
     case i.InquiryQuestion: return <i style={style} className={'fa fa-question'} />;
     case i.Image: return <i style={style} className={'fa fa-image'} />;
     case i.Instructions: return <i style={style} className={'fas fa-file-alt'} />;
@@ -178,7 +178,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Unity: return <i style={style} className={'fa fa-gamepad'} />;
     case i.Video: return <i style={style} className={'fa fa-film'} />;
     case i.WbInline: return <i style={style} className={'fa fa-flask'} />;
-    case i.YouTube: return <i style={style} className={'fa fa-youtube'} />;
+    case i.YouTube: return <i style={style} className={'fab fa-youtube'} />;
     default: return <i style={style} className={'fa fa-question'} />;
   }
 };

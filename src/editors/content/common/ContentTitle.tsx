@@ -17,7 +17,7 @@ export const RemoveButton =
       <div
         className={`action-btn action-btn-remove ${canRemove ? '' : 'disabled'}`}
         onClick={canRemove ? onClick : () => { }}>
-        <i className="fa fa-trash-o" />
+        <i className="fas fa-trash" />
         Delete
     </div>;
 
@@ -46,10 +46,10 @@ export const ContentTitle: React.StatelessComponent<ContentTitleProps> = ({
 
       {onDuplicate
         ? <div
-        className={`action-btn action-btn-duplicate`}
-        onClick={onDuplicate}>
-        <i className="fa fa-copy" />
-        Duplicate
+          className={`action-btn action-btn-duplicate`}
+          onClick={onDuplicate}>
+          <i className="fa fa-copy" />
+          Duplicate
       </div>
         : null}
 
