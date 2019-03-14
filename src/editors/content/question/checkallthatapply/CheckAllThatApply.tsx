@@ -12,13 +12,13 @@ import { Button } from '../../common/controls';
 import { CombinationsMap } from 'types/combinations';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 import {
-  AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem,
+  AUTOGEN_MAX_CHOICES, autogenResponseFilter,
   modelWithDefaultFeedback,
+  getGeneratedResponseBody,
+  getGeneratedResponseScore,
 } from 'editors/content/part/defaultFeedbackGenerator';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import createGuid from 'utils/guid';
-import { ContentElements } from 'data/content/common/elements';
-import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 
 export interface CheckAllThatApplyProps extends QuestionProps<contentTypes.MultipleChoice> {
   advancedScoringInitialized: boolean;
@@ -186,17 +186,12 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     if (advancedScoring && isComplexFeedback(partModel)) {
       let updatedPartModel = resetAllFeedback(partModel);
 
-      const generated = getGeneratedResponseItem(updatedPartModel);
-      const body = generated ? generated.feedback.first().body
-        : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
-
       // update part model with default feedback
       updatedPartModel = modelWithDefaultFeedback(
         updatedPartModel,
         itemModel.choices.toArray(),
-        body,
-        generated ? generated.score : '0',
-        AUTOGEN_MAX_CHOICES,
+        getGeneratedResponseBody(updatedPartModel),
+        getGeneratedResponseScore(updatedPartModel),
         onGetChoiceCombinations,
       );
 
@@ -286,16 +281,11 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     // because we changed response match values, we must update choice refs
     // const updatedModels = updateChoiceValuesAndRefs(itemModel, updatedPartModel);
 
-    const generated = getGeneratedResponseItem(updatedPartModel);
-    const body = generated ? generated.feedback.first().body
-      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
-
     updatedPartModel = modelWithDefaultFeedback(
       updatedPartModel,
       itemModel.choices.toArray(),
-      body,
-      generated ? generated.score : '0',
-      AUTOGEN_MAX_CHOICES,
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
       this.props.onGetChoiceCombinations,
     );
 
@@ -354,17 +344,12 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     updatedItemModel = itemModel.with(
       { choices: itemModel.choices.set(choice.guid, choice) });
 
-    const generated = getGeneratedResponseItem(updatedPartModel);
-    const body = generated ? generated.feedback.first().body
-      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
-
     // update part model with default feedback
     updatedPartModel = modelWithDefaultFeedback(
       updatedPartModel,
       updatedItemModel.choices.toArray(),
-      body,
-      generated ? generated.score : '0',
-      AUTOGEN_MAX_CHOICES,
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
       onGetChoiceCombinations,
     );
 
@@ -408,17 +393,12 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       updatedItemModel = updatedModels.itemModel;
       updatedPartModel = updatedModels.partModel;
 
-      const generated = getGeneratedResponseItem(updatedPartModel);
-      const body = generated ? generated.feedback.first().body
-        : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
-
       // update part model with default feedback
       updatedPartModel = modelWithDefaultFeedback(
         updatedPartModel,
         updatedItemModel.choices.toArray(),
-        body,
-        generated ? generated.score : '0',
-        AUTOGEN_MAX_CHOICES,
+        getGeneratedResponseBody(updatedPartModel),
+        getGeneratedResponseScore(updatedPartModel),
         onGetChoiceCombinations,
       );
 
@@ -477,17 +457,12 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       choices: this.props.itemModel.choices.set(c.guid, c),
     });
 
-    const generated = getGeneratedResponseItem(updatedPartModel);
-    const body = generated ? generated.feedback.first().body
-      : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
-
     // update part model with default feedback
     updatedPartModel = modelWithDefaultFeedback(
       updatedPartModel,
       updatedItemModel.choices.toArray(),
-      body,
-      generated ? generated.score : '0',
-      AUTOGEN_MAX_CHOICES,
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
       onGetChoiceCombinations,
     );
 
@@ -530,7 +505,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             editMode={editMode}
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
-            onRemove={itemModel.choices.size > 1
+            onRemove={itemModel.choices.size > 2
               ? choiceId => this.onRemoveChoice(choiceId)
               : undefined
             }
@@ -617,7 +592,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
                   }
                 }
               }}
-              hideOther={itemModel.choices.size <= 1}
+              hideIncorrect={itemModel.choices.size <= 1}
               onEdit={this.onPartEdit}
               branchingQuestions={this.props.branchingQuestions}
             />

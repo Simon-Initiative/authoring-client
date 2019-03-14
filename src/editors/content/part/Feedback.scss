@@ -1,12 +1,18 @@
 @import 'oli/colors';
 @import 'oli/mixins';
 
-.feedbacks {
+.feedback {
   @include disable-select;
 
   .feedback-items {
     .response {
       margin-bottom: 25px;
+    }
+  }
+
+  .score {
+    input {
+      width: 80px;
     }
   }
 }
