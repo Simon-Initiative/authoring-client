@@ -14,6 +14,7 @@ import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
+import { ACTIVE_ORG_STORAGE_KEY, activeOrgUserKey } from 'actions/utils/activeOrganization';
 
 const DEFAULT_WIDTH_PX = 400;
 const COLLAPSED_WIDTH_PX = 80;
@@ -316,51 +317,17 @@ export class NavigationPanel
   }
 
   updateActiveOrgPref = (courseGuid: string, username: string, organizationGuid: string) => {
-    const key = 'activeOrganization';
 
-    const defaultValueObject = {
-      user: {
-        [username]: {
-          course: {
-            [courseGuid]: {
-              organization: organizationGuid,
-            },
-          },
-        },
-      },
-    };
+    const userKey = activeOrgUserKey(username, courseGuid);
 
-    Maybe.maybe(loadFromLocalStorage(key))
+    Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
       .caseOf({
-        just: (obj) => {
-          if (obj.user) {
-            if (obj.user[username]) {
-              if (obj.user[username].course) {
-                if (obj.user[username].course[courseGuid]) {
-                  obj.user[username].course[courseGuid].organization = organizationGuid;
-                } else {
-                  obj.user[username].course[courseGuid] = { organization: organizationGuid };
-                }
-              } else {
-                obj.user[username].course = { [courseGuid]: { organization: organizationGuid } };
-              }
-            } else {
-              obj.user[username] = { course: { [courseGuid]: { organization: organizationGuid } } };
-            }
-          } else {
-            obj.user = {
-              [username]: {
-                course: {
-                  [courseGuid]: {
-                    organization: organizationGuid,
-                  },
-                },
-              },
-            };
-          }
-          saveToLocalStorage(key, JSON.stringify(obj));
+        just: (prefs) => {
+          prefs[userKey] = organizationGuid;
+          saveToLocalStorage(ACTIVE_ORG_STORAGE_KEY, JSON.stringify(prefs));
         },
-        nothing: () => saveToLocalStorage(key, JSON.stringify(defaultValueObject)),
+        nothing: () => saveToLocalStorage(
+          ACTIVE_ORG_STORAGE_KEY, JSON.stringify({ [userKey]: organizationGuid })),
       });
   }
 

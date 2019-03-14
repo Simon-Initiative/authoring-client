@@ -8,6 +8,7 @@ import * as router from 'actions/router';
 import { State } from 'reducers';
 import { Maybe } from 'tsmonad';
 import { loadFromLocalStorage } from 'utils/localstorage';
+import { activeOrgUserKey, ACTIVE_ORG_STORAGE_KEY } from './utils/activeOrganization';
 
 function isDifferentCourse(getState, courseId): boolean {
   const course: models.CourseModel = getState().course;
@@ -152,14 +153,12 @@ export function viewCourse(courseId: string) {
         nothing: () => {
           dispatch(orgActions.releaseOrg());
           let savedOrg;
-          Maybe.maybe(loadFromLocalStorage('activeOrganization'))
-            .lift((obj) => {
+          Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
+            .lift((prefs) => {
               const username = getState().user.profile.username;
-              if (obj && obj.user && obj.user[username] &&
-                obj.user[username].course && obj.user[username].course[courseId] &&
-                obj.user[username] && obj.user[username].course[courseId].organization) {
-                savedOrg = orgs.find(res => res.guid ===
-                  obj.user[username].course[courseId].organization);
+              const userKey = activeOrgUserKey(username, courseId);
+              if (prefs[userKey]) {
+                savedOrg = orgs.find(res => res.guid === prefs[userKey]);
               }
             });
           const orgGuid = savedOrg ? savedOrg.guid : orgs[0].guid;
