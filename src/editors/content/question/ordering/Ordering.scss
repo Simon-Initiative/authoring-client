@@ -7,6 +7,12 @@
   .feedback-items {
     .response {
       margin-bottom: 25px;
+
+      &.simplefeedback {
+        &.input-list-item .input-list-item-content {
+          padding-left: 0px;
+        }
+      }
     }
   }
 

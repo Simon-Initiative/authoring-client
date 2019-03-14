@@ -27,6 +27,7 @@ import { ContentElements } from 'data/content/common/elements';
 
 import './Ordering.scss';
 import { ConditionalBranchSelect } from '../../common/BranchSelect';
+import { classNames } from 'styles/jss';
 
 export const isComplexFeedback = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.filter(autogenResponseFilter).toArray();
@@ -157,7 +158,6 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         itemModel.choices.toArray(),
         getGeneratedResponseBody(updatedPartModel),
         getGeneratedResponseScore(updatedPartModel),
-        AUTOGEN_MAX_CHOICES,
         onGetChoicePermutations,
       );
 
@@ -192,7 +192,6 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       updatedItemModel.choices.toArray(),
       getGeneratedResponseBody(updatedPartModel),
       getGeneratedResponseScore(updatedPartModel),
-      AUTOGEN_MAX_CHOICES,
       onGetChoicePermutations,
     );
 
@@ -254,7 +253,6 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       choices,
       getGeneratedResponseBody(updatedModel),
       getGeneratedResponseScore(updatedModel),
-      AUTOGEN_MAX_CHOICES,
       onGetChoicePermutations,
     );
 
@@ -275,7 +273,6 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       choices,
       getGeneratedResponseBody(updatedModel),
       getGeneratedResponseScore(updatedModel),
-      AUTOGEN_MAX_CHOICES,
       onGetChoicePermutations,
     );
 
@@ -323,7 +320,6 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       updatedItemModel.choices.toArray(),
       getGeneratedResponseBody(updatedPartModel),
       getGeneratedResponseScore(updatedPartModel),
-      AUTOGEN_MAX_CHOICES,
       onGetChoicePermutations,
     );
 
@@ -392,7 +388,6 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       itemModel.choices.toArray(),
       getGeneratedResponseBody(updatedPartModel),
       getGeneratedResponseScore(updatedPartModel),
-      AUTOGEN_MAX_CHOICES,
       onGetChoicePermutations,
     );
 
@@ -413,7 +408,6 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       choices,
       body,
       score,
-      AUTOGEN_MAX_CHOICES,
       onGetChoicePermutations,
       lang,
     );
@@ -443,7 +437,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
             branchingQuestions={this.props.branchingQuestions}
-            onRemove={this.props.itemModel.choices.size > 1 ?
+            onRemove={this.props.itemModel.choices.size > 2 ?
               choiceId => this.onRemoveChoice(choiceId) :
               undefined} />
         );
@@ -520,9 +514,9 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             onUpdateHover={this.props.onUpdateHover}
             onFocus={this.props.onFocus}
             key={response.guid}
-            className="response"
+            className={classNames(['response', !advancedScoring && 'simplefeedback'])}
             id={response.guid}
-            label={!advancedScoring ? '' : `${i + 1}`}
+            label={advancedScoring && `${i + 1}`}
             contentTitle={!advancedScoring ? 'Correct' : ''}
             context={context}
             services={services}
@@ -613,9 +607,9 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         onUpdateHover={this.props.onUpdateHover}
         onFocus={this.props.onFocus}
         key={defaultResponse.guid}
-        className="response"
+        className={classNames(['response', !advancedScoring && 'simplefeedback'])}
         id={defaultResponse.guid}
-        label=""
+        label={advancedScoring && ''}
         contentTitle="Incorrect"
         context={context}
         services={services}

@@ -5,7 +5,7 @@ import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import { Select, TextInput } from 'editors/content/common/controls';
-import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
+import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion.controller';
 import { PoolRefEditor } from 'editors/content/selection/PoolRefEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
