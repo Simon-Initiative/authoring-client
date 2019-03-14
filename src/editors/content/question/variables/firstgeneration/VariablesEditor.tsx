@@ -81,8 +81,8 @@ export class VariablesEditor
       ? this.state.results.get(variable.name).errored
         ? <span className={classNames([classes.error, className])}>Error</span>
         : <span className={classNames([classes.evaluated, className])}>
-            {this.state.results.get(variable.name).result}
-          </span>
+          {this.state.results.get(variable.name).result}
+        </span>
       : null;
 
     return (
@@ -125,7 +125,7 @@ export class VariablesEditor
               onClick={this.onRemoveVariable.bind(this, variable.guid)}
               type="button"
               className="btn btn-sm">
-              <i className="fa fa-close"></i>
+              <i className="fas fa-times"></i>
             </button>
           </span>
         </td>
@@ -178,11 +178,11 @@ export class VariablesEditor
     // variables
     const testButton = model.size > 0
       ? <button className="btn btn-sm btn-link" type="button"
-      disabled={!editMode}
-      onClick={() => this.onTestExpressions()}>
-      Test Expressions
+        disabled={!editMode}
+        onClick={() => this.onTestExpressions()}>
+        Test Expressions
     </button>
-    : null;
+      : null;
 
     return (
       <div className={classNames([classes.buttonPanel, className])}>
@@ -201,18 +201,18 @@ export class VariablesEditor
 
     const tableOrNot = model.size > 0
       ? <table className={classNames(['table', 'table-sm'])}>
-          <thead>
-            <tr>
-              <th>Var</th>
-              <th>Expression</th>
-              <th>Evaluation</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {model.toArray().map(v => this.renderVariable(v))}
-          </tbody>
-        </table>
+        <thead>
+          <tr>
+            <th>Var</th>
+            <th>Expression</th>
+            <th>Evaluation</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {model.toArray().map(v => this.renderVariable(v))}
+        </tbody>
+      </table>
       : null;
 
     return (

@@ -143,7 +143,7 @@ export default class ActivityEditor
         highlightColor={CONTENT_COLORS.Activity} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders" /></div>
+            <div><i className="fas fa-sliders-h" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
@@ -165,11 +165,11 @@ export default class ActivityEditor
     let activityIcon = 'fa fa-check';
     if (this.isFeedback()) {
       activityType = 'Survey';
-      activityIcon = 'fa fa-check-square-o';
+      activityIcon = 'far fa-check-square';
     }
     if (resource.type === LegacyTypes.workbook_page) {
       activityType = 'Workbook Page';
-      activityIcon = 'fa fa-file-o';
+      activityIcon = 'far fa-file';
     }
     if (resource.type === LegacyTypes.assessment2) {
       activityType = 'Summative Assessment';

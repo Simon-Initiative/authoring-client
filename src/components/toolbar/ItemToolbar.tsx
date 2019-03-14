@@ -132,7 +132,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             tooltip="Remove Item"
             size={ToolbarButtonSize.Wide}
             disabled={!editMode || !(this.hasSelection())}>
-            <i className="fa fa-close" /> Remove
+            <i className="fas fa-times" /> Remove
           </ToolbarButton>
         </ToolbarLayout.Column>
         <ToolbarLayout.Column>
@@ -141,14 +141,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             tooltip="Move Item Up"
             size={ToolbarButtonSize.Small}
             disabled={!editMode || !(this.hasSelection() && canMove)}>
-            <i className="fa fa-long-arrow-up" />
+            <i className="fas fa-long-arrow-alt-up" />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => this.getContainer().onMoveDown(this.getItem())}
             tooltip="Move Item Down"
             size={ToolbarButtonSize.Small}
             disabled={!editMode || !(this.hasSelection() && canMove)}>
-            <i className="fa fa-long-arrow-down" />
+            <i className="fas fa-long-arrow-alt-down" />
           </ToolbarButton>
         </ToolbarLayout.Column>
       </React.Fragment>

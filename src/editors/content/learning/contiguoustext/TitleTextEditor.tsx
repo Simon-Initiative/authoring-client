@@ -36,22 +36,22 @@ export const TitleTextEditor
         classes.titleTextEditor,
         !editMode && classes.disabled,
         className])}>
-          <ContiguousTextEditor
-            onInsertParsedContent={() => { }}
-            className={classes.contiguousTextEditor}
-            activeContentGuid={null}
-            hover={null}
-            onUpdateHover={() => { }}
-            onFocus={onFocus}
-            context={context}
-            services={services}
-            editMode={editMode}
-            model={(model as ContiguousText).with({ mode: ContiguousTextMode.SimpleText })}
-            editorStyles={editorStyles}
-            hideBorder={true}
-            onEdit={onEdit} />
+        <ContiguousTextEditor
+          onInsertParsedContent={() => { }}
+          className={classes.contiguousTextEditor}
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => { }}
+          onFocus={onFocus}
+          context={context}
+          services={services}
+          editMode={editMode}
+          model={(model as ContiguousText).with({ mode: ContiguousTextMode.SimpleText })}
+          editorStyles={editorStyles}
+          hideBorder={true}
+          onEdit={onEdit} />
         <div className={classes.editIcon}>
-          <i className="fa fa-pencil" />
+          <i className="fas fa-pencil-alt" />
         </div>
         <div className={classes.hoverUnderline} />
       </div>

@@ -33,15 +33,15 @@ export const getNameAndIconByType = (type: string) => caseOf<TitleIcon>(type)({
   },
   [LegacyTypes.assessment2_pool]: {
     name: 'Question Pool',
-    icon: <i className="title-icon fa fa-shopping-basket" />,
+    icon: <i className="title-icon fas fa-shopping-basket" />,
   },
   [LegacyTypes.feedback]: {
     name: 'Survey',
-    icon: <i className="title-icon fa fa-check-square-o" />,
+    icon: <i className="title-icon far fa-check-square" />,
   },
   [LegacyTypes.workbook_page]: {
     name: 'Workbook Page',
-    icon: <i className="title-icon fa fa-file-o" />,
+    icon: <i className="title-icon far fa-file" />,
   },
 })({
   name: 'Unknown',

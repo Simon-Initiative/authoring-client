@@ -28,8 +28,8 @@ export interface ParamEditorState {
  */
 @injectSheet(styles)
 export default class ParamEditor
-    extends AbstractContentEditor<contentTypes.Param,
-    StyledComponentProps<ParamEditorProps>, ParamEditorState> {
+  extends AbstractContentEditor<contentTypes.Param,
+  StyledComponentProps<ParamEditorProps>, ParamEditorState> {
 
   constructor(props) {
     super(props);
@@ -85,7 +85,7 @@ export default class ParamEditor
   }
 
   renderToolbar() {
-    return <ToolbarGroup label="Parameter" highlightColor={CONTENT_COLORS.Param}/>;
+    return <ToolbarGroup label="Parameter" highlightColor={CONTENT_COLORS.Param} />;
   }
 
   onEditName(name) {
@@ -103,7 +103,7 @@ export default class ParamEditor
 
     const { classes, editMode } = this.props;
 
-    const style : any = {
+    const style: any = {
       position: 'absolute',
       right: -25,
       top: 0,
@@ -111,25 +111,25 @@ export default class ParamEditor
     const isRemoveable = totalCount > 1;
     const remove = isRemoveable
       ? <button
-          style={style}
-          className="btn btn-sm remove-btn"
-          disabled={!editMode}
-          onClick={this.onRemoveContent.bind(this, content)}>
-          <i className="fa fa-close"></i>
-        </button>
+        style={style}
+        className="btn btn-sm remove-btn"
+        disabled={!editMode}
+        onClick={this.onRemoveContent.bind(this, content)}>
+        <i className="fas fa-times"></i>
+      </button>
       : null;
 
     if (content.contentType === 'WbPath') {
       return (
         <div className={classNames([classes.paramText])}>
 
-            <TextInput width="100%"
-              label=""
-              editMode={this.props.editMode}
-              value={content.href}
-              type="text"
-              onEdit={this.onEditContent.bind(this, content)} />
-            {remove}
+          <TextInput width="100%"
+            label=""
+            editMode={this.props.editMode}
+            value={content.href}
+            type="text"
+            onEdit={this.onEditContent.bind(this, content)} />
+          {remove}
         </div>
       );
     }
@@ -137,13 +137,13 @@ export default class ParamEditor
       return (
         <div className={classNames([classes.paramText])}>
 
-            <TextInput width="100%"
-              label=""
-              editMode={this.props.editMode}
-              value={content.preference}
-              type="text"
-              onEdit={this.onEditContent.bind(this, content)} />
-            {remove}
+          <TextInput width="100%"
+            label=""
+            editMode={this.props.editMode}
+            value={content.preference}
+            type="text"
+            onEdit={this.onEditContent.bind(this, content)} />
+          {remove}
         </div>
       );
     }
@@ -151,26 +151,26 @@ export default class ParamEditor
       return (
         <div className={classNames([classes.paramText])}>
 
-            <TextInput width="100%"
-              label=""
-              editMode={this.props.editMode}
-              value={content.preference}
-              type="text"
-              onEdit={this.onEditContent.bind(this, content)} />
-            {remove}
+          <TextInput width="100%"
+            label=""
+            editMode={this.props.editMode}
+            value={content.preference}
+            type="text"
+            onEdit={this.onEditContent.bind(this, content)} />
+          {remove}
         </div>
       );
     }
     return (
       <div className={classNames([classes.paramText])}>
 
-          <TextInput width="100%"
-            label=""
-            editMode={this.props.editMode}
-            value={content.text}
-            type="text"
-            onEdit={this.onEditContent.bind(this, content)} />
-          {remove}
+        <TextInput width="100%"
+          label=""
+          editMode={this.props.editMode}
+          value={content.text}
+          type="text"
+          onEdit={this.onEditContent.bind(this, content)} />
+        {remove}
       </div>
     );
   }
@@ -192,7 +192,7 @@ export default class ParamEditor
     this.props.onEdit(model, model);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes } = this.props;
 
