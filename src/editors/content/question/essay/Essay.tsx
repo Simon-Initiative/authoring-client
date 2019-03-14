@@ -66,11 +66,12 @@ export class Essay
 
     return (
       <TabSection key="choices" className="choices">
-        <TabSectionHeader title="How would an expert answer this question?">
+        <TabSectionHeader title="Feedback">
         </TabSectionHeader>
         <TabSectionContent key="explanation" className="feedback">
           {/* All question types except short answers and essays use feedback.
           Short answers and essays use the explanation instead */}
+          <div className="instruction-label">How would an expert answer this question?</div>
           <ExplanationEditor
             {...this.props}
             model={partModel.explanation}

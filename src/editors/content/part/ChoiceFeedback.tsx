@@ -13,6 +13,8 @@ import {
 import {
   AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseItem, modelWithDefaultFeedback,
   renderMaxChoicesWarning,
+  getGeneratedResponseBody,
+  getGeneratedResponseScore,
 } from 'editors/content/part/defaultFeedbackGenerator';
 import { CombinationsMap } from 'types/combinations';
 import guid from 'utils/guid';
@@ -20,9 +22,10 @@ import { Maybe } from 'tsmonad';
 
 import './ChoiceFeedback.scss';
 import { ConditionalBranchSelect } from '../common/BranchSelect';
+import { classNames } from 'styles/jss';
 
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
-  hideOther?: boolean;
+  hideIncorrect?: boolean;
   simpleFeedback?: boolean;
   choices: contentTypes.Choice[];
   onInvalidFeedback?: (responseGuid: string) => void;
@@ -83,16 +86,11 @@ export abstract class ChoiceFeedback
 
     // don't update model when just score or text changes
     if (oldMatch !== response.match) {
-      const generated = getGeneratedResponseItem(updatedModel);
-      const body = generated ? generated.feedback.first().body
-        : this.placeholderResponse.feedback.first().body;
-
       updatedModel = modelWithDefaultFeedback(
         updatedModel,
         choices,
-        body,
-        generated ? generated.score : '0',
-        AUTOGEN_MAX_CHOICES,
+        getGeneratedResponseBody(updatedModel),
+        getGeneratedResponseScore(updatedModel),
         onGetChoiceCombinations,
       );
     }
@@ -107,16 +105,11 @@ export abstract class ChoiceFeedback
       responses: model.responses.delete(response.guid),
     });
 
-    const generated = getGeneratedResponseItem(updatedModel);
-    const body = generated ? generated.feedback.first().body
-      : this.placeholderResponse.feedback.first().body;
-
     updatedModel = modelWithDefaultFeedback(
       updatedModel,
       choices,
-      body,
-      generated ? generated.score : '0',
-      AUTOGEN_MAX_CHOICES,
+      getGeneratedResponseBody(updatedModel),
+      getGeneratedResponseScore(updatedModel),
       onGetChoiceCombinations,
     );
 
@@ -194,16 +187,11 @@ export abstract class ChoiceFeedback
       ),
     });
 
-    const generated = getGeneratedResponseItem(updatedPart);
-    const body = generated ? generated.feedback.first().body
-      : this.placeholderResponse.feedback.first().body;
-
     const updatedModel = modelWithDefaultFeedback(
       updatedPart,
       choices,
-      body,
-      generated ? generated.score : '0',
-      AUTOGEN_MAX_CHOICES,
+      getGeneratedResponseBody(updatedPart),
+      getGeneratedResponseScore(updatedPart),
       onGetChoiceCombinations,
     );
 
@@ -255,9 +243,9 @@ export abstract class ChoiceFeedback
             onUpdateHover={this.props.onUpdateHover}
             onFocus={this.props.onFocus}
             key={response.guid}
-            className="response"
+            className={classNames(['response', simpleFeedback && 'simplefeedback'])}
             id={response.guid}
-            label={simpleFeedback ? '' : `${i + 1}`}
+            label={!simpleFeedback && `${i + 1}`}
             contentTitle={simpleFeedback ? 'Correct' : ''}
             context={context}
             services={services}
@@ -365,13 +353,13 @@ export abstract class ChoiceFeedback
         onUpdateHover={this.props.onUpdateHover}
         onFocus={this.props.onFocus}
         key={defaultResponse.guid}
-        className="response"
+        className={classNames(['response', simpleFeedback && 'simplefeedback'])}
         id={defaultResponse.guid}
-        label=""
-        contentTitle="Other"
+        label={!simpleFeedback && ''}
+        contentTitle="Incorrect"
         context={context}
         services={services}
-        editMode={!this.props.hideOther && editMode}
+        editMode={!this.props.hideIncorrect && editMode}
         body={feedback.body}
         onEdit={(body, source) =>
           this.onDefaultFeedbackEdit(
@@ -393,7 +381,7 @@ export abstract class ChoiceFeedback
                     <input
                       type="number"
                       className="form-control input-sm form-control-sm"
-                      disabled={this.props.hideOther || !editMode}
+                      disabled={this.props.hideIncorrect || !editMode}
                       value={defaultResponse.score}
                       onChange={({ target: { value } }) =>
                         this.onScoreEdit(defaultResponse, value)}

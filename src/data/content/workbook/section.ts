@@ -8,7 +8,7 @@ import { Maybe } from 'tsmonad';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 import { PurposeType } from 'data/content/learning/common';
 
-export const SECTION_ELEMENTS = [...BODY_ELEMENTS, 'section'];
+export const SECTION_ELEMENTS = [...BODY_ELEMENTS, 'section', 'activity', 'multipanel'];
 
 export type SectionParams = {
   id?: string,
@@ -21,7 +21,7 @@ export type SectionParams = {
 const defaultContent = {
   contentType: 'Section',
   elementType: 'section',
-  id:'',
+  id: '',
   title: Title.fromText('New Section Title'),
   purpose: Maybe.nothing(),
   body: new ContentElements().with({ supportedElements: Immutable.List<string>(SECTION_ELEMENTS) }),
