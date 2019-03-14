@@ -22,8 +22,8 @@ export const collectInlinesNested =
         return n.contentType === 'WbInline'
           || n.contentType === 'Multipanel';
       }).map(e => caseOf<(string | ContentElement)[]>(e.contentType)({
-        Multipanel: [e.inline.idref, e],
-        WbInline: [e.idref, e],
+        Multipanel: () => [e.inline.idref, e],
+        WbInline: () => [e.idref, e],
       })([e.idref, e]));
 
       return Immutable.Map<string, ContentElement>(inlineRefs);
