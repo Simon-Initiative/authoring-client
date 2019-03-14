@@ -11,7 +11,7 @@ import guid from 'utils/guid';
 import {
   locateNextOfKin, findNodeByGuid,
 } from 'editors/document/assessment/utils';
-import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
+import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion.controller';
 import { AssessmentNodeRenderer } from 'editors/document/common/questions';
 import { getChildren, Outline, setChildren }
   from 'editors/document/assessment/outline/Outline';

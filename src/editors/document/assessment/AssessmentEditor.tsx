@@ -14,7 +14,7 @@ import {
   handleBranchingReordering, handleBranchingDeletion,
 } from 'editors/document/assessment/utils';
 import { Collapse } from 'editors/content/common/Collapse';
-import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
+import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion.controller';
 import { AssessmentNodeRenderer } from 'editors/document/common/questions';
 import { getChildren, Outline, setChildren, EditDetails }
   from 'editors/document/assessment/outline/Outline';
