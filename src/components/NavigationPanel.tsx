@@ -532,11 +532,9 @@ export class NavigationPanel
             ? <RequestButton text="" className="btn-primary previewButton"
               onClick={() => this.onPreview()}><i className="fa fa-eye" /></RequestButton>
             : <div className={classes.publishAction}>
-              {this.getWidth() < 210
-                ? <RequestButton text="Preview" className="btn-primary previewButton"
-                  onClick={() => this.onPreview()} />
-                : <RequestButton text="Preview Course" className="btn-primary previewButton"
-                  onClick={() => this.onPreview()} />}
+              <RequestButton text={this.getWidth() < 210 ? 'Preview' : 'Preview Course'}
+                className="btn-primary previewButton"
+                onClick={() => this.onPreview()} />
               <HelpPopover>
                 You can launch a full course preview using the active organization to allow
                 it to be viewed publically.
