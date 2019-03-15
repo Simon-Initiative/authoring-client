@@ -83,9 +83,9 @@ export class RequestButton extends React.Component<RequestButtonProps, RequestBu
           {text}
           {children}
         </button>
-        {pending ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> : null}
-        {successful ? <i className="fa fa-check-circle" /> : null}
-        {failed ? <i className="fa fa-times-circle" /> : null}
+        {pending ? <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" /> : null}
+        {successful ? <i className="fas fa-check-circle" /> : null}
+        {failed ? <i className="fas fa-times-circle" /> : null}
       </span>
     );
   }
@@ -473,7 +473,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           onChange={this.onLicenseChange}>
           {licenseOptions}
         </Select> {isCCUrl ? <a title="License Summary" href={license} target="_blank">
-          <i className="fa fa-external-link" /></a> : null}
+          <i className="fas fa-external-link-alt" /></a> : null}
       </React.Fragment>
     );
   }

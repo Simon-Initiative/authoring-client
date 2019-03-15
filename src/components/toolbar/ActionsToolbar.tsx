@@ -90,7 +90,7 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
             onClick={this.redo}
             disabled={!editMode || !canRedo}
             size={ToolbarButtonSize.Full}>
-            <i className={'fa fa-repeat'} /> Redo
+            <i className={'fas fa-redo'} /> Redo
         </ToolbarButton>
         </ToolbarLayout.Column>
         <ToolbarLayout.Inline>
@@ -107,7 +107,7 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
             disabled={previewing || !canPreview}
             size={ToolbarButtonSize.Large}>
             <div>{previewing
-              ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+              ? <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />
               : <i className="fa fa-eye" />}</div>
             <div>{previewing
               ? 'Previewing'

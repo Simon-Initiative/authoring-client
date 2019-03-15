@@ -60,7 +60,7 @@ export default class QuoteEditor
     return (
       <ToolbarGroup label="Quote" columns={2.8} highlightColor={CONTENT_COLORS.BlockQuote}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders" /></div>
+          <div><i className="fas fa-sliders-h" /></div>
           <div>Details</div>
         </ToolbarButton>
       </ToolbarGroup>

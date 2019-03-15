@@ -50,18 +50,18 @@ const source = {
  * Initiator React Component
  */
 @DragSource(
-({ dragType }) => dragType || DragTypes.DynaDropInitiator,
-source, (connect, monitor) => {
-  return {
-    connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview(),
-    isDragging: monitor.isDragging(),
-  };
-})
+  ({ dragType }) => dragType || DragTypes.DynaDropInitiator,
+  source, (connect, monitor) => {
+    return {
+      connectDragSource: connect.dragSource(),
+      connectDragPreview: connect.dragPreview(),
+      isDragging: monitor.isDragging(),
+    };
+  })
 @injectSheet(styles)
 export class Initiator
-    extends React.PureComponent<StyledComponentProps<InitiatorProps>,
-    InitiatorState> {
+  extends React.PureComponent<StyledComponentProps<InitiatorProps>,
+  InitiatorState> {
 
   constructor(props) {
     super(props);
@@ -101,14 +101,14 @@ export class Initiator
         {onDelete &&
           <Tooltip
             title={canDelete
-                ? 'Delete choice'
-                : 'Drag and drop questions must contain at least one choice. '
-                  + 'Please add another choice before removing.'
+              ? 'Delete choice'
+              : 'Drag and drop questions must contain at least one choice. '
+              + 'Please add another choice before removing.'
             }
             delay={1000}>
             <Remove
               className={classes.removeBtn}
-              customIcon="fa fa-trash"
+              customIcon="fas fa-trash"
               editMode={editMode && canDelete}
               onRemove={(e) => {
                 e.stopPropagation();

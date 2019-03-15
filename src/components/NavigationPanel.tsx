@@ -433,7 +433,7 @@ export class NavigationPanel
               router.route === ROUTE.ALL_RESOURCES && classes.selectedNavItem,
             ])}
             onClick={() => viewActions.viewAllResources(course.guid, currentOrg.guid)}>
-            <i className="fa fa-files-o" />{!collapsed && ' All Resources'}
+            <i className="fas fa-folder-open" />{!collapsed && ' All Resources'}
           </div>
         </Tooltip>
 
@@ -468,7 +468,7 @@ export class NavigationPanel
                 (e.nativeEvent as any).originator = 'OrgDropdownToggle';
                 this.setState({ showOrgDropdown: !showOrgDropdown });
               }}>
-              <i className={'fa fa-sort-desc'} />
+              <i className={'fas fa-sort-down'} />
             </div>
           </div>
           <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>

@@ -27,8 +27,8 @@ export interface ActivityLinkEditorState {
  * React Component
  */
 export default class ActivityLinkEditor
-    extends AbstractContentEditor
-    <contentTypes.ActivityLink, ActivityLinkEditorProps & JSSProps, ActivityLinkEditorState> {
+  extends AbstractContentEditor
+  <contentTypes.ActivityLink, ActivityLinkEditorProps & JSSProps, ActivityLinkEditorState> {
 
   constructor(props) {
     super(props);
@@ -49,32 +49,32 @@ export default class ActivityLinkEditor
     return (
       <SidebarContent title="Activity Link">
         <SidebarGroup label="Activity">
-        <Select
-          editMode={this.props.editMode}
-          label=""
-          value={model.idref}
-          onChange={idref => onEdit(model.with({ idref }))}>
-          {highStakesOptions}
-        </Select>
+          <Select
+            editMode={this.props.editMode}
+            label=""
+            value={model.idref}
+            onChange={idref => onEdit(model.with({ idref }))}>
+            {highStakesOptions}
+          </Select>
         </SidebarGroup>
         <SidebarGroup label="Purpose">
-        <Select
-          editMode={this.props.editMode}
-          label=""
-          value={model.purpose}
-          onChange={purpose => onEdit(model.with({ purpose }))}>
-          {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-        </Select>
+          <Select
+            editMode={this.props.editMode}
+            label=""
+            value={model.purpose}
+            onChange={purpose => onEdit(model.with({ purpose }))}>
+            {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+          </Select>
         </SidebarGroup>
         <SidebarGroup label="Target">
-        <Select
-          editMode={editMode}
-          value={model.target}
-          onChange={v =>
-            onEdit(model.with({ target: v === 'self' ? LinkTarget.Self : LinkTarget.New }))}>
-          <option value={LinkTarget.Self}>Open in this window</option>
-          <option value={LinkTarget.New}>Open in new window</option>
-        </Select>
+          <Select
+            editMode={editMode}
+            value={model.target}
+            onChange={v =>
+              onEdit(model.with({ target: v === 'self' ? LinkTarget.Self : LinkTarget.New }))}>
+            <option value={LinkTarget.Self}>Open in this window</option>
+            <option value={LinkTarget.New}>Open in new window</option>
+          </Select>
         </SidebarGroup>
       </SidebarContent>
     );
@@ -86,7 +86,7 @@ export default class ActivityLinkEditor
     return (
       <ToolbarGroup label="Activity Link" columns={2} highlightColor={CONTENT_COLORS.Xref}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders"/></div>
+          <div><i className="fas fa-sliders-h" /></div>
           <div>Details</div>
         </ToolbarButton>
       </ToolbarGroup>

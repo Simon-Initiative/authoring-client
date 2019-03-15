@@ -95,8 +95,8 @@ const getOrderedObjectiveQuestions = (
   const questionRefs: Map<string, QuestionRef> = (
     skill
       ? skillQuestionRefs
-          .valueOr(Map<string, List<QuestionRef>>())
-          .get(skill.id) || List<QuestionRef>()
+        .valueOr(Map<string, List<QuestionRef>>())
+        .get(skill.id) || List<QuestionRef>()
       : skills.reduce(
         (acc, skill) => acc
           .concat(skillQuestionRefs
@@ -106,13 +106,13 @@ const getOrderedObjectiveQuestions = (
         List<QuestionRef>(),
       )
   )
-  // filter out undefined refs
-  .filter(ref => !!ref)
-  // dedupe refs
-  .reduce(
-    (acc, ref) => acc.set(ref.id, ref),
-    OrderedMap<string, QuestionRef>(),
-  );
+    // filter out undefined refs
+    .filter(ref => !!ref)
+    // dedupe refs
+    .reduce(
+      (acc, ref) => acc.set(ref.id, ref),
+      OrderedMap<string, QuestionRef>(),
+    );
 
   return questionRefs.toArray();
 };
@@ -440,8 +440,8 @@ export class Objective
 
     return organizationResourceMap.bind(
       orgResources => workbookPageRefs.lift(workbookPageRefs =>
-          workbookPageRefs.filter(pageRef => orgResources.has(organizationId)
-            && orgResources.get(organizationId).contains(pageRef),
+        workbookPageRefs.filter(pageRef => orgResources.has(organizationId)
+          && orgResources.get(organizationId).contains(pageRef),
         ).toList(),
       ),
     );
@@ -596,7 +596,7 @@ export class Objective
                         <Tooltip title="Question Pool" distance={15}
                           size="small" arrowSize="small">
                           <div key={question.key} className={classes.skillGridCell}>
-                            <i className={classNames(['fa fa-shopping-basket',
+                            <i className={classNames(['fas fa-shopping-basket',
                               classes.poolColor, classes.gridAssessmentIcon])} />
                           </div>
                         </Tooltip>
@@ -652,7 +652,7 @@ export class Objective
       objective,
       objectiveModelRules,
       { pageCount, skills, skillQuestionRefs: orgSkillQuestionRefs },
-      { disabled: orgSkillQuestionRefs.caseOf({ just: () => false , nothing: () => true }) },
+      { disabled: orgSkillQuestionRefs.caseOf({ just: () => false, nothing: () => true }) },
     );
 
     const getRefGuidFromRefId = (id: string) =>
@@ -685,16 +685,18 @@ export class Objective
                   ),
                   nothing: () => undefined,
                 })}
-                <i className={classNames(['fa fa-file-o', classes.detailsSectionIcon])} />
+                <i className={classNames(['far fa-file', classes.detailsSectionIcon])} />
                 Pages
-              {orgWorkbookPageRefs.caseOf({
-                just: refs => (
-                    <span className={classNames(['badge badge-light', classes.countBadge])}>
-                      {refs.size}
-                    </span>
-                  ),
-                nothing: () => null,
-              })}
+              {
+                  orgWorkbookPageRefs.caseOf({
+                    just: refs => (
+                      <span className={classNames(['badge badge-light', classes.countBadge])}>
+                        {refs.size}
+                      </span>
+                    ),
+                    nothing: () => null,
+                  })
+                }
               </h3>
               {orgWorkbookPageRefs.caseOf({
                 just: (refs) => {
@@ -704,9 +706,9 @@ export class Objective
                         {refs.map(refGuid => (
                           <div key={refGuid} className={classes.pageTitle}>
                             <a href={`#${getRefGuidFromRefId(refGuid)}-${course.guid}`
-                                + `-${organization.guid}`}>
+                              + `-${organization.guid}`}>
                               <i className={classNames(
-                                ['fa fa-file-o', classes.detailsSectionIcon])} />
+                                ['far fa-file', classes.detailsSectionIcon])} />
                               {getWBPTitleFromRefId(refGuid)}
                             </a>
                           </div>
@@ -727,7 +729,7 @@ export class Objective
                 },
                 nothing: () => (
                   <div className={classes.loading}>
-                    <i className="fa fa-circle-o-notch fa-spin fa-fw" /> Loading...
+                    <i className="fas fa-circle-notch fa-spin fa-fw" /> Loading...
                 </div>
                 ),
               })}
@@ -768,8 +770,8 @@ export class Objective
                   just: () => (
                     // orgSkillQuestionRefs data is loaded, so we know there arent any refs
                     skills.size > 0 && orderedObjectiveAssessments.length < 1 &&
-                      <div style={{ color: colors.gray, fontWeight: 400 }}>
-                        These skills are not referenced by any assessments
+                    <div style={{ color: colors.gray, fontWeight: 400 }}>
+                      These skills are not referenced by any assessments
                       </div>
                   ),
                   nothing: () => undefined,
@@ -832,7 +834,7 @@ export class Objective
     const checkModelResults = checkModel(
       objective, objectiveModelRules,
       { pageCount, skills, skillQuestionRefs: orgSkillQuestionRefs },
-      { disabled: orgSkillQuestionRefs.caseOf({ just: () => false , nothing: () => true }) },
+      { disabled: orgSkillQuestionRefs.caseOf({ just: () => false, nothing: () => true }) },
     );
 
     const skillCount = skills.size;
@@ -876,16 +878,16 @@ export class Objective
               const formativeCount = skills.reduce(
                 (sum, skill) => sum +
                   getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs, skill)
-                  .filter(r => r.assessmentType === LegacyTypes.inline)
-                  .length,
+                    .filter(r => r.assessmentType === LegacyTypes.inline)
+                    .length,
                 0,
               );
 
               const summativeCount = skills.reduce(
                 (sum, skill) => sum +
                   getOrderedObjectiveQuestions(skills, orgSkillQuestionRefs, skill)
-                  .filter(r => r.assessmentType === LegacyTypes.assessment2)
-                  .length,
+                    .filter(r => r.assessmentType === LegacyTypes.assessment2)
+                    .length,
                 0,
               );
 
@@ -908,8 +910,8 @@ export class Objective
                     className={classNames([
                       classes.detailsOverviewSeparator, classes.summativeColor])}>
                     {`${guaranteedSummativeCount} `}
-                    <i className="fa fa-check"/>
-                    </span>
+                    <i className="fa fa-check" />
+                  </span>
                 </span>
               );
             },

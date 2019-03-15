@@ -152,10 +152,10 @@ export default class AudioEditor
       <SidebarContent title="Audio">
         <SidebarGroup label="Controls">
           <SidebarRow>
-          <ToggleSwitch
-            checked={this.props.model.controls}
-            onClick={this.onControlEdit}
-            label="Display audio controls" />
+            <ToggleSwitch
+              checked={this.props.model.controls}
+              onClick={this.onControlEdit}
+              label="Display audio controls" />
           </SidebarRow>
         </SidebarGroup>
         <MediaMetadataEditor
@@ -180,7 +180,7 @@ export default class AudioEditor
 
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders" /></div>
+            <div><i className="fas fa-sliders-h" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
