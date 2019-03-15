@@ -59,7 +59,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
   }
 
   render() {
-    const waitingIcon = <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />;
+    const waitingIcon = <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />;
     const waitingHeading = 'Setting up your course';
     const waitingContent = <p>We'll take you there as soon as it's ready.</p>;
     const waiting =

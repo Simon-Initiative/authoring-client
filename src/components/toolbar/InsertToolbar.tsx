@@ -567,7 +567,7 @@ export class InsertToolbar
                   />)
                 }
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'fa fa-file-o'} />
+                <i style={{ width: 22 }} className={'far fa-file'} />
                 Insert workbook page
                 </ToolbarButtonMenuItem>
 
@@ -636,7 +636,7 @@ export class InsertToolbar
                   />)
                 }
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'fa fa-check-square-o'} />
+                <i style={{ width: 22 }} className={'fas fa-poll'} />
                 Insert survey
                 </ToolbarButtonMenuItem>
 
@@ -658,7 +658,7 @@ export class InsertToolbar
 
                 }}
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'fa fa-check-square-o'} />
+                <i style={{ width: 22 }} className={'fas fa-poll'} />
                 Create survey
                 </ToolbarButtonMenuItem>
 

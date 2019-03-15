@@ -222,7 +222,7 @@ export default class LinkEditor
           <ToolbarButton
             disabled={!editMode}
             onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-file-o" /></div>
+            <div><i className="far fa-file" /></div>
             <div>Select File</div>
           </ToolbarButton>
         </SidebarGroup>
@@ -256,7 +256,7 @@ export default class LinkEditor
                 checked={!this.state.isExternal}
                 onChange={() => this.onSourceChange(false)}
                 type="radio" />&nbsp;
-        Media Library
+      Media Library
             </label>
           </div>
           <div className="form-check" style={{ marginBottom: '30px' }}>
@@ -268,7 +268,7 @@ export default class LinkEditor
                 disabled={!editMode}
                 checked={this.state.isExternal}
                 type="radio" />&nbsp;
-        URL
+      URL
             </label>
           </div>
         </SidebarGroup>
@@ -287,7 +287,7 @@ export default class LinkEditor
         columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders" /></div>
+            <div><i className="fas fa-sliders-h" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

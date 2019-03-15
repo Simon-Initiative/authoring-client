@@ -26,7 +26,7 @@ export const GlobalError = injectSheetSFC<GlobalErrorProps>(styles)(({
 
         <div>
           <span>
-            <i className="fa fa-frown-o fa-4x"></i>
+            <i className="far fa-frown fa-4x"></i>
           </span>
         </div>
 

@@ -56,7 +56,7 @@ export default class DocumentView
 
   renderDeleted() {
 
-    const deletedIcon = <i className="fa fa-trash fa-1x fa-fw" />;
+    const deletedIcon = <i className="fas fa-trash fa-1x fa-fw" />;
     const waitingHeading = 'Resource Deleted';
     const waitingContent = <p>It looks like this resource has been deleted.</p>;
     return (

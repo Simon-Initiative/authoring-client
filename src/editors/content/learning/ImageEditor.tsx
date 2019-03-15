@@ -393,7 +393,7 @@ export default class ImageEditor
             <i className="fa fa-expand"/> Sizing
           </ToolbarButton> */}
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders" /></div>
+            <div><i className="fas fa-sliders-h" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

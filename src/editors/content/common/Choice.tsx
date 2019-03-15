@@ -184,9 +184,8 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
                     onClick={() =>
                       response && simpleSelectProps.onToggleSimpleSelect(response, choice)} >
                     <i
-                      className={`fa ${simpleSelectProps.selected
-                        ? 'fa-check-circle' : 'fa-check-circle-o'}`
-                      } />
+                      className={simpleSelectProps.selected
+                        ? 'fas fa-check-circle' : 'far fa-check-circle'} />
                   </Button>
                 </ItemControl>
               )

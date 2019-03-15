@@ -58,7 +58,7 @@ export default class MathEditor
     return (
       <ToolbarGroup label="Math Editor" columns={3} highlightColor={CONTENT_COLORS.Math}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders" /></div>
+          <div><i className="fas fa-sliders-h" /></div>
           <div>Details</div>
         </ToolbarButton>
       </ToolbarGroup>

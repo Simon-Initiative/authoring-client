@@ -11,7 +11,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
-'editors/content/utils/content';
+  'editors/content/utils/content';
 import { Select, TextInput } from 'editors/content/common/controls';
 import { TabContainer } from 'editors/content/common/TabContainer';
 import AlternativeEditor from 'editors/content/learning/AlternativeEditor';
@@ -133,14 +133,14 @@ export default class AlternativesEditor
               onShowSidebar();
               onDiscover(DiscoverableId.AlternativesEditorGroup);
             }} size={ToolbarButtonSize.Wide}>
-            <i className="fa fa-group" /> Group
+            <i className="fas fa-layer-group" /> Group
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
               onShowSidebar();
               onDiscover(DiscoverableId.AlternativesEditorDefault);
             }} size={ToolbarButtonSize.Wide}>
-            <i className="fa fa-check-square-o" /> Default
+            <i className="far fa-check-square" /> Default
           </ToolbarButton>
         </ToolbarLayout.Column>
       </ToolbarGroup>

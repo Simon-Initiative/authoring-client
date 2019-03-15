@@ -12,7 +12,7 @@ import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
-'editors/content/utils/content';
+  'editors/content/utils/content';
 
 import { styles } from './BlockQuote.styles';
 
@@ -131,7 +131,7 @@ export default class BlockQuoteToolbar
             }
             disabled={noTextSelected || !editMode}
             tooltip="Highlight">
-            <i className={'fa fa-pencil'} />
+            <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
@@ -180,8 +180,9 @@ export default class BlockQuoteToolbar
             onClick={
               () => {
                 onEdit(model.with({
-                  text: model.text.addEntity(EntityTypes.link, true,
-                                             new contentTypes.Link(), selection),
+                  text: model.text.addEntity(
+                    EntityTypes.link, true,
+                    new contentTypes.Link(), selection),
                 }));
               }
             }
@@ -193,8 +194,9 @@ export default class BlockQuoteToolbar
             onClick={
               () => {
                 onEdit(model.with({
-                  text: model.text.addEntity(EntityTypes.xref, true,
-                                             new contentTypes.Xref(), selection),
+                  text: model.text.addEntity(
+                    EntityTypes.xref, true,
+                    new contentTypes.Xref(), selection),
                 }));
               }
             }

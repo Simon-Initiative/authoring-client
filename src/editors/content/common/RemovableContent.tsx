@@ -21,7 +21,7 @@ export const RemovableContent = (props: RemovableContentProps) => {
           className="btn btn-sm remove-btn"
           disabled={!props.editMode}
           onClick={props.onRemove}>
-          <i className="fa fa-close"></i>
+          <i className="fas fa-times"></i>
         </button>
       </div>
       <div className="content-body">

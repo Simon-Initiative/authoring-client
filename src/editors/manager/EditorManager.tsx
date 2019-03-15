@@ -117,7 +117,7 @@ export default class EditorManager
 
 
   renderLoading() {
-    const waitingIcon = <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />;
+    const waitingIcon = <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />;
     const waitingHeading = 'Please wait';
     const waitingContent = <p>We're loading the course material.</p>;
     return (

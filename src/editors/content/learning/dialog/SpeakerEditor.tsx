@@ -5,7 +5,7 @@ import * as contentTypes from 'data/contentTypes';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
-'editors/content/utils/content';
+  'editors/content/utils/content';
 
 // import './SpeakerEditor.scss';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -111,7 +111,7 @@ export default class SpeakerEditor
                 checked={this.state.isDisplayedAsImage}
                 onChange={() => this.onToggleDisplayAsImage(true)}
                 type="radio" />&nbsp;
-    as Image
+  as Image
             </label>
           </div>
 
@@ -134,7 +134,7 @@ export default class SpeakerEditor
                 value="text"
                 checked={!this.state.isDisplayedAsImage}
                 type="radio" />&nbsp;
-    as Text
+  as Text
             </label>
           </div>
 
@@ -160,7 +160,7 @@ export default class SpeakerEditor
     return (
       <ToolbarGroup label="Speaker" columns={4} highlightColor={CONTENT_COLORS.Dialog}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders" /></div>
+          <div><i className="fas fa-sliders-h" /></div>
           <div>Change Name or Image</div>
         </ToolbarButton>
       </ToolbarGroup>
