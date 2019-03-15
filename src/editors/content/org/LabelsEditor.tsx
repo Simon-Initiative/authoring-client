@@ -83,7 +83,7 @@ export class LabelsEditor
     return (
       <div className="form-group row">
         <label className="col-2 col-form-label">{label}</label>
-        <div className="col-2">
+        <div className="col-10">
           {this.renderEditor(attr, update)}
         </div>
       </div>
