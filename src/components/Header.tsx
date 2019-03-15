@@ -77,7 +77,9 @@ const styles: JSSStyles = {
   },
 
   headerUserProfile: {
-    textAlign: 'right',
+    '& .dropdown-menu.dropdown-menu-right': {
+      textAlign: 'center',
+    },
     headerLink: {
       marginRight: 0,
     },
@@ -190,7 +192,7 @@ class Header extends React.PureComponent<StyledComponentProps<HeaderProps>, Head
             Help / Feedback
           </MenuItem>
           <div className="dropdown-divider"></div>
-          <MenuItem url={logoutUrl}>Logout</MenuItem>
+          <MenuItem url={logoutUrl}>Log Out</MenuItem>
         </Menu>
       </React.Fragment>
     );
