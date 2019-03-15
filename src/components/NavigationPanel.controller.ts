@@ -8,6 +8,8 @@ import { State } from 'reducers';
 import { Document } from 'data/persistence';
 import { UserProfile } from 'types/user';
 import { load as loadOrg, releaseOrg } from 'actions/orgs';
+import { CourseId } from 'data/types';
+import { preview } from 'actions/preview';
 
 interface StateProps {
   course: CourseModel;
@@ -18,6 +20,7 @@ interface DispatchProps {
   viewActions: viewActions.ViewActions;
   onLoadOrg: (courseId: string, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
+  onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
 }
 
 interface OwnProps {
@@ -49,6 +52,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
     onLoadOrg: (courseId: string, documentId: string) => dispatch(loadOrg(courseId, documentId)),
     onReleaseOrg: () => dispatch(releaseOrg() as any),
+    onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) =>
+      dispatch(preview(courseId, organizationId, false, redeploy)),
   };
 };
 
