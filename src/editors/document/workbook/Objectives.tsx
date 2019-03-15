@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Typeahead, Token, Highlighter } from 'react-bootstrap-typeahead';
+import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
