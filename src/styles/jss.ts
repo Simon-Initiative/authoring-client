@@ -21,10 +21,10 @@ export const classNames = (names: string | string[]) => {
 export const injectSheet = injectSheetJSS;
 
 export function injectSheetSFC<P>(style: any):
-    (component:
-      (props: StyledComponentProps<P>
-        & Readonly<{ children?: React.ReactNode }>)
-       => JSX.Element)
+  (component:
+    (props: StyledComponentProps<P>
+      & Readonly<{ children?: React.ReactNode }>)
+      => JSX.Element)
     => React.StatelessComponent<P> {
   return injectSheetJSS(style);
 }
