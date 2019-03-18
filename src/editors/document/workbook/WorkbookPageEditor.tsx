@@ -112,7 +112,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const { objectives, courseId } = context;
 
     if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE
-        || objectives.size < 1) {
+      || objectives.size < 1) {
       this.noObjectivesMessage = buildMissingObjectivesMessage(courseId, context.orgId);
       showMessage(this.noObjectivesMessage);
     }

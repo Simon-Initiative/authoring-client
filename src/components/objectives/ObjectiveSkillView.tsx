@@ -37,6 +37,7 @@ import { Edge, PathElement } from 'types/edge';
 import { ConfirmModal } from 'components/ConfirmModal';
 
 import './ObjectiveSkillView.scss';
+import { extractFullText } from 'data/content/objectives/objective';
 
 type SkillPathElement = PathElement & { title?: string };
 
@@ -462,12 +463,12 @@ export class ObjectiveSkillView
         sourceType: LegacyTypes.assessment2,
         destinationType: LegacyTypes.assessment2_pool,
       })
-      .then((assessmentToPoolEdges) => {
-        return {
-          poolToSkillEdges,
-          assessmentToPoolEdges,
-        };
-      });
+        .then((assessmentToPoolEdges) => {
+          return {
+            poolToSkillEdges,
+            assessmentToPoolEdges,
+          };
+        });
     }).then(({ poolToSkillEdges, assessmentToPoolEdges }) => {
       return reduceSkillPoolQuestionRefs(skills, poolToSkillEdges, assessmentToPoolEdges);
     });
@@ -610,7 +611,12 @@ export class ObjectiveSkillView
       (objective.model as LearningObjectivesModel)
         .objectives
         .toArray()
-        .map(o => ({ title: o.title, id: o.id })));
+        .map(o => ({
+          title: o.rawContent.caseOf({
+            just: c => extractFullText(c),
+            nothing: () => o.title,
+          }), id: o.id,
+        })));
 
     const skillObjects = skills.map(skill => (skill.model as SkillsModel)
       .skills
@@ -1151,12 +1157,17 @@ export class ObjectiveSkillView
     const { skills } = this.props;
     const text = searchText.trim().toLowerCase();
 
-    const filterFn = (o: contentTypes.LearningObjective): boolean =>
-      o.title.toLowerCase().includes(text)
-      || o.skills.toArray().reduce(
-        (acc, s) => acc || (skills.has(s) && skills.get(s).title.toLowerCase().includes(text)),
-        false,
-      );
+    const filterFn = (o: contentTypes.LearningObjective): boolean => {
+      const objTitle = o.rawContent.caseOf({
+        just: c => extractFullText(c),
+        nothing: () => o.title,
+      });
+      return objTitle.toLowerCase().includes(text)
+        || o.skills.toArray().reduce(
+          (acc, s) => acc || (skills.has(s) && skills.get(s).title.toLowerCase().includes(text)),
+          false,
+        );
+    };
 
     // searchText state is used for highlighting matches, and resources state creates
     // one row in the table for each resource present
@@ -1306,8 +1317,12 @@ export class ObjectiveSkillView
             width={400}
             value=""
             placeholder="New Learning Objective"
-            existing={this.state.objectives === null ? Immutable.List<string>()
-              : this.state.objectives.objectives.toList().map(o => o.title).toList()}
+            existing={this.state.objectives === null
+              ? Immutable.List<string>()
+              : this.state.objectives.objectives.toList().map(o => o.rawContent.caseOf({
+                just: c => extractFullText(c),
+                nothing: () => o.title,
+              })).toList()}
             onClick={this.createNew} />
         </div>
       </div>
