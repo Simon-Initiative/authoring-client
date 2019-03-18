@@ -31,14 +31,14 @@ export class UndoRedoToolbar extends React.Component<UndoRedoToolbarProps, {}> {
   render() {
     return (
       <div className="undo-redo-toolbar">
-        <div className="flex-spacer"/>
+        <div className="flex-spacer" />
         <div
           className="btn-group btn-group-sm asxToolbar"
           role="group"
           aria-label="Assessment Toolbar">
 
           {this.button('undo', this.props.onUndo, this.props.undoEnabled)}
-          {this.button('repeat', this.props.onRedo, this.props.redoEnabled)}
+          {this.button('redo', this.props.onRedo, this.props.redoEnabled)}
 
         </div>
       </div>
