@@ -45,7 +45,8 @@ export class DuplicateListingInput
   onChange(e) {
     const value = e.target.value;
 
-    const duplicates = this.props.existing.filter(v => v.indexOf(value) !== -1).toList();
+    const duplicates = this.props.existing.filter(
+      v => v.toLowerCase().indexOf(value) !== -1).toList();
     this.setState({ value, duplicates });
   }
 
@@ -57,7 +58,7 @@ export class DuplicateListingInput
   }
 
   renderDuplicates() {
-    const duplicateDiv : any = {
+    const duplicateDiv: any = {
       boxShadow: '10px 10px 5px #888888',
       background: 'none repeat scroll 0 0 #FFFFFF',
       opacity: 1,
@@ -82,7 +83,7 @@ export class DuplicateListingInput
     );
   }
 
-  shouldRenderDuplicates() : boolean {
+  shouldRenderDuplicates(): boolean {
     return this.state.duplicates.size > 0 && this.state.value.length > 2;
   }
 
@@ -90,7 +91,7 @@ export class DuplicateListingInput
 
     const duplicates = this.shouldRenderDuplicates() ? this.renderDuplicates() : null;
 
-    const outerDiv : any = {
+    const outerDiv: any = {
       position: 'relative',
       top: '0px',
       left: '0px',
@@ -98,18 +99,18 @@ export class DuplicateListingInput
 
     return (
       <div style={outerDiv}>
-        <form 
+        <form
           className="form-inline"
           onSubmit={this.onSubmit}>
           <input
             disabled={!this.props.editMode}
-            style={ { width: this.props.width } }
+            style={{ width: this.props.width }}
             placeholder={this.props.placeholder}
             onChange={this.onChange}
             className="form-control mb-2 mr-sm-2 mb-sm-0"
             type="string"
             value={this.state.value}
-            id={this.id}/>
+            id={this.id} />
           <button
             type="button"
             className="btn btn-primary"

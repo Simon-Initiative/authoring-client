@@ -4,6 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import { retrieveAllObjectives } from 'components/objectives/persistence';
 
 import ModalSelection from './ModalSelection';
+import { extractFullText } from 'data/content/objectives/objective';
 
 
 export interface ObjectiveSelection {
@@ -49,7 +50,9 @@ export class ObjectiveSelection
   renderRows() {
     const link = (obj: contentTypes.LearningObjective) =>
       <button onClick={this.clickResource.bind(this, obj)}
-        className="btn btn-link">{obj.title}</button>;
+        className="btn btn-link">{
+          obj.rawContent.caseOf({ just: c => extractFullText(c), nothing: () => obj.title })
+        }</button>;
 
     return this.state.objectives.toArray().map((r) => {
       const active = this.state.selected.has(r) ? 'table-active' : '';
@@ -66,9 +69,9 @@ export class ObjectiveSelection
         onInsert={() => this.props.onInsert(this.state.selected)}>
         <table className="table table-sm">
           <thead>
-              <tr>
-                  <th>Objective</th>
-              </tr>
+            <tr>
+              <th>Objective</th>
+            </tr>
           </thead>
           <tbody>
             {this.renderRows()}
