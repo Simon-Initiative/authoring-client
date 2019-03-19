@@ -26,25 +26,35 @@ export class LabelsEditor
   }
 
   onSequenceEdit(sequence: string) {
-    const cr = org.makeUpdateRootModel((m) => {
-      return m.with({ labels: m.labels.with({ sequence }) });
-    });
+    const undo = m => m.with(
+      { labels: m.labels.with({ sequence: this.props.model.labels.sequence }) });
+    const cr = org.makeUpdateRootModel(
+      (m) => {
+        return m.with({ labels: m.labels.with({ sequence }) });
+      },
+      undo);
     this.props.onEdit(cr);
   }
 
   onUnitEdit(unit: string) {
+    const undo = m => m.with(
+      { labels: m.labels.with({ unit: this.props.model.labels.unit }) });
     this.props.onEdit(
-      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ unit }) })));
+      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ unit }) }), undo));
   }
 
   onModuleEdit(module: string) {
+    const undo = m => m.with(
+      { labels: m.labels.with({ module: this.props.model.labels.module }) });
     this.props.onEdit(
-      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ module }) })));
+      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ module }) }), undo));
   }
 
   onSectionEdit(section: string) {
+    const undo = m => m.with(
+      { labels: m.labels.with({ section: this.props.model.labels.section }) });
     this.props.onEdit(
-      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ section }) })));
+      org.makeUpdateRootModel(m => m.with({ labels: m.labels.with({ section }) }), undo));
   }
 
 
@@ -73,7 +83,7 @@ export class LabelsEditor
     return (
       <div className="form-group row">
         <label className="col-2 col-form-label">{label}</label>
-        <div className="col-2">
+        <div className="col-10">
           {this.renderEditor(attr, update)}
         </div>
       </div>

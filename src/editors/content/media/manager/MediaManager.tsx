@@ -49,22 +49,22 @@ const SORT_MAPPINGS = {
   'A-Z': {
     orderBy: 'fileName',
     order: 'asc',
-    icon: 'fa fa-sort-alpha-asc',
+    icon: 'fas fa-sort-alpha-up',
   },
   'Z-A': {
     orderBy: 'fileName',
     order: 'desc',
-    icon: 'fa fa-sort-alpha-desc',
+    icon: 'fas fa-sort-alpha-down',
   },
   Type: {
     orderBy: 'mimeType',
     order: 'asc',
-    icon: 'fa fa-file-image-o',
+    icon: 'far fa-file-image',
   },
   'File Size': {
     orderBy: 'fileSize',
     order: 'asc',
-    icon: 'fa fa-sort-numeric-asc',
+    icon: 'fas fa-sort-numeric-up',
   },
 };
 
@@ -434,7 +434,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
         {isLoadingMedia && !allItemsLoaded
           ? (
             <div className="loading">
-              <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+              <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />
               {PAGE_LOADING_MESSAGE}
             </div>
           )
@@ -512,7 +512,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                         mediaItemRefs.get(selectedItem.guid).size
                       )
                       : (
-                        <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+                        <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />
                       )
                   }
                 </div>

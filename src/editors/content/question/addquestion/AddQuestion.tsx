@@ -8,6 +8,8 @@ import {
   createLikertSeries, createLikert, createFeedbackMultipleChoice,
   createFeedbackOpenResponse, createSupportingContent,
 } from './questionFactories';
+import { CombinationsMap, PermutationsMap } from 'types/combinations';
+import { caseOf } from 'utils/utils';
 
 type AddOption =
   // Formative/Summative Assessment
@@ -59,33 +61,13 @@ const FEEDBACK_OPTIONS: AddOption[] = [
   'FeedbackOpenResponse',
 ];
 
-type ToJSXElement = (onQuestionAdd: (question: Node) => void) => JSX.Element;
-const RenderOptions: { [key in AddOption]?: ToJSXElement } = {
-  MultipleChoiceSingle:
-    button(createMultipleChoiceQuestion.bind(null, 'single'), 'Multiple choice'),
-  MultipleChoiceMultiple:
-    button(createMultipleChoiceQuestion.bind(null, 'multiple'), 'Check all that apply'),
-  Ordering: button(createOrdering, 'Ordering'),
-  ShortAnswer: button(createShortAnswer, 'Short Answer'),
-  Essay: button(createEssay, 'Essay'),
-  Multipart: button(createMultipart, 'Input (Text, Numeric, Dropdown)'),
-  DragAndDrop: button(createDragDrop, 'Drag and Drop'),
-  ImageHotspot: button(createImageHotspot, 'Image Hotspot'),
-  EmbeddedPool: button(createEmbeddedPool, 'Embedded Pool'),
-  SupportingContent: button(createSupportingContent, 'Supporting Content'),
-  LikertSeries: button(createLikertSeries, 'Question Series with Scale'),
-  Likert: button(createLikert, 'Question with Scale'),
-  FeedbackMultipleChoice: button(createFeedbackMultipleChoice, 'Multiple Choice Question'),
-  FeedbackOpenResponse: button(createFeedbackOpenResponse, 'Open-Ended Question'),
-  Separator: () => <ToolbarButtonMenuDivider />,
-};
-
-
 export interface AddQuestionProps {
   editMode: boolean;
   assessmentType: AssessmentType;
-  onQuestionAdd: (question: Node) => void;
   isBranching?: boolean;
+  onQuestionAdd: (question: Node) => void;
+  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
+  onGetChoicePermutations: (comboNum: number) => PermutationsMap;
 }
 
 export interface AddQuestionState { }
@@ -99,7 +81,9 @@ export class AddQuestion extends React.Component<AddQuestionProps, AddQuestionSt
   isBranching = this.props.isBranching || false;
 
   render() {
-    const { assessmentType, onQuestionAdd } = this.props;
+    const {
+      assessmentType, onQuestionAdd, onGetChoiceCombinations, onGetChoicePermutations,
+    } = this.props;
 
     let options: AddOption[];
 
@@ -131,23 +115,68 @@ export class AddQuestion extends React.Component<AddQuestionProps, AddQuestionSt
 
     return (
       <React.Fragment>
-        {options.map(option => RenderOptions[option](onQuestionAdd))}
+        {options.map(option => caseOf<JSX.Element>(option)({
+          MultipleChoiceSingle: (
+            <a onClick={() => onQuestionAdd(
+              createMultipleChoiceQuestion('single', onGetChoiceCombinations),
+            )} className="dropdown-item">Multiple choice</a>
+          ),
+          MultipleChoiceMultiple: (
+            <a onClick={() => onQuestionAdd(
+              createMultipleChoiceQuestion('multiple', onGetChoiceCombinations),
+            )} className="dropdown-item">Check all that apply</a>
+          ),
+          Ordering: (
+            <a onClick={() => onQuestionAdd(createOrdering(onGetChoicePermutations))}
+              className="dropdown-item">Ordering</a>
+          ),
+          ShortAnswer: (
+            <a onClick={() => onQuestionAdd(createShortAnswer())}
+              className="dropdown-item">Short Answer</a>
+          ),
+          Essay: (
+            <a onClick={() => onQuestionAdd(createEssay())}
+              className="dropdown-item">Essay</a>
+          ),
+          Multipart: (
+            <a onClick={() => onQuestionAdd(createMultipart())}
+              className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
+          ),
+          DragAndDrop: (
+            <a onClick={() => onQuestionAdd(createDragDrop())}
+              className="dropdown-item">Drag and Drop</a>
+          ),
+          ImageHotspot: (
+            <a onClick={() => onQuestionAdd(createImageHotspot())}
+              className="dropdown-item">Image Hotspot</a>
+          ),
+          EmbeddedPool: (
+            <a onClick={() => onQuestionAdd(createEmbeddedPool())}
+              className="dropdown-item">Embedded Pool</a>
+          ),
+          SupportingContent: (
+            <a onClick={() => onQuestionAdd(createSupportingContent())}
+              className="dropdown-item">Supporting Content</a>
+          ),
+          LikertSeries: (
+            <a onClick={() => onQuestionAdd(createLikertSeries())}
+              className="dropdown-item">Question Series with Scale</a>
+          ),
+          Likert: (
+            <a onClick={() => onQuestionAdd(createLikert())}
+              className="dropdown-item">Question with Scale</a>
+          ),
+          FeedbackMultipleChoice: (
+            <a onClick={() => onQuestionAdd(createFeedbackMultipleChoice())}
+              className="dropdown-item">Multiple Choice Question</a>
+          ),
+          FeedbackOpenResponse: (
+            <a onClick={() => onQuestionAdd(createFeedbackOpenResponse())}
+              className="dropdown-item">Open-Ended Question</a>
+          ),
+          Separator: () => <ToolbarButtonMenuDivider />,
+        })(undefined))}
       </React.Fragment>
     );
   }
-}
-
-
-// HELPERS
-function onAdd(question: Node) {
-  return (onQuestionAdd: (_: Node) => void) =>
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
-      e.preventDefault();
-      onQuestionAdd(question);
-    };
-}
-
-function button(factory: () => Node, label: string): ToJSXElement {
-  return (onQuestionAdd: (_: Node) => void) =>
-    <a onClick={onAdd(factory())(onQuestionAdd)} className="dropdown-item">{label}</a>;
 }

@@ -8,8 +8,6 @@ import { getExpandId, render, NodeTypes } from 'editors/document/org/traversal';
 import { collapseNodes, expandNodes } from 'actions/expand';
 import { SourceNodeType } from 'editors/content/org/drag/utils';
 import { TreeNode } from 'editors/document/org/TreeNode';
-import { containsUnitsOnly } from './utils';
-import { ModalMessage } from 'utils/ModalMessage';
 import * as Messages from 'types/messages';
 import * as org from 'data/models/utils/org';
 
@@ -25,40 +23,6 @@ function isNumberedNodeType(node: any) {
     || node.contentType === contentTypes.OrganizationContentTypes.Module
     || node.contentType === contentTypes.OrganizationContentTypes.Section
     || node.contentType === contentTypes.OrganizationContentTypes.Sequence);
-}
-
-const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
-  + ' information in the OLI Learning Dashboard.  Therefore it is recommended that a one-level'
-  + ' organization use modules instead of units to organize course material.';
-
-function buildMoreInfoAction(display, dismiss) {
-  const moreInfoAction = {
-    label: 'More Info',
-    enabled: true,
-    execute: (message: Messages.Message, dispatch) => {
-      display(
-        <ModalMessage onCancel={dismiss}>{moreInfoText}</ModalMessage>);
-    },
-  };
-  return moreInfoAction;
-}
-
-const content = new Messages.TitledContent().with({
-  title: 'No modules.',
-  message: 'Organizations without modules have learning dashboard limitations in OLI',
-});
-
-function buildUnitsMessage(display, dismiss) {
-
-  return new Messages.Message().with({
-    content,
-    guid: 'UnitsOnly',
-    scope: Messages.Scope.Resource,
-    severity: Messages.Severity.Warning,
-    canUserDismiss: false,
-    actions: Immutable.List([buildMoreInfoAction(display, dismiss)]),
-  });
-
 }
 
 function calculatePositionsAtLevel(
@@ -179,7 +143,6 @@ interface OrgEditorState {
 class OrgEditor extends React.Component<OrgEditorProps,
   OrgEditorState>  {
 
-  unitsMessageDisplayed: boolean;
   pendingHighlightedNodes: Immutable.Set<string>;
   positionsAtLevel: Object;
   allNodeIds: string[];
@@ -189,7 +152,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
   constructor(props: OrgEditorProps) {
     super(props);
 
-    this.unitsMessageDisplayed = false;
     this.onNodeEdit = this.onNodeEdit.bind(this);
     this.onClickComponent = this.onClickComponent.bind(this);
 
@@ -211,12 +173,9 @@ class OrgEditor extends React.Component<OrgEditorProps,
       undoStackSize: 0,
       redoStackSize: 0,
     };
-
-    this.updateUnitsMessage(props);
   }
 
   componentDidMount() {
-
     // If the page has not been viewed yet or custom expand/collapse state has not been set by the
     // user, expand the top-level nodes
     this.props.expanded.caseOf({
@@ -245,20 +204,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
       });
     this.props.dispatch(
       expandNodes(this.props.context.documentId, ids));
-  }
-
-  updateUnitsMessage(props: OrgEditorProps) {
-
-    const containsOnly = containsUnitsOnly(props.model);
-
-    if (this.unitsMessageDisplayed && !containsOnly) {
-      this.unitsMessageDisplayed = false;
-      props.dismissMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
-
-    } else if (!this.unitsMessageDisplayed && containsOnly) {
-      this.unitsMessageDisplayed = true;
-      props.showMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
-    }
   }
 
   onReposition(sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) {
@@ -302,8 +247,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
   componentWillReceiveProps(nextProps) {
 
     if (this.props.model !== nextProps.model) {
-
-      this.updateUnitsMessage(nextProps);
 
       // Recalculate the position of the nodes ad each level. Doing this here
       // avoids having to do this on ever render.

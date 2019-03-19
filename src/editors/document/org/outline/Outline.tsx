@@ -94,6 +94,15 @@ const canHandleDrop: Tree.CanDropHandler<OutlineNode> = (
   newParent: Maybe<OutlineNode>,
   newIndex: number): boolean => {
 
+  // Do not allow dropping immediately above or below the
+  // original node
+  if (newIndex < originalIndex) {
+    if (originalIndex - newIndex < 1) {
+      return false;
+    }
+  } else if (newIndex - originalIndex <= 1) {
+    return false;
+  }
   return true;
 };
 

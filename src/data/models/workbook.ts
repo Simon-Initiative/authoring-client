@@ -9,6 +9,9 @@ import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
 const WB_ELEMENTS = [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS];
 
+export const NEW_PAGE_CONTENT =
+  'This is a new page with empty contents.';
+
 export type WorkbookPageModelParams = {
   resource?: contentTypes.Resource,
   guid?: string,

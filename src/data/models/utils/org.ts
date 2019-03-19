@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
 import { OrganizationModel } from 'data/models/org';
 import { Maybe } from 'tsmonad';
-import { map, filter } from 'data/utils/map';
+import { map } from 'data/utils/map';
 import { ContentElement } from 'data/content/common/interfaces';
 
 export type OrgNode =
@@ -35,6 +35,7 @@ export type OrgChangeRequest =
 export interface UpdateRootModel {
   type: 'UpdateRootModel';
   mapper: (model: OrganizationModel) => OrganizationModel;
+  undo: (model: OrganizationModel) => OrganizationModel;
 }
 
 
@@ -42,6 +43,7 @@ export interface UpdateNode {
   type: 'UpdateNode';
   nodeId: string;
   mapper: (node: OrgNode) => OrgNode;
+  undo: (node: OrgNode) => OrgNode;
 }
 
 export interface AddNode {
@@ -65,10 +67,12 @@ export interface MoveNode {
 
 
 export function makeUpdateRootModel(
-  mapper: (OrganizationModel) => OrganizationModel): UpdateRootModel {
+  mapper: (OrganizationModel) => OrganizationModel,
+  undo: (OrganizationModel) => OrganizationModel): UpdateRootModel {
   return {
     type: 'UpdateRootModel',
     mapper,
+    undo,
   };
 }
 
@@ -102,11 +106,13 @@ export function makeMoveNode(
 
 export function makeUpdateNode(
   nodeId: string,
-  mapper: (node: OrgNode) => OrgNode): UpdateNode {
+  mapper: (node: OrgNode) => OrgNode,
+  undo: (node: OrgNode) => OrgNode): UpdateNode {
   return {
     type: 'UpdateNode',
     nodeId,
     mapper,
+    undo,
   };
 }
 
@@ -140,13 +146,16 @@ export interface RemoveAnonymousNode {
   node: AnonymousNode;
 }
 
-
+export type AppliedChange = {
+  updatedModel: OrganizationModel;
+  undo: OrgChangeRequest;
+};
 
 // Attempts to apply a change request to an organization model.
 // If the change can successfully be applied just the new model
 // is returned, otherwise nothing is returned.
 export function applyChange(
-  model: OrganizationModel, change: OrgChangeRequest): Maybe<OrganizationModel> {
+  model: OrganizationModel, change: OrgChangeRequest): Maybe<AppliedChange> {
 
   if (change.type === 'UpdateRootModel') {
     return updateRootModel(model, change);
@@ -172,26 +181,58 @@ export function applyChange(
   if (change.type === 'SetAnonymousAttribute') {
 
   }
+  return Maybe.nothing();
 }
 
 // Remove a strongly identified node. This change request type
 // is unique in that it really cannot fail - since if we cannot
 // find the node to remove then it has already been removed.
-function removeNode(model: OrganizationModel, change: RemoveNode): Maybe<OrganizationModel> {
-  const predicate = (e) => {
-    if ((e as any).id !== undefined) {
-      return !((e as any).id === change.nodeId);
-    }
-    return true;
+function removeNode(model: OrganizationModel, change: RemoveNode): Maybe<AppliedChange> {
+
+  const holder = {
+    parentId: null,
+    found: false,
+    index: 0,
+    node: null,
   };
-  return Maybe.just(
-    filter(predicate, (model as any) as ContentElement)) as Maybe<OrganizationModel>;
+
+  const updatedModel = model.with(
+    { sequences: removeNodeHelper(model.sequences, change, holder) });
+
+  if (holder.found) {
+    return Maybe.just({
+      updatedModel,
+      undo: makeAddNode(holder.parentId, holder.node, Maybe.just(holder.index)),
+    });
+  }
+  return Maybe.nothing();
+}
+
+function removeNodeHelper(e, change: RemoveNode, holder) {
+
+  if (e.children === undefined) {
+    return e;
+  }
+  // See if the node to remove is in this parent
+  const arr = e.children.toArray();
+  for (let i = 0; i < arr.length; i += 1) {
+    const c = arr[i];
+    if (c.id === change.nodeId) {
+      holder.parentId = e.id;
+      holder.found = true;
+      holder.node = c;
+      holder.index = i;
+      return e.with({ children: e.children.delete(c.guid) });
+    }
+  }
+  return e.with(
+    { children: e.children.map(c => removeNodeHelper(c, change, holder)).toOrderedMap() });
 }
 
 // Add a strongly identified node.  Fails if the parent node cannot
 // be found, or if there is an index specified to add at that exceeds
 // the current length of the children map.
-function addNode(model: OrganizationModel, change: AddNode): Maybe<OrganizationModel> {
+function addNode(model: OrganizationModel, change: AddNode): Maybe<AppliedChange> {
 
   // Assume that the operation will fail
   let succeeded = false;
@@ -233,20 +274,31 @@ function addNode(model: OrganizationModel, change: AddNode): Maybe<OrganizationM
   };
 
   const updated = (map(add, (model as any) as ContentElement) as any) as OrganizationModel;
-  return succeeded ? Maybe.just(updated) : Maybe.nothing();
+
+  if (succeeded) {
+    const ac = {
+      updatedModel: updated,
+      undo: makeRemoveNode(change.node.id),
+    };
+    return Maybe.just(ac);
+  }
+  return Maybe.nothing();
+
 }
 
 
 // Allows updating of the root model. This cannot fail since we always have this model.
 function updateRootModel(
-  model: OrganizationModel, change: UpdateRootModel): Maybe<OrganizationModel> {
-  return Maybe.just(change.mapper(model));
+  model: OrganizationModel, change: UpdateRootModel): Maybe<AppliedChange> {
+
+  const undo = makeUpdateRootModel(change.undo, change.mapper);
+  return Maybe.just({ updatedModel: change.mapper(model), undo });
 }
 
 
 // Allows updating of a strongly identifiable node. Can fail if
 // the node cannot be found.
-function updateNode(model: OrganizationModel, change: UpdateNode): Maybe<OrganizationModel> {
+function updateNode(model: OrganizationModel, change: UpdateNode): Maybe<AppliedChange> {
 
   // Assume that the operation will fail
   let succeeded = false;
@@ -260,19 +312,41 @@ function updateNode(model: OrganizationModel, change: UpdateNode): Maybe<Organiz
     return e;
   };
 
-  const updated
+  const updatedModel
     = (map(wrappedMapper, (model as any) as ContentElement) as any) as OrganizationModel;
-  return succeeded ? Maybe.just(updated) : Maybe.nothing();
+  const undo = makeUpdateNode(change.nodeId, change.undo, change.mapper);
+
+  return succeeded ? Maybe.just({ updatedModel, undo }) : Maybe.nothing();
+
 }
 
 
 // Moves a node, which is essentially an atomic remove and add. Fails
 // if either the remove and add cannot be performed.
-function moveNode(model: OrganizationModel, change: MoveNode): Maybe<OrganizationModel> {
+function moveNode(model: OrganizationModel, change: MoveNode): Maybe<AppliedChange> {
+
   return removeNode(model, makeRemoveNode(change.node.id)).caseOf({
-    just: m => addNode(
-      m, makeAddNode(change.destParentId, change.node, Maybe.just(change.destIndex))),
+    just: (ac) => {
+      const theAdd = ac.undo as AddNode;
+      const index = theAdd.index.valueOr(0);
+      const add = addNode(
+        ac.updatedModel,
+        makeAddNode(change.destParentId, change.node, Maybe.just(change.destIndex)));
+
+      return add.caseOf({
+        just: (a) => {
+
+          return Maybe.just({
+            updatedModel: a.updatedModel,
+            undo: makeMoveNode(change.node, theAdd.parentId, index),
+          });
+
+        },
+        nothing: () => Maybe.nothing(),
+      });
+
+    },
     nothing: () => Maybe.nothing(),
-  }) as Maybe<OrganizationModel>;
+  }) as Maybe<AppliedChange>;
 }
 

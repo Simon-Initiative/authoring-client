@@ -132,13 +132,13 @@ export default class YouTubeEditor
             onShowSidebar();
             onDiscover(DiscoverableId.YouTubeEditorSourceURL);
           }} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-youtube-play" /></div>
+          <div><i className="fab fa-youtube-square" /></div>
           <div>Source URL</div>
         </ToolbarButton>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={() => window.open('https://youtube.com', '_blank').focus()}
             size={ToolbarButtonSize.Large}>
-            <i className="fa fa-youtube" /> YouTube.com
+            <i className="fab fa-youtube" /> YouTube.com
           </ToolbarButton>
         </ToolbarLayout.Column>
       </ToolbarGroup>

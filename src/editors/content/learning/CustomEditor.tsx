@@ -34,7 +34,7 @@ export interface CustomEditorState {
 @injectSheet(styles)
 export class CustomEditor
   extends AbstractContentEditor<Custom,
-    StyledComponentProps<CustomEditorProps>, CustomEditorState> {
+  StyledComponentProps<CustomEditorProps>, CustomEditorState> {
 
   constructor(props) {
     super(props);
@@ -114,14 +114,14 @@ export class CustomEditor
             onShowSidebar();
             onDiscover(DiscoverableId.CustomEditorDetails);
           }} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders" /></div>
+          <div><i className="fas fa-sliders-h" /></div>
           <div>Details</div>
         </ToolbarButton>
       </ToolbarGroup>
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const { className, classes, model } = this.props;
 
     return (

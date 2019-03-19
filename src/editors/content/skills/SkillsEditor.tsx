@@ -20,7 +20,7 @@ export interface SkillsEditorState {
 
 function toSkillArray(
   ids: Immutable.Set<string>,
-  allSkills: Immutable.OrderedMap<string, contentTypes.Skill>) : Skill[] {
+  allSkills: Immutable.OrderedMap<string, contentTypes.Skill>): Skill[] {
 
   return ids
     .toArray()
@@ -43,7 +43,7 @@ export default class SkillsEditor
 
   componentWillReceiveProps(nextProps: SkillsEditorProps) {
     if (nextProps.model !== this.props.model ||
-        this.props.context.skills !== nextProps.context.skills) {
+      this.props.context.skills !== nextProps.context.skills) {
       this.setState({ selected: toSkillArray(nextProps.model, nextProps.context.skills) });
     }
 
@@ -76,7 +76,7 @@ export default class SkillsEditor
     this.props.onFocus(null, null, Maybe.nothing());
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const options = this.props.context.skills
       .toArray()
       .map(s => ({ id: s.id, title: s.title }));
@@ -85,6 +85,7 @@ export default class SkillsEditor
       <div className="skills-editor">
         <Typeahead
           multiple
+          disabled={!this.props.editMode}
           onChange={(selected: Skill[]) => {
             if (this.state.selected.length !== selected.length) {
               const model = Immutable.Set(selected.map(s => s.id));

@@ -126,7 +126,7 @@ export default class OrgEditorManager
 
 
   renderLoading() {
-    const waitingIcon = <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />;
+    const waitingIcon = <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />;
     return (
       <div className="waiting-notification scale-in-center">
         {waitingIcon}

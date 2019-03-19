@@ -256,7 +256,7 @@ export default class ContiguousTextToolbar
             }
             disabled={!supports('em') || noTextSelected || !editMode}
             tooltip="Highlight">
-            <i className={'fa fa-pencil'} />
+            <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
@@ -358,7 +358,7 @@ export default class ContiguousTextToolbar
             }
             disabled={!supports('extra') || !rangeEntitiesEnabled}
             tooltip="Rollover Content">
-            <i className={'fa fa-address-book-o'} />
+            <i className={'far fa-address-book'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={

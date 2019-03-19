@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import * as models from 'data/models';
-
 import * as contentTypes from 'data/contentTypes';
 import { Actions } from 'editors/document/org/Actions.controller';
 import { Details } from 'editors/document/org/Details';
@@ -12,8 +11,44 @@ import * as Messages from 'types/messages';
 import * as org from 'data/models/utils/org';
 import { Maybe } from 'tsmonad';
 import { OrgComponentEditor } from './OrgComponentEditor';
-
+import guid from 'utils/guid';
 import './OrgDetailsEditor.scss';
+import { containsUnitsOnly } from './utils';
+import { ModalMessage } from 'utils/ModalMessage';
+
+function buildMoreInfoAction(display, dismiss) {
+  const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
+    + ' information in the OLI Learning Dashboard.  Therefore it is recommended that a one-level'
+    + ' organization use modules instead of units to organize course material.';
+
+
+  const moreInfoAction = {
+    label: 'More Info',
+    enabled: true,
+    execute: (message: Messages.Message, dispatch) => {
+      display(
+        <ModalMessage onCancel={dismiss}>{moreInfoText}</ModalMessage>);
+    },
+  };
+  return moreInfoAction;
+}
+
+function buildUnitsMessage(display, dismiss) {
+  const content = new Messages.TitledContent().with({
+    title: 'No modules.',
+    message: 'Organizations without modules have learning dashboard limitations in OLI',
+  });
+
+  return new Messages.Message().with({
+    content,
+    guid: 'UnitsOnly',
+    scope: Messages.Scope.Organization,
+    severity: Messages.Severity.Warning,
+    canUserDismiss: false,
+    actions: List([buildMoreInfoAction(display, dismiss)]),
+  });
+
+}
 
 export interface OrgDetailsEditorProps {
   skills: Map<string, contentTypes.Skill>;
@@ -27,6 +62,10 @@ export interface OrgDetailsEditorProps {
   dismissModal: () => void;
   displayModal: (c) => void;
   course: models.CourseModel;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
 }
 
 const enum TABS {
@@ -46,6 +85,7 @@ export interface OrgDetailsEditorState {
 export class OrgDetailsEditor
   extends React.PureComponent<StyledComponentProps<OrgDetailsEditorProps>,
   OrgDetailsEditorState> {
+  unitsMessageDisplayed: boolean = false;
 
   constructor(props) {
     super(props);
@@ -56,6 +96,33 @@ export class OrgDetailsEditor
     this.state = {
       currentTab: TABS.Details,
     };
+  }
+
+  componentDidMount() {
+    this.updateUnitsMessage(this.props);
+  }
+
+  componentWillReceiveProps(nextProps: Readonly<OrgDetailsEditorProps>) {
+    if (this.props.model !== nextProps.model) {
+      this.updateUnitsMessage(nextProps);
+    }
+  }
+
+  updateUnitsMessage(props: OrgDetailsEditorProps) {
+    const { model } = this.props;
+
+    model.lift((model) => {
+      const containsOnly = containsUnitsOnly(model);
+
+      if (!containsOnly) {
+        this.unitsMessageDisplayed = false;
+        props.dismissMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
+
+      } else if (!this.unitsMessageDisplayed && containsOnly) {
+        this.unitsMessageDisplayed = true;
+        props.showMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
+      }
+    });
   }
 
   onNodeEdit(request: org.OrgChangeRequest) {
@@ -87,16 +154,25 @@ export class OrgDetailsEditor
 
   onAddSequence() {
 
+    const id = guid();
+
     const mapper = (model) => {
       const s: contentTypes.Sequence = new contentTypes.Sequence()
-        .with({ title: 'New ' + model.labels.sequence });
+        .with({ id, title: 'New ' + model.labels.sequence });
       const sequences = model.sequences
         .with({ children: model.sequences.children.set(s.guid, s) });
 
       return model.with({ sequences });
     };
 
-    this.props.onEdit(org.makeUpdateRootModel(mapper));
+    const undo = (model: models.OrganizationModel) => {
+      const children = model.sequences.children.filter(
+        c => (c as any).id === id).toOrderedMap();
+      const sequences = model.sequences.with({ children });
+      return model.with({ sequences });
+    };
+
+    this.props.onEdit(org.makeUpdateRootModel(mapper, undo));
   }
 
   onTabClick(index: number) {

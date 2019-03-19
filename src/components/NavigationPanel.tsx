@@ -14,6 +14,11 @@ import * as nav from 'types/navigation';
 import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
+import { RequestButton } from 'editors/document/course/CourseEditor';
+import { CourseId } from 'data/types';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
+import { ACTIVE_ORG_STORAGE_KEY, activeOrgUserKey } from 'actions/utils/activeOrganization';
+
 
 const DEFAULT_WIDTH_PX = 400;
 const COLLAPSED_WIDTH_PX = 80;
@@ -26,7 +31,7 @@ export const styles: JSSStyles = {
     flexDirection: 'column',
     backgroundColor: colors.grayLightest,
     borderRight: [1, 'solid', colors.grayLight],
-    padding: [10, 0],
+    padding: [10, 0, 5, 0],
     position: 'relative',
   },
   collapsed: {
@@ -197,6 +202,15 @@ export const styles: JSSStyles = {
     cursor: 'ew-resize',
     zIndex: 1000,
   },
+  publishActions: {
+    margin: [2, 0, 2, 20],
+
+    publishAction: {
+      span: {
+        marginRight: 10,
+      },
+    },
+  },
 };
 
 export interface NavigationPanelProps {
@@ -204,12 +218,13 @@ export interface NavigationPanelProps {
   course: CourseModel;
   viewActions: viewActions.ViewActions;
   router: RouterState;
-  activeOrg: Maybe<Document>;
   profile: UserProfile;
   userId: string;
   userName: string;
   onCreateOrg: () => void;
+  onLoadOrg: (courseId: string, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
+  onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
 }
 
 export interface NavigationPanelState {
@@ -315,11 +330,41 @@ export class NavigationPanel
       'navbar_collapsed_' + username, `${collapsed}`);
   }
 
+  updateActiveOrgPref = (courseGuid: string, username: string, organizationGuid: string) => {
+
+    const userKey = activeOrgUserKey(username, courseGuid);
+
+    Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
+      .caseOf({
+        just: (prefs) => {
+          prefs[userKey] = organizationGuid;
+          saveToLocalStorage(ACTIVE_ORG_STORAGE_KEY, JSON.stringify(prefs));
+        },
+        nothing: () => saveToLocalStorage(
+          ACTIVE_ORG_STORAGE_KEY, JSON.stringify({ [userKey]: organizationGuid })),
+      });
+  }
+
   getWidth = () => {
     const { collapsed, width, newWidth } = this.state;
     return collapsed
       ? COLLAPSED_WIDTH_PX
       : newWidth.valueOr(width.valueOr(DEFAULT_WIDTH_PX));
+  }
+
+  onPreview(redeploy: boolean = true): Promise<void> {
+    const { router, onPreview } = this.props;
+
+    return router.courseId.caseOf({
+      just: courseId =>
+        router.orgId.caseOf({
+          just: orgId =>
+            onPreview(courseId, orgId, redeploy)
+              .catch(err => console.error('Full preview error:', err)),
+          nothing: () => Promise.reject(null),
+        }),
+      nothing: () => Promise.reject(null),
+    });
   }
 
   render() {
@@ -388,7 +433,7 @@ export class NavigationPanel
               router.route === ROUTE.ALL_RESOURCES && classes.selectedNavItem,
             ])}
             onClick={() => viewActions.viewAllResources(course.guid, currentOrg.guid)}>
-            <i className="fa fa-files-o" />{!collapsed && ' All Resources'}
+            <i className="fas fa-folder-open" />{!collapsed && ' All Resources'}
           </div>
         </Tooltip>
 
@@ -423,7 +468,7 @@ export class NavigationPanel
                 (e.nativeEvent as any).originator = 'OrgDropdownToggle';
                 this.setState({ showOrgDropdown: !showOrgDropdown });
               }}>
-              <i className={'fa fa-sort-desc'} />
+              <i className={'fas fa-sort-down'} />
             </div>
           </div>
           <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
@@ -434,6 +479,8 @@ export class NavigationPanel
 
                   if (org.id !== currentOrg.id) {
                     this.props.onReleaseOrg();
+                    this.updateActiveOrgPref(course.guid, profile.username, org.guid);
+                    this.props.onLoadOrg(course.guid, org.guid);
                     viewActions.viewDocument(org.guid, course.guid, org.guid);
                   }
 
@@ -480,6 +527,23 @@ export class NavigationPanel
           }
         </div>
 
+        <div className={classes.publishActions}>
+          {collapsed
+            ? <RequestButton text="" className="btn-primary previewButton"
+              onClick={() => this.onPreview()}><i className="fa fa-eye" /></RequestButton>
+            : <div className={classes.publishAction}>
+              <RequestButton text={this.getWidth() < 210 ? 'Preview' : 'Preview Course'}
+                className="btn-primary previewButton"
+                onClick={() => this.onPreview()} />
+              <HelpPopover>
+                You can launch a full course preview using the active organization to allow
+                it to be viewed publically.
+                <br /><br />
+                It may take a few minutes for larger courses.
+              </HelpPopover>
+            </div>
+          }
+        </div>
       </div>
     );
   }

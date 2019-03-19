@@ -28,5 +28,10 @@ export const styles: JSSStyles = {
   },
   removeBtn: {
     padding: [2, 4],
+    width: 'initial !important',
+
+    '& button': {
+      fontSize: 12,
+    },
   },
 };

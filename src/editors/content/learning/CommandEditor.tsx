@@ -311,7 +311,7 @@ export default class CommandEditor
     return (
       <ToolbarGroup label="Command" columns={4} highlightColor={CONTENT_COLORS.Command}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders" /></div>
+          <div><i className="fas fa-sliders-h" /></div>
           <div>Details</div>
         </ToolbarButton>
       </ToolbarGroup>

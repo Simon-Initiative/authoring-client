@@ -28,7 +28,7 @@ export const InputList: React.StatelessComponent<InputListProps> = ({
 export interface InputListItemProps {
   className?: string;
   id: string;
-  label: string;
+  label?: string;
   contentTitle?: string;
   context: AppContext;
   services: AppServices;
@@ -132,9 +132,11 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
           {isDraggable && connectDragSource(
             <div className="item-drag-handle"><DragHandle /></div>,
           )}
-          <div className="label-text">
-            {label}
-          </div>
+          {(label === '' || label) &&
+            <div className="label-text">
+              {label}
+            </div>
+          }
           {controls}
         </div>
         {connectDragPreview(

@@ -33,7 +33,7 @@ export class LoadingSpinner
       <div className={classNames(['LoadingSpinner', classes.LoadingSpinner, className])}>
         {failed
           ? <i className="fa fa-times-circle" />
-          : <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />}
+          : <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />}
         &nbsp;{message}
       </div>
     );

@@ -117,7 +117,7 @@ export default class BlockCodeToolbar
             }
             disabled={noTextSelected || !editMode}
             tooltip="Highlight">
-            <i className={'fa fa-pencil'} />
+            <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={

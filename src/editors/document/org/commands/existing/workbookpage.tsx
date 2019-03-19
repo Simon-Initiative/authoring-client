@@ -8,6 +8,7 @@ import createGuid from 'utils/guid';
 import { Resource, ResourceState } from 'data/content/resource';
 import * as o from 'data/models/utils/org';
 import { Maybe } from 'tsmonad';
+import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 
 export class AddExistingWorkbookPageCommand extends AbstractCommand {
 
@@ -47,7 +48,8 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
       node.contentType === 'Module') {
 
       const predicate = (res: Resource): boolean =>
-        res.type === LegacyTypes.workbook_page
+        res.id !== PLACEHOLDER_ITEM_ID
+        && res.type === LegacyTypes.workbook_page
         && res.resourceState !== ResourceState.DELETED;
 
       return new Promise((resolve, reject) => {

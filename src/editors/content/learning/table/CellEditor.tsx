@@ -216,7 +216,7 @@ export default class CellEditor
             onEdit={this.onCellEdit.bind(this)}
           />
         </div>
-        <i className={classNames(['fa fa-caret-square-o-down', classes.selectCell])} />
+        <i className={classNames(['far fa-caret-square-down', classes.selectCell])} />
       </div>
     );
   }

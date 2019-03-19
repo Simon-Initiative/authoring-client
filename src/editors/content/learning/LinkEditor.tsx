@@ -28,7 +28,7 @@ export interface LinkEditorState {
 export default class LinkEditor
   extends AbstractContentEditor<contentTypes.Link, LinkEditorProps & JSSProps, LinkEditorState> {
 
-  constructor(props : LinkEditorProps) {
+  constructor(props: LinkEditorProps) {
     super(props);
 
     this.state = {
@@ -48,14 +48,29 @@ export default class LinkEditor
   renderSideBarExternal() {
     const { editMode, model, onEdit } = this.props;
 
+    const isMissingScheme = !(
+      model.href.startsWith('mailto://') ||
+      model.href.startsWith('ftp://') ||
+      model.href.startsWith('http://') ||
+      model.href.startsWith('https://')
+    );
+
+    const missingSchemeMessage = isMissingScheme
+      ? <span style={{ color: 'darkred' }}>URLs should begin with <code>https://</code></span>
+      : null;
+
     return (
       <React.Fragment>
 
         <SidebarGroup label="URL">
+
+          {missingSchemeMessage}
+
           <TextInput
             editMode={editMode}
             width="100%"
             label=""
+            hasError={isMissingScheme}
             value={model.href}
             type="string"
             onEdit={href => onEdit(model.with({ href }))}
@@ -207,7 +222,7 @@ export default class LinkEditor
           <ToolbarButton
             disabled={!editMode}
             onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-file-o" /></div>
+            <div><i className="far fa-file" /></div>
             <div>Select File</div>
           </ToolbarButton>
         </SidebarGroup>
@@ -225,8 +240,8 @@ export default class LinkEditor
     const { editMode } = this.props;
 
     const content = this.state.isExternal
-    ? this.renderSideBarExternal()
-    : this.renderSideBarWebContent();
+      ? this.renderSideBarExternal()
+      : this.renderSideBarWebContent();
 
     return (
       <SidebarContent title="Hyperlink">
@@ -241,7 +256,7 @@ export default class LinkEditor
                 checked={!this.state.isExternal}
                 onChange={() => this.onSourceChange(false)}
                 type="radio" />&nbsp;
-              Media Library
+      Media Library
             </label>
           </div>
           <div className="form-check" style={{ marginBottom: '30px' }}>
@@ -253,7 +268,7 @@ export default class LinkEditor
                 disabled={!editMode}
                 checked={this.state.isExternal}
                 type="radio" />&nbsp;
-              URL
+      URL
             </label>
           </div>
         </SidebarGroup>
@@ -272,7 +287,7 @@ export default class LinkEditor
         columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders" /></div>
+            <div><i className="fas fa-sliders-h" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

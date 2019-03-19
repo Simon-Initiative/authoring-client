@@ -20,8 +20,8 @@ export interface WritelockModalState {
  */
 @injectSheet(styles)
 export class WritelockModal
-    extends React.PureComponent<StyledComponentProps<WritelockModalProps>,
-    WritelockModalState> {
+  extends React.PureComponent<StyledComponentProps<WritelockModalProps>,
+  WritelockModalState> {
   modal: any;
 
   constructor(props) {
@@ -50,7 +50,7 @@ export class WritelockModal
             <div className="modal-body">
               <div>
                 <span className="fa-stack fa-2x">
-                  <i className="fa fa-lock fa-stack-1x"></i>
+                  <i className="fas fa-lock fa-stack-1x"></i>
                   <i className="fa fa-ban fa-stack-2x" style={{ color: '#f39c12' }}></i>
                 </span>
               </div>

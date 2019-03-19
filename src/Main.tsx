@@ -38,18 +38,48 @@ import Preview from 'components/Preview';
 import { caseOf } from 'utils/utils';
 import { NavigationPanel } from 'components/NavigationPanel.controller';
 import * as viewActions from 'actions/view';
+import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 
-const createOrg = (courseId, title, type) => {
+const createOrg = (courseId, title, courseTitle: string, wbId) => {
   const g = guid();
   const id = courseId + '_' +
     title.toLowerCase().split(' ')[0] + '_'
     + g.substring(g.lastIndexOf('-') + 1);
 
+  const prefix = courseTitle.toLowerCase().startsWith('Welcome')
+    ? '' : 'Welcome to ';
+
+  const resourceref = new contentTypes.ResourceRef().with({
+    idref: wbId,
+  });
+
+  const item = new contentTypes.Item().with({
+    resourceref,
+  });
+
+  const module = new contentTypes.Module().with({
+    title: prefix + courseTitle,
+    children: Immutable.OrderedMap<string, any>([[item.guid, item]]),
+  });
+  const unit = new contentTypes.Unit().with({
+    title: prefix + courseTitle,
+    children: Immutable.OrderedMap<string, any>([[module.guid, module]]),
+  });
+  const sequence = new contentTypes.Sequence().with({
+    title: courseTitle,
+    children: Immutable.OrderedMap<string, any>([[unit.guid, unit]]),
+  });
+
+  const sequences = new contentTypes.Sequences().with({
+    children: Immutable.OrderedMap<string, any>([[sequence.guid, sequence]]),
+  });
+
   return new models.OrganizationModel().with({
-    type,
+    type: LegacyTypes.organization,
     id,
     title,
     resource: new contentTypes.Resource().with({ title, id, guid: id }),
+    sequences,
     version: '1.0',
   });
 };
@@ -65,7 +95,6 @@ interface MainProps {
   onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
   onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
-  onReleaseOrg: (documentId: string) => Promise<{}>;
   onSetServerTimeSkew: () => void;
   onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
@@ -142,18 +171,27 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     course.lift((c) => {
       const title = 'New Organization';
-      const type = LegacyTypes.organization;
-      const resource = createOrg(c.guid, title, type);
 
-      persistence.createDocument(c.guid, resource)
+      const wbId = guid();
+      const body = NEW_PAGE_CONTENT;
+      const wb = models.WorkbookPageModel.createNew(wbId, 'Welcome', body);
+
+      persistence.createDocument(c.guid, wb)
         .then((result) => {
-          const r = (result as any).model.resource;
 
-          const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
-          onUpdateCourseResources(updated);
+          const resource = createOrg(c.guid, title, c.title, wbId);
 
-          viewActions.viewDocument(r.guid, c.guid, r.guid);
+          persistence.createDocument(c.guid, resource)
+            .then((result) => {
+              const r = (result as any).model.resource;
+
+              const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
+              onUpdateCourseResources(updated);
+
+              viewActions.viewDocument(r.guid, c.guid, r.guid);
+            });
         });
+
     });
   }
 
@@ -193,7 +231,7 @@ export default class Main extends React.Component<MainProps, MainState> {
         <ImportCourseView dispatch={onDispatch} />
       ),
       [ROUTE.CREATE]: (
-        <CreateCourseView dispatch={onDispatch} />
+        <CreateCourseView userName={user.user} dispatch={onDispatch} />
       ),
       [ROUTE.PREVIEW]: () => {
         const documentId = router.resourceId;
