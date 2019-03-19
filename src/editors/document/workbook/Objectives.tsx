@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Typeahead, Highlighter } from 'react-bootstrap-typeahead';
+import { Typeahead } from 'react-bootstrap-typeahead';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -111,18 +111,6 @@ export class Objectives
           options={options}
           labelKey="title"
           selected={this.state.selected}
-          renderMenuItemChildren={(option, props, index) => [
-            <Highlighter key="title" search={props.text}>
-              {option.title}
-            </Highlighter>,
-            <div>
-              <small>
-                Skills: {this.props.context.objectives.get(option.id)
-                  ? this.props.context.objectives.get(option.id).skills.size
-                  : 0}
-              </small>
-            </div>,
-          ]}
         />
       </div >
     );

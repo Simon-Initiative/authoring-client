@@ -78,6 +78,7 @@ export { YouTube } from 'data/content/learning/youtube';
 
 // Assessment
 export { Choice } from './content/assessment/choice';
+export { Conclusion } from './content/assessment/conclusion';
 export { Content } from './content/assessment/content';
 export { Custom } from './content/assessment/custom';
 export { Essay } from './content/assessment/essay';
@@ -87,6 +88,7 @@ export { GradingCriteria } from './content/assessment/criteria';
 export { Hint } from './content/assessment/hint';
 export { Hotspot } from './content/assessment/image_hotspot/hotspot';
 export { ImageHotspot } from './content/assessment/image_hotspot/image_hotspot';
+export { Introduction } from './content/assessment/introduction';
 export { Lock } from './content/lock';
 export { Match } from './content/assessment/match';
 export { MultipleChoice } from './content/assessment/multiple_choice';
