@@ -53,6 +53,7 @@ function buildUnitsMessage(display, dismiss) {
 export interface OrgDetailsEditorProps {
   skills: Map<string, contentTypes.Skill>;
   objectives: Map<string, contentTypes.LearningObjective>;
+  placements: org.Placements;
   model: Maybe<models.OrganizationModel>;
   onEdit: (request: org.OrgChangeRequest) => void;
   editMode: boolean;

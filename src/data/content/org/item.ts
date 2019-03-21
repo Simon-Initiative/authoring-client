@@ -112,14 +112,14 @@ export class Item extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const children = [this.resourceref.toPersistence()];
 
     this.preferences.lift(p => children.push(p));
-    this.preconditions.lift(p => children.push(p.toPersistence));
-    this.supplements.lift(p => children.push(p.toPersistence));
-    this.schedule.lift(p => children.push(p.toPersistence));
+    this.preconditions.lift(p => children.push(p.toPersistence()));
+    this.supplements.lift(p => children.push(p.toPersistence()));
+    this.schedule.lift(p => children.push(p.toPersistence()));
 
     const s = {
       item: {

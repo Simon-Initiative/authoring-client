@@ -11,6 +11,7 @@ import * as commands from './commands/map';
 import { Command } from './commands/command';
 import { RemoveCommand } from './commands/remove';
 import { Outline } from './outline/Outline';
+import { PreconditionsEditor } from './PreconditionsEditor';
 import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import './OrgComponent.scss';
@@ -19,6 +20,7 @@ export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
   objectives: Map<string, t.LearningObjective>;
   course: models.CourseModel;
+  placements: org.Placements;
   org: Maybe<models.OrganizationModel>;
   componentId: string;
   editMode: boolean;
@@ -137,6 +139,14 @@ export class OrgComponentEditor
     });
   }
 
+  onEditPreconditions(m, preconditions) {
+    const change = org.makeUpdateNode(
+      m.id,
+      n => (n as any).with({ preconditions }),
+      n => (n as any).with({ preconditions: m.preconditions }));
+    this.props.onEdit(change);
+  }
+
   renderContent(
     model: t.Sequence | t.Unit | t.Module | t.Section): JSX.Element {
 
@@ -173,12 +183,25 @@ export class OrgComponentEditor
               onUndo={onUndo.bind(this)}
               onRedo={onRedo.bind(this)} />
             {titleEditor}
+
+            <PreconditionsEditor
+              parentId={model.id}
+              editMode={this.props.editMode}
+              org={org}
+              placements={this.props.placements}
+              course={this.props.course}
+              preconditions={model.preconditions}
+              onEdit={p => this.onEditPreconditions(model, p)}
+            />
+
             {this.renderActionBar(model)}
             <Outline
               onView={this.onView}
               editMode={this.props.editMode}
               onEdit={this.props.onEdit}
               nodes={model.children}
+              org={org}
+              placements={this.props.placements}
               parentNodeId={model.id}
               course={this.props.course}
               commandProcessor={this.processCommand.bind(this, org)}
