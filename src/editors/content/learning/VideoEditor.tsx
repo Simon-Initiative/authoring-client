@@ -199,7 +199,7 @@ export default class VideoEditor
       <ToolbarGroup label="Video" highlightColor={CONTENT_COLORS.Video} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders" /></div>
+            <div><i className="fas fa-sliders-h" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

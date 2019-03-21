@@ -20,8 +20,8 @@ export interface ConflictModalState {
  */
 @injectSheet(styles)
 export class ConflictModal
-    extends React.PureComponent<StyledComponentProps<ConflictModalProps>,
-    ConflictModalState> {
+  extends React.PureComponent<StyledComponentProps<ConflictModalProps>,
+  ConflictModalState> {
   modal: any;
 
   constructor(props) {
@@ -51,7 +51,7 @@ export class ConflictModal
               <div>
                 <span className="fa-stack fa-2x">
                   <i className="fa fa-exclamation fa-stack-1x"></i>
-                  <i className="fa fa-file-o fa-stack-2x"></i>
+                  <i className="far fa-file fa-stack-2x"></i>
                 </span>
               </div>
               <div className={classNames([classes.messageText, 'flex-spacer'])}>

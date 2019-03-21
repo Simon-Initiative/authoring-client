@@ -184,9 +184,8 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
                     onClick={() =>
                       response && simpleSelectProps.onToggleSimpleSelect(response, choice)} >
                     <i
-                      className={`fa ${simpleSelectProps.selected
-                        ? 'fa-check-circle' : 'fa-check-circle-o'}`
-                      } />
+                      className={simpleSelectProps.selected
+                        ? 'fas fa-check-circle' : 'far fa-check-circle'} />
                   </Button>
                 </ItemControl>
               )
@@ -217,8 +216,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
             {wasLastCorrectChoice ? (
               <div className="message alert alert-warning">
                 <i className="fa fa-exclamation-circle" />
-                {' Correct choices not updated. \
-                  There must be at least one choice'}
+                {' Feedback requires at least one correct choice. Please select a correct choice'}
               </div>
             )
               : null}

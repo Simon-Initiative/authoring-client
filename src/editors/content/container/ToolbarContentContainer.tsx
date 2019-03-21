@@ -27,8 +27,8 @@ export interface ToolbarContentContainerState {
  */
 @injectSheet<ToolbarContentContainerProps>(styles)
 export class ToolbarContentContainer
-    extends React.PureComponent<StyledComponentProps<ToolbarContentContainerProps>,
-    ToolbarContentContainerState> {
+  extends React.PureComponent<StyledComponentProps<ToolbarContentContainerProps>,
+  ToolbarContentContainerState> {
 
   constructor(props) {
     super(props);
@@ -75,79 +75,79 @@ export class ToolbarContentContainer
     return (
       <div className={classes.miniToolbar}>
         <ToolbarButton
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Bold, selection));
-            }}
-            tooltip="Bold"
-            disabled={!formatEnabled}>
-          <i className={'fa fa-bold'}/>
+          onClick={() => {
+            this.onFormatEdit(text.toggleStyle(InlineStyles.Bold, selection));
+          }}
+          tooltip="Bold"
+          disabled={!formatEnabled}>
+          <i className={'fa fa-bold'} />
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Italic, selection));
-            }}
-            tooltip="Italic"
-            disabled={!formatEnabled}>
-          <i className={'fa fa-italic'}/>
+          onClick={() => {
+            this.onFormatEdit(text.toggleStyle(InlineStyles.Italic, selection));
+          }}
+          tooltip="Italic"
+          disabled={!formatEnabled}>
+          <i className={'fa fa-italic'} />
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Strikethrough, selection));
-            }}
-            tooltip="Strikethrough"
-            disabled={!formatEnabled}>
-          <i className={'fa fa-strikethrough'}/>
+          onClick={() => {
+            this.onFormatEdit(text.toggleStyle(InlineStyles.Strikethrough, selection));
+          }}
+          tooltip="Strikethrough"
+          disabled={!formatEnabled}>
+          <i className={'fa fa-strikethrough'} />
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Highlight, selection));
-            }}
-            tooltip="Highlight"
-            disabled={!formatEnabled}>
-          <i className={'fa fa-pencil'}/>
+          onClick={() => {
+            this.onFormatEdit(text.toggleStyle(InlineStyles.Highlight, selection));
+          }}
+          tooltip="Highlight"
+          disabled={!formatEnabled}>
+          <i className={'fas fa-pencil-alt'} />
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Superscript, selection));
-            }}
-            tooltip="Superscript"
-            disabled={!formatEnabled}>
-          <i className={'fa fa-superscript'}/>
+          onClick={() => {
+            this.onFormatEdit(text.toggleStyle(InlineStyles.Superscript, selection));
+          }}
+          tooltip="Superscript"
+          disabled={!formatEnabled}>
+          <i className={'fa fa-superscript'} />
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Subscript, selection));
-            }}
-            tooltip="Subscript"
-            disabled={!formatEnabled}>
-          <i className={'fa fa-subscript'}/>
+          onClick={() => {
+            this.onFormatEdit(text.toggleStyle(InlineStyles.Subscript, selection));
+          }}
+          tooltip="Subscript"
+          disabled={!formatEnabled}>
+          <i className={'fa fa-subscript'} />
         </ToolbarButton>
 
         <div className="flex-spacer" />
 
         <ToolbarDropdown
-            hideArrow
-            label={<i className={classNames(['fa fa-ellipsis-v', classes.moreLabel])}/>} >
+          hideArrow
+          label={<i className={classNames(['fa fa-ellipsis-v', classes.moreLabel])} />} >
           <button className="dropdown-item"
             onClick={() => {
               this.onFormatEdit(text.toggleStyle(InlineStyles.Var, selection));
             }}
             disabled={!formatEnabled}>
-            <i className="fa fa-code"/> Code
+            <i className="fa fa-code" /> Code
           </button>
           <button className="dropdown-item"
             onClick={() => {
               this.onFormatEdit(text.toggleStyle(InlineStyles.Term, selection));
             }}
             disabled={!formatEnabled}>
-            <i className="fa fa-book"/> Term
+            <i className="fa fa-book" /> Term
           </button>
           <button className="dropdown-item"
             onClick={() => {
               this.onFormatEdit(text.toggleStyle(InlineStyles.Foreign, selection));
             }}
             disabled={!formatEnabled}>
-            <i className="fa fa-globe"/> Foreign
+            <i className="fa fa-globe" /> Foreign
           </button>
         </ToolbarDropdown>
       </div>

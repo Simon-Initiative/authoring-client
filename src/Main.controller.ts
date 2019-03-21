@@ -32,7 +32,6 @@ interface DispatchProps {
   onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
   onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
-  onReleaseOrg: (documentId: string) => Promise<{}>;
   onSetServerTimeSkew: () => void;
   onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
@@ -78,7 +77,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onLoad: (courseId: string, documentId: string) => dispatch(load(courseId, documentId)),
     onRelease: (documentId: string) => dispatch(release(documentId)),
     onLoadOrg: (courseId: string, documentId: string) => dispatch(loadOrg(courseId, documentId)),
-    onReleaseOrg: (documentId: string) => Promise.resolve({}),
     onSetServerTimeSkew: () => dispatch(setServerTimeSkew()),
     onLoadCourse: (courseId: string) => dispatch(loadCourse(courseId)),
     onDispatch: dispatch,

@@ -15,6 +15,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { MapFn } from 'data/utils/map';
 import { fetchSkills } from 'actions/skills';
 import { fetchObjectives } from 'actions//objectives';
+import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 
 /**
  * An interface that defines the  'services' that are available to
@@ -99,7 +100,8 @@ export class DispatchBasedServices implements AppServices {
   }
 
   createWorkbookPage(title: string, courseId: string): Promise<persistence.Document> {
-    const resource = models.WorkbookPageModel.createNew(guid(), 'New Page', 'Empty contents');
+    const resource = models.WorkbookPageModel.createNew(
+      guid(), 'New Page', NEW_PAGE_CONTENT);
     return this.createResource(courseId, resource);
   }
 

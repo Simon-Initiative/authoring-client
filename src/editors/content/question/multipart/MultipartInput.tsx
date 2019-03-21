@@ -373,7 +373,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
                     className="btn-remove"
                     editMode={editMode}
                     onClick={() => this.onRemove(item, parts[index])}>
-                    <i className="fa fa-trash" /> Remove Item
+                    <i className="fas fa-trash" /> Remove Item
                   </Button>,
                 ]}>
 

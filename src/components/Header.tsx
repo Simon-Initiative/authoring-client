@@ -76,8 +76,10 @@ const styles: JSSStyles = {
 
   },
 
-  headerLogout: {
-
+  headerUserProfile: {
+    '& .dropdown-menu.dropdown-menu-right': {
+      textAlign: 'center',
+    },
     headerLink: {
       marginRight: 0,
     },
@@ -105,15 +107,15 @@ type LinkProps = {
 };
 
 const Link: React.StatelessComponent<StyledComponentProps<LinkProps>> =
-injectSheetSFC<LinkProps>(styles)(({
-  className,
-  action,
-  children,
-  classes,
-}) => (
-  <a className={classNames([classes.headerLink, className])} href="#"
-    onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
-));
+  injectSheetSFC<LinkProps>(styles)(({
+    className,
+    action,
+    children,
+    classes,
+  }) => (
+      <a className={classNames([classes.headerLink, className])} href="#"
+        onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
+    ));
 
 type MenuProps = {
   label: string | JSX.Element,
@@ -121,22 +123,22 @@ type MenuProps = {
 };
 
 const Menu: React.StatelessComponent<StyledComponentProps<MenuProps>> =
-injectSheetSFC<MenuProps>(styles)(({
-  label,
-  children,
-  classes,
-}) => (
-  <div className={classNames([classes.headerDropdown, 'dropdown show'])}>
-    <a className={classNames([classes.headerLink, 'dropdown-toggle'])} href="#"
-      target="_blank"
-      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      {label}
-    </a>
-    <div className="dropdown-menu dropdown-menu-right">
-      {children}
-    </div>
-  </div>
-));
+  injectSheetSFC<MenuProps>(styles)(({
+    label,
+    children,
+    classes,
+  }) => (
+      <div className={classNames([classes.headerDropdown, 'dropdown show'])}>
+        <a className={classNames([classes.headerLink, 'dropdown-toggle'])} href="#"
+          target="_blank"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {label}
+        </a>
+        <div className="dropdown-menu dropdown-menu-right">
+          {children}
+        </div>
+      </div>
+    ));
 
 
 type MenuItemProps = {
@@ -145,12 +147,12 @@ type MenuItemProps = {
 };
 
 const MenuItem: React.StatelessComponent<StyledComponentProps<MenuItemProps>> =
-injectSheetSFC<MenuItemProps>(styles)(({
-  url,
-  children,
-}) => (
-  <a className="dropdown-item" href={url}>{children}</a>
-));
+  injectSheetSFC<MenuItemProps>(styles)(({
+    url,
+    children,
+  }) => (
+      <a className="dropdown-item" href={url}>{children}</a>
+    ));
 
 /**
  * Header React Component
@@ -168,17 +170,19 @@ class Header extends React.PureComponent<StyledComponentProps<HeaderProps>, Head
   }
 
   renderAbout() {
+    const { user } = this.props;
 
-    const name = this.props.user.profile.username;
-    const email = this.props.user.profile.email;
+    const name = user.profile.username;
+    const email = user.profile.email;
     const formUrl = buildFeedbackFromCurrent(name, email);
     const QUICK_START_GUIDE_URL
       = 'https://docs.google.com/document/d/1B_AQpFRn2zue6-'
       + 'nW6h8z6bOGfHWYqAjI7WCZ-WQMrf4/edit?usp=sharing';
+    const logoutUrl = user.logoutUrl;
 
     return (
       <React.Fragment>
-        <Menu label={<i className="fa fa-question-circle" />}>
+        <Menu label={user.profile.username}>
           <h6 className="dropdown-header">Course Author v{getVersion()}</h6>
           <div className="dropdown-divider"></div>
           <MenuItem url={QUICK_START_GUIDE_URL}>
@@ -187,6 +191,8 @@ class Header extends React.PureComponent<StyledComponentProps<HeaderProps>, Head
           <MenuItem url={formUrl}>
             Help / Feedback
           </MenuItem>
+          <div className="dropdown-divider"></div>
+          <MenuItem url={logoutUrl}>Log Out</MenuItem>
         </Menu>
       </React.Fragment>
     );
@@ -264,8 +270,7 @@ class Header extends React.PureComponent<StyledComponentProps<HeaderProps>, Head
           transitionEnterTimeout={250} transitionLeaveTimeout={500}>
           {this.renderSaveNotification()}
         </ReactCSSTransitionGroup>
-        <div className={classes.headerLogout}>
-          <a className={classes.headerLink} href={this.props.user.logoutUrl}>Logout</a>
+        <div className={classes.headerUserProfile}>
           {this.renderAbout()}
         </div>
       </div>

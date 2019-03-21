@@ -312,7 +312,7 @@ export default class ConjugateEditor
         <div>
           {contentEditor}
         </div>
-        <i className={classNames(['fa fa-caret-square-o-down', classes.selectConjugate])} />
+        <i className={classNames(['far fa-caret-square-down', classes.selectConjugate])} />
       </div>
     );
   }

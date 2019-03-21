@@ -7,6 +7,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 
 import './Objectives.scss';
+import { extractFullText } from 'data/content/objectives/objective';
 
 type ObjTitle = { id: string, title: string };
 
@@ -24,7 +25,16 @@ function toObjArray(
 
   return ids
     .toArray()
-    .map(id => ({ id, title: objs.has(id) ? objs.get(id).title : 'Loading...' }));
+    .map(id => ({
+      id,
+      title: objs.has(id)
+        // Support objectives with marked-up content, which is not saved to the title attribute
+        ? objs.get(id).rawContent.caseOf({
+          just: c => extractFullText(c),
+          nothing: () => objs.get(id).title,
+        })
+        : 'Loading...',
+    }));
 
 }
 
@@ -76,12 +86,13 @@ export class Objectives
 
   renderMain(): JSX.Element {
 
+    const title = o =>
+      o.rawContent.caseOf({ just: c => extractFullText(c), nothing: () => o.title });
+
     const options = this.props.context.objectives
       .toArray()
-      .map(o => ({
-        id: o.id,
-        title: o.title ? o.title : 'Loading...',
-      }));
+      .map(o => ({ id: o.id, title: title(o) ? title(o) : 'Loading...' }))
+      .sort((a, b) => a.title.trim() < b.title.trim() ? -1 : 1);
 
     return (
       <div className="objectives-editor">
@@ -92,22 +103,16 @@ export class Objectives
           multiple
           disabled={!this.props.editMode}
           onChange={(selected: ObjTitle[]) => {
-
             if (selected.length !== this.state.selected.length) {
               const model = Immutable.List(selected.map(s => s.id));
               this.setState({ selected }, () => this.props.onEdit(model));
             }
-
           }}
           options={options}
           labelKey="title"
           selected={this.state.selected}
         />
-      </div>
+      </div >
     );
-
   }
-
-
 }
-

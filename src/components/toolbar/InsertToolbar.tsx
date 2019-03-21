@@ -33,6 +33,7 @@ import { ImageHotspot } from 'data/content/workbook/multipanel/image_hotspot';
 import { Hotspot } from 'data/content/workbook/multipanel/hotspot';
 import { Panel } from 'data/content/workbook/multipanel/panel';
 import { PurposeTypes } from 'data/content/org/types';
+import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -548,6 +549,7 @@ export class InsertToolbar
                   <ResourceSelection
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.workbook_page
+                      && res.id !== PLACEHOLDER_ITEM_ID
                       && res.resourceState !== ResourceState.DELETED}
                     courseId={context.courseId}
                     onInsert={(resource) => {
@@ -565,7 +567,7 @@ export class InsertToolbar
                   />)
                 }
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'fa fa-file-o'} />
+                <i style={{ width: 22 }} className={'far fa-file'} />
                 Insert workbook page
                 </ToolbarButtonMenuItem>
 
@@ -634,7 +636,7 @@ export class InsertToolbar
                   />)
                 }
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'fa fa-check-square-o'} />
+                <i style={{ width: 22 }} className={'fas fa-poll'} />
                 Insert survey
                 </ToolbarButtonMenuItem>
 
@@ -656,7 +658,7 @@ export class InsertToolbar
 
                 }}
                 disabled={!editMode || !parentSupportsElementType('activity')}>
-                <i style={{ width: 22 }} className={'fa fa-check-square-o'} />
+                <i style={{ width: 22 }} className={'fas fa-poll'} />
                 Create survey
                 </ToolbarButtonMenuItem>
 

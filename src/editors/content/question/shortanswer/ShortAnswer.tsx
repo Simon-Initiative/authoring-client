@@ -65,7 +65,7 @@ export class ShortAnswer
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Details" />
           <TabSectionContent>
-            <div style={{ display: 'inline' }}>
+            <div>
               <Select
                 editMode={editMode}
                 label="Whitespace"
@@ -83,11 +83,12 @@ export class ShortAnswer
                 onClick={this.onToggleCaseSensitive} />
             </div>
           </TabSectionContent>
-          <TabSectionHeader title="How would an expert answer this question?">
+          <TabSectionHeader title="Feedback">
           </TabSectionHeader>
           {/* All question types except short answers and essays use feedback.
           Short answers and essays use the explanation instead */}
           <TabSectionContent key="explanation" className="feedback">
+            <div className="instruction-label">How would an expert answer this question?</div>
             <ConditionalBranchSelect
               editMode={editMode}
               branch={feedback.lang}

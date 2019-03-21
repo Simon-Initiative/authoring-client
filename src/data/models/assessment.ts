@@ -8,6 +8,7 @@ import { isArray, isNullOrUndefined } from 'util';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { splitQuestionsIntoPages } from './utils/assessment';
 import { AssessmentType, LegacyTypes } from 'data/types';
+import { Maybe } from 'tsmonad';
 
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
@@ -16,6 +17,8 @@ export type AssessmentModelParams = {
   recommendedAttempts?: string;
   maxAttempts?: string;
   branching?: boolean,
+  introduction?: Maybe<contentTypes.Content>,
+  conclusion?: Maybe<contentTypes.Content>,
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
   nodes?: Immutable.OrderedMap<string, contentTypes.Node>,
@@ -29,6 +32,8 @@ const defaultAssessmentModelParams = {
   recommendedAttempts: '3',
   maxAttempts: '3',
   branching: false,
+  introduction: Maybe.nothing(),
+  conclusion: Maybe.nothing(),
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
   nodes: Immutable.OrderedMap<string, contentTypes.Node>(),
@@ -77,6 +82,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   recommendedAttempts: string;
   maxAttempts: string;
   branching: boolean;
+  introduction: Maybe<contentTypes.Content>;
+  conclusion: Maybe<contentTypes.Content>;
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   nodes: Immutable.OrderedMap<string, contentTypes.Node>;
@@ -99,6 +106,20 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       const id = guid();
 
       switch (key) {
+        case 'introduction':
+          model = model.with(
+            {
+              introduction: Maybe.just(
+                contentTypes.Introduction.fromPersistence(item, id, notify)),
+            });
+          break;
+        case 'conclusion':
+          model = model.with(
+            {
+              conclusion: Maybe.just(
+                contentTypes.Conclusion.fromPersistence(item, id, notify)),
+            });
+          break;
         case 'page':
           model = model.with(
             { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id, notify)) });
@@ -225,9 +246,14 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
         { short_title: { '#text': 'reveal' } },
       );
     }
+
+    this.introduction.lift(i => children.push(i.toPersistence()));
+
     children.push(
       ...this.pages.toArray().map(page => page.toPersistence()),
     );
+
+    this.conclusion.lift(c => children.push(c.toPersistence()));
 
     let resource = this.resource.toPersistence();
     let doc = null;

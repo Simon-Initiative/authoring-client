@@ -6,7 +6,7 @@ import {
 } from 'editors/document/common/AbstractEditor';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion';
+import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion.controller';
 import { Outline } from 'editors/document/assessment/outline/Outline';
 import { AssessmentNodeRenderer } from 'editors/document/common/questions';
 import {

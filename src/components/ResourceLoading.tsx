@@ -14,9 +14,9 @@ export interface ResourceLoadingProps {
  */
 export const ResourceLoading: React.StatelessComponent<StyledComponentProps<ResourceLoadingProps>>
   = injectSheetSFC<ResourceLoadingProps>(styles)(({
-  className, classes, children,
-}) => {
-    const waitingIcon = <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />;
+    className, classes, children,
+  }) => {
+    const waitingIcon = <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />;
     const waitingHeading = 'Please wait';
     const waitingContent = <p>We're loading the course material.</p>;
 

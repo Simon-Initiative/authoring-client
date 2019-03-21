@@ -10,7 +10,7 @@ import { Unordered } from 'data/content/org/unordered';
 import { Item } from 'data/content/org/item';
 import { Module } from 'data/content/org/module';
 import { Include } from 'data/content/org/include';
-import { createPlaceholderItem } from 'data/content/org/common';
+import { createPlaceholderItem, PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 import createGuid from 'utils/guid';
 
 import * as types from 'data/content/org/types';
@@ -118,8 +118,12 @@ export class Unit extends Immutable.Record(defaultContent) {
             { children: model.children.set(id, Include.fromPersistence(item, id)) });
           break;
         case 'item':
-          model = model.with(
-            { children: model.children.set(id, Item.fromPersistence(item, id)) });
+
+          const candidateItem = Item.fromPersistence(item, id);
+          if (candidateItem.resourceref.idref !== PLACEHOLDER_ITEM_ID) {
+            model = model.with(
+              { children: model.children.set(id, candidateItem) });
+          }
           break;
         case 'supplements':
           model = model.with(
@@ -141,9 +145,9 @@ export class Unit extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
-    const children : Object[] = [{ title: { '#text': this.title } }];
+    const children: Object[] = [{ title: { '#text': this.title } }];
 
     this.description.lift(p => children.push(({ description: { '#text': p } } as any)));
     this.metadata.lift(p => children.push(p));

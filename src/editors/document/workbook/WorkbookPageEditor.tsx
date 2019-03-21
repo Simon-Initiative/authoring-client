@@ -26,6 +26,7 @@ import { map } from 'data/utils/map';
 import { ContentElement } from 'data/content/common/interfaces';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import './WorkbookPageEditor.scss';
+import { MessageState } from 'reducers/messages';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: string) => void;
@@ -36,6 +37,7 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
+  messages: MessageState;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
@@ -109,8 +111,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const { context, showMessage } = this.props;
     const { objectives, courseId } = context;
 
-    if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE ||
-      objectives.size < 1) {
+    if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE
+      || objectives.size < 1) {
       this.noObjectivesMessage = buildMissingObjectivesMessage(courseId, context.orgId);
       showMessage(this.noObjectivesMessage);
     }

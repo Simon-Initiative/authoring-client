@@ -76,8 +76,8 @@ export interface ImageHotspotEditorState {
  */
 @injectSheet(styles)
 export class ImageHotspotEditor
-    extends React.PureComponent<StyledComponentProps<ImageHotspotEditorProps>,
-    ImageHotspotEditorState> {
+  extends React.PureComponent<StyledComponentProps<ImageHotspotEditorProps>,
+  ImageHotspotEditorState> {
   svgRef: any;
 
   constructor(props) {
@@ -145,41 +145,41 @@ export class ImageHotspotEditor
         height: 400,
       })),
     )
-    .then(({ src, width, height }) => {
-      // reposition hotspots so they are guaranteed to be in the image
-      const hotspots = model.hotspots.map(hotspot =>
-        hotspot.shape === 'rect'
-          ? hotspot.with({
-            coords: Immutable.List<number>([
-              Math.floor(width / 2) - 50,
-              Math.floor(height / 2) - 50,
-              Math.floor(width / 2) + 50,
-              Math.floor(height / 2) + 50,
-            ]),
-          })
-        : hotspot.shape === 'circle'
-          ? hotspot.with({
-            coords: Immutable.List<number>([
-              Math.floor(width / 2),
-              Math.floor(height / 2),
-              100,
-            ]),
-          })
-        // TODO: handle case when hotspot is a polygon
-        : hotspot
+      .then(({ src, width, height }) => {
+        // reposition hotspots so they are guaranteed to be in the image
+        const hotspots = model.hotspots.map(hotspot =>
+          hotspot.shape === 'rect'
+            ? hotspot.with({
+              coords: Immutable.List<number>([
+                Math.floor(width / 2) - 50,
+                Math.floor(height / 2) - 50,
+                Math.floor(width / 2) + 50,
+                Math.floor(height / 2) + 50,
+              ]),
+            })
+            : hotspot.shape === 'circle'
+              ? hotspot.with({
+                coords: Immutable.List<number>([
+                  Math.floor(width / 2),
+                  Math.floor(height / 2),
+                  100,
+                ]),
+              })
+              // TODO: handle case when hotspot is a polygon
+              : hotspot
         ,
-      ).toOrderedMap();
+        ).toOrderedMap();
 
-      onEdit(
-        model.with({
-          src,
-          width,
-          height,
-          hotspots,
-        }),
-        partModel,
-      );
-    });
+        onEdit(
+          model.with({
+            src,
+            width,
+            height,
+            hotspots,
+          }),
+          partModel,
+        );
+      });
   }
 
   onAddHotspot(shape: string) {
@@ -277,48 +277,48 @@ export class ImageHotspotEditor
         className={classNames(['ImageHotspotEditor', classes.ImageHotspotEditor, className])}
         style={{ width: model.width && model.width + 2 }}>
         <div className={classes.toolbar}>
-        <ToolbarButton
+          <ToolbarButton
             onClick={this.onSelectImage}
             size={ToolbarButtonSize.Small}
             tooltip="Select Hotspot Image"
             disabled={!editMode}>
-          <i className="fa fa-picture-o" />
-        </ToolbarButton>
-        <ToolbarButton
+            <i className="fas fa-camera-retro" />
+          </ToolbarButton>
+          <ToolbarButton
             onClick={() => this.onAddHotspot('rect')}
             size={ToolbarButtonSize.Fit}
             tooltip="Create a rectangle hotspot"
             disabled={!editMode}>
-          Rectangle
+            Rectangle
         </ToolbarButton>
-        <ToolbarButton
+          <ToolbarButton
             onClick={() => this.onAddHotspot('circle')}
             size={ToolbarButtonSize.Fit}
             tooltip="Create a circle hotspot"
             disabled={!editMode}>
-          Circle
+            Circle
         </ToolbarButton>
-        <ToolbarButton
+          <ToolbarButton
             onClick={() => this.onAddHotspot('poly')}
             size={ToolbarButtonSize.Fit}
             tooltip="Create a polygon hotspot"
             disabled={true || !editMode}>
-          Polygon
+            Polygon
         </ToolbarButton>
-        <div className="flex-spacer" />
-        <ToolbarButton
+          <div className="flex-spacer" />
+          <ToolbarButton
             onClick={() => this.onRemoveHotspot(selectedHotspot.valueOr(''))}
             size={ToolbarButtonSize.Fit}
             className={classes.removeHotspotButton}
             tooltip={selectedHotspot.caseOf({ just: () => true, nothing: () => false })
               && model.hotspots.size <= 1
-                ? 'An image hotspot question must contain at least one hotspot. '
-                  + 'Please add another hotspot before removing this one.'
-                : 'Remove selected hotspot'
+              ? 'An image hotspot question must contain at least one hotspot. '
+              + 'Please add another hotspot before removing this one.'
+              : 'Remove selected hotspot'
             }
             disabled={selectedHotspot.caseOf({ just: () => false, nothing: () => true })
               || model.hotspots.size <= 1}>
-          Remove Hotspot
+            Remove Hotspot
         </ToolbarButton>
         </div>
         <div
@@ -337,7 +337,7 @@ export class ImageHotspotEditor
                       context.courseId,
                       context.resourcePath,
                       model.src,
-                  )}
+                    )}
                   width={model.width} height={model.height} />
                 <svg
                   className={classes.hotspots} width={model.width} height={model.height}>

@@ -90,7 +90,7 @@ export default class DirectorEditor
         <SidebarGroup label="Source File">
           <div>{file}</div>
           <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-file-o" /></div>
+            <div><i className="far fa-file" /></div>
             <div>Select File</div>
           </ToolbarButton>
         </SidebarGroup>
@@ -126,7 +126,7 @@ export default class DirectorEditor
 
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders" /></div>
+            <div><i className="fas fa-sliders-h" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

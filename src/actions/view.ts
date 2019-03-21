@@ -5,15 +5,22 @@ import * as courseActions from 'actions/course';
 import * as orgActions from 'actions/orgs';
 import { LegacyTypes } from 'data/types';
 import * as router from 'actions/router';
+import { State } from 'reducers';
+import { Maybe } from 'tsmonad';
+import { loadFromLocalStorage } from 'utils/localstorage';
+import { activeOrgUserKey, ACTIVE_ORG_STORAGE_KEY } from './utils/activeOrganization';
 
 function isDifferentCourse(getState, courseId): boolean {
   const course: models.CourseModel = getState().course;
   return course === null || course.guid !== courseId;
 }
 
-function isDifferentOrg(getState, orgId): boolean {
+function isDifferentOrg(getState: () => State, orgId): boolean {
+  const { course } = getState();
   return getState().router.orgId.caseOf({
-    just: id => orgId !== id,
+    just: id => course.resourcesById.has(id)
+      && course.resourcesById.get(id).type === LegacyTypes.organization
+      && orgId !== id,
     nothing: () => true,
   });
 }
@@ -48,6 +55,7 @@ function transitionCourseView(destination, courseId, orgId, dispatch, getState) 
   } else if (isDifferentOrg(getState, orgId)) {
     dispatch(orgActions.releaseOrg());
     dispatch(orgActions.load(courseId, orgId));
+    dispatch(dismissScopedMessages(Scope.Organization));
     router.push(destination);
   } else {
     dispatch(dismissScopedMessages(Scope.Resource));
@@ -119,7 +127,7 @@ export function viewAllCourses() {
 
 
 export function viewCourse(courseId: string) {
-  return function (dispatch, getState) {
+  return function (dispatch, getState: () => State) {
     dispatch(courseActions.loadCourse(courseId)).then((c) => {
 
       // This ensures that we wipe any messages displayed from
@@ -144,12 +152,20 @@ export function viewCourse(courseId: string) {
         },
         nothing: () => {
           dispatch(orgActions.releaseOrg());
-          dispatch(orgActions.load(courseId, orgs[0].guid));
-          dispatch(viewDocument(courseId, courseId, orgs[0].guid));
+          let savedOrg;
+          Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
+            .lift((prefs) => {
+              const username = getState().user.profile.username;
+              const userKey = activeOrgUserKey(username, courseId);
+              if (prefs[userKey]) {
+                savedOrg = orgs.find(res => res.guid === prefs[userKey]);
+              }
+            });
+          const orgGuid = savedOrg ? savedOrg.guid : orgs[0].guid;
+          dispatch(orgActions.load(courseId, orgGuid));
+          dispatch(viewDocument(courseId, courseId, orgGuid));
         },
       });
-
-
     });
   };
 }

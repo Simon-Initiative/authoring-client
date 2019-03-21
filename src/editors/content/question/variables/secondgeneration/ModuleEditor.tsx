@@ -157,7 +157,7 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
     const testResults =
       this.state.testing
         ? <span className="vertical-center">
-          <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> Testing...
+          <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" /> Testing...
         </span>
         : this.state.testingCompleted
           ? this.state.failed

@@ -105,8 +105,8 @@ export default class CodeBlock
                 <option value="text">Text</option>
                 <option value="xml">XML</option>
               </Select>
-            <SidebarRow>
-            </SidebarRow>
+              <SidebarRow>
+              </SidebarRow>
               <ToggleSwitch
                 editMode={this.props.editMode}
                 checked={this.props.model.number}
@@ -151,7 +151,7 @@ export default class CodeBlock
             onShowSidebar();
             onDiscover(DiscoverableId.CodeBlockEditorLanguage);
           }} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-file-code-o" /></div>
+          <div><i className="far fa-file-code" /></div>
           <div>Language</div>
         </ToolbarButton>
 
@@ -161,7 +161,7 @@ export default class CodeBlock
               onShowSidebar();
               onDiscover(DiscoverableId.CodeBlockEditorLineNumbers);
             }} size={ToolbarButtonSize.ExtraWide}>
-            <i className="fa fa-sort-numeric-asc" /> Line Numbers
+            <i className="fas fa-sort-numeric-up" /> Line Numbers
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
