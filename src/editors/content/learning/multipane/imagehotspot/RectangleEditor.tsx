@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { throttle } from 'utils/timing';
 import { Maybe } from 'tsmonad';
 import { BoundingClientRect, Point } from 'types/common';
@@ -37,9 +37,8 @@ export interface RectangleEditorState {
 /**
  * RectangleEditor React Component
  */
-@injectSheet(styles)
-export class RectangleEditor
-    extends React.PureComponent<StyledComponentProps<RectangleEditorProps>,
+class RectangleEditor
+    extends React.PureComponent<StyledComponentProps<RectangleEditorProps, typeof styles>,
     RectangleEditorState> {
 
   constructor(props) {
@@ -315,3 +314,6 @@ export class RectangleEditor
     );
   }
 }
+
+const StyledRectangleEditor = withStyles<RectangleEditorProps>(styles)(RectangleEditor);
+export { StyledRectangleEditor as RectangleEditor };

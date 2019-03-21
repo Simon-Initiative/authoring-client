@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { StyledComponentProps } from 'types/component';
 import { Map, List } from 'immutable';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
@@ -83,8 +82,7 @@ export interface OrgDetailsEditorState {
  * OrgDetailsEditor React Component
  */
 export class OrgDetailsEditor
-  extends React.PureComponent<StyledComponentProps<OrgDetailsEditorProps>,
-  OrgDetailsEditorState> {
+  extends React.PureComponent<OrgDetailsEditorProps, OrgDetailsEditorState> {
   unitsMessageDisplayed: boolean = false;
 
   constructor(props) {

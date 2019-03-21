@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
@@ -13,6 +13,7 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import { styles } from './BlockCode.styles';
+import { StyledComponentProps } from 'types/component';
 
 export interface BlockCodeToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
@@ -23,16 +24,17 @@ export interface BlockCodeToolbarState {
 
 }
 
-@injectSheet(styles)
-export default class BlockCodeToolbar
+type StyledBlockCodeToolbarProps = StyledComponentProps<BlockCodeToolbarProps, typeof styles>;
+
+class BlockCodeToolbar
   extends AbstractContentEditor<contentTypes.BlockCode,
-  BlockCodeToolbarProps & JSSProps, BlockCodeToolbarState> {
+  StyledBlockCodeToolbarProps, BlockCodeToolbarState> {
 
   constructor(props) {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: BlockCodeToolbarProps, nextState) {
+  shouldComponentUpdate(nextProps: StyledBlockCodeToolbarProps, nextState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || nextProps.selection !== this.props.selection;
   }
@@ -148,3 +150,6 @@ export default class BlockCodeToolbar
     return null;
   }
 }
+
+const StyledBlockCodeToolbar = withStyles<BlockCodeToolbarProps>(styles)(BlockCodeToolbar);
+export default StyledBlockCodeToolbar;

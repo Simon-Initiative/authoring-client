@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps, RenderContext }
   from 'editors/content/common/AbstractContentEditor';
@@ -7,6 +7,7 @@ import ContiguousTextEditor from 'editors/content/learning/contiguoustext/Contig
 import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockCodeToolbar from './BlockCodeToolbar.controller';
 import { styles } from './BlockCode.styles';
+import { StyledComponentProps } from 'types/component';
 
 export interface BlockCodeEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
@@ -17,10 +18,10 @@ export interface BlockCodeEditorState {
 
 }
 
-@injectSheet(styles)
-export default class BlockCodeEditor
+class BlockCodeEditor
   extends AbstractContentEditor
-  <contentTypes.BlockCode, BlockCodeEditorProps & JSSProps, BlockCodeEditorState> {
+  <contentTypes.BlockCode, StyledComponentProps<BlockCodeEditorProps, typeof styles>,
+  BlockCodeEditorState> {
 
   constructor(props) {
     super(props);
@@ -62,3 +63,6 @@ export default class BlockCodeEditor
     );
   }
 }
+
+const StyledBlockCodeEditor = withStyles<BlockCodeEditorProps>(styles)(BlockCodeEditor);
+export default StyledBlockCodeEditor;

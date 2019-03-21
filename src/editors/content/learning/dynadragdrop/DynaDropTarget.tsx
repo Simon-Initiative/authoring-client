@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { DragTypes } from 'utils/drag';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { TargetToggle } from 'editors/content/learning/dynadragdrop/TargetToggle';
@@ -51,9 +51,8 @@ const target = {
     canDrop: monitor.canDrop(),
   };
 })
-@injectSheet(styles)
-export class DynaDropTarget
-    extends React.PureComponent<StyledComponentProps<DynaDropTargetProps>,
+class DynaDropTarget
+    extends React.PureComponent<StyledComponentProps<DynaDropTargetProps, typeof styles>,
     DynaDropTargetState> {
 
   constructor(props) {
@@ -91,3 +90,6 @@ export class DynaDropTarget
     ));
   }
 }
+
+const StyledDynaDropTarget = withStyles<DynaDropTargetProps>(styles)(DynaDropTarget);
+export { StyledDynaDropTarget as DynaDropTarget };

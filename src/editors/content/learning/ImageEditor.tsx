@@ -3,7 +3,7 @@ import { Image } from '../../../data/content/learning/image';
 import { AbstractContentEditor, AbstractContentEditorProps } from
   '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
-import { injectSheet } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import { Select } from '../common/Select';
 import { StyledComponentProps } from 'types/component';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
@@ -278,10 +278,9 @@ export function selectImage(model, resourcePath, courseModel, display, dismiss):
   });
 }
 
-@injectSheet(styles)
-export default class ImageEditor
+class ImageEditor
   extends AbstractContentEditor
-  <Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
+  <Image, StyledComponentProps<ImageEditorProps, typeof styles>, ImageEditorState> {
 
   constructor(props) {
     super(props);
@@ -438,3 +437,6 @@ export default class ImageEditor
     );
   }
 }
+
+const StyledImageEditor = withStyles<ImageEditorProps>(styles)(ImageEditor);
+export default StyledImageEditor;

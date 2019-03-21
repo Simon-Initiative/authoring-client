@@ -17,7 +17,7 @@ import { CoursesViewSearchable } from './components/CoursesViewSearchable.contro
 import DocumentView from 'components/DocumentView';
 import ResourceView from 'components/ResourceView';
 import CreateCourseView from 'components/CreateCourseView';
-import ObjectiveSkillView from 'components/objectives/ObjectiveSkillView.controller';
+import { ObjectiveSkillView } from 'components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from 'components/ImportCourseView';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';

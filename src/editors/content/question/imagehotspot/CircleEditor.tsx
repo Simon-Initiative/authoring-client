@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { throttle } from 'utils/timing';
 import { Maybe } from 'tsmonad';
 import { BoundingClientRect, Point } from 'types/common';
@@ -35,9 +35,8 @@ export interface CircleEditorState {
 /**
  * CircleEditor React Component
  */
-@injectSheet(styles)
-export class CircleEditor
-    extends React.PureComponent<StyledComponentProps<CircleEditorProps>,
+class CircleEditor
+    extends React.PureComponent<StyledComponentProps<CircleEditorProps, typeof styles>,
     CircleEditorState> {
 
   constructor(props) {
@@ -257,3 +256,6 @@ export class CircleEditor
     );
   }
 }
+
+const StyledCircleEditor = withStyles<CircleEditorProps>(styles)(CircleEditor);
+export { StyledCircleEditor as CircleEditor };

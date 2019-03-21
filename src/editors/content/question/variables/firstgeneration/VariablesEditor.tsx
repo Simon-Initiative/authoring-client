@@ -5,7 +5,7 @@ import { Evaluation, evaluate } from 'data/persistence/variables';
 import { AbstractContentEditor, AbstractContentEditorProps } from
   'editors/content/common/AbstractContentEditor';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 
 import AceEditor from 'react-ace';
 
@@ -35,10 +35,9 @@ type Variables = Immutable.OrderedMap<string, contentTypes.Variable>;
 /**
  * VariablesEditor React Component
  */
-@injectSheet(styles)
-export class VariablesEditor
+class VariablesEditor
   extends AbstractContentEditor<Variables,
-  StyledComponentProps<VariablesEditorProps>, VariablesEditorState> {
+  StyledComponentProps<VariablesEditorProps, typeof styles>, VariablesEditorState> {
 
 
   constructor(props) {
@@ -223,3 +222,6 @@ export class VariablesEditor
     );
   }
 }
+
+const StyledVariablesEditor = withStyles<VariablesEditorProps>(styles)(VariablesEditor);
+export { StyledVariablesEditor as VariablesEditor };

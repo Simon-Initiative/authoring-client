@@ -7,7 +7,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { getVersion } from 'utils/buildinfo';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, injectSheetSFC, classNames, JSSStyles } from 'styles/jss';
+import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import * as chroma from 'chroma-js';
 import { RouterState } from 'reducers/router';
@@ -106,59 +106,64 @@ type LinkProps = {
   children: any,
 };
 
-const Link: React.StatelessComponent<StyledComponentProps<LinkProps>> =
-  injectSheetSFC<LinkProps>(styles)(({
-    className,
-    action,
-    children,
-    classes,
-  }) => (
-      <a className={classNames([classes.headerLink, className])} href="#"
-        onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
-    ));
+/**
+ * Link React Component
+ */
+const Link = withStyles<LinkProps>(styles)(({
+  className,
+  action,
+  children,
+  classes,
+}) => (
+  <a className={classNames([classes.headerLink, className])} href="#"
+    onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
+));
 
 type MenuProps = {
   label: string | JSX.Element,
   children: any,
 };
 
-const Menu: React.StatelessComponent<StyledComponentProps<MenuProps>> =
-  injectSheetSFC<MenuProps>(styles)(({
-    label,
-    children,
-    classes,
-  }) => (
-      <div className={classNames([classes.headerDropdown, 'dropdown show'])}>
-        <a className={classNames([classes.headerLink, 'dropdown-toggle'])} href="#"
-          target="_blank"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {label}
-        </a>
-        <div className="dropdown-menu dropdown-menu-right">
-          {children}
-        </div>
-      </div>
-    ));
-
+/**
+ * Menu React Component
+ */
+const Menu = withStyles<MenuProps>(styles)(({
+  label,
+  children,
+  classes,
+}) => (
+  <div className={classNames([classes.headerDropdown, 'dropdown show'])}>
+    <a className={classNames([classes.headerLink, 'dropdown-toggle'])} href="#"
+      target="_blank"
+      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {label}
+    </a>
+    <div className="dropdown-menu dropdown-menu-right">
+      {children}
+    </div>
+  </div>
+));
 
 type MenuItemProps = {
   url: string,
   children: any,
 };
 
-const MenuItem: React.StatelessComponent<StyledComponentProps<MenuItemProps>> =
-  injectSheetSFC<MenuItemProps>(styles)(({
+/**
+ * MenuItem React Component
+ */
+const MenuItem = withStyles<MenuItemProps>(styles)(({
     url,
     children,
   }) => (
-      <a className="dropdown-item" href={url}>{children}</a>
-    ));
+    <a className="dropdown-item" href={url}>{children}</a>
+  ));
 
 /**
  * Header React Component
  */
-@injectSheet(styles)
-class Header extends React.PureComponent<StyledComponentProps<HeaderProps>, HeaderState> {
+class Header
+  extends React.PureComponent<StyledComponentProps<HeaderProps, typeof styles>, HeaderState> {
 
   timer: any;
 
@@ -279,4 +284,5 @@ class Header extends React.PureComponent<StyledComponentProps<HeaderProps>, Head
 
 }
 
-export default Header;
+const StyledHeader = withStyles<HeaderProps>(styles)(Header);
+export default StyledHeader;

@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { AppContext } from 'editors/common/AppContext';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { buildUrl } from 'utils/path';
 import { RectangleEditor } from 'editors/content/question/imagehotspot/RectangleEditor';
@@ -74,9 +74,8 @@ export interface ImageHotspotEditorState {
 /**
  * ImageHotspotEditor React Component
  */
-@injectSheet(styles)
-export class ImageHotspotEditor
-  extends React.PureComponent<StyledComponentProps<ImageHotspotEditorProps>,
+class ImageHotspotEditor
+  extends React.PureComponent<StyledComponentProps<ImageHotspotEditorProps, typeof styles>,
   ImageHotspotEditorState> {
   svgRef: any;
 
@@ -403,3 +402,6 @@ export class ImageHotspotEditor
     );
   }
 }
+
+const StyledImageHotspotEditor = withStyles<ImageHotspotEditorProps>(styles)(ImageHotspotEditor);
+export { StyledImageHotspotEditor as ImageHotspotEditor };

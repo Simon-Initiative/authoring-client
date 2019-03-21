@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
@@ -29,10 +29,9 @@ export interface CellEditorState {
 /**
  * The content editor for table cells.
  */
-@injectSheet(styles)
-export default class CellEditor
+class CellEditor
   extends AbstractContentEditor<contentTypes.CellData | contentTypes.CellHeader,
-  StyledComponentProps<CellEditorProps>, CellEditorState> {
+  StyledComponentProps<CellEditorProps, typeof styles>, CellEditorState> {
 
   constructor(props) {
     super(props);
@@ -222,3 +221,6 @@ export default class CellEditor
   }
 
 }
+
+const StyledCellEditor = withStyles<CellEditorProps>(styles)(CellEditor);
+export default StyledCellEditor;

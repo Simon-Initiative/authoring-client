@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import { DiscoverableId } from 'types/discoverable';
 import { DiscoverableState as DiscoverableReducerState } from 'reducers/discoverable';
@@ -16,6 +16,7 @@ export interface DiscoverableProps {
   discoverables: DiscoverableReducerState;
   focusChild?: boolean | string;
   focusAction?: FocusAction;
+  onDiscover?: () => void;
 }
 
 export interface DiscoverableState {
@@ -25,9 +26,8 @@ export interface DiscoverableState {
 /**
  * Discoverable React Component
  */
-@injectSheet(styles)
-export class Discoverable
-  extends React.PureComponent<StyledComponentProps<DiscoverableProps>,
+class Discoverable
+  extends React.Component<StyledComponentProps<DiscoverableProps, typeof styles>,
   DiscoverableState> {
 
   constructor(props) {
@@ -78,3 +78,6 @@ export class Discoverable
     );
   }
 }
+
+const StyledDiscoverable = withStyles<DiscoverableProps>(styles)(Discoverable);
+export { StyledDiscoverable as Discoverable };

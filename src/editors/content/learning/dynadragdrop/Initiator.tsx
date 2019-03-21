@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import { DragHandle } from 'components/common/DragHandle';
 import { DragTypes } from 'utils/drag';
@@ -58,9 +58,8 @@ const source = {
       isDragging: monitor.isDragging(),
     };
   })
-@injectSheet(styles)
-export class Initiator
-  extends React.PureComponent<StyledComponentProps<InitiatorProps>,
+class Initiator
+  extends React.PureComponent<StyledComponentProps<InitiatorProps, typeof styles>,
   InitiatorState> {
 
   constructor(props) {
@@ -120,3 +119,6 @@ export class Initiator
     ));
   }
 }
+
+const StyledInitiator = withStyles<InitiatorProps>(styles)(Initiator);
+export { StyledInitiator as Initiator };

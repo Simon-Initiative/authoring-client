@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { injectSheetSFC, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
+import { StyledComponentProps } from 'types/component';
 import { styles } from './GlobalError.styles';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 
@@ -10,8 +11,9 @@ export interface GlobalErrorProps {
   email: string;
 }
 
-export const GlobalError = injectSheetSFC<GlobalErrorProps>(styles)(({
-  classes, error, info, userName, email,
+const GlobalError:
+React.StatelessComponent<StyledComponentProps<GlobalErrorProps, typeof styles>> = ({
+  classes, userName, email,
 }) => {
 
   const reportError = () => {
@@ -50,4 +52,7 @@ export const GlobalError = injectSheetSFC<GlobalErrorProps>(styles)(({
     </div>
   );
 
-});
+};
+
+const StyledGlobalError = withStyles<GlobalErrorProps>(styles)(GlobalError);
+export { StyledGlobalError as GlobalError };

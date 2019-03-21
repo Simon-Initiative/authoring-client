@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { Tooltip } from 'utils/tooltip';
 import { ToolbarButtonSize } from './ToolbarButton';
 import { styles } from './ToolbarButton.styles';
 import { Autohider } from './Autohider';
+import { StyledComponentProps } from 'types/component';
 
 export interface ToolbarButtonDropdownProps {
-  className?: string;
   label: any;
   disabled?: boolean;
   selected?: boolean;
@@ -18,9 +18,8 @@ export interface ToolbarButtonDropdownState {
   shown: boolean;
 }
 
-@injectSheet(styles)
-export class ToolbarButtonDropdown
-  extends React.Component<ToolbarButtonDropdownProps & JSSProps, ToolbarButtonDropdownState> {
+class ToolbarButtonDropdown extends React.Component<
+  StyledComponentProps<ToolbarButtonDropdownProps, typeof styles>, ToolbarButtonDropdownState> {
   constructor(props) {
     super(props);
 
@@ -73,3 +72,7 @@ export class ToolbarButtonDropdown
       : <React.Fragment>{button}{component}</React.Fragment>;
   }
 }
+
+const StyledToolbarButtonDropdown = withStyles<ToolbarButtonDropdownProps>(styles)
+  (ToolbarButtonDropdown);
+export { StyledToolbarButtonDropdown as ToolbarButtonDropdown };

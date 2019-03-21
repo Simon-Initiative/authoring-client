@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { CONTENT_COLORS } from
   'editors/content/utils/content';
@@ -15,6 +15,7 @@ import {
 } from 'data/content/bibtek/common';
 import { ignoredAttributes } from './common';
 import { styles } from './EntryEditor.styles';
+import { StyledComponentProps } from 'types/component';
 
 export interface EntryEditorProps
   extends AbstractContentEditorProps<contentTypes.Entry> {
@@ -32,11 +33,9 @@ function toFriendlyLabel(key: string) {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
-
-@injectSheet(styles)
-export default class EntryEditor
+class EntryEditor
   extends AbstractContentEditor
-  <contentTypes.Entry, EntryEditorProps & JSSProps, EntryEditorState> {
+  <contentTypes.Entry, StyledComponentProps<EntryEditorProps, typeof styles>, EntryEditorState> {
 
   constructor(props) {
     super(props);
@@ -221,7 +220,9 @@ export default class EntryEditor
   }
 
   renderPair(key1: string, value1, key2: string, value2) {
-    const labelStyle = { width: '125px', textAlign: 'right', paddingRight: '5px' };
+    const labelStyle: React.CSSProperties = {
+      width: '125px', textAlign: 'right', paddingRight: '5px' };
+
     return (
       <tr>
         <td style={labelStyle}>{this.renderLabel(key1, value1)}</td>
@@ -295,3 +296,6 @@ export default class EntryEditor
     );
   }
 }
+
+const StyledEntryEditor = withStyles<EntryEditorProps>(styles)(EntryEditor);
+export default StyledEntryEditor;

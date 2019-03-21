@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
@@ -10,6 +10,7 @@ import { loadFromLocalStorage } from 'utils/localstorage';
 import { ContentElement } from 'data/content/common/interfaces';
 import { CourseModel } from 'data/models';
 import { nonMoveableTypes } from 'data/content/restrictions';
+import { StyledComponentProps } from 'types/component';
 
 export interface ItemToolbarProps {
   context: AppContext;
@@ -23,13 +24,15 @@ export interface ItemToolbarProps {
   course: CourseModel;
 }
 
-/**
- * InsertToolbar React Stateless Component
- */
-@injectSheet(styles)
-export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps> {
+type StyledItemToolbarProps = StyledComponentProps<ItemToolbarProps, typeof styles>;
 
-  constructor(props: ItemToolbarProps) {
+/**
+ * InsertToolbar React Component
+ */
+class ItemToolbar
+  extends React.PureComponent<StyledItemToolbarProps> {
+
+  constructor(props: StyledItemToolbarProps) {
     super(props);
   }
 
@@ -155,3 +158,6 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     );
   }
 }
+
+const Styled = withStyles<ItemToolbarProps>(styles)(ItemToolbar);
+export { Styled as ItemToolbar };

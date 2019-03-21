@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { TargetToggle } from 'editors/content/learning/dynadragdrop/TargetToggle';
 
 import { styles } from 'editors/content/learning/dynadragdrop/DynaDropLabel.styles';
@@ -20,9 +20,12 @@ export interface DynaDropLabelState {
   text: string;
 }
 
-@injectSheet(styles)
-export class DynaDropLabel
-  extends React.Component<StyledComponentProps<DynaDropLabelProps>, DynaDropLabelState> {
+/**
+ * DynaDropLabel React Component
+ */
+class DynaDropLabel
+  extends React.Component<StyledComponentProps<DynaDropLabelProps, typeof styles>,
+  DynaDropLabelState> {
   caretPosition: any;
   direction: number;
   ref: any;
@@ -134,3 +137,6 @@ export class DynaDropLabel
     return editMode ? this.renderEdit() : this.renderView();
   }
 }
+
+const StyledDynaDropLabel = withStyles<DynaDropLabelProps>(styles)(DynaDropLabel);
+export { StyledDynaDropLabel as DynaDropLabel };

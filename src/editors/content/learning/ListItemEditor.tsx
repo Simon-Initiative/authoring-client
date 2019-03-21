@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -22,20 +22,20 @@ export interface ListItemEditorState {
 
 }
 
+type StyledListItemEditorProps = StyledComponentProps<ListItemEditorProps, typeof styles>;
+
 /**
  * The content editor for list items.
  */
-@injectSheet(styles)
-export default class ListItemEditor
-    extends AbstractContentEditor<contentTypes.Li,
-    StyledComponentProps<ListItemEditorProps>, ListItemEditorState> {
+class ListItemEditor
+    extends AbstractContentEditor<contentTypes.Li, StyledListItemEditorProps, ListItemEditorState> {
   selectionState: any;
 
   constructor(props) {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: ListItemEditorProps, nextState: ListItemEditorState) {
+  shouldComponentUpdate(nextProps: StyledListItemEditorProps, nextState: ListItemEditorState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || this.props.label !== nextProps.label;
   }
@@ -71,3 +71,6 @@ export default class ListItemEditor
 
 }
 
+
+const StyledListItemEditor = withStyles<ListItemEditorProps>(styles)(ListItemEditor);
+export default StyledListItemEditor;

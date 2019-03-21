@@ -12,7 +12,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { DiscoverableId } from 'types/discoverable';
 import { ImageHotspotEditor } from './imagehotspot/ImageHotspotEditor';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSStyles } from 'styles/jss';
+import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { TitleTextEditor } from '../contiguoustext/TitleTextEditor';
 import colors from 'styles/colors';
@@ -197,16 +197,17 @@ export interface MultipanelEditorState {
   activityPageCount: Maybe<number>;
 }
 
+type StyledMultipanelEditorProps = StyledComponentProps<MultipanelEditorProps, typeof styles>;
+
 /**
  * The content editor for contiguous text.
  */
-@injectSheet(styles)
-export class MultipanelEditor
+class MultipanelEditor
   extends AbstractContentEditor<Multipanel,
-  StyledComponentProps<MultipanelEditorProps>, MultipanelEditorState> {
+  StyledMultipanelEditorProps, MultipanelEditorState> {
   panelTabScrollDiv: HTMLElement;
 
-  constructor(props: MultipanelEditorProps) {
+  constructor(props: StyledMultipanelEditorProps) {
     super(props);
 
     this.state = {
@@ -254,7 +255,7 @@ export class MultipanelEditor
     }
   }
 
-  shouldComponentUpdate(nextProps: StyledComponentProps<MultipanelEditorProps>): boolean {
+  shouldComponentUpdate(nextProps: StyledMultipanelEditorProps): boolean {
     return true;
   }
 
@@ -550,14 +551,14 @@ export class MultipanelEditor
                     guid, this.props.context.courseId, this.props.context.orgId);
                 }}
                 type="button"
-                style={{ colors: flatui.emerald }}
+                style={{ colors: flatui.emerald } as React.CSSProperties}
                 className="btn btn-link">
                 Edit Activity
               </button>
               <button
                 onClick={() => this.onSelectInlineActivity()}
                 type="button"
-                style={{ colors: flatui.emerald }}
+                style={{ colors: flatui.emerald } as React.CSSProperties}
                 className="btn btn-link">
                 Change Activity
               </button>
@@ -568,3 +569,6 @@ export class MultipanelEditor
     );
   }
 }
+
+const StyledMultipanelEditor = withStyles<MultipanelEditorProps>(styles)(MultipanelEditor);
+export { StyledMultipanelEditor as MultipanelEditor };

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { StyledComponentProps } from 'types/component';
-import { injectSheetSFC, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
@@ -26,7 +25,7 @@ export interface TitleTextEditorProps {
  * TitleTextEditor React Stateless Component
  */
 export const TitleTextEditor
-  = injectSheetSFC<StyledComponentProps<TitleTextEditorProps>>(styles)((({
+  = withStyles<TitleTextEditorProps>(styles)(({
     className, classes, context, services, model,
     editMode, onEdit, onFocus, editorStyles,
   }) => {
@@ -56,4 +55,4 @@ export const TitleTextEditor
         <div className={classes.hoverUnderline} />
       </div>
     );
-  }));
+  });

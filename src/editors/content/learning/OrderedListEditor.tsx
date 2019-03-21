@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import * as numbering from 'utils/numbering';
 import {
@@ -37,10 +37,9 @@ export interface OrderedListEditorState {
 /**
  * The content editor for contiguous text.
  */
-@injectSheet(styles)
-export default class OrderedList
+class OrderedListEditor
   extends AbstractContentEditor<contentTypes.Ol,
-  StyledComponentProps<OrderedListEditorProps>, OrderedListEditorState> {
+  StyledComponentProps<OrderedListEditorProps, typeof styles>, OrderedListEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -270,3 +269,6 @@ export default class OrderedList
 
 }
 
+
+const StyledOrderedListEditor = withStyles<OrderedListEditorProps>(styles)(OrderedListEditor);
+export default StyledOrderedListEditor;

@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer, ActiveContext } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
@@ -39,34 +39,33 @@ export function determineBaseUrl(resource: Resource): string {
 const TOOLBAR_COL_WIDTH = 31;
 const DEFAULT_TOOLBAR_GROUP_COLS = 10;
 
-export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
-  = injectSheetSFC<ToolbarGroupProps>(styles)(({
-    className, classes, columns, label, children,
-  }) => {
-    const width = ((columns || DEFAULT_TOOLBAR_GROUP_COLS) * TOOLBAR_COL_WIDTH);
-    return children
-      ? (
-        <div className={classNames([classes.toolbarGroupContainer, className])}>
-          <div style={{ width }} className={classNames([classes.toolbarGroup])}>
-            <div className={classes.tbGroupItems}>{children}</div>
-          </div>
-          <div className={classes.tbGroupLabel}>{label}</div>
+export const ToolbarGroup = withStyles<ToolbarGroupProps>(styles)(({
+  className, classes, columns, label, children,
+}) => {
+  const width = ((columns || DEFAULT_TOOLBAR_GROUP_COLS) * TOOLBAR_COL_WIDTH);
+  return children
+    ? (
+      <div className={classNames([classes.toolbarGroupContainer, className])}>
+        <div style={{ width }} className={classNames([classes.toolbarGroup])}>
+          <div className={classes.tbGroupItems}>{children}</div>
         </div>
-      )
-      : (
-        <div className={classes.toolbarGroupContainer}>
-          <div style={{ width: 6 * TOOLBAR_COL_WIDTH }}
-            className={classes.toolbarGroup}>
-            <div className={classes.tbVerticallyCentered}>
-              <div className={classes.tbNoAdvancedControls}>
-                This item does not have any advanced controls
-              </div>
+        <div className={classes.tbGroupLabel}>{label}</div>
+      </div>
+    )
+    : (
+      <div className={classes.toolbarGroupContainer}>
+        <div style={{ width: 6 * TOOLBAR_COL_WIDTH }}
+          className={classes.toolbarGroup}>
+          <div className={classes.tbVerticallyCentered}>
+            <div className={classes.tbNoAdvancedControls}>
+              This item does not have any advanced controls
             </div>
           </div>
-          <div className={classes.tbGroupLabel}>{label}</div>
         </div>
-      );
-  });
+        <div className={classes.tbGroupLabel}>{label}</div>
+      </div>
+    );
+});
 
 interface ToolbarLayoutProps {
   className?: string;
@@ -74,9 +73,9 @@ interface ToolbarLayoutProps {
 }
 
 export const ToolbarLayout = {
-  Inline: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+  Inline: withStyles<ToolbarLayoutProps>(styles)(({
     className, classes, children,
-  }: StyledComponentProps<ToolbarLayoutProps>) => {
+  }) => {
     return (
       <div className={classNames([classes.toolbarLayoutInline, className])}>
         {children}
@@ -84,9 +83,9 @@ export const ToolbarLayout = {
     );
   }),
 
-  Grid: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+  Grid: withStyles<ToolbarLayoutProps>(styles)(({
     className, classes, children,
-  }: StyledComponentProps<ToolbarLayoutProps>) => {
+  }) => {
     return (
       <div className={classNames([classes.toolbarLayoutGrid, className])}>
         {children}
@@ -94,18 +93,18 @@ export const ToolbarLayout = {
     );
   }),
 
-  Row: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+  Row: withStyles<ToolbarLayoutProps>(styles)(({
     className, classes, children,
-  }: StyledComponentProps<ToolbarLayoutProps>) => {
+  }) => {
     return (
       <div className={classNames([classes.toolbarLayoutRow, className])}>
         {children}
       </div>
     );
   }),
-  Column: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+  Column: withStyles<ToolbarLayoutProps>(styles)(({
     className, classes, children, maxWidth,
-  }: StyledComponentProps<ToolbarLayoutProps>) => {
+  }) => {
     const style = maxWidth !== undefined ? { maxWidth } : undefined;
     return (
       <div
@@ -117,7 +116,7 @@ export const ToolbarLayout = {
   }),
 };
 
-export interface ToolbarProps {
+export interface ContextAwareToolbarProps {
   courseModel: CourseModel;
   resource: Resource;
   editMode: boolean;
@@ -138,14 +137,16 @@ export interface ToolbarProps {
   onDismissMessage: (message: Message) => void;
 }
 
-@injectSheet(styles)
-export class ContextAwareToolbar extends React.Component<StyledComponentProps<ToolbarProps>> {
+type StyledContextAwareToolbarProps = StyledComponentProps<ContextAwareToolbarProps, typeof styles>;
+
+class ContextAwareToolbar
+  extends React.Component<StyledContextAwareToolbarProps> {
 
   constructor(props) {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>): boolean {
+  shouldComponentUpdate(nextProps: StyledContextAwareToolbarProps): boolean {
 
     // See if the content switched or changed
     const contentSwitchedOrChanged = this.props.content.caseOf({
@@ -287,3 +288,6 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
   }
 
 }
+
+const StyledContextAwareToolbar = withStyles<ContextAwareToolbarProps>(styles)(ContextAwareToolbar);
+export { StyledContextAwareToolbar as ContextAwareToolbar };

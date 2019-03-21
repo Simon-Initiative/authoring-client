@@ -1,14 +1,27 @@
 import { CSSProperties } from 'react';
-import injectSheetJSS from 'react-jss';
-import { StyledComponentProps } from 'types/component';
+import injectStyles from 'react-jss';
+import { ComponentProps, StyledComponentProps } from 'types/component';
 
-export interface JSSProps {
-  classes?: any;
-}
+export { CSSProperties };
+
+export type JssValue =
+  | string
+  | number
+  | (string | number | (string | number)[] | '!important')[]
+  | null
+  | false;
+
+type JSSStyle = CSSProperties | JSSStyles | {
+  [K in keyof CSSProperties]: JssValue | JSSStyle | ((props: any) => (JssValue | JSSStyle))
+} | {
+  extend: JSSStyle[],
+};
 
 export interface JSSStyles {
-  [key: string]: CSSProperties | JSSStyles;
+  [displayName: string]: JSSStyle | ((props: any) => JSSStyle);
 }
+
+export type JSSThemedStyles = (theme: any) => JSSStyles;
 
 export const classNames = (names: string | string[]) => {
   if (typeof names === 'string') {
@@ -18,15 +31,19 @@ export const classNames = (names: string | string[]) => {
   return names.filter(n => n).join(' ');
 };
 
-export const injectSheet = injectSheetJSS;
+// This is really not ideal, the typing here is completely broken using inference.
+// Therefore, we must force the types we need using 'any' annotations. This function
+// should be replaced with the official JSS withStyles in jss@10 when it becomes more stable
+export const withStyles = <Props>(styles: JSSStyles | JSSThemedStyles) =>
+  (component: (
+    React.ComponentClass<StyledComponentProps<Props, JSSStyles>>
+    | ((props: StyledComponentProps<Props, JSSStyles>) => any)
+  )) =>
+    (injectStyles(styles as any)(component as any) as any) as React.ComponentClass<
+    ComponentProps<Props>>;
 
-export function injectSheetSFC<P>(style: any):
-  (component:
-    (props: StyledComponentProps<P>
-      & Readonly<{ children?: React.ReactNode }>)
-      => JSX.Element)
-    => React.StatelessComponent<P> {
-  return injectSheetJSS(style);
+export interface WithStyles<S extends JSSStyles | JSSThemedStyles> {
+  classes: { [P in keyof S]: string };
 }
 
-export const injectSheetRE = (style, component) => injectSheetSFC(style)(component);
+export const injectSheetRE = (style, component) => withStyles(style)(component);

@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { Tooltip } from 'utils/tooltip';
 
 import { styles } from './ToolbarButton.styles';
+import { StyledComponentProps } from 'types/component';
 
 export enum ToolbarButtonSize {
   Large = 'large',
@@ -23,8 +24,9 @@ export interface ToolbarButtonProps {
   tooltip?: string;
 }
 
-@injectSheet(styles)
-export class ToolbarButton extends React.PureComponent<ToolbarButtonProps & JSSProps> {
+class ToolbarButton
+  extends React.PureComponent<StyledComponentProps<ToolbarButtonProps, typeof styles>> {
+
   constructor(props) {
     super(props);
   }
@@ -58,3 +60,6 @@ export class ToolbarButton extends React.PureComponent<ToolbarButtonProps & JSSP
       : button;
   }
 }
+
+const StyledToolbarButton = withStyles<ToolbarButtonProps>(styles)(ToolbarButton);
+export { StyledToolbarButton as ToolbarButton };
