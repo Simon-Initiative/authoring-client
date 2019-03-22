@@ -78,16 +78,6 @@
   dependencies:
     redux "^3.6.0"
 
-"@types/redux-thunk@^2.1.0":
-  version "2.1.32"
-  resolved "https://registry.yarnpkg.com/@types/redux-thunk/-/redux-thunk-2.1.32.tgz#27fac368ced9ea170bf15e5fa4a21d9201f73102"
-  dependencies:
-    redux "^3.6.0"
-
-"@types/redux@^3.6.0":
-  version "3.6.31"
-  resolved "https://registry.yarnpkg.com/@types/redux/-/redux-3.6.31.tgz#40eafa7575db36b912ce0059b85de98c205b0708"
-
 "@types/theming@*":
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@types/theming/-/theming-1.3.3.tgz#e770833b38b43f138acd4d0794b52892caf34c6c"
