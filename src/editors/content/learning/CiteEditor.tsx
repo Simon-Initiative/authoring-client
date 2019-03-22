@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -22,7 +21,7 @@ export interface CiteEditorState {
  */
 export default class CiteEditor
   extends AbstractContentEditor
-  <contentTypes.Cite, CiteEditorProps & JSSProps, CiteEditorState> {
+  <contentTypes.Cite, CiteEditorProps, CiteEditorState> {
 
   constructor(props) {
     super(props);

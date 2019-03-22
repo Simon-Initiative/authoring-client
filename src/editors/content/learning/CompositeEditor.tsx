@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -33,10 +33,9 @@ export interface CompositeEditorState {
 /**
  * The content editor for Composites.
  */
-@injectSheet(styles)
-export default class CompositeEditor
+class CompositeEditor
   extends AbstractContentEditor<contentTypes.Composite,
-  StyledComponentProps<CompositeEditorProps>, CompositeEditorState> {
+  StyledComponentProps<CompositeEditorProps, typeof styles>, CompositeEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -193,3 +192,6 @@ export default class CompositeEditor
     );
   }
 }
+
+const StyledCompositeEditor = withStyles<CompositeEditorProps>(styles)(CompositeEditor);
+export default StyledCompositeEditor;

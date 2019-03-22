@@ -9,7 +9,7 @@ import {
 } from 'editors/content/common/TabContainer';
 import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
@@ -62,9 +62,8 @@ export interface ImageHotspotState
 /**
  * ImageHotspot Editor React Component
  */
-@injectSheet(styles)
-export class ImageHotspot
-  extends Question<StyledComponentProps<ImageHotspotProps>, ImageHotspotState> {
+class ImageHotspot
+  extends Question<StyledComponentProps<ImageHotspotProps, typeof styles>, ImageHotspotState> {
   choiceMap: Immutable.Map<string, contentTypes.Choice>;
 
   constructor(props) {
@@ -267,3 +266,6 @@ export class ImageHotspot
     return false;
   }
 }
+
+const StyledImageHotspot = withStyles<ImageHotspotProps>(styles)(ImageHotspot);
+export { StyledImageHotspot as ImageHotspot };

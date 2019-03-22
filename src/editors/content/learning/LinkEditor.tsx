@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -26,7 +25,7 @@ export interface LinkEditorState {
  * React Component
  */
 export default class LinkEditor
-  extends AbstractContentEditor<contentTypes.Link, LinkEditorProps & JSSProps, LinkEditorState> {
+  extends AbstractContentEditor<contentTypes.Link, LinkEditorProps, LinkEditorState> {
 
   constructor(props: LinkEditorProps) {
     super(props);

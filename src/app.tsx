@@ -19,11 +19,11 @@ import { ApplicationRoot } from './ApplicationRoot';
 import { updateRoute } from 'actions/router';
 import { registerStore } from 'utils/store';
 import { createLogger } from 'redux-logger';
+import { Dispatch } from 'react-redux';
 
 // import application styles
 import 'stylesheets/index.scss';
 import 'react-tippy/dist/tippy.css';
-import { Dispatch } from 'react-redux';
 
 // attach global variables to window
 (window as any).React = React;

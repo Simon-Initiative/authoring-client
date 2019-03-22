@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {
@@ -32,13 +32,15 @@ export interface ContiguousTextEditorState {
 
 }
 
+type StyledContiguousTextEditorProps =
+  StyledComponentProps<ContiguousTextEditorProps, typeof styles>;
+
 /**
  * The content editor for contiguous text.
  */
-@injectSheet(styles)
-export default class ContiguousTextEditor
+class ContiguousTextEditor
   extends AbstractContentEditor<contentTypes.ContiguousText,
-  StyledComponentProps<ContiguousTextEditorProps>, ContiguousTextEditorState> {
+  StyledContiguousTextEditorProps, ContiguousTextEditorState> {
 
   selectionState: any;
 
@@ -48,7 +50,7 @@ export default class ContiguousTextEditor
     this.draftDrivenFocus = this.draftDrivenFocus.bind(this);
   }
 
-  shouldComponentUpdate(nextProps: StyledComponentProps<ContiguousTextEditorProps>) {
+  shouldComponentUpdate(nextProps: StyledContiguousTextEditorProps) {
     return nextProps.model !== this.props.model;
   }
 
@@ -135,3 +137,7 @@ export default class ContiguousTextEditor
     );
   }
 }
+
+const StyledContiguousTextEditor = withStyles<ContiguousTextEditorProps>(styles)
+  (ContiguousTextEditor);
+export default StyledContiguousTextEditor;

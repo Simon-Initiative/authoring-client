@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 
 import { styles } from './WritelockModal.styles';
 
@@ -18,9 +18,8 @@ export interface WritelockModalState {
 /**
  * WritelockModal React Component
  */
-@injectSheet(styles)
-export class WritelockModal
-  extends React.PureComponent<StyledComponentProps<WritelockModalProps>,
+class WritelockModal
+  extends React.PureComponent<StyledComponentProps<WritelockModalProps, typeof styles>,
   WritelockModalState> {
   modal: any;
 
@@ -73,3 +72,6 @@ export class WritelockModal
     );
   }
 }
+
+const StyledWritelockModal = withStyles<WritelockModalProps>(styles)(WritelockModal);
+export { StyledWritelockModal as WritelockModal };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -36,10 +36,9 @@ export interface DefinitionEditorState {
 /**
  * The content editor for definitions.
  */
-@injectSheet(styles)
-export default class DefinitionEditor
+class DefinitionEditor
   extends AbstractContentEditor<contentTypes.Definition,
-  StyledComponentProps<DefinitionEditorProps>, DefinitionEditorState> {
+  StyledComponentProps<DefinitionEditorProps, typeof styles>, DefinitionEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -269,3 +268,6 @@ export default class DefinitionEditor
     );
   }
 }
+
+const StyledDefinitionEditor = withStyles<DefinitionEditorProps>(styles)(DefinitionEditor);
+export default StyledDefinitionEditor;

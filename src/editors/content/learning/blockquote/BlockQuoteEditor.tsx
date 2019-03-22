@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps, RenderContext }
   from 'editors/content/common/AbstractContentEditor';
@@ -8,6 +8,7 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockQuoteToolbar from './BlockQuoteToolbar.controller';
 
 import { styles } from './BlockQuote.styles';
+import { StyledComponentProps } from 'types/component';
 
 export interface BlockQuoteEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockQuote> {
@@ -18,10 +19,10 @@ export interface BlockQuoteEditorState {
 
 }
 
-@injectSheet(styles)
-export default class BlockQuoteEditor
+class BlockQuoteEditor
     extends AbstractContentEditor
-    <contentTypes.BlockQuote, BlockQuoteEditorProps & JSSProps, BlockQuoteEditorState> {
+    <contentTypes.BlockQuote, StyledComponentProps<BlockQuoteEditorProps, typeof styles>,
+    BlockQuoteEditorState> {
 
   constructor(props) {
     super(props);
@@ -65,3 +66,6 @@ export default class BlockQuoteEditor
     );
   }
 }
+
+const StyledBlockQuoteEditor = withStyles<BlockQuoteEditorProps>(styles)(BlockQuoteEditor);
+export default StyledBlockQuoteEditor;

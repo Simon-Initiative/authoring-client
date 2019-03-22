@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheetSFC, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { Tooltip } from 'utils/tooltip';
 
 import { styles } from './TargetToggle.styles';
@@ -17,24 +17,27 @@ export interface TargetToggleProps {
 /**
  * TargetToggle React Stateless Component
  */
-export const TargetToggle: React.StatelessComponent<StyledComponentProps<TargetToggleProps>>
-  = injectSheetSFC<TargetToggleProps>(styles)(({
+const TargetToggle:
+React.StatelessComponent<StyledComponentProps<TargetToggleProps, typeof styles>> = ({
   className, classes, id, onToggleType, canToggle,
 }) => {
-    return (
-      <div className={classNames(['TargetToggle', classes.targetToggle,
-        className, !canToggle && classes.disabled])}
-          onClick={() => canToggle && onToggleType(id)}>
-          {canToggle
-            ? (
+  return (
+    <div className={classNames(['TargetToggle', classes.targetToggle,
+      className, !canToggle && classes.disabled])}
+        onClick={() => canToggle && onToggleType(id)}>
+        {canToggle
+          ? (
+            <i className="fa fa-crosshairs" />
+          )
+          : (
+            <Tooltip title={DELETE_TOOLTIP_MSG}>
               <i className="fa fa-crosshairs" />
-            )
-            : (
-              <Tooltip title={DELETE_TOOLTIP_MSG}>
-                <i className="fa fa-crosshairs" />
-              </Tooltip>
-            )
-          }
-      </div>
-    );
-  });
+            </Tooltip>
+          )
+        }
+    </div>
+  );
+};
+
+const StyledTargetToggle = withStyles<TargetToggleProps>(styles)(TargetToggle);
+export { StyledTargetToggle as TargetToggle };

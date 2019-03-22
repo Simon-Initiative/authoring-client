@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 
 import styles from './SearchBar.style';
 
@@ -17,10 +17,9 @@ export interface SearchBarState {
 /**
  * SearchBar React Component
  */
-@injectSheet(styles)
-export default class SearchBar
-    extends React.PureComponent<StyledComponentProps<SearchBarProps>,
-    SearchBarState> {
+class SearchBar
+  extends React.PureComponent<StyledComponentProps<SearchBarProps, typeof styles>,
+  SearchBarState> {
 
   constructor(props) {
     super(props);
@@ -53,3 +52,6 @@ export default class SearchBar
     );
   }
 }
+
+const StyledSearchBar = withStyles<SearchBarProps>(styles)(SearchBar);
+export default StyledSearchBar;

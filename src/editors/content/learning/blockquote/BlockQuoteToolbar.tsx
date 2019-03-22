@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
@@ -15,6 +15,7 @@ import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 
 import { styles } from './BlockQuote.styles';
+import { StyledComponentProps } from 'types/component';
 
 export interface BlockQuoteToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockQuote> {
@@ -25,16 +26,17 @@ export interface BlockQuoteToolbarState {
 
 }
 
-@injectSheet(styles)
-export default class BlockQuoteToolbar
+type StyledBlockQuoteToolbarProps = StyledComponentProps<BlockQuoteToolbarProps, typeof styles>;
+
+class BlockQuoteToolbar
   extends AbstractContentEditor<contentTypes.BlockQuote,
-  BlockQuoteToolbarProps & JSSProps, BlockQuoteToolbarState> {
+  StyledBlockQuoteToolbarProps, BlockQuoteToolbarState> {
 
   constructor(props) {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: BlockQuoteToolbarProps, nextState) {
+  shouldComponentUpdate(nextProps: StyledBlockQuoteToolbarProps, nextState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || nextProps.selection !== this.props.selection;
   }
@@ -213,3 +215,6 @@ export default class BlockQuoteToolbar
     return null;
   }
 }
+
+const StyledBlockQuoteToolbar = withStyles<BlockQuoteToolbarProps>(styles)(BlockQuoteToolbar);
+export default StyledBlockQuoteToolbar;

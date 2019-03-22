@@ -5,7 +5,7 @@ import * as contentTypes from '../../data/contentTypes';
 import { StyledComponentProps } from 'types/component';
 import { extractFullText, LearningObjective } from 'data/content/objectives/objective';
 import { Button } from 'components/common/Button';
-import { injectSheet, classNames, JSSStyles } from 'styles/jss';
+import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 import { LegacyTypes } from 'data/types';
@@ -344,9 +344,11 @@ export interface ObjectiveState {
   isEditingTitle: boolean;
 }
 
-@injectSheet(styles)
-export class Objective
-  extends React.PureComponent<StyledComponentProps<ObjectiveProps>, ObjectiveState> {
+/**
+ * Objective React Component
+ */
+class Objective
+  extends React.PureComponent<StyledComponentProps<ObjectiveProps, typeof styles>, ObjectiveState> {
 
   constructor(props) {
     super(props);
@@ -1009,3 +1011,5 @@ export class Objective
   }
 }
 
+const StyledObjective = withStyles<ObjectiveProps>(styles)(Objective);
+export { StyledObjective as Objective };

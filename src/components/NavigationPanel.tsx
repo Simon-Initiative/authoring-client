@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSStyles } from 'styles/jss';
+import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import { Maybe } from 'tsmonad';
 import colors from 'styles/colors';
 import * as viewActions from 'actions/view';
@@ -239,9 +239,8 @@ export interface NavigationPanelState {
 /**
  * NavigationPanel React Component
  */
-@injectSheet(styles)
-export class NavigationPanel
-  extends React.PureComponent<StyledComponentProps<NavigationPanelProps>,
+class NavigationPanel
+  extends React.PureComponent<StyledComponentProps<NavigationPanelProps, typeof styles>,
   NavigationPanelState> {
 
   constructor(props) {
@@ -548,3 +547,6 @@ export class NavigationPanel
     );
   }
 }
+
+const StyledNavigationPanel = withStyles<NavigationPanelProps>(styles)(NavigationPanel);
+export { StyledNavigationPanel as NavigationPanel };

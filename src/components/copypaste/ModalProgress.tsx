@@ -64,7 +64,7 @@ export class ModalProgress extends React.Component<ModalProgressProps, ModalProg
         <div className="progress-bar progress-bar-striped"
           role="progressbar"
           style={style}
-          aria-valuenow={complete} aria-valuemin="0" aria-valuemax={total}></div>
+          aria-valuenow={complete} aria-valuemin={0} aria-valuemax={total}></div>
       </div>
     );
   }

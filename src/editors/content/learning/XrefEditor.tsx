@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -47,7 +46,7 @@ export interface XrefEditorState {
 */
 export default class XrefEditor
   extends AbstractContentEditor
-  <contentTypes.Xref, XrefEditorProps & JSSProps, XrefEditorState> {
+  <contentTypes.Xref, XrefEditorProps, XrefEditorState> {
 
   constructor(props) {
     super(props);

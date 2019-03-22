@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheetSFC, classNames, JSSStyles } from 'styles/jss';
+import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { EditorSidebarState } from 'reducers/editorSidebar';
 
@@ -41,9 +41,10 @@ export interface SidebarToggleProps {
 /**
  * SidebarToggle React Stateless Component
  */
-export const SidebarToggle = injectSheetSFC<SidebarToggleProps>(styles)(({
+const SidebarToggle:
+React.StatelessComponent<StyledComponentProps<SidebarToggleProps, typeof styles>> = ({
   className, classes, editorSidebar, onToggleSidebar,
-}: StyledComponentProps<SidebarToggleProps>) => {
+}) => {
   return !editorSidebar.show && (
     <div
       className={classNames(['SidebarToggle', classes.SidebarToggle, className])}
@@ -54,4 +55,7 @@ export const SidebarToggle = injectSheetSFC<SidebarToggleProps>(styles)(({
       <i className="fa fa-angle-double-left" />
     </div>
   );
-});
+};
+
+const StyledSidebarToggle = withStyles<SidebarToggleProps>(styles)(SidebarToggle);
+export { StyledSidebarToggle as SidebarToggle };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -24,6 +24,7 @@ import {
 } from 'components/common/Discoverable.controller';
 
 import { styles } from './Table.styles';
+import { TextAlignProperty } from 'csstype';
 
 export interface TableEditorProps
   extends AbstractContentEditorProps<contentTypes.Table> {
@@ -46,10 +47,9 @@ function getKey(
 /**
  * The content editor for tables.
  */
-@injectSheet(styles)
-export default class TableEditor
+class TableEditor
   extends AbstractContentEditor<contentTypes.Table,
-  StyledComponentProps<TableEditorProps>, TableEditorState> {
+  StyledComponentProps<TableEditorProps, typeof styles>, TableEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -188,7 +188,7 @@ export default class TableEditor
 
     const { className, classes } = this.props;
 
-    const textAlign = cell.align;
+    const textAlign = cell.align as TextAlignProperty;
 
     // Passing this fake parent to the CellEditor so that the
     // empty supportedElements causes all Insert Toolbar buttons
@@ -212,7 +212,7 @@ export default class TableEditor
       props: this.props,
     };
 
-    const style = { textAlign };
+    const style: React.CSSProperties = { textAlign };
 
     if (!isFirefox && !isIE && !isEdge) {
       style['height'] = '1px';
@@ -444,3 +444,5 @@ export default class TableEditor
 
 }
 
+const StyledTableEditor = withStyles<TableEditorProps>(styles)(TableEditor);
+export default StyledTableEditor;

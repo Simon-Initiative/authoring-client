@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { ActiveContextState } from 'reducers/active';
 import { ContentModel, AssessmentModel } from 'data/models';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import { ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import {
@@ -34,6 +34,7 @@ import { Hotspot } from 'data/content/workbook/multipanel/hotspot';
 import { Panel } from 'data/content/workbook/multipanel/panel';
 import { PurposeTypes } from 'data/content/org/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
+import { StyledComponentProps } from 'types/component';
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -102,9 +103,9 @@ const createMultipanel = (inline) => {
 /**
  * InsertToolbar React Component
  */
-@injectSheet(styles)
-export class InsertToolbar
-  extends React.Component<InsertToolbarProps & JSSProps, InsertToolbarState> {
+class InsertToolbar
+  extends React.Component<StyledComponentProps<InsertToolbarProps, typeof styles>,
+  InsertToolbarState> {
 
   constructor(props) {
     super(props);
@@ -803,3 +804,6 @@ export class InsertToolbar
     );
   }
 }
+
+const StyledInsertToolbar = withStyles<InsertToolbarProps>(styles)(InsertToolbar);
+export { StyledInsertToolbar as InsertToolbar };

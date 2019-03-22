@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
@@ -33,6 +33,7 @@ import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
 import EntryList from 'editors/content/bibliography/EntryList';
 import ModalSelection from 'utils/selection/ModalSelection';
+import { StyledComponentProps } from 'types/component';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -48,6 +49,9 @@ export interface ContiguousTextToolbarProps
 export interface ContiguousTextToolbarState {
 
 }
+
+type StyledContiguousTextToolbarProps =
+  StyledComponentProps<ContiguousTextToolbarProps, typeof styles>;
 
 function selectBibEntry(bib: contentTypes.Bibliography, display, dismiss)
   : Promise<Maybe<contentTypes.Entry>> {
@@ -73,17 +77,16 @@ function selectBibEntry(bib: contentTypes.Bibliography, display, dismiss)
 /**
  * The content editor for contiguous text.
  */
-@injectSheet(styles)
-export default class ContiguousTextToolbar
+class ContiguousTextToolbar
   extends AbstractContentEditor<contentTypes.ContiguousText,
-  ContiguousTextToolbarProps & JSSProps, ContiguousTextToolbarState> {
+  StyledContiguousTextToolbarProps, ContiguousTextToolbarState> {
 
   constructor(props) {
     super(props);
 
   }
 
-  shouldComponentUpdate(nextProps: ContiguousTextToolbarProps, nextState) {
+  shouldComponentUpdate(nextProps: StyledContiguousTextToolbarProps, nextState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || nextProps.selection !== this.props.selection;
   }
@@ -462,3 +465,7 @@ export default class ContiguousTextToolbar
   }
 
 }
+
+const StyledContiguousTextToolbar = withStyles<ContiguousTextToolbarProps>(styles)
+  (ContiguousTextToolbar);
+export default StyledContiguousTextToolbar;

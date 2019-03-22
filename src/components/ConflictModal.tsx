@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 
 import { styles } from './ConflictModal.styles';
 
@@ -18,9 +18,8 @@ export interface ConflictModalState {
 /**
  * ConflictModal React Component
  */
-@injectSheet(styles)
-export class ConflictModal
-  extends React.PureComponent<StyledComponentProps<ConflictModalProps>,
+class ConflictModal
+  extends React.PureComponent<StyledComponentProps<ConflictModalProps, typeof styles>,
   ConflictModalState> {
   modal: any;
 
@@ -74,3 +73,6 @@ export class ConflictModal
     );
   }
 }
+
+const StyledConflictModal = withStyles<ConflictModalProps>(styles)(ConflictModal);
+export { StyledConflictModal as ConflictModal };
