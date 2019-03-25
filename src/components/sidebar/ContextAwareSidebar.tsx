@@ -140,6 +140,7 @@ export interface ContextAwareSidebarProps {
   onDismissModal: () => void;
   timeSkewInMs: number;
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
+  onDuplicate: (model: ContentModel) => void;
 }
 
 export interface ContextAwareSidebarState {
@@ -289,6 +290,14 @@ class ContextAwareSidebar
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
+                  className={classes.dupeButton}
+                  onClick={() => this.props.onDuplicate(this.props.model)}
+                  editMode={editMode}>
+                  Duplicate this Page
+                </Button>
+              </SidebarRow>
+              <SidebarRow>
+                <Button
                   className={classes.deleteButton}
                   onClick={this.showDeleteModal}
                   editMode={editMode}
@@ -402,6 +411,14 @@ class ContextAwareSidebar
             }
             <SidebarGroup label="Advanced">
               <SidebarRow>
+                <Button
+                  className={classes.dupeButton}
+                  onClick={() => this.props.onDuplicate(this.props.model)}
+                  editMode={editMode}>
+                  Duplicate this Assessment
+                </Button>
+              </SidebarRow>
+              <SidebarRow>
                 {model.type === LegacyTypes.inline
                   ? <React.Fragment><ToggleSwitch
                     checked={model.branching}
@@ -440,6 +457,14 @@ class ContextAwareSidebar
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
+                  className={classes.dupeButton}
+                  onClick={() => this.props.onDuplicate(this.props.model)}
+                  editMode={editMode}>
+                  Duplicate this Pool
+                </Button>
+              </SidebarRow>
+              <SidebarRow>
+                <Button
                   className={classes.deleteButton}
                   onClick={this.showDeleteModal}
                   editMode={editMode}
@@ -468,6 +493,14 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             <SidebarGroup label="Advanced">
+              <SidebarRow>
+                <Button
+                  className={classes.dupeButton}
+                  onClick={() => this.props.onDuplicate(this.props.model)}
+                  editMode={editMode}>
+                  Duplicate this Survey
+                </Button>
+              </SidebarRow>
               <SidebarRow>
                 <Button
                   className={classes.deleteButton}

@@ -16,6 +16,7 @@ import { ContentModel, CourseModel, Node } from 'data/models';
 import { modalActions } from 'actions/modal';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
+import { duplicate } from 'actions/duplication';
 
 interface StateProps {
   content: Maybe<ContentElement>;
@@ -37,6 +38,7 @@ interface DispatchProps {
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
+  onDuplicate: (model: ContentModel) => void;
 }
 
 interface OwnProps {
@@ -88,6 +90,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onDismissModal: () => dispatch(modalActions.dismiss()),
     onGetChoiceCombinations: (comboNum: number): CombinationsMap => {
       return dispatch(computeCombinations(comboNum) as any);
+    },
+    onDuplicate: (model: ContentModel) => {
+      return dispatch(duplicate(model) as any);
     },
   };
 };
