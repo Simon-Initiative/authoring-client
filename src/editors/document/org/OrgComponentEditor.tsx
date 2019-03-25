@@ -175,6 +175,20 @@ export class OrgComponentEditor
 
     return this.props.org.caseOf({
       just: (org) => {
+
+        const preconditions = model.preconditions !== undefined
+          ?
+          <PreconditionsEditor
+            parentId={model.id}
+            editMode={this.props.editMode}
+            org={org}
+            placements={this.props.placements}
+            course={this.props.course}
+            preconditions={model.preconditions}
+            onEdit={p => this.onEditPreconditions(model, p)}
+          />
+          : null;
+
         return (
           <div className="org-component-editor">
             <UndoRedoToolbar
@@ -184,15 +198,7 @@ export class OrgComponentEditor
               onRedo={onRedo.bind(this)} />
             {titleEditor}
 
-            <PreconditionsEditor
-              parentId={model.id}
-              editMode={this.props.editMode}
-              org={org}
-              placements={this.props.placements}
-              course={this.props.course}
-              preconditions={model.preconditions}
-              onEdit={p => this.onEditPreconditions(model, p)}
-            />
+            {preconditions}
 
             {this.renderActionBar(model)}
             <Outline
