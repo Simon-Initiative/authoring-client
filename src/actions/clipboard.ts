@@ -26,7 +26,7 @@ export const setItem = (item: ContentElement, page: string): SetItemAction => ({
 });
 
 export function cut(item: ContentElement, page: string) {
-  return function (dispatch: Dispatch<State>, getState: () => State) {
+  return function (dispatch: Dispatch, getState: () => State) {
     const { activeContext, documents } = getState();
 
     // We will have to re-implement if we ever support multiple
@@ -54,13 +54,13 @@ export function copy(item: ContentElement, page: string) {
 
   saveToLocalStorage('clipboard', serialized);
 
-  return function (dispatch: Dispatch<State>, getState: () => State) {
+  return function (dispatch: Dispatch, getState: () => State) {
     dispatch(setItem(item, page));
   };
 }
 
 export function paste() {
-  return function (dispatch: Dispatch<State>, getState: () => State) {
+  return function (dispatch: Dispatch, getState: () => State) {
 
     const { activeContext } = getState();
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Map } from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSStyles } from 'styles/jss';
+import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import flatui from 'styles/palettes/flatui';
 import * as contentTypes from '../../data/contentTypes';
@@ -118,9 +118,8 @@ export interface SkillState {
 /**
  * Skill React Component
  */
-@injectSheet(styles)
-export class Skill
-  extends React.PureComponent<StyledComponentProps<SkillProps>,
+class Skill
+  extends React.PureComponent<StyledComponentProps<SkillProps, typeof styles>,
   SkillState> {
 
   constructor(props) {
@@ -272,4 +271,5 @@ export class Skill
   }
 }
 
-
+const StyledSkill = withStyles<SkillProps>(styles)(Skill);
+export { StyledSkill as Skill };

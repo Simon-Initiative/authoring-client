@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -28,7 +27,7 @@ export interface ActivityLinkEditorState {
  */
 export default class ActivityLinkEditor
   extends AbstractContentEditor
-  <contentTypes.ActivityLink, ActivityLinkEditorProps & JSSProps, ActivityLinkEditorState> {
+  <contentTypes.ActivityLink, ActivityLinkEditorProps, ActivityLinkEditorState> {
 
   constructor(props) {
     super(props);

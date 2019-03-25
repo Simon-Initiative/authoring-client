@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -26,10 +26,9 @@ export interface ParamEditorState {
 /**
  * The content editor for list items.
  */
-@injectSheet(styles)
-export default class ParamEditor
+class ParamEditor
   extends AbstractContentEditor<contentTypes.Param,
-  StyledComponentProps<ParamEditorProps>, ParamEditorState> {
+  StyledComponentProps<ParamEditorProps, typeof styles>, ParamEditorState> {
 
   constructor(props) {
     super(props);
@@ -218,3 +217,5 @@ export default class ParamEditor
 
 }
 
+const StyledParamEditor = withStyles<ParamEditorProps>(styles)(ParamEditor);
+export default StyledParamEditor;

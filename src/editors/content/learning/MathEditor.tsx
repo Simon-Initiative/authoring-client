@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
 import {
@@ -26,7 +25,7 @@ export interface MathEditorState {
  */
 export default class MathEditor
   extends AbstractContentEditor
-  <contentTypes.Math, MathEditorProps & JSSProps, MathEditorState> {
+  <contentTypes.Math, MathEditorProps, MathEditorState> {
 
   constructor(props) {
     super(props);

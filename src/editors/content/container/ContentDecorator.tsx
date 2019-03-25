@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames as jssClassNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { getContentIcon, insertableContentTypes } from 'editors/content/utils/content';
 
 import { styles } from './ContentDecorator.styles';
@@ -20,12 +20,14 @@ export interface ContentDecoratorState {
 
 }
 
-@injectSheet(styles)
-export class ContentDecorator
-  extends React.Component<StyledComponentProps<ContentDecoratorProps>,
+/**
+ * ContentDecorator React Component
+ */
+class ContentDecorator
+  extends React.Component<StyledComponentProps<ContentDecoratorProps, typeof styles>,
     ContentDecoratorState> {
 
-  constructor(props, childState) {
+  constructor(props) {
     super(props);
 
     this.hideContentLabel = this.hideContentLabel.bind(this);
@@ -54,7 +56,7 @@ export class ContentDecorator
 
     return (
       <div
-        className={jssClassNames([
+        className={classNames([
           'content-decorator',
           classes.contentDecorator,
           isActiveContent && 'active-content',
@@ -66,7 +68,7 @@ export class ContentDecorator
           ? null
           : (
             <div
-              className={jssClassNames([
+              className={classNames([
                 classes.handle,
                 isActiveContent && 'active-content',
               ])}
@@ -78,7 +80,7 @@ export class ContentDecorator
             </div>
           )
         }
-        <div className={jssClassNames([
+        <div className={classNames([
           classes.content,
           isActiveContent && 'active-content',
         ])}>
@@ -88,3 +90,6 @@ export class ContentDecorator
     );
   }
 }
+
+const StyledContentDecorator = withStyles<ContentDecoratorProps>(styles)(ContentDecorator);
+export { StyledContentDecorator as ContentDecorator };

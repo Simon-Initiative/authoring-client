@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -22,10 +22,9 @@ export interface MeaningEditorState {
 
 }
 
-@injectSheet(styles)
-export default class MeaningEditor
+class MeaningEditor
     extends AbstractContentEditor<contentTypes.Meaning,
-    StyledComponentProps<MeaningEditorProps>, MeaningEditorState> {
+    StyledComponentProps<MeaningEditorProps, typeof styles>, MeaningEditorState> {
 
   constructor(props) {
     super(props);
@@ -69,3 +68,6 @@ export default class MeaningEditor
   }
 
 }
+
+const StyledMeaningEditor = withStyles<MeaningEditorProps>(styles)(MeaningEditor);
+export default StyledMeaningEditor;

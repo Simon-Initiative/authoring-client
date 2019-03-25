@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 
 import { styles } from './LoadingSpinner.styles';
 
@@ -17,9 +17,8 @@ export interface LoadingSpinnerState {
 /**
  * LoadingSpinner React Component
  */
-@injectSheet(styles)
-export class LoadingSpinner
-  extends React.PureComponent<StyledComponentProps<LoadingSpinnerProps>,
+class LoadingSpinner
+  extends React.PureComponent<StyledComponentProps<LoadingSpinnerProps, typeof styles>,
   LoadingSpinnerState> {
 
   constructor(props) {
@@ -39,3 +38,6 @@ export class LoadingSpinner
     );
   }
 }
+
+const StyledLoadingSpinner = withStyles<LoadingSpinnerProps>(styles)(LoadingSpinner);
+export { StyledLoadingSpinner as LoadingSpinner };

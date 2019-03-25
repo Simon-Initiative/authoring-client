@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -20,12 +20,12 @@ export interface InstructionsEditorProps
 
 export interface InstructionsEditorState {
 
+
 }
 
-@injectSheet(styles)
-export default class InstructionsEditor
+class InstructionsEditor
     extends AbstractContentEditor<contentTypes.Instructions,
-    StyledComponentProps<InstructionsEditorProps>, InstructionsEditorState> {
+    StyledComponentProps<InstructionsEditorProps, typeof styles>, InstructionsEditorState> {
 
   constructor(props) {
     super(props);
@@ -66,3 +66,6 @@ export default class InstructionsEditor
   }
 
 }
+
+const StyledInstructionsEditor = withStyles<InstructionsEditorProps>(styles)(InstructionsEditor);
+export default StyledInstructionsEditor;

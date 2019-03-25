@@ -27,7 +27,7 @@ function setTargetNode(node): SetXrefTargetAction {
 // targetId is an id
 // documentId is a guid
 export function fetchAndSetTargetNode(targetId: string, documentId: string) {
-  return (dispatch: Dispatch<State>, getState: () => State): Promise<any> => {
+  return (dispatch: Dispatch, getState: () => State): Promise<any> => {
     const { course } = getState();
     return persistence.retrieveDocument(course.guid, documentId).then((doc) => {
       const wbpage = doc.model as WorkbookPageModel;

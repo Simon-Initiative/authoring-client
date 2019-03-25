@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -47,10 +47,9 @@ function getKey(
 /**
  * The content editor for tables.
  */
-@injectSheet(styles)
-export default class ConjugationEditor
+class ConjugationEditor
   extends AbstractContentEditor<contentTypes.Conjugation,
-  StyledComponentProps<ConjugationEditorProps>, ConjugationEditorState> {
+  StyledComponentProps<ConjugationEditorProps, typeof styles>, ConjugationEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -513,3 +512,5 @@ export default class ConjugationEditor
 
 }
 
+const StyledConjugationEditor = withStyles<ConjugationEditorProps>(styles)(ConjugationEditor);
+export default StyledConjugationEditor;

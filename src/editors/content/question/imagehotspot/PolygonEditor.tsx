@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { throttle } from 'utils/timing';
 import { Maybe } from 'tsmonad';
 import { BoundingClientRect, Point } from 'types/common';
@@ -43,9 +43,8 @@ export interface PolygonEditorState {
 /**
  * PolygonEditor React Component
  */
-@injectSheet(styles)
-export class PolygonEditor
-    extends React.PureComponent<StyledComponentProps<PolygonEditorProps>,
+class PolygonEditor
+    extends React.PureComponent<StyledComponentProps<PolygonEditorProps, typeof styles>,
     PolygonEditorState> {
 
   constructor(props) {
@@ -281,3 +280,6 @@ export class PolygonEditor
     );
   }
 }
+
+const StyledPolygonEditor = withStyles<PolygonEditorProps>(styles)(PolygonEditor);
+export { StyledPolygonEditor as PolygonEditor };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import { Custom } from 'data/content/assessment/custom';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -41,10 +41,9 @@ export interface DynaDragDropEditorState {
 
 }
 
-@injectSheet(styles)
-export class DynaDragDropEditor
+class DynaDragDropEditor
   extends AbstractContentEditor<Custom,
-    StyledComponentProps<DynaDragDropEditorProps>, DynaDragDropEditorState> {
+    StyledComponentProps<DynaDragDropEditorProps, typeof styles>, DynaDragDropEditorState> {
 
   constructor(props) {
     super(props);
@@ -297,3 +296,6 @@ export class DynaDragDropEditor
     );
   }
 }
+
+const StyledDynaDragDropEditor = withStyles<DynaDragDropEditorProps>(styles)(DynaDragDropEditor);
+export { StyledDynaDragDropEditor as DynaDragDropEditor };

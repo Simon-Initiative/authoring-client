@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -25,10 +25,9 @@ export interface ProofEditorState {
 
 }
 
-@injectSheet(styles)
-export default class ProofEditor
+class ProofEditor
   extends AbstractContentEditor<contentTypes.Proof,
-  StyledComponentProps<ProofEditorProps>, ProofEditorState> {
+  StyledComponentProps<ProofEditorProps, typeof styles>, ProofEditorState> {
 
   constructor(props) {
     super(props);
@@ -93,3 +92,6 @@ export default class ProofEditor
     );
   }
 }
+
+const StyledProofEditor = withStyles<ProofEditorProps>(styles)(ProofEditor);
+export default StyledProofEditor;

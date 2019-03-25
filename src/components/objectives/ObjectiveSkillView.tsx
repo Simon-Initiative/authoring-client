@@ -320,8 +320,7 @@ interface ObjectiveSkillViewState {
 // abstract away the presence of multiple documents and present a single,
 // unified UI where the user can create and edit LOs and skills.
 
-
-export class ObjectiveSkillView
+class ObjectiveSkillView
   extends React.Component<ObjectiveSkillViewProps, ObjectiveSkillViewState> {
 
   viewActions: Object;
@@ -1392,4 +1391,4 @@ export class ObjectiveSkillView
 
 }
 
-export default ObjectiveSkillView;
+export { ObjectiveSkillView };

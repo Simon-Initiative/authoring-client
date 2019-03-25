@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
-
+import { withStyles, classNames } from 'styles/jss';
 import { styles } from './ToolbarDropdown.styles';
+import { StyledComponentProps } from 'types/component';
 
 export enum ToolbarDropdownSize {
   Large = 'large',
@@ -19,8 +19,9 @@ export interface ToolbarDropdownProps {
   positionMenuOnRight?: boolean;
 }
 
-@injectSheet(styles)
-export class ToolbarDropdown extends React.PureComponent<ToolbarDropdownProps & JSSProps> {
+class ToolbarDropdown
+  extends React.PureComponent<StyledComponentProps<ToolbarDropdownProps, typeof styles>> {
+
   constructor(props) {
     super(props);
   }
@@ -55,3 +56,6 @@ export class ToolbarDropdown extends React.PureComponent<ToolbarDropdownProps & 
     );
   }
 }
+
+const StyledToolbarDropdown = withStyles<ToolbarDropdownProps>(styles)(ToolbarDropdown);
+export { StyledToolbarDropdown as ToolbarDropdown };

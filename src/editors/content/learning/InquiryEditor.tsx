@@ -1,12 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-
 import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -14,7 +13,6 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-
 import { styles } from './Inquiry.styles';
 
 export interface InquiryEditorProps
@@ -27,10 +25,9 @@ export interface InquiryEditorState {
 
 }
 
-@injectSheet(styles)
-export default class InquiryEditor
+class InquiryEditor
   extends AbstractContentEditor<contentTypes.Inquiry,
-  StyledComponentProps<InquiryEditorProps>, InquiryEditorState> {
+  StyledComponentProps<InquiryEditorProps, typeof styles>, InquiryEditorState> {
 
   constructor(props) {
     super(props);
@@ -121,3 +118,6 @@ export default class InquiryEditor
   }
 
 }
+
+const StyledInquiryEditor = withStyles<InquiryEditorProps>(styles)(InquiryEditor);
+export default StyledInquiryEditor;

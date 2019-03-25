@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -33,14 +33,15 @@ export interface AlternativesEditorState {
 
 }
 
-@injectSheet(styles)
-export default class AlternativesEditor
+type StyledAlternativesEditorProps = StyledComponentProps<AlternativesEditorProps, typeof styles>;
+
+class AlternativesEditor
   extends AbstractContentEditor<contentTypes.Alternatives,
-  StyledComponentProps<AlternativesEditorProps>, AlternativesEditorState> {
+  StyledAlternativesEditorProps, AlternativesEditorState> {
 
   defaultTabIndex: number;
 
-  constructor(props: AlternativesEditorProps) {
+  constructor(props: StyledAlternativesEditorProps) {
     super(props);
 
     this.onGroupEdit = this.onGroupEdit.bind(this);
@@ -348,3 +349,5 @@ export default class AlternativesEditor
 
 }
 
+const StyledAlternativesEditor = withStyles<AlternativesEditorProps>(styles)(AlternativesEditor);
+export default StyledAlternativesEditor;

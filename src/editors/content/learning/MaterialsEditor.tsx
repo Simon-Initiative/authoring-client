@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -26,10 +26,9 @@ export interface MaterialsEditorState {
 
 }
 
-@injectSheet(styles)
-export default class MaterialsEditor
+class MaterialsEditor
   extends AbstractContentEditor<contentTypes.Materials,
-  StyledComponentProps<MaterialsEditorProps>, MaterialsEditorState> {
+  StyledComponentProps<MaterialsEditorProps, typeof styles>, MaterialsEditorState> {
 
   constructor(props) {
     super(props);
@@ -133,3 +132,6 @@ export default class MaterialsEditor
   }
 
 }
+
+const StyledMaterialsEditor = withStyles<MaterialsEditorProps>(styles)(MaterialsEditor);
+export default StyledMaterialsEditor;

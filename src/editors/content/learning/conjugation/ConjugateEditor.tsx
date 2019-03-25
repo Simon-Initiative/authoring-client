@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
@@ -35,10 +35,9 @@ export interface ConjugateEditorState {
 /**
  * The content editor for table cells.
  */
-@injectSheet(styles)
-export default class ConjugateEditor
+class ConjugateEditor
   extends AbstractContentEditor<contentTypes.ConjugationCell,
-  StyledComponentProps<ConjugateEditorProps>, ConjugateEditorState> {
+  StyledComponentProps<ConjugateEditorProps, typeof styles>, ConjugateEditorState> {
 
   constructor(props) {
     super(props);
@@ -318,3 +317,6 @@ export default class ConjugateEditor
   }
 
 }
+
+const StyledConjugateEditor = withStyles<ConjugateEditorProps>(styles)(ConjugateEditor);
+export default StyledConjugateEditor;

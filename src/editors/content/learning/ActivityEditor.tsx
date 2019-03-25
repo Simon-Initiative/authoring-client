@@ -11,9 +11,8 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
-
 import { styles } from 'editors/content/learning/Activity.styles';
 import { ResourceState } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
@@ -34,10 +33,9 @@ export interface ActivityEditorProps {
 // Activities can be summative assessments, feedback (surveys), or workbook pages. We show the
 // right wording in the ActivityEditor simply by switching on the resource type.
 
-@injectSheet(styles)
-export default class ActivityEditor
+class ActivityEditor
   extends AbstractContentEditor<contentTypes.Activity,
-  StyledComponentProps<ActivityEditorProps>, ActivityEditorState> {
+  StyledComponentProps<ActivityEditorProps, typeof styles>, ActivityEditorState> {
   constructor(props) {
     super(props);
 
@@ -189,3 +187,6 @@ export default class ActivityEditor
     );
   }
 }
+
+const StyledActivityEditor = withStyles<ActivityEditorProps>(styles)(ActivityEditor);
+export default StyledActivityEditor;

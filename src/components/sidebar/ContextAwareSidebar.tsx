@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, injectSheetSFC, classNames, JSSProps } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import {
   RenderContext, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -38,7 +38,7 @@ interface SidebarRowProps {
   label?: string;
 }
 
-export const SidebarRow = injectSheetSFC<SidebarRowProps>(styles)(({
+export const SidebarRow = withStyles<SidebarRowProps>(styles)(({
   classes, label, children }) => {
   return (
     <div className={classes.sidebarRow}>
@@ -57,9 +57,9 @@ interface SidebarHeaderProps {
   onHide: () => void;
 }
 
-const SidebarHeader = injectSheetSFC<SidebarHeaderProps>(styles)(({
+const SidebarHeader = withStyles<SidebarHeaderProps>(styles)(({
   classes, title, onHide,
-}: StyledComponentProps<SidebarHeaderProps>) => {
+}) => {
   return (
     <h3 className={classes.header}>
       {title}
@@ -80,9 +80,9 @@ interface SidebarContentProps {
 /**
  * SidebarGroup React Stateless Component
  */
-export const SidebarContent = injectSheetSFC<SidebarContentProps>(styles)(({
+export const SidebarContent = withStyles<SidebarContentProps>(styles)(({
   className, classes, children, title, onHide,
-}: StyledComponentProps<SidebarContentProps>) => {
+}) => {
   return (
     <div className={classNames([classes.sidebarContent, className])}>
       <SidebarHeader title={title} onHide={onHide} />
@@ -106,9 +106,9 @@ interface SidebarGroupProps {
 /**
  * SidebarGroup React Stateless Component
  */
-export const SidebarGroup = injectSheetSFC<SidebarGroupProps>(styles)(({
+export const SidebarGroup = withStyles<SidebarGroupProps>(styles)(({
   className, classes, children, label,
-}: StyledComponentProps<SidebarGroupProps>) => {
+}) => {
   return (
     <div className={classNames([classes.sidebarGroup, className])}>
       <div className={classes.sidebarGroupLabel}>{label}</div>
@@ -149,9 +149,9 @@ export interface ContextAwareSidebarState {
 /**
  * React Component for Context Aware Sidebar
  */
-@injectSheet(styles)
-export class ContextAwareSidebar
-  extends React.PureComponent<ContextAwareSidebarProps & JSSProps, ContextAwareSidebarState> {
+class ContextAwareSidebar
+  extends React.PureComponent<
+  StyledComponentProps<ContextAwareSidebarProps, typeof styles>, ContextAwareSidebarState> {
 
   constructor(props) {
     super(props);
@@ -554,3 +554,6 @@ export class ContextAwareSidebar
     );
   }
 }
+
+const StyledContextAwareSidebar = withStyles<ContextAwareSidebarProps>(styles)(ContextAwareSidebar);
+export { StyledContextAwareSidebar as ContextAwareSidebar };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -25,10 +25,9 @@ export interface InquiryQuestionEditorState {
 
 }
 
-@injectSheet(styles)
-export default class InquiryQuestionEditor
+class InquiryQuestionEditor
   extends AbstractContentEditor<contentTypes.InquiryQuestion,
-  StyledComponentProps<InquiryQuestionEditorProps>, InquiryQuestionEditorState> {
+  StyledComponentProps<InquiryQuestionEditorProps, typeof styles>, InquiryQuestionEditorState> {
 
   constructor(props) {
     super(props);
@@ -115,3 +114,7 @@ export default class InquiryQuestionEditor
   }
 
 }
+
+const StyledInquiryQuestionEditor = withStyles<InquiryQuestionEditorProps>(styles)
+  (InquiryQuestionEditor);
+export default StyledInquiryQuestionEditor;
