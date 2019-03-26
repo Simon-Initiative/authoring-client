@@ -14,6 +14,7 @@ import { Outline } from './outline/Outline';
 import { PreconditionsEditor } from './PreconditionsEditor';
 import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
+import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
 
 export interface OrgComponentEditorProps {
@@ -191,27 +192,55 @@ export class OrgComponentEditor
 
         return (
           <div className="org-component-editor">
-            <UndoRedoToolbar
-              undoEnabled={canUndo}
-              redoEnabled={canRedo}
-              onUndo={onUndo.bind(this)}
-              onRedo={onRedo.bind(this)} />
-            {titleEditor}
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              {titleEditor}
+              <div className="flex-spacer" />
+              <UndoRedoToolbar
+                undoEnabled={canUndo}
+                redoEnabled={canRedo}
+                onUndo={onUndo.bind(this)}
+                onRedo={onRedo.bind(this)} />
+            </div>
 
             {preconditions}
 
-            {this.renderActionBar(model)}
-            <Outline
-              onView={this.onView}
-              editMode={this.props.editMode}
-              onEdit={this.props.onEdit}
-              nodes={model.children}
-              org={org}
-              placements={this.props.placements}
-              parentNodeId={model.id}
-              course={this.props.course}
-              commandProcessor={this.processCommand.bind(this, org)}
-            />
+            {model.contentType === t.OrganizationContentTypes.Module
+              ? (
+                <TabContainer labels={['Content', 'Analytics']}>
+                  <Tab>
+                    {this.renderActionBar(model)}
+                    <Outline
+                      onView={this.onView}
+                      editMode={this.props.editMode}
+                      onEdit={this.props.onEdit}
+                      nodes={model.children}
+                      org={org}
+                      placements={this.props.placements}
+                      parentNodeId={model.id}
+                      course={this.props.course}
+                      commandProcessor={this.processCommand.bind(this, org)} />
+                  </Tab>
+                  <Tab>
+
+                  </Tab>
+                </TabContainer>
+              )
+              : (
+                <React.Fragment>
+                  {this.renderActionBar(model)}
+                  <Outline
+                    onView={this.onView}
+                    editMode={this.props.editMode}
+                    onEdit={this.props.onEdit}
+                    nodes={model.children}
+                    org={org}
+                    placements={this.props.placements}
+                    parentNodeId={model.id}
+                    course={this.props.course}
+                    commandProcessor={this.processCommand.bind(this, org)} />
+                </React.Fragment>
+              )
+            }
           </div>
         );
       },
