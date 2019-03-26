@@ -18,6 +18,7 @@ interface StateProps {
   model: Maybe<models.OrganizationModel>;
   editMode: boolean;
   course: models.CourseModel;
+  placements: org.Placements;
 }
 
 interface DispatchProps {
@@ -46,6 +47,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     model: orgs.activeOrg.map(d => d.model as models.OrganizationModel),
     course,
     editMode: course.editable,
+    placements: orgs.placements,
   };
 };
 

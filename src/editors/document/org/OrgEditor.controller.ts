@@ -6,6 +6,7 @@ import { undo, redo, documentEditingEnable } from 'actions/document';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
 import { modalActions } from 'actions/modal';
+import * as org from 'data/models/utils/org';
 
 interface StateProps {
   canUndo: boolean;
@@ -26,12 +27,11 @@ interface DispatchProps {
 
 interface OwnProps {
   context: AppContext;
+  placements: org.Placements;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   return {
-    // canUndo: state.documents.get(ownProps.context.documentId).undoStack.size > 0,
-    // canRedo: state.documents.get(ownProps.context.documentId).redoStack.size > 0,
     canUndo: false,
     canRedo: false,
     course: state.course,

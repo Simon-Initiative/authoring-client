@@ -1,10 +1,11 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren } from 'data/content/common';
+import { defaultIdGuid, getChildren } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Maybe } from 'tsmonad';
 import * as types from 'data/content/org/types';
 
 export type IncludeParams = {
+  id?: string,
   organization?: string,
   title?: string,
   version?: string,
@@ -16,6 +17,7 @@ export type IncludeParams = {
 const defaultContent = {
   contentType: types.ContentTypes.Include,
   elementType: 'include',
+  id: '',
   title: Maybe.nothing<string>(),
   idref: '',
   organization: '',
@@ -28,6 +30,7 @@ export class Include extends Immutable.Record(defaultContent) {
 
   contentType: types.ContentTypes.Include;
   elementType: 'include';
+  id: string;
   organization: string;
   title: Maybe<string>;
   version: string;
@@ -36,7 +39,7 @@ export class Include extends Immutable.Record(defaultContent) {
   guid: string;
 
   constructor(params?: IncludeParams) {
-    super(augment(params));
+    super(defaultIdGuid(params));
   }
 
   with(values: IncludeParams) {
@@ -48,6 +51,9 @@ export class Include extends Immutable.Record(defaultContent) {
     const s = (root as any).include;
     let model = new Include({ guid });
 
+    if (s['@id'] !== undefined) {
+      model = model.with({ id: s['@id'] });
+    }
     if (s['@idref'] !== undefined) {
       model = model.with({ idref: s['@idref'] });
     }
@@ -82,6 +88,7 @@ export class Include extends Immutable.Record(defaultContent) {
 
     const s = {
       include: {
+        '@id': this.id,
         '@idref': this.idref,
         '@organization': this.organization,
         '@version': this.version,

@@ -41,9 +41,25 @@ let reduxLoggingEnabled = (window as Window).localStorage.getItem('redux-logging
 
   return reduxLoggingEnabled ? 'Redux logging enabled' : 'Redux logging disabled';
 };
+
+let experimentalOrgEditing = (window as Window)
+  .localStorage.getItem('experimental-org-editing') === 'true';
+(window as any).enableExperimentalOrgEditing = (show: boolean) => {
+  experimentalOrgEditing = !!show;
+  (window as Window).localStorage
+    .setItem('experimental-org-editing', experimentalOrgEditing ? 'true' : 'false');
+
+  return experimentalOrgEditing
+    ? 'Experimental org editing enabled' : 'Experimental org editing disabled';
+};
+
 (window as any).help = () => {
   console.log(`
 Available Commands:
+
+  enableExperimentalOrgEditing(enable: boolean)
+    Enable experimental support for editing preconditions
+
   showReduxLogs(show: boolean)
     Enable redux logging if show is true, otherwise disable redux logging.
     Setting persists in local storage.
