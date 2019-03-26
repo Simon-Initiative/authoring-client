@@ -6,9 +6,13 @@ import { Maybe } from 'tsmonad';
 import { map } from 'data/utils/map';
 import { ContentElement } from 'data/content/common/interfaces';
 
+
 export type OrgNode =
-  ct.Sequence | ct.Unit | ct.Module |
+  ct.Sequence |
+  ct.Unit |
+  ct.Module |
   ct.Section |
+  ct.Include |
   ct.Item;
 
 export type AnonymousNode =
@@ -27,6 +31,116 @@ export type OrgChangeRequest =
   SetAnonymousAttribute |
   AddAnonymousNode |
   RemoveAnonymousNode;
+
+function isNumberedNodeType(node: any) {
+  return (node.contentType === ct.OrganizationContentTypes.Unit
+    || node.contentType === ct.OrganizationContentTypes.Module
+    || node.contentType === ct.OrganizationContentTypes.Section
+    || node.contentType === ct.OrganizationContentTypes.Sequence);
+}
+
+
+export type PlacementParams = {
+  node: OrgNode,
+  positionAtLevel: Maybe<number>,
+  level: number,
+  directAncestors: Immutable.Set<string>,
+  parent: Maybe<Placement>,
+};
+
+const defaults = (params: Partial<PlacementParams> = {}) => ({
+  node: null,
+  positionAtLevel: Maybe.nothing(),
+  level: 0,
+  directAncestors: Immutable.Set<string>(),
+  parent: Maybe.nothing(),
+});
+
+export type Placements = Immutable.OrderedMap<string, Placement>;
+
+export class Placement extends Immutable.Record(defaults()) {
+
+  node: OrgNode;
+  positionAtLevel: Maybe<number>;
+  level: number;
+  directAncestors: Immutable.Set<string>;
+  parent: Maybe<Placement>;
+
+  constructor(params?: Partial<PlacementParams>) {
+    super(defaults(params));
+  }
+
+  with(values: Partial<PlacementParams>) {
+    return this.merge(values) as this;
+  }
+
+}
+
+
+// Make one traversal through the organization model, building
+// a flattened represetnation of the organization hierarchy, more
+// suitable for optimal rendering and other tasks.
+export function modelToPlacements(
+  model: OrganizationModel): Placements {
+
+  const positions = {};
+  const positionAtLevels = {};
+  const placements = [];
+  const arr = model.sequences.children.toArray();
+
+  arr.forEach((n) => {
+    modelToPlacementsHelper(
+      n, 0, positions, positionAtLevels, placements, Maybe.nothing());
+  });
+
+  return Immutable.OrderedMap<string, Placement>(
+    placements.map(p => [p.node.id, p]));
+}
+
+
+function modelToPlacementsHelper(
+  node: any, level: number,
+  positions: Object, positionAtLevels: Object,
+  placements: Placement[],
+  parent: Maybe<Placement>): void {
+
+
+  let positionAtLevel = Maybe.nothing<number>();
+
+  if (isNumberedNodeType(node)) {
+    if (positionAtLevels[level] === undefined) {
+      positionAtLevels[level] = 1;
+    } else {
+      positionAtLevels[level] = positionAtLevels[level] + 1;
+    }
+    positionAtLevel = Maybe.just(positionAtLevels[level]);
+
+    positions[node.guid] = positionAtLevels[level];
+  }
+
+  const placement = new Placement().with({
+    node,
+    level,
+    positionAtLevel,
+    parent,
+    directAncestors: parent.caseOf({
+      just: p => p.directAncestors.add(p.node.id),
+      nothing: () => Immutable.Set<string>(),
+    }),
+  });
+  placements.push(placement);
+
+  if (node.children !== undefined) {
+
+    node.children.toArray()
+      .forEach(n => modelToPlacementsHelper(
+        n, level + 1, positions, positionAtLevels,
+        placements, Maybe.just(placement)));
+  }
+}
+
+
+
 
 // Change requests for strongly identifiable nodes in an
 // org model. Strongly identifiable nodes are nodes that

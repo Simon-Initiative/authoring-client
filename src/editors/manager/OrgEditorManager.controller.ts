@@ -26,6 +26,7 @@ interface StateProps {
   canUndo: boolean;
   canRedo: boolean;
   course: CourseModel;
+  placements: org.Placements;
 }
 
 interface DispatchProps {
@@ -76,6 +77,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     canUndo: false,
     canRedo: false,
     course: state.course,
+    placements: orgs.placements,
   };
 };
 

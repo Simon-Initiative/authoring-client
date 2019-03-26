@@ -3,7 +3,6 @@ import * as Immutable from 'immutable';
 
 import * as models from 'data/models';
 import { viewDocument } from 'actions/view';
-import * as contentTypes from 'data/contentTypes';
 import { getExpandId, render, NodeTypes } from 'editors/document/org/traversal';
 import { collapseNodes, expandNodes } from 'actions/expand';
 import { SourceNodeType } from 'editors/content/org/drag/utils';
@@ -17,31 +16,6 @@ import { Maybe } from 'tsmonad';
 import { NavigationItem } from 'types/navigation';
 
 import './OrgEditor.scss';
-
-function isNumberedNodeType(node: any) {
-  return (node.contentType === contentTypes.OrganizationContentTypes.Unit
-    || node.contentType === contentTypes.OrganizationContentTypes.Module
-    || node.contentType === contentTypes.OrganizationContentTypes.Section
-    || node.contentType === contentTypes.OrganizationContentTypes.Sequence);
-}
-
-function calculatePositionsAtLevel(
-  model: models.OrganizationModel, allNodeIds: string[],
-  idMap: Object, parentMap: Object): Object {
-
-  const positions = {};
-  const positionAtLevels = {};
-
-  const arr = model.sequences.children.toArray();
-
-  arr.map((n, i) => {
-    parentMap[n.guid] = model.sequences;
-    calculatePositionsAtLevelHelper(
-      n, i, 0, positions, positionAtLevels, allNodeIds, idMap, parentMap);
-  });
-
-  return positions;
-}
 
 function hasMissingResource(
   model: models.OrganizationModel, course: models.CourseModel): boolean {
@@ -69,45 +43,17 @@ function hasMissingResourceHelper(
   return false;
 }
 
-function calculatePositionsAtLevelHelper(
-  node: any, index: number, level: number,
-  positions: Object, positionAtLevels: Object, allNodeIds: string[],
-  idMap: Object, parentMap: Object): void {
+function identifyNewNodes(last: org.Placements, current: org.Placements): org.Placement[] {
 
-  if (isNumberedNodeType(node)) {
-    if (positionAtLevels[level] === undefined) {
-      positionAtLevels[level] = 1;
-    } else {
-      positionAtLevels[level] = positionAtLevels[level] + 1;
-    }
-
-    positions[node.guid] = positionAtLevels[level];
-  }
-
-  idMap[node.id] = node;
-
-  allNodeIds.push(node.id);
-
-  if (node.children !== undefined) {
-
-    node.children.toArray()
-      .map(c => parentMap[c.guid] = node);
-
-    node.children.toArray()
-      .map((n, i) => calculatePositionsAtLevelHelper(
-        n, i, level + 1, positions, positionAtLevels, allNodeIds, idMap, parentMap));
-  }
-}
-
-function identifyNewNodes(last: string[], current: string[]): string[] {
-
-  const lastMap = last.reduce((p, c) => { p[c] = true; return p; }, {});
-  return current.filter(c => lastMap[c] === undefined);
+  const lastMap = last.reduce((p, c) => { p[c.node.id] = true; return p; }, {});
+  return current.toArray()
+    .filter(c => lastMap[c.node.id] === undefined);
 }
 
 export interface OrgEditorProps {
   selectedItem: Maybe<NavigationItem>;
   model: models.OrganizationModel;
+  placements: org.Placements;
   onEdit: (request: org.OrgChangeRequest) => void;
   services: AppServices;
   context: AppContext;
@@ -144,10 +90,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
   OrgEditorState>  {
 
   pendingHighlightedNodes: Immutable.Set<string>;
-  positionsAtLevel: Object;
-  allNodeIds: string[];
-  idMap: Object;
-  parentMap: Object;
 
   constructor(props: OrgEditorProps) {
     super(props);
@@ -156,12 +98,6 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.onClickComponent = this.onClickComponent.bind(this);
 
     this.pendingHighlightedNodes = null;
-
-    this.allNodeIds = [];
-    this.idMap = {};
-    this.parentMap = {};
-    this.positionsAtLevel = calculatePositionsAtLevel(
-      this.props.model, this.allNodeIds, this.idMap, this.parentMap);
 
     if (hasMissingResource(props.model, props.context.courseModel)) {
       props.services.refreshCourse(props.context.courseId);
@@ -246,31 +182,23 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
   componentWillReceiveProps(nextProps) {
 
-    if (this.props.model !== nextProps.model) {
+    if (this.props.placements !== nextProps.placements) {
 
-      // Recalculate the position of the nodes ad each level. Doing this here
-      // avoids having to do this on ever render.
-
-      const lastAllNodes = this.allNodeIds;
-      this.allNodeIds = [];
-      this.idMap = {};
-      this.parentMap = {};
-
-      this.positionsAtLevel = calculatePositionsAtLevel(
-        nextProps.model, this.allNodeIds, this.idMap, this.parentMap);
 
       // As long as we are still using the same actual document, indentify
       // newly added nodes so that we can highlight them:
 
       if (this.props.model.guid === nextProps.model.guid) {
-        const newNodes = identifyNewNodes(lastAllNodes, this.allNodeIds);
+
+        const newNodes = identifyNewNodes(this.props.placements, nextProps.placements);
+
         if (newNodes.length > 0) {
           if (this.pendingHighlightedNodes === null) {
             this.pendingHighlightedNodes
-              = Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid));
+              = Immutable.Set.of(...newNodes.map(p => p.node.guid));
           } else {
             this.pendingHighlightedNodes = this.pendingHighlightedNodes
-              .union(Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid)));
+              .union(Immutable.Set.of(...newNodes.map(p => p.node.guid)));
           }
 
           // As long as the new nodes were not the result of an undo or redo,
@@ -278,12 +206,11 @@ class OrgEditor extends React.Component<OrgEditorProps,
           if (this.props.context.undoRedoGuid === nextProps.context.undoRedoGuid) {
             this.props.dispatch(
               expandNodes(this.props.context.documentId, newNodes
-                .map(id => this.parentMap[this.idMap[id].guid].id)));
+                .filter(p => p.parent.caseOf({ just: n => true, nothing: () => false }))
+                .map(p => p.parent.caseOf({ just: n => n.node.id, nothing: () => '' }))));
           }
         }
       }
-
-
     }
 
     if (this.pendingHighlightedNodes !== null) {
@@ -385,7 +312,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
         <tbody>
           {render(
             this.props.model.sequences,
-            isExpanded, renderNode, this.positionsAtLevel)}
+            isExpanded, renderNode, this.props.placements)}
         </tbody>
       </table>
     );

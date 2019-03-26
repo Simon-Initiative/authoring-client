@@ -17,6 +17,7 @@ import * as Messages from 'types/messages';
 
 export interface OrgEditorManagerProps {
   document: persistence.Document;
+  placements: org.Placements;
   hasFailed: boolean;
   documentId: string;
   userId: string;
