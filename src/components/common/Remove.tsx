@@ -16,7 +16,7 @@ export const Remove = (props) => {
           ? props.children
           : props.loading
             ? <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" />
-            : <i className={props.customIcon || `fas fa-times`} />
+            : <i className={props.customIcon || 'fas fa-times'} />
         }
       </button>
     </span>
