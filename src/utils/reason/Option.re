@@ -1,27 +1,23 @@
-let valueOr = (opt: option('a), default: 'a) => {
+let valueOr = (opt: option('a), default: 'a) =>
   switch (opt) {
-    | Some(value) => value
-    | None => default
-  }
-};
+  | Some(value) => value
+  | None => default
+  };
 
-let valueOrCompute = (opt: option('a), fn) => {
+let valueOrCompute = (opt: option('a), fn) =>
   switch (opt) {
-    | Some(value) => value
-    | None => fn()
-  }
-};
+  | Some(value) => value
+  | None => fn()
+  };
 
-let valueOrThrow = (opt: option('a)) => {
+let valueOrThrow = (opt: option('a)) =>
   switch (opt) {
-    | Some(value) => value
-    | None => raise(Not_found)
-  }
-};
+  | Some(value) => value
+  | None => raise(Not_found)
+  };
 
-let lift = (opt: option('a), fn) => {
+let lift = (opt: option('a), fn) =>
   switch (opt) {
-    | Some(value) => fn(value)
-    | None => opt
-  }
-};
+  | Some(value) => fn(value)
+  | None => opt
+  };
