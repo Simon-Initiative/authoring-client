@@ -63,8 +63,8 @@ it('Non-overlapping markup text parsing', () => {
   expect(styles.length).toBe(4);
   expect(styles[0]).toEqual({ offset: 1, length: 1, style: 'ITALIC' });
   expect(styles[1]).toEqual({ offset: 3, length: 1, style: 'ITALIC' });
-  expect(styles[2]).toEqual({ offset: 2, length: 1, style: 'SUBSCRIPT' });
-  expect(styles[3]).toEqual({ offset: 3, length: 1, style: 'SUPERSCRIPT' });
+  expect(styles[2]).toEqual({ offset: 2, length: 1, style: 'SUBSCRIPT' } as any);
+  expect(styles[3]).toEqual({ offset: 3, length: 1, style: 'SUPERSCRIPT' } as any);
 
 });
 
@@ -92,9 +92,9 @@ it('overlapping markup text parsing', () => {
 
   expect(styles.length).toBe(4);
 
-  expect(styles[0]).toEqual({ offset: 1, length: 1, style: 'SUBSCRIPT' });
+  expect(styles[0]).toEqual({ offset: 1, length: 1, style: 'SUBSCRIPT' } as any);
   expect(styles[1]).toEqual({ offset: 1, length: 3, style: 'ITALIC' });
-  expect(styles[2]).toEqual({ offset: 2, length: 1, style: 'SUPERSCRIPT' });
+  expect(styles[2]).toEqual({ offset: 2, length: 1, style: 'SUPERSCRIPT' } as any);
   expect(styles[3]).toEqual({ offset: 2, length: 1, style: 'BOLD' });
 
 });

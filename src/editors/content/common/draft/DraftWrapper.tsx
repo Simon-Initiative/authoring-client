@@ -223,14 +223,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
           contentState = cloneDuplicatedEntities(contentState);
 
-          editorState = EditorState.push(editorState, contentState);
+          editorState = EditorState.push(editorState, contentState, 'insert-fragment');
 
-          const blocks = contentState.blockMap;
+          const blocks = contentState.getBlockMap();
           editorState = blocks.reduce(addSpaceAfterEntity, editorState);
           contentState = editorState.getCurrentContent();
 
           const seenIds = {};
-          const result = contentState.blockMap.reduce(deDupeIds, { editorState, seenIds });
+          const result = contentState.getBlockMap().reduce(deDupeIds, { editorState, seenIds });
           editorState = result.editorState;
           contentState = editorState.getCurrentContent();
 
@@ -294,7 +294,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       if (nextProps.content.content !== current) {
         this.lastContent = nextProps.content.content;
         const newEditorState = EditorState.push(
-          this.state.editorState, nextProps.content.content);
+          this.state.editorState, nextProps.content.content, 'insert-fragment');
 
         this.setState({
           editorState: newEditorState,
@@ -327,15 +327,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       const range: EntityRange = findEntity(
         (key, e) => entityKey === key, this.state.editorState.getCurrentContent());
-      const ss = SelectionState.createEmpty(range.contentBlock.key).merge({
-        anchorKey: range.contentBlock.key,
-        focusKey: range.contentBlock.key,
+      const ss: SelectionState = SelectionState.createEmpty(range.contentBlock.getKey()).merge({
+        anchorKey: range.contentBlock.getKey(),
+        focusKey: range.contentBlock.getKey(),
         anchorOffset: range.start,
         focusOffset: range.start,
-      });
+      }) as SelectionState;
 
       if (this.props.onEntitySelected !== undefined) {
-        const data = this.state.editorState.getCurrentContent().getEntity(entityKey).data;
+        const data = this.state.editorState.getCurrentContent().getEntity(entityKey).getData();
         this.props.onEntitySelected(entityKey, data);
       }
 
@@ -375,10 +375,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         },
         nothing: () => {
           const { editorState } = this.state;
-          this.onChange(EditorState.push(editorState, Modifier.replaceText(
-            editorState.getCurrentContent(),
-            editorState.getSelection(),
-            text)));
+          this.onChange(EditorState.push(
+            editorState, Modifier.replaceText(
+              editorState.getCurrentContent(),
+              editorState.getSelection(),
+              text),
+            'insert-fragment'),
+          );
         },
       });
 
@@ -442,11 +445,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           spellCheck={true}
           stripPastedStyles={false}
           handleReturn={this.handleReturn.bind(this)}
-          handleCutFragment={this.handleCutFragment.bind(this)}
           handlePastedText={this.handlePastedText.bind(this)}
-          handlePastedFragment={this.handlePastedFragment.bind(this)}
           customStyleMap={styleMap}
-          blockRenderMap={blockRenderMap}
+          blockRenderMap={blockRenderMap as any}
           blockStyleFn={this.blockStyleFn.bind(this)}
           editorState={this.state.editorState}
           readOnly={this.props.locked}

@@ -24,7 +24,7 @@ export function validateRemoval(model: ContentModel, itemToRemove: ContentElemen
       if (e.contentType === 'ContiguousText') {
         const ct = e as ContiguousText;
         ct.getEntitiesByType(EntityTypes.command).forEach((e) => {
-          p[1].push(e.entity.data.target);
+          p[1].push(e.entity.getData().target);
         });
       }
       return p;
