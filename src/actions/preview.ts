@@ -26,6 +26,8 @@ export function preview(
 
   return function (dispatch): Promise<any> {
 
+    const OPEN_IN_NEW_WINDOW_ALWAYS = '';
+
     return dispatch(invokePreview(organizationId, isRefreshAttempt, server))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
@@ -36,14 +38,16 @@ export function preview(
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewSuccess') {
           const refresh = result.message === 'pending';
+
           window.open(
             '/#preview' + organizationId + '-' + courseId
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
             + (refresh ? '&refresh=true' : '')
             + (redeploy ? '&redeploy=true' : ''),
-            courseId);
+            OPEN_IN_NEW_WINDOW_ALWAYS);
+
         } else if (result.type === 'PreviewPending') {
-          window.open('/#preview' + organizationId + '-' + courseId, courseId);
+          window.open('/#preview' + organizationId + '-' + courseId, OPEN_IN_NEW_WINDOW_ALWAYS);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);
