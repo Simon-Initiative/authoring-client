@@ -11,11 +11,11 @@
             "allow-pascal-case"
         ],
         "object-shorthand-properties-first": false,
-        "no-unused-variable": true,
         "strict-boolean-expressions": false,
         "no-trailing-whitespace": false,
         "no-consecutive-blank-lines": false,
-        "ter-func-call-spacing": false
+        "ter-func-call-spacing": false,
+        "prefer-template": false
     },
     "rulesDirectory": []
 }

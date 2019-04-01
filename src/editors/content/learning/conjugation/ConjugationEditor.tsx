@@ -40,7 +40,7 @@ export interface ConjugationEditorState {
 function getKey(
   index: number, collection:
     Immutable.OrderedMap<string,
-    contentTypes.ConjugationCell | contentTypes.Cr>) {
+      contentTypes.ConjugationCell | contentTypes.Cr>) {
   return collection.toArray()[index].guid;
 }
 
@@ -367,27 +367,27 @@ class ConjugationEditor
           <button className="dropdown-item"
             disabled={!editMode}
             onClick={() => onInsert(index)}>
-            {`Insert row before`}
+            {'Insert row before'}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
             onClick={() => onInsert(index + 1)}>
-            {`Insert row after`}
+            {'Insert row after'}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
             onClick={() => onInsertHeader(index)}>
-            {`Insert header row before`}
+            {'Insert header row before'}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
             onClick={() => onInsertHeader(index + 1)}>
-            {`Insert header row after`}
+            {'Insert header row after'}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
             onClick={() => onRemove(index)}>
-            {`Remove row`}
+            {'Remove row'}
           </button>
         </ToolbarDropdown>
       </div>
@@ -412,7 +412,7 @@ class ConjugationEditor
           <button className="dropdown-item"
             disabled={!editMode}
             onClick={() => onRemove(index)}>
-            {`Remove column`}
+            {'Remove column'}
           </button>
         </ToolbarDropdown>
       </div>

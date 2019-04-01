@@ -28,7 +28,7 @@ export function toDraft(
   } else {
     toParse.forEach(entry => parse(entry, { draft, depth: 0 }, backingTextProvider));
   }
-  return convertFromRaw(draft);
+  return convertFromRaw(draft as any);
 }
 
 
