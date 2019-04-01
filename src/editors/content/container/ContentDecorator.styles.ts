@@ -15,14 +15,13 @@ export const styles: JSSStyles = {
     width: '100%',
   },
   hover: {
-    '& > $handle': props => ({
+    '& > $handle': {
       left: -18,
       opacity: 1,
       cursor: 'pointer',
-      borderLeft: '2px solid ' + getContentColor(props.contentType),
-
+      borderLeft: props => '2px solid ' + getContentColor(props.contentType),
       transition: 'opacity .1s ease-in',
-    }),
+    },
   },
   handle: {
     extend: [disableSelect],
