@@ -103,7 +103,7 @@ export function detectInputRefChanges(
           refMap.concat(
             c.getEntitiesByType(EntityTypes.input_ref)
               .reduce(
-                (tempMap, ref) => tempMap.set(ref.entity.data['@input'], ref),
+                (tempMap, ref) => tempMap.set(ref.entity.getData()['@input'], ref),
                 Immutable.Map(),
               )).toMap(),
         Immutable.Map());
@@ -117,9 +117,9 @@ export function detectInputRefChanges(
   // Find the changes by comparing the current and previous lists of input_refs
   return {
     additions: currentRefMap.filter((_, key) =>
-      currentKeys.subtract(previousKeys).contains(key)).toList(),
+      currentKeys.subtract(previousKeys).contains(key)).toList() as any,
     deletions: previousRefMap.filter((_, key) =>
-      previousKeys.subtract(currentKeys).contains(key)).toList(),
+      previousKeys.subtract(currentKeys).contains(key)).toList() as any,
   };
 }
 

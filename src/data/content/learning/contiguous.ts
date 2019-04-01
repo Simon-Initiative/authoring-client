@@ -132,14 +132,14 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   getFirstReferenceId(): string | undefined {
     const firstBlock = this.content.getFirstBlock();
     if (firstBlock) {
-      return (firstBlock.data as Immutable.Map<string, string>).get('id');
+      return (firstBlock.getData() as Immutable.Map<string, string>).get('id');
     }
     return undefined;
   }
 
   getAllReferenceIds(): string[] {
     return this.content.getBlocksAsArray()
-      .map(block => (block.data as Immutable.Map<string, string>).get('id'));
+      .map(block => (block.getData() as Immutable.Map<string, string>).get('id'));
   }
 
   selectionOverlapsEntity(selection: TextSelection): boolean {
@@ -153,7 +153,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
           block.findEntityRanges(
             c => c.getEntity() !== null,
             (start: number, end: number) => {
-              overlaps = overlaps || selection.hasEdgeWithin(block.key, start, end);
+              overlaps = overlaps || selection.hasEdgeWithin(block.getKey(), start, end);
             },
           );
           return overlaps;
@@ -170,9 +170,9 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
           let overlaps: Immutable.Set<string> = acc;
           let styles = Immutable.OrderedSet<string>();
           block.findStyleRanges(
-            (c) => { styles = c.getStyle(); return c.style.size !== 0; },
+            (c) => { styles = c.getStyle(); return c.getStyle().size !== 0; },
             (start: number, end: number) => {
-              if (selection.hasEdgeWithin(block.key, start, end)) {
+              if (selection.hasEdgeWithin(block.getKey(), start, end)) {
                 overlaps = overlaps.union(styles);
               }
             },
@@ -274,8 +274,8 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
       // Now update the text
       const rawSelection = new SelectionState({
-        anchorKey: matched[0].range.contentBlock.key,
-        focusKey: matched[0].range.contentBlock.key,
+        anchorKey: matched[0].range.contentBlock.getKey(),
+        focusKey: matched[0].range.contentBlock.getKey(),
         anchorOffset: matched[0].range.start,
         focusOffset: matched[0].range.end,
       });
@@ -304,8 +304,8 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     const removed = this.removeEntity(info.entityKey);
 
     const rawSelection = new SelectionState({
-      anchorKey: info.range.contentBlock.key,
-      focusKey: info.range.contentBlock.key,
+      anchorKey: info.range.contentBlock.getKey(),
+      focusKey: info.range.contentBlock.getKey(),
       anchorOffset: info.range.start,
       focusOffset: info.range.end,
     });
@@ -313,12 +313,12 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     // Some of the entity data objects are regular objects and do not
     // support clone
-    const clone = info.entity.data.clone !== undefined
-      ? info.entity.data.clone()
-      : Object.assign({}, info.entity.data);
+    const clone = info.entity.getData().clone !== undefined
+      ? info.entity.getData().clone()
+      : Object.assign({}, info.entity.getData());
 
     return removed.addEntity(
-      info.entity.type, info.entity.mutability === 'MUTABLE', clone, selection);
+      info.entity.getType(), info.entity.getMutability() === 'MUTABLE', clone, selection);
 
   }
 
@@ -338,36 +338,36 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     // We cannot insert an entity at the beginning of a content block,
     // to handle that case we adjust and add 1 to the focus offset
-    if (selectionState.focusOffset === selectionState.anchorOffset
-      && selectionState.focusKey === selectionState.anchorKey) {
+    if (selectionState.getFocusOffset() === selectionState.getAnchorOffset()
+      && selectionState.getFocusKey() === selectionState.getAnchorKey()) {
 
-      if (selectionState.focusOffset === 0) {
+      if (selectionState.getFocusOffset() === 0) {
 
-        const block = contentState.getBlockForKey(selectionState.anchorKey);
+        const block = contentState.getBlockForKey(selectionState.getAnchorKey());
         contentState = appendText(block, contentState, '  ');
         const text = block.getText();
 
         selectionState = new SelectionState({
-          anchorKey: selectionState.anchorKey,
-          focusKey: selectionState.focusKey,
+          anchorKey: selectionState.getAnchorKey(),
+          focusKey: selectionState.getFocusKey(),
           anchorOffset: text.length + 1,
           focusOffset: text.length + 2,
         });
       } else {
 
         selectionState = new SelectionState({
-          anchorKey: selectionState.anchorKey,
-          focusKey: selectionState.focusKey,
-          anchorOffset: selectionState.anchorOffset,
-          focusOffset: selectionState.anchorOffset + 1,
+          anchorKey: selectionState.getAnchorKey(),
+          focusKey: selectionState.getFocusKey(),
+          anchorOffset: selectionState.getAnchorOffset,
+          focusOffset: selectionState.getAnchorOffset() + 1,
         });
       }
     }
 
-    const block = contentState.getBlockForKey(selectionState.anchorKey);
+    const block = contentState.getBlockForKey(selectionState.getAnchorKey());
     const text = block.getText();
 
-    if (text.length < selectionState.focusOffset) {
+    if (text.length < selectionState.getFocusOffset()) {
       contentState = appendText(block, contentState, '  ');
     }
 
@@ -408,9 +408,9 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     if (
       (selectionState.getIsBackward()
-        && selectionState.getAnchorOffset() === block.text.length) ||
+        && selectionState.getAnchorOffset() === block.getText().length) ||
       (!selectionState.getIsBackward()
-        && selectionState.getFocusOffset() === block.text.length)) {
+        && selectionState.getFocusOffset() === block.getText().length)) {
 
       contentState = appendText(block, contentState, '  ');
     }
@@ -437,12 +437,12 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     // So, if it isn't, we adjust the selection to make it collapsed (just for
     // the purpose of this split)
     const raw = s.getRawSelectionState();
-    const selection = raw.isCollapsed()
+    const selection: SelectionState = raw.isCollapsed()
       ? raw
       : raw.merge({
-        anchorKey: raw.focusKey,
-        anchorOffset: raw.focusOffset,
-      });
+        anchorKey: raw.getFocusKey(),
+        anchorOffset: raw.getFocusOffset(),
+      }) as SelectionState;
 
     // Split the current block
     const split = Modifier.splitBlock(this.content, selection);
@@ -456,7 +456,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     split.getBlocksAsArray()
       .forEach((b) => {
         which.push(b);
-        if (b.key === selection.focusKey) {
+        if (b.getKey() === selection.getFocusKey()) {
           which = second;
         }
       });
@@ -477,7 +477,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   // the text in that block is empty or contains all spaces
   isEffectivelyEmpty(): boolean {
     return this.content.getBlockMap().size === 1
-      && this.content.getFirstBlock().text.trim() === '';
+      && this.content.getFirstBlock().getText().trim() === '';
   }
 
   // Returns true if the selection is collapsed and the cursor is
@@ -486,9 +486,9 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   isCursorAtEffectiveEnd(textSelection: TextSelection): boolean {
     const last = this.content.getLastBlock();
     return textSelection.isCollapsed()
-      && last.key === textSelection.getAnchorKey()
-      && (last.text.length <= textSelection.getAnchorOffset()
-        || (last.text as string).substr(textSelection.getAnchorOffset()).trim() === '');
+      && last.getKey() === textSelection.getAnchorKey()
+      && (last.getText().length <= textSelection.getAnchorOffset()
+        || (last.getText() as string).substr(textSelection.getAnchorOffset()).trim() === '');
   }
 
   // Returns true if the selection is collapsed and is at the
@@ -496,7 +496,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   isCursorAtBeginning(textSelection: TextSelection): boolean {
     const first = this.content.getFirstBlock();
     return textSelection.isCollapsed()
-      && first.key === textSelection.getAnchorKey()
+      && first.getKey() === textSelection.getAnchorKey()
       && textSelection.getAnchorOffset() === 0;
   }
 
@@ -504,9 +504,9 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     const content = getEntities(EntityTypes.input_ref, this.content)
       .reduce(
         (contentState, info) => {
-          if (itemMap[info.entity.data['@input']] !== undefined) {
+          if (itemMap[info.entity.getData()['@input']] !== undefined) {
             return contentState.mergeEntityData(
-              info.entityKey, { '@input': itemMap[info.entity.data['@input']] });
+              info.entityKey, { '@input': itemMap[info.entity.getData()['@input']] });
           }
 
           return contentState;
@@ -519,10 +519,10 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   extractPlainText(): Maybe<string> {
 
     const blocks = this.content.getBlocksAsArray();
-    const unstyled = blocks.filter(b => b.type === 'unstyled');
+    const unstyled = blocks.filter(b => b.getType() === 'unstyled');
 
     if (unstyled.length > 0) {
-      return Maybe.just(unstyled[0].text);
+      return Maybe.just(unstyled[0].getText());
     }
     return Maybe.nothing();
   }
@@ -551,7 +551,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       return Maybe.nothing();
     }
 
-    const text: string = block.text;
+    const text: string = block.getText();
     // >= is correct here instead of >, since the focus offset value is exclusive
     if (text.length >= selection.getAnchorOffset() && text.length >= selection.getFocusOffset()) {
 

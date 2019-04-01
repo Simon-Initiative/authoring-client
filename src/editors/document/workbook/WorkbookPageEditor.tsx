@@ -186,7 +186,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         if ('ContiguousText' === e.contentType) {
           const ct = e as ContiguousText;
           const citations = ct.getEntitiesByType(EntityTypes.cite);
-          const matched = citations.filter(c => c.entity.data.entry === id);
+          const matched = citations.filter(c => c.entity.getData().entry === id);
 
           return matched.reduce(
             (ct, e) => ct.removeEntity(e.entityKey),

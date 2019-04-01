@@ -53,7 +53,7 @@ export function hasSelection(ss: SelectionState) {
   return false;
 }
 
-export function removeHTML(text : string) : string {
+export function removeHTML(text: string): string {
   return text
     .replace(/<br>/i, '\n')
     .replace(/<\/div>/i, '')
@@ -71,7 +71,7 @@ export function setCaretPosition(editableDiv, positionIndex) {
   sel.addRange(range);
 }
 
-export function getSelectionRange(editableDiv) : Object {
+export function getSelectionRange(editableDiv): Object {
   if (window.getSelection) {
     const sel = window.getSelection();
     if (sel.rangeCount) {
@@ -130,8 +130,8 @@ export function determineChangeType(
     return SelectionChangeType.None;
   }
 
-  const previousHasSelection : boolean = hasSelection(previous);
-  const currentHasSelection : boolean = hasSelection(current);
+  const previousHasSelection: boolean = hasSelection(previous);
+  const currentHasSelection: boolean = hasSelection(current);
 
   if (!currentHasSelection && !previousHasSelection) {
     return SelectionChangeType.CursorPosition;
@@ -147,7 +147,7 @@ function getSingularKey(o) {
   return null;
 }
 
-export function cloneDuplicatedEntities(current: ContentState) : ContentState {
+export function cloneDuplicatedEntities(current: ContentState): ContentState {
   let contentState = current;
   const entities = getAllEntities(contentState);
 
@@ -159,7 +159,7 @@ export function cloneDuplicatedEntities(current: ContentState) : ContentState {
     } else {
       // This is a duplicate, clone it
 
-      const copy = Object.assign({}, e.entity.data);
+      const copy = Object.assign({}, e.entity.getData());
 
       // If the data has an id, generate a new one to
       // avoid duplication
@@ -173,11 +173,11 @@ export function cloneDuplicatedEntities(current: ContentState) : ContentState {
       }
 
       contentState = contentState.createEntity(
-        e.entity.type, e.entity.mutability, copy);
+        e.entity.getType(), e.entity.getMutability(), copy);
       const createdKey = contentState.getLastCreatedEntityKey();
       const range = new SelectionState({
-        anchorKey: e.range.contentBlock.key,
-        focusKey: e.range.contentBlock.key,
+        anchorKey: e.range.contentBlock.getKey(),
+        focusKey: e.range.contentBlock.getKey(),
         anchorOffset: e.range.start,
         focusOffset: e.range.end,
       });

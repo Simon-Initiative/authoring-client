@@ -18,7 +18,7 @@ export function updateData(contentBlock, contentState, blockData) {
 
 }
 
-function changeForBlock(contentState: ContentState, block) : ContentState {
+function changeForBlock(contentState: ContentState, block): ContentState {
 
   // Extract the id from the data map and change it
   const id = block.data === undefined || block.data === null
@@ -37,6 +37,6 @@ function changeForBlock(contentState: ContentState, block) : ContentState {
 
 }
 
-export function cloneContent(contentState: ContentState) : ContentState {
-  return contentState.blockMap.toArray().reduce(changeForBlock, contentState);
+export function cloneContent(contentState: ContentState): ContentState {
+  return contentState.getBlockMap().toArray().reduce(changeForBlock, contentState);
 }
