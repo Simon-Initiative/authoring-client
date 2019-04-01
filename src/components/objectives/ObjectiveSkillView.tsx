@@ -625,7 +625,7 @@ class ObjectiveSkillView
     logger.group(
       LogLevel.INFO,
       LogTag.DEFAULT,
-      `Objective Details:`,
+      'Objective Details:',
       (logger) => {
         objectiveObjects[0].forEach((objective) => {
           logger
@@ -640,7 +640,7 @@ class ObjectiveSkillView
     logger.group(
       LogLevel.INFO,
       LogTag.DEFAULT,
-      `Skill Details:`,
+      'Skill Details:',
       (logger) => {
         skillObjects[0].forEach((skill) => {
           logger

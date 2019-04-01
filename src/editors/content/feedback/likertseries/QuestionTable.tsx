@@ -154,7 +154,7 @@ export class QuestionTable extends React.PureComponent<Props, State> {
                 items.set(item.guid, item.with({ prompt: item.prompt.with({ content }) })),
                 source)} />
           </td>
-          {Array(Number.parseInt(scale.scaleSize))
+          {Array(Number.parseInt(scale.scaleSize, 10))
             .fill(null).map(_ => <td className="question-table-radio">
               <input name=""
                 value=""

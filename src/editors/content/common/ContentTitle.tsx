@@ -46,7 +46,7 @@ export const ContentTitle: React.StatelessComponent<ContentTitleProps> = ({
 
       {onDuplicate
         ? <div
-          className={`action-btn action-btn-duplicate`}
+          className={'action-btn action-btn-duplicate'}
           onClick={onDuplicate}>
           <i className="fa fa-copy" />
           Duplicate

@@ -15,9 +15,9 @@ export type SetSkillsAction = {
   skills: Immutable.OrderedMap<string, Skill>,
 };
 
-export function setSkills(skills: Immutable.OrderedMap<string, Skill>) : SetSkillsAction {
+export function setSkills(skills: Immutable.OrderedMap<string, Skill>): SetSkillsAction {
   return {
-	  type: SET_SKILLS,
+    type: SET_SKILLS,
     skills,
   };
 }
@@ -27,9 +27,9 @@ export type UpdateSkillsAction = {
   skills: Immutable.OrderedMap<string, Skill>,
 };
 
-export function updateSkills(skills: Immutable.OrderedMap<string, Skill>) : UpdateSkillsAction {
+export function updateSkills(skills: Immutable.OrderedMap<string, Skill>): UpdateSkillsAction {
   return {
-	  type: UPDATE_SKILLS,
+    type: UPDATE_SKILLS,
     skills,
   };
 }
@@ -38,19 +38,19 @@ export const fetchSkills = (courseId: string) =>
   (dispatch): Promise<any> => {
 
     return persistence.bulkFetchDocuments(courseId, [LegacyTypes.skills_model], 'byTypes')
-    .then ((skills) => {
+      .then((skills) => {
 
-      // Convert the multiple documents of skills into an
-      // array of arrays of key values
-      const skillArray = skills
-        .map(doc => (doc.model as any).skills.toArray())
-        .reduce((p, c) => [...p, ...c], [])
-        .map(s => [s.id, s]);
+        // Convert the multiple documents of skills into an
+        // array of arrays of key values
+        const skillArray = skills
+          .map(doc => (doc.model as any).skills.toArray())
+          .reduce((p, c) => [...p, ...c], [])
+          .map(s => [s.id, s]);
 
-      const map = Immutable.OrderedMap<string, Skill>(skillArray);
-      dispatch(setSkills(map));
-      return map;
-    });
+        const map = Immutable.OrderedMap<string, Skill>(skillArray);
+        dispatch(setSkills(map));
+        return map;
+      });
   };
 
 

@@ -16,9 +16,9 @@ export type SetObjectivesAction = {
 };
 
 export function setObjectives(
-  objectives: Immutable.OrderedMap<string, LearningObjective>) : SetObjectivesAction {
+  objectives: Immutable.OrderedMap<string, LearningObjective>): SetObjectivesAction {
   return {
-	  type: SET_OBJECTIVES,
+    type: SET_OBJECTIVES,
     objectives,
   };
 }
@@ -29,9 +29,9 @@ export type UpdateObjectivesAction = {
 };
 
 export function updateObjectives(
-  objectives: Immutable.OrderedMap<string, LearningObjective>) : UpdateObjectivesAction {
+  objectives: Immutable.OrderedMap<string, LearningObjective>): UpdateObjectivesAction {
   return {
-	  type: UPDATE_OBJECTIVES,
+    type: UPDATE_OBJECTIVES,
     objectives,
   };
 }
@@ -40,19 +40,19 @@ export const fetchObjectives = (courseId: string) =>
   (dispatch): Promise<any> => {
 
     return persistence.bulkFetchDocuments(courseId, [LegacyTypes.learning_objectives], 'byTypes')
-    .then ((objectives) => {
+      .then((objectives) => {
 
-      // Convert the multiple documents of objs into an
-      // array of arrays of key values
-      const arr = objectives
-        .map(doc => (doc.model as any).objectives.toArray())
-        .reduce((p, c) => [...p, ...c], [])
-        .map(s => [s.id, s]);
+        // Convert the multiple documents of objs into an
+        // array of arrays of key values
+        const arr = objectives
+          .map(doc => (doc.model as any).objectives.toArray())
+          .reduce((p, c) => [...p, ...c], [])
+          .map(s => [s.id, s]);
 
-      const map = Immutable.OrderedMap<string, LearningObjective>(arr);
-      dispatch(setObjectives(map));
-      return map;
-    });
+        const map = Immutable.OrderedMap<string, LearningObjective>(arr);
+        dispatch(setObjectives(map));
+        return map;
+      });
   };
 
 

@@ -9,8 +9,8 @@ export function onEditScaleSize(
   scaleSize: string, scale: LikertScale,
   onEditScale: (scale: LikertScale, src: ContentElement) => void) {
 
-  const newSize = Number.parseInt(scaleSize);
-  const oldSize = Number.parseInt(scale.scaleSize);
+  const newSize = Number.parseInt(scaleSize, 10);
+  const oldSize = Number.parseInt(scale.scaleSize, 10);
 
   // A scale's labels have a `value` attribute which corresponds to its position.
   // Whenever we change the scale size, we need to relabel the labels with
