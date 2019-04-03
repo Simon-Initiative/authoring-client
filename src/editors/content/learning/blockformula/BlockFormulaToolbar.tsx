@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
@@ -15,6 +15,7 @@ import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 
 import { styles } from './BlockFormula.styles';
+import { StyledComponentProps } from 'types/component';
 
 export interface BlockFormulaToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockFormula> {
@@ -25,16 +26,17 @@ export interface BlockFormulaToolbarState {
 
 }
 
-@injectSheet(styles)
-export default class BlockFormulaToolbar
+type StyledBlockFormulaToolbarProps = StyledComponentProps<BlockFormulaToolbarProps, typeof styles>;
+
+class BlockFormulaToolbar
   extends AbstractContentEditor<contentTypes.BlockFormula,
-  BlockFormulaToolbarProps & JSSProps, BlockFormulaToolbarState> {
+  StyledBlockFormulaToolbarProps, BlockFormulaToolbarState> {
 
   constructor(props) {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: BlockFormulaToolbarProps, nextState) {
+  shouldComponentUpdate(nextProps: StyledBlockFormulaToolbarProps, nextState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || nextProps.selection !== this.props.selection;
   }
@@ -170,3 +172,6 @@ export default class BlockFormulaToolbar
     return null;
   }
 }
+
+const StyledBlockFormulaToolbar = withStyles<BlockFormulaToolbarProps>(styles)(BlockFormulaToolbar);
+export default StyledBlockFormulaToolbar;

@@ -7,7 +7,7 @@ import {
 import { Hotspot } from 'data/content/workbook/multipanel/hotspot';
 import { AppContext } from 'editors/common/AppContext';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSStyles } from 'styles/jss';
+import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -165,9 +165,8 @@ export interface ImageHotspotEditorState {
 /**
  * ImageHotspotEditor React Component
  */
-@injectSheet(styles)
-export class ImageHotspotEditor
-  extends React.PureComponent<StyledComponentProps<ImageHotspotEditorProps>,
+class ImageHotspotEditor
+  extends React.PureComponent<StyledComponentProps<ImageHotspotEditorProps, typeof styles>,
   ImageHotspotEditorState> {
   svgRef: any;
 
@@ -686,3 +685,6 @@ export class ImageHotspotEditor
     );
   }
 }
+
+const StyledImageHotspotEditor = withStyles<ImageHotspotEditorProps>(styles)(ImageHotspotEditor);
+export { StyledImageHotspotEditor as ImageHotspotEditor };

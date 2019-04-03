@@ -1,12 +1,13 @@
 import * as React from 'react';
 import * as t from '../../../data/contentTypes';
+import * as org from 'data/models/utils/org';
 
 export type IsNodeExpanded = (guid: string) => boolean;
 
 export type NodeTypes = t.Sequence | t.Unit | t.Module | t.Section | t.Item | t.Include;
 
 
-export function getExpandId(model: NodeTypes) : string {
+export function getExpandId(model: NodeTypes): string {
   if (model.contentType === t.OrganizationContentTypes.Include) {
     return model.guid;
   }
@@ -16,7 +17,7 @@ export function getExpandId(model: NodeTypes) : string {
 
 export function render(
   sequences: t.Sequences, isExpanded: IsNodeExpanded,
-  nodeRenderers: any, positionAtLevels: object) : React.Component[] {
+  nodeRenderers: any, placements: org.Placements): React.Component[] {
 
   const elements = [];
 
@@ -28,7 +29,7 @@ export function render(
 
     return renderHelper(
       n, sequences, i, isExpanded,
-      elements, nodeRenderers, 0, positionAtLevels);
+      elements, nodeRenderers, 0, placements);
 
   });
 
@@ -36,11 +37,12 @@ export function render(
 }
 
 export function renderHelper(
-  node : NodeTypes, parent: any, index: number,
+  node: NodeTypes, parent: any, index: number,
   isExpanded: IsNodeExpanded, elements: React.Component[],
-  nodeRenderers: any, depth: number, positionAtLevels: Object) {
+  nodeRenderers: any, depth: number, placements: org.Placements) {
 
-  elements.push(nodeRenderers(node, parent, index, depth, positionAtLevels[node.guid]));
+  elements.push(nodeRenderers(
+    node, parent, index, depth, placements.get(node.id).positionAtLevel.valueOr(0)));
 
   if (isExpanded(getExpandId(node))
     && node.contentType !== t.OrganizationContentTypes.Item
@@ -54,7 +56,7 @@ export function renderHelper(
 
       return renderHelper(
         n, node, i, isExpanded, elements,
-        nodeRenderers, depth + 1, positionAtLevels);
+        nodeRenderers, depth + 1, placements);
     });
   }
 }

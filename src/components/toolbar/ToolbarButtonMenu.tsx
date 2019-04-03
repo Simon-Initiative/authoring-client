@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import guid from 'utils/guid';
-
 import { styles } from './ToolbarButtonMenu.styles';
+import { StyledComponentProps } from 'types/component';
 
 export interface ToolbarWideMenuProps {
   className?: string;
@@ -11,6 +11,7 @@ export interface ToolbarWideMenuProps {
   icon: any;
 }
 
+export type ToolbarNarrowMenuProps = ToolbarWideMenuProps;
 
 export interface ToolbarQuadMenuProps {
   className?: string;
@@ -55,8 +56,7 @@ export const ToolbarButtonMenuDivider = () => {
   );
 };
 
-export class ToolbarButtonMenuItem
-  extends React.PureComponent<ToolbarButtonMenuItemProps> {
+export class ToolbarButtonMenuItem extends React.PureComponent<ToolbarButtonMenuItemProps> {
 
   constructor(props) {
     super(props);
@@ -81,10 +81,8 @@ export class ToolbarButtonMenuItem
   }
 }
 
-
-@injectSheet(styles)
-export class ToolbarNarrowMenu
-  extends React.PureComponent<ToolbarWideMenuProps & JSSProps> {
+class ToolbarNarrowMenu
+  extends React.PureComponent<StyledComponentProps<ToolbarNarrowMenuProps, typeof styles>> {
 
   id: string;
 
@@ -138,9 +136,12 @@ export class ToolbarNarrowMenu
 }
 
 
-@injectSheet(styles)
-export class ToolbarWideMenu
-  extends React.PureComponent<ToolbarWideMenuProps & JSSProps> {
+const StyledToolbarNarrowMenu = withStyles<ToolbarNarrowMenuProps>(styles)(ToolbarNarrowMenu);
+export { StyledToolbarNarrowMenu as ToolbarNarrowMenu };
+
+
+class ToolbarWideMenu
+  extends React.PureComponent<StyledComponentProps<ToolbarWideMenuProps, typeof styles>> {
 
   id: string;
 
@@ -192,11 +193,13 @@ export class ToolbarWideMenu
   }
 }
 
+const StyledToolbarWideMenu = withStyles<ToolbarWideMenuProps>(styles)(ToolbarWideMenu);
+export { StyledToolbarWideMenu as ToolbarWideMenu };
 
 
-@injectSheet(styles)
-export class ToolbarQuadMenu
-  extends React.PureComponent<ToolbarQuadMenuProps & JSSProps> {
+
+class ToolbarQuadMenu
+  extends React.PureComponent<StyledComponentProps<ToolbarQuadMenuProps, typeof styles>> {
 
 
   constructor(props) {
@@ -253,3 +256,6 @@ export class ToolbarQuadMenu
 
   }
 }
+
+const StyledToolbarQuadMenu = withStyles<ToolbarQuadMenuProps>(styles)(ToolbarQuadMenu);
+export { StyledToolbarQuadMenu as ToolbarQuadMenu };

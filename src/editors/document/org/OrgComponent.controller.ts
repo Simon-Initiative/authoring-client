@@ -16,6 +16,7 @@ interface StateProps {
   objectives: Map<string, t.LearningObjective>;
   course: models.CourseModel;
   org: Maybe<models.OrganizationModel>;
+  placements: org.Placements;
   canUndo: boolean;
   canRedo: boolean;
 }
@@ -43,6 +44,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const { undoStack, redoStack } = orgs;
   const canUndo = undoStack.size > 0;
   const canRedo = redoStack.size > 0;
+  const placements = orgs.placements;
 
   return {
     org,
@@ -51,6 +53,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     course,
     canUndo,
     canRedo,
+    placements,
   };
 };
 

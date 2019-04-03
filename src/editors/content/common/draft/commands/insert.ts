@@ -2,7 +2,7 @@ import { AbstractCommand } from '../../command';
 import { AtomicBlockUtils, EditorState, Modifier } from 'draft-js';
 
 export class InsertBlockEntityCommand
- extends AbstractCommand<EditorState> {
+  extends AbstractCommand<EditorState> {
 
   type: string;
   data: Object;
@@ -14,7 +14,7 @@ export class InsertBlockEntityCommand
     this.data = data;
   }
 
-  execute(editorState: EditorState, context, services) : Promise<EditorState> {
+  execute(editorState: EditorState, context, services): Promise<EditorState> {
 
     const contentState = editorState.getCurrentContent();
     const contentStateWithEntity = contentState.createEntity(
@@ -29,9 +29,9 @@ export class InsertBlockEntityCommand
     );
 
     return Promise.resolve(AtomicBlockUtils.insertAtomicBlock(
-        newEditorState,
-        entityKey,
-        ' '));
+      newEditorState,
+      entityKey,
+      ' '));
   }
 }
 
@@ -51,12 +51,12 @@ export class InsertInlineEntityCommand extends AbstractCommand<EditorState> {
     this.backingText = backingText;
   }
 
-  execute(editorState: EditorState, context, services) : Promise<EditorState> {
+  execute(editorState: EditorState, context, services): Promise<EditorState> {
     let contentState = editorState.getCurrentContent();
     const selectionState = editorState.getSelection();
 
     // Create the entity
-    contentState = contentState.createEntity(this.type, this.mutability, this.data);
+    contentState = contentState.createEntity(this.type, this.mutability as any, this.data);
     const entityKey = contentState.getLastCreatedEntityKey();
 
     // Insert the backing text with entity

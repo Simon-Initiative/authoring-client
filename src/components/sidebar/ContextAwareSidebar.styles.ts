@@ -80,6 +80,10 @@ export const styles: JSSStyles = {
     border: [[1, 'solid', colors.danger]],
   },
 
+  dupeButton: {
+    border: [[1, 'solid', colors.primary]],
+  },
+
   sidebarContent: {
 
   },

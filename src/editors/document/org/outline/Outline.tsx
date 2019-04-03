@@ -4,7 +4,7 @@ import { Maybe } from 'tsmonad';
 
 import * as Tree from 'editors/common/tree';
 import { renderTab } from './tabs';
-import { CourseModel } from 'data/models';
+import { CourseModel, OrganizationModel } from 'data/models';
 import './Outline.scss';
 import * as org from 'data/models/utils/org';
 
@@ -26,6 +26,8 @@ export interface OutlineProps {
   onView: (componentOrResourceId: string) => void;
   commandProcessor: (model, command) => void;
   course: CourseModel;
+  placements: org.Placements;
+  org: OrganizationModel;
 }
 
 export class Outline extends React.PureComponent<OutlineProps, {}> {
@@ -54,8 +56,8 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
 
   render() {
 
-    const { nodes, editMode,
-      course, children, onView, commandProcessor } = this.props;
+    const { nodes, editMode, onEdit,
+      course, children, onView, commandProcessor, placements, org } = this.props;
 
     return (
       <div className="org-outline-container">
@@ -70,7 +72,9 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
           onEdit={this.onEdit}
           onChangeExpansion={() => { }}
           onSelect={() => { }}
-          renderNodeComponent={renderTab.bind(null, course, onView, commandProcessor)}
+          renderNodeComponent={renderTab.bind(
+            null, course, onView, onEdit,
+            commandProcessor, placements, org, editMode)}
           canHandleDrop={canHandleDrop} />
         {children}
       </div>

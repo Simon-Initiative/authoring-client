@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { Custom } from 'data/content/assessment/custom';
 import { isSupportedDynaDropSrcFile } from 'editors/content/utils/common';
 import {
@@ -31,10 +31,9 @@ export interface CustomEditorState {
 
 }
 
-@injectSheet(styles)
-export class CustomEditor
+class CustomEditor
   extends AbstractContentEditor<Custom,
-  StyledComponentProps<CustomEditorProps>, CustomEditorState> {
+  StyledComponentProps<CustomEditorProps, typeof styles>, CustomEditorState> {
 
   constructor(props) {
     super(props);
@@ -138,3 +137,6 @@ export class CustomEditor
     );
   }
 }
+
+const StyledCustomEditor = withStyles<CustomEditorProps>(styles)(CustomEditor);
+export { StyledCustomEditor as CustomEditor };

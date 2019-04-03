@@ -4,32 +4,47 @@ import * as Tree from 'editors/common/tree';
 import { OutlineNode } from './types';
 import * as t from 'data/contentTypes';
 import './tabs.scss';
-import { CourseModel } from 'data/models';
+import * as org from 'data/models/utils/org';
+import { CourseModel, OrganizationModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
 import { RemoveCommand } from '../commands/remove';
+import { PreconditionsEditor } from '../PreconditionsEditor';
 
 export interface TabProps {
   course?: CourseModel;
+  placements: org.Placements;
+  org: OrganizationModel;
+  editMode: boolean;
   node: OutlineNode;
   nodeState: Tree.NodeState<OutlineNode>;
   handlers: Tree.Handlers;
   connectDragSource?: any;
   onView: (id) => void;
+  onEdit: (cr: org.OrgChangeRequest) => void;
   commandProcessor: (model, command) => void;
 }
 
 export function renderTab(
   course: CourseModel,
   onView: (id) => void,
+  onEdit: (cr) => void,
   commandProcessor: (model, command) => void,
+  placements: org.Placements,
+  org: OrganizationModel,
+  editMode: boolean,
   node: OutlineNode,
   nodeState: Tree.NodeState<OutlineNode>,
-  handlers: Tree.Handlers): JSX.Element {
+  handlers: Tree.Handlers,
+): JSX.Element {
 
   const coreProps = {
     nodeState,
     handlers,
     course,
+    org,
+    placements,
+    editMode,
+    onEdit,
   };
 
   switch (node.contentType) {
@@ -70,10 +85,29 @@ const ItemTab = (props: TabProps) => {
     ? 'Workbook Page' : 'Assessment';
   const title = resource.title;
 
+  const onEdit = (preconditions) => {
+    const cr = org.makeUpdateNode(
+      props.node.id,
+      n => (n as any).with({ preconditions }),
+      n => (n as any).with({ preconditions: (props.node as t.Item).preconditions }));
+    props.onEdit(cr);
+  };
+
   const previewLink = (
-    <button className="btn btn-link" onClick={() => props.onView(resource.guid)}>
-      {title}
-    </button>
+    <div>
+      <button className="btn btn-link" onClick={() => props.onView(resource.guid)}>
+        {title}
+      </button>
+      <PreconditionsEditor
+        parentId={props.node.id}
+        editMode={props.editMode}
+        org={props.org}
+        placements={props.placements}
+        course={props.course}
+        preconditions={(props.node as t.Item).preconditions}
+        onEdit={onEdit}
+      />
+    </div>
   );
 
   return (
@@ -160,9 +194,9 @@ class Tab extends React.PureComponent<TabProperties, {}> {
               <div className="info d-flex justify-content-between">
                 <Label {...this.props}>{label}</Label>
               </div>
-              <small className="content">
+              <div className="content">
                 {previewText}
-              </small>
+              </div>
             </div>
             {buildRemove(course.editable, node, commandProcessor)}
           </div>

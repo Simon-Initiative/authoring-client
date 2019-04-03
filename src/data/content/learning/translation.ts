@@ -49,7 +49,7 @@ export class Translation extends Immutable.Record(defaultContent) {
 
     const id = t['@id']
       ? t['@id']
-      : notify() || createGuid();
+      : (notify(), createGuid());
 
     const title = t['@title'] !== undefined
       ? Maybe.just(t['@title'])

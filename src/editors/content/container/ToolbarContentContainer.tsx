@@ -4,7 +4,7 @@ import { StyledComponentProps } from 'types/component';
 import {
   ContentContainer, ContentContainerProps,
 } from 'editors/content/container/ContentContainer';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarDropdown } from 'components/toolbar/ToolbarDropdown';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
@@ -25,9 +25,8 @@ export interface ToolbarContentContainerState {
 /**
  * ToolbarContentContainer React Component
  */
-@injectSheet<ToolbarContentContainerProps>(styles)
-export class ToolbarContentContainer
-  extends React.PureComponent<StyledComponentProps<ToolbarContentContainerProps>,
+class ToolbarContentContainer
+  extends React.PureComponent<StyledComponentProps<ToolbarContentContainerProps, typeof styles>,
   ToolbarContentContainerState> {
 
   constructor(props) {
@@ -173,3 +172,7 @@ export class ToolbarContentContainer
     );
   }
 }
+
+const StyledToolbarContentContainer = withStyles<ToolbarContentContainerProps>(styles)
+  (ToolbarContentContainer);
+export { StyledToolbarContentContainer as ToolbarContentContainer };

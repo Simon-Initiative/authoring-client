@@ -11,11 +11,11 @@ export type expandNodesAction = {
   nodeIds: string[],
 };
 
-export function expandNodes(resourceId: string, nodeIds: string[]) : expandNodesAction {
+export function expandNodes(resourceId: string, nodeIds: string[]): expandNodesAction {
   return {
-	  type: EXPAND_NODES,
+    type: EXPAND_NODES,
     resourceId,
-	  nodeIds,
+    nodeIds,
   };
 }
 
@@ -25,11 +25,11 @@ export type collapseNodesAction = {
   nodeIds: string[],
 };
 
-export function collapseNodes(resourceId: string, nodeIds: string[]) : collapseNodesAction {
+export function collapseNodes(resourceId: string, nodeIds: string[]): collapseNodesAction {
   return {
-	  type: COLLAPSE_NODES,
+    type: COLLAPSE_NODES,
     resourceId,
-	  nodeIds,
+    nodeIds,
   };
 }
 

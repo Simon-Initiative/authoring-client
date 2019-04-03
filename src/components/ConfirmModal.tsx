@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSProps, JSSStyles } from 'styles/jss';
+import { classNames, withStyles, JSSStyles } from 'styles/jss';
 import { disableSelect } from 'styles/mixins';
 import { Button } from './common/Button';
 
@@ -16,7 +16,7 @@ export const styles: JSSStyles = {
   },
 };
 
-export interface ConfirmModalProps extends JSSProps {
+export interface ConfirmModalProps {
   confirmLabel?: string;
   confirmClass?: string;
   cancelLabel?: string;
@@ -29,9 +29,9 @@ export interface ConfirmModalState {
 
 }
 
-@injectSheet(styles)
-export class ConfirmModal
-  extends React.PureComponent<StyledComponentProps<ConfirmModalProps>, ConfirmModalState> {
+class ConfirmModal extends React.PureComponent<
+  StyledComponentProps<ConfirmModalProps, typeof styles>, ConfirmModalState> {
+
   modal: any;
 
   componentDidMount() {
@@ -91,3 +91,6 @@ export class ConfirmModal
     );
   }
 }
+
+const StyledConfirmModal = withStyles<ConfirmModalProps>(styles)(ConfirmModal);
+export { StyledConfirmModal as ConfirmModal };

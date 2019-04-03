@@ -1,4 +1,4 @@
-export { InsertExampleCommand } from 'editors/content/common/draft/commands/example';
+
 export { InsertSectionCommand } from 'editors/content/common/draft/commands/section';
 export { InsertPulloutCommand } from 'editors/content/common/draft/commands/pullout';
 export { InsertMediaCommand } from 'editors/content/common/draft/commands/media';

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
 import { LearningObjective, Skill } from 'data/contentTypes';
-import ObjectiveSkillView from './ObjectiveSkillView';
+import { ObjectiveSkillView } from './ObjectiveSkillView';
 import { fetchSkills, setSkills, updateSkills } from 'actions/skills';
 import { setObjectives, updateObjectives } from 'actions/objectives';
 import * as Messages from 'types/messages';
@@ -93,5 +93,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   };
 };
 
-export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(ObjectiveSkillView);
+export const controller = connect<StateProps, DispatchProps, OwnProps>
+    (mapStateToProps, mapDispatchToProps)(ObjectiveSkillView);
+
+export { controller as ObjectiveSkillView };

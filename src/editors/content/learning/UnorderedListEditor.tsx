@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -36,10 +36,9 @@ export interface UnorderedListEditorState {
 /**
  * The content editor for contiguous text.
  */
-@injectSheet(styles)
-export default class UnorderedList
+class UnorderedListEditor
   extends AbstractContentEditor<contentTypes.Ul,
-  StyledComponentProps<UnorderedListEditorProps>, UnorderedListEditorState> {
+  StyledComponentProps<UnorderedListEditorProps, typeof styles>, UnorderedListEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -221,3 +220,6 @@ export default class UnorderedList
     );
   }
 }
+
+const StyledUnorderedListEditor = withStyles<UnorderedListEditorProps>(styles)(UnorderedListEditor);
+export default StyledUnorderedListEditor;

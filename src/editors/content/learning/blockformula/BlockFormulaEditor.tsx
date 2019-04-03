@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps, RenderContext }
   from 'editors/content/common/AbstractContentEditor';
 import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockFormulaToolbar from './BlockFormulaToolbar.controller';
-
 import { styles } from './BlockFormula.styles';
+import { StyledComponentProps } from 'types/component';
 
 export interface BlockFormulaEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockFormula> {
@@ -18,10 +18,10 @@ export interface BlockFormulaEditorState {
 
 }
 
-@injectSheet(styles)
-export default class BlockFormulaEditor
+class BlockFormulaEditor
     extends AbstractContentEditor
-    <contentTypes.BlockFormula, BlockFormulaEditorProps & JSSProps, BlockFormulaEditorState> {
+    <contentTypes.BlockFormula, StyledComponentProps<BlockFormulaEditorProps, typeof styles>,
+    BlockFormulaEditorState> {
 
   constructor(props) {
     super(props);
@@ -65,3 +65,6 @@ export default class BlockFormulaEditor
     );
   }
 }
+
+const StyledBlockFormulaEditor = withStyles<BlockFormulaEditorProps>(styles)(BlockFormulaEditor);
+export default StyledBlockFormulaEditor;

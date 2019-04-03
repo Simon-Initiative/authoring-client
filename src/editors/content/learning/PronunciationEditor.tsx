@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -22,10 +22,9 @@ export interface PronunciationEditorState {
 
 }
 
-@injectSheet(styles)
-export default class PronunciationEditor
+class PronunciationEditor
     extends AbstractContentEditor<contentTypes.Pronunciation,
-    StyledComponentProps<PronunciationEditorProps>, PronunciationEditorState> {
+    StyledComponentProps<PronunciationEditorProps, typeof styles>, PronunciationEditorState> {
 
   constructor(props) {
     super(props);
@@ -66,3 +65,6 @@ export default class PronunciationEditor
   }
 
 }
+
+const StyledPronunciationEditor = withStyles<PronunciationEditorProps>(styles)(PronunciationEditor);
+export default StyledPronunciationEditor;

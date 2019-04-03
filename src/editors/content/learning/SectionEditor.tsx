@@ -12,7 +12,7 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { injectSheet } from 'styles/jss';
+import { withStyles } from 'styles/jss';
 import { styles } from './SectionEditor.styles';
 import { StyledComponentProps } from 'types/component';
 
@@ -27,9 +27,9 @@ export interface SectionEditorState {
 
 }
 
-@injectSheet(styles)
-export default class SectionEditor extends AbstractContentEditor
-  <contentTypes.WorkbookSection, StyledComponentProps<SectionEditorProps>, SectionEditorState> {
+class SectionEditor extends AbstractContentEditor
+  <contentTypes.WorkbookSection, StyledComponentProps<SectionEditorProps, typeof styles>,
+  SectionEditorState> {
   constructor(props) {
     super(props);
 
@@ -123,3 +123,6 @@ export default class SectionEditor extends AbstractContentEditor
     );
   }
 }
+
+const StyledSectionEditor = withStyles<SectionEditorProps>(styles)(SectionEditor);
+export default StyledSectionEditor;

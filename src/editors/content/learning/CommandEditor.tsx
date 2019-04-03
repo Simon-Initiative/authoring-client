@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
@@ -59,7 +58,7 @@ export interface CommandEditorState {
  */
 export default class CommandEditor
   extends AbstractContentEditor
-  <contentTypes.Command, CommandEditorProps & JSSProps, CommandEditorState> {
+  <contentTypes.Command, CommandEditorProps, CommandEditorState> {
 
   constructor(props) {
     super(props);

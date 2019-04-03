@@ -22,7 +22,7 @@ export class Preconditions extends Immutable.Record(defaultContent) {
 
   contentType: types.ContentTypes.Preconditions;
   elementType: 'preconditions';
-  preconditions?: Immutable.OrderedMap<string, Precondition>;
+  preconditions: Immutable.OrderedMap<string, Precondition>;
   guid: string;
 
   constructor(params?: PreconditionsParams) {
@@ -56,7 +56,7 @@ export class Preconditions extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const s = {
       preconditions: {

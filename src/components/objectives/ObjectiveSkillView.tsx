@@ -320,8 +320,7 @@ interface ObjectiveSkillViewState {
 // abstract away the presence of multiple documents and present a single,
 // unified UI where the user can create and edit LOs and skills.
 
-
-export class ObjectiveSkillView
+class ObjectiveSkillView
   extends React.Component<ObjectiveSkillViewProps, ObjectiveSkillViewState> {
 
   viewActions: Object;
@@ -626,7 +625,7 @@ export class ObjectiveSkillView
     logger.group(
       LogLevel.INFO,
       LogTag.DEFAULT,
-      `Objective Details:`,
+      'Objective Details:',
       (logger) => {
         objectiveObjects[0].forEach((objective) => {
           logger
@@ -641,7 +640,7 @@ export class ObjectiveSkillView
     logger.group(
       LogLevel.INFO,
       LogTag.DEFAULT,
-      `Skill Details:`,
+      'Skill Details:',
       (logger) => {
         skillObjects[0].forEach((skill) => {
           logger
@@ -1392,4 +1391,4 @@ export class ObjectiveSkillView
 
 }
 
-export default ObjectiveSkillView;
+export { ObjectiveSkillView };

@@ -20,7 +20,6 @@ export const styles: JSSStyles = {
       opacity: 1,
       cursor: 'pointer',
       borderLeft: props => '2px solid ' + getContentColor(props.contentType),
-
       transition: 'opacity .1s ease-in',
     },
   },
@@ -70,9 +69,7 @@ export const styles: JSSStyles = {
     },
   },
   label: {
-    font: {
-      size: 11,
-    },
+    fontSize: 11,
 
     '& i.unicode-icon': {
       font: {

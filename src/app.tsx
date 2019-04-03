@@ -19,11 +19,11 @@ import { ApplicationRoot } from './ApplicationRoot';
 import { updateRoute } from 'actions/router';
 import { registerStore } from 'utils/store';
 import { createLogger } from 'redux-logger';
+import { Dispatch } from 'react-redux';
 
 // import application styles
 import 'stylesheets/index.scss';
 import 'react-tippy/dist/tippy.css';
-import { Dispatch } from 'react-redux';
 
 // attach global variables to window
 (window as any).React = React;
@@ -41,9 +41,25 @@ let reduxLoggingEnabled = (window as Window).localStorage.getItem('redux-logging
 
   return reduxLoggingEnabled ? 'Redux logging enabled' : 'Redux logging disabled';
 };
+
+let experimentalOrgEditing = (window as Window)
+  .localStorage.getItem('experimental-org-editing') === 'true';
+(window as any).enableExperimentalOrgEditing = (show: boolean) => {
+  experimentalOrgEditing = !!show;
+  (window as Window).localStorage
+    .setItem('experimental-org-editing', experimentalOrgEditing ? 'true' : 'false');
+
+  return experimentalOrgEditing
+    ? 'Experimental org editing enabled' : 'Experimental org editing disabled';
+};
+
 (window as any).help = () => {
   console.log(`
 Available Commands:
+
+  enableExperimentalOrgEditing(enable: boolean)
+    Enable experimental support for editing preconditions
+
   showReduxLogs(show: boolean)
     Enable redux logging if show is true, otherwise disable redux logging.
     Setting persists in local storage.

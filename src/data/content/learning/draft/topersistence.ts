@@ -74,7 +74,7 @@ const entityHandlers = {
 export function fromDraft(state: ContentState, inlineText = false): Object {
 
   const rawContent = convertToRaw(state);
-  return translate(rawContent, state, inlineText);
+  return translate(rawContent as any, state, inlineText);
 }
 
 function translate(content: common.RawDraft, state: ContentState, inlineText: boolean): Object {

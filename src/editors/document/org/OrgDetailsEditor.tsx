@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { StyledComponentProps } from 'types/component';
 import { Map, List } from 'immutable';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
@@ -53,6 +52,7 @@ function buildUnitsMessage(display, dismiss) {
 export interface OrgDetailsEditorProps {
   skills: Map<string, contentTypes.Skill>;
   objectives: Map<string, contentTypes.LearningObjective>;
+  placements: org.Placements;
   model: Maybe<models.OrganizationModel>;
   onEdit: (request: org.OrgChangeRequest) => void;
   editMode: boolean;
@@ -83,8 +83,7 @@ export interface OrgDetailsEditorState {
  * OrgDetailsEditor React Component
  */
 export class OrgDetailsEditor
-  extends React.PureComponent<StyledComponentProps<OrgDetailsEditorProps>,
-  OrgDetailsEditorState> {
+  extends React.PureComponent<OrgDetailsEditorProps, OrgDetailsEditorState> {
   unitsMessageDisplayed: boolean = false;
 
   constructor(props) {

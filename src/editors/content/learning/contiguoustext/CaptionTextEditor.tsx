@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { Maybe } from 'tsmonad';
@@ -33,9 +33,8 @@ export interface CaptionTextEditorState {
 /**
  * CaptionTextEditor React Component
  */
-@injectSheet(styles)
-export class CaptionTextEditor
-    extends React.PureComponent<StyledComponentProps<CaptionTextEditorProps>,
+class CaptionTextEditor
+    extends React.PureComponent<StyledComponentProps<CaptionTextEditorProps, typeof styles>,
     CaptionTextEditorState> {
   ref: HTMLElement;
 
@@ -113,3 +112,6 @@ export class CaptionTextEditor
     );
   }
 }
+
+const StyledCaptionTextEditor = withStyles<CaptionTextEditorProps>(styles)(CaptionTextEditor);
+export { StyledCaptionTextEditor as CaptionTextEditor };

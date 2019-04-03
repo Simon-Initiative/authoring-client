@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 import {
@@ -27,7 +26,7 @@ export interface QuoteEditorState {
  */
 export default class QuoteEditor
   extends AbstractContentEditor
-  <contentTypes.Quote, QuoteEditorProps & JSSProps, QuoteEditorState> {
+  <contentTypes.Quote, QuoteEditorProps, QuoteEditorState> {
 
   constructor(props) {
     super(props);

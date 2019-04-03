@@ -1,10 +1,14 @@
-import { ContentBlock, ContentState, Entity, Modifier, SelectionState } from 'draft-js';
+import {
+  ContentBlock, ContentState,
+  EntityInstance, Modifier, SelectionState,
+} from 'draft-js';
+
 import * as Immutable from 'immutable';
 import { EntityTypes } from '../common';
 
 export type Changes = {
-  additions: Immutable.List<Entity>;
-  deletions: Immutable.List<Entity>;
+  additions: Immutable.List<EntityInfo>;
+  deletions: Immutable.List<EntityInfo>;
 };
 
 export type EntityRange = {
@@ -16,19 +20,19 @@ export type EntityRange = {
 export type EntityInfo = {
   range: EntityRange,
   entityKey: string,
-  entity: Entity,
+  entity: EntityInstance,
 };
 
-export function removeInputRef(contentState: ContentState, itemModelId: string) : ContentState {
+export function removeInputRef(contentState: ContentState, itemModelId: string): ContentState {
 
-    // Find the range that represents the entity
+  // Find the range that represents the entity
   const range = findEntityRangeByInput(itemModelId, contentState);
 
-    // Remove that entity via its range
+  // Remove that entity via its range
   if (range !== null) {
     const selectionState = new SelectionState({
-      anchorKey: range.contentBlock.key,
-      focusKey: range.contentBlock.key,
+      anchorKey: range.contentBlock.getKey(),
+      focusKey: range.contentBlock.getKey(),
       anchorOffset: range.start,
       focusOffset: range.end,
     });
@@ -42,16 +46,16 @@ export function removeInputRef(contentState: ContentState, itemModelId: string) 
 
 export function removeEntity(
   contentState: ContentState,
-  isEntity: (key: string, entity: Object) => boolean) : ContentState {
+  isEntity: (key: string, entity: Object) => boolean): ContentState {
 
   // Find the range that represents the entity
   const range = findEntity(isEntity, contentState);
 
-    // Remove that entity via its range
+  // Remove that entity via its range
   if (range !== null) {
     const selectionState = new SelectionState({
-      anchorKey: range.contentBlock.key,
-      focusKey: range.contentBlock.key,
+      anchorKey: range.contentBlock.getKey(),
+      focusKey: range.contentBlock.getKey(),
       anchorOffset: range.start,
       focusOffset: range.end,
     });
@@ -64,7 +68,7 @@ export function removeEntity(
 
 
 export function findEntity(
-  isEntity: (key: string, entity) => boolean, contentState: ContentState) : EntityRange {
+  isEntity: (key: string, entity) => boolean, contentState: ContentState): EntityRange {
 
   const matchPredicate = (key: string) => {
     return key !== null &&
@@ -83,7 +87,7 @@ export function findEntity(
 }
 
 
-function findEntityRangeByInput(inputId: string, contentState: ContentState) : EntityRange {
+function findEntityRangeByInput(inputId: string, contentState: ContentState): EntityRange {
 
   const matchPredicate = (key: string) => {
     return key !== null &&
@@ -103,7 +107,7 @@ function findEntityRangeByInput(inputId: string, contentState: ContentState) : E
 
 function findEntityRangeForBlock(
   contentBlock: ContentBlock,
-  contentState: ContentState, isMatch: (key: string) => boolean) : EntityRange[] {
+  contentState: ContentState, isMatch: (key: string) => boolean): EntityRange[] {
 
   const ranges = [];
 
@@ -122,7 +126,7 @@ function findEntityRangeForBlock(
 
 function getEntitiesForBlock(
   contentBlock: ContentBlock,
-  contentState: ContentState, isMatch: (key: string) => boolean) : EntityInfo[] {
+  contentState: ContentState, isMatch: (key: string) => boolean): EntityInfo[] {
 
   const entities = [];
   let lastEntityKey = null;
@@ -156,11 +160,11 @@ function getEntitiesForBlock(
 
 export function getEntities(
   type: EntityTypes,
-  contentState: ContentState) : EntityInfo[] {
+  contentState: ContentState): EntityInfo[] {
 
   const matchPredicate = (key: string) => {
     return key !== null &&
-        contentState.getEntity(key).getType() === type;
+      contentState.getEntity(key).getType() === type;
   };
 
   return contentState.getBlocksAsArray()
@@ -169,7 +173,7 @@ export function getEntities(
 }
 
 export function getAllEntities(
-  contentState: ContentState) : EntityInfo[] {
+  contentState: ContentState): EntityInfo[] {
 
   const matchPredicate = (key: string) => true;
 
@@ -178,11 +182,11 @@ export function getAllEntities(
     .reduce((p, c) => p.concat(c), []);
 }
 
-function keyedByInput(entities : EntityInfo[], uniqueIdentifier: string) : Object {
+function keyedByInput(entities: EntityInfo[], uniqueIdentifier: string): Object {
   return entities
     .reduce(
       (p, c) => {
-        p[c.entity.data[uniqueIdentifier]] = c;
+        p[c.entity.getData()[uniqueIdentifier]] = c;
         return p;
       },
       {});
@@ -192,7 +196,7 @@ function keyedByInput(entities : EntityInfo[], uniqueIdentifier: string) : Objec
 // added or deleted between versions of ContentState
 export function detectChanges(
   type: EntityTypes, uniqueIdentifier: string,
-  prev: ContentState, current: ContentState) : Changes {
+  prev: ContentState, current: ContentState): Changes {
 
   let additions = Immutable.List<EntityInfo>();
   let deletions = Immutable.List<EntityInfo>();

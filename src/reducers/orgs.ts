@@ -18,6 +18,7 @@ import { Document } from 'data/persistence';
 import { Maybe } from 'tsmonad';
 import { NavigationItem, makePackageOverview } from 'types/navigation';
 import * as org from 'data/models/utils/org';
+import { OrganizationModel } from 'data/models';
 
 type ActionTypes =
   OrgChangeFailedAction | OrgChangeSucceededAction | ReleaseOrgAction |
@@ -27,6 +28,7 @@ type ActionTypes =
 
 export type OrgsState = {
   activeOrg: Maybe<Document>,
+  placements: Immutable.OrderedMap<string, org.Placement>,
   lastChangeSucceeded: boolean,
   documentId: Maybe<string>,
   selectedItem: NavigationItem,
@@ -36,6 +38,7 @@ export type OrgsState = {
 
 const initialState = {
   activeOrg: Maybe.nothing<Document>(),
+  placements: Immutable.OrderedMap<string, org.Placement>(),
   lastChangeSucceeded: true,
   documentId: Maybe.nothing<string>(),
   selectedItem: makePackageOverview(),
@@ -96,15 +99,17 @@ export const orgs = (
         just: d => Maybe.just(d.with({ model: action.model })),
         nothing: () => Maybe.nothing(),
       });
-      return Object.assign({}, state, { activeOrg });
+      const placements = org.modelToPlacements(action.model);
+      return Object.assign({}, state, { activeOrg, placements });
     }
     case ORG_REQUESTED:
       return Object.assign({}, state, { documentId: Maybe.just(action.orgId) });
     case ORG_LOADED: {
       const undoStack = Immutable.Stack<org.OrgChangeRequest>();
       const redoStack = Immutable.Stack<org.OrgChangeRequest>();
+      const placements = org.modelToPlacements(action.document.model as OrganizationModel);
       return Object.assign(
-        {}, state, { activeOrg: Maybe.just(action.document), undoStack, redoStack });
+        {}, state, { activeOrg: Maybe.just(action.document), undoStack, redoStack, placements });
     }
     case ORG_CHANGE_FAILED:
       return Object.assign({}, state, { lastChangeSucceeded: false });

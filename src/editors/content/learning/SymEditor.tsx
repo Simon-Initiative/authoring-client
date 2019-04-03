@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
@@ -22,7 +21,7 @@ export interface SymEditorState {
  * React Component
  */
 export default class SymEditor
-  extends AbstractContentEditor<contentTypes.Sym, SymEditorProps & JSSProps, SymEditorState> {
+  extends AbstractContentEditor<contentTypes.Sym, SymEditorProps, SymEditorState> {
 
   constructor(props) {
     super(props);

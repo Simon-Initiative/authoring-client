@@ -1,12 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames } from 'styles/jss';
+import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-
 import { Select } from 'editors/content/common/controls';
 import { ContentElements, MATERIAL_ELEMENTS, BOX_ELEMENTS } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
@@ -29,10 +28,9 @@ export interface TheoremEditorState {
 
 }
 
-@injectSheet(styles)
-export default class TheoremEditor
+class TheoremEditor
   extends AbstractContentEditor<contentTypes.Theorem,
-  StyledComponentProps<TheoremEditorProps>, TheoremEditorState> {
+  StyledComponentProps<TheoremEditorProps, typeof styles>, TheoremEditorState> {
 
   constructor(props) {
     super(props);
@@ -211,3 +209,6 @@ export default class TheoremEditor
   }
 
 }
+
+const TheoremEditorStyled = withStyles<TheoremEditorProps>(styles)(TheoremEditor);
+export default TheoremEditorStyled;
