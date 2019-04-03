@@ -44,6 +44,12 @@ export class Title
     this.onKeyUp = this.onKeyUp.bind(this);
   }
 
+  componentWillReceiveProps(nextProps: TitleProps) {
+    if (this.props.title !== nextProps.title) {
+      this.setState({ title: nextProps.title });
+    }
+  }
+
   onTitleEdit() {
     const title = this.titleInput.value;
     this.setState(

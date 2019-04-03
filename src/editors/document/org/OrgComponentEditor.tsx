@@ -79,7 +79,10 @@ export class OrgComponentEditor
   }
 
   componentWillReceiveProps(nextProps: OrgComponentEditorProps) {
-    this.findComponentModel(nextProps);
+    if (this.props.componentId !== nextProps.componentId
+      || this.props.org !== nextProps.org) {
+      this.findComponentModel(nextProps);
+    }
   }
 
   findComponentModel(props: OrgComponentEditorProps) {
