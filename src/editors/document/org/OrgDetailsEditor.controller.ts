@@ -19,6 +19,8 @@ interface StateProps {
   editMode: boolean;
   course: models.CourseModel;
   placements: org.Placements;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 interface DispatchProps {
@@ -48,6 +50,8 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     course,
     editMode: course.editable,
     placements: orgs.placements,
+    canUndo: orgs.undoStack.size > 0,
+    canRedo: orgs.redoStack.size > 0,
   };
 };
 
