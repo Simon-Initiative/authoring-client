@@ -288,7 +288,6 @@ class ObjectiveSkillView
     const fetchAllOrgResources = persistence.bulkFetchDocuments(
       course.guid, [LegacyTypes.organization], 'byTypes');
 
-
     // fetch workbook page to inline assessment edges
     const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.workbook_page,

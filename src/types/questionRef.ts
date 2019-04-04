@@ -144,3 +144,25 @@ export const getQuestionRefFromPathInfo = (
   // no parent exists. this is the end of the path and a question has not been found
   return Maybe.nothing();
 };
+
+export const getReadableTitleFromType = (type: string) => {
+  switch (type) {
+    case 'essay':
+      return 'Essay';
+    case 'short_answer':
+      return 'Short Answer';
+    case 'fill_in_the_blank':
+      return 'Fill in the Blank';
+    case 'image_hotspot':
+      return 'Image Hotspot';
+    case 'multiple_choice':
+      return 'Multiple Choice';
+    case 'numeric':
+      return 'Numeric';
+    case 'ordering':
+      return 'Ordering';
+    case 'question':
+    default:
+      return 'Question';
+  }
+};

@@ -4,14 +4,17 @@ import { ModuleAnalytics } from './ModuleAnalytics';
 import { OrderedMap } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import * as models from 'data/models';
+import { push } from 'actions/router';
+import { Maybe } from 'tsmonad';
 
 interface StateProps {
   objectives: OrderedMap<string, contentTypes.LearningObjective>;
   skills: OrderedMap<string, contentTypes.Skill>;
+  organization: models.OrganizationModel;
 }
 
 interface DispatchProps {
-
+  onPushRoute: (path: string) => void;
 }
 
 interface OwnProps {
@@ -20,16 +23,18 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
-  const { objectives, skills } = state;
+  const { objectives, skills, orgs } = state;
   return {
     objectives,
     skills,
+    // we are guaranteed to have an activeOrg when this component loads
+    organization: orgs.activeOrg.valueOrThrow().model as models.OrganizationModel,
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-
+    onPushRoute: path => dispatch(push(path)),
   };
 };
 

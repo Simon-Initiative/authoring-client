@@ -10,11 +10,11 @@ import * as models from 'data/models';
 import { flattenChildren } from 'data/models/utils/org';
 import { resourceId } from 'types/edge';
 import {
-  QuestionRef, getQuestionRefFromPathInfo,
+  QuestionRef, getQuestionRefFromPathInfo, getReadableTitleFromType,
 } from 'types/questionRef';
 import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import colors from 'styles/colors';
-import { disableSelect } from 'styles/mixins';
+import { disableSelect, ellipsizeOverflow, link } from 'styles/mixins';
 import { extractFullText } from 'data/content/objectives/objective';
 
 type SkillRef = {
@@ -69,6 +69,22 @@ const styles: JSSStyles = {
     flex: 1,
     marginLeft: 10,
   },
+  objectiveDetails: {
+    margin: [0, 20, 20, 20],
+  },
+  skill: {
+
+  },
+  skillQuestions: {
+    marginLeft: 20,
+  },
+  question: {
+    extend: [ellipsizeOverflow],
+    marginTop: 5,
+  },
+  questionLink: {
+    extend: [link],
+  },
 };
 
 export interface ModuleAnalyticsProps {
@@ -76,10 +92,13 @@ export interface ModuleAnalyticsProps {
   model: contentTypes.Module;
   objectives: OrderedMap<string, contentTypes.LearningObjective>;
   skills: OrderedMap<string, contentTypes.Skill>;
+  organization: models.OrganizationModel;
+  onPushRoute: (path: string) => void;
 }
 
 export interface ModuleAnalyticsState {
   objectiveRefs: Maybe<List<ObjectiveRef>>;
+  organizationResourceMap: Maybe<Map<string, List<string>>>;
   hoveredObjectives: Map<string, boolean>;
   expandedObjectives: Map<string, boolean>;
 }
@@ -113,13 +132,16 @@ class ModuleAnalytics
   getDefaultState = () => {
     return {
       objectiveRefs: Maybe.nothing<List<ObjectiveRef>>(),
+      organizationResourceMap: Maybe.nothing<Map<string, List<string>>>(),
       hoveredObjectives: Map<string, boolean>(),
       expandedObjectives: Map<string, boolean>(),
     };
   }
 
   async fetchResources() {
-    const { model, course, objectives, skills } = this.props;
+    const { model, course, objectives, skills, organization } = this.props;
+
+    const orgResources = organization.getFlattenedResources();
 
     // get all page and assesment items in org item
     const ids = flattenChildren(model.children)
@@ -140,7 +162,13 @@ class ModuleAnalytics
 
     // fetch skill edges for all items
     const allIds = ids.concat(
-      sourceEdges.map(e => resourceId(e.destinationId)));
+      sourceEdges
+        .filter(e => e.destinationType === LegacyTypes.inline
+          || e.destinationType === LegacyTypes.assessment2
+          || e.destinationType === LegacyTypes.assessment2_pool
+          || e.destinationType === LegacyTypes.workbook_page,
+        )
+        .map(e => resourceId(e.destinationId)));
 
     const skillEdges = await persistence.fetchEdgesByIds(
       course.guid, { destinationType: LegacyTypes.skill }, { sourceIds: allIds });
@@ -217,9 +245,30 @@ class ModuleAnalytics
     });
   }
 
-  renderObjectiveDetails(objectiveRef: ObjectiveRef) {
+  renderObjectiveDetails(objectiveRef: ObjectiveRef, organization: models.OrganizationModel) {
+    const { classes, course, onPushRoute } = this.props;
+
     return (
-      <div></div>
+      <div className={classes.objectiveDetails}>
+        {objectiveRef.skills.map(skill => (
+          <div key={skill.id} className={classes.skill}>
+            <i className="fa fa-cubes" /> <b>Skill:</b> {skill.title}
+            <div className={classes.skillQuestions}>
+              {skill.questions.map(question => (
+                <div key={question.key} className={classes.question}>
+                  <i className="far fa-question-circle" /> <span className={classes.questionLink}
+                    onClick={() => onPushRoute(
+                      `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
+                      + `-${organization.guid}`
+                      + `?questionId=${question.id}`)}>
+                    {question.title.valueOr(getReadableTitleFromType(question.type))}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     );
   }
 
@@ -229,7 +278,7 @@ class ModuleAnalytics
     );
   }
 
-  renderObjectiveRef(objectiveRef: ObjectiveRef) {
+  renderObjectiveRef(objectiveRef: ObjectiveRef, organization: models.OrganizationModel) {
     const { classes } = this.props;
     const { expandedObjectives } = this.state;
 
@@ -240,6 +289,7 @@ class ModuleAnalytics
 
     return (
       <div
+        key={objectiveRef.id}
         className={classes.objectiveRef}
         onMouseEnter={() => this.onEnterObjective(objectiveRef.id)}
         onMouseLeave={() => this.onLeaveObjective(objectiveRef.id)}>
@@ -256,13 +306,13 @@ class ModuleAnalytics
             </div>
           </div>
         </div>
-        {isExpanded && this.renderObjectiveDetails(objectiveRef)}
+        {isExpanded && this.renderObjectiveDetails(objectiveRef, organization)}
       </div>
     );
   }
 
   render() {
-    const { className, classes, model, course } = this.props;
+    const { className, classes, model, organization } = this.props;
     const { objectiveRefs } = this.state;
 
     return (
@@ -271,7 +321,7 @@ class ModuleAnalytics
           just: refs => refs.size > 0
             ? (
               <div className={classes.objectivesList}>
-                {refs.map(ref => this.renderObjectiveRef(ref))}
+                {refs.map(ref => this.renderObjectiveRef(ref, organization))}
               </div>
             )
             : (
