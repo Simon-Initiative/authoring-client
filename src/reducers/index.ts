@@ -25,8 +25,10 @@ import { clipboard, ClipboardState } from 'reducers/clipboard';
 import { XrefState, xref } from 'reducers/xref';
 import { BibliographyState, orderedIds } from 'reducers/bibliography';
 import { orgs, OrgsState } from 'reducers/orgs';
+import { analytics, AnalyticsState } from 'reducers/analytics';
 
 export interface State {
+  analytics: AnalyticsState;
   orgs: OrgsState;
   activeContext: ActiveContextState;
   documents: DocumentsState;
@@ -55,6 +57,7 @@ export interface State {
 }
 
 const reducers = combineReducers({
+  analytics,      // Data analytics related state
   orgs,           // The organization global state
   activeContext,  // The active editing context - aka: what is being edited
   documents,      // The current state and models of documents under edit
