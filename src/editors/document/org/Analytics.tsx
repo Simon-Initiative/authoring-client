@@ -126,7 +126,7 @@ class Analytics
     this.fetchResources();
   }
 
-  componentWillUpdate(
+  componentDidUpdate(
     nextProps: Readonly<AnalyticsProps>, nextState: Readonly<AnalyticsState>) {
     // this assumes that aggregateModel, skills, objectives are all set together
     if (nextProps.model !== null
