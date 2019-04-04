@@ -652,7 +652,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                   <div className="row">
                     <div className="col-9">
                       No datasets have been created for this course package.
-                      To see statistics about content effectiveness in the course author,
+                      To see statistics about content effectiveness in the Course Author,
                       you must first create a dataset.
                     </div>
                     <div className="col-3">

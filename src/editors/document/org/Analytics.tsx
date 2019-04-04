@@ -16,6 +16,7 @@ import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import colors from 'styles/colors';
 import { disableSelect, ellipsizeOverflow, link } from 'styles/mixins';
 import { extractFullText } from 'data/content/objectives/objective';
+import { dedupeArray } from 'utils/utils';
 
 export type OrgItem =  contentTypes.Sequence
   | contentTypes.Unit
@@ -36,7 +37,7 @@ type ObjectiveRef = {
 };
 
 const styles: JSSStyles = {
-  ModuleAnalytics: {
+  Analytics: {
     // camelCase styles
   },
   objectivesList: {
@@ -92,7 +93,7 @@ const styles: JSSStyles = {
   },
 };
 
-export interface ModuleAnalyticsProps {
+export interface AnalyticsProps {
   course: models.CourseModel;
   model: OrgItem;
   objectives: OrderedMap<string, contentTypes.LearningObjective>;
@@ -101,7 +102,7 @@ export interface ModuleAnalyticsProps {
   onPushRoute: (path: string) => void;
 }
 
-export interface ModuleAnalyticsState {
+export interface AnalyticsState {
   objectiveRefs: Maybe<List<ObjectiveRef>>;
   organizationResourceMap: Maybe<Map<string, List<string>>>;
   hoveredObjectives: Map<string, boolean>;
@@ -109,11 +110,11 @@ export interface ModuleAnalyticsState {
 }
 
 /**
- * ModuleAnalytics React Component
+ * Analytics React Component
  */
-class ModuleAnalytics
-    extends React.PureComponent<StyledComponentProps<ModuleAnalyticsProps, typeof styles>,
-    ModuleAnalyticsState> {
+class Analytics
+    extends React.PureComponent<StyledComponentProps<AnalyticsProps, typeof styles>,
+    AnalyticsState> {
 
   constructor(props) {
     super(props);
@@ -126,7 +127,7 @@ class ModuleAnalytics
   }
 
   componentWillUpdate(
-    nextProps: Readonly<ModuleAnalyticsProps>, nextState: Readonly<ModuleAnalyticsState>) {
+    nextProps: Readonly<AnalyticsProps>, nextState: Readonly<AnalyticsState>) {
     // this assumes that aggregateModel, skills, objectives are all set together
     if (nextProps.model !== null
       && nextProps.model !== this.props.model) {
@@ -163,7 +164,7 @@ class ModuleAnalytics
     const sourceEdges = await persistence.fetchEdgesByIds(
       course.guid, {}, { sourceIds: ids });
 
-    // fetch skill edges for all items
+    // fetch skill edges for all items, then dedupe ids
     const allIds = ids.concat(
       sourceEdges
         .filter(e => e.destinationType === LegacyTypes.inline
@@ -197,34 +198,38 @@ class ModuleAnalytics
     const objectiveEdges = await persistence.fetchEdgesByIds(
       course.guid, { destinationType: LegacyTypes.learning_objective }, { sourceIds: allIds });
 
-    const objectiveRefs: List<ObjectiveRef> = objectiveEdges.reduce(
-      (acc, objEdge) => Maybe.maybe(objectives.get(resourceId(objEdge.destinationId)))
-        .caseOf({
-          just: objective => acc.push({
-            id: objective.id,
-            title: objective.title,
-            rawContent: objective.rawContent,
-            skills: objective.skills.reduce(
-              (acc, skillId) => Maybe.maybe(skillQuestionRefMap.get(skillId))
-                .caseOf({
-                  just: questionRefs => acc.push({
-                    id: skillId,
-                    title: Maybe.maybe(skills.get(skillId))
-                      .caseOf({
-                        just: skill => skill.title,
-                        nothing: () => '[skill not found]',
-                      }),
-                    questions: questionRefs.toList(),
+    const objectiveRefs: List<ObjectiveRef> =
+      dedupeArray(objectiveEdges, e => resourceId(e.destinationId)).reduce(
+        (acc, objEdge) => Maybe.maybe(objectives.get(resourceId(objEdge.destinationId)))
+          .caseOf({
+            just: objective => acc.push({
+              id: objective.id,
+              title: objective.title,
+              rawContent: objective.rawContent,
+              skills: objective.skills.reduce(
+                (acc, skillId) => Maybe.maybe(skillQuestionRefMap.get(skillId))
+                  .caseOf({
+                    just: questionRefs => acc.push({
+                      id: skillId,
+                      title: Maybe.maybe(skills.get(skillId))
+                        .caseOf({
+                          just: skill => skill.title,
+                          nothing: () => '[skill not found]',
+                        }),
+                      questions: questionRefs.toList(),
+                    }),
+                    nothing: () => acc,
                   }),
-                  nothing: () => acc,
-                }),
-              List<SkillRef>(),
-            ),
+                List<SkillRef>(),
+              ),
+            }),
+            nothing: () => acc,
           }),
-          nothing: () => acc,
-        }),
-      List<ObjectiveRef>(),
-    );
+        List<ObjectiveRef>(),
+      )
+      // filter out objectives with no skills
+      .filter(objective => objective.skills.size > 0)
+      .toList();
 
     this.setState({
       objectiveRefs: Maybe.just(objectiveRefs),
@@ -319,7 +324,7 @@ class ModuleAnalytics
     const { objectiveRefs } = this.state;
 
     return (
-      <div className={classNames(['ModuleAnalytics', classes.ModuleAnalytics, className])}>
+      <div className={classNames(['Analytics', classes.Analytics, className])}>
         {objectiveRefs.caseOf({
           just: refs => refs.size > 0
             ? (
@@ -344,5 +349,5 @@ class ModuleAnalytics
   }
 }
 
-const StyledModuleAnalytics = withStyles<ModuleAnalyticsProps>(styles)(ModuleAnalytics);
-export { StyledModuleAnalytics as ModuleAnalytics };
+const StyledAnalytics = withStyles<AnalyticsProps>(styles)(Analytics);
+export { StyledAnalytics as Analytics };

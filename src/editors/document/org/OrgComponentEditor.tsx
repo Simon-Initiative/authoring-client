@@ -16,7 +16,7 @@ import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
-import { ModuleAnalytics } from './ModuleAnalytics.controller';
+import { Analytics } from './Analytics.controller';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -196,15 +196,6 @@ export class OrgComponentEditor
 
         const contentWithActionBar = (
           <React.Fragment>
-            <UndoRedoToolbar
-              undoEnabled={canUndo}
-              redoEnabled={canRedo}
-              onUndo={onUndo.bind(this)}
-              onRedo={onRedo.bind(this)} />
-            {titleEditor}
-
-            {preconditions}
-
             {this.renderActionBar(model)}
             <Outline
               onView={this.onView}
@@ -243,7 +234,7 @@ export class OrgComponentEditor
                     {contentWithActionBar}
                   </Tab>
                   <Tab>
-                    <ModuleAnalytics course={this.props.course} model={model} />
+                    <Analytics course={this.props.course} model={model} />
                   </Tab>
                 </TabContainer>
               )

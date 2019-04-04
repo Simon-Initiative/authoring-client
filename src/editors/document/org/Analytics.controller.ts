@@ -1,6 +1,6 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
-import { ModuleAnalytics, OrgItem } from './ModuleAnalytics';
+import { Analytics, OrgItem } from './Analytics';
 import { OrderedMap } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import * as models from 'data/models';
@@ -40,6 +40,6 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(ModuleAnalytics);
+    (mapStateToProps, mapDispatchToProps)(Analytics);
 
-export { controller as ModuleAnalytics };
+export { controller as Analytics };
