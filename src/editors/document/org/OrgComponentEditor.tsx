@@ -16,7 +16,7 @@ import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
-import { ModuleAnalytics, OrgItem } from './ModuleAnalytics.controller';
+import { ModuleAnalytics } from './ModuleAnalytics.controller';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;

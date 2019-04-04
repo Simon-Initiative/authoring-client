@@ -146,8 +146,6 @@ class ModuleAnalytics
   async fetchResources() {
     const { model, course, objectives, skills, organization } = this.props;
 
-    const orgResources = organization.getFlattenedResources();
-
     // get all page and assesment items in org item
     const ids = flattenChildren(model.children)
       .map(id => course.resourcesById.get(id))

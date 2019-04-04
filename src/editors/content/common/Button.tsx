@@ -2,15 +2,17 @@ import * as React from 'react';
 
 export type ButtonProps = {
   children?: any;
-  className? : string;
+  className?: string;
   onClick: () => void;
   type?: string;
+  size?: string;
   editMode: boolean;
 };
 
 export const Button = (props: ButtonProps) => {
   const type = props.type === undefined ? 'primary' : props.type;
-  const classes = 'btn btn-sm btn-' + type + (props.className ? ` ${props.className}` : '');
+  const size = props.size === undefined ? 'sm' : props.size;
+  const classes = `btn btn-${size} btn-${type} ${props.className}`;
   return (
     <button
       disabled={!props.editMode}
