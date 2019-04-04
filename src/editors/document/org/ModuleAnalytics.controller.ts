@@ -1,11 +1,12 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
-import { ModuleAnalytics } from './ModuleAnalytics';
+import { ModuleAnalytics, OrgItem } from './ModuleAnalytics';
 import { OrderedMap } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import * as models from 'data/models';
 import { push } from 'actions/router';
-import { Maybe } from 'tsmonad';
+
+export { OrgItem };
 
 interface StateProps {
   objectives: OrderedMap<string, contentTypes.LearningObjective>;
@@ -19,7 +20,7 @@ interface DispatchProps {
 
 interface OwnProps {
   course: models.CourseModel;
-  model: contentTypes.Module;
+  model: OrgItem;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

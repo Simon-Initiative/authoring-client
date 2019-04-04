@@ -16,7 +16,7 @@ import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
-import { ModuleAnalytics } from './ModuleAnalytics.controller';
+import { ModuleAnalytics, OrgItem } from './ModuleAnalytics.controller';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -221,7 +221,10 @@ export class OrgComponentEditor
 
             {preconditions}
 
-            {model.contentType === t.OrganizationContentTypes.Module
+            {model.contentType === t.OrganizationContentTypes.Sequence
+              || model.contentType === t.OrganizationContentTypes.Unit
+              || model.contentType === t.OrganizationContentTypes.Module
+              || model.contentType === t.OrganizationContentTypes.Section
               ? (
                 <TabContainer labels={['Content', 'Analytics']}>
                   <Tab>

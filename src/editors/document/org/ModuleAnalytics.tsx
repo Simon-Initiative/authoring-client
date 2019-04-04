@@ -17,6 +17,11 @@ import colors from 'styles/colors';
 import { disableSelect, ellipsizeOverflow, link } from 'styles/mixins';
 import { extractFullText } from 'data/content/objectives/objective';
 
+export type OrgItem =  contentTypes.Sequence
+  | contentTypes.Unit
+  | contentTypes.Module
+  | contentTypes.Section;
+
 type SkillRef = {
   id: string,
   title: string,
@@ -89,7 +94,7 @@ const styles: JSSStyles = {
 
 export interface ModuleAnalyticsProps {
   course: models.CourseModel;
-  model: contentTypes.Module;
+  model: OrgItem;
   objectives: OrderedMap<string, contentTypes.LearningObjective>;
   skills: OrderedMap<string, contentTypes.Skill>;
   organization: models.OrganizationModel;
