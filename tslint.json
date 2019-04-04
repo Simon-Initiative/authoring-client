@@ -15,7 +15,8 @@
         "no-trailing-whitespace": false,
         "no-consecutive-blank-lines": false,
         "ter-func-call-spacing": false,
-        "prefer-template": false
+        "prefer-template": false,
+        "align": [true, "statements"]
     },
     "rulesDirectory": []
 }

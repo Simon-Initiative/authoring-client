@@ -16,6 +16,7 @@ import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
+import { ModuleAnalytics } from './ModuleAnalytics.controller';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -190,6 +191,22 @@ export class OrgComponentEditor
           />
           : null;
 
+        const contentWithActionBar = (
+          <React.Fragment>
+            {this.renderActionBar(model)}
+            <Outline
+              onView={this.onView}
+              editMode={this.props.editMode}
+              onEdit={this.props.onEdit}
+              nodes={model.children}
+              org={org}
+              placements={this.props.placements}
+              parentNodeId={model.id}
+              course={this.props.course}
+              commandProcessor={this.processCommand.bind(this, org)} />
+          </React.Fragment>
+        );
+
         return (
           <div className="org-component-editor">
             <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -208,38 +225,14 @@ export class OrgComponentEditor
               ? (
                 <TabContainer labels={['Content', 'Analytics']}>
                   <Tab>
-                    {this.renderActionBar(model)}
-                    <Outline
-                      onView={this.onView}
-                      editMode={this.props.editMode}
-                      onEdit={this.props.onEdit}
-                      nodes={model.children}
-                      org={org}
-                      placements={this.props.placements}
-                      parentNodeId={model.id}
-                      course={this.props.course}
-                      commandProcessor={this.processCommand.bind(this, org)} />
+                    {contentWithActionBar}
                   </Tab>
                   <Tab>
-
+                    <ModuleAnalytics course={this.props.course} model={model} />
                   </Tab>
                 </TabContainer>
               )
-              : (
-                <React.Fragment>
-                  {this.renderActionBar(model)}
-                  <Outline
-                    onView={this.onView}
-                    editMode={this.props.editMode}
-                    onEdit={this.props.onEdit}
-                    nodes={model.children}
-                    org={org}
-                    placements={this.props.placements}
-                    parentNodeId={model.id}
-                    course={this.props.course}
-                    commandProcessor={this.processCommand.bind(this, org)} />
-                </React.Fragment>
-              )
+              : contentWithActionBar
             }
           </div>
         );

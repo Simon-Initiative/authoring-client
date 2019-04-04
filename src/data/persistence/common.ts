@@ -17,7 +17,7 @@ function handleError(err, reject) {
 export type HttpRequestParams = {
   method?: string,
   url: string,
-  body?: any,
+  body?: string | FormData,
   headers?: Object,
   query?: Object,
   hasTextResult?: boolean,

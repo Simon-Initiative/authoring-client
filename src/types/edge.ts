@@ -24,3 +24,12 @@ export type Edge = {
     };
   };
 };
+
+
+/**
+ * Edge sourceIds and destinationIds are guaranteed to have 3 parts e.g.
+ * package:version:resourceid. This returns the last part, which is
+ * the actual resource id
+ * @param fullId sourceId or destinationId
+ */
+export const resourceId = (fullId: string) => fullId.split(':')[2];

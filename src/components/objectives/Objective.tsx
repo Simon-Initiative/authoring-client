@@ -17,8 +17,9 @@ import { Tooltip } from 'utils/tooltip';
 import { Skill, skillModelRules } from 'components/objectives/Skill';
 import { IssueTooltip } from 'components/objectives/IssueTooltip';
 import {
-  addPluralS, getReadableTitleFromType, QuestionRef, calculateGuaranteedSummativeCount,
+  addPluralS, getReadableTitleFromType, calculateGuaranteedSummativeCount,
 } from 'components/objectives/utils';
+import { QuestionRef } from 'types/questionRef';
 import { checkModel, ModelCheckerRule, RequirementType } from 'data/linter/modelChecker';
 
 export interface RuleData {

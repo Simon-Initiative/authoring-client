@@ -1,23 +1,6 @@
 import { Map } from 'immutable';
-import { Maybe } from 'tsmonad';
 import { LegacyTypes } from 'data/types';
-
-export interface PoolInfo {
-  questionCount?: number;
-  count?: number;
-  exhaustion?: string;
-  strategy?: string;
-}
-
-export interface QuestionRef {
-  key: string;
-  id: string;
-  title: Maybe<string>;
-  type: string;
-  assessmentType: LegacyTypes;
-  assessmentId: string;
-  poolInfo: Maybe<PoolInfo>;
-}
+import { QuestionRef } from 'types/questionRef';
 
 export const addPluralS = (string: string, itemCount: number) =>
 itemCount === 1 ? string : `${string}s`;
