@@ -81,7 +81,10 @@ export class OrgComponentEditor
   }
 
   componentWillReceiveProps(nextProps: OrgComponentEditorProps) {
-    this.findComponentModel(nextProps);
+    if (this.props.componentId !== nextProps.componentId
+      || this.props.org !== nextProps.org) {
+      this.findComponentModel(nextProps);
+    }
   }
 
   findComponentModel(props: OrgComponentEditorProps) {
@@ -193,6 +196,15 @@ export class OrgComponentEditor
 
         const contentWithActionBar = (
           <React.Fragment>
+            <UndoRedoToolbar
+              undoEnabled={canUndo}
+              redoEnabled={canRedo}
+              onUndo={onUndo.bind(this)}
+              onRedo={onRedo.bind(this)} />
+            {titleEditor}
+
+            {preconditions}
+
             {this.renderActionBar(model)}
             <Outline
               onView={this.onView}
