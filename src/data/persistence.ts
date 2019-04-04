@@ -24,6 +24,8 @@ export {
 
 export { developerRegistration } from './persistence/developer';
 
+export { fetchDataSet } from './persistence/analytics';
+
 export {
   PreviewSuccess,
   PreviewResult,
