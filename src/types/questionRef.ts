@@ -2,7 +2,7 @@ import { Maybe } from 'tsmonad';
 import { LegacyTypes } from 'data/types';
 import { PathElement } from 'types/edge';
 
-export type SkillPathElement = PathElement & { title?: string };
+export type SkillPathElement = PathElement & { title?: string, '@id'?: string };
 
 export interface PoolInfo {
   questionCount?: number;
@@ -19,6 +19,7 @@ export interface QuestionRef {
   assessmentType: LegacyTypes;
   assessmentId: string;
   poolInfo: Maybe<PoolInfo>;
+  part: Maybe<string>;
 }
 
 const getPoolQuestionCount = (pathItem: SkillPathElement) => {
@@ -41,7 +42,7 @@ const getPoolQuestionCount = (pathItem: SkillPathElement) => {
 
 export const getQuestionRefFromPathInfo = (
   pathItem: SkillPathElement, assessmentType: LegacyTypes,
-  assessmentId: string): Maybe<QuestionRef> => {
+  assessmentId: string, part?: string): Maybe<QuestionRef> => {
   // base case: if this pathItem is a question, return the QuestionRef
   switch (pathItem.name) {
     case 'essay':
@@ -54,6 +55,7 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
+        part: Maybe.maybe(part),
       });
     case 'short_answer':
       return Maybe.just({
@@ -65,6 +67,7 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
+        part: Maybe.maybe(part),
       });
     case 'fill_in_the_blank':
       return Maybe.just({
@@ -76,6 +79,7 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
+        part: Maybe.maybe(part),
       });
     case 'image_hotspot':
       return Maybe.just({
@@ -87,6 +91,7 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
+        part: Maybe.maybe(part),
       });
     case 'multiple_choice':
       return Maybe.just({
@@ -98,6 +103,7 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
+        part: Maybe.maybe(part),
       });
     case 'numeric':
       return Maybe.just({
@@ -109,6 +115,7 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
+        part: Maybe.maybe(part),
       });
     case 'ordering':
       return Maybe.just({
@@ -120,6 +127,7 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
+        part: Maybe.maybe(part),
       });
     case 'question':
       return Maybe.just({
@@ -131,14 +139,17 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
+        part: Maybe.maybe(part),
       });
     default:
       break;
   }
 
+  const partId = pathItem.name === 'part' ? pathItem['@id'] : part;
+
   // item is not a question, recurse on parent if it exists
   if (pathItem.parent) {
-    return getQuestionRefFromPathInfo(pathItem.parent, assessmentType, assessmentId);
+    return getQuestionRefFromPathInfo(pathItem.parent, assessmentType, assessmentId, partId);
   }
 
   // no parent exists. this is the end of the path and a question has not been found

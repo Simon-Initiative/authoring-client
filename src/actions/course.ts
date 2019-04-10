@@ -6,6 +6,9 @@ import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
+import { Dispatch } from 'redux';
+import { State } from 'reducers';
+import { requestDataSet } from './analytics';
 
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -30,16 +33,23 @@ export const updateCourseResources = (resources: Immutable.OrderedMap<string, Re
     type: UPDATE_COURSE_RESOURCES,
   });
 
-
 /**
+ *
  * Course changed action builder
  * @param model - course model
  */
-export const courseChanged = (model: CourseModel): CourseChangedAction => ({
-  model,
-  type: COURSE_CHANGED,
-});
+export const courseChanged = (model: CourseModel) => (dispatch) => {
+  dispatch({
+    model,
+    type: COURSE_CHANGED,
+  });
 
+  // load course analytics
+  // TODO: CHANGE TO ACTUAL IMPLEMENTATION
+  console.log('requestDataSet');
+  dispatch(requestDataSet('mock_data'));
+
+};
 
 
 function createPlaceholderPage(courseId: string) {

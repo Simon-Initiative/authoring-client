@@ -9,13 +9,14 @@ import {
 } from 'actions/course';
 import { OtherAction } from './utils';
 import { Maybe } from 'tsmonad';
+import { DataSet } from 'types/analytics/dataset';
 
 export type ActionTypes = RequestedDataSetAction
   | DataSetReceivedAction | CourseChangedAction | OtherAction;
 
 export type AnalyticsState = {
   requestedDataSetId: Maybe<string>,
-  dataSet: Maybe<Object>,
+  dataSet: Maybe<DataSet>,
 };
 
 const initialState: AnalyticsState = {
@@ -32,7 +33,11 @@ export const analytics = (
       return Object.assign(
         {},
         state,
-        { requestedDataSetId: Maybe.nothing(), dataSet: Maybe.just(action.dataSet) });
+        {
+          requestedDataSetId: Maybe.nothing(),
+          dataSetId: action.dataSetId,
+          dataSet: Maybe.just(action.dataSet),
+        });
     case REQUESTED_DATASET:
       return Object.assign(
         {},
