@@ -494,6 +494,7 @@ function parse(item: Object, context: ParsingContext, backingTextProvider: Objec
     if (inlineHandler !== undefined) {
       blockHandlers['p']({ p: { '#array': [item] } }, context, backingTextProvider);
     } else {
+      // tslint:disable-next-line:no-console
       console.log('Unsupported Text content encountered: key = [' + key + '], contents next line');
       console.dir(item);
     }

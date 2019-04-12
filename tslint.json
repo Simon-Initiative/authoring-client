@@ -16,7 +16,8 @@
         "no-consecutive-blank-lines": false,
         "ter-func-call-spacing": false,
         "prefer-template": false,
-        "align": [true, "statements"]
+        "align": [true, "statements"],
+        "no-console": [true, "log", "error"]
     },
     "rulesDirectory": []
 }

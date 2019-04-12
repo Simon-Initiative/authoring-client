@@ -22,6 +22,29 @@ import { Tooltip } from 'utils/tooltip';
 import { AnalyticsState as ReduxAnalyticsState } from 'reducers/analytics';
 import { convert } from 'utils/format';
 import * as chroma from 'chroma-js';
+import { ContentElements } from 'data/content/common/elements';
+import { map } from 'data/utils/map';
+import { EntityTypes } from 'data/content/learning/common';
+
+const getOrderedParts = (body: ContentElements, parts: List<contentTypes.Part>) => {
+  return body.content.reduce(
+    (acc, contentElement) => {
+      let updatedAcc = acc;
+      map((ce) => {
+        if (ce.contentType === 'ContiguousText') {
+          (ce as contentTypes.ContiguousText).getEntitiesByType(EntityTypes.input_ref)
+            .forEach(entityInfo => updatedAcc = updatedAcc.push(entityInfo.entity.data['@input']));
+        }
+        return ce;
+      }, contentElement);
+
+      return updatedAcc;
+    },
+    List<any>(),
+  )
+  .map(input => parts.find(p => p.responses.every(r => r.input === input)))
+  .filter(part => !!part);
+};
 
 export type OrgItem =  contentTypes.Sequence
   | contentTypes.Unit
@@ -84,15 +107,13 @@ const styles: JSSStyles = {
     margin: [0, 20, 20, 20],
   },
   skill: {
-
+    marginBottom: 20,
   },
   skillQuestions: {
     marginTop: 6,
     marginLeft: 20,
   },
   question: {
-    display: 'flex',
-    flexDirection: 'row',
     padding: 4,
     border: [1, 'solid', colors.grayLighter],
     borderBottom: 'none',
@@ -103,30 +124,44 @@ const styles: JSSStyles = {
 
     '&:last-child': {
       borderBottom: [1, 'solid', colors.grayLighter],
-      height: 37,
     },
+  },
+  questionTitle: {
+    display: 'flex',
+    flexDirection: 'row',
 
     '& i': {
       marginTop: 4,
       marginRight: 2,
     },
   },
-  questionIcon: {
+  partIcon: {
+    margin: 4,
+  },
+  partTitle: {
+    display: 'flex',
+    flexDirection: 'row',
+    flex: 1,
+    marginLeft: 40,
+  },
+  questionLabel: {
     marginRight: [6, '!important'],
+    fontWeight: 600,
   },
   questionLink: {
     extend: [ellipsizeOverflow, link],
     display: 'inline',
-    flex: 1,
   },
   questionStats: {
     display: 'flex',
     flexDirection: 'row',
+    flex: 1,
     width: 400,
   },
   stat: {
     display: 'inline-block',
-    margin: [0, 10],
+    margin: [0, 4],
+    minWidth: 60,
 
     '& i': {
       marginRight: 4,
@@ -481,19 +516,77 @@ class Analytics
     );
   }
 
-  renderObjectiveDetails(objectiveRef: ObjectiveRef, organization: models.OrganizationModel) {
+  renderMultipleParts(
+    question: QuestionRef, skill: SkillRef, organization: models.OrganizationModel) {
     const { classes, course, analytics, onPushRoute } = this.props;
 
-    analytics.dataSet.lift(dataSet => console.log(dataSet));
+    const parts = getOrderedParts(question.body, question.parts)
+      // get ordered index of part, because we will filter out parts without this skill
+      .map((part, index) => ({
+        index,
+        id: part.id,
+        guid: part.guid,
+        skills: part.skills,
+      }))
+      // only include parts that pertain to this skill
+      .filter(part => part.skills.contains(skill.id));
 
-    objectiveRef.skills.forEach(skill => skill.questions.forEach(question =>
-        question.part.lift(partId =>
-            console.log(partId))));
+    return parts.map(part => (
+      <div key={part.guid} className={classes.partTitle}>
+        <i className={classNames([classes.partIcon, 'fa fa-marker'])} />
+        <div className={classes.questionLink}
+          onClick={() => onPushRoute(
+            `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
+            + `-${organization.guid}`
+            + `?questionId=${question.id}`
+            + `&partId=${part.id}`)}>
+          Part {part.index + 1}
+        </div>
+        {analytics.dataSet.bind(analyticsDataSet =>
+            Maybe.maybe(analyticsDataSet.byPart.get(part.id)).lift(
+              partAnalytics => partAnalytics),
+            ).caseOf({
+              just: partAnalytics => this.renderPartStats(partAnalytics),
+              nothing: () => this.renderNoAnalyticsMsg(),
+            })
+        }
+      </div>
+    ));
+  }
 
-    objectiveRef.skills.forEach(skill => skill.questions.forEach(question =>
-        question.part.lift(partId =>
-          analytics.dataSet.lift(dataSet =>
-            console.log(dataSet.byPart.get(partId))))));
+  renderQuestion(question: QuestionRef, skill: SkillRef, organization: models.OrganizationModel) {
+    const { classes, course, analytics, onPushRoute } = this.props;
+
+    return (
+      <div key={question.key} className={classes.question}>
+        <div key={question.key} className={classes.questionTitle}>
+          <span className={classes.questionLabel}>{question.label}:</span>
+          <div className={classes.questionLink}
+            onClick={() => onPushRoute(
+              `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
+              + `-${organization.guid}`
+              + `?questionId=${question.id}`)}>
+            {question.title.valueOr(getReadableTitleFromType(question.type))}
+          </div>
+          {question.parts.size === 1 && (
+            Maybe.maybe(question.parts.first()).bind(part =>
+              analytics.dataSet.bind(analyticsDataSet =>
+                Maybe.maybe(analyticsDataSet.byPart.get(part.id)).lift(partAnalytics =>
+                  partAnalytics,
+                ),
+              )).caseOf({
+                just: partAnalytics => this.renderPartStats(partAnalytics),
+                nothing: () => this.renderNoAnalyticsMsg(),
+              })
+          )}
+        </div>
+        {question.parts.size > 1 && this.renderMultipleParts(question, skill, organization)}
+      </div>
+    );
+  }
+
+  renderObjectiveDetails(objectiveRef: ObjectiveRef, organization: models.OrganizationModel) {
+    const { classes } = this.props;
 
     return (
       <div className={classes.objectiveDetails}>
@@ -501,28 +594,7 @@ class Analytics
           <div key={skill.id} className={classes.skill}>
             <i className="fa fa-cube" /> <b>Skill:</b> {skill.title}
             <div className={classes.skillQuestions}>
-              {skill.questions.map(question => (
-                <div key={question.key} className={classes.question}>
-                  <i className={classNames(['far fa-question-circle', classes.questionIcon])} />
-                  <div className={classes.questionLink}
-                    onClick={() => onPushRoute(
-                      `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
-                      + `-${organization.guid}`
-                      + `?questionId=${question.id}`)}>
-                    {question.title.valueOr(getReadableTitleFromType(question.type))}
-                  </div>
-                  {question.part.bind(partId =>
-                    analytics.dataSet.bind(analyticsDataSet =>
-                      Maybe.maybe(analyticsDataSet.byPart.get(partId)).lift(partAnalytics =>
-                        partAnalytics,
-                      ),
-                    )).caseOf({
-                      just: partAnalytics => this.renderPartStats(partAnalytics),
-                      nothing: () => this.renderNoAnalyticsMsg(),
-                    })
-                  }
-                </div>
-              ))}
+              {skill.questions.map(question => this.renderQuestion(question, skill, organization))}
             </div>
           </div>
         ))}
