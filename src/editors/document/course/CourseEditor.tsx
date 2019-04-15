@@ -553,7 +553,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         <div className="row info">
           <div className="col-md-12">
             <h2>Course Package</h2>
-            <TabContainer labels={['Details', 'Status', 'Analytics']}>
+            <TabContainer labels={['Details', 'Workflow', 'Analytics']}>
               <Tab>
                 <div className="infoContain">
                   <div className="row">
@@ -613,12 +613,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                     </div>
                     <div className="col-9">{this.renderLicenseSelect()}</div>
                   </div>
-                  <div className="row">
-                    <div className="col-3">Actions</div>
-                    <div className="col-9">
-                      {this.renderActions()}
-                    </div>
-                  </div>
                   <hr />
                   <div className="row">
                     <div className="col-3">Unique ID</div>
@@ -641,8 +635,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               <Tab>
                 <div className="infoContain">
                   <div className="row">
-                    <div className="col-12 course-status">
+                    <div className="col-3">Status</div>
+                    <div className="col-9">
                       {this.renderStatus()}
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-3">Actions</div>
+                    <div className="col-9">
+                      {this.renderActions()}
                     </div>
                   </div>
                 </div>
