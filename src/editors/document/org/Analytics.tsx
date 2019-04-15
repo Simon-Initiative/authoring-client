@@ -151,12 +151,11 @@ const styles: JSSStyles = {
   questionLink: {
     extend: [ellipsizeOverflow, link],
     display: 'inline',
+    flex: 1,
   },
   questionStats: {
     display: 'flex',
     flexDirection: 'row',
-    flex: 1,
-    width: 400,
   },
   stat: {
     display: 'inline-block',
@@ -372,7 +371,6 @@ class Analytics
 
     return (
       <div className={classes.questionStats}>
-        <div className="flex-spacer"/>
         <span className={classes.noStats}>Analytics are unavailable for this {item}</span>
       </div>
     );
@@ -414,7 +412,6 @@ class Analytics
 
     return (
       <div className={classes.questionStats}>
-        <div className="flex-spacer"/>
         <Tooltip
           html={(
             <div className={classes.analyticsTooltipContent}>
