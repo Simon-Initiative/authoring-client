@@ -358,7 +358,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
         selectionState = new SelectionState({
           anchorKey: selectionState.getAnchorKey(),
           focusKey: selectionState.getFocusKey(),
-          anchorOffset: selectionState.getAnchorOffset,
+          anchorOffset: selectionState.getAnchorOffset(),
           focusOffset: selectionState.getAnchorOffset() + 1,
         });
       }
@@ -371,16 +371,17 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       contentState = appendText(block, contentState, '  ');
     }
 
-    const contentStateWithEntity = contentState.createEntity(type, mutability, data);
-    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-    const contentStateWithLink = Modifier.applyEntity(
+    contentState = contentState.createEntity(type, mutability, data);
+    const entityKey = contentState.getLastCreatedEntityKey();
+
+    contentState = Modifier.applyEntity(
       contentState,
       selectionState,
       entityKey,
     );
 
     return this.with({
-      content: contentStateWithLink,
+      content: contentState,
       entityEditCount: this.entityEditCount + 1,
     });
   }
