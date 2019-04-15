@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/learning/common';
-import { connect, Dispatch } from 'react-redux';
-import { State } from 'reducers';
 
 import './InputRef.scss';
 
@@ -59,37 +57,10 @@ const InputRef = (props) => {
   );
 };
 
-interface StateProps {
-  activeItemId: string;
-}
-
-interface DispatchProps {
-
-}
-
-interface OwnProps {
-
-}
-
-const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
-  return {
-    activeItemId: state.inputRef.valueOr(''),
-  };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
-  return {
-
-  };
-};
-
-const ConnectedInputRef = connect<StateProps, DispatchProps, OwnProps>
-(mapStateToProps, mapDispatchToProps)(InputRef);
-
-export default function (props: Object) : Decorator {
+export default function (props: Object): Decorator {
   return {
     strategy: byType.bind(undefined, EntityTypes.input_ref),
-    component: ConnectedInputRef,
+    component: InputRef,
     props,
   };
 }
