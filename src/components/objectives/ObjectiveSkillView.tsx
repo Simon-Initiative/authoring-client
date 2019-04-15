@@ -871,7 +871,7 @@ class ObjectiveSkillView
         return Promise.resolve(false);
       })
       .catch((err) => {
-        console.log(`Error removing objective ${obj}: ${err}`);
+        console.error(`Error removing objective ${obj}: ${err}`);
         this.setState({
           loading: false,
         });

@@ -208,7 +208,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           .catch((err) => {
             // We need to handle this better.  This editor should be managed
             // by the EditorManager
-            console.log(err);
+            console.error(err);
           });
       });
 
@@ -239,7 +239,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         });
         courseChanged(model.with({ theme: themeId }));
       })
-      .catch(err => console.log(`Error setting theme ${themeId}: ${err}`));
+      .catch(err => console.error(`Error setting theme ${themeId}: ${err}`));
   }
 
   onClickNewVersion() {
@@ -279,7 +279,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       .then((document) => {
         this.props.viewAllCourses();
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   }
 
   displayRemovePackageModal() {

@@ -17,7 +17,7 @@
         "ter-func-call-spacing": false,
         "prefer-template": false,
         "align": [true, "statements"],
-        "no-console": [true, "log", "error"]
+        "no-console": [true, "log"]
     },
     "rulesDirectory": []
 }

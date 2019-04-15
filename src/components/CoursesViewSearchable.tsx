@@ -118,7 +118,7 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
         });
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         this.props.sendMessage(errorMessageAction());
       });
 

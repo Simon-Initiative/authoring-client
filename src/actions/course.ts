@@ -94,7 +94,7 @@ export function loadCourse(courseId: string) {
         }
 
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   };
 }
 
