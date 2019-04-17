@@ -225,9 +225,6 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
         return [{
           propertyName: 'onEntitySelected',
           value: onEntitySelected,
-        }, {
-          propertyName: 'selectedEntity',
-          value: selectedInput,
         }];
       }
       return [];
