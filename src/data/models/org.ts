@@ -5,7 +5,7 @@ import { Maybe } from 'tsmonad';
 import { getKey } from 'data/common';
 import { LegacyTypes } from 'data/types';
 import { setId } from 'data/content/common';
-import * as types from 'data/content/org/types';
+import { flattenChildren } from 'data/models/utils/org';
 
 export type OrganizationModelParams = {
   resource?: contentTypes.Resource,
@@ -72,29 +72,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   }
 
   getFlattenedResources() {
-    type Children = Immutable.OrderedMap<string,
-      contentTypes.Sequence | contentTypes.Unit | contentTypes.Module | contentTypes.Include
-      | contentTypes.Item | contentTypes.Section>;
-
-    const flattenChildren = (children: Children): Immutable.List<string> => {
-      return children.reduce(
-        (acc, child) => {
-          switch (child.contentType) {
-            case types.ContentTypes.Sequence:
-            case types.ContentTypes.Unit:
-            case types.ContentTypes.Module:
-            case types.ContentTypes.Section:
-              return acc.concat(flattenChildren(child.children)).toList();
-            case types.ContentTypes.Item:
-              return acc.concat(child.resourceref.idref).toList();
-            default:
-              return acc;
-          }
-        },
-        Immutable.List<string>(),
-      );
-    };
-
     return flattenChildren(this.sequences.children);
   }
 

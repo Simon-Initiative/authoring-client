@@ -14,7 +14,9 @@ import { Outline } from './outline/Outline';
 import { PreconditionsEditor } from './PreconditionsEditor';
 import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
+import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
+import { Analytics } from './Analytics.controller';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -192,17 +194,8 @@ export class OrgComponentEditor
           />
           : null;
 
-        return (
-          <div className="org-component-editor">
-            <UndoRedoToolbar
-              undoEnabled={canUndo}
-              redoEnabled={canRedo}
-              onUndo={onUndo.bind(this)}
-              onRedo={onRedo.bind(this)} />
-            {titleEditor}
-
-            {preconditions}
-
+        const contentWithActionBar = (
+          <React.Fragment>
             {this.renderActionBar(model)}
             <Outline
               onView={this.onView}
@@ -213,8 +206,40 @@ export class OrgComponentEditor
               placements={this.props.placements}
               parentNodeId={model.id}
               course={this.props.course}
-              commandProcessor={this.processCommand.bind(this, org)}
-            />
+              commandProcessor={this.processCommand.bind(this, org)} />
+          </React.Fragment>
+        );
+
+        return (
+          <div className="org-component-editor">
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              {titleEditor}
+              <div className="flex-spacer" />
+              <UndoRedoToolbar
+                undoEnabled={canUndo}
+                redoEnabled={canRedo}
+                onUndo={onUndo.bind(this)}
+                onRedo={onRedo.bind(this)} />
+            </div>
+
+            {preconditions}
+
+            {model.contentType === t.OrganizationContentTypes.Sequence
+              || model.contentType === t.OrganizationContentTypes.Unit
+              || model.contentType === t.OrganizationContentTypes.Module
+              || model.contentType === t.OrganizationContentTypes.Section
+              ? (
+                <TabContainer labels={['Content', 'Analytics']}>
+                  <Tab>
+                    {contentWithActionBar}
+                  </Tab>
+                  <Tab>
+                    <Analytics course={this.props.course} model={model} />
+                  </Tab>
+                </TabContainer>
+              )
+              : contentWithActionBar
+            }
           </div>
         );
       },

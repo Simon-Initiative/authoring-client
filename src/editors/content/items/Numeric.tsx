@@ -8,7 +8,7 @@ import {
 import { Select, Button } from '../common/controls';
 import {
   TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import guid from 'utils/guid';
 import { NumericFeedback } from '../part/NumericFeedback';
 

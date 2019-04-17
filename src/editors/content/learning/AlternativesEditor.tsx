@@ -13,7 +13,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 import { Select, TextInput } from 'editors/content/common/controls';
-import { TabContainer } from 'editors/content/common/TabContainer';
+import { TabContainer } from 'components/common/TabContainer';
 import AlternativeEditor from 'editors/content/learning/AlternativeEditor';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';

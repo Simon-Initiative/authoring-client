@@ -9,7 +9,7 @@ import { Button } from '../common/controls';
 import guid from 'utils/guid';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 

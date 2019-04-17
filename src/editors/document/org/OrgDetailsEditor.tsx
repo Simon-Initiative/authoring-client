@@ -14,6 +14,7 @@ import guid from 'utils/guid';
 import './OrgDetailsEditor.scss';
 import { containsUnitsOnly } from './utils';
 import { ModalMessage } from 'utils/ModalMessage';
+import { TabContainer, Tab } from 'components/common/TabContainer';
 
 function buildMoreInfoAction(display, dismiss) {
   const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
@@ -178,26 +179,22 @@ export class OrgDetailsEditor
     this.setState({ currentTab: index });
   }
 
-  renderTabs() {
-
-    const tabs = ['Content', 'Details', 'Labels', 'Actions']
-      .map((title, index) => {
-        const active = index === this.state.currentTab ? 'active' : '';
-        const classes = 'nav-link ' + active;
-        return (
-          <a
-            key={title}
-            className={classes}
-            onClick={this.onTabClick.bind(this, index)}>
-            {title}
-          </a>
-        );
-      });
-
+  renderTabs(model: models.OrganizationModel) {
     return (
-      <ul className="nav nav-tabs">
-        {tabs}
-      </ul>
+      <TabContainer labels={['Content', 'Details', 'Labels', 'Actions']}>
+        <Tab>
+          {this.renderContent(model)}
+        </Tab>
+        <Tab>
+          {this.renderDetails(model)}
+        </Tab>
+        <Tab>
+          {this.renderLabels(model)}
+        </Tab>
+        <Tab>
+          {this.renderActions(model)}
+        </Tab>
+      </TabContainer>
     );
   }
 
@@ -228,19 +225,6 @@ export class OrgDetailsEditor
     );
   }
 
-  renderActiveTabContent(model: models.OrganizationModel) {
-    switch (this.state.currentTab) {
-      case TABS.Content:
-        return this.renderContent(model);
-      case TABS.Details:
-        return this.renderDetails(model);
-      case TABS.Labels:
-        return this.renderLabels(model);
-      case TABS.Actions:
-        return this.renderActions(model);
-    }
-  }
-
   render() {
 
     return this.props.model.caseOf({
@@ -251,12 +235,7 @@ export class OrgDetailsEditor
 
               <h3>Organization: {m.title}</h3>
 
-              {this.renderTabs()}
-
-              <div className="active-tab-content">
-                {this.renderActiveTabContent(m)}
-              </div>
-
+              {this.renderTabs(m)}
             </div>
           </div>);
       },

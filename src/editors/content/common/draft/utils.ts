@@ -47,7 +47,8 @@ export function getPosition() {
 export function hasSelection(ss: SelectionState) {
   if (ss.getAnchorKey() !== ss.getFocusKey()) {
     return true;
-  } if (ss.getAnchorOffset() !== ss.getFocusOffset()) {
+  }
+  if (ss.getAnchorOffset() !== ss.getFocusOffset()) {
     return true;
   }
   return false;
