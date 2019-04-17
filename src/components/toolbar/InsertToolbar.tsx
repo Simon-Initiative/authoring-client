@@ -44,7 +44,7 @@ const WOLFRAM_ICON = require('../../../assets/wolfram.png');
 
 const imgSize = 24;
 
-const TableCreation = require('editors/content/learning/table/TableCreation.bs').jsComponent;
+import SizePicker from 'editors/content/learning/table/SizePicker';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object, context?) => void;
@@ -262,7 +262,7 @@ class InsertToolbar
               label={'Table'}
               disabled={!editMode || !parentSupportsElementType('table')}>
               <ToolbarButtonMenuForm>
-                <TableCreation onTableCreate={onTableCreate.bind(this, onInsert)} />
+                <SizePicker onTableCreate={onTableCreate.bind(this, onInsert)} />
               </ToolbarButtonMenuForm>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
