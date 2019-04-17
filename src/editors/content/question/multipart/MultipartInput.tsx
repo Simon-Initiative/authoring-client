@@ -46,10 +46,6 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     this.setFirstItemActive();
   }
 
-  shouldComponentUpdate(nextProps) {
-    return true;
-  }
-
   /** Implement required abstract method to set className */
   getClassName() {
     return 'multipart-input';
