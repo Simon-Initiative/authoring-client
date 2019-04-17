@@ -65,7 +65,7 @@ export type AnalyticsByPart = {
 
 export type DataSet = {
   byResource: Map<string, AnalyticsByResource>,
-  byPart: Map<string, AnalyticsByPart>,
+  byResourcePart: Map<string, Map<string, AnalyticsByPart>>,
   bySkill: Map<string, AnalyticsBySkill>,
   status: DatasetStatus,
   dateCreated: string,

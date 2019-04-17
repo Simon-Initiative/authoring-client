@@ -11,9 +11,12 @@ const parseDatasetJson = (json: any): DataSet => ({
     (acc, val) => acc.set(val.resource, val),
     Map<string, AnalyticsByResource>(),
   ),
-  byPart: json.datasetBlob && json.datasetBlob.jsonObject.byPart.reduce(
-    (acc, val) => acc.set(val.id, val),
-    Map<string, AnalyticsByPart>(),
+  byResourcePart: json.datasetBlob && json.datasetBlob.jsonObject.byPart.reduce(
+    (acc, val) => acc.set(
+      val.resourceId,
+      (acc.get(val.resourceId) || Map<string, AnalyticsByPart>()).set(val.part, val),
+    ),
+    Map<string, Map<string, AnalyticsByPart>>(),
   ),
   bySkill: json.datasetBlob && json.datasetBlob.jsonObject.bySkill.reduce(
     (acc, val) => acc.set(val.skill, val),

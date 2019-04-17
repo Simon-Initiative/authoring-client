@@ -542,7 +542,7 @@ class Analytics
         </div>
         {analytics.dataSet.bind(analyticsDataSet =>
             Maybe.maybe(analyticsDataSet.status === DatasetStatus.DONE
-                && analyticsDataSet.byPart.get(part.id)).lift(
+                && analyticsDataSet.byResourcePart.getIn([question.assessmentId, part.id])).lift(
               partAnalytics => partAnalytics),
             ).caseOf({
               just: partAnalytics => this.renderPartStats(partAnalytics),
@@ -570,9 +570,10 @@ class Analytics
           {question.parts.size === 1 && (
             Maybe.maybe(question.parts.first()).bind(part =>
               analytics.dataSet.bind(analyticsDataSet =>
-                Maybe.maybe(analyticsDataSet.byPart.get(part.id)).lift(partAnalytics =>
-                  partAnalytics,
-                ),
+                Maybe.maybe(analyticsDataSet.byResourcePart.getIn([question.assessmentId, part.id]))
+                  .lift(partAnalytics =>
+                    partAnalytics,
+                  ),
               )).caseOf({
                 just: partAnalytics => this.renderPartStats(partAnalytics),
                 nothing: () => this.renderNoAnalyticsMsg(),
