@@ -6,7 +6,7 @@ import {
 } from '../question/Question';
 import {
   TabSection, TabSectionContent, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
 import { ConditionalBranchSelect } from '../../common/BranchSelect';

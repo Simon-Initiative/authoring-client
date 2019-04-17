@@ -48,4 +48,5 @@ export {
 
 export {
   fetchEdges,
+  fetchEdgesByIds,
 } from './persistence/edge';

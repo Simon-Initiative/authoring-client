@@ -13,7 +13,7 @@ import {
 import '../common.scss';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { Select } from 'editors/content/common/Select';
-import { TabOptionControl } from 'editors/content/common/TabContainer';
+import { TabOptionControl } from 'components/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { onEditScaleSize } from 'editors/content/feedback/utils';
 import { LikertScale } from 'data/content/feedback/likert_scale';

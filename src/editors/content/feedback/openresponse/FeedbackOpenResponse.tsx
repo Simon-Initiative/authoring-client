@@ -10,7 +10,7 @@ import { AbstractContentEditor, AbstractContentEditorProps, AbstractContentEdito
   from 'editors/content/common/AbstractContentEditor';
 import { getLabelForFeedbackQuestion } from 'data/models/feedback';
 import '../common.scss';
-import { TabOptionControl } from 'editors/content/common/TabContainer';
+import { TabOptionControl } from 'components/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';

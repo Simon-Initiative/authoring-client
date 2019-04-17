@@ -7,7 +7,7 @@ import {
 } from '../question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import { Button } from '../../common/controls';
 import { CombinationsMap } from 'types/combinations';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';

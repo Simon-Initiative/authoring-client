@@ -11,7 +11,7 @@ export type JssValue =
   | null
   | false;
 
-type JSSStyle = CSSProperties | JSSStyles | {
+export type JSSStyle = CSSProperties | JSSStyles | {
   [K in keyof CSSProperties]: JssValue | JSSStyle | ((props: any) => (JssValue | JSSStyle))
 } | {
   extend: JSSStyle[],

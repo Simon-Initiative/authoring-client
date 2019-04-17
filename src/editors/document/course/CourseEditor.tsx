@@ -18,6 +18,7 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { TextInput } from 'editors/content/common/controls';
 import { isNullOrUndefined } from 'util';
 import { PackageLicenseTypes } from 'data/content/learning/common';
+import { TabContainer, Tab } from 'components/common/TabContainer';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -552,94 +553,120 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         <div className="row info">
           <div className="col-md-12">
             <h2>Course Package</h2>
-            <div className="infoContain">
-              <div className="row">
-                <div className="col-3">Title</div>
-                <div className="col-9">
-                  <Title title={model.title}
-                    editMode={this.props.editMode}
-                    onBeginExternallEdit={() => true}
-                    requiresExternalEdit={false}
-                    isHoveredOver={true}
-                    onEdit={this.onTitleEdit}
-                    loading={false}
-                    disableRemoval={true}
-                    editWording="Edit"
-                    onRemove={() => false}
-                  >{model.title}</Title>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-3">Description</div>
-                <div className="col-9">
-                  <Title title={model.description}
-                    editMode={this.props.editMode}
-                    onBeginExternallEdit={() => true}
-                    requiresExternalEdit={false}
-                    isHoveredOver={true}
-                    onEdit={this.onDescriptionEdit}
-                    loading={false}
-                    disableRemoval={true}
-                    editWording="Edit"
-                    onRemove={() => false}
-                  >{model.description}</Title>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-3">Team members</div>
-                <div className="col-9">{this.renderDevelopers()}</div>
-              </div>
-              <div className="row">
-                <div className="col-3">Theme</div>
-                <div className="col-9">{this.renderThemes()}</div>
-              </div>
-              <div className="row">
-                <div className="col-3">Version</div>
-                <div className="col-9">{model.version}</div>
-              </div>
-              <div className="row">
-                <div className="col-3">License <HelpPopover activateOnClick>
-                  <div><img src={CC_LICENSES} />
-                    <br /><br />
-                    <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
-                      target="_blank">
-                      More information
-                    </a>
+            <TabContainer labels={['Details', 'Workflow', 'Analytics']}>
+              <Tab>
+                <div className="infoContain">
+                  <div className="row">
+                    <div className="col-3">Title</div>
+                    <div className="col-9">
+                      <Title title={model.title}
+                        editMode={this.props.editMode}
+                        onBeginExternallEdit={() => true}
+                        requiresExternalEdit={false}
+                        isHoveredOver={true}
+                        onEdit={this.onTitleEdit}
+                        loading={false}
+                        disableRemoval={true}
+                        editWording="Edit"
+                        onRemove={() => false}
+                      >{model.title}</Title>
+                    </div>
                   </div>
-                </HelpPopover>
+                  <div className="row">
+                    <div className="col-3">Description</div>
+                    <div className="col-9">
+                      <Title title={model.description}
+                        editMode={this.props.editMode}
+                        onBeginExternallEdit={() => true}
+                        requiresExternalEdit={false}
+                        isHoveredOver={true}
+                        onEdit={this.onDescriptionEdit}
+                        loading={false}
+                        disableRemoval={true}
+                        editWording="Edit"
+                        onRemove={() => false}
+                      >{model.description}</Title>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-3">Team members</div>
+                    <div className="col-9">{this.renderDevelopers()}</div>
+                  </div>
+                  <div className="row">
+                    <div className="col-3">Theme</div>
+                    <div className="col-9">{this.renderThemes()}</div>
+                  </div>
+                  <div className="row">
+                    <div className="col-3">Version</div>
+                    <div className="col-9">{model.version}</div>
+                  </div>
+                  <div className="row">
+                    <div className="col-3">License <HelpPopover activateOnClick>
+                      <div><img src={CC_LICENSES} />
+                        <br /><br />
+                        <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                          target="_blank">
+                          More information
+                        </a>
+                      </div>
+                    </HelpPopover>
+                    </div>
+                    <div className="col-9">{this.renderLicenseSelect()}</div>
+                  </div>
+                  <hr />
+                  <div className="row">
+                    <div className="col-3">Unique ID</div>
+                    <div className="col-9">{model.id}</div>
+                  </div>
+                  <div className="row">
+                    <div className="col-3">Package Location</div>
+                    <div className="col-9">{model.svnLocation}</div>
+                  </div>
+                  {/* <div className="row">
+                    <div className="col-3">Thumbnail<br /><br />
+                    </div>
+                    <div className="col-9">
+                      <img src={THUMBNAIL} className="img-fluid" alt=""></img>
+                    </div>
+                  </div> */}
+                  {adminRow}
                 </div>
-                <div className="col-9">{this.renderLicenseSelect()}</div>
-              </div>
-              <div className="row">
-                <div className="col-3">Status</div>
-                <div className="col-9">
-                  {this.renderStatus()}
+              </Tab>
+              <Tab>
+                <div className="infoContain">
+                  <div className="row">
+                    <div className="col-3">Status</div>
+                    <div className="col-9">
+                      {this.renderStatus()}
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-3">Actions</div>
+                    <div className="col-9">
+                      {this.renderActions()}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="row">
-                <div className="col-3">Actions</div>
-                <div className="col-9">
-                  {this.renderActions()}
+              </Tab>
+              <Tab>
+                <div className="infoContain">
+                  <div className="row">
+                    <div className="col-9">
+                      No datasets have been created for this course package.
+                      To see statistics about content effectiveness in the Course Author,
+                      you must first create a dataset.
+                    </div>
+                    <div className="col-3">
+                      <Button
+                        editMode={this.props.editMode}
+                        onClick={() => console.log('NOT IMPLEMENTED')}>
+                        Create Dataset
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <hr />
-              <div className="row">
-                <div className="col-3">Unique ID</div>
-                <div className="col-9">{model.id}</div>
-              </div>
-              <div className="row">
-                <div className="col-3">Package Location</div>
-                <div className="col-9">{model.svnLocation}</div>
-              </div>
-              {/* <div className="row">
-                <div className="col-3">Thumbnail<br /><br />
-                </div>
-                <div className="col-9">
-                  <img src={THUMBNAIL} className="img-fluid" alt=""></img>
-                </div>
-              </div> */}
-              {adminRow}
-            </div>
+              </Tab>
+            </TabContainer>
           </div>
         </div>
       </div>

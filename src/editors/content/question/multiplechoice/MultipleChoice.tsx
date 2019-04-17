@@ -8,7 +8,7 @@ import {
 } from 'editors/content/question/question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 

@@ -15,7 +15,7 @@ import guid from 'utils/guid';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { TabOptionControl } from 'editors/content/common/TabContainer';
+import { TabOptionControl } from 'components/common/TabContainer';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface Props extends AbstractContentEditorProps<FeedbackMultipleChoice> {

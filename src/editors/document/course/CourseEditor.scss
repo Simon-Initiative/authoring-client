@@ -44,12 +44,19 @@
     }
 
     .infoContain {
+        margin-top: 20px;
         border-radius: 2px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 
         .row {
             margin: 0;
         }
+
+    }
+
+    .course-status {
+      display: flex;
+      justify-content: center;
     }
 
     .info {
@@ -157,12 +164,13 @@
                     margin-top: 0.25rem;
                     font-weight: 400;
                     font-size: 0.93rem;
-                    color: rgba(0, 0, 0, 0.87);
                 }
 
                 .step.active, .step.active:after {
                     cursor: auto;
                     background: #f3f4f5;
+                    border: 1px solid lighten($primary, 10%);
+                    border-radius: 4px;
                 }
 
                 .step.disabled, .step.disabled:after {

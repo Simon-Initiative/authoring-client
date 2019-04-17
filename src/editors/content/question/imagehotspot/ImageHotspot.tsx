@@ -6,7 +6,7 @@ import {
 } from '../question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { withStyles, classNames } from 'styles/jss';

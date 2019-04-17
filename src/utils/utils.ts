@@ -1,3 +1,5 @@
+import { List, OrderedMap } from 'immutable';
+
 export function pipe(...args) {
   return input => args.reduce((acc, f) => f(acc), input);
 }
@@ -80,4 +82,19 @@ function caseOrDefault<T>(key: string):
 export function caseOf<T>(key: string): (cases: Cases<T>) => (defaultCase: (T | Fn<T>)) => T {
   return (cases: Cases<T>) => (defaultCase: T | Fn<T>) =>
     executeIfFunction<T>(caseOrDefault<T>(key)(cases)(defaultCase));
+}
+
+/**
+ * Removes duplicate items from an array
+ * @param arr Array to remove duplicates
+ * @param keyFn Optional function to map unique keys when performing deduplication on items
+ */
+export function dedupeArray<T>(arr: T[], keyFn?: (item: T) => string | number): T[] {
+  return arr
+    .map(item => ({
+      key: keyFn ? keyFn(item) : item,
+      val: item,
+    }))
+    .reduce((acc, { key, val }) => acc.set(key, val), OrderedMap<string | number | T, T>())
+    .valueSeq().toArray();
 }
