@@ -25,6 +25,7 @@ import * as chroma from 'chroma-js';
 import { ContentElements } from 'data/content/common/elements';
 import { map } from 'data/utils/map';
 import { EntityTypes } from 'data/content/learning/common';
+import { DatasetStatus } from 'types/analytics/dataset';
 
 const getOrderedParts = (body: ContentElements, parts: List<contentTypes.Part>) => {
   return body.content.reduce(
@@ -540,7 +541,8 @@ class Analytics
           Part {part.index + 1}
         </div>
         {analytics.dataSet.bind(analyticsDataSet =>
-            Maybe.maybe(analyticsDataSet.byPart.get(part.id)).lift(
+            Maybe.maybe(analyticsDataSet.status === DatasetStatus.DONE
+                && analyticsDataSet.byPart.get(part.id)).lift(
               partAnalytics => partAnalytics),
             ).caseOf({
               just: partAnalytics => this.renderPartStats(partAnalytics),

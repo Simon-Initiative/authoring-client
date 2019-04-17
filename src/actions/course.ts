@@ -6,9 +6,7 @@ import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
-import { Dispatch } from 'redux';
-import { State } from 'reducers';
-import { requestDataSet } from './analytics';
+import { requestDataSet, dataSetReceived } from './analytics';
 
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -45,9 +43,9 @@ export const courseChanged = (model: CourseModel) => (dispatch) => {
   });
 
   // load course analytics
-  // TODO: CHANGE TO ACTUAL IMPLEMENTATION
-  console.log('requestDataSet');
-  dispatch(requestDataSet('mock_data'));
+  if (model.activeDatasetGuid) {
+    dispatch(requestDataSet(model.activeDatasetGuid));
+  }
 
 };
 

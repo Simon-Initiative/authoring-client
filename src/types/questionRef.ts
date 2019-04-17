@@ -59,7 +59,7 @@ const getParts = (pathItem: SkillPathElement) => pathItem.parts
   ? List<Part>(pathItem.parts.map(p => Part.fromPersistence(p, guid(), () => {})))
   : List<Part>();
 
-const getBody = (pathItem: SkillPathElement) => ContentElements.fromPersistence(
+const getBody = (pathItem: SkillPathElement) => pathItem['body'] && ContentElements.fromPersistence(
   pathItem['body'], guid(), QUESTION_BODY_ELEMENTS, null, () => {});
 
 export const getQuestionRefFromPathInfo = (

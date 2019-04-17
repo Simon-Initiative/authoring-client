@@ -1,5 +1,11 @@
 import { Map } from 'immutable';
 
+export enum DatasetStatus {
+  PROCESSING,
+  DONE,
+  FAILED,
+}
+
 export type AnalyticsByResource = {
   resource: string,
   title: string,
@@ -61,4 +67,7 @@ export type DataSet = {
   byResource: Map<string, AnalyticsByResource>,
   byPart: Map<string, AnalyticsByPart>,
   bySkill: Map<string, AnalyticsBySkill>,
+  status: DatasetStatus,
+  dateCreated: string,
+  dateCompleted: string,
 };

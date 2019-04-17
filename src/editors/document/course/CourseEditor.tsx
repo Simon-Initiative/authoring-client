@@ -19,18 +19,22 @@ import { TextInput } from 'editors/content/common/controls';
 import { isNullOrUndefined } from 'util';
 import { PackageLicenseTypes } from 'data/content/learning/common';
 import { TabContainer, Tab } from 'components/common/TabContainer';
+import { AnalyticsState } from 'reducers/analytics';
+import { LoadingSpinner } from 'components/common/LoadingSpinner';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
 
 export interface CourseEditorProps {
   model: models.CourseModel;
+  editMode: boolean;
+  analytics: AnalyticsState;
   courseChanged: (m: models.CourseModel) => any;
   viewAllCourses: () => any;
-  editMode: boolean;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
+  onCreateDataset: () => void;
 }
 
 type ThemeSelection = {
@@ -492,7 +496,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   render() {
-    const { model } = this.props;
+    const { model, analytics, onCreateDataset } = this.props;
 
     const isAdmin = hasRole('admin');
 
@@ -652,14 +656,49 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 <div className="infoContain">
                   <div className="row">
                     <div className="col-9">
-                      No datasets have been created for this course package.
-                      To see statistics about content effectiveness in the Course Author,
-                      you must first create a dataset.
+                      {analytics.requestedDataSetId.caseOf({
+                        just: () => (
+                          <React.Fragment>
+                            <LoadingSpinner>
+                              Please wait while your new dataset is processed,
+                              this might take a while.
+                              <br/>
+                              <br/>
+                              You may continue to use the editor
+                              while this operation is in progress.
+                            </LoadingSpinner>
+                          </React.Fragment>
+                        ),
+                        nothing: () => analytics.dataSet.caseOf({
+                          just: dataSet => (
+                            <React.Fragment>
+                              Analytics displayed are from the latest dataset created
+                              on <b>{dataSet.dateCreated}</b>.
+                              To get the most recent student data for analytics, create a new
+                              dataset.
+                              <br />
+                              <br />
+                              <b>Notice:</b> Dataset creation may take a while. You may continue
+                              to use the editor while the operation is in progress.
+                            </React.Fragment>
+                          ),
+                          nothing: () => (
+                            <React.Fragment>
+                              No datasets have been created for this course package.
+                              To see statistics about content effectiveness in the Course Author,
+                              you must first create a dataset.
+                            </React.Fragment>
+                          ),
+                        }),
+                      })}
                     </div>
                     <div className="col-3">
                       <Button
-                        editMode={this.props.editMode}
-                        onClick={() => console.log('NOT IMPLEMENTED')}>
+                        editMode={this.props.editMode && analytics.requestedDataSetId.caseOf({
+                          just: () => false,
+                          nothing: () => true,
+                        })}
+                        onClick={() => onCreateDataset()}>
                         Create Dataset
                       </Button>
                     </div>

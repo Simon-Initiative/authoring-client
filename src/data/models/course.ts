@@ -36,6 +36,7 @@ export type CourseModelParams = {
   options?: string,
   icon?: contentTypes.WebContent,
   theme?: string,
+  activeDatasetGuid?: string;
   resources?: Immutable.OrderedMap<string, contentTypes.Resource>,
   resourcesById?: Immutable.OrderedMap<string, contentTypes.Resource>,
   webContents?: Immutable.OrderedMap<string, contentTypes.WebContent>,
@@ -60,6 +61,7 @@ const defaultCourseModel = {
   options: '',
   icon: new contentTypes.WebContent(),
   theme: '',
+  activeDatasetGuid: null,
   resources: Immutable.OrderedMap<string, contentTypes.Resource>(),
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>(),
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>(),
@@ -106,6 +108,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   options: string;
   icon: contentTypes.WebContent;
   theme: string;
+  activeDatasetGuid: string;
   resources: Immutable.OrderedMap<string, contentTypes.Resource>;
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>;
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>;
@@ -166,6 +169,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       options: JSON.stringify(c.options),
       icon: new contentTypes.WebContent(),
       theme: c.theme,
+      activeDatasetGuid: c.activeDatasetGuid,
       metadata,
       resources,
       webContents,

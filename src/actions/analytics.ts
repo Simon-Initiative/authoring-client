@@ -1,8 +1,7 @@
-import { fetchDataSet } from 'data/persistence';
+import { fetchDataSet, createDataSet } from 'data/persistence';
 import { Maybe } from 'tsmonad';
 
-import { MOCK_DATA_PRINCIPLES_OF_COMP } from 'types/analytics/mock_datasets';
-import { DataSet } from 'types/analytics/dataset';
+import { DataSet, DatasetStatus } from 'types/analytics/dataset';
 import { Dispatch } from 'redux';
 import { State } from 'reducers';
 
@@ -28,7 +27,7 @@ export type DATASET_RECEIVED = typeof DATASET_RECEIVED;
 export type DataSetReceivedAction = {
   type: DATASET_RECEIVED,
   dataSetId: string,
-  dataSet: Object,
+  dataSet: DataSet,
 };
 
 export const dataSetReceived = (
@@ -40,19 +39,24 @@ export const dataSetReceived = (
   dataSet,
 });
 
+export const createNewDataSet = () =>
+  async (dispatch: Dispatch<any>, getState: () => State) => {
+    const packageId = getState().course.guid;
+    const { guid } = await createDataSet(packageId);
+    dispatch(requestDataSet(guid));
+  };
+
 
 export const requestDataSet = (dataSetId: string) =>
   (dispatch: Dispatch, getState: () => State) => {
     dispatch(requestedDataSet(dataSetId));
-    // poll(dataSetId, dispatch, getState);
-
-    // TODO: REPLACE WITH ACTUAL IMPLEMENTAION
-    dispatch(dataSetReceived(dataSetId, MOCK_DATA_PRINCIPLES_OF_COMP));
+    poll(dataSetId, dispatch, getState);
   };
 
-function isAvailable(dataSet) {
+function isAvailable(dataSet: DataSet) {
   // Replace this with an actual implementation
-  return false;
+  return dataSet.status === DatasetStatus.DONE
+    || dataSet.status === DatasetStatus.FAILED;
 }
 
 const TIME_TO_WAIT = 30 * 1000;
@@ -69,10 +73,8 @@ function poll(dataSetId: string, dispatch, getState) {
   fetchDataSet(dataSetId).then((result) => {
 
     if (isRequestStillActive(dataSetId, getState)) {
-      if (isAvailable(result)) {
-        // verify result is a valid dataset or convert result to valid dataset
-        dispatch(dataSetReceived(dataSetId, result as DataSet));
-      } else {
+      dispatch(dataSetReceived(dataSetId, result));
+      if (result.status === DatasetStatus.PROCESSING) {
         setTimeout(
           () => {
             if (isRequestStillActive(dataSetId, getState)) {

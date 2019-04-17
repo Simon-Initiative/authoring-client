@@ -4,9 +4,11 @@ import { CourseModel } from 'data/models';
 import { courseChanged } from 'actions/course';
 import * as viewActions from 'actions/view';
 import { modalActions } from 'actions/modal';
+import { createNewDataSet } from 'actions/analytics';
+import { AnalyticsState } from 'reducers/analytics';
 
 interface StateProps {
-
+  analytics: AnalyticsState;
 }
 
 interface DispatchProps {
@@ -14,6 +16,7 @@ interface DispatchProps {
   viewAllCourses: () => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
+  onCreateDataset: () => void;
 }
 
 interface OwnProps {
@@ -22,7 +25,9 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
-  return {};
+  return {
+    analytics: state.analytics,
+  };
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
@@ -33,6 +38,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(viewActions.viewAllCourses()),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
+    onCreateDataset: () => dispatch(createNewDataSet()),
   };
 };
 

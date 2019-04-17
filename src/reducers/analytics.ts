@@ -1,3 +1,4 @@
+import { Record } from 'immutable';
 import {
   RequestedDataSetAction,
   REQUESTED_DATASET,
@@ -9,20 +10,35 @@ import {
 } from 'actions/course';
 import { OtherAction } from './utils';
 import { Maybe } from 'tsmonad';
-import { DataSet } from 'types/analytics/dataset';
+import { DataSet, DatasetStatus } from 'types/analytics/dataset';
 
 export type ActionTypes = RequestedDataSetAction
   | DataSetReceivedAction | CourseChangedAction | OtherAction;
 
-export type AnalyticsState = {
+export type AnalyticsStateParams = {
   requestedDataSetId: Maybe<string>,
   dataSet: Maybe<DataSet>,
 };
 
-const initialState: AnalyticsState = {
-  requestedDataSetId: Maybe.nothing(),
-  dataSet: Maybe.nothing(),
-};
+const defaults = (params: Partial<AnalyticsStateParams> = {}) => ({
+  requestedDataSetId: params.requestedDataSetId || Maybe.nothing<string>(),
+  dataSet: params.dataSet || Maybe.nothing<DataSet>(),
+});
+
+export class AnalyticsState extends Record(defaults()) {
+  requestedDataSetId: Maybe<string>;
+  dataSet: Maybe<DataSet>;
+
+  constructor(params?: Partial<AnalyticsStateParams>) {
+    super(defaults(params));
+  }
+
+  with(values: Partial<AnalyticsStateParams>) {
+    return this.merge(values) as this;
+  }
+}
+
+const initialState = new AnalyticsState();
 
 export const analytics = (
   state: AnalyticsState = initialState,
@@ -30,19 +46,16 @@ export const analytics = (
 ): AnalyticsState => {
   switch (action.type) {
     case DATASET_RECEIVED:
-      return Object.assign(
-        {},
-        state,
-        {
-          requestedDataSetId: Maybe.nothing(),
-          dataSetId: action.dataSetId,
-          dataSet: Maybe.just(action.dataSet),
-        });
+      return state.with({
+        requestedDataSetId: action.dataSet.status === DatasetStatus.PROCESSING
+          ? state.requestedDataSetId
+          : Maybe.nothing(),
+        dataSet: Maybe.just(action.dataSet),
+      });
     case REQUESTED_DATASET:
-      return Object.assign(
-        {},
-        state,
-        { requestedDataSetId: Maybe.just(action.dataSetId) });
+      return state.with({
+        requestedDataSetId: Maybe.just(action.dataSetId),
+      });
     case COURSE_CHANGED:
       return initialState;
     default:
