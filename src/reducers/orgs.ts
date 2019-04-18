@@ -56,8 +56,7 @@ function processChange(
 
   const undoStack = state.undoStack.push(action.cr);
   const redoStack = Immutable.Stack<org.OrgChangeRequest>();
-  const requestInFlight = false;
-  return Object.assign({}, state, { undoStack, redoStack, requestInFlight });
+  return Object.assign({}, state, { undoStack, redoStack });
 }
 
 
@@ -66,8 +65,7 @@ function processUndo(
 
   const undoStack = state.undoStack.pop();
   const redoStack = state.redoStack.push(action.cr);
-  const requestInFlight = false;
-  return Object.assign({}, state, { undoStack, redoStack, requestInFlight });
+  return Object.assign({}, state, { undoStack, redoStack });
 }
 
 function processRedo(
@@ -75,8 +73,7 @@ function processRedo(
 
   const redoStack = state.redoStack.pop();
   const undoStack = state.undoStack.push(action.cr);
-  const requestInFlight = false;
-  return Object.assign({}, state, { redoStack, undoStack, requestInFlight });
+  return Object.assign({}, state, { redoStack, undoStack });
 }
 
 
@@ -121,9 +118,9 @@ export const orgs = (
         {}, state, { activeOrg: Maybe.just(action.document), undoStack, redoStack, placements });
     }
     case ORG_CHANGE_FAILED:
-      return Object.assign({}, state, { lastChangeSucceeded: false });
+      return Object.assign({}, state, { lastChangeSucceeded: false, requestInFlight: false });
     case ORG_CHANGE_SUCCEEDED:
-      return Object.assign({}, state, { lastChangeSucceeded: true });
+      return Object.assign({}, state, { lastChangeSucceeded: true, requestInFlight: false });
     default:
       return state;
   }

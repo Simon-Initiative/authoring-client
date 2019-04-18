@@ -10,7 +10,6 @@ import * as Messages from 'types/messages';
 import { modalActions } from 'actions/modal';
 import { Maybe } from 'tsmonad';
 import { change, undo, redo } from 'actions/orgs';
-import { reduceSkillSummativeQuestionRefs } from 'components/objectives/ObjectiveSkillView';
 
 interface StateProps {
   skills: Map<string, t.Skill>;
@@ -43,6 +42,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const { skills, objectives, course, orgs } = state;
   const org = orgs.activeOrg.map(v => (v.model as models.OrganizationModel));
   const { undoStack, redoStack, requestInFlight } = orgs;
+
   const canUndo = undoStack.size > 0 && !requestInFlight;
   const canRedo = redoStack.size > 0 && !requestInFlight;
   const placements = orgs.placements;

@@ -301,7 +301,6 @@ export function undo() {
     const cr = undoStack.peek();
 
     if (cr) {
-      dispatch(requestInitiated());
       dispatch(change(cr, ChangeType.Undo));
     }
 
@@ -315,7 +314,6 @@ export function redo() {
     const cr = redoStack.peek();
 
     if (cr) {
-      dispatch(requestInitiated());
       dispatch(change(cr, ChangeType.Redo));
     }
   };
