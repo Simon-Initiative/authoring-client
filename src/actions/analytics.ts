@@ -1,9 +1,11 @@
+import { Map } from 'immutable';
 import { fetchDataSet, createDataSet } from 'data/persistence';
 import { Maybe } from 'tsmonad';
 
 import { DataSet, DatasetStatus } from 'types/analytics/dataset';
 import { Dispatch } from 'redux';
 import { State } from 'reducers';
+import { dateFormatted } from 'utils/date';
 
 export const REQUESTED_DATASET = 'analytics/REQUESTED_DATASET';
 export type REQUESTED_DATASET = typeof REQUESTED_DATASET;
@@ -71,7 +73,6 @@ function isRequestStillActive(original: string, getState): boolean {
 
 function poll(dataSetId: string, dispatch, getState) {
   fetchDataSet(dataSetId).then((result) => {
-
     if (isRequestStillActive(dataSetId, getState)) {
       dispatch(dataSetReceived(dataSetId, result));
       if (result.status === DatasetStatus.PROCESSING) {
@@ -84,5 +85,15 @@ function poll(dataSetId: string, dispatch, getState) {
           TIME_TO_WAIT);
       }
     }
+  })
+  .catch((err) => {
+    dispatch(dataSetReceived(dataSetId, {
+      byResource: Map(),
+      byResourcePart: Map(),
+      bySkill: Map(),
+      status: DatasetStatus.FAILED,
+      dateCreated: dateFormatted(new Date()),
+      dateCompleted: dateFormatted(new Date()),
+    }));
   });
 }

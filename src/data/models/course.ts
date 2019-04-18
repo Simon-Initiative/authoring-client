@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../contentTypes';
 import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
-import { parseDate } from 'data/content/resource';
+import { parseDate } from 'utils/date';
 import { DatasetStatus } from 'types/analytics/dataset';
 
 // Must match DeployStage enum values in ContentService

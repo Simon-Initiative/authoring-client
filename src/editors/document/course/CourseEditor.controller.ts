@@ -6,8 +6,10 @@ import * as viewActions from 'actions/view';
 import { modalActions } from 'actions/modal';
 import { createNewDataSet } from 'actions/analytics';
 import { AnalyticsState } from 'reducers/analytics';
+import { UserState } from 'reducers/user';
 
 interface StateProps {
+  user: UserState;
   analytics: AnalyticsState;
 }
 
@@ -26,6 +28,7 @@ interface OwnProps {
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   return {
+    user: state.user,
     analytics: state.analytics,
   };
 };

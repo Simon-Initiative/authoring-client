@@ -21,7 +21,6 @@ export function buildReportProblemAction(
   };
 }
 
-
 export function buildConflictMessage() {
 
   const content = new Messages.TitledContent().with({
