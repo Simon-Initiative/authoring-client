@@ -635,9 +635,9 @@ class Analytics
               {!isExpanded && this.renderAggregateObjectiveDetails(objectiveRef)}
             </div>
           </div>
-        </div>
-        {isExpanded && this.renderObjectiveDetails(objectiveRef, organization)}
-      </div>
+        </div>;
+      {isExpanded && this.renderObjectiveDetails(objectiveRef, organization)}
+      </div >
     );
   }
 
