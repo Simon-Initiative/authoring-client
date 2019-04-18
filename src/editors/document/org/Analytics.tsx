@@ -446,11 +446,11 @@ class Analytics
                 <b>Average help needed:</b>
                 <div className={classNames([classes.stat, classes.avgHelpNeeded])}>
                   <i className="fa fa-life-ring" />
-                  {convert.toPercentage(partAnalytics.avgHelpNeeded)}
+                  {Number.parseFloat(partAnalytics.avgHelpNeeded).toFixed(2)}
                 </div>
               </div>
               <div>
-                The percentage of students who requested one or more hints for
+                The ratio of students who requested one or more hints for
                 this question.
               </div>
             </div>
@@ -461,7 +461,7 @@ class Analytics
           arrowSize="small">
           <div className={classNames([classes.stat, classes.avgHelpNeeded])}>
             <i className="fa fa-life-ring" />
-            {convert.toPercentage(partAnalytics.avgHelpNeeded)}
+            {Number.parseFloat(partAnalytics.avgHelpNeeded).toFixed(2)}
           </div>
         </Tooltip>
 
