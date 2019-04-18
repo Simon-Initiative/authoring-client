@@ -125,7 +125,7 @@ export const convert = {
   /**
    * Converts a decimal number to a percentage
    */
-  toPercentage: (value: number) => (value * 100) + '%',
+  toPercentage: (value: number) => Math.round(value * 100) + '%',
 };
 
 export const stringFormat = {
