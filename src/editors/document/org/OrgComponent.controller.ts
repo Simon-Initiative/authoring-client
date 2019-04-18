@@ -19,6 +19,7 @@ interface StateProps {
   placements: org.Placements;
   canUndo: boolean;
   canRedo: boolean;
+  editMode: boolean;
 }
 
 interface DispatchProps {
@@ -43,8 +44,11 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const org = orgs.activeOrg.map(v => (v.model as models.OrganizationModel));
   const { undoStack, redoStack, requestInFlight } = orgs;
 
+  // If a request is in flight, do not allow editing
+  const editMode = ownProps.editMode && !requestInFlight;
   const canUndo = undoStack.size > 0 && !requestInFlight;
   const canRedo = redoStack.size > 0 && !requestInFlight;
+
   const placements = orgs.placements;
 
   return {
@@ -55,6 +59,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     canUndo,
     canRedo,
     placements,
+    editMode,
   };
 };
 
