@@ -17,6 +17,18 @@ enum ChangeType {
 }
 
 
+export type REQUEST_INITIATED = 'orgs/REQUEST_INITIATED';
+export const REQUEST_INITIATED: REQUEST_INITIATED = 'orgs/REQUEST_INITIATED';
+
+export type RequestInitiatedAction = {
+  type: REQUEST_INITIATED,
+};
+
+export const requestInitiated = (): RequestInitiatedAction => ({
+  type: REQUEST_INITIATED,
+});
+
+
 export type CHANGE_PROCESSED = 'orgs/CHANGE_PROCESSED';
 export const CHANGE_PROCESSED: CHANGE_PROCESSED = 'orgs/CHANGE_PROCESSED';
 
@@ -205,6 +217,7 @@ function applyChange(
         previousRevisionGuid: m.resource.lastRevisionGuid,
         lastRevisionGuid: nextRevision,
       });
+      dispatch(modelUpdated(model.with({ resource })));
 
       if (changeType === ChangeType.Undo) {
         dispatch(changeUndone(ac.undo));
@@ -214,7 +227,6 @@ function applyChange(
       } else {
         dispatch(changeProcessed(ac.undo));
       }
-      dispatch(modelUpdated(model.with({ resource })));
 
       persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
         .then(() => {
@@ -274,6 +286,7 @@ export function change(change: org.OrgChangeRequest, changeType = ChangeType.Nor
 
     getState().orgs.activeOrg.lift((doc) => {
       const courseId = getState().course.guid;
+      dispatch(requestInitiated());
       applyChange(dispatch, doc, courseId, change, 1, changeType);
     });
   };
@@ -288,6 +301,7 @@ export function undo() {
     const cr = undoStack.peek();
 
     if (cr) {
+      dispatch(requestInitiated());
       dispatch(change(cr, ChangeType.Undo));
     }
 
@@ -301,6 +315,7 @@ export function redo() {
     const cr = redoStack.peek();
 
     if (cr) {
+      dispatch(requestInitiated());
       dispatch(change(cr, ChangeType.Redo));
     }
   };
