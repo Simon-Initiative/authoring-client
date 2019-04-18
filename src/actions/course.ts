@@ -43,8 +43,8 @@ export const courseChanged = (model: CourseModel) => (dispatch) => {
   });
 
   // load course analytics
-  if (model.activeDatasetGuid) {
-    dispatch(requestDataSet(model.activeDatasetGuid));
+  if (model.activeDataset) {
+    dispatch(requestDataSet(model.activeDataset.guid));
   }
 
 };

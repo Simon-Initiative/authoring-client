@@ -3,6 +3,7 @@ import * as contentTypes from '../contentTypes';
 import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
 import { parseDate } from 'data/content/resource';
+import { DatasetStatus } from 'types/analytics/dataset';
 
 // Must match DeployStage enum values in ContentService
 export enum DeployStage {
@@ -36,7 +37,12 @@ export type CourseModelParams = {
   options?: string,
   icon?: contentTypes.WebContent,
   theme?: string,
-  activeDatasetGuid?: string;
+  activeDataset?: {
+    datasetStatus: DatasetStatus;
+    dateCompleted: string;
+    dateCreated: string;
+    guid: string;
+  };
   resources?: Immutable.OrderedMap<string, contentTypes.Resource>,
   resourcesById?: Immutable.OrderedMap<string, contentTypes.Resource>,
   webContents?: Immutable.OrderedMap<string, contentTypes.WebContent>,
@@ -61,7 +67,7 @@ const defaultCourseModel = {
   options: '',
   icon: new contentTypes.WebContent(),
   theme: '',
-  activeDatasetGuid: null,
+  activeDataset: null,
   resources: Immutable.OrderedMap<string, contentTypes.Resource>(),
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>(),
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>(),
@@ -108,7 +114,12 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   options: string;
   icon: contentTypes.WebContent;
   theme: string;
-  activeDatasetGuid: string;
+  activeDataset?: {
+    datasetStatus: DatasetStatus;
+    dateCompleted: string;
+    dateCreated: string;
+    guid: string;
+  };
   resources: Immutable.OrderedMap<string, contentTypes.Resource>;
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>;
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>;
@@ -169,7 +180,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       options: JSON.stringify(c.options),
       icon: new contentTypes.WebContent(),
       theme: c.theme,
-      activeDatasetGuid: c.activeDatasetGuid,
+      activeDataset: c.activeDataset,
       metadata,
       resources,
       webContents,

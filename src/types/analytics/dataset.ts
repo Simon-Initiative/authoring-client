@@ -1,9 +1,9 @@
 import { Map } from 'immutable';
 
 export enum DatasetStatus {
-  PROCESSING,
-  DONE,
-  FAILED,
+  PROCESSING = 'PROCESSING',
+  DONE = 'DONE',
+  FAILED = 'FAILED',
 }
 
 export type AnalyticsByResource = {
