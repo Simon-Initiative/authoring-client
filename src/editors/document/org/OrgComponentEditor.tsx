@@ -224,8 +224,7 @@ export class OrgComponentEditor
 
             {preconditions}
 
-            {model.contentType === t.OrganizationContentTypes.Sequence
-              || model.contentType === t.OrganizationContentTypes.Unit
+            {model.contentType === t.OrganizationContentTypes.Unit
               || model.contentType === t.OrganizationContentTypes.Module
               || model.contentType === t.OrganizationContentTypes.Section
               ? (
