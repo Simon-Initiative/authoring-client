@@ -34,7 +34,8 @@ const getOrderedParts = (body: ContentElements, parts: List<contentTypes.Part>) 
       map((ce) => {
         if (ce.contentType === 'ContiguousText') {
           (ce as contentTypes.ContiguousText).getEntitiesByType(EntityTypes.input_ref)
-            .forEach(entityInfo => updatedAcc = updatedAcc.push(entityInfo.entity.data['@input']));
+            .forEach(entityInfo => updatedAcc = updatedAcc.push(
+              entityInfo.entity.getData()['@input']));
         }
         return ce;
       }, contentElement);
