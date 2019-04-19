@@ -55,12 +55,6 @@ export const requestDataSet = (dataSetId: string) =>
     poll(dataSetId, dispatch, getState);
   };
 
-function isAvailable(dataSet: DataSet) {
-  // Replace this with an actual implementation
-  return dataSet.status === DatasetStatus.DONE
-    || dataSet.status === DatasetStatus.FAILED;
-}
-
 const TIME_TO_WAIT = 30 * 1000;
 
 function isRequestStillActive(original: string, getState): boolean {
