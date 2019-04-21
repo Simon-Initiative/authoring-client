@@ -42,16 +42,17 @@ interface OwnProps {
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   const { orgs, course, skills, objectives } = state;
+  const { requestInFlight } = orgs;
 
   return {
     skills,
     objectives,
     model: orgs.activeOrg.map(d => d.model as models.OrganizationModel),
     course,
-    editMode: course.editable,
+    editMode: course.editable && !requestInFlight,
     placements: orgs.placements,
-    canUndo: orgs.undoStack.size > 0,
-    canRedo: orgs.redoStack.size > 0,
+    canUndo: orgs.undoStack.size > 0 && !requestInFlight,
+    canRedo: orgs.redoStack.size > 0 && !requestInFlight,
   };
 };
 
