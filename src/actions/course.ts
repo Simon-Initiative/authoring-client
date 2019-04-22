@@ -6,8 +6,7 @@ import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
-import { requestDataSet, dataSetReceived } from './analytics';
-
+import { requestDataSet } from './analytics';
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
 export const COURSE_CHANGED: COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -41,14 +40,7 @@ export const courseChanged = (model: CourseModel) => (dispatch) => {
     model,
     type: COURSE_CHANGED,
   });
-
-  // load course analytics
-  if (model.activeDataset) {
-    dispatch(requestDataSet(model.activeDataset.guid));
-  }
-
 };
-
 
 function createPlaceholderPage(courseId: string) {
 
@@ -88,6 +80,8 @@ export function loadCourse(courseId: string) {
           dispatch(courseChanged(document.model));
           dispatch(fetchSkills(courseId));
           dispatch(fetchObjectives(courseId));
+          dispatch(requestDataSet(courseModel.activeDataset.guid));
+
           return document.model;
         }
 
@@ -95,6 +89,3 @@ export function loadCourse(courseId: string) {
       .catch(err => console.error(err));
   };
 }
-
-
-
