@@ -7,7 +7,7 @@ import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import './CoursesViewSearchable.scss';
-import { LoadingSpinner } from 'components/common/LoadingSpinner';
+import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
@@ -157,7 +157,7 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
 const Waiting = (): JSX.Element => {
   return (
     <div className="lead" style={{ width: '175px' }} >
-      <LoadingSpinner message="Loading courses..." />
+      <LoadingSpinner size={LoadingSpinnerSize.Small} message="Loading courses..." />
     </div>
   );
 };

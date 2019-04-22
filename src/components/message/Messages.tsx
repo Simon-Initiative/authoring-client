@@ -66,7 +66,7 @@ export class Messages
               nothing: () => false,
             });
 
-            const isPackageRoute = router.resourceId.caseOf({
+            const isPackageDetailsRoute = router.resourceId.caseOf({
               just: resourceId => router.courseId.caseOf({
                 just: courseId => resourceId === courseId,
                 nothing: () => false,
@@ -74,13 +74,21 @@ export class Messages
               nothing: () => false,
             });
 
+            const isCoursePackageRoute = router.courseId.caseOf({
+              just: () => true,
+              nothing: () => false,
+            });
+
             switch (m.scope) {
               case Scope.Organization:
                 return isOrganizationRoute;
-              case Scope.Package:
-                return isPackageRoute;
+              case Scope.PackageDetails:
+                return isPackageDetailsRoute;
               case Scope.Resource:
-                return !isOrganizationRoute && !isPackageRoute && router.route === ROUTE.RESOURCE;
+                return !isOrganizationRoute && !isPackageDetailsRoute
+                  && router.route === ROUTE.RESOURCE;
+              case Scope.CoursePackage:
+                return isCoursePackageRoute;
               case Scope.Application:
               default:
                 return true;

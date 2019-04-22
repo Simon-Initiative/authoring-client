@@ -22,7 +22,7 @@ const parseDatasetJson = (json: any): DataSet => ({
     (acc, val) => acc.set(val.skill, val),
     Map<string, AnalyticsBySkill>(),
   ) || Map<string, AnalyticsBySkill>(),
-  status: caseOf<DatasetStatus>(json.status)({
+  status: caseOf<DatasetStatus>(json.datasetStatus)({
     DONE: DatasetStatus.DONE,
     FAILED: DatasetStatus.FAILED,
     PROCESSING: DatasetStatus.PROCESSING,

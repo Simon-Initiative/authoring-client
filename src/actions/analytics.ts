@@ -1,11 +1,13 @@
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import { fetchDataSet, createDataSet } from 'data/persistence';
 import { Maybe } from 'tsmonad';
-
+import { showMessage, dismissSpecificMessage } from 'actions/messages';
 import { DataSet, DatasetStatus } from 'types/analytics/dataset';
 import { Dispatch } from 'redux';
 import { State } from 'reducers';
 import { dateFormatted } from 'utils/date';
+import { Message, Severity, TitledContent, Scope, MessageAction } from 'types/messages';
+import { Priority } from 'types/messages/message';
 
 export const REQUESTED_DATASET = 'analytics/REQUESTED_DATASET';
 export type REQUESTED_DATASET = typeof REQUESTED_DATASET;
@@ -45,17 +47,15 @@ export const createNewDataSet = () =>
   async (dispatch: Dispatch<any>, getState: () => State) => {
     const packageId = getState().course.guid;
     const { guid } = await createDataSet(packageId);
-    dispatch(requestDataSet(guid));
+    dispatch(requestDataSet(guid, true));
   };
 
 
-export const requestDataSet = (dataSetId: string) =>
+export const requestDataSet = (dataSetId: string, isNewDataset?: boolean) =>
   (dispatch: Dispatch, getState: () => State) => {
     dispatch(requestedDataSet(dataSetId));
-    poll(dataSetId, dispatch, getState);
+    poll(dataSetId, isNewDataset, dispatch, getState);
   };
-
-const TIME_TO_WAIT = 30 * 1000;
 
 function isRequestStillActive(original: string, getState): boolean {
   const requestedDataSetId: Maybe<string> = getState().analytics.requestedDataSetId;
@@ -65,7 +65,38 @@ function isRequestStillActive(original: string, getState): boolean {
   });
 }
 
-function poll(dataSetId: string, dispatch, getState) {
+const TIME_TO_WAIT = 10 * 1000;   // 10 seconds
+
+const analyticsDoneOrFailedMessage = (status: DatasetStatus): Message =>
+  status === DatasetStatus.DONE
+    ? (
+      new Message().with({
+        severity: Severity.Information,
+        scope: Scope.CoursePackage,
+        priority: Priority.Medium,
+        guid: 'ANALYTICS_DONE_OR_FAILED_MESSAGE',
+        canUserDismiss: true,
+        content: new TitledContent().with({
+          title: 'Dataset Creation Complete',
+          message: 'This course package is now showing analytics using the latest dataset',
+        }),
+      })
+    )
+    : (
+      new Message().with({
+        severity: Severity.Error,
+        scope: Scope.CoursePackage,
+        priority: Priority.Medium,
+        guid: 'ANALYTICS_DONE_OR_FAILED_MESSAGE',
+        canUserDismiss: true,
+        content: new TitledContent().with({
+          title: 'Dataset Creation Failed',
+          message: 'Something went wrong while creating a new dataset for this course',
+        }),
+      })
+    );
+
+function poll(dataSetId: string, isNewDataset: boolean, dispatch, getState) {
   fetchDataSet(dataSetId).then((result) => {
     if (isRequestStillActive(dataSetId, getState)) {
       dispatch(dataSetReceived(dataSetId, result));
@@ -73,10 +104,12 @@ function poll(dataSetId: string, dispatch, getState) {
         setTimeout(
           () => {
             if (isRequestStillActive(dataSetId, getState)) {
-              poll(dataSetId, dispatch, getState);
+              poll(dataSetId, isNewDataset, dispatch, getState);
             }
           },
           TIME_TO_WAIT);
+      } else if (isNewDataset) {
+        dispatch(showMessage(analyticsDoneOrFailedMessage(result.status)));
       }
     }
   })

@@ -4,7 +4,6 @@ import { JSSStyles } from 'styles/jss';
 export const styles: JSSStyles = {
   LoadingSpinner: {
     textAlign: 'center',
-    fontSize: '0.8em',
     color: colors.gray,
 
     '&i': {
@@ -12,5 +11,14 @@ export const styles: JSSStyles = {
       animationDuration: '1s',
       '-webkit-animation-duration': '1s',
     },
+  },
+  sizeSmall: {
+    fontSize: '0.8em',
+  },
+  sizeNormal: {
+    fontSize: '1em',
+  },
+  sizeLarge: {
+    fontSize: '1.2em',
   },
 };

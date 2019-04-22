@@ -658,12 +658,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     return (
       <React.Fragment>
         <LoadingSpinner>
-          Please wait while your new dataset is processed,
-          this might take a while.
+          Please wait while your new dataset is created, this might take a while.
           <br/>
           <br/>
-          You may continue to use the editor
-          while this operation is in progress.
+          You may continue to use the editor while this operation is in progress.
         </LoadingSpinner>
       </React.Fragment>
     );

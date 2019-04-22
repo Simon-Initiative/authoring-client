@@ -8,7 +8,7 @@ import { SortDirection, SortableTable } from 'components/common/SortableTable';
 import { CourseModel } from 'data/models';
 import './DeleteResourceModal.scss';
 import { LegacyTypes } from 'data/types';
-import { LoadingSpinner } from 'components/common/LoadingSpinner';
+import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import { Severity, Toast } from 'components/common/Toast';
 
 export interface DeleteResourceModalProps {
@@ -161,10 +161,11 @@ export default class DeleteResourceModal extends
     ];
 
     const failureIcon =
-      <LoadingSpinner failed message="Something went wrong - please try again" />;
+      <LoadingSpinner size={LoadingSpinnerSize.Small}
+        failed message="Something went wrong - please try again" />;
 
     const loadingSpinner =
-      <LoadingSpinner message=
+      <LoadingSpinner size={LoadingSpinnerSize.Small} message=
         {`Checking if this ${resourceTypeLowercase} can be safely deleted`} />;
 
     const deletionConfirmation =
