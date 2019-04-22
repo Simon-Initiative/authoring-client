@@ -238,15 +238,16 @@ class Analytics
   }
 
   componentWillMount() {
-    this.fetchResources();
+    this.fetchResources(this.props);
   }
 
-  componentDidUpdate(
+  componentWillReceiveProps(
     nextProps: Readonly<AnalyticsProps>, nextState: Readonly<AnalyticsState>) {
     // this assumes that aggregateModel, skills, objectives are all set together
     if (nextProps.model !== null
       && nextProps.model !== this.props.model) {
-      this.fetchResources();
+      this.fetchResources(nextProps);
+      this.setState(this.getDefaultState());
     }
   }
 
@@ -259,8 +260,8 @@ class Analytics
     };
   }
 
-  async fetchResources() {
-    const { model, course, objectives, skills, organization } = this.props;
+  async fetchResources(nextProps: AnalyticsProps) {
+    const { model, course, objectives, skills, organization } = nextProps;
 
     // get all page and assesment items in org item
     const ids = flattenChildren(model.children)
