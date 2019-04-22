@@ -3,6 +3,8 @@ import {
   ORG_REQUESTED, ORG_LOADED, ORG_CHANGE_FAILED, MODEL_UPDATED,
   ORG_CHANGE_SUCCEEDED, CHANGE_SELECTED_ITEM, RELEASE_ORG,
   CHANGE_REDONE, CHANGE_UNDONE, CHANGE_PROCESSED,
+  REQUEST_INITIATED,
+  RequestInitiatedAction,
   ChangeProcessedAction,
   ChangeSelectedItemAction,
   OrgChangeSucceededAction, ReleaseOrgAction,
@@ -22,7 +24,7 @@ import { OrganizationModel } from 'data/models';
 
 type ActionTypes =
   OrgChangeFailedAction | OrgChangeSucceededAction | ReleaseOrgAction |
-  OrgLoadedAction | OrgRequestedAction | ModelUpdatedAction |
+  OrgLoadedAction | OrgRequestedAction | ModelUpdatedAction | RequestInitiatedAction |
   ChangeRedoneAction | ChangeUndoneAction | UpdateRouteAction |
   ChangeSelectedItemAction | ChangeProcessedAction | OtherAction;
 
@@ -34,6 +36,7 @@ export type OrgsState = {
   selectedItem: NavigationItem,
   undoStack: Immutable.Stack<org.OrgChangeRequest>,
   redoStack: Immutable.Stack<org.OrgChangeRequest>,
+  requestInFlight: boolean,
 };
 
 const initialState = {
@@ -44,6 +47,7 @@ const initialState = {
   selectedItem: makePackageOverview(),
   undoStack: Immutable.Stack<org.OrgChangeRequest>(),
   redoStack: Immutable.Stack<org.OrgChangeRequest>(),
+  requestInFlight: false,
 };
 
 
@@ -78,6 +82,8 @@ export const orgs = (
   action: ActionTypes,
 ): OrgsState => {
   switch (action.type) {
+    case REQUEST_INITIATED:
+      return Object.assign({}, state, { requestInFlight: true });
     // On any route change, we reset the undo/redo stacks
     case UPDATE_ROUTE_ACTION:
       return Object.assign({}, state, {
@@ -112,9 +118,9 @@ export const orgs = (
         {}, state, { activeOrg: Maybe.just(action.document), undoStack, redoStack, placements });
     }
     case ORG_CHANGE_FAILED:
-      return Object.assign({}, state, { lastChangeSucceeded: false });
+      return Object.assign({}, state, { lastChangeSucceeded: false, requestInFlight: false });
     case ORG_CHANGE_SUCCEEDED:
-      return Object.assign({}, state, { lastChangeSucceeded: true });
+      return Object.assign({}, state, { lastChangeSucceeded: true, requestInFlight: false });
     default:
       return state;
   }
