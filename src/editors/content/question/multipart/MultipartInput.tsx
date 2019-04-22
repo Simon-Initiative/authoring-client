@@ -213,6 +213,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       canInsertAnotherPart,
       onBodyEdit,
       setActiveItemIdActionAction,
+      selectedInput,
     } = this.props;
 
     const onEntitySelected = (key: string, data: Object) => {
@@ -259,6 +260,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
           editMode={editMode}
           services={services}
           context={context}
+          selectedEntity={selectedInput}
           model={body}
           onEdit={onBodyEdit} />
       </div>

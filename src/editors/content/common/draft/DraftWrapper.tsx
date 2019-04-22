@@ -21,7 +21,7 @@ import { updateData } from 'data/content/common/clone';
 import './DraftWrapper.scss';
 import parseContent from 'data/parsers/parse';
 import { ParsedContent } from 'data/parsers/common/types';
-
+import { Maybe } from 'tsmonad';
 
 export interface DraftWrapperProps {
   onEdit: (text: ContiguousText, src?) => void;
@@ -36,6 +36,7 @@ export interface DraftWrapperProps {
   parent: any;
   onInsertParsedContent: (content: ParsedContent) => void;
   onEntitySelected?: (key: string, data: Object) => void;
+  selectedEntity?: Maybe<string>;
 }
 
 interface DraftWrapperState {
@@ -197,7 +198,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const contentState = props.content.content;
     this.lastContent = contentState;
 
-    const es = EditorState.createWithContent(contentState, this.getCompositeDecorator());
+    const es = EditorState.createWithContent(contentState, this.getCompositeDecorator(this.props));
     const newEditorState = EditorState.set(es, { allowUndo: false });
 
     this.state = {
@@ -282,10 +283,23 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     if (this.state.editorState.getSelection() !== nextState.editorState.getSelection()) {
       return true;
     }
+    if (this.props.selectedEntity !== nextProps.selectedEntity) {
+      return true;
+    }
     return false;
   }
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
+
+    if (this.props.selectedEntity !== nextProps.selectedEntity) {
+      this.lastContent = nextProps.content.content;
+      const es = EditorState.createWithContent(
+        nextProps.content.content,
+        this.getCompositeDecorator(nextProps));
+      const newEditorState = EditorState.set(es, { allowUndo: false });
+      this.setState({ editorState: newEditorState });
+      return;
+    }
 
     if (this.props.content.content !== nextProps.content.content) {
 
@@ -304,21 +318,20 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     } else if (this.props.content.entityEditCount !== nextProps.content.entityEditCount) {
 
       this.lastContent = nextProps.content.content;
-
       const es = EditorState.createWithContent(
         nextProps.content.content,
-        this.getCompositeDecorator());
+        this.getCompositeDecorator(nextProps));
       const newEditorState = EditorState.set(es, { allowUndo: false });
       this.setState({ editorState: newEditorState });
     }
   }
 
-  getCompositeDecorator() {
+  getCompositeDecorator(props: DraftWrapperProps) {
     const onDecoratorEdit = (contentState: ContentState) => {
       this.forceContentChange(contentState, 'apply-entity');
     };
     const onContiguousTextEdit = (text: ContiguousText, src) => {
-      this.props.onEdit(text, src);
+      props.onEdit(text, src);
     };
 
     const onSelect = (entityKey) => {
@@ -334,20 +347,21 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         focusOffset: range.start,
       }) as SelectionState;
 
-      if (this.props.onEntitySelected !== undefined) {
+      if (props.onEntitySelected !== undefined) {
         const data = this.state.editorState.getCurrentContent().getEntity(entityKey).getData();
-        this.props.onEntitySelected(entityKey, data);
+        props.onEntitySelected(entityKey, data);
       }
 
-      this.props.onSelectionChange(ss, true);
+      props.onSelectionChange(ss, true);
     };
     const compositeDecorator = buildCompositeDecorator({
-      services: this.props.services,
-      context: this.props.context, onEdit: onDecoratorEdit,
+      selectedEntity: props.selectedEntity,
+      services: props.services,
+      context: props.context, onEdit: onDecoratorEdit,
       onDecoratorClick: onSelect.bind(this),
-      parentProps: this.props.parentProps,
-      parent: this.props.parent,
-      getContiguousText: () => this.props.content,
+      parentProps: props.parentProps,
+      parent: props.parent,
+      getContiguousText: () => props.content,
       onContiguousTextEdit,
     });
     return compositeDecorator;
@@ -358,7 +372,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const editorState = this.state.editorState;
     const content = editorState.getCurrentContent();
 
-    const es = EditorState.createWithContent(content, this.getCompositeDecorator());
+    const es = EditorState.createWithContent(content, this.getCompositeDecorator(this.props));
     const newEditorState = EditorState.set(es, { allowUndo: false });
     this.setState({ editorState: newEditorState });
   }
