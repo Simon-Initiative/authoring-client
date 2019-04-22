@@ -1,4 +1,5 @@
 import { Map } from 'immutable';
+import { Maybe } from 'tsmonad';
 
 export enum DatasetStatus {
   PROCESSING = 'PROCESSING',
@@ -64,9 +65,9 @@ export type AnalyticsByPart = {
 };
 
 export type DataSet = {
-  byResource: Map<string, AnalyticsByResource>,
-  byResourcePart: Map<string, Map<string, AnalyticsByPart>>,
-  bySkill: Map<string, AnalyticsBySkill>,
+  byResource: Maybe<Map<string, AnalyticsByResource>>,
+  byResourcePart: Maybe<Map<string, Map<string, AnalyticsByPart>>>,
+  bySkill: Maybe<Map<string, AnalyticsBySkill>>,
   status: DatasetStatus,
   dateCreated: string,
   dateCompleted: string,

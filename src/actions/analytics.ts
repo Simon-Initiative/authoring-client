@@ -58,6 +58,8 @@ export const requestDataSet = (dataSetId: string, isNewDataset?: boolean) =>
   };
 
 function isRequestStillActive(original: string, getState): boolean {
+  if (getState().course === null) return false;
+
   const requestedDataSetId: Maybe<string> = getState().analytics.requestedDataSetId;
   return requestedDataSetId.caseOf({
     just: id => id === original,
@@ -115,9 +117,9 @@ function poll(dataSetId: string, isNewDataset: boolean, dispatch, getState) {
   })
   .catch((err) => {
     dispatch(dataSetReceived(dataSetId, {
-      byResource: Map(),
-      byResourcePart: Map(),
-      bySkill: Map(),
+      byResource: Maybe.nothing(),
+      byResourcePart: Maybe.nothing(),
+      bySkill: Maybe.nothing(),
       status: DatasetStatus.FAILED,
       dateCreated: dateFormatted(new Date()),
       dateCompleted: dateFormatted(new Date()),

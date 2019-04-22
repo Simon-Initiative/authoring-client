@@ -80,7 +80,10 @@ export function loadCourse(courseId: string) {
           dispatch(courseChanged(document.model));
           dispatch(fetchSkills(courseId));
           dispatch(fetchObjectives(courseId));
-          dispatch(requestDataSet(courseModel.activeDataset.guid));
+
+          if (courseModel.activeDataset) {
+            dispatch(requestDataSet(courseModel.activeDataset.guid));
+          }
 
           return document.model;
         }

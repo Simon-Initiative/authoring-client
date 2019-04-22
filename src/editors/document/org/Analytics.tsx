@@ -542,15 +542,19 @@ class Analytics
             + `&partId=${part.id}`)}>
           Part {part.index + 1}
         </div>
-        {analytics.dataSet.bind(analyticsDataSet =>
-            Maybe.maybe(analyticsDataSet.status === DatasetStatus.DONE
-                && analyticsDataSet.byResourcePart.getIn([question.assessmentId, part.id])).lift(
-              partAnalytics => partAnalytics),
-            ).caseOf({
-              just: partAnalytics => this.renderPartStats(partAnalytics),
-              nothing: () => this.renderNoAnalyticsMsg(),
-            })
-        }
+        {analytics.dataSet.caseOf({
+          just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+            just: byResourcePart => Maybe.maybe(
+                analyticsDataSet.status === DatasetStatus.DONE
+                && byResourcePart.getIn([question.assessmentId, part.id]),
+              ).caseOf({
+                just: partAnalytics => this.renderPartStats(partAnalytics),
+                nothing: () => this.renderNoAnalyticsMsg(),
+              }),
+            nothing: () => this.renderNoAnalyticsMsg(),
+          }),
+          nothing: () => this.renderNoAnalyticsMsg(),
+        })}
       </div>
     ));
   }
@@ -570,16 +574,21 @@ class Analytics
             {question.title.valueOr(getReadableTitleFromType(question.type))}
           </div>
           {question.parts.size === 1 && (
-            Maybe.maybe(question.parts.first()).bind(part =>
-              analytics.dataSet.bind(analyticsDataSet =>
-                Maybe.maybe(analyticsDataSet.byResourcePart.getIn([question.assessmentId, part.id]))
-                  .lift(partAnalytics =>
-                    partAnalytics,
-                  ),
-              )).caseOf({
-                just: partAnalytics => this.renderPartStats(partAnalytics),
+            Maybe.maybe(question.parts.first()).caseOf({
+              just: part => analytics.dataSet.caseOf({
+                just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+                  just: byResourcePart => Maybe.maybe(
+                      byResourcePart.getIn([question.assessmentId, part.id]),
+                    ).caseOf({
+                      just: partAnalytics => this.renderPartStats(partAnalytics),
+                      nothing: () => this.renderNoAnalyticsMsg(),
+                    }),
+                  nothing: () => this.renderNoAnalyticsMsg(),
+                }),
                 nothing: () => this.renderNoAnalyticsMsg(),
-              })
+              }),
+              nothing: () => this.renderNoAnalyticsMsg(),
+            })
           )}
         </div>
         {question.parts.size > 1 && this.renderMultipleParts(question, skill, organization)}

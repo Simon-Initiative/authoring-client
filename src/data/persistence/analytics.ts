@@ -1,3 +1,4 @@
+import { Maybe } from 'tsmonad';
 import { Map } from 'immutable';
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
@@ -7,21 +8,27 @@ import {
 import { caseOf } from 'utils/utils';
 
 const parseDatasetJson = (json: any): DataSet => ({
-  byResource: json.datasetBlob && json.datasetBlob.byResource.reduce(
-    (acc, val) => acc.set(val.resource, val),
-    Map<string, AnalyticsByResource>(),
-  ) || Map<string, AnalyticsByResource>(),
-  byResourcePart: json.datasetBlob && json.datasetBlob.byPart.reduce(
-    (acc, val) => acc.set(
-      val.resourceId,
-      (acc.get(val.resourceId) || Map<string, AnalyticsByPart>()).set(val.part, val),
-    ),
-    Map<string, Map<string, AnalyticsByPart>>(),
-  ) || Map<string, Map<string, AnalyticsByPart>>(),
-  bySkill: json.datasetBlob && json.datasetBlob.bySkill.reduce(
-    (acc, val) => acc.set(val.skill, val),
-    Map<string, AnalyticsBySkill>(),
-  ) || Map<string, AnalyticsBySkill>(),
+  byResource: json.datasetBlob
+    ? Maybe.just(json.datasetBlob.byResource.reduce(
+      (acc, val) => acc.set(val.resource, val),
+      Map<string, AnalyticsByResource>(),
+    ))
+    : Maybe.nothing(),
+  byResourcePart: json.datasetBlob
+    ? Maybe.just(json.datasetBlob.byPart.reduce(
+      (acc, val) => acc.set(
+        val.resourceId,
+        (acc.get(val.resourceId) || Map<string, AnalyticsByPart>()).set(val.part, val),
+      ),
+      Map<string, Map<string, AnalyticsByPart>>(),
+    ))
+    : Maybe.nothing(),
+  bySkill: json.datasetBlob
+    ? Maybe.just(json.datasetBlob.bySkill.reduce(
+      (acc, val) => acc.set(val.skill, val),
+      Map<string, AnalyticsBySkill>(),
+    ))
+    : Maybe.nothing(),
   status: caseOf<DatasetStatus>(json.datasetStatus)({
     DONE: DatasetStatus.DONE,
     FAILED: DatasetStatus.FAILED,
