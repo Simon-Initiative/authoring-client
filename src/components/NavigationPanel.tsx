@@ -352,7 +352,10 @@ class NavigationPanel
   }
 
   onResizeHandleMousedown = (e) => {
+    const { width, collapsed } = this.state;
+
     this.setState({
+      width: collapsed ? Maybe.just(COLLAPSED_WIDTH_PX) : width,
       isResizing: true,
       resizeStart: e.nativeEvent.clientX,
     });
@@ -436,10 +439,8 @@ class NavigationPanel
           <div className={classes.collapseButtonContainer}>
           <Tooltip title="Collapse Outline" position="right" size="small" delay={750}>
             <div className={classes.collapseButton}
-              onClick={(e) => {
-                this.onCollapse();
-                e.stopPropagation();
-              }}>
+              onClick={this.onCollapse}
+              onMouseDown={e => e.stopPropagation()}>
               <i className="fa fa-angle-double-left" />
             </div>
           </Tooltip>
@@ -589,9 +590,7 @@ class NavigationPanel
                   classes.navItem,
                 ])}
                 onClick={() => {
-                  const newWidth =  width.lift(w =>
-                      w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
-
+                  const newWidth = width.lift(w => w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
                   this.setState({
                     width: newWidth,
                     collapsed: false,
