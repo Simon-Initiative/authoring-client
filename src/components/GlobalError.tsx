@@ -31,11 +31,6 @@ const GlobalError:
       }
     });
 
-    const reportError = () => {
-      const url = buildFeedbackFromCurrent(userName, email);
-      window.open(url, 'error');
-    };
-
     return (
       <div className={classNames([classes.globalError])}>
 
@@ -56,10 +51,10 @@ const GlobalError:
             fix the problem.
         </p>
 
-        <button
-          onClick={() => reportError(user)}
-          className="btn btn-primary">
-          Report this problem
+          <button
+            onClick={() => reportError(user)}
+            className="btn btn-primary">
+            Report this problem
         </button>
 
         </div>
@@ -97,6 +92,6 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(StyledGlobalError);
+  (mapStateToProps, mapDispatchToProps)(StyledGlobalError);
 
 export { controller as GlobalError };
