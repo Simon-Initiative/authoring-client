@@ -272,6 +272,7 @@ export class Logger {
     }
 
     this.options.console.level = logLevelValue(level);
+    // tslint:disable-next-line:no-console
     console.log('Log level set to ' + level);
     return this;
   }

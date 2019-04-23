@@ -12,7 +12,7 @@ import { DuplicateListingInput } from 'components/objectives/DuplicateListingInp
 import guid from 'utils/guid';
 import { buildReadOnlyMessage } from 'utils/lock';
 import { buildPersistenceFailureMessage } from 'utils/error';
-import { LoadingSpinner } from 'components/common/LoadingSpinner.tsx';
+import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner.tsx';
 import { ExistingSkillSelection } from 'components/objectives/ExistingSkillSelection';
 import {
   AggregateModel, buildAggregateModel, UnifiedObjectivesModel,
@@ -871,7 +871,7 @@ class ObjectiveSkillView
         return Promise.resolve(false);
       })
       .catch((err) => {
-        console.log(`Error removing objective ${obj}: ${err}`);
+        console.error(`Error removing objective ${obj}: ${err}`);
         this.setState({
           loading: false,
         });
@@ -1239,7 +1239,7 @@ class ObjectiveSkillView
     const content = this.state.aggregateModel === null
       ? (
         <div className="page-loading">
-          <LoadingSpinner message="Loading Objectives..." />
+          <LoadingSpinner size={LoadingSpinnerSize.Small} message="Loading Objectives..." />
         </div>
       )
       : this.renderContent();

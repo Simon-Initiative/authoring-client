@@ -20,7 +20,8 @@ export enum Priority {
 
 export enum Scope {
   Application,
-  Package,
+  PackageDetails,
+  CoursePackage,
   Organization,
   Resource,
 }

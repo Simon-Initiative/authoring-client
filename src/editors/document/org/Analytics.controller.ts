@@ -5,10 +5,12 @@ import { OrderedMap } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import * as models from 'data/models';
 import { push } from 'actions/router';
+import { AnalyticsState } from 'reducers/analytics';
 
 export { OrgItem };
 
 interface StateProps {
+  analytics: AnalyticsState;
   objectives: OrderedMap<string, contentTypes.LearningObjective>;
   skills: OrderedMap<string, contentTypes.Skill>;
   organization: models.OrganizationModel;
@@ -24,8 +26,9 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
-  const { objectives, skills, orgs } = state;
+  const { analytics, objectives, skills, orgs } = state;
   return {
+    analytics,
     objectives,
     skills,
     // we are guaranteed to have an activeOrg when this component loads
