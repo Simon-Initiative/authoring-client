@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+// tslint:disable-next-line
 import * as React from 'react';
 import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
@@ -16,42 +18,51 @@ export interface GlobalErrorProps {
 }
 
 const GlobalError:
-React.StatelessComponent<StyledComponentProps<GlobalErrorProps, typeof styles>> = ({
-  classes, user,
-}) => {
+  React.StatelessComponent<StyledComponentProps<GlobalErrorProps, typeof styles>> = ({
+    classes, user, error,
+  }) => {
 
-  return (
-    <div className={classNames([classes.globalError])}>
+    const [reported, setReported] = useState(false);
+    useEffect(() => {
+      // Report this error event to google analytics
+      if (!reported) {
+        (window as any).gtag('event', 'exception', { description: error, fatal: true });
+        setReported(true);
+      }
+    });
 
-      <div className={classNames([classes.globalContent])}>
+    return (
+      <div className={classNames([classes.globalError])}>
 
-        <div>
-          <span>
-            <i className="far fa-frown fa-4x"></i>
-          </span>
-        </div>
+        <div className={classNames([classes.globalContent])}>
 
-        <p>
-          Oh no! Something went wrong.
+          <div>
+            <span>
+              <i className="far fa-frown fa-4x"></i>
+            </span>
+          </div>
+
+          <p>
+            Oh no! Something went wrong.
         </p>
 
-        <p>
-          Refreshing your browser and trying again may
-          fix the problem.
+          <p>
+            Refreshing your browser and trying again may
+            fix the problem.
         </p>
 
-        <button
-          onClick={() => reportError(user)}
-          className="btn btn-primary">
-          Report this problem
+          <button
+            onClick={() => reportError(user)}
+            className="btn btn-primary">
+            Report this problem
         </button>
 
+        </div>
+
       </div>
+    );
 
-    </div>
-  );
-
-};
+  };
 
 const StyledGlobalError = withStyles<GlobalErrorProps>(styles)(GlobalError);
 
@@ -81,6 +92,6 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(StyledGlobalError);
+  (mapStateToProps, mapDispatchToProps)(StyledGlobalError);
 
 export { controller as GlobalError };

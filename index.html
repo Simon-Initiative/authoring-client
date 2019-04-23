@@ -98,11 +98,12 @@
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-5145430-2"></script>
   <script>
-  if (window.location.href.indexOf('echo.oli.cmu.edu') === -1) {
+    if (window.location.href.indexOf('echo.oli.cmu.edu') === -1) {
       window['ga-disable-UA-5145430-2'] = true;
     }
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
+    window.gtag = gtag;
     gtag('js', new Date());
     gtag('config', 'UA-5145430-2');
   </script>
