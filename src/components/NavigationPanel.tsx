@@ -524,7 +524,7 @@ class NavigationPanel
         ])}>
           <Tooltip
             disabled={!collapsed}
-            title={currentOrg.title}
+            title={`${currentOrg.title} (${currentOrg.id})`}
             position="right"
             distance={32}
             style={{ overflow: 'hidden', flex: 1, display: 'flex' }}>
@@ -590,7 +590,9 @@ class NavigationPanel
                   classes.navItem,
                 ])}
                 onClick={() => {
-                  const newWidth = width.lift(w => w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
+                  const newWidth = width.lift(w =>
+                    w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
+
                   this.setState({
                     width: newWidth,
                     collapsed: false,
@@ -616,10 +618,12 @@ class NavigationPanel
         <div className={classNames([classes.publishActions, collapsed && 'collapsed'])}>
           {collapsed
             ? (
-              <RequestButton text="" className="btn-secondary previewButton"
-                onClick={() => this.onPreview()}>
-                <i className="fa fa-eye" />
-              </RequestButton>
+              <Tooltip title="Preview Course" position="right" distance={30}>
+                <RequestButton text="" className="btn-secondary previewButton"
+                  onClick={() => this.onPreview()}>
+                  <i className="fa fa-eye" />
+                </RequestButton>
+              </Tooltip>
             )
             : (
               <div className={classes.publishAction}>
