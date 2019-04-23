@@ -121,6 +121,11 @@ export const convert = {
     if (num === 0) return 'zero';
     return convertMillions(num);
   },
+
+  /**
+   * Converts a decimal number to a percentage
+   */
+  toPercentage: (value: number) => Math.round(value * 100) + '%',
 };
 
 export const stringFormat = {
@@ -178,4 +183,5 @@ export const stringFormat = {
 
     return findLargestString(text.substr(0, MAX_TEXT_LENGTH)) + '...';
   },
+
 };

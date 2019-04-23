@@ -83,8 +83,6 @@ export function createMultipleChoiceQuestion(
 
   model = model.with({ parts: model.parts.set(part.guid, part) });
 
-  console.log('model', model);
-
   return model;
 }
 

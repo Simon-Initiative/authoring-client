@@ -6,7 +6,7 @@ import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
-
+import { requestDataSet } from './analytics';
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
 export const COURSE_CHANGED: COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -30,17 +30,17 @@ export const updateCourseResources = (resources: Immutable.OrderedMap<string, Re
     type: UPDATE_COURSE_RESOURCES,
   });
 
-
 /**
+ *
  * Course changed action builder
  * @param model - course model
  */
-export const courseChanged = (model: CourseModel): CourseChangedAction => ({
-  model,
-  type: COURSE_CHANGED,
-});
-
-
+export const courseChanged = (model: CourseModel) => (dispatch) => {
+  dispatch({
+    model,
+    type: COURSE_CHANGED,
+  });
+};
 
 function createPlaceholderPage(courseId: string) {
 
@@ -80,13 +80,15 @@ export function loadCourse(courseId: string) {
           dispatch(courseChanged(document.model));
           dispatch(fetchSkills(courseId));
           dispatch(fetchObjectives(courseId));
+
+          if (courseModel.activeDataset) {
+            dispatch(requestDataSet(courseModel.activeDataset.guid));
+          }
+
           return document.model;
         }
 
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   };
 }
-
-
-

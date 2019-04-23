@@ -357,19 +357,10 @@ export default class Main extends React.Component<MainProps, MainState> {
     const { modal, user, hover, onUpdateHover } = this.props;
 
     if (this.state.hasErrored) {
-      const userName = user === null
-        ? ''
-        : user.profile.firstName + ' ' + user.profile.lastName;
-      const email = user === null
-        ? ''
-        : user.profile.email;
-
       return (
         <GlobalError
           info={this.info}
           error={this.error}
-          userName={userName}
-          email={email}
         />
       );
     }

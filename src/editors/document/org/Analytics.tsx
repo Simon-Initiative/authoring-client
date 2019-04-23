@@ -17,6 +17,36 @@ import colors from 'styles/colors';
 import { disableSelect, ellipsizeOverflow, link } from 'styles/mixins';
 import { extractFullText } from 'data/content/objectives/objective';
 import { dedupeArray } from 'utils/utils';
+import flatui from 'styles/palettes/flatui';
+import { Tooltip } from 'utils/tooltip';
+import { AnalyticsState as ReduxAnalyticsState } from 'reducers/analytics';
+import { convert } from 'utils/format';
+import * as chroma from 'chroma-js';
+import { ContentElements } from 'data/content/common/elements';
+import { map } from 'data/utils/map';
+import { EntityTypes } from 'data/content/learning/common';
+import { DatasetStatus } from 'types/analytics/dataset';
+
+const getOrderedParts = (body: ContentElements, parts: List<contentTypes.Part>) => {
+  return body.content.reduce(
+    (acc, contentElement) => {
+      let updatedAcc = acc;
+      map((ce) => {
+        if (ce.contentType === 'ContiguousText') {
+          (ce as contentTypes.ContiguousText).getEntitiesByType(EntityTypes.input_ref)
+            .forEach(entityInfo => updatedAcc = updatedAcc.push(
+              entityInfo.entity.getData()['@input']));
+        }
+        return ce;
+      }, contentElement);
+
+      return updatedAcc;
+    },
+    List<any>(),
+  )
+  .map(input => parts.find(p => p.responses.every(r => r.input === input)))
+  .filter(part => !!part);
+};
 
 export type OrgItem =  contentTypes.Sequence
   | contentTypes.Unit
@@ -79,23 +109,108 @@ const styles: JSSStyles = {
     margin: [0, 20, 20, 20],
   },
   skill: {
-
+    marginBottom: 20,
   },
   skillQuestions: {
+    marginTop: 6,
     marginLeft: 20,
   },
   question: {
-    extend: [ellipsizeOverflow],
-    marginTop: 5,
+    padding: 4,
+    border: [1, 'solid', colors.grayLighter],
+    borderBottom: 'none',
+
+    '&:nth-child(even)': {
+      backgroundColor: '#F7FBFF',
+    },
+
+    '&:last-child': {
+      borderBottom: [1, 'solid', colors.grayLighter],
+    },
+  },
+  questionTitle: {
+    display: 'flex',
+    flexDirection: 'row',
+
+    '& i': {
+      marginTop: 4,
+      marginRight: 2,
+    },
+  },
+  partIcon: {
+    margin: 4,
+  },
+  partTitle: {
+    display: 'flex',
+    flexDirection: 'row',
+    flex: 1,
+    marginLeft: 40,
+  },
+  questionLabel: {
+    marginRight: [6, '!important'],
+    fontWeight: 600,
   },
   questionLink: {
-    extend: [link],
+    extend: [ellipsizeOverflow, link],
+    display: 'inline',
+    flex: 1,
+  },
+  questionStats: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  stat: {
+    display: 'inline-block',
+    margin: [0, 4],
+    minWidth: 60,
+
+    '& i': {
+      marginRight: 4,
+    },
+  },
+  firstTryCorrect: {
+    border: [1, 'solid', colors.grayDark],
+    fontSize: 10,
+    margin: [3, 8],
+    verticalAlign: 'top',
+    width: 60,
+    textAlign: 'center',
+    fontWeight: 700,
+  },
+  eventuallyCorrect: {
+    '& i': {
+      color: flatui.pomegranite,
+    },
+  },
+  distinctStudents: {
+    '& i': {
+      color: flatui.wetAsphalt,
+    },
+  },
+  avgHelpNeeded: {
+    '& i': {
+      color: flatui.wetAsphalt,
+    },
+  },
+  accuracyRate: {
+    '& i': {
+      color: flatui.nephritis,
+    },
+  },
+  analyticsTooltipContent: {
+    textAlign: 'start',
+  },
+  noStats: {
+    color: colors.grayDark,
+    margin: [2, 10],
+    fontSize: 14,
   },
 };
 
 export interface AnalyticsProps {
   course: models.CourseModel;
   model: OrgItem;
+  analytics: ReduxAnalyticsState;
   objectives: OrderedMap<string, contentTypes.LearningObjective>;
   skills: OrderedMap<string, contentTypes.Skill>;
   organization: models.OrganizationModel;
@@ -123,15 +238,16 @@ class Analytics
   }
 
   componentWillMount() {
-    this.fetchResources();
+    this.fetchResources(this.props);
   }
 
-  componentDidUpdate(
+  componentWillReceiveProps(
     nextProps: Readonly<AnalyticsProps>, nextState: Readonly<AnalyticsState>) {
     // this assumes that aggregateModel, skills, objectives are all set together
     if (nextProps.model !== null
       && nextProps.model !== this.props.model) {
-      this.fetchResources();
+      this.fetchResources(nextProps);
+      this.setState(this.getDefaultState());
     }
   }
 
@@ -144,8 +260,8 @@ class Analytics
     };
   }
 
-  async fetchResources() {
-    const { model, course, objectives, skills, organization } = this.props;
+  async fetchResources(nextProps: AnalyticsProps) {
+    const { model, course, objectives, skills, organization } = nextProps;
 
     // get all page and assesment items in org item
     const ids = flattenChildren(model.children)
@@ -253,26 +369,243 @@ class Analytics
     });
   }
 
+  renderNoAnalyticsMsg(item: string = 'item') {
+    const { classes } = this.props;
+
+    return (
+      <div className={classes.questionStats}>
+        <span className={classes.noStats}>Analytics are unavailable for this {item}</span>
+      </div>
+    );
+  }
+
+  renderPartStats(partAnalytics) {
+    const { classes } = this.props;
+
+    const renderEventuallyCorrectIcon = (completionRate: number) => {
+      return completionRate > .80
+        ? (
+          <i className="fas fa-check-circle" style={{ color: flatui.nephritis }} />
+        )
+        : (
+          <i className="fa fa-times-circle" style={{ color: flatui.pomegranite }} />
+        );
+    };
+
+    const renderAccuracyRateBar = (accuracyRate: number) => {
+      const rate = Math.min(Math.max(0, accuracyRate), 1);
+
+      // generate a background color on a scale of [red -> orange -> yellow -> green]
+      const hue = rate * 145;
+      const sat = (-1.1 * (rate * rate)) + (0.9 * rate) + .63;
+      const backgroundColor = chroma.hsl(hue, sat, .5).hex();
+
+      // minimum contrast ratio for text visibility is 4.5
+      const color = chroma.contrast(backgroundColor, colors.black) > 4.5
+        ? colors.black : colors.white;
+      const borderColor = chroma(backgroundColor).darken(0.5).hex();
+
+      return (
+        <div className={classNames([classes.stat, classes.firstTryCorrect])}
+          style={{ backgroundColor, color, borderColor }}>
+          {convert.toPercentage(accuracyRate)}
+        </div>
+      );
+    };
+
+    return (
+      <div className={classes.questionStats}>
+        <Tooltip
+          html={(
+            <div className={classes.analyticsTooltipContent}>
+              <div>
+                <b>Distinct students:</b>
+                <div className={classNames([classes.stat, classes.distinctStudents])}>
+                  <i className="fa fa-users" />
+                  {partAnalytics.distinctStudents}
+                </div>
+              </div>
+              <div>
+                The number of distinct students who submitted an answer
+                for this question.
+              </div>
+            </div>
+          )}
+          theme="light"
+          delay={250}
+          size="small"
+          arrowSize="small">
+          <div className={classNames([classes.stat, classes.distinctStudents])}>
+            <i className="fa fa-users" />
+            {partAnalytics.distinctStudents}
+          </div>
+        </Tooltip>
+
+        <Tooltip
+          html={(
+            <div className={classNames([classes.stat, classes.analyticsTooltipContent])}>
+              <div>
+                <b>Average help needed:</b>
+                <div className={classNames([classes.stat, classes.avgHelpNeeded])}>
+                  <i className="fa fa-life-ring" />
+                  {Number.parseFloat(partAnalytics.avgHelpNeeded).toFixed(2)}
+                </div>
+              </div>
+              <div>
+                The ratio of students who requested one or more hints for
+                this question.
+              </div>
+            </div>
+          )}
+          theme="light"
+          delay={250}
+          size="small"
+          arrowSize="small">
+          <div className={classNames([classes.stat, classes.avgHelpNeeded])}>
+            <i className="fa fa-life-ring" />
+            {Number.parseFloat(partAnalytics.avgHelpNeeded).toFixed(2)}
+          </div>
+        </Tooltip>
+
+        <Tooltip
+          html={(
+            <div className={classes.analyticsTooltipContent}>
+              <div>
+                <b>Eventually correct:</b>
+                <div className={classNames([classes.stat, classes.eventuallyCorrect])}>
+                  {renderEventuallyCorrectIcon(partAnalytics.completionRate)}
+                  {convert.toPercentage(partAnalytics.completionRate)}
+                </div>
+              </div>
+              <div>
+                The percentage of students who eventually answered
+                this question correctly.
+              </div>
+            </div>
+          )}
+          theme="light"
+          delay={250}
+          size="small"
+          arrowSize="small">
+          <div className={classNames([classes.stat, classes.eventuallyCorrect])}>
+            {renderEventuallyCorrectIcon(partAnalytics.completionRate)}
+            {convert.toPercentage(partAnalytics.completionRate)}
+          </div>
+        </Tooltip>
+
+        <Tooltip
+          html={(
+            <div className={classes.analyticsTooltipContent}>
+              <div>
+                <b>First try correct:</b>
+                {renderAccuracyRateBar(partAnalytics.accuracyRate)}
+              </div>
+              <div>
+                The percentage of students who answered this question
+                correctly on the first attempt.
+              </div>
+            </div>
+          )}
+          theme="light"
+          delay={250}
+          size="small"
+          arrowSize="small">
+          {renderAccuracyRateBar(partAnalytics.accuracyRate)}
+        </Tooltip>
+      </div>
+    );
+  }
+
+  renderMultipleParts(
+    question: QuestionRef, skill: SkillRef, organization: models.OrganizationModel) {
+    const { classes, course, analytics, onPushRoute } = this.props;
+
+    const parts = getOrderedParts(question.body, question.parts)
+      // get ordered index of part, because we will filter out parts without this skill
+      .map((part, index) => ({
+        index,
+        id: part.id,
+        guid: part.guid,
+        skills: part.skills,
+      }))
+      // only include parts that pertain to this skill
+      .filter(part => part.skills.contains(skill.id));
+
+    return parts.map(part => (
+      <div key={part.guid} className={classes.partTitle}>
+        <i className={classNames([classes.partIcon, 'fa fa-marker'])} />
+        <div className={classes.questionLink}
+          onClick={() => onPushRoute(
+            `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
+            + `-${organization.guid}`
+            + `?questionId=${question.id}`
+            + `&partId=${part.id}`)}>
+          Part {part.index + 1}
+        </div>
+        {analytics.dataSet.caseOf({
+          just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+            just: byResourcePart => Maybe.maybe(
+                analyticsDataSet.status === DatasetStatus.DONE
+                && byResourcePart.getIn([question.assessmentId, part.id]),
+              ).caseOf({
+                just: partAnalytics => this.renderPartStats(partAnalytics),
+                nothing: () => this.renderNoAnalyticsMsg(),
+              }),
+            nothing: () => this.renderNoAnalyticsMsg(),
+          }),
+          nothing: () => this.renderNoAnalyticsMsg(),
+        })}
+      </div>
+    ));
+  }
+
+  renderQuestion(question: QuestionRef, skill: SkillRef, organization: models.OrganizationModel) {
+    const { classes, course, analytics, onPushRoute } = this.props;
+
+    return (
+      <div key={question.key} className={classes.question}>
+        <div key={question.key} className={classes.questionTitle}>
+          <span className={classes.questionLabel}>{question.label}:</span>
+          <div className={classes.questionLink}
+            onClick={() => onPushRoute(
+              `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
+              + `-${organization.guid}`
+              + `?questionId=${question.id}`)}>
+            {question.title.valueOr(getReadableTitleFromType(question.type))}
+          </div>
+          {question.parts.size === 1 && (
+            Maybe.maybe(question.parts.first()).caseOf({
+              just: part => analytics.dataSet.caseOf({
+                just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+                  just: byResourcePart => Maybe.maybe(
+                      byResourcePart.getIn([question.assessmentId, part.id]),
+                    ).caseOf({
+                      just: partAnalytics => this.renderPartStats(partAnalytics),
+                      nothing: () => this.renderNoAnalyticsMsg(),
+                    }),
+                  nothing: () => this.renderNoAnalyticsMsg(),
+                }),
+                nothing: () => this.renderNoAnalyticsMsg(),
+              }),
+              nothing: () => this.renderNoAnalyticsMsg(),
+            })
+          )}
+        </div>
+        {question.parts.size > 1 && this.renderMultipleParts(question, skill, organization)}
+      </div>
+    );
+  }
+
   renderObjectiveDetails(objectiveRef: ObjectiveRef, organization: models.OrganizationModel) {
-    const { classes, course, onPushRoute } = this.props;
+    const { classes } = this.props;
 
     return (
       <div className={classes.objectiveDetails}>
         {objectiveRef.skills.map(skill => (
           <div key={skill.id} className={classes.skill}>
-            <i className="fa fa-cubes" /> <b>Skill:</b> {skill.title}
+            <i className="fa fa-cube" /> <b>Skill:</b> {skill.title}
             <div className={classes.skillQuestions}>
-              {skill.questions.map(question => (
-                <div key={question.key} className={classes.question}>
-                  <i className="far fa-question-circle" /> <span className={classes.questionLink}
-                    onClick={() => onPushRoute(
-                      `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
-                      + `-${organization.guid}`
-                      + `?questionId=${question.id}`)}>
-                    {question.title.valueOr(getReadableTitleFromType(question.type))}
-                  </span>
-                </div>
-              ))}
+              {skill.questions.map(question => this.renderQuestion(question, skill, organization))}
             </div>
           </div>
         ))}
@@ -310,12 +643,12 @@ class Analytics
               {displayedTitle}
             </div>
             <div>
-              {!isExpanded  && this.renderAggregateObjectiveDetails(objectiveRef)}
+              {!isExpanded && this.renderAggregateObjectiveDetails(objectiveRef)}
             </div>
           </div>
         </div>
         {isExpanded && this.renderObjectiveDetails(objectiveRef, organization)}
-      </div>
+      </div >
     );
   }
 

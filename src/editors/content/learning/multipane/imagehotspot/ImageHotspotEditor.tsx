@@ -26,7 +26,7 @@ import { fetchImageSize } from 'utils/image';
 import { convert } from 'utils/format';
 import { PolygonEditor } from 'editors/content/question/imagehotspot/PolygonEditor';
 import { Panel } from 'data/content/workbook/multipanel/panel';
-import { LoadingSpinner } from 'components/common/LoadingSpinner';
+import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
 import { TextInput } from 'editors/content/common/controls';
 
@@ -498,7 +498,8 @@ class ImageHotspotEditor
             ),
             nothing: () => isLoadingActivity
               ? (
-                <LoadingSpinner message="Loading Activity Pages..." />
+                <LoadingSpinner size={LoadingSpinnerSize.Small}
+                  message="Loading Activity Pages..." />
               )
               : (
                 <div className={classes.errorMsg}>

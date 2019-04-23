@@ -3,6 +3,50 @@
 import { fetchServerTime } from '../data/persistence';
 
 
+const monthsToOrdinal = {
+  Jan: 0,
+  Feb: 1,
+  Mar: 2,
+  Apr: 3,
+  May: 4,
+  Jun: 5,
+  Jul: 6,
+  Aug: 7,
+  Sep: 8,
+  Oct: 9,
+  Nov: 10,
+  Dec: 11,
+};
+
+function convertHour(hour: number, isPM: boolean): number {
+  if (isPM) {
+    return hour === 12 ? 12 : hour + 12;
+  }
+
+  return hour === 12 ? 0 : hour;
+}
+
+export function parseDate(value: string): Date {
+
+  const p = value.split(' ');
+  const t = p[3].split(':');
+
+  return new Date(Date.UTC(
+    parseInt(p[2], 10), monthsToOrdinal[p[0]],
+    parseInt(p[1].substr(0, p[1].indexOf(',')), 10),
+    convertHour(parseInt(t[0], 10), p[4] === 'PM'),
+    parseInt(t[1], 10),
+    parseInt(t[2], 10),
+  ));
+}
+
+const dateOptions = {
+  month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric',
+};
+
+export const dateFormatted = (date: Date): string =>
+  date.toLocaleDateString('en-US', dateOptions);
+
 export function determineServerTimeSkewInMs() : Promise<number> {
 
   return new Promise((resolve, reject) => {

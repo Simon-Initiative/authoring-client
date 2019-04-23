@@ -21,7 +21,6 @@ export function buildReportProblemAction(
   };
 }
 
-
 export function buildConflictMessage() {
 
   const content = new Messages.TitledContent().with({
@@ -31,7 +30,7 @@ export function buildConflictMessage() {
   return new Messages.Message().with({
     content,
     guid: 'PersistenceConflict',
-    scope: Messages.Scope.Package,
+    scope: Messages.Scope.CoursePackage,
     severity: Messages.Severity.Error,
     canUserDismiss: true,
     actions: Immutable.List(),

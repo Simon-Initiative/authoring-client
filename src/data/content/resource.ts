@@ -3,28 +3,6 @@ import { FileNode } from './file_node';
 import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from 'data/types';
 
-export type ResourceParams = {
-  rev?: number,
-  guid?: string,
-  id?: string,
-  type?: LegacyTypes,
-  title?: string,
-  lastRevisionGuid?: string;
-  previousRevisionGuid?: string;
-  lastRevisionNumber?: string;
-  dateCreated?: Date,
-  dateUpdated?: Date,
-  fileNode?: FileNode,
-  resourceState?: ResourceState,
-};
-
-// Added to support soft resource deletion
-export enum ResourceState {
-  ACTIVE = 'ACTIVE',
-  DELETED = 'DELETED',
-  RESTORED = 'RESTORED',
-}
-
 const monthsToOrdinal = {
   Jan: 0,
   Feb: 1,
@@ -60,6 +38,28 @@ export function parseDate(value: string): Date {
     parseInt(t[1], 10),
     parseInt(t[2], 10),
   ));
+}
+
+export type ResourceParams = {
+  rev?: number,
+  guid?: string,
+  id?: string,
+  type?: LegacyTypes,
+  title?: string,
+  lastRevisionGuid?: string;
+  previousRevisionGuid?: string;
+  lastRevisionNumber?: string;
+  dateCreated?: Date,
+  dateUpdated?: Date,
+  fileNode?: FileNode,
+  resourceState?: ResourceState,
+};
+
+// Added to support soft resource deletion
+export enum ResourceState {
+  ACTIVE = 'ACTIVE',
+  DELETED = 'DELETED',
+  RESTORED = 'RESTORED',
 }
 
 export class Resource extends Immutable.Record(

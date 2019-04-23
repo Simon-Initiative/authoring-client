@@ -25,7 +25,7 @@ import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import {
   styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS,
 } from 'components/sidebar/ContextAwareSidebar.styles';
-import { relativeToNow, adjustForSkew } from 'utils/date';
+import { relativeToNow, adjustForSkew, dateFormatted } from 'utils/date';
 import { Tooltip } from 'utils/tooltip';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Button } from 'editors/content/common/Button';
@@ -251,12 +251,6 @@ class ContextAwareSidebar
       model, resource, editMode, currentPage, onSetCurrentNodeOrPage,
       onEditModel, classes,
     } = this.props;
-
-    const dateOptions = {
-      month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric',
-    };
-    const dateFormatted = (date: Date): string =>
-      date.toLocaleDateString('en-US', dateOptions);
 
     const adjusted = (date: Date): Date => adjustForSkew(date, this.props.timeSkewInMs);
 

@@ -19,18 +19,27 @@ import { TextInput } from 'editors/content/common/controls';
 import { isNullOrUndefined } from 'util';
 import { PackageLicenseTypes } from 'data/content/learning/common';
 import { TabContainer, Tab } from 'components/common/TabContainer';
+import { AnalyticsState } from 'reducers/analytics';
+import { LoadingSpinner } from 'components/common/LoadingSpinner';
+import { parseDate, dateFormatted } from 'utils/date';
+import { DatasetStatus } from 'types/analytics/dataset';
+import { reportError } from 'utils/feedback';
+import { UserState } from 'reducers/user';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
 
 export interface CourseEditorProps {
+  user: UserState;
   model: models.CourseModel;
+  editMode: boolean;
+  analytics: AnalyticsState;
   courseChanged: (m: models.CourseModel) => any;
   viewAllCourses: () => any;
-  editMode: boolean;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
+  onCreateDataset: () => void;
 }
 
 type ThemeSelection = {
@@ -208,7 +217,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           .catch((err) => {
             // We need to handle this better.  This editor should be managed
             // by the EditorManager
-            console.log(err);
+            console.error(err);
           });
       });
 
@@ -239,7 +248,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         });
         courseChanged(model.with({ theme: themeId }));
       })
-      .catch(err => console.log(`Error setting theme ${themeId}: ${err}`));
+      .catch(err => console.error(`Error setting theme ${themeId}: ${err}`));
   }
 
   onClickNewVersion() {
@@ -279,7 +288,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       .then((document) => {
         this.props.viewAllCourses();
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   }
 
   displayRemovePackageModal() {
@@ -491,63 +500,242 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     persistence.persistDocument(doc);
   }
 
-  render() {
+  renderAdminDetails() {
+    return (
+      <div className="row">
+        <div className="col-3">Administrator</div>
+        <div className="col-9">
+          <Button
+            editMode
+            type="outline-primary"
+            onClick={() => persistence.skillsDownload(this.props.model.guid)}>
+            <i className="fa fa-download" /> Download Skill Files
+          </Button>
+          &nbsp;&nbsp;
+          <Button
+            editMode
+            type="outline-danger"
+            onClick={this.displayRemovePackageModal}>
+            Delete Course Package
+          </Button>
+          <br /><br />
+          Create new package version&nbsp;
+          <HelpPopover>
+            You can create a copy of this course package as a new version, allowing you to develop
+            content independently of the original. This is useful when you want to get started
+            on the next generation of a course without changing an existing course that's already
+            in use.
+            <br />
+            <br />
+            New version numbers must adhere to&nbsp;
+            {/* tslint:disable-next-line:max-line-length */}
+            <a href="https://fullstack-developer.academy/what-is-semantic-versioning/#semanticversioninginnodejsnpm" target="_blank">Semantic Versioning</a> rules.
+          </HelpPopover>
+          <br />
+          <br />
+          <TextInput
+            editMode={this.props.editMode}
+            width="220px"
+            label="New Version Number (e.g. 1.1)"
+            type="text"
+            value={this.state.newVersionNumber}
+            onEdit={this.validateVersionNumber}
+            hasError={this.state.newVersionNumber !== '' && !this.state.isNewVersionValid}
+          />
+          <br />
+          <RequestButton text="Create Version" className="btn-primary createVersion"
+            onClick={() => this.onClickNewVersion()} />
+        </div>
+      </div>
+    );
+  }
+
+  renderDetails() {
     const { model } = this.props;
 
     const isAdmin = hasRole('admin');
 
-    let adminRow = null;
-
-    if (isAdmin) {
-      adminRow = <div>
+    return (
+      <div className="infoContain">
         <div className="row">
-          <div className="col-3">Administrator</div>
+          <div className="col-3">Title</div>
           <div className="col-9">
-            <Button
-              editMode
-              type="outline-primary"
-              onClick={() => persistence.skillsDownload(this.props.model.guid)}>
-              <i className="fa fa-download" /> Download Skill Files
-            </Button>
-            &nbsp;&nbsp;
-            <Button
-              editMode
-              type="outline-danger"
-              onClick={this.displayRemovePackageModal}>
-              Delete Course Package
-            </Button>
-            <br /><br />
-            Create new package version&nbsp;
-            <HelpPopover>
-              You can create a copy of this course package as a new version, allowing you to develop
-              content independently of the original. This is useful when you want to get started
-              on the next generation of a course without changing an existing course that's already
-              in use.
-              <br />
-              <br />
-              New version numbers must adhere to&nbsp;
-              {/* tslint:disable-next-line:max-line-length */}
-              <a href="https://fullstack-developer.academy/what-is-semantic-versioning/#semanticversioninginnodejsnpm" target="_blank">Semantic Versioning</a> rules.
-            </HelpPopover>
-            <br />
-            <br />
-            <TextInput
-              editMode={this.props.editMode && isAdmin}
-              width="220px"
-              label="New Version Number (e.g. 1.1)"
-              type="text"
-              value={this.state.newVersionNumber}
-              onEdit={this.validateVersionNumber}
-              hasError={this.state.newVersionNumber !== '' && !this.state.isNewVersionValid}
-            />
-            <br />
-            <RequestButton text="Create Version" className="btn-primary createVersion"
-              onClick={() => this.onClickNewVersion()} />
+            <Title title={model.title}
+              editMode={this.props.editMode}
+              onBeginExternallEdit={() => true}
+              requiresExternalEdit={false}
+              isHoveredOver={true}
+              onEdit={this.onTitleEdit}
+              loading={false}
+              disableRemoval={true}
+              editWording="Edit"
+              onRemove={() => false}
+            >{model.title}</Title>
           </div>
         </div>
-      </div>;
-    }
+        <div className="row">
+          <div className="col-3">Description</div>
+          <div className="col-9">
+            <Title title={model.description}
+              editMode={this.props.editMode}
+              onBeginExternallEdit={() => true}
+              requiresExternalEdit={false}
+              isHoveredOver={true}
+              onEdit={this.onDescriptionEdit}
+              loading={false}
+              disableRemoval={true}
+              editWording="Edit"
+              onRemove={() => false}
+            >{model.description}</Title>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-3">Team members</div>
+          <div className="col-9">{this.renderDevelopers()}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">Theme</div>
+          <div className="col-9">{this.renderThemes()}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">Version</div>
+          <div className="col-9">{model.version}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">License <HelpPopover activateOnClick>
+            <div><img src={CC_LICENSES} />
+              <br /><br />
+              <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                target="_blank">
+                More information
+              </a>
+            </div>
+          </HelpPopover>
+          </div>
+          <div className="col-9">{this.renderLicenseSelect()}</div>
+        </div>
+        <hr />
+        <div className="row">
+          <div className="col-3">Unique ID</div>
+          <div className="col-9">{model.id}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">Package Location</div>
+          <div className="col-9">{model.svnLocation}</div>
+        </div>
+        {/* <div className="row">
+          <div className="col-3">Thumbnail<br /><br />
+          </div>
+          <div className="col-9">
+            <img src={THUMBNAIL} className="img-fluid" alt=""></img>
+          </div>
+        </div> */}
+        {isAdmin && this.renderAdminDetails()}
+      </div>
+    );
+  }
 
+  renderWorkflow() {
+    return (
+      <div className="infoContain">
+        <div className="row">
+          <div className="col-3">Status</div>
+          <div className="col-9">
+            {this.renderStatus()}
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-3">Actions</div>
+          <div className="col-9">
+            {this.renderActions()}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderProcessingAnalyticsMsg() {
+    return (
+      <React.Fragment>
+        <LoadingSpinner>
+          Please wait while your new dataset is created, this might take a while.
+          <br/>
+          <br/>
+          You may continue to use the editor while this operation is in progress.
+        </LoadingSpinner>
+      </React.Fragment>
+    );
+  }
+
+  renderAnalytics() {
+    const { user, analytics, onCreateDataset } = this.props;
+
+    return (
+      <div className="infoContain">
+        <div className="row">
+          <div className="col-9">
+            {analytics.requestedDataSetId.caseOf({
+              just: () => this.renderProcessingAnalyticsMsg(),
+              nothing: () => analytics.dataSet.caseOf({
+                just: dataSet => dataSet.status === DatasetStatus.PROCESSING
+                  ? this.renderProcessingAnalyticsMsg()
+                  : dataSet.status === DatasetStatus.FAILED
+                  ? (
+                    <React.Fragment>
+                      <i className="fa fa-times-circle" style={{ marginRight: 5 }} />
+                      <b>Dataset Creation Failed</b>
+                      <br />
+                      Something went wrong while creating a new dataset for this course.
+                      <br />
+                      <br />
+                      If this issue continues to occur, please report it to to OLI support.
+                      <Button
+                        editMode={true}
+                        type="secondary"
+                        style={{ marginLeft: 10 }}
+                        onClick={() => reportError(user)}>
+                        Report this problem
+                      </Button>
+                    </React.Fragment>
+                  )
+                  : (
+                    <React.Fragment>
+                      Analytics for this course are based on the latest dataset, which was created
+                      {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
+                      To get the most recent data for analytics, create a new dataset.
+                      <br />
+                      <br />
+                      <b>Notice:</b> Dataset creation may take a few minutes depending on the size
+                      of the course. You may continue to use the editor while the operation is in
+                      progress.
+                    </React.Fragment>
+                  ),
+                nothing: () => (
+                  <React.Fragment>
+                    No datasets have been created for this course package.
+                    To see statistics about content effectiveness in the Course Author,
+                    you must first create a dataset.
+                  </React.Fragment>
+                ),
+              }),
+            })}
+          </div>
+          <div className="col-3">
+            <Button
+              editMode={this.props.editMode && analytics.requestedDataSetId.caseOf({
+                just: () => false,
+                nothing: () => true,
+              })}
+              onClick={() => onCreateDataset()}>
+              Create Dataset
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  render() {
     return (
       <div className="course-editor" >
         <div className="row info">
@@ -555,116 +743,13 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             <h2>Course Package</h2>
             <TabContainer labels={['Details', 'Workflow', 'Analytics']}>
               <Tab>
-                <div className="infoContain">
-                  <div className="row">
-                    <div className="col-3">Title</div>
-                    <div className="col-9">
-                      <Title title={model.title}
-                        editMode={this.props.editMode}
-                        onBeginExternallEdit={() => true}
-                        requiresExternalEdit={false}
-                        isHoveredOver={true}
-                        onEdit={this.onTitleEdit}
-                        loading={false}
-                        disableRemoval={true}
-                        editWording="Edit"
-                        onRemove={() => false}
-                      >{model.title}</Title>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-3">Description</div>
-                    <div className="col-9">
-                      <Title title={model.description}
-                        editMode={this.props.editMode}
-                        onBeginExternallEdit={() => true}
-                        requiresExternalEdit={false}
-                        isHoveredOver={true}
-                        onEdit={this.onDescriptionEdit}
-                        loading={false}
-                        disableRemoval={true}
-                        editWording="Edit"
-                        onRemove={() => false}
-                      >{model.description}</Title>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-3">Team members</div>
-                    <div className="col-9">{this.renderDevelopers()}</div>
-                  </div>
-                  <div className="row">
-                    <div className="col-3">Theme</div>
-                    <div className="col-9">{this.renderThemes()}</div>
-                  </div>
-                  <div className="row">
-                    <div className="col-3">Version</div>
-                    <div className="col-9">{model.version}</div>
-                  </div>
-                  <div className="row">
-                    <div className="col-3">License <HelpPopover activateOnClick>
-                      <div><img src={CC_LICENSES} />
-                        <br /><br />
-                        <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
-                          target="_blank">
-                          More information
-                        </a>
-                      </div>
-                    </HelpPopover>
-                    </div>
-                    <div className="col-9">{this.renderLicenseSelect()}</div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-3">Unique ID</div>
-                    <div className="col-9">{model.id}</div>
-                  </div>
-                  <div className="row">
-                    <div className="col-3">Package Location</div>
-                    <div className="col-9">{model.svnLocation}</div>
-                  </div>
-                  {/* <div className="row">
-                    <div className="col-3">Thumbnail<br /><br />
-                    </div>
-                    <div className="col-9">
-                      <img src={THUMBNAIL} className="img-fluid" alt=""></img>
-                    </div>
-                  </div> */}
-                  {adminRow}
-                </div>
+                {this.renderDetails()}
               </Tab>
               <Tab>
-                <div className="infoContain">
-                  <div className="row">
-                    <div className="col-3">Status</div>
-                    <div className="col-9">
-                      {this.renderStatus()}
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-3">Actions</div>
-                    <div className="col-9">
-                      {this.renderActions()}
-                    </div>
-                  </div>
-                </div>
+                {this.renderWorkflow()}
               </Tab>
               <Tab>
-                <div className="infoContain">
-                  <div className="row">
-                    <div className="col-9">
-                      No datasets have been created for this course package.
-                      To see statistics about content effectiveness in the Course Author,
-                      you must first create a dataset.
-                    </div>
-                    <div className="col-3">
-                      <Button
-                        editMode={this.props.editMode}
-                        onClick={() => console.log('NOT IMPLEMENTED')}>
-                        Create Dataset
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                {this.renderAnalytics()}
               </Tab>
             </TabContainer>
           </div>

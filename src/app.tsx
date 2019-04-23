@@ -54,6 +54,7 @@ let experimentalOrgEditing = (window as Window)
 };
 
 (window as any).help = () => {
+  // tslint:disable-next-line:no-console
   console.log(`
 Available Commands:
 

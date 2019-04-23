@@ -62,10 +62,14 @@ function caseOrDefault<T>(key: string):
  *    },
  *  })('Unknown');
  *
+ * // organismKingdom = 'Animal'
+ *
  * Notes:
  *  1. The generic given to caseOf<generic> specifies the return value.
  *  2. As seen in the 'single-cell' case, if a function is provided it will
- *     be evaluated and the return value will be the result
+ *     be evaluated and the return value will be the result. This is important
+ *     in situations where lazy evaluation is required, e.g. when a property
+ *     should only be accessed on some object under that specific case.
  *
  * This function works by returning a function that returns another function
  * which is finally called with the default value which finally runs through the cases
