@@ -6,6 +6,7 @@ import { ModalMessage } from 'utils/ModalMessage';
 export type HelpPopoverProps = {
   position?: Position,
   activateOnClick?: boolean,
+  modalTitle?: string;
   displayModal: (component: any) => void;
   dismissModal: () => void;
 };
@@ -23,7 +24,7 @@ const DEFAULT_TOOLTIP_PROPS = {
   interactive: true,
   arrow: true,
   position: Position.Top,
-  className: 'help-popover-trigger',
+  className: 'help-popover',
   activateOnClick: false,
 };
 
@@ -38,10 +39,11 @@ export class HelpPopover extends React.PureComponent<HelpPopoverProps, {}> {
   render() {
     const props = mergeWithDefaultProps(this.props);
 
-    const modal = <ModalMessage onCancel={props.dismissModal}>{this.props.children}</ModalMessage>;
+    const modal = <ModalMessage title={props.modalTitle}
+      onCancel={props.dismissModal}>{this.props.children}</ModalMessage>;
 
     return props.activateOnClick
-      ? <div className="help-popover-container help-popover-trigger">
+      ? <div className="help-popover help-popover-container help-popover-trigger">
         <i onClick={() => props.displayModal(modal)}
            className={'fa fa-question-circle'}></i>
       </div>

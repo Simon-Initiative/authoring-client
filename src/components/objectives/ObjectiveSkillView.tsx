@@ -1227,7 +1227,7 @@ class ObjectiveSkillView
 
     return (
       <h2>Learning Objectives and Skills&nbsp;
-        <HelpPopover activateOnClick>
+        <HelpPopover activateOnClick modalTitle="About Learning Objectives and Skills">
           <iframe src={src} height={500} width={'100%'} />
         </HelpPopover>
       </h2>
