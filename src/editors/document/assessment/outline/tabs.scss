@@ -11,7 +11,7 @@ $active-tab: $blue;
   color: $emerald;
 }
 
-.tab-item {
+.assessment-tab-item {
   cursor: pointer;
   border-style: none;
   border-color: #CCCCCC;
@@ -29,10 +29,16 @@ $active-tab: $blue;
     background-color: lighten(#edeff0, 5%);
   }
 
+  .dragHandleGrab {
+    margin-right: 10px;
+
+    .grip {
+      height: 86%;
+    }
+  }
+
   .content {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
   }
 
   .info {

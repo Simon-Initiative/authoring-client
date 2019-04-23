@@ -3,8 +3,8 @@
 
 $active-tab: $blue;
 
-.tab-item {
-  cursor: pointer;
+.org-tab-item {
+  cursor: default;
   border-style: none;
   border-color: #CCCCCC;
   color: black;
@@ -21,6 +21,15 @@ $active-tab: $blue;
     background-color: lighten(#edeff0, 5%);
   }
 
+  .dragHandleGrab {
+    margin-right: 10px;
+
+    .grip {
+      margin-top: 0;
+      height: 88%;
+    }
+  }
+
   .content {
     white-space: nowrap;
     overflow: hidden;
@@ -35,6 +44,10 @@ $active-tab: $blue;
     small {
       display: inline-block;
     }
+  }
+
+  .remove-btn {
+    padding-top: 10px;
   }
 }
 

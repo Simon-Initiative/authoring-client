@@ -9,6 +9,8 @@ import { CourseModel, OrganizationModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
 import { RemoveCommand } from '../commands/remove';
 import { PreconditionsEditor } from '../PreconditionsEditor';
+import { DragHandle } from 'components/common/DragHandle';
+import { Remove } from 'components/common/Remove';
 
 export interface TabProps {
   course?: CourseModel;
@@ -63,13 +65,7 @@ export function renderTab(
 const buildRemove = (editMode: boolean, model, processor) => {
   const removeCommand = new RemoveCommand();
   return (
-    <button
-      className="btn btn-link btn-sm" key="remove"
-      style={{ color: 'gray ' }}
-      disabled={!editMode}
-      onClick={() => processor(model, removeCommand)}>
-      <i className="fa fa-times" aria-hidden="true"></i>
-    </button>
+    <Remove editMode={editMode} onRemove={() => processor(model, removeCommand)} />
   );
 };
 
@@ -174,7 +170,7 @@ class Tab extends React.PureComponent<TabProperties, {}> {
       course, children, connectDragSource, commandProcessor,
     } = this.props;
 
-    const classes = 'tab-item '
+    const classes = 'org-tab-item '
       + (nodeState.isSelected ? 'tab-item-active' : '');
 
     const indentation = {
@@ -190,6 +186,7 @@ class Tab extends React.PureComponent<TabProperties, {}> {
           {children}
 
           <div className="d-flex w-100 flex-row justify-content-between">
+            <DragHandle />
             <div className="d-flex w-100 flex-column justify-content-between">
               <div className="info d-flex justify-content-between">
                 <Label {...this.props}>{label}</Label>
