@@ -85,7 +85,7 @@ export class RequestButton extends React.Component<RequestButtonProps, RequestBu
     const { pending, successful, failed } = this.state;
 
     return (
-      <span>
+      <span className="RequestButton">
         <button
           style={{ marginRight: '5px' }}
           className={`btn ${className}`}

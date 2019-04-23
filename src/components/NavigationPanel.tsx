@@ -34,6 +34,12 @@ export const styles: JSSStyles = {
     borderRight: [1, 'solid', colors.grayLight],
     padding: [10, 0, 5, 0],
     position: 'relative',
+
+    '&:hover': {
+      '& $resizeHandle $collapseButton': {
+        opacity: 1,
+      },
+    },
   },
   collapsed: {
     '&$navItem': {
@@ -198,18 +204,61 @@ export const styles: JSSStyles = {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    right: 0,
-    width: 5,
+    right: -14,
+    width: 14,
     cursor: 'ew-resize',
     zIndex: 1000,
   },
+  collapseButtonContainer: {
+    position: 'absolute',
+    top: 182,
+    right: -2,
+  },
+  collapseButton: {
+    width: 30,
+    height: 30,
+    borderRadius: '50%',
+    color: colors.grayDark,
+    border: [1, 'solid', colors.grayDark],
+    background: colors.white,
+    paddingRight: 2,
+    paddingTop: 2,
+    textAlign: 'center',
+    cursor: 'pointer',
+    boxShadow: [2, 3, 10, -2, 'rgba(148,148,148,1)'],
+    fontSize: 16,
+    opacity: 0,
+
+    transition: 'opacity .2s ease-out',
+
+    '& i': {
+      fontWeight: 600,
+    },
+
+    '&:hover': {
+      color: colors.selection,
+      border: [1, 'solid', colors.selection],
+    },
+  },
   publishActions: {
-    margin: [2, 0, 2, 20],
+    margin: 'auto',
 
     publishAction: {
       span: {
         marginRight: 10,
       },
+    },
+
+    '& .RequestButton': {
+      marginRight: 10,
+    },
+
+    '&.collapsed .RequestButton': {
+      marginRight: 0,
+    },
+
+    '& .previewButton': {
+      marginRight: [0, '!important'],
     },
   },
 };
@@ -367,11 +416,36 @@ class NavigationPanel
     });
   }
 
+  onCollapse = () => {
+    const { profile } = this.props;
+    const { width } = this.state;
+
+    this.setState({
+      collapsed: true,
+    });
+    this.updatePersistentPrefs(profile.username, width.valueOr(DEFAULT_WIDTH_PX), true);
+  }
+
   renderResizeHandle() {
     const { classes } = this.props;
+    const { collapsed } = this.state;
 
     return (
-      <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown} />
+      <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown}>
+        {!collapsed && (
+          <div className={classes.collapseButtonContainer}>
+          <Tooltip title="Collapse Outline" position="right" size="small" delay={750}>
+            <div className={classes.collapseButton}
+              onClick={(e) => {
+                this.onCollapse();
+                e.stopPropagation();
+              }}>
+              <i className="fa fa-angle-double-left" />
+            </div>
+          </Tooltip>
+          </div>
+        )}
+      </div>
     );
   }
 
@@ -498,13 +572,12 @@ class NavigationPanel
           </a>
         </div>
       </div>
-
     );
   }
 
   renderOrgTree(currentOrg: Resource, selectedItem: Maybe<nav.NavigationItem>) {
     const { classes, profile } = this.props;
-    const { collapsed } = this.state;
+    const { width, collapsed } = this.state;
 
     return (
       <React.Fragment>
@@ -516,13 +589,16 @@ class NavigationPanel
                   classes.navItem,
                 ])}
                 onClick={() => {
+                  const newWidth =  width.lift(w =>
+                      w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
+
                   this.setState({
-                    width: Maybe.just(DEFAULT_WIDTH_PX),
+                    width: newWidth,
                     collapsed: false,
                   });
                   this.updatePersistentPrefs(
                     profile.username,
-                    DEFAULT_WIDTH_PX,
+                    newWidth.valueOr(DEFAULT_WIDTH_PX),
                     false,
                   );
                 }}>
@@ -538,21 +614,27 @@ class NavigationPanel
           }
         </div>
 
-        <div className={classes.publishActions}>
+        <div className={classNames([classes.publishActions, collapsed && 'collapsed'])}>
           {collapsed
-            ? <RequestButton text="" className="btn-primary previewButton"
-              onClick={() => this.onPreview()}><i className="fa fa-eye" /></RequestButton>
-            : <div className={classes.publishAction}>
-              <RequestButton text={this.getWidth() < 210 ? 'Preview' : 'Preview Course'}
-                className="btn-primary previewButton"
-                onClick={() => this.onPreview()} />
-              <HelpPopover>
-                You can launch a full course preview using the active organization to allow
-                it to be viewed publically.
-                <br /><br />
-                It may take a few minutes for larger courses.
-              </HelpPopover>
-            </div>
+            ? (
+              <RequestButton text="" className="btn-secondary previewButton"
+                onClick={() => this.onPreview()}>
+                <i className="fa fa-eye" />
+              </RequestButton>
+            )
+            : (
+              <div className={classes.publishAction}>
+                <RequestButton text={this.getWidth() < 210 ? 'Preview' : 'Preview Course'}
+                  className="btn-secondary previewButton"
+                  onClick={() => this.onPreview()} />
+                <HelpPopover>
+                  Launch a full <b>course preview</b> of the current organization.
+                  This preview URL can be shared and viewed publically.
+                  <br /><br />
+                  This may take a few minutes for larger courses.
+                </HelpPopover>
+              </div>
+            )
           }
         </div>
       </React.Fragment>
