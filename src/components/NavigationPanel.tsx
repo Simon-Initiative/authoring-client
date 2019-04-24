@@ -133,7 +133,7 @@ export const styles: JSSStyles = {
         '&:hover': {
           backgroundColor: colors.selection,
           color: colors.white,
-          borderLeft: [1, 'solid', colors.white, '!important'],
+          borderLeft: [[1, 'solid', colors.white], '!important'],
         },
       },
     },

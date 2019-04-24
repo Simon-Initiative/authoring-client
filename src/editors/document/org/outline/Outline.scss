@@ -1,6 +1,5 @@
 .org-outline-container {
   display: flex;
-  overflow-y: auto;
   flex: 0 0 500px;
   flex-direction: column;
   margin-right: 2px;
@@ -19,7 +18,6 @@
       padding: 0.4em;
       padding-bottom: 1px;
       padding-right: 6px;
-      overflow-y: auto;
     }
   }
 

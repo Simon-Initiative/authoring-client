@@ -6,6 +6,7 @@ export interface ModalMessage {
 
 export interface ModalMessageProps {
   okLabel?: string;
+  title?: string;
   onCancel: () => void;
 }
 
@@ -29,6 +30,7 @@ export class ModalMessage extends React.PureComponent<ModalMessageProps, {}> {
         <div className="modal-dialog modal-lg" role="document">
           <div className="modal-content">
             <div className="modal-header">
+              {this.props.title}
               <button onClick={this.props.onCancel} type="button" className="close"
                 data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>

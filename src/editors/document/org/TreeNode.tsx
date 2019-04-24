@@ -6,6 +6,7 @@ import { NodeTypes } from './traversal';
 import * as org from 'data/models/utils/org';
 
 import './TreeNode.scss';
+import { getNameAndIconByType } from 'components/ResourceView';
 
 export interface TreeNodeProps {
   isSelected: boolean;
@@ -23,7 +24,7 @@ export interface TreeNodeProps {
   editMode: boolean;
   onClick: (model: NodeTypes) => void;
   onReposition: (
-    sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
+  sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
 
 export interface TreeNodeState {
@@ -55,16 +56,22 @@ export class TreeNode
     return '';
   }
 
+  getResourceIcon(resource: contentTypes.Resource) {
+    return getNameAndIconByType(resource.type).icon;
+  }
+
   renderTitle() {
 
-    const { isExpanded } = this.props;
+    const { isExpanded, model } = this.props;
 
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
 
       const resource = this.props.context.courseModel.resourcesById.get(
         this.props.model.resourceref.idref);
       return resource !== undefined
-        ? resource.title
+        ? <React.Fragment>
+          <span style={{ marginRight: 8 }}>{this.getResourceIcon(resource)}</span>{resource.title}
+        </React.Fragment>
         : 'Loading...';
     }
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {

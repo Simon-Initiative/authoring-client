@@ -12,6 +12,7 @@ import { LikertSeries } from 'data/content/feedback/likert_series';
 import { Likert } from 'data/content/feedback/likert';
 import { FeedbackMultipleChoice } from 'data/content/feedback/feedback_multiple_choice';
 import { FeedbackOpenResponse } from 'data/content/feedback/feedback_open_response';
+import { DragHandle } from 'components/common/DragHandle';
 
 const newText: (type: string) => string = type => 'New ' + type;
 
@@ -317,7 +318,7 @@ class Tab extends React.PureComponent<TabProperties, {}> {
       node, nodeState, handlers, label, previewText, children, connectDragSource, showSkills,
     } = this.props;
 
-    const classes = 'tab-item '
+    const classes = 'assessment-tab-item '
       + (nodeState.isSelected ? 'tab-item-active' : '');
 
     const indentation = {
@@ -332,13 +333,16 @@ class Tab extends React.PureComponent<TabProperties, {}> {
 
           {children}
 
-          <div className="d-flex w-100 flex-column justify-content-between">
-            <small className="content">
-              {`${nodeState.indexWithinParent + 1}. ${previewText}`}
-            </small>
-            <div className="info d-flex justify-content-between">
-              <Label {...this.props}>{label}</Label>
-              {showSkills ? <Skills {...this.props} question={node} /> : null}
+          <div className="d-flex w-100 flex-row justify-content-between">
+            <DragHandle />
+            <div className="d-flex w-100 flex-column justify-content-between ellipsize-overflow">
+              <small className="content ellipsize-overflow">
+                {`${nodeState.indexWithinParent + 1}. ${previewText}`}
+              </small>
+              <div className="info d-flex justify-content-between">
+                <Label {...this.props}>{label}</Label>
+                {showSkills ? <Skills {...this.props} question={node} /> : null}
+              </div>
             </div>
           </div>
         </div>
