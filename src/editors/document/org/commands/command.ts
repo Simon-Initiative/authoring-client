@@ -36,7 +36,7 @@ export abstract class AbstractCommand implements Command {
 
   precondition(
     org: models.OrganizationModel,
-    node: t.Sequence | t.Unit | t.Module | t.Section | t.Item): boolean {
+    node: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section | t.Item): boolean {
 
     return true;
   }

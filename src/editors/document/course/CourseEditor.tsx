@@ -25,6 +25,7 @@ import { parseDate, dateFormatted } from 'utils/date';
 import { DatasetStatus } from 'types/analytics/dataset';
 import { reportError } from 'utils/feedback';
 import { UserState } from 'reducers/user';
+import flatui from 'styles/palettes/flatui';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -85,7 +86,7 @@ export class RequestButton extends React.Component<RequestButtonProps, RequestBu
     const { pending, successful, failed } = this.state;
 
     return (
-      <span>
+      <span className="RequestButton">
         <button
           style={{ marginRight: '5px' }}
           className={`btn ${className}`}
@@ -93,9 +94,18 @@ export class RequestButton extends React.Component<RequestButtonProps, RequestBu
           {text}
           {children}
         </button>
-        {pending ? <i className="fas fa-circle-notch fa-spin fa-1x fa-fw" /> : null}
-        {successful ? <i className="fas fa-check-circle" /> : null}
-        {failed ? <i className="fas fa-times-circle" /> : null}
+        {pending
+            ? <i className="fas fa-circle-notch fa-spin fa-1x fa-fw"
+              style={{ color: flatui.peterRiver, marginLeft: 4 }} />
+            : null}
+        {successful
+          ? <i className="fas fa-check-circle"
+              style={{ color: flatui.emerald, marginLeft: 4 }} />
+          : null}
+        {failed
+          ? <i className="fas fa-times-circle"
+              style={{ color: flatui.pomegranite, marginLeft: 4 }} />
+          : null}
       </span>
     );
   }

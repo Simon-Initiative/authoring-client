@@ -14,6 +14,7 @@ interface DispatchProps {
 
 interface OwnProps {
   activateOnClick?: boolean;
+  modalTitle?: string;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

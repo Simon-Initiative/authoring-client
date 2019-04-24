@@ -17,6 +17,7 @@ import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
 import { Analytics } from './Analytics.controller';
+import { Remove } from 'components/common/Remove';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -124,9 +125,12 @@ export class OrgComponentEditor
 
   }
 
-  getLabel(model: t.Sequence | t.Unit | t.Module | t.Section) {
+  getLabel(model: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section) {
     return this.props.org.caseOf({
       just: (o) => {
+        if (model.contentType === 'Sequences') {
+          return 'Organization';
+        }
         if (model.contentType === 'Sequence') {
           return o.labels.sequence;
         }
@@ -282,7 +286,7 @@ export class OrgComponentEditor
     return [];
   }
 
-  renderActionBar(model: t.Sequence | t.Unit | t.Module | t.Section) {
+  renderActionBar(model: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section) {
     return this.props.org.caseOf({
       just: (org) => {
 
@@ -290,12 +294,12 @@ export class OrgComponentEditor
 
         const removeCommand = new RemoveCommand();
         const remove = (
-          <button
+          <Remove
             style={{ float: 'right' }}
-            className="btn btn-link btn-sm" key="remove"
-            disabled={!removeCommand.precondition(org, model) || !this.props.editMode}
-            onClick={() => processor(removeCommand)}>{removeCommand.description(org.labels)}
-          </button>
+            editMode={this.props.editMode && removeCommand.precondition(org, model)}
+            onRemove={() => processor(removeCommand)}>
+            Remove {this.getLabel(model)}
+          </Remove>
         );
         return (
           <div>
