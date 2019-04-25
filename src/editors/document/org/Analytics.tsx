@@ -44,11 +44,11 @@ const getOrderedParts = (body: ContentElements, parts: List<contentTypes.Part>) 
     },
     List<any>(),
   )
-  .map(input => parts.find(p => p.responses.every(r => r.input === input)))
-  .filter(part => !!part);
+    .map(input => parts.find(p => p.responses.every(r => r.input === input)))
+    .filter(part => !!part);
 };
 
-export type OrgItem =  contentTypes.Sequence
+export type OrgItem = contentTypes.Sequence
   | contentTypes.Unit
   | contentTypes.Module
   | contentTypes.Section;
@@ -182,7 +182,7 @@ const styles: JSSStyles = {
       color: flatui.pomegranite,
     },
   },
-  distinctStudents: {
+  practice: {
     '& i': {
       color: flatui.wetAsphalt,
     },
@@ -228,8 +228,8 @@ export interface AnalyticsState {
  * Analytics React Component
  */
 class Analytics
-    extends React.PureComponent<StyledComponentProps<AnalyticsProps, typeof styles>,
-    AnalyticsState> {
+  extends React.PureComponent<StyledComponentProps<AnalyticsProps, typeof styles>,
+  AnalyticsState> {
 
   constructor(props) {
     super(props);
@@ -303,7 +303,7 @@ class Analytics
         just: ref => acc.set(
           resourceId(edge.destinationId),
           (acc.get(resourceId(edge.destinationId)) || OrderedMap<string, QuestionRef>())
-          .set(ref.key, ref),
+            .set(ref.key, ref),
         ),
         nothing: () => acc,
       }), Map<string, OrderedMap<string, QuestionRef>>(),
@@ -343,9 +343,9 @@ class Analytics
           }),
         List<ObjectiveRef>(),
       )
-      // filter out objectives with no skills
-      .filter(objective => objective.skills.size > 0)
-      .toList();
+        // filter out objectives with no skills
+        .filter(objective => objective.skills.size > 0)
+        .toList();
 
     this.setState({
       objectiveRefs: Maybe.just(objectiveRefs),
@@ -419,14 +419,14 @@ class Analytics
           html={(
             <div className={classes.analyticsTooltipContent}>
               <div>
-                <b>Distinct students:</b>
-                <div className={classNames([classes.stat, classes.distinctStudents])}>
+                <b>Number of attempts:</b>
+                <div className={classNames([classes.stat, classes.practice])}>
                   <i className="fa fa-users" />
-                  {partAnalytics.distinctStudents}
+                  {partAnalytics.practice}
                 </div>
               </div>
               <div>
-                The number of distinct students who submitted an answer
+                The number of times a student submitted an answer
                 for this question.
               </div>
             </div>
@@ -435,9 +435,9 @@ class Analytics
           delay={250}
           size="small"
           arrowSize="small">
-          <div className={classNames([classes.stat, classes.distinctStudents])}>
+          <div className={classNames([classes.stat, classes.practice])}>
             <i className="fa fa-users" />
-            {partAnalytics.distinctStudents}
+            {partAnalytics.practice}
           </div>
         </Tooltip>
 
@@ -545,12 +545,12 @@ class Analytics
         {analytics.dataSet.caseOf({
           just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
             just: byResourcePart => Maybe.maybe(
-                analyticsDataSet.status === DatasetStatus.DONE
-                && byResourcePart.getIn([question.assessmentId, part.id]),
-              ).caseOf({
-                just: partAnalytics => this.renderPartStats(partAnalytics),
-                nothing: () => this.renderNoAnalyticsMsg(),
-              }),
+              analyticsDataSet.status === DatasetStatus.DONE
+              && byResourcePart.getIn([question.assessmentId, part.id]),
+            ).caseOf({
+              just: partAnalytics => this.renderPartStats(partAnalytics),
+              nothing: () => this.renderNoAnalyticsMsg(),
+            }),
             nothing: () => this.renderNoAnalyticsMsg(),
           }),
           nothing: () => this.renderNoAnalyticsMsg(),
@@ -578,11 +578,11 @@ class Analytics
               just: part => analytics.dataSet.caseOf({
                 just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
                   just: byResourcePart => Maybe.maybe(
-                      byResourcePart.getIn([question.assessmentId, part.id]),
-                    ).caseOf({
-                      just: partAnalytics => this.renderPartStats(partAnalytics),
-                      nothing: () => this.renderNoAnalyticsMsg(),
-                    }),
+                    byResourcePart.getIn([question.assessmentId, part.id]),
+                  ).caseOf({
+                    just: partAnalytics => this.renderPartStats(partAnalytics),
+                    nothing: () => this.renderNoAnalyticsMsg(),
+                  }),
                   nothing: () => this.renderNoAnalyticsMsg(),
                 }),
                 nothing: () => this.renderNoAnalyticsMsg(),
