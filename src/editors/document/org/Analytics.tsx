@@ -445,15 +445,17 @@ class Analytics
           html={(
             <div className={classNames([classes.stat, classes.analyticsTooltipContent])}>
               <div>
-                <b>Average help needed:</b>
+                <b>Relative difficulty:</b>
                 <div className={classNames([classes.stat, classes.avgHelpNeeded])}>
                   <i className="fa fa-life-ring" />
                   {Number.parseFloat(partAnalytics.avgHelpNeeded).toFixed(2)}
                 </div>
               </div>
               <div>
-                The ratio of students who requested one or more hints for
-                this question.
+                The ratio of times a student either requested a hint or gave an incorrect answer
+                to the total number of question interactions.
+                A higher number indicates a lower proportion of correct answers,
+                and a more difficult question.
               </div>
             </div>
           )}
