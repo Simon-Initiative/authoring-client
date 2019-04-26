@@ -47,6 +47,8 @@ export class Sequences extends Immutable.Record(defaultContent) {
     const s = (root as any).sequences;
     let model = new Sequences({ guid });
 
+    const children = [];
+
     getChildren(s).forEach((item) => {
 
       const key = getKey(item);
@@ -58,17 +60,17 @@ export class Sequences extends Immutable.Record(defaultContent) {
             { progressConstraints: Maybe.just(ProgressConstraints.fromPersistence(item, id)) });
           break;
         case 'sequence':
-          model = model.with(
-            { children: model.children.set(id, Sequence.fromPersistence(item, id)) });
+          children.push([id, Sequence.fromPersistence(item, id)]);
           break;
         case 'include':
-          model = model.with(
-            { children: model.children.set(id, Include.fromPersistence(item, id)) });
+          children.push([id, Include.fromPersistence(item, id)]);
           break;
         default:
 
       }
     });
+
+    model = model.with({ children: Immutable.OrderedMap<string, any>(children) });
 
     return model;
   }

@@ -77,41 +77,41 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
   static fromPersistence(root: Object, guid: string) {
 
     const o = (root as any).objective;
-    let model = new LearningObjective({ guid });
+    const lo = { guid } as any;
 
     if (o['@id'] !== undefined) {
-      model = model.with({ id: o['@id'] });
+      lo.id = o['@id'];
     }
     if (o['@process'] !== undefined) {
-      model = model.with({ process: Maybe.just<LearningProcess>(o['@process']) });
+      lo.process = Maybe.just<LearningProcess>(o['@process']);
     }
     if (o['@category'] !== undefined) {
-      model = model.with({ category: Maybe.just<KnowledgeCategory>(o['@category']) });
+      lo.category = Maybe.just<KnowledgeCategory>(o['@category']);
     }
 
     const children = getChildren(o);
 
     // Set the title when we have only a '#text' child
     if (children.length === 1 && getKey(children[0]) === '#text') {
-      model = model.with({ title: children[0]['#text'] });
+      lo.title = children[0]['#text'];
     } else {
 
       // Otherwise, we have content that we are not supporting the direct edit
       // of (e.g. lists, images, formatting)
 
       // Strip out the id attr if it has been absorbed from the objective
-      children.forEach((c) => { if (c['@id'] === model.id) { delete c['@id']; } });
+      children.forEach((c) => { if (c['@id'] === lo.id) { delete c['@id']; } });
 
       if (o['#array'] === undefined && o['#text'] === undefined) {
         // handle the case when objective is empty, treat it as empty #text string
-        model = model.with({ title: '' });
+        lo.title = '';
       } else {
         // objective has content other than simple text, set as rawContent
-        model = model.with({ rawContent: Maybe.just(children) });
+        lo.rawContent = Maybe.just(children);
       }
     }
 
-    return model;
+    return new LearningObjective(lo);
   }
 
   toPersistence(): Object {

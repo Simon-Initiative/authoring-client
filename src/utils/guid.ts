@@ -1,3 +1,23 @@
+import { logger, LogTag } from './logger';
+
+const pool = [];
+const POOL_SIZE = 10000;
+
+let hits = 0;
+let misses = 0;
+
+function fillPool() {
+  for (let i = 0; i < POOL_SIZE - pool.length; i += 1) {
+    pool.push(guid());
+  }
+}
+
+const schedule = () => setTimeout(() => { fillPool(); schedule(); }, 1000);
+
+schedule();
+
+setInterval(() => logger.debug(LogTag.DEFAULT, 'Hit rate: ' + (hits / (hits + misses))), 5000);
+
 
 /**
  * Returns an RFC4122 version 4 compliant GUID.
@@ -5,6 +25,17 @@
  * for source and related discussion. d
  */
 export default function guid() {
+  if (pool.length > 0) {
+    hits = hits + 1;
+    // pop() is the fastest way to do get an item.
+    // It is O(1) relative to the size of the array
+    return pool.pop();
+  }
+  misses = misses + 1;
+  return createOne();
+}
+
+function createOne() {
   let d = new Date().getTime();
   if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
     d += performance.now(); // use high-precision timer if available
@@ -23,5 +54,6 @@ export default function guid() {
     return (((d + Math.random() * 6) % 6 | 0) + 10).toString(16);
   });
 }
+
 
 (window as any).guid = guid;

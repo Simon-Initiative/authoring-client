@@ -94,6 +94,8 @@ export class Sequence extends Immutable.Record(defaultContent) {
       model = model.with({ audience: s['@audience'] });
     }
 
+    const children = [];
+
     getChildren(s).forEach((item) => {
 
       const key = getKey(item);
@@ -116,16 +118,13 @@ export class Sequence extends Immutable.Record(defaultContent) {
             { unordered: Maybe.just(Unordered.fromPersistence(item, id)) });
           break;
         case 'unit':
-          model = model.with(
-            { children: model.children.set(id, Unit.fromPersistence(item, id)) });
+          children.push([id, Unit.fromPersistence(item, id)]);
           break;
         case 'module':
-          model = model.with(
-            { children: model.children.set(id, Module.fromPersistence(item, id)) });
+          children.push([id, Module.fromPersistence(item, id)]);
           break;
         case 'include':
-          model = model.with(
-            { children: model.children.set(id, Include.fromPersistence(item, id)) });
+          children.push([id, Include.fromPersistence(item, id)]);
           break;
         case 'supplements':
           model = model.with(
@@ -144,12 +143,14 @@ export class Sequence extends Immutable.Record(defaultContent) {
       }
     });
 
+    model = model.with({ children: Immutable.OrderedMap<string, any>(children) });
+
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
-    const children : Object[] = [{ title: { '#text': this.title } }];
+    const children: Object[] = [{ title: { '#text': this.title } }];
 
     this.description.lift(p => children.push(({ description: { '#text': p } } as any)));
     this.metadata.lift(p => children.push(p));

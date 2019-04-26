@@ -62,20 +62,19 @@ const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<Po
 export const reduceObjectiveWorkbookPageRefs = (
   objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>,
   workbookpageToObjectiveEdges: Edge[],
-) => objectives.reduce(
-  (acc, objective) => acc.set(
-    objective.id,
-    (acc.get(objective.id) || Immutable.List<string>())
-      .concat(
-        workbookpageToObjectiveEdges
-          // filter out edges that dont point to this objective
-          .filter(edge => resourceId(edge.destinationId) === objective.id)
-          // map to workbook page ids
-          .map(edge => resourceId(edge.sourceId)),
-      ).toList(),
-  ),
-  Immutable.Map<string, Immutable.List<string>>(),
-);
+) => {
+  const entries = [];
+  objectives.toArray().forEach((objective) => {
+    const items = workbookpageToObjectiveEdges
+      // filter out edges that dont point to this objective
+      .filter(edge => resourceId(edge.destinationId) === objective.id)
+      // map to workbook page ids
+      .map(edge => resourceId(edge.sourceId));
+    entries.push([objective.id, Immutable.List<string>(items)]);
+  });
+
+  return Immutable.Map<string, Immutable.List<string>>(entries);
+};
 
 export const reduceSkillFormativeQuestionRefs = (
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
