@@ -65,19 +65,19 @@ export class Item extends Immutable.Record(defaultContent) {
   static fromPersistence(root: Object, guid: string) {
 
     const s = (root as any).item;
-    let model = new Item({ guid });
+    const params = { guid } as any;
 
     if (s['@id'] !== undefined) {
-      model = model.with({ id: s['@id'] });
+      params.id = s['@id'];
     }
     if (s['@purpose'] !== undefined) {
-      model = model.with({ purpose: Maybe.just(s['@purpose']) });
+      params.purpose = Maybe.just(s['@purpose']);
     }
     if (s['@duration'] !== undefined) {
-      model = model.with({ duration: Maybe.just(s['@duration']) });
+      params.duration = Maybe.just(s['@duration']);
     }
     if (s['@scoring_mode'] !== undefined) {
-      model = model.with({ scoringMode: s['@scoring_mode'] });
+      params.scoringMode = s['@scoring_mode'];
     }
 
     getChildren(s).forEach((item) => {
@@ -87,29 +87,26 @@ export class Item extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'resourceref':
-          model = model.with({ resourceref: ResourceRef.fromPersistence(item, id) });
+          params.resourceref = ResourceRef.fromPersistence(item, id);
           break;
         case 'preferences:preference_values':
-          model = model.with({ preferences: Maybe.just(item) });
+          params.preferences = Maybe.just(item);
           break;
         case 'preconditions':
-          model = model.with(
-            { preconditions: Maybe.just(Preconditions.fromPersistence(item, id)) });
+          params.preconditions = Maybe.just(Preconditions.fromPersistence(item, id));
           break;
         case 'supplements':
-          model = model.with(
-            { supplements: Maybe.just(Supplements.fromPersistence(item, id)) });
+          params.supplements = Maybe.just(Supplements.fromPersistence(item, id));
           break;
         case 'schedule':
-          model = model.with(
-            { schedule: Maybe.just(Schedule.fromPersistence(item, id)) });
+          params.schedule = Maybe.just(Schedule.fromPersistence(item, id));
           break;
         default:
 
       }
     });
 
-    return model;
+    return new Item(params);
   }
 
   toPersistence(): Object {

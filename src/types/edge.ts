@@ -32,4 +32,7 @@ export type Edge = {
  * the actual resource id
  * @param fullId sourceId or destinationId
  */
-export const resourceId = (fullId: string) => fullId.split(':')[2];
+export const resourceId = (fullId: string) => {
+  const index = fullId.lastIndexOf(':');
+  return fullId.substr(index + 1);
+};

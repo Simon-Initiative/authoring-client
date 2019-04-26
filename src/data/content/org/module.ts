@@ -76,18 +76,19 @@ export class Module extends Immutable.Record(defaultContent) {
   static fromPersistence(root: Object, guid: string) {
 
     const s = (root as any).module;
-    let model = new Module({ guid });
+    const params = { guid } as any;
 
     if (s['@id'] !== undefined) {
-      model = model.with({ id: s['@id'] });
+      params.id = s['@id'];
     }
     if (s['@progress_constraint_idref'] !== undefined) {
-      model = model.with({ progressConstraintIdref: Maybe.just(s['@progress_constraint_idref']) });
+      params.progressConstraintIdref = Maybe.just(s['@progress_constraint_idref']);
     }
     if (s['@duration'] !== undefined) {
-      model = model.with({ duration: Maybe.just(s['@duration']) });
+      params.duration = Maybe.just(s['@duration']);
     }
 
+    const children = [];
 
     getChildren(s).forEach((item) => {
 
@@ -96,53 +97,46 @@ export class Module extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'metadata:metadata':
-          model = model.with({ metadata: Maybe.just(item) });
+          params.metadata = Maybe.just(item);
           break;
         case 'dependencies':
-          model = model.with(
-            { dependencies: Maybe.just(Dependencies.fromPersistence(item, id)) });
+          params.dependencies = Maybe.just(Dependencies.fromPersistence(item, id));
           break;
         case 'preconditions':
-          model = model.with(
-            { preconditions: Maybe.just(Preconditions.fromPersistence(item, id)) });
+          params.preconditions = Maybe.just(Preconditions.fromPersistence(item, id));
           break;
         case 'unordered':
-          model = model.with(
-            { unordered: Maybe.just(Unordered.fromPersistence(item, id)) });
+          params.unordered = Maybe.just(Unordered.fromPersistence(item, id));
           break;
         case 'section':
-          model = model.with(
-            { children: model.children.set(id, Section.fromPersistence(item, id)) });
+          children.push([id, Section.fromPersistence(item, id)]);
           break;
         case 'include':
-          model = model.with(
-            { children: model.children.set(id, Include.fromPersistence(item, id)) });
+          children.push([id, Include.fromPersistence(item, id)]);
           break;
         case 'item':
           const candidateItem = Item.fromPersistence(item, id);
           if (candidateItem.resourceref.idref !== PLACEHOLDER_ITEM_ID) {
-            model = model.with(
-              { children: model.children.set(id, candidateItem) });
+            children.push([id, Item.fromPersistence(item, id)]);
           }
           break;
         case 'supplements':
-          model = model.with(
-            { supplements: Maybe.just(Supplements.fromPersistence(item, id)) });
+          params.supplements = Maybe.just(Supplements.fromPersistence(item, id));
           break;
         case 'title':
-          model = model.with(
-            { title: item['title']['#text'] });
+          params.title = item['title']['#text'];
           break;
         case 'description':
-          model = model.with(
-            { description: Maybe.just(item['description']['#text']) });
+          params.description = Maybe.just(item['description']['#text']);
           break;
         default:
 
       }
     });
 
-    return model;
+    params.children = Immutable.OrderedMap<string, any>(children);
+
+    return new Module(params);
   }
 
   toPersistence(): Object {

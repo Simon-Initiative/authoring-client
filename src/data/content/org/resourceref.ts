@@ -39,22 +39,22 @@ export class ResourceRef extends Immutable.Record(defaultContent) {
   static fromPersistence(root: Object, guid: string) {
 
     const r = (root as any).resourceref;
-    let model = new ResourceRef({ guid });
+    const params = { guid } as any;
 
     if (r['@package'] !== undefined) {
-      model = model.with({ package: Maybe.just(r['@package']) });
+      params.package = Maybe.just(r['@package']);
     }
     if (r['@version'] !== undefined) {
-      model = model.with({ version: Maybe.just(r['@version']) });
+      params.version = Maybe.just(r['@version']);
     }
     if (r['@idref'] !== undefined) {
-      model = model.with({ idref: r['@idref'] });
+      params.idref = r['@idref'];
     }
 
-    return model;
+    return new ResourceRef(params);
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const r = {
       resourceref: {
