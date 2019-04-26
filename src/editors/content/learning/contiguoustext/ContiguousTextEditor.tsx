@@ -26,6 +26,9 @@ export interface ContiguousTextEditorProps
   // Optional callback for tracking entity selections. It is up to the
   // entity impl to determine how it interprets 'selection'
   onEntitySelected?: (key: string, data: Object) => void;
+
+  // Optional active entity key
+  selectedEntity?: Maybe<string>;
 }
 
 export interface ContiguousTextEditorState {
@@ -51,7 +54,8 @@ class ContiguousTextEditor
   }
 
   shouldComponentUpdate(nextProps: StyledContiguousTextEditorProps) {
-    return nextProps.model !== this.props.model;
+    return nextProps.model !== this.props.model
+      || nextProps.selectedEntity !== this.props.selectedEntity;
   }
 
   renderActiveEntity(entity) {
@@ -103,7 +107,6 @@ class ContiguousTextEditor
   }
 
   renderMain(): JSX.Element {
-
     const { className, classes, model, parent, editMode, viewOnly,
       hideBorder = false, editorStyles } = this.props;
 
@@ -118,6 +121,7 @@ class ContiguousTextEditor
           viewOnly && classes.viewOnly, className])}>
 
         <DraftWrapper
+          selectedEntity={this.props.selectedEntity}
           onEntitySelected={this.props.onEntitySelected}
           onInsertParsedContent={o =>
             this.props.onInsertParsedContent(this.props.context.resourcePath, o)}

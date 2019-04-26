@@ -37,16 +37,15 @@
       }
     }
 
-    .active-tab-content {
-      margin-top: 30px;
-
-      .dragHandleGrab .grip {
-        margin-top: 8px;
-      }
-    }
-
     .nav-link {
       cursor: pointer;
+    }
+  }
+
+  .tab-container {
+    .tab-header {
+      margin-top: 10px;
+      margin-bottom: 10px;
     }
   }
 

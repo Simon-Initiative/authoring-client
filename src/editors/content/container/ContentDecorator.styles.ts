@@ -53,11 +53,6 @@ export const styles: JSSStyles = {
 
       transition: 'left .1s ease-in, width .1s ease-in, margin-left .1s ease-in',
 
-      '& $grip': {
-        backgroundImage: props => gripBGTemplate(
-          chroma(getContentColor(props.contentType)).brighten(1).hex()),
-      },
-
       '& $label': {
         marginLeft: 2,
       },
@@ -83,6 +78,12 @@ export const styles: JSSStyles = {
     backgroundImage: gripBGTemplate('rgba(0,0,0,0.2)'),
     backgroundRepeat: 'repeat',
     backgroundSize: '4px 4px',
+
+    '$handle.active-content &': {
+      backgroundImage: props => gripBGTemplate(
+        chroma(getContentColor(props.contentType)).brighten(1).hex()),
+    },
+
   },
   content: {
     flex: 1,

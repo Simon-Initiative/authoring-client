@@ -3,23 +3,28 @@ import { StyledComponentProps } from 'types/component';
 import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { EditorSidebarState } from 'reducers/editorSidebar';
+import { Tooltip } from 'utils/tooltip';
 
 const styles: JSSStyles = {
   SidebarToggle: {
-    width: 30,
-    height: 30,
-    borderRadius: '50%',
     position: 'absolute',
     top: 10,
     right: 10,
     zIndex: 1000,
+  },
+  toggleButton: {
+    width: 30,
+    height: 30,
+    borderRadius: '50%',
     color: colors.grayDark,
-    border: [2, 'solid', colors.grayDark],
+    border: [1, 'solid', colors.grayDark],
     background: colors.white,
-    paddingRight: 3,
+    paddingRight: 2,
+    paddingTop: 2,
     textAlign: 'center',
     cursor: 'pointer',
-    boxShadow: [2, 3, 10, -2, 'rgba(148,148,148,1)'],
+    boxShadow: [1, 3, 10, -2, 'rgba(148,148,148,1)'],
+    fontSize: 16,
 
     '& i': {
       fontWeight: 600,
@@ -27,7 +32,7 @@ const styles: JSSStyles = {
 
     '&:hover': {
       color: colors.selection,
-      border: [2, 'solid', colors.selection],
+      border: [1, 'solid', colors.selection],
     },
   },
 };
@@ -47,12 +52,16 @@ React.StatelessComponent<StyledComponentProps<SidebarToggleProps, typeof styles>
 }) => {
   return !editorSidebar.show && (
     <div
-      className={classNames(['SidebarToggle', classes.SidebarToggle, className])}
-      onClick={(e) => {
-        onToggleSidebar(!editorSidebar.show);
-        e.stopPropagation();
-      }}>
-      <i className="fa fa-angle-double-left" />
+      className={classNames(['SidebarToggle', classes.SidebarToggle, className])}>
+      <Tooltip title="Show Sidebar" position="left" size="small" delay={750}>
+        <div className={classes.toggleButton}
+          onClick={(e) => {
+            onToggleSidebar(!editorSidebar.show);
+            e.stopPropagation();
+          }}>
+          <i className="fa fa-angle-double-left" />
+        </div>
+      </Tooltip>
     </div>
   );
 };

@@ -5,6 +5,8 @@ import { OrganizationModel } from 'data/models/org';
 import { Maybe } from 'tsmonad';
 import { map } from 'data/utils/map';
 import { ContentElement } from 'data/content/common/interfaces';
+import * as types from 'data/content/org/types';
+import { LegacyTypes } from 'data/types';
 
 
 export type OrgNode =
@@ -464,3 +466,24 @@ function moveNode(model: OrganizationModel, change: MoveNode): Maybe<AppliedChan
   }) as Maybe<AppliedChange>;
 }
 
+type OrgItemChildren = Immutable.OrderedMap<string, ct.Sequence | ct.Unit | ct.Module | ct.Include
+  | ct.Item | ct.Section>;
+
+export const flattenChildren = (children: OrgItemChildren): Immutable.List<string> => {
+  return children.reduce(
+    (acc, child) => {
+      switch (child.contentType) {
+        case types.ContentTypes.Sequence:
+        case types.ContentTypes.Unit:
+        case types.ContentTypes.Module:
+        case types.ContentTypes.Section:
+          return acc.concat(flattenChildren(child.children)).toList();
+        case types.ContentTypes.Item:
+          return acc.concat(child.resourceref.idref).toList();
+        default:
+          return acc;
+      }
+    },
+    Immutable.List<string>(),
+  );
+};

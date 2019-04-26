@@ -12,7 +12,7 @@ import { DuplicateListingInput } from 'components/objectives/DuplicateListingInp
 import guid from 'utils/guid';
 import { buildReadOnlyMessage } from 'utils/lock';
 import { buildPersistenceFailureMessage } from 'utils/error';
-import { LoadingSpinner } from 'components/common/LoadingSpinner.tsx';
+import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner.tsx';
 import { ExistingSkillSelection } from 'components/objectives/ExistingSkillSelection';
 import {
   AggregateModel, buildAggregateModel, UnifiedObjectivesModel,
@@ -21,7 +21,9 @@ import {
 import * as Messages from 'types/messages';
 import { UserState } from 'reducers/user';
 import { Objective } from 'components/objectives/Objective';
-import { QuestionRef, PoolInfo } from 'components/objectives/utils';
+import {
+  QuestionRef, PoolInfo, getQuestionRefFromPathInfo,
+} from 'types/questionRef';
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
 import { LearningObjectivesModel } from 'data/models/objective';
 import { SkillsModel } from 'data/models/skill';
@@ -33,137 +35,11 @@ import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
 import SearchBar from 'components/common/SearchBar';
-import { Edge, PathElement } from 'types/edge';
+import { Edge, resourceId } from 'types/edge';
 import { ConfirmModal } from 'components/ConfirmModal';
 
 import './ObjectiveSkillView.scss';
 import { extractFullText } from 'data/content/objectives/objective';
-
-type SkillPathElement = PathElement & { title?: string };
-
-const getPoolQuestionCount = (pathItem: SkillPathElement) => {
-  // base case: if this pathItem is a pool, return the questionCount
-  switch (pathItem.name) {
-    case 'pool':
-      return Maybe.just({
-        questionCount: pathItem['questionCount'],
-      });
-    default:
-      break;
-  }
-  if (pathItem.parent) {
-    return getPoolQuestionCount(pathItem.parent);
-  }
-
-  // no parent exists. this is the end of the path and a pool parent has not been found
-  return Maybe.nothing();
-};
-
-const getQuestionRefFromPathInfo = (
-  pathItem: SkillPathElement, assessmentType: LegacyTypes,
-  assessmentId: string): Maybe<QuestionRef> => {
-  // base case: if this pathItem is a question, return the QuestionRef
-  switch (pathItem.name) {
-    case 'essay':
-      return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
-        id: pathItem['@id'],
-        title: pathItem.title
-          ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
-        type: 'essay',
-        assessmentType,
-        assessmentId,
-        poolInfo: getPoolQuestionCount(pathItem),
-      });
-    case 'short_answer':
-      return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
-        id: pathItem['@id'],
-        title: pathItem.title
-          ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
-        type: 'short_answer',
-        assessmentType,
-        assessmentId,
-        poolInfo: getPoolQuestionCount(pathItem),
-      });
-    case 'fill_in_the_blank':
-      return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
-        id: pathItem['@id'],
-        title: pathItem.title
-          ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
-        type: 'fill_in_the_blank',
-        assessmentType,
-        assessmentId,
-        poolInfo: getPoolQuestionCount(pathItem),
-      });
-    case 'image_hotspot':
-      return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
-        id: pathItem['@id'],
-        title: pathItem.title
-          ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
-        type: 'image_hotspot',
-        assessmentType,
-        assessmentId,
-        poolInfo: getPoolQuestionCount(pathItem),
-      });
-    case 'multiple_choice':
-      return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
-        id: pathItem['@id'],
-        title: pathItem.title
-          ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
-        type: 'multiple_choice',
-        assessmentType,
-        assessmentId,
-        poolInfo: getPoolQuestionCount(pathItem),
-      });
-    case 'numeric':
-      return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
-        id: pathItem['@id'],
-        title: pathItem.title
-          ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
-        type: 'numeric',
-        assessmentType,
-        assessmentId,
-        poolInfo: getPoolQuestionCount(pathItem),
-      });
-    case 'ordering':
-      return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
-        id: pathItem['@id'],
-        title: pathItem.title
-          ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
-        type: 'ordering',
-        assessmentType,
-        assessmentId,
-        poolInfo: getPoolQuestionCount(pathItem),
-      });
-    case 'question':
-      return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
-        id: pathItem['@id'],
-        title: pathItem.title
-          ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
-        type: 'question',
-        assessmentType,
-        assessmentId,
-        poolInfo: getPoolQuestionCount(pathItem),
-      });
-    default:
-      break;
-  }
-
-  // item is not a question, recurse on parent if it exists
-  if (pathItem.parent) {
-    return getQuestionRefFromPathInfo(pathItem.parent, assessmentType, assessmentId);
-  }
-
-  // no parent exists. this is the end of the path and a question has not been found
-  return Maybe.nothing();
-};
 
 const getQuestionRefFromSkillEdge = (
   edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
@@ -193,9 +69,9 @@ export const reduceObjectiveWorkbookPageRefs = (
       .concat(
         workbookpageToObjectiveEdges
           // filter out edges that dont point to this objective
-          .filter(edge => edge.destinationId.split(':')[2] === objective.id)
+          .filter(edge => resourceId(edge.destinationId) === objective.id)
           // map to workbook page ids
-          .map(edge => edge.sourceId.split(':')[2]),
+          .map(edge => resourceId(edge.sourceId)),
       ).toList(),
   ),
   Immutable.Map<string, Immutable.List<string>>(),
@@ -209,10 +85,10 @@ export const reduceSkillFormativeQuestionRefs = (
     skill.id,
     (acc.get(skill.id) || Immutable.List<QuestionRef>())
       .concat(
-        formativeToSkillEdges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+        formativeToSkillEdges.filter(edge => resourceId(edge.destinationId) === skill.id)
           .map(edge =>
             getQuestionRefFromSkillEdge(
-              edge, LegacyTypes.inline, edge.sourceId.split(':')[2]))
+              edge, LegacyTypes.inline, resourceId(edge.sourceId)))
           .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
             just: ref => true,
             nothing: () => false,
@@ -231,9 +107,9 @@ export const reduceSkillSummativeQuestionRefs = (
     skill.id,
     (acc.get(skill.id) || Immutable.List<QuestionRef>())
       .concat(
-        summativeToSkillEdges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+        summativeToSkillEdges.filter(edge => resourceId(edge.destinationId) === skill.id)
           .map(edge => getQuestionRefFromSkillEdge(
-            edge, LegacyTypes.assessment2, edge.sourceId.split(':')[2]))
+            edge, LegacyTypes.assessment2, resourceId(edge.sourceId)))
           .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
             just: ref => true,
             nothing: () => false,
@@ -253,9 +129,9 @@ export const reduceSkillPoolQuestionRefs = (
     skill.id,
     (acc.get(skill.id) || Immutable.List<QuestionRef>())
       .concat(
-        poolToSkillEdges.filter(edge => edge.destinationId.split(':')[2] === skill.id)
+        poolToSkillEdges.filter(edge => resourceId(edge.destinationId) === skill.id)
           .map(edge => getQuestionRefFromSkillEdge(
-            edge, LegacyTypes.assessment2_pool, edge.sourceId.split(':')[2]))
+            edge, LegacyTypes.assessment2_pool, resourceId(edge.sourceId)))
           .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
             just: ref => true,
             nothing: () => false,
@@ -264,7 +140,7 @@ export const reduceSkillPoolQuestionRefs = (
             ...questionRef,
             poolInfo: getPoolInfoFromPoolRefEdge(
               assessmentToPoolEdges.find(
-                e => e.destinationId.split(':')[2] === questionRef.assessmentId),
+                e => resourceId(e.destinationId) === questionRef.assessmentId),
               questionRef.poolInfo.valueOr({ questionCount: 0 }).questionCount,
             ),
           })))
@@ -412,7 +288,6 @@ class ObjectiveSkillView
     const fetchAllOrgResources = persistence.bulkFetchDocuments(
       course.guid, [LegacyTypes.organization], 'byTypes');
 
-
     // fetch workbook page to inline assessment edges
     const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.workbook_page,
@@ -506,8 +381,8 @@ class ObjectiveSkillView
             org.resource.id,
             orgResources.concat(
               combinedEdges
-                .filter(edge => orgResources.contains(edge.sourceId.split(':')[2]))
-                .map(edge => edge.destinationId.split(':')[2]),
+                .filter(edge => orgResources.contains(resourceId(edge.sourceId)))
+                .map(edge => resourceId(edge.destinationId)),
             ).toList(),
           );
         },
@@ -996,7 +871,7 @@ class ObjectiveSkillView
         return Promise.resolve(false);
       })
       .catch((err) => {
-        console.log(`Error removing objective ${obj}: ${err}`);
+        console.error(`Error removing objective ${obj}: ${err}`);
         this.setState({
           loading: false,
         });
@@ -1352,7 +1227,7 @@ class ObjectiveSkillView
 
     return (
       <h2>Learning Objectives and Skills&nbsp;
-        <HelpPopover activateOnClick>
+        <HelpPopover activateOnClick modalTitle="About Learning Objectives and Skills">
           <iframe src={src} height={500} width={'100%'} />
         </HelpPopover>
       </h2>
@@ -1364,7 +1239,7 @@ class ObjectiveSkillView
     const content = this.state.aggregateModel === null
       ? (
         <div className="page-loading">
-          <LoadingSpinner message="Loading Objectives..." />
+          <LoadingSpinner size={LoadingSpinnerSize.Small} message="Loading Objectives..." />
         </div>
       )
       : this.renderContent();

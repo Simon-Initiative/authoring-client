@@ -4,7 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
 } from '../question/Question';
-import { TabContainer } from 'editors/content/common/TabContainer';
+import { TabContainer } from 'components/common/TabContainer';
 import { FillInTheBlank } from '../../items/FillInTheBlank';
 import { Text } from '../../items/Text';
 import { Numeric } from '../../items/Numeric';
@@ -18,6 +18,7 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { Badge } from '../../common/Badge';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
+import { RouterState } from 'reducers/router';
 
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
@@ -26,7 +27,9 @@ export interface MultipartInputProps
   activeContext: ActiveContext;
   canInsertAnotherPart: PartAddPredicate;
   selectedInput: Maybe<string>;
+  router: RouterState;
   setActiveItemIdActionAction: (activeItemId: string) => void;
+  onClearSearchParam: (name) => void;
   onAddItemPart: (item, part, body) => void;
 }
 
@@ -43,7 +46,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   }
 
   componentDidMount() {
-    this.setFirstItemActive();
+    this.setRoutedOrFirstItemActive();
   }
 
   /** Implement required abstract method to set className */
@@ -170,6 +173,27 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     }
   }
 
+  setRoutedOrFirstItemActive = () => {
+    const { model, router, setActiveItemIdActionAction, onClearSearchParam } = this.props;
+
+    if (router.urlParams.has('partId')) {
+      const partId = router.urlParams.get('partId');
+      const index = model.parts.toList().findIndex(part => part.id === partId);
+      const items = model.items.toList();
+      const item = items.get(index);
+
+      if (index > -1 && item && item.contentType !== 'Unsupported') {
+        setActiveItemIdActionAction(item.id);
+      } else {
+        this.setFirstItemActive();
+      }
+
+      onClearSearchParam('partId');
+    } else {
+      this.setFirstItemActive();
+    }
+  }
+
   setFirstItemActive = () => {
     const { model, setActiveItemIdActionAction } = this.props;
 
@@ -213,6 +237,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       canInsertAnotherPart,
       onBodyEdit,
       setActiveItemIdActionAction,
+      selectedInput,
     } = this.props;
 
     const onEntitySelected = (key: string, data: Object) => {
@@ -259,6 +284,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
           editMode={editMode}
           services={services}
           context={context}
+          selectedEntity={selectedInput}
           model={body}
           onEdit={onBodyEdit} />
       </div>

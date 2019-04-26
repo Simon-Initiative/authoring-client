@@ -26,7 +26,7 @@ export enum Layout {
 }
 
 export interface ContentContainerProps
-    extends AbstractContentEditorProps<ContentElements> {
+  extends AbstractContentEditorProps<ContentElements> {
   className?: string;
   hideContentLabel?: boolean | string[];
   disableContentSelection?: boolean | string[];
@@ -35,6 +35,7 @@ export interface ContentContainerProps
   hideSingleDecorator?: boolean;
   hideAllDecorators?: boolean;
   layout?: Layout;
+  selectedEntity?: Maybe<string>;
   overrideRemove?: (model: ContentElements, childModel: Object) => boolean;
 }
 
@@ -42,7 +43,7 @@ export interface ContentContainerState {
 
 }
 
-export function indexOf(guid: string, model: ContentElements) : number {
+export function indexOf(guid: string, model: ContentElements): number {
   let index = -1;
   const arr = model.content.toArray();
   for (let i = 0; i < arr.length; i += 1) {
@@ -60,7 +61,7 @@ export function indexOf(guid: string, model: ContentElements) : number {
  */
 export class ContentContainer
   extends AbstractContentEditor<ContentElements,
-    ContentContainerProps, ContentContainerState> {
+  ContentContainerProps, ContentContainerState> {
 
   textSelections: Immutable.Map<string, any>;
   supportedElements: Immutable.List<string>;
@@ -83,6 +84,7 @@ export class ContentContainer
     return this.props.model !== nextProps.model
       || this.props.context !== nextProps.context
       || this.props.activeContentGuid !== nextProps.activeContentGuid
+      || this.props.selectedEntity !== nextProps.selectedEntity
       || this.props.hover !== nextProps.hover;
   }
 
@@ -131,18 +133,18 @@ export class ContentContainer
 
         // We replace the text when it is effectively empty
         if (active.isEffectivelyEmpty()) {
-          const updated : ContentElements = this.insertAfter(model, arrToAdd, index);
+          const updated: ContentElements = this.insertAfter(model, arrToAdd, index);
           onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), firstItem);
 
-        // We insert after when the cursor is at the end
+          // We insert after when the cursor is at the end
         } else if (selection === undefined || active.isCursorAtEffectiveEnd(selection)) {
           onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
 
-        // If it is at the beginning, insert the new item before the text
+          // If it is at the beginning, insert the new item before the text
         } else if (active.isCursorAtBeginning(selection)) {
           onEdit(this.insertAfter(model, arrToAdd, index - 1), firstItem);
 
-        // Otherwise we split the contiguous block in two parts and insert in between
+          // Otherwise we split the contiguous block in two parts and insert in between
         } else {
           const pair = active.split(selection);
           let updated = model.with({ content: model.content.set(pair[0].guid, pair[0]) });
@@ -233,7 +235,8 @@ export class ContentContainer
       const index = indexOf(activeContentGuid, model);
 
       const newModel = model.with({
-        content: model.content.delete(childModel.guid)});
+        content: model.content.delete(childModel.guid),
+      });
 
       onEdit(this.insertAt(newModel, [childModel], (Math.max(index - 1, 0))), childModel);
     }
@@ -246,7 +249,8 @@ export class ContentContainer
       const index = indexOf(activeContentGuid, model);
 
       const newModel = model.with({
-        content: model.content.delete(childModel.guid)});
+        content: model.content.delete(childModel.guid),
+      });
 
       onEdit(
         this.insertAt(
@@ -288,7 +292,7 @@ export class ContentContainer
         && disableContentSelection.find(type => type === model.contentType)));
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const { hideContentLabel, disableContentSelection, hover,
       hideSingleDecorator = false,
       hideAllDecorators = false,
@@ -321,13 +325,13 @@ export class ContentContainer
             : this.props.onFocus,
           parent: this,
           key: model.guid,
-          onTextSelectionChange: s =>  this.textSelections = this.textSelections.set(model.guid, s),
+          onTextSelectionChange: s => this.textSelections = this.textSelections.set(model.guid, s),
         };
 
         bindProperties(model).forEach(p => props[p.propertyName] = p.value);
 
         const childRenderer = React.createElement(
-            getEditorByContentType((model as any).contentType), props);
+          getEditorByContentType((model as any).contentType), props);
 
         const isHoverContent = (hover === model.guid);
         const isActiveContent = (model.guid === this.props.activeContentGuid);

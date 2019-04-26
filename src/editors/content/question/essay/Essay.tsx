@@ -6,7 +6,7 @@ import {
 } from 'editors/content/question/question/Question';
 import {
   TabSection, TabSectionContent, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import guid from 'utils/guid';
 import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
 

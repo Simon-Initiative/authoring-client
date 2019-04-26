@@ -6,7 +6,7 @@ import { AbstractItemPartEditorProps } from 'editors/content/common/AbstractItem
 import { Button, Select } from 'editors/content/common/controls';
 import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import { Hints } from 'editors/content/part/Hints';
 import SkillsEditor from 'editors/content/skills/SkillsEditor';
 import { CriteriaEditor } from 'editors/content/question/question/CriteriaEditor';

@@ -14,7 +14,10 @@ import { Outline } from './outline/Outline';
 import { PreconditionsEditor } from './PreconditionsEditor';
 import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
+import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
+import { Analytics } from './Analytics.controller';
+import { Remove } from 'components/common/Remove';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -122,9 +125,12 @@ export class OrgComponentEditor
 
   }
 
-  getLabel(model: t.Sequence | t.Unit | t.Module | t.Section) {
+  getLabel(model: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section) {
     return this.props.org.caseOf({
       just: (o) => {
+        if (model.contentType === 'Sequences') {
+          return 'Organization';
+        }
         if (model.contentType === 'Sequence') {
           return o.labels.sequence;
         }
@@ -192,17 +198,8 @@ export class OrgComponentEditor
           />
           : null;
 
-        return (
-          <div className="org-component-editor">
-            <UndoRedoToolbar
-              undoEnabled={canUndo}
-              redoEnabled={canRedo}
-              onUndo={onUndo.bind(this)}
-              onRedo={onRedo.bind(this)} />
-            {titleEditor}
-
-            {preconditions}
-
+        const contentWithActionBar = (
+          <React.Fragment>
             {this.renderActionBar(model)}
             <Outline
               onView={this.onView}
@@ -213,8 +210,39 @@ export class OrgComponentEditor
               placements={this.props.placements}
               parentNodeId={model.id}
               course={this.props.course}
-              commandProcessor={this.processCommand.bind(this, org)}
-            />
+              commandProcessor={this.processCommand.bind(this, org)} />
+          </React.Fragment>
+        );
+
+        return (
+          <div className="org-component-editor">
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              {titleEditor}
+              <div className="flex-spacer" />
+              <UndoRedoToolbar
+                undoEnabled={canUndo}
+                redoEnabled={canRedo}
+                onUndo={onUndo.bind(this)}
+                onRedo={onRedo.bind(this)} />
+            </div>
+
+            {preconditions}
+
+            {model.contentType === t.OrganizationContentTypes.Unit
+              || model.contentType === t.OrganizationContentTypes.Module
+              || model.contentType === t.OrganizationContentTypes.Section
+              ? (
+                <TabContainer labels={['Content', 'Analytics']}>
+                  <Tab>
+                    {contentWithActionBar}
+                  </Tab>
+                  <Tab>
+                    <Analytics course={this.props.course} model={model} />
+                  </Tab>
+                </TabContainer>
+              )
+              : contentWithActionBar
+            }
           </div>
         );
       },
@@ -258,7 +286,7 @@ export class OrgComponentEditor
     return [];
   }
 
-  renderActionBar(model: t.Sequence | t.Unit | t.Module | t.Section) {
+  renderActionBar(model: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section) {
     return this.props.org.caseOf({
       just: (org) => {
 
@@ -266,12 +294,12 @@ export class OrgComponentEditor
 
         const removeCommand = new RemoveCommand();
         const remove = (
-          <button
+          <Remove
             style={{ float: 'right' }}
-            className="btn btn-link btn-sm" key="remove"
-            disabled={!removeCommand.precondition(org, model) || !this.props.editMode}
-            onClick={() => processor(removeCommand)}>{removeCommand.description(org.labels)}
-          </button>
+            editMode={this.props.editMode && removeCommand.precondition(org, model)}
+            onRemove={() => processor(removeCommand)}>
+            Remove {this.getLabel(model)}
+          </Remove>
         );
         return (
           <div>

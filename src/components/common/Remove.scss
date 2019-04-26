@@ -18,4 +18,13 @@
       color: $gray;
     }
   }
+
+  .remove-button-content {
+    color: $danger;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }

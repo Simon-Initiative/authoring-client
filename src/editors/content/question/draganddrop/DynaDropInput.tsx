@@ -4,7 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
 } from '../question/Question';
-import { TabContainer } from 'editors/content/common/TabContainer';
+import { TabContainer } from 'components/common/TabContainer';
 import { DynaDropTargetItems } from '../../items/DynaDropTargetItems';
 import { FillInTheBlank }
   from 'data/content/assessment/fill_in_the_blank';

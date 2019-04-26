@@ -10,7 +10,7 @@ import {
 } from '../question/Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
+} from 'components/common/TabContainer';
 import { PermutationsMap } from 'types/combinations';
 import { convert } from 'utils/format';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';

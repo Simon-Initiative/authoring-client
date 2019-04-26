@@ -46,7 +46,7 @@ function transitionCourseView(destination, courseId, orgId, dispatch, getState) 
 
   if (isDifferentCourse(getState, courseId)) {
 
-    dispatch(dismissScopedMessages(Scope.Package));
+    dispatch(dismissScopedMessages(Scope.PackageDetails));
 
     dispatch(courseActions.loadCourse(courseId)).then((c) => {
       dispatch(orgActions.releaseOrg());
@@ -132,7 +132,7 @@ export function viewCourse(courseId: string) {
 
       // This ensures that we wipe any messages displayed from
       // another course
-      dispatch(dismissScopedMessages(Scope.Package));
+      dispatch(dismissScopedMessages(Scope.PackageDetails));
 
       // Make sure we have an org active and that it pertains to
       // this course

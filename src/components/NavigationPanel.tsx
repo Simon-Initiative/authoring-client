@@ -18,6 +18,7 @@ import { RequestButton } from 'editors/document/course/CourseEditor';
 import { CourseId } from 'data/types';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { ACTIVE_ORG_STORAGE_KEY, activeOrgUserKey } from 'actions/utils/activeOrganization';
+import { Resource } from 'data/contentTypes';
 
 
 const DEFAULT_WIDTH_PX = 400;
@@ -33,6 +34,12 @@ export const styles: JSSStyles = {
     borderRight: [1, 'solid', colors.grayLight],
     padding: [10, 0, 5, 0],
     position: 'relative',
+
+    '&:hover': {
+      '& $resizeHandle $collapseButton': {
+        opacity: 1,
+      },
+    },
   },
   collapsed: {
     '&$navItem': {
@@ -126,7 +133,7 @@ export const styles: JSSStyles = {
         '&:hover': {
           backgroundColor: colors.selection,
           color: colors.white,
-          borderLeft: [1, 'solid', colors.white, '!important'],
+          borderLeft: [[1, 'solid', colors.white], '!important'],
         },
       },
     },
@@ -197,18 +204,61 @@ export const styles: JSSStyles = {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    right: 0,
-    width: 5,
+    right: -14,
+    width: 14,
     cursor: 'ew-resize',
     zIndex: 1000,
   },
+  collapseButtonContainer: {
+    position: 'absolute',
+    top: 182,
+    right: -2,
+  },
+  collapseButton: {
+    width: 30,
+    height: 30,
+    borderRadius: '50%',
+    color: colors.grayDark,
+    border: [1, 'solid', colors.grayDark],
+    background: colors.white,
+    paddingRight: 2,
+    paddingTop: 2,
+    textAlign: 'center',
+    cursor: 'pointer',
+    boxShadow: [2, 3, 10, -2, 'rgba(148,148,148,1)'],
+    fontSize: 16,
+    opacity: 0,
+
+    transition: 'opacity .2s ease-out',
+
+    '& i': {
+      fontWeight: 600,
+    },
+
+    '&:hover': {
+      color: colors.selection,
+      border: [1, 'solid', colors.selection],
+    },
+  },
   publishActions: {
-    margin: [2, 0, 2, 20],
+    margin: 'auto',
 
     publishAction: {
       span: {
         marginRight: 10,
       },
+    },
+
+    '& .RequestButton': {
+      marginRight: 10,
+    },
+
+    '&.collapsed .RequestButton': {
+      marginRight: 0,
+    },
+
+    '& .previewButton': {
+      marginRight: [0, '!important'],
     },
   },
 };
@@ -302,7 +352,10 @@ class NavigationPanel
   }
 
   onResizeHandleMousedown = (e) => {
+    const { width, collapsed } = this.state;
+
     this.setState({
+      width: collapsed ? Maybe.just(COLLAPSED_WIDTH_PX) : width,
       isResizing: true,
       resizeStart: e.nativeEvent.clientX,
     });
@@ -366,9 +419,234 @@ class NavigationPanel
     });
   }
 
-  render() {
-    const { className, classes, viewActions, course, router, profile, onCreateOrg } = this.props;
+  onCollapse = () => {
+    const { profile } = this.props;
+    const { width } = this.state;
+
+    this.setState({
+      collapsed: true,
+    });
+    this.updatePersistentPrefs(profile.username, width.valueOr(DEFAULT_WIDTH_PX), true);
+  }
+
+  renderResizeHandle() {
+    const { classes } = this.props;
+    const { collapsed } = this.state;
+
+    return (
+      <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown}>
+        {!collapsed && (
+          <div className={classes.collapseButtonContainer}>
+          <Tooltip title="Collapse Outline" position="right" size="small" delay={750}>
+            <div className={classes.collapseButton}
+              onClick={this.onCollapse}
+              onMouseDown={e => e.stopPropagation()}>
+              <i className="fa fa-angle-double-left" />
+            </div>
+          </Tooltip>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  renderOverview(currentOrg: Resource) {
+    const { classes, viewActions, course, router } = this.props;
+    const { collapsed } = this.state;
+
+    return (
+      <Tooltip disabled={!collapsed} title="Overview" position="right">
+      <div
+        className={classNames([
+          classes.navItem,
+          Maybe.sequence({ courseId: router.courseId, resourceId: router.resourceId }).caseOf({
+            just: ({ courseId, resourceId }) => courseId === course.guid
+              && resourceId === course.guid && classes.selectedNavItem,
+            nothing: () => undefined,
+          }),
+        ])}
+        onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
+        <i className="fa fa-book" />{!collapsed && ' Overview'}
+      </div>
+    </Tooltip>
+
+    );
+  }
+
+  renderObjectives(currentOrg: Resource) {
+    const { classes, viewActions, course, router } = this.props;
+    const { collapsed } = this.state;
+
+    return (
+      <Tooltip disabled={!collapsed} title="Objectives" position="right">
+        <div className={classNames([
+          classes.navItem,
+          router.route === ROUTE.OBJECTIVES && classes.selectedNavItem,
+        ])}
+          onClick={() => viewActions.viewObjectives(course.guid, currentOrg.guid)}>
+          <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
+        </div>
+      </Tooltip>
+    );
+  }
+
+  renderAllResources(currentOrg: Resource) {
+    const { classes, viewActions, course, router } = this.props;
+    const { collapsed } = this.state;
+
+    return (
+      <Tooltip disabled={!collapsed} title="All Resources" position="right">
+        <div
+          className={classNames([
+            classes.navItem,
+            router.route === ROUTE.ALL_RESOURCES && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewAllResources(course.guid, currentOrg.guid)}>
+          <i className="fas fa-folder-open" />{!collapsed && ' All Resources'}
+        </div>
+      </Tooltip>
+
+    );
+  }
+
+  renderOrgDropdown(currentOrg: Resource) {
+    const { classes, viewActions, course, router, profile, onCreateOrg } = this.props;
     const { showOrgDropdown, collapsed } = this.state;
+
+    return (
+      <div className="dropdown">
+        <div className={classNames([
+          classes.navItemDropdown,
+          router.resourceId.caseOf({
+            just: id => id === currentOrg.guid && classes.selectedNavItem,
+            nothing: () => null,
+          }),
+        ])}>
+          <Tooltip
+            disabled={!collapsed}
+            title={`${currentOrg.title} (${currentOrg.id})`}
+            position="right"
+            distance={32}
+            style={{ overflow: 'hidden', flex: 1, display: 'flex' }}>
+            <div className={classNames([
+              classes.dropdownText,
+              collapsed && classes.dropdownTextCollapsed,
+            ])}
+              onClick={() =>
+                viewActions.viewDocument(currentOrg.guid, course.guid, currentOrg.guid)}>
+              <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
+            </div>
+          </Tooltip>
+          <div className={classNames([
+            classes.dropdownToggle,
+            collapsed && classes.dropdownToggleCollapsed,
+          ])}
+            onClick={(e) => {
+              (e.nativeEvent as any).originator = 'OrgDropdownToggle';
+              this.setState({ showOrgDropdown: !showOrgDropdown });
+            }}>
+            <i className={'fas fa-sort-down'} />
+          </div>
+        </div>
+        <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
+          {course.resources.valueSeq().filter(r => r.type === 'x-oli-organization').map(org => (
+            <a key={org.guid}
+              className={classNames(['dropdown-item'])}
+              onClick={() => {
+
+                if (org.id !== currentOrg.id) {
+                  this.props.onReleaseOrg();
+                  this.updateActiveOrgPref(course.guid, profile.username, org.guid);
+                  this.props.onLoadOrg(course.guid, org.guid);
+                  viewActions.viewDocument(org.guid, course.guid, org.guid);
+                }
+
+              }}>
+              {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
+            </a>
+          ))}
+          <div className="dropdown-divider" />
+          <a key="create-org"
+            className={classNames(['dropdown-item'])}
+            onClick={() => onCreateOrg()}>
+            <i className={'fa fa-plus-circle'} /> Create New Organization
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  renderOrgTree(currentOrg: Resource, selectedItem: Maybe<nav.NavigationItem>) {
+    const { classes, profile } = this.props;
+    const { width, collapsed } = this.state;
+
+    return (
+      <React.Fragment>
+        <div className={classes.orgTree}>
+          {collapsed
+            ? (
+              <div
+                className={classNames([
+                  classes.navItem,
+                ])}
+                onClick={() => {
+                  const newWidth = width.lift(w =>
+                    w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
+
+                  this.setState({
+                    width: newWidth,
+                    collapsed: false,
+                  });
+                  this.updatePersistentPrefs(
+                    profile.username,
+                    newWidth.valueOr(DEFAULT_WIDTH_PX),
+                    false,
+                  );
+                }}>
+                <i className="fa fa-angle-double-right" />
+              </div>
+            )
+            : (
+              <OrgEditorManager
+                documentId={currentOrg.guid}
+                selectedItem={selectedItem}
+                {...this.props} />
+            )
+          }
+        </div>
+
+        <div className={classNames([classes.publishActions, collapsed && 'collapsed'])}>
+          {collapsed
+            ? (
+              <Tooltip title="Preview Course" position="right" distance={30}>
+                <RequestButton text="" className="btn-secondary previewButton"
+                  onClick={() => this.onPreview()}>
+                  <i className="fa fa-eye" />
+                </RequestButton>
+              </Tooltip>
+            )
+            : (
+              <div className={classes.publishAction}>
+                <RequestButton text={this.getWidth() < 210 ? 'Preview' : 'Preview Course'}
+                  className="btn-secondary previewButton"
+                  onClick={() => this.onPreview()} />
+                <HelpPopover>
+                  Launch a full <b>course preview</b> of the current organization.
+                  This preview URL can be shared and viewed publically.
+                  <br /><br />
+                  This may take a few minutes for larger courses.
+                </HelpPopover>
+              </div>
+            )
+          }
+        </div>
+      </React.Fragment>
+    );
+  }
+
+  render() {
+    const { className, classes, course, router } = this.props;
+    const { collapsed } = this.state;
 
     // course may not be loaded before first render. wait for it to load before rendering
     if (!course) return null;
@@ -398,151 +676,15 @@ class NavigationPanel
           className,
         ])}
         style={{ width: this.getWidth() }}>
-        <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown} />
 
-        <Tooltip disabled={!collapsed} title="Overview" position="right">
-          <div
-            className={classNames([
-              classes.navItem,
-              Maybe.sequence({ courseId: router.courseId, resourceId: router.resourceId }).caseOf({
-                just: ({ courseId, resourceId }) => courseId === course.guid
-                  && resourceId === course.guid && classes.selectedNavItem,
-                nothing: () => undefined,
-              }),
-            ])}
-            onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
-            <i className="fa fa-book" />{!collapsed && ' Overview'}
-          </div>
-        </Tooltip>
+        {this.renderResizeHandle()}
 
-        <Tooltip disabled={!collapsed} title="Objectives" position="right">
-          <div className={classNames([
-            classes.navItem,
-            router.route === ROUTE.OBJECTIVES && classes.selectedNavItem,
-          ])}
-            onClick={() => viewActions.viewObjectives(course.guid, currentOrg.guid)}>
-            <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
-          </div>
-        </Tooltip>
+        {this.renderOverview(currentOrg)}
+        {this.renderObjectives(currentOrg)}
+        {this.renderAllResources(currentOrg)}
+        {this.renderOrgDropdown(currentOrg)}
+        {this.renderOrgTree(currentOrg, selectedItem)}
 
-        <Tooltip disabled={!collapsed} title="All Resources" position="right">
-          <div
-            className={classNames([
-              classes.navItem,
-              router.route === ROUTE.ALL_RESOURCES && classes.selectedNavItem,
-            ])}
-            onClick={() => viewActions.viewAllResources(course.guid, currentOrg.guid)}>
-            <i className="fas fa-folder-open" />{!collapsed && ' All Resources'}
-          </div>
-        </Tooltip>
-
-        <div className="dropdown">
-          <div className={classNames([
-            classes.navItemDropdown,
-            router.resourceId.caseOf({
-              just: id => id === currentOrg.guid && classes.selectedNavItem,
-              nothing: () => null,
-            }),
-          ])}>
-            <Tooltip
-              disabled={!collapsed}
-              title={currentOrg.title}
-              position="right"
-              distance={32}
-              style={{ overflow: 'hidden', flex: 1, display: 'flex' }}>
-              <div className={classNames([
-                classes.dropdownText,
-                collapsed && classes.dropdownTextCollapsed,
-              ])}
-                onClick={() =>
-                  viewActions.viewDocument(currentOrg.guid, course.guid, currentOrg.guid)}>
-                <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
-              </div>
-            </Tooltip>
-            <div className={classNames([
-              classes.dropdownToggle,
-              collapsed && classes.dropdownToggleCollapsed,
-            ])}
-              onClick={(e) => {
-                (e.nativeEvent as any).originator = 'OrgDropdownToggle';
-                this.setState({ showOrgDropdown: !showOrgDropdown });
-              }}>
-              <i className={'fas fa-sort-down'} />
-            </div>
-          </div>
-          <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
-            {course.resources.valueSeq().filter(r => r.type === 'x-oli-organization').map(org => (
-              <a key={org.guid}
-                className={classNames(['dropdown-item'])}
-                onClick={() => {
-
-                  if (org.id !== currentOrg.id) {
-                    this.props.onReleaseOrg();
-                    this.updateActiveOrgPref(course.guid, profile.username, org.guid);
-                    this.props.onLoadOrg(course.guid, org.guid);
-                    viewActions.viewDocument(org.guid, course.guid, org.guid);
-                  }
-
-                }}>
-                {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
-              </a>
-            ))}
-            <div className="dropdown-divider" />
-            <a key="create-org"
-              className={classNames(['dropdown-item'])}
-              onClick={() => onCreateOrg()}>
-              <i className={'fa fa-plus-circle'} /> Create New Organization
-            </a>
-          </div>
-        </div>
-
-        <div className={classes.orgTree}>
-          {collapsed
-            ? (
-              <div
-                className={classNames([
-                  classes.navItem,
-                ])}
-                onClick={() => {
-                  this.setState({
-                    width: Maybe.just(DEFAULT_WIDTH_PX),
-                    collapsed: false,
-                  });
-                  this.updatePersistentPrefs(
-                    profile.username,
-                    DEFAULT_WIDTH_PX,
-                    false,
-                  );
-                }}>
-                <i className="fa fa-angle-double-right" />
-              </div>
-            )
-            : (
-              <OrgEditorManager
-                documentId={currentOrg.guid}
-                selectedItem={selectedItem}
-                {...this.props} />
-            )
-          }
-        </div>
-
-        <div className={classes.publishActions}>
-          {collapsed
-            ? <RequestButton text="" className="btn-primary previewButton"
-              onClick={() => this.onPreview()}><i className="fa fa-eye" /></RequestButton>
-            : <div className={classes.publishAction}>
-              <RequestButton text={this.getWidth() < 210 ? 'Preview' : 'Preview Course'}
-                className="btn-primary previewButton"
-                onClick={() => this.onPreview()} />
-              <HelpPopover>
-                You can launch a full course preview using the active organization to allow
-                it to be viewed publically.
-                <br /><br />
-                It may take a few minutes for larger courses.
-              </HelpPopover>
-            </div>
-          }
-        </div>
       </div>
     );
   }

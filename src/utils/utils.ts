@@ -1,3 +1,5 @@
+import { List, OrderedMap } from 'immutable';
+
 export function pipe(...args) {
   return input => args.reduce((acc, f) => f(acc), input);
 }
@@ -60,10 +62,14 @@ function caseOrDefault<T>(key: string):
  *    },
  *  })('Unknown');
  *
+ * // organismKingdom = 'Animal'
+ *
  * Notes:
  *  1. The generic given to caseOf<generic> specifies the return value.
  *  2. As seen in the 'single-cell' case, if a function is provided it will
- *     be evaluated and the return value will be the result
+ *     be evaluated and the return value will be the result. This is important
+ *     in situations where lazy evaluation is required, e.g. when a property
+ *     should only be accessed on some object under that specific case.
  *
  * This function works by returning a function that returns another function
  * which is finally called with the default value which finally runs through the cases
@@ -80,4 +86,19 @@ function caseOrDefault<T>(key: string):
 export function caseOf<T>(key: string): (cases: Cases<T>) => (defaultCase: (T | Fn<T>)) => T {
   return (cases: Cases<T>) => (defaultCase: T | Fn<T>) =>
     executeIfFunction<T>(caseOrDefault<T>(key)(cases)(defaultCase));
+}
+
+/**
+ * Removes duplicate items from an array
+ * @param arr Array to remove duplicates
+ * @param keyFn Optional function to map unique keys when performing deduplication on items
+ */
+export function dedupeArray<T>(arr: T[], keyFn?: (item: T) => string | number): T[] {
+  return arr
+    .map(item => ({
+      key: keyFn ? keyFn(item) : item,
+      val: item,
+    }))
+    .reduce((acc, { key, val }) => acc.set(key, val), OrderedMap<string | number | T, T>())
+    .valueSeq().toArray();
 }

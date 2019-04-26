@@ -11,7 +11,7 @@ import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { webContentsPath } from 'editors/content/media/utils';
 import { CourseModel } from 'data/models/course';
 import './MediaManager.scss';
-import { LoadingSpinner } from 'components/common/LoadingSpinner';
+import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 const MAX_NAME_LENGTH = 26;
@@ -380,7 +380,8 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               </div>
             ))}
             {isLoadingMedia && !allItemsLoaded
-              ? <LoadingSpinner key="loading" message={PAGE_LOADING_MESSAGE} />
+              ? <LoadingSpinner key="loading"
+                  size={LoadingSpinnerSize.Small} message={PAGE_LOADING_MESSAGE} />
               : null
             }
           </div>
