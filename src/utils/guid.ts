@@ -1,40 +1,53 @@
 import { logger, LogTag } from './logger';
 
+// Use a pool of already created guids to optimize performance
+// in areas of the code that quickly request thousands of guids:
 const pool = [];
 const POOL_SIZE = 10000;
 
+// Used to track our hit rate for tuning purposes
 let hits = 0;
 let misses = 0;
 
+// Fill the pool up to its configured max size
 function fillPool() {
   for (let i = 0; i < POOL_SIZE - pool.length; i += 1) {
     pool.push(createOne());
   }
 }
 
+// Every second, refill the pool.
 const schedule = () => setTimeout(() => { fillPool(); schedule(); }, 1000);
 
+// Start refilling the pool.
 schedule();
 
+// Report our hit rate
 setInterval(() => logger.debug(LogTag.DEFAULT, 'Hit rate: ' + (hits / (hits + misses))), 5000);
 
 
-/**
- * Returns an RFC4122 version 4 compliant GUID.
- * See http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
- * for source and related discussion. d
- */
+// Request a guid
 export default function guid() {
+
+  // If we have a guid available, take it
   if (pool.length > 0) {
     hits = hits + 1;
     // pop() is the fastest way to do get an item.
     // It is O(1) relative to the size of the array
     return pool.pop();
   }
+
+  // The pool was empty so we need to create one
+  // for this request
   misses = misses + 1;
   return createOne();
 }
 
+/**
+ * Returns an RFC4122 version 4 compliant GUID.
+ * See http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+ * for source and related discussion. d
+ */
 function createOne() {
   let d = new Date().getTime();
   if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
