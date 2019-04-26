@@ -8,7 +8,7 @@ let misses = 0;
 
 function fillPool() {
   for (let i = 0; i < POOL_SIZE - pool.length; i += 1) {
-    pool.push(guid());
+    pool.push(createOne());
   }
 }
 
