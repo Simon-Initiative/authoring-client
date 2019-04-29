@@ -9,7 +9,9 @@ import { Map } from 'immutable';
 import * as t from 'data/contentTypes';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { modalActions } from 'actions/modal';
-import { change, undo, redo } from 'actions/orgs';
+import { change, undo, redo, load as loadOrg, orgLoaded } from 'actions/orgs';
+import { UserState } from 'reducers/user';
+import { Document } from 'data/persistence';
 
 
 interface StateProps {
@@ -21,6 +23,7 @@ interface StateProps {
   placements: org.Placements;
   canUndo: boolean;
   canRedo: boolean;
+  user: UserState;
 }
 
 interface DispatchProps {
@@ -32,6 +35,7 @@ interface DispatchProps {
   onUndo: () => void;
   onRedo: () => void;
   dispatch: any;
+  orgLoaded: (doc: Document) => void;
 }
 
 interface OwnProps {
@@ -41,7 +45,7 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { orgs, course, skills, objectives } = state;
+  const { orgs, course, skills, objectives, user } = state;
   const { requestInFlight } = orgs;
 
   return {
@@ -53,31 +57,32 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     placements: orgs.placements,
     canUndo: orgs.undoStack.size > 0 && !requestInFlight,
     canRedo: orgs.redoStack.size > 0 && !requestInFlight,
+    user,
   };
 };
 
-const mapDispatchToProps = (d: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
+const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
   return {
     onEdit: (cr: org.OrgChangeRequest) => {
-      d(change(cr) as any);
+      dispatch(change(cr) as any);
     },
     showMessage: (message: Messages.Message) => {
-      return d(showMessage(message));
+      return dispatch(showMessage(message));
     },
     dismissMessage: (message: Messages.Message) => {
-      d(dismissSpecificMessage(message));
+      dispatch(dismissSpecificMessage(message));
     },
     dismissModal: () => {
-      return d(modalActions.dismiss());
+      return dispatch(modalActions.dismiss());
     },
     displayModal: (c) => {
-      d(modalActions.display(c));
+      dispatch(modalActions.display(c));
     },
-    dispatch: (a) => {
-      d(a);
-    },
-    onUndo: () => d(undo() as any),
-    onRedo: () => d(redo() as any),
+    dispatch,
+    onUndo: () => dispatch(undo() as any),
+    onRedo: () => dispatch(redo() as any),
+    orgLoaded: (doc: Document) =>
+      dispatch(orgLoaded(doc)),
   };
 };
 
