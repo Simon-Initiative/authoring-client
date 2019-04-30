@@ -102,6 +102,10 @@ const styleMap = {
   DEEMPHASIS: {
     fontWeight: 'lighter',
   },
+  EMPHASIS: {
+    fontWeight: 'bolder',
+    fontStyle: 'oblique',
+  },
   BDO: {
     direction: 'rtl',
     unicodeBidi: 'bidi-override',
