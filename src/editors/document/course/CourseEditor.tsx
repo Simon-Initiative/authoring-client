@@ -697,7 +697,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                         <br />
                         {dataSet.message
                           ? dataSet.message
-                          : 'Something went wrong while creating a new dataset for this course'}
+                          : 'Something went wrong while creating a new dataset for this course.'}
                         <br />
                         <br />
                         If you don't think you should be seeing this issue,
@@ -717,7 +717,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                                          To get the most recent data for analytics, create a new dataset.
+                      To get the most recent data for analytics, create a new dataset.
                       <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
