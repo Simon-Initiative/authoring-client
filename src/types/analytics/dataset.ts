@@ -69,6 +69,7 @@ export type DataSet = {
   byResourcePart: Maybe<Map<string, Map<string, AnalyticsByPart>>>,
   bySkill: Maybe<Map<string, AnalyticsBySkill>>,
   status: DatasetStatus,
+  message: string,
   dateCreated: string,
   dateCompleted: string,
 };
