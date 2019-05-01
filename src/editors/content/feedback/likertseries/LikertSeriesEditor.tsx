@@ -11,14 +11,14 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { ContentElements } from 'data/content/common/elements';
-import '../common.scss';
-import './LikertSeriesEditor.scss';
 import { QuestionTable } from './QuestionTable';
 import { LikertScale } from 'data/content/feedback/likert_scale';
 import { ContentElement } from 'data/content/common/interfaces';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+
+import '../common.scss';
 
 export interface Props extends AbstractContentEditorProps<LikertSeries> {
   canRemove: boolean;
