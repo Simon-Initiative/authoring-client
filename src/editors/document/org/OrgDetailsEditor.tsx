@@ -16,7 +16,6 @@ import { ModalMessage } from 'utils/ModalMessage';
 import { TabContainer, Tab } from 'components/common/TabContainer';
 import { UserState } from 'reducers/user';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
-import { Document } from 'data/persistence/common';
 import { duplicate } from 'actions/duplication';
 
 function buildMoreInfoAction(display, dismiss) {
