@@ -95,16 +95,16 @@ export class RequestButton extends React.Component<RequestButtonProps, RequestBu
           {children}
         </button>
         {pending
-            ? <i className="fas fa-circle-notch fa-spin fa-1x fa-fw"
-              style={{ color: flatui.peterRiver, marginLeft: 4 }} />
-            : null}
+          ? <i className="fas fa-circle-notch fa-spin fa-1x fa-fw"
+            style={{ color: flatui.peterRiver, marginLeft: 4 }} />
+          : null}
         {successful
           ? <i className="fas fa-check-circle"
-              style={{ color: flatui.emerald, marginLeft: 4 }} />
+            style={{ color: flatui.emerald, marginLeft: 4 }} />
           : null}
         {failed
           ? <i className="fas fa-times-circle"
-              style={{ color: flatui.pomegranite, marginLeft: 4 }} />
+            style={{ color: flatui.pomegranite, marginLeft: 4 }} />
           : null}
       </span>
     );
@@ -669,8 +669,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       <React.Fragment>
         <LoadingSpinner>
           Please wait while your new dataset is created, this might take a while.
-          <br/>
-          <br/>
+          <br />
+          <br />
           You may continue to use the editor while this operation is in progress.
         </LoadingSpinner>
       </React.Fragment>
@@ -690,36 +690,41 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 just: dataSet => dataSet.status === DatasetStatus.PROCESSING
                   ? this.renderProcessingAnalyticsMsg()
                   : dataSet.status === DatasetStatus.FAILED
-                  ? (
-                    <React.Fragment>
-                      <i className="fa fa-times-circle" style={{ marginRight: 5 }} />
-                      <b>Dataset Creation Failed</b>
-                      <br />
-                      Something went wrong while creating a new dataset for this course.
-                      <br />
-                      <br />
-                      If this issue continues to occur, please report it to to OLI support.
-                      <Button
-                        editMode={true}
-                        type="secondary"
-                        style={{ marginLeft: 10 }}
-                        onClick={() => reportError(user)}>
-                        Report this problem
+                    ? (
+                      <React.Fragment>
+                        <i className="fa fa-times-circle" style={{ marginRight: 5 }} />
+                        <b>Dataset Creation Failed</b>
+                        <br />
+                        {dataSet.message
+                          ? dataSet.message
+                          : 'Something went wrong while creating a new dataset for this course'}
+                        <br />
+                        <br />
+                        If you don't think you should be seeing this issue,
+                        please report it to to OLI support.
+                        <br />
+                        <br />
+                        <Button
+                          editMode={true}
+                          type="secondary"
+                          style={{ marginLeft: 10 }}
+                          onClick={() => reportError(user)}>
+                          Report this problem
                       </Button>
-                    </React.Fragment>
-                  )
-                  : (
-                    <React.Fragment>
-                      Analytics for this course are based on the latest dataset, which was created
+                      </React.Fragment>
+                    )
+                    : (
+                      <React.Fragment>
+                        Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                      To get the most recent data for analytics, create a new dataset.
+                                          To get the most recent data for analytics, create a new dataset.
                       <br />
-                      <br />
-                      <b>Notice:</b> Dataset creation may take a few minutes depending on the size
-                      of the course. You may continue to use the editor while the operation is in
-                      progress.
+                        <br />
+                        <b>Notice:</b> Dataset creation may take a few minutes depending on the size
+                        of the course. You may continue to use the editor while the operation is in
+                        progress.
                     </React.Fragment>
-                  ),
+                    ),
                 nothing: () => (
                   <React.Fragment>
                     No datasets have been created for this course package.
