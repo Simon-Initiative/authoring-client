@@ -9,9 +9,8 @@ import { Map } from 'immutable';
 import * as t from 'data/contentTypes';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { modalActions } from 'actions/modal';
-import { change, undo, redo, load as loadOrg, orgLoaded } from 'actions/orgs';
+import { change, undo, redo } from 'actions/orgs';
 import { UserState } from 'reducers/user';
-import { Document } from 'data/persistence';
 
 
 interface StateProps {
@@ -35,7 +34,6 @@ interface DispatchProps {
   onUndo: () => void;
   onRedo: () => void;
   dispatch: any;
-  orgLoaded: (doc: Document) => void;
 }
 
 interface OwnProps {
@@ -81,8 +79,6 @@ const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
     dispatch,
     onUndo: () => dispatch(undo() as any),
     onRedo: () => dispatch(redo() as any),
-    orgLoaded: (doc: Document) =>
-      dispatch(orgLoaded(doc)),
   };
 };
 

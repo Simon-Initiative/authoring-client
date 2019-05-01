@@ -71,7 +71,6 @@ export interface OrgDetailsEditorProps {
   onUndo: () => void;
   onRedo: () => void;
   user: UserState;
-  orgLoaded: (doc: Document) => void;
 }
 
 const enum TABS {
@@ -204,7 +203,7 @@ export class OrgDetailsEditor
   }
 
   renderActions(model: models.OrganizationModel) {
-    const { dispatch, course, user, orgLoaded } = this.props;
+    const { dispatch, course, user } = this.props;
 
     function dupe() {
       dispatch(duplicate(model)).then((doc) => {
