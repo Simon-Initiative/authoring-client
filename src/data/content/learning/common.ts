@@ -169,7 +169,7 @@ const addStyle = (oliStyle, draftStyle) => {
 
 addStyle('bold', 'BOLD');
 addStyle('italic', 'ITALIC');
-addStyle('emphasis', 'BOLD');
+addStyle('emphasis', 'EMPHASIS');
 addStyle('deemphasis', 'DEEMPHASIS');
 addStyle('highlight', 'HIGHLIGHT');
 addStyle('line-through', 'STRIKETHROUGH');
