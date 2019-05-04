@@ -5,3 +5,11 @@
 
 Typescript/React based WYSIWYG editor for building Open Learning Initiative courses.
 
+## Related repositories
+* [authoring-dev](https://github.com/Simon-Initiative/authoring-dev) - Docker development environment for the course authoring platform
+* [authoring-server](https://github.com/Simon-Initiative/authoring-server) - Java server, REST API, bridge to OLI
+* [authoring-admin](https://github.com/Simon-Initiative/authoring-admin) - Elm admin client
+* [authoring-eval](https://github.com/Simon-Initiative/authoring-eval) - Typescript/Node dynamic question evaluation engine
+
+## License
+This software is licensed under the [MIT License](./LICENSE) © 2019 Carnegie Mellon University
