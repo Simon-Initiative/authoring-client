@@ -42,11 +42,11 @@ export class DuplicateListingInput
     this.setState({ value: nextProps.value });
   }
 
-  onChange(e) {
+  onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
 
     const duplicates = this.props.existing.filter(
-      v => v.toLowerCase().indexOf(value) !== -1).toList();
+      v => v.toLowerCase().indexOf(value.toLowerCase()) !== -1).toList();
     this.setState({ value, duplicates });
   }
 
