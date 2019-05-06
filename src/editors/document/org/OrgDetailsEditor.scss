@@ -1,52 +1,56 @@
-@import 'oli/colors';
-@import 'oli/typography';
+@import "oli/colors";
+@import "oli/typography";
 
 .org-details-editor {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 15px;
-  height: 100%;
-
-  .btn {
-    i {
-      margin-right: 8px;
-    }
-  }
-
-  .org-tab {
-    margin-left: 40px;
-    margin-right: 40px;
-  }
-
-	.doc-head {
     flex: 1;
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    height: 100%;
 
-    .action-bar {
-      .btn {
-        padding: 5px 20px;
-        position: relative;
-        top: -6px;
+    .org-details-title {
+        display: flex;
+        justify-content: space-between;
+    }
 
-        &:hover {
-          border: 0px solid $blue;
-          color: $blue;
-          text-decoration: underline;
+    .btn {
+        i {
+            margin-right: 8px;
         }
-      }
     }
 
-    .nav-link {
-      cursor: pointer;
+    .org-tab {
+        margin-left: 40px;
+        margin-right: 40px;
     }
-  }
 
-  .tab-container {
-    .tab-header {
-      margin-top: 10px;
-      margin-bottom: 10px;
+    .doc-head {
+        flex: 1;
+        overflow: auto;
+
+        .action-bar {
+            .btn {
+                padding: 5px 20px;
+                position: relative;
+                top: -6px;
+
+                &:hover {
+                    border: 0px solid $blue;
+                    color: $blue;
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
     }
-  }
 
+    .tab-container {
+        .tab-header {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    }
 }

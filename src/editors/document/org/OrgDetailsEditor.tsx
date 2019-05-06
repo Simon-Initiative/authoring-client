@@ -15,6 +15,7 @@ import './OrgDetailsEditor.scss';
 import { containsUnitsOnly } from './utils';
 import { ModalMessage } from 'utils/ModalMessage';
 import { TabContainer, Tab } from 'components/common/TabContainer';
+import UndoRedoToolbar from 'editors/document/common/UndoRedoToolbar';
 
 function buildMoreInfoAction(display, dismiss) {
   const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
@@ -233,7 +234,14 @@ export class OrgDetailsEditor
           <div className="org-details-editor">
             <div className="doc-head">
 
-              <h3>Organization: {m.title}</h3>
+              <div className="org-details-title">
+                <h3>Organization: {m.title}</h3>
+                <UndoRedoToolbar
+                  undoEnabled={this.props.canUndo}
+                  redoEnabled={this.props.canRedo}
+                  onUndo={this.props.onUndo.bind(this)}
+                  onRedo={this.props.onRedo.bind(this)} />
+              </div>
 
               {this.renderTabs(m)}
             </div>

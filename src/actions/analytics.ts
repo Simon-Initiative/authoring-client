@@ -93,7 +93,7 @@ const analyticsDoneOrFailedMessage = (status: DatasetStatus): Message =>
         canUserDismiss: true,
         content: new TitledContent().with({
           title: 'Dataset Creation Failed',
-          message: 'Something went wrong while creating a new dataset for this course',
+          message: 'Something went wrong while creating a new dataset for this course.',
         }),
       })
     );
@@ -115,14 +115,15 @@ function poll(dataSetId: string, isNewDataset: boolean, dispatch, getState) {
       }
     }
   })
-  .catch((err) => {
-    dispatch(dataSetReceived(dataSetId, {
-      byResource: Maybe.nothing(),
-      byResourcePart: Maybe.nothing(),
-      bySkill: Maybe.nothing(),
-      status: DatasetStatus.FAILED,
-      dateCreated: dateFormatted(new Date()),
-      dateCompleted: dateFormatted(new Date()),
-    }));
-  });
+    .catch((err) => {
+      dispatch(dataSetReceived(dataSetId, {
+        byResource: Maybe.nothing(),
+        byResourcePart: Maybe.nothing(),
+        bySkill: Maybe.nothing(),
+        status: DatasetStatus.FAILED,
+        dateCreated: dateFormatted(new Date()),
+        dateCompleted: dateFormatted(new Date()),
+        message: '',
+      }));
+    });
 }

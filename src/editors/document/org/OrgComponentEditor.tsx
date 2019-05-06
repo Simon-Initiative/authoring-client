@@ -218,12 +218,18 @@ export class OrgComponentEditor
           <div className="org-component-editor">
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               {titleEditor}
-              <div className="flex-spacer" />
-              <UndoRedoToolbar
-                undoEnabled={canUndo}
-                redoEnabled={canRedo}
-                onUndo={onUndo.bind(this)}
-                onRedo={onRedo.bind(this)} />
+              {model.contentType === t.OrganizationContentTypes.Unit
+                || model.contentType === t.OrganizationContentTypes.Module
+                || model.contentType === t.OrganizationContentTypes.Section
+                || model.contentType === t.OrganizationContentTypes.Sequence
+                ? <React.Fragment><div className="flex-spacer" />
+                  <UndoRedoToolbar
+                    undoEnabled={canUndo}
+                    redoEnabled={canRedo}
+                    onUndo={onUndo.bind(this)}
+                    onRedo={onRedo.bind(this)} /></React.Fragment>
+                : null
+              }
             </div>
 
             {preconditions}
