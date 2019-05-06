@@ -2,27 +2,27 @@
 
 [![Open Learning Initiative](https://oli.cmu.edu/wp-content/uploads/2018/10/oli-logo-78px-high-1.svg)](http://oli.cmu.edu/)
 
-[![Build Status](https://dalaran.oli.cmu.edu/jenkins/buildStatus/icon?job=course-editor)](https://dalaran.oli.cmu.edu/jenkins/job/course-editor/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Simon-Initiative/course-editor/blob/master/LICENSE)
+[![Build Status](https://dalaran.oli.cmu.edu/jenkins/buildStatus/icon?job=authoring-client)](https://dalaran.oli.cmu.edu/jenkins/job/authoring-client/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Simon-Initiative/authoring-client/blob/master/LICENSE)
 
 Typescript/React/Redux based front-end for authoring and editing Open Learning Initiative course packages.
 
 ## WYSIWYG editing
 
-Course authors create and maintain course materials using a familiar, WYSIWYG editing UI/UX.  
+Course authors create and maintain course materials using a familiar, WYSIWYG editing UI/UX.
 
 ![screen shot](docs/screenshot.png "Screen shot")
 
 ## Assessment creation
 
-Reinforce and assess students understanding of concepts through formative and summative assessments, leveraging a variety of interactive question types. 
+Reinforce and assess students understanding of concepts through formative and summative assessments, leveraging a variety of interactive question types.
 
 ![screen shot](docs/assessments.png "Screen shot")
 
 ## Learning engineering best practices
 
 Learning engineering best practices and design principles, exposed directly in the authoring environment, serve as guardrails
-to steer an author through the development process. 
+to steer an author through the development process.
 
 
 ![screen shot](docs/objectives.png "Screen shot")
@@ -30,7 +30,7 @@ to steer an author through the development process.
 ## Data analytics
 
 Iteratively improve a course over time, guided by a rich set of learner-generated data analytics. Quickly spot problem
-questions or areas of the course where learning content is not meeting the learners' needs. 
+questions or areas of the course where learning content is not meeting the learners' needs.
 
 
 ![screen shot](docs/analytics.png "Screen shot")
