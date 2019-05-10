@@ -30,6 +30,7 @@
     "react-dnd": "2.5.4",
     "react-dnd-html5-backend": "2.5.4",
     "react-dom": "^16.8.4",
+    "react-hot-loader": "^4.8.4",
     "react-jss": "^8.6.1",
     "react-redux": "^6.0.1",
     "react-tippy": "^1.2.2",
