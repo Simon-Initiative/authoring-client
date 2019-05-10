@@ -36,6 +36,7 @@ const parseDatasetJson = (json: any): DataSet => ({
   })(DatasetStatus.DONE),
   dateCreated: json.dateCreated,
   dateCompleted: json.dateCompleted,
+  message: json.message,
 });
 
 type FetchDataSetResponse = DataSet;

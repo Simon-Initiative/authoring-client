@@ -5,7 +5,6 @@ import * as contentTypes from 'data/contentTypes';
 import { Actions } from 'editors/document/org/Actions.controller';
 import { Details } from 'editors/document/org/Details';
 import { LabelsEditor } from 'editors/content/org/LabelsEditor';
-import { duplicateOrganization } from 'actions/models';
 import * as Messages from 'types/messages';
 import * as org from 'data/models/utils/org';
 import { Maybe } from 'tsmonad';
@@ -15,6 +14,10 @@ import './OrgDetailsEditor.scss';
 import { containsUnitsOnly } from './utils';
 import { ModalMessage } from 'utils/ModalMessage';
 import { TabContainer, Tab } from 'components/common/TabContainer';
+import { UserState } from 'reducers/user';
+import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
+import { duplicate } from 'actions/duplication';
+import UndoRedoToolbar from 'editors/document/common/UndoRedoToolbar';
 
 function buildMoreInfoAction(display, dismiss) {
   const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
@@ -67,6 +70,7 @@ export interface OrgDetailsEditorProps {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
+  user: UserState;
 }
 
 const enum TABS {
@@ -199,12 +203,13 @@ export class OrgDetailsEditor
   }
 
   renderActions(model: models.OrganizationModel) {
-    const { dispatch, course } = this.props;
+    const { dispatch, course, user } = this.props;
 
-    const dupe = () => dispatch(
-      duplicateOrganization(
-        course.guid,
-        model, course));
+    function dupe() {
+      dispatch(duplicate(model)).then((doc) => {
+        updateActiveOrgPref(course.guid, user.profile.username, doc.model.guid);
+      });
+    }
 
     return (
       <Actions
@@ -233,7 +238,14 @@ export class OrgDetailsEditor
           <div className="org-details-editor">
             <div className="doc-head">
 
-              <h3>Organization: {m.title}</h3>
+              <div className="org-details-title">
+                <h3>Organization: {m.title}</h3>
+                <UndoRedoToolbar
+                  undoEnabled={this.props.canUndo}
+                  redoEnabled={this.props.canRedo}
+                  onUndo={this.props.onUndo.bind(this)}
+                  onRedo={this.props.onRedo.bind(this)} />
+              </div>
 
               {this.renderTabs(m)}
             </div>
