@@ -498,6 +498,8 @@ class NavigationPanel
     const { classes, viewActions, course, router, profile, onCreateOrg } = this.props;
     const { showOrgDropdown, collapsed } = this.state;
 
+    const availableOrgs = r => r.type === 'x-oli-organization' && r.resourceState !== 'DELETED';
+
     return (
       <div className="dropdown">
         <div className={classNames([
@@ -534,7 +536,7 @@ class NavigationPanel
           </div>
         </div>
         <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
-          {course.resources.valueSeq().filter(r => r.type === 'x-oli-organization').map(org => (
+          {course.resources.valueSeq().filter(availableOrgs).map(org => (
             <a key={org.guid}
               className={classNames(['dropdown-item'])}
               onClick={() => {

@@ -299,14 +299,14 @@ export class OrgComponentEditor
         const processor = this.processCommand.bind(this, org, model);
 
         const removeCommand = new RemoveCommand();
-        const remove = (
+        const remove = model.contentType !== 'Sequences' ? (
           <Remove
             style={{ float: 'right' }}
             editMode={this.props.editMode && removeCommand.precondition(org, model)}
             onRemove={() => processor(removeCommand)}>
             Remove {this.getLabel(model)}
           </Remove>
-        );
+        ) : null;
         return (
           <div>
             {[
