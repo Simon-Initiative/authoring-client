@@ -9,7 +9,7 @@ import { Map } from 'immutable';
 import * as t from 'data/contentTypes';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { modalActions } from 'actions/modal';
-import { change, undo, redo, releaseOrg } from 'actions/orgs';
+import { change, undo, redo } from 'actions/orgs';
 import { UserState } from 'reducers/user';
 
 
