@@ -58,7 +58,7 @@ export const objectiveModelRules: ModelCheckerRule<LearningObjective, RuleData>[
   isIssue: (data: LearningObjective, aux) => {
     const { skills, skillQuestionRefs } = aux;
     return skills.reduce(
-      (acc, skill) => {
+      (acc: boolean, skill) => {
         const refs = getOrderedObjectiveQuestions(skills, skillQuestionRefs, skill);
         const formativeCount = refs
           .filter(r => r.assessmentType === LegacyTypes.inline)

@@ -17,7 +17,7 @@ import { Tooltip } from 'utils/tooltip';
 import { RequestButton } from 'editors/document/course/CourseEditor';
 import { CourseId } from 'data/types';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
-import { ACTIVE_ORG_STORAGE_KEY, activeOrgUserKey } from 'actions/utils/activeOrganization';
+import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { Resource } from 'data/contentTypes';
 
 
@@ -382,21 +382,6 @@ class NavigationPanel
       'navbar_collapsed_' + username, `${collapsed}`);
   }
 
-  updateActiveOrgPref = (courseGuid: string, username: string, organizationGuid: string) => {
-
-    const userKey = activeOrgUserKey(username, courseGuid);
-
-    Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
-      .caseOf({
-        just: (prefs) => {
-          prefs[userKey] = organizationGuid;
-          saveToLocalStorage(ACTIVE_ORG_STORAGE_KEY, JSON.stringify(prefs));
-        },
-        nothing: () => saveToLocalStorage(
-          ACTIVE_ORG_STORAGE_KEY, JSON.stringify({ [userKey]: organizationGuid })),
-      });
-  }
-
   getWidth = () => {
     const { collapsed, width, newWidth } = this.state;
     return collapsed
@@ -437,13 +422,13 @@ class NavigationPanel
       <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown}>
         {!collapsed && (
           <div className={classes.collapseButtonContainer}>
-          <Tooltip title="Collapse Outline" position="right" size="small" delay={750}>
-            <div className={classes.collapseButton}
-              onClick={this.onCollapse}
-              onMouseDown={e => e.stopPropagation()}>
-              <i className="fa fa-angle-double-left" />
-            </div>
-          </Tooltip>
+            <Tooltip title="Collapse Outline" position="right" size="small" delay={750}>
+              <div className={classes.collapseButton}
+                onClick={this.onCollapse}
+                onMouseDown={e => e.stopPropagation()}>
+                <i className="fa fa-angle-double-left" />
+              </div>
+            </Tooltip>
           </div>
         )}
       </div>
@@ -456,19 +441,19 @@ class NavigationPanel
 
     return (
       <Tooltip disabled={!collapsed} title="Overview" position="right">
-      <div
-        className={classNames([
-          classes.navItem,
-          Maybe.sequence({ courseId: router.courseId, resourceId: router.resourceId }).caseOf({
-            just: ({ courseId, resourceId }) => courseId === course.guid
-              && resourceId === course.guid && classes.selectedNavItem,
-            nothing: () => undefined,
-          }),
-        ])}
-        onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
-        <i className="fa fa-book" />{!collapsed && ' Overview'}
-      </div>
-    </Tooltip>
+        <div
+          className={classNames([
+            classes.navItem,
+            Maybe.sequence({ courseId: router.courseId, resourceId: router.resourceId }).caseOf({
+              just: ({ courseId, resourceId }) => courseId === course.guid
+                && resourceId === course.guid && classes.selectedNavItem,
+              nothing: () => undefined,
+            }),
+          ])}
+          onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
+          <i className="fa fa-book" />{!collapsed && ' Overview'}
+        </div>
+      </Tooltip>
 
     );
   }
@@ -513,6 +498,8 @@ class NavigationPanel
     const { classes, viewActions, course, router, profile, onCreateOrg } = this.props;
     const { showOrgDropdown, collapsed } = this.state;
 
+    const availableOrgs = r => r.type === 'x-oli-organization' && r.resourceState !== 'DELETED';
+
     return (
       <div className="dropdown">
         <div className={classNames([
@@ -549,14 +536,14 @@ class NavigationPanel
           </div>
         </div>
         <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
-          {course.resources.valueSeq().filter(r => r.type === 'x-oli-organization').map(org => (
+          {course.resources.valueSeq().filter(availableOrgs).map(org => (
             <a key={org.guid}
               className={classNames(['dropdown-item'])}
               onClick={() => {
 
                 if (org.id !== currentOrg.id) {
                   this.props.onReleaseOrg();
-                  this.updateActiveOrgPref(course.guid, profile.username, org.guid);
+                  updateActiveOrgPref(course.guid, profile.username, org.guid);
                   this.props.onLoadOrg(course.guid, org.guid);
                   viewActions.viewDocument(org.guid, course.guid, org.guid);
                 }

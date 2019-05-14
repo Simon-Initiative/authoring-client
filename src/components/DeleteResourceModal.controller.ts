@@ -8,6 +8,7 @@ import { ResourceState } from 'data/content/resource';
 import { updateCourseResources } from 'actions/course';
 import * as viewActions from 'actions/view';
 import { modalActions } from 'actions/modal';
+import { LegacyTypes } from 'data/types';
 
 interface StateProps {
 
@@ -42,8 +43,18 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
         updatedResource.guid, updatedResource,
       ]]);
       dispatch(updateCourseResources(resources));
-      dispatch(viewActions.viewAllResources(course.guid, orgId));
+
+      let orgToView = orgId;
+      if (orgToView === updatedResource.guid) {
+        orgToView = ownProps.course.resources.toArray().filter(
+          r => r.type === LegacyTypes.organization
+            && r.guid !== orgId && r.resourceState !== 'DELETED',
+        )[0].guid;
+      }
+
+      dispatch(viewActions.viewAllResources(course.guid, orgToView));
       dispatch(modalActions.dismiss());
+
     },
   };
 };

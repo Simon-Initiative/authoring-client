@@ -136,7 +136,7 @@ export default class DialogEditor
 
     // Prevent removal if speaker is used in any lines
     return this.props.model.lines.reduce(
-      (speakerUsed, line) => line.speaker === speaker.id ? true : speakerUsed,
+      (speakerUsed: boolean, line) => line.speaker === speaker.id ? true : speakerUsed,
       false);
   }
 
