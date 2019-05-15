@@ -54,6 +54,7 @@ interface CourseEditorState {
   selectedOrganizationId: string;
   newVersionNumber: string;
   isNewVersionValid: boolean;
+  newVersionErrorMessage: string;
 }
 
 interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
@@ -115,27 +116,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   organizations: Resource[] = [];
 
-  constructor(props: CourseEditorProps) {
-    super(props);
-
-    this.state = {
-      selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
-      themes: [],
-      selectedOrganizationId: '',
-      newVersionNumber: '',
-      isNewVersionValid: false,
-    };
-
-    this.onEditDevelopers = this.onEditDevelopers.bind(this);
-    this.renderMenuItemChildren = this.renderMenuItemChildren.bind(this);
-    this.onEditTheme = this.onEditTheme.bind(this);
-    this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
-    this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
-    this.onRequestDeployment = this.onRequestDeployment.bind(this);
-    this.onClickNewVersion = this.onClickNewVersion.bind(this);
-    this.validateVersionNumber = this.validateVersionNumber.bind(this);
-  }
+  state = {
+    ...this.state,
+    selectedDevelopers: this.props.model.developers.filter(d => d.isDeveloper).toArray(),
+    themes: [],
+    selectedOrganizationId: '',
+    newVersionNumber: '',
+    isNewVersionValid: false,
+    newVersionErrorMessage: '',
+  };
 
   componentDidMount() {
     this.fetchGlobalThemes();
@@ -171,7 +160,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     });
   }
 
-  onTitleEdit(title) {
+  onTitleEdit = (title) => {
     const model = this.props.model.with({ title });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -183,7 +172,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     persistence.persistDocument(doc);
   }
 
-  onDescriptionEdit(description) {
+  onDescriptionEdit = (description) => {
     const model = this.props.model.with({ description });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -195,7 +184,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     persistence.persistDocument(doc);
   }
 
-  onEditDevelopers(developers: UserInfo[]) {
+  onEditDevelopers = (developers: UserInfo[]) => {
     // For some reason the onChange callback for the Typeahead executes
     // twice for each UI-driven edit.  This check short-circuits the
     // second call.
@@ -244,7 +233,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.props.courseChanged(model);
   }
 
-  onEditTheme(themeId: string) {
+  onEditTheme = (themeId: string) => {
     const { model, courseChanged } = this.props;
 
     persistence.setCourseTheme(model.guid, themeId)
@@ -261,7 +250,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       .catch(err => console.error(`Error setting theme ${themeId}: ${err}`));
   }
 
-  onClickNewVersion() {
+  onCreateNewVersion = () => {
     const { model, viewAllCourses } = this.props;
     const { newVersionNumber, isNewVersionValid } = this.state;
 
@@ -269,15 +258,18 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       // Reparse version number to remove spaces/other formatting issues in the raw input string
       return persistence.createNewVersion(
         model.guid, this.parseVersionNumber(newVersionNumber).join('.'))
-        .then(viewAllCourses);
+        .then(viewAllCourses)
+        .catch(err => this.setState({ newVersionErrorMessage: err.message }));
     }
+
+    return Promise.reject();
   }
 
   parseVersionNumber(versionNumber: string) {
     return versionNumber.split('.').map(s => parseInt(s, 10));
   }
 
-  validateVersionNumber(newVersionNumber: string) {
+  onValidateVersionNumber = (newVersionNumber: string) => {
     // Validate version number under semantic versioning syntax
     // Valid version numbers are major minor (1.1) or major minor patch (1.1.0)
     const isValid = parsed => (parsed.length === 2 || parsed.length === 3)
@@ -301,7 +293,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       .catch(err => console.error(err));
   }
 
-  displayRemovePackageModal() {
+  onDisplayRemovePackageModal = () => {
     this.props.onDisplayModal(<ModalPrompt
       text={'Are you sure you want to permanently delete this course package? \
           This action cannot be undone.'}
@@ -320,7 +312,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       <Typeahead
         disabled={!this.props.editMode}
         multiple
-        renderMenuItemChildren={this.renderMenuItemChildren}
+        renderMenuItemChildren={this.onRenderMenuItemChildren}
         onChange={this.onEditDevelopers}
         options={developers}
         labelKey={(d: UserInfo) => `${d.firstName} ${d.lastName} (${d.email})`}
@@ -329,7 +321,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  renderMenuItemChildren(dev: UserInfo, props, index) {
+  onRenderMenuItemChildren = (dev: UserInfo, props, index) => {
     const name = dev.firstName + ' ' + dev.lastName;
     return [
       <strong key="name">{name}</strong>,
@@ -464,7 +456,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     return actions;
   }
 
-  onRequestDeployment(stage: DeployStage, redeploy: boolean) {
+  onRequestDeployment = (stage: DeployStage, redeploy: boolean) => {
     const { model, courseChanged } = this.props;
 
     return persistence.requestDeployment(model.guid, stage, redeploy)
@@ -525,7 +517,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <Button
             editMode
             type="outline-danger"
-            onClick={this.displayRemovePackageModal}>
+            onClick={this.onDisplayRemovePackageModal}>
             Delete Course Package
           </Button>
           <br /><br />
@@ -549,12 +541,20 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             label="New Version Number (e.g. 1.1)"
             type="text"
             value={this.state.newVersionNumber}
-            onEdit={this.validateVersionNumber}
+            onEdit={this.onValidateVersionNumber}
             hasError={this.state.newVersionNumber !== '' && !this.state.isNewVersionValid}
           />
+          {this.state.newVersionNumber === '' || this.state.isNewVersionValid
+            ? null
+            : <span style={{ paddingLeft: '5px', color: 'darkred' }}>
+              Should look like <code>1.1</code> or <code>1.1.1</code></span>}
+          {this.state.newVersionErrorMessage
+            ? <div><br />{this.state.newVersionErrorMessage}</div>
+            : null}
+          <br />
           <br />
           <RequestButton text="Create Version" className="btn-primary createVersion"
-            onClick={() => this.onClickNewVersion()} />
+            onClick={this.onCreateNewVersion} />
         </div>
       </div>
     );
@@ -717,7 +717,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                      To get the most recent data for analytics, create a new dataset.
+                                        To get the most recent data for analytics, create a new dataset.
                       <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
