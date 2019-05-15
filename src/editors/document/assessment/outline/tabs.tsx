@@ -126,8 +126,7 @@ const QuestionTab = (props: TabProps) => {
 const ContentTab = (props: TabProps) => {
   const c = props.node as Content;
 
-  // Use the first ContiguousText content as the preview text if available,
-  // otherwise just use the contentType of the first ContentElement
+  // Use the first ContiguousText content as the preview text if available
   const textBlocks = c.body.content
     .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
@@ -139,7 +138,7 @@ const ContentTab = (props: TabProps) => {
         just: t => t !== '' ? t : newContentText,
         nothing: () => newContentText,
       })
-    : c.body.content.first().contentType;
+    : newContentText;
 
   return (
     <Tab
