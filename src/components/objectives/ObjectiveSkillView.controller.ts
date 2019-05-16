@@ -55,7 +55,6 @@ const mapStateToProps = (state: State): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-
     onFetchSkills: (courseId: string) => {
       return dispatch(fetchSkills(courseId));
     },
@@ -94,6 +93,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(ObjectiveSkillView);
+  (mapStateToProps, mapDispatchToProps)(ObjectiveSkillView);
 
 export { controller as ObjectiveSkillView };

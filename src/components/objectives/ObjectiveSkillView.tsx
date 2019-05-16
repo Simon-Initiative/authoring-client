@@ -40,6 +40,8 @@ import { ConfirmModal } from 'components/ConfirmModal';
 
 import './ObjectiveSkillView.scss';
 import { extractFullText } from 'data/content/objectives/objective';
+import { WritelockModal } from 'components/WritelockModal';
+import { ConflictModal } from 'components/ConflictModal.controller';
 
 const getQuestionRefFromSkillEdge = (
   edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
@@ -535,11 +537,18 @@ class ObjectiveSkillView
   }
 
   failureEncountered(error: string) {
+    const { displayModal, showMessage, user } = this.props;
+
     this.setState({ isSavePending: false });
 
-    this.failureMessage = Maybe.just(buildPersistenceFailureMessage(
-      error, this.props.user.profile));
-    this.failureMessage.lift(m => this.props.showMessage(m));
+    if (error === 'Forbidden') {
+      displayModal(React.createElement(WritelockModal));
+    } else if (error === 'Conflict') {
+      displayModal(React.createElement(ConflictModal));
+    } else {
+      this.failureMessage = Maybe.just(buildPersistenceFailureMessage(error, user.profile, true));
+      this.failureMessage.lift(showMessage);
+    }
   }
 
   onObjectiveEdit(obj: contentTypes.LearningObjective) {
@@ -1157,7 +1166,9 @@ class ObjectiveSkillView
     this.props.onUpdateObjectives(Immutable.OrderedMap(
       [[obj.get('id'), obj]]));
 
-    persistence.persistDocument(document);
+    persistence.persistDocument(document)
+      .then(result => this.saveCompleted())
+      .catch(error => this.failureEncountered(error));
   }
 
   renderContent() {
