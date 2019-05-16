@@ -26,6 +26,8 @@ import { DatasetStatus } from 'types/analytics/dataset';
 import { reportError } from 'utils/feedback';
 import { UserState } from 'reducers/user';
 import flatui from 'styles/palettes/flatui';
+import * as Messages from 'types/messages';
+import { buildGeneralErrorMessage } from 'utils/error';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -39,6 +41,7 @@ export interface CourseEditorProps {
   viewAllCourses: () => any;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
+  onShowMessage: (message: Messages.Message) => void;
   onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
   onCreateDataset: () => void;
 }
@@ -211,7 +214,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           .catch((err) => {
             // We need to handle this better.  This editor should be managed
             // by the EditorManager
-            console.error(err);
+            this.props.onShowMessage(
+              buildGeneralErrorMessage('Error adding developer: ' + err.message));
           });
       });
 
@@ -242,7 +246,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         });
         courseChanged(model.with({ theme: themeId }));
       })
-      .catch(err => console.error(`Error setting theme ${themeId}: ${err}`));
+      .catch((err) => {
+        this.props.onShowMessage(
+          buildGeneralErrorMessage(`Error setting theme ${themeId}: ${err.message}`));
+      });
   }
 
   onCreateNewVersion = () => {
@@ -289,7 +296,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       .then((document) => {
         this.props.viewAllCourses();
       })
-      .catch(err => console.error(err));
+      .catch((err) => {
+        this.props.onShowMessage(
+          buildGeneralErrorMessage(`Error removing package: ${err.message}`));
+      });
   }
 
   onDisplayRemovePackageModal = () => {
@@ -729,7 +739,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                            To get the most recent data for analytics, create a new dataset.
+                        To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size

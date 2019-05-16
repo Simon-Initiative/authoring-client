@@ -11,6 +11,7 @@ import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpi
 import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
+import { buildGeneralErrorMessage } from 'utils/error';
 
 function reportProblemAction(): Messages.MessageAction {
 
@@ -118,10 +119,8 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
         });
       })
       .catch((err) => {
-        console.error(err);
-        this.props.sendMessage(errorMessageAction());
+        this.props.sendMessage(buildGeneralErrorMessage(err.message));
       });
-
   }
 
   render() {

@@ -7,6 +7,8 @@ import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 import { requestDataSet } from './analytics';
+import { buildGeneralErrorMessage } from 'utils/error';
+import { showMessage } from 'actions/messages';
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
 export const COURSE_CHANGED: COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -89,6 +91,8 @@ export function loadCourse(courseId: string) {
         }
 
       })
-      .catch(err => console.error(err));
+      .catch((err) => {
+        dispatch(showMessage(buildGeneralErrorMessage(err.message)));
+      });
   };
 }

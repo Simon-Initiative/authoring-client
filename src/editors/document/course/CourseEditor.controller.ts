@@ -7,6 +7,8 @@ import { modalActions } from 'actions/modal';
 import { createNewDataSet } from 'actions/analytics';
 import { AnalyticsState } from 'reducers/analytics';
 import { UserState } from 'reducers/user';
+import * as Messages from 'types/messages';
+import { showMessage } from 'actions/messages';
 
 interface StateProps {
   user: UserState;
@@ -19,6 +21,7 @@ interface DispatchProps {
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   onCreateDataset: () => void;
+  onShowMessage: (message: Messages.Message) => void;
 }
 
 interface OwnProps {
@@ -41,6 +44,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(viewActions.viewAllCourses()),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
+    onShowMessage: (message: Messages.Message) => dispatch(showMessage(message)),
     onCreateDataset: () => dispatch(createNewDataSet()),
   };
 };

@@ -11,7 +11,7 @@ import * as viewActions from 'actions/view';
 import { DuplicateListingInput } from 'components/objectives/DuplicateListingInput';
 import guid from 'utils/guid';
 import { buildReadOnlyMessage } from 'utils/lock';
-import { buildPersistenceFailureMessage } from 'utils/error';
+import { buildPersistenceFailureMessage, buildGeneralErrorMessage } from 'utils/error';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner.tsx';
 import { ExistingSkillSelection } from 'components/objectives/ExistingSkillSelection';
 import {
@@ -585,7 +585,7 @@ class ObjectiveSkillView
 
       () => persistence.persistDocument(updatedDocument)
         .then(result => this.saveCompleted())
-        .catch(error => this.failureEncountered(error)),
+        .catch(error => this.failureEncountered(error.statusText)),
     );
 
     this.props.onUpdateObjectives(Immutable.OrderedMap(
@@ -845,7 +845,7 @@ class ObjectiveSkillView
   }
 
   canDeleteObjective(obj: contentTypes.LearningObjective): Promise<boolean> {
-    const { course } = this.props;
+    const { course, showMessage } = this.props;
 
     if (obj.skills.size > 0) {
       this.services.displayModal(
@@ -883,13 +883,15 @@ class ObjectiveSkillView
         this.setState({
           loading: false,
         });
+        showMessage(buildGeneralErrorMessage('Error removing objective. ' + err.message));
+
         return Promise.resolve(false);
       });
   }
 
   canDeleteSkill(skill: contentTypes.Skill): Promise<boolean> {
 
-    const { course } = this.props;
+    const { course, showMessage } = this.props;
 
     this.setState({
       loading: true,
@@ -923,6 +925,8 @@ class ObjectiveSkillView
         this.setState({
           loading: false,
         });
+        showMessage(buildGeneralErrorMessage('Error removing skill. ' + err.message));
+
         return Promise.resolve(false);
       });
   }
