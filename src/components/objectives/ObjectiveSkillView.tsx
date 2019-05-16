@@ -181,7 +181,7 @@ interface ObjectiveSkillViewState {
   overrideExpanded: boolean;
   isSavePending: boolean;
   loading: boolean;
-  organizationResourceMap: Maybe<Immutable.Map<string, Immutable.List<string>>>;
+  organizationResourceMap: Maybe<Immutable.OrderedMap<string, string>>;
   skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
   workbookPageRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
   searchText: string;
@@ -247,13 +247,20 @@ class ObjectiveSkillView
 
   componentWillUpdate(
     nextProps: Readonly<ObjectiveSkillViewProps>, nextState: Readonly<ObjectiveSkillViewState>) {
+
+    const obj = this.props.selectedOrganization.caseOf({
+      just: o => o,
+      nothing: () => null,
+    });
+
     // this assumes that aggregateModel, skills, objectives are all set together
     if (nextState.aggregateModel !== null
       && nextState.aggregateModel !== this.state.aggregateModel) {
-      this.fetchAllRefs(this.props.skills, nextState.objectives);
+
+      this.fetchAllRefs(this.props.skills, nextState.objectives, obj);
 
     } else if (this.state.aggregateModel !== null && nextProps.skills !== this.props.skills) {
-      this.fetchAllRefs(nextProps.skills, this.state.objectives);
+      this.fetchAllRefs(nextProps.skills, this.state.objectives, obj);
     }
   }
 
@@ -280,12 +287,9 @@ class ObjectiveSkillView
   fetchAllRefs(
     skills: Immutable.OrderedMap<string, contentTypes.Skill>,
     objectivesModel: UnifiedObjectivesModel,
+    org: models.OrganizationModel,
   ) {
     const { course } = this.props;
-
-    // fetch all organizations for course
-    const fetchAllOrgResources = persistence.bulkFetchDocuments(
-      course.guid, [LegacyTypes.organization], 'byTypes');
 
     // fetch workbook page to inline assessment edges
     const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.guid, {
@@ -347,7 +351,6 @@ class ObjectiveSkillView
     });
 
     Promise.all([
-      fetchAllOrgResources,
       fetchWorkbookPageToObjectiveEdges,
       fetchWorkbookPageToInlineEdges,
       fetchWorkbookPageToSummativeEdges,
@@ -356,7 +359,6 @@ class ObjectiveSkillView
       fetchSummativeRefs,
       fetchPoolRefs,
     ]).then(([
-      orgDocs,
       workbookPageRefs,
       workbookPageToInlineEdges,
       workbookPageToSummativeEdges,
@@ -371,22 +373,16 @@ class ObjectiveSkillView
         ...workbookPageToSummativeEdges,
         ...summativeToPoolEdges,
       ];
-      const organizationResourceMap = orgDocs.reduce(
-        (orgAcc, orgDoc) => {
-          const org = orgDoc.model as models.OrganizationModel;
-          const orgResources = org.getFlattenedResources();
 
-          return orgAcc.set(
-            org.resource.id,
-            orgResources.concat(
-              combinedEdges
-                .filter(edge => orgResources.contains(resourceId(edge.sourceId)))
-                .map(edge => resourceId(edge.destinationId)),
-            ).toList(),
-          );
-        },
-        Immutable.Map<string, Immutable.List<string>>(),
-      );
+      const allResources = [
+        ...org.getFlattenedResources().toArray(),
+        ...combinedEdges
+          .filter(edge => org.id === resourceId(edge.sourceId))
+          .map(edge => resourceId(edge.destinationId)),
+      ];
+
+      const organizationResourceMap = Immutable.OrderedMap<string, string>(
+        allResources.map(r => [r, r]));
 
       this.setState({
         organizationResourceMap: Maybe.just(organizationResourceMap),
@@ -1057,7 +1053,6 @@ class ObjectiveSkillView
     const { onPushRoute, selectedOrganization } = this.props;
     const {
       overrideExpanded, searchText, skillQuestionRefs, workbookPageRefs,
-      organizationResourceMap,
     } = this.state;
 
     return selectedOrganization.caseOf({
@@ -1084,6 +1079,13 @@ class ObjectiveSkillView
           .toArray()
           .forEach((objective: contentTypes.LearningObjective) => {
 
+            const wbs = Maybe.just(
+              workbookPageRefs.caseOf({
+                just: w => w.get(objective.id),
+                nothing: () => Immutable.List<string>(),
+              }),
+            );
+
             rows.push(
               <Objective
                 key={objective.id}
@@ -1095,8 +1097,7 @@ class ObjectiveSkillView
                 onBeginExternalEdit={this.onBeginExternalEdit}
                 onPushRoute={onPushRoute}
                 skillQuestionRefs={skillQuestionRefs}
-                workbookPageRefs={workbookPageRefs}
-                organizationResourceMap={organizationResourceMap}
+                workbookPageRefs={wbs}
                 objective={objective}
                 organization={organization}
                 highlightText={searchText}
