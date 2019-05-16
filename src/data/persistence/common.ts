@@ -6,11 +6,12 @@ import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak'
 
 const fetch = (window as any).fetch;
 
-function handleError(err, reject) {
-  if (err.message && err.message === 'Unauthorized') {
+function handleError(error: { status: string, statusText: string, message: string }, reject) {
+  // The status text is the human-readable server response code from the `fetch` Response object
+  if (error.statusText && error.statusText === 'Unauthorized') {
     forceLogin();
   } else {
-    reject(err);
+    reject(error);
   }
 }
 
@@ -55,19 +56,25 @@ export function authenticatedFetch(params: HttpRequestParams) {
           body,
         });
       })
-      .then((response) => {
+      .then((response: Response) => {
         if (!response.ok) {
-          reject(response.statusText);
+          // Error responses from the server return objects of type { message: string }.
+          // Typescript cannot type-check rejected promises.
+          response.text().then((text) => {
+            reject({
+              status: response.status,
+              statusText: response.statusText,
+              message: (JSON.parse(text) as { message: string }).message,
+            });
+          });
         } else {
           resolve(hasTextResult ? response.text() : response.json());
         }
       })
-      .catch((err) => {
-        handleError(err, reject);
+      .catch((error: { status: string, statusText: string, message: string }) => {
+        handleError(error, reject);
       });
-
   });
-
 }
 
 export type RevisionId = string;

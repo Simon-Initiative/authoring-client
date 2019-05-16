@@ -21,6 +21,22 @@ export function buildReportProblemAction(
   };
 }
 
+export function buildGeneralErrorMessage(error: string, name: string, email: string) {
+
+  const content = new Messages.TitledContent().with({
+    title: 'Something went wrong',
+    message: error,
+  });
+  return new Messages.Message().with({
+    content,
+    guid: 'PersistenceConflict',
+    scope: Messages.Scope.CoursePackage,
+    severity: Messages.Severity.Error,
+    canUserDismiss: true,
+    actions: Immutable.List(),
+  });
+}
+
 export function buildConflictMessage() {
 
   const content = new Messages.TitledContent().with({

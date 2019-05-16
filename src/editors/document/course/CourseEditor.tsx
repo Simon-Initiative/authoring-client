@@ -60,19 +60,14 @@ interface CourseEditorState {
 interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
 interface RequestButtonState { pending: boolean; successful: boolean; failed: boolean; }
 export class RequestButton extends React.Component<RequestButtonProps, RequestButtonState> {
-  constructor(props: RequestButtonProps) {
-    super(props);
+  state = {
+    ...this.state,
+    pending: false,
+    successful: false,
+    failed: false,
+  };
 
-    this.state = {
-      pending: false,
-      successful: false,
-      failed: false,
-    };
-
-    this.onClickWithState = this.onClickWithState.bind(this);
-  }
-
-  onClickWithState(): () => void {
+  onClickWithState = () => {
     const { onClick } = this.props;
 
     return () => this.setState(
@@ -259,7 +254,11 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       return persistence.createNewVersion(
         model.guid, this.parseVersionNumber(newVersionNumber).join('.'))
         .then(viewAllCourses)
-        .catch(err => this.setState({ newVersionErrorMessage: err.message }));
+        .catch((err) => {
+          this.setState({ newVersionErrorMessage: err.message });
+          // Reject promise just to set the failure icon of the create version button
+          return Promise.reject();
+        });
     }
 
     return Promise.reject();
@@ -502,6 +501,24 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     persistence.persistDocument(doc);
   }
 
+  renderNewVersionValidationError() {
+    const { newVersionNumber, isNewVersionValid } = this.state;
+
+    let content: JSX.Element = null;
+
+    if (newVersionNumber !== '' && !isNewVersionValid) {
+      content = <span>Should look like <code>1.1</code> or <code>1.1.1</code></span>;
+    }
+
+    return <div className="localized-error">{content}</div>;
+  }
+
+  renderNewVersionCreationError() {
+    const { newVersionErrorMessage } = this.state;
+
+    return <div className="localized-error">{newVersionErrorMessage}</div>;
+  }
+
   renderAdminDetails() {
     return (
       <div className="row">
@@ -544,17 +561,12 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             onEdit={this.onValidateVersionNumber}
             hasError={this.state.newVersionNumber !== '' && !this.state.isNewVersionValid}
           />
-          {this.state.newVersionNumber === '' || this.state.isNewVersionValid
-            ? null
-            : <span style={{ paddingLeft: '5px', color: 'darkred' }}>
-              Should look like <code>1.1</code> or <code>1.1.1</code></span>}
-          {this.state.newVersionErrorMessage
-            ? <div><br />{this.state.newVersionErrorMessage}</div>
-            : null}
-          <br />
-          <br />
+          {/* Two error locations for new version - syntax validations (performed locally),
+          and server errors when the form is submitted */}
+          {this.renderNewVersionValidationError()}
           <RequestButton text="Create Version" className="btn-primary createVersion"
             onClick={this.onCreateNewVersion} />
+          {this.renderNewVersionCreationError()}
         </div>
       </div>
     );
@@ -717,8 +729,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                                        To get the most recent data for analytics, create a new dataset.
-                      <br />
+                            To get the most recent data for analytics, create a new dataset.
+                        <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
                         of the course. You may continue to use the editor while the operation is in
