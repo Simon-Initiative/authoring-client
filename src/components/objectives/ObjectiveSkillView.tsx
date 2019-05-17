@@ -536,17 +536,18 @@ class ObjectiveSkillView
     this.failureMessage = Maybe.nothing<Messages.Message>();
   }
 
-  failureEncountered(error: string) {
+  failureEncountered(error: { statusText: string, message: string }) {
     const { displayModal, showMessage, user } = this.props;
 
     this.setState({ isSavePending: false });
 
-    if (error === 'Forbidden') {
+    if (error.statusText === 'Forbidden') {
       displayModal(React.createElement(WritelockModal));
-    } else if (error === 'Conflict') {
+    } else if (error.statusText === 'Conflict') {
       displayModal(React.createElement(ConflictModal));
     } else {
-      this.failureMessage = Maybe.just(buildPersistenceFailureMessage(error, user.profile, true));
+      this.failureMessage = Maybe.just(
+        buildPersistenceFailureMessage(error.message, user.profile, true));
       this.failureMessage.lift(showMessage);
     }
   }
@@ -585,7 +586,7 @@ class ObjectiveSkillView
 
       () => persistence.persistDocument(updatedDocument)
         .then(result => this.saveCompleted())
-        .catch(error => this.failureEncountered(error.statusText)),
+        .catch(error => this.failureEncountered(error)),
     );
 
     this.props.onUpdateObjectives(Immutable.OrderedMap(
