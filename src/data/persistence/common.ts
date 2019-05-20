@@ -58,13 +58,17 @@ export function authenticatedFetch(params: HttpRequestParams) {
       })
       .then((response: Response) => {
         if (!response.ok) {
-          // Error responses from the server return objects of type { message: string }.
-          // Typescript cannot type-check rejected promises.
           response.text().then((text) => {
+            // Error responses from the server should always return
+            // objects of type { message: string }
+            let errorMessage = JSON.parse(text);
+            if (errorMessage.message) {
+              errorMessage = errorMessage.message;
+            }
             reject({
               status: response.status,
               statusText: response.statusText,
-              message: (JSON.parse(text) as { message: string }).message,
+              message: errorMessage,
             });
           });
         } else {
