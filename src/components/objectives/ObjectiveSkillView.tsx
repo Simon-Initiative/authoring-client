@@ -1184,7 +1184,12 @@ class ObjectiveSkillView
 
     unified.newBucket = document;
 
-    this.setState({ objectives: unified });
+    const workbookPageRefs = this.state.workbookPageRefs.caseOf({
+      just: m => Maybe.just(m.set(obj.id, Immutable.List<string>())),
+      nothing: () => Maybe.nothing<Immutable.Map<string, Immutable.List<string>>>(),
+    });
+
+    this.setState({ objectives: unified, workbookPageRefs });
 
     this.props.onUpdateObjectives(Immutable.OrderedMap(
       [[obj.get('id'), obj]]));
