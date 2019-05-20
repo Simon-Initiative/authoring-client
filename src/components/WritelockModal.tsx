@@ -6,8 +6,8 @@ import { styles } from './WritelockModal.styles';
 
 export interface WritelockModalProps {
   className?: string;
-  courseId: string;
-  documentId: string;
+  courseId?: string;
+  documentId?: string;
   onLoadDocument: (courseId, documentId) => Promise<any>;
 }
 
@@ -62,9 +62,11 @@ class WritelockModal
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-primary"
-                onClick={e => onLoadDocument(courseId, documentId)}
-                data-dismiss="modal">Refresh</button>
+              {courseId && documentId
+                ? <button type="button" className="btn btn-primary"
+                  onClick={e => onLoadDocument(courseId, documentId)}
+                  data-dismiss="modal">Refresh</button>
+                : null}
             </div>
           </div>
         </div>
