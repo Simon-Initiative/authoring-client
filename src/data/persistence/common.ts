@@ -62,7 +62,7 @@ export function authenticatedFetch(params: HttpRequestParams) {
             // Error responses from the server should always return
             // objects of type { message: string }
             let message = JSON.parse(text);
-            if (message.message) {
+            if (message.message !== undefined) {
               message = message.message;
             }
             reject({
