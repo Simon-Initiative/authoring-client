@@ -36,7 +36,7 @@ const styles: JSSStyles = {
     cursor: 'pointer',
     color: colors.white,
     display: 'inline-block',
-    padding: [5, 10],
+    padding: [2, 8],
 
     '&:hover': {
       color: colors.white,
@@ -115,9 +115,9 @@ const Link = withStyles<LinkProps>(styles)(({
   children,
   classes,
 }) => (
-  <a className={classNames([classes.headerLink, className])} href="#"
-    onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
-));
+    <a className={classNames([classes.headerLink, className])} href="#"
+      onClick={(e) => { e.preventDefault(); action(); }}>{children}</a>
+  ));
 
 type MenuProps = {
   label: string | JSX.Element,
@@ -132,17 +132,17 @@ const Menu = withStyles<MenuProps>(styles)(({
   children,
   classes,
 }) => (
-  <div className={classNames([classes.headerDropdown, 'dropdown show'])}>
-    <a className={classNames([classes.headerLink, 'dropdown-toggle'])} href="#"
-      target="_blank"
-      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      {label}
-    </a>
-    <div className="dropdown-menu dropdown-menu-right">
-      {children}
+    <div className={classNames([classes.headerDropdown, 'dropdown show'])}>
+      <a className={classNames([classes.headerLink, 'dropdown-toggle'])} href="#"
+        target="_blank"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {label}
+      </a>
+      <div className="dropdown-menu dropdown-menu-right">
+        {children}
+      </div>
     </div>
-  </div>
-));
+  ));
 
 type MenuItemProps = {
   url: string,
@@ -153,9 +153,9 @@ type MenuItemProps = {
  * MenuItem React Component
  */
 const MenuItem = withStyles<MenuItemProps>(styles)(({
-    url,
-    children,
-  }) => (
+  url,
+  children,
+}) => (
     <a className="dropdown-item" href={url}>{children}</a>
   ));
 
@@ -244,9 +244,15 @@ class Header
   }
 
   renderPackageTitle() {
-    const { classes, course } = this.props;
-
-    return <span>{course.title} <span className={classes.version}>v{course.version}</span></span>;
+    const { classes, course, viewActions } = this.props;
+    return (
+      <span>
+        <a className={classes.headerLink}
+          onClick={(e) => { e.preventDefault(); viewActions.viewCourse(course.guid); }}>
+          {course.title}
+        </a> <span className={classes.version}>v{course.version}</span>
+      </span>
+    );
   }
 
   renderApplicationLabel() {
