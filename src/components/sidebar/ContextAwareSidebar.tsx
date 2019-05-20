@@ -263,6 +263,17 @@ class ContextAwareSidebar
         : dateFormatted(date);
     };
 
+    const idDisplay = (
+      <SidebarGroup label="OLI Identifier">
+        <SidebarRow>
+          <Tooltip title={resource.id}
+            delay={150} distance={5} size="small" arrowSize="small">
+            {resource.id}
+          </Tooltip>
+        </SidebarRow>
+      </SidebarGroup>
+    );
+
     switch (model.modelType) {
       case ModelTypes.WorkbookPageModel:
         return (
@@ -281,6 +292,7 @@ class ContextAwareSidebar
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
+            {idDisplay}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
@@ -323,6 +335,7 @@ class ContextAwareSidebar
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
+            {idDisplay}
             {/* Branching assessments require a specific page structuring,
             so they cannot be modified by the user */}
             {model.branching
@@ -448,6 +461,7 @@ class ContextAwareSidebar
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
+            {idDisplay}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
@@ -486,6 +500,7 @@ class ContextAwareSidebar
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
+            {idDisplay}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
