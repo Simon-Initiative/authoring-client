@@ -8,7 +8,7 @@ const fetch = (window as any).fetch;
 
 function handleError(error: { status: string, statusText: string, message: string }, reject) {
   // The status text is the human-readable server response code from the `fetch` Response object
-  if (error.statusText && error.statusText === 'Unauthorized') {
+  if (error.statusText === 'Unauthorized') {
     forceLogin();
   } else {
     reject(error);
