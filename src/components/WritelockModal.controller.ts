@@ -12,8 +12,8 @@ interface DispatchProps {
 }
 
 interface OwnProps {
-  courseId: string;
-  documentId: string;
+  courseId?: string;
+  documentId?: string;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
