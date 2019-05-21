@@ -26,6 +26,7 @@ import { DatasetStatus } from 'types/analytics/dataset';
 import { reportError } from 'utils/feedback';
 import { UserState } from 'reducers/user';
 import flatui from 'styles/palettes/flatui';
+import { Maybe } from 'tsmonad';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -678,7 +679,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   renderAnalytics() {
-    const { user, analytics, onCreateDataset } = this.props;
+    const { user, analytics, onCreateDataset, editMode, model } = this.props;
 
     return (
       <div className="infoContain">
@@ -717,8 +718,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                      To get the most recent data for analytics, create a new dataset.
-                      <br />
+  To get the most recent data for analytics, create a new dataset.
+                        <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
                         of the course. You may continue to use the editor while the operation is in
@@ -737,13 +738,31 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           </div>
           <div className="col-3">
             <Button
-              editMode={this.props.editMode && analytics.requestedDataSetId.caseOf({
+              editMode={editMode && analytics.requestedDataSetId.caseOf({
                 just: () => false,
                 nothing: () => true,
               })}
               onClick={() => onCreateDataset()}>
               Create Dataset
             </Button>
+            {analytics.dataSet
+              .bind(dataSet => dataSet.status === DatasetStatus.DONE
+                ? Maybe.just({})
+                : Maybe.nothing())
+              .caseOf({
+                just: _ => <div>< br />
+                  <br />
+                  <Button
+                    className="btn btn-secondary"
+                    editMode={editMode &&
+                      model.activeDataset !== null && model.activeDataset !== undefined}
+                    onClick={() => persistence.downloadDataset(
+                      model.activeDataset.guid, model.title, model.version)}>
+                    Download Dataset
+                </Button>
+                </div>,
+                nothing: () => null,
+              })}
           </div>
         </div>
       </div>
@@ -760,7 +779,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               <Tab>
                 {this.renderDetails()}
               </Tab>
-              <Tab>
+              < Tab>
                 {this.renderWorkflow()}
               </Tab>
               <Tab>

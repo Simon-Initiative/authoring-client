@@ -27,6 +27,7 @@ export { developerRegistration } from './persistence/developer';
 export {
   fetchDataSet,
   createDataSet,
+  downloadDataset,
 } from './persistence/analytics';
 
 export {
