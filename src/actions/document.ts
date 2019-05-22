@@ -197,21 +197,23 @@ function saveCompleted(dispatch, getState: () => State, documentId, document) {
     dismissSpecificMessage(new Messages.Message().with({ guid: documentId + '_PERSISTENCE' })));
 }
 
-function saveFailed(dispatch, getState, courseId, documentId, error) {
+function saveFailed(
+  dispatch, getState, courseId, documentId,
+  error: { status: string, statusText: string, message: string }) {
 
   dispatch(lastSaveSucceeded(documentId, Maybe.just(false)));
 
-  if (error === 'Forbidden') {
+  if (error.statusText === 'Forbidden') {
     // if it is a write-lock failure, disable editing and show write-lock modal
     dispatch(documentEditingEnable(false, documentId));
     dispatch(modalActions.display(React.createElement(WritelockModal, { courseId, documentId })));
-  } else if (error === 'Conflict') {
+  } else if (error.statusText === 'Conflict') {
     // if it is a conflict failure, disable editing and show conflict modal
     dispatch(documentEditingEnable(false, documentId));
     dispatch(modalActions.display(React.createElement(ConflictModal, { courseId, documentId })));
   } else {
     // some other failure, show persistence error message
-    const message = buildPersistenceFailureMessage(error, getState().user.profile);
+    const message = buildPersistenceFailureMessage(error.statusText, getState().user.profile);
     dispatch(showMessage(message.with({ guid: documentId + '_PERSISTENCE' })));
   }
 }

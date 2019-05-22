@@ -6,6 +6,12 @@
     padding: 30px 15px;
     margin: 0 20px;
 
+    .localized-error {
+        color: darkred;
+        height: 40px;
+        line-height: 40px;
+    }
+
     .fa.fa-circle-o-notch.fa-spin.fa-1x.fa-fw {
         color: gray();
     }

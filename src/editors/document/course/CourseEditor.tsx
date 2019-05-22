@@ -27,6 +27,8 @@ import { reportError } from 'utils/feedback';
 import { UserState } from 'reducers/user';
 import flatui from 'styles/palettes/flatui';
 import { Maybe } from 'tsmonad';
+import * as Messages from 'types/messages';
+import { buildGeneralErrorMessage } from 'utils/error';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -40,6 +42,7 @@ export interface CourseEditorProps {
   viewAllCourses: () => any;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
+  onShowMessage: (message: Messages.Message) => void;
   onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
   onCreateDataset: () => void;
 }
@@ -55,24 +58,20 @@ interface CourseEditorState {
   selectedOrganizationId: string;
   newVersionNumber: string;
   isNewVersionValid: boolean;
+  newVersionErrorMessage: string;
 }
 
 interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
 interface RequestButtonState { pending: boolean; successful: boolean; failed: boolean; }
 export class RequestButton extends React.Component<RequestButtonProps, RequestButtonState> {
-  constructor(props: RequestButtonProps) {
-    super(props);
+  state = {
+    ...this.state,
+    pending: false,
+    successful: false,
+    failed: false,
+  };
 
-    this.state = {
-      pending: false,
-      successful: false,
-      failed: false,
-    };
-
-    this.onClickWithState = this.onClickWithState.bind(this);
-  }
-
-  onClickWithState(): () => void {
+  onClickWithState = () => {
     const { onClick } = this.props;
 
     return () => this.setState(
@@ -116,27 +115,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   organizations: Resource[] = [];
 
-  constructor(props: CourseEditorProps) {
-    super(props);
-
-    this.state = {
-      selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
-      themes: [],
-      selectedOrganizationId: '',
-      newVersionNumber: '',
-      isNewVersionValid: false,
-    };
-
-    this.onEditDevelopers = this.onEditDevelopers.bind(this);
-    this.renderMenuItemChildren = this.renderMenuItemChildren.bind(this);
-    this.onEditTheme = this.onEditTheme.bind(this);
-    this.displayRemovePackageModal = this.displayRemovePackageModal.bind(this);
-    this.onDescriptionEdit = this.onDescriptionEdit.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
-    this.onRequestDeployment = this.onRequestDeployment.bind(this);
-    this.onClickNewVersion = this.onClickNewVersion.bind(this);
-    this.validateVersionNumber = this.validateVersionNumber.bind(this);
-  }
+  state = {
+    ...this.state,
+    selectedDevelopers: this.props.model.developers.filter(d => d.isDeveloper).toArray(),
+    themes: [],
+    selectedOrganizationId: '',
+    newVersionNumber: '',
+    isNewVersionValid: false,
+    newVersionErrorMessage: '',
+  };
 
   componentDidMount() {
     this.fetchGlobalThemes();
@@ -172,7 +159,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     });
   }
 
-  onTitleEdit(title) {
+  onTitleEdit = (title) => {
     const model = this.props.model.with({ title });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -184,7 +171,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     persistence.persistDocument(doc);
   }
 
-  onDescriptionEdit(description) {
+  onDescriptionEdit = (description) => {
     const model = this.props.model.with({ description });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -196,7 +183,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     persistence.persistDocument(doc);
   }
 
-  onEditDevelopers(developers: UserInfo[]) {
+  onEditDevelopers = (developers: UserInfo[]) => {
     // For some reason the onChange callback for the Typeahead executes
     // twice for each UI-driven edit.  This check short-circuits the
     // second call.
@@ -228,7 +215,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           .catch((err) => {
             // We need to handle this better.  This editor should be managed
             // by the EditorManager
-            console.error(err);
+            this.props.onShowMessage(
+              buildGeneralErrorMessage('Error adding developer: ' + err.message));
           });
       });
 
@@ -245,7 +233,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.props.courseChanged(model);
   }
 
-  onEditTheme(themeId: string) {
+  onEditTheme = (themeId: string) => {
     const { model, courseChanged } = this.props;
 
     persistence.setCourseTheme(model.guid, themeId)
@@ -259,10 +247,13 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         });
         courseChanged(model.with({ theme: themeId }));
       })
-      .catch(err => console.error(`Error setting theme ${themeId}: ${err}`));
+      .catch((err) => {
+        this.props.onShowMessage(
+          buildGeneralErrorMessage(`Error setting theme ${themeId}: ${err.message}`));
+      });
   }
 
-  onClickNewVersion() {
+  onCreateNewVersion = () => {
     const { model, viewAllCourses } = this.props;
     const { newVersionNumber, isNewVersionValid } = this.state;
 
@@ -270,15 +261,22 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       // Reparse version number to remove spaces/other formatting issues in the raw input string
       return persistence.createNewVersion(
         model.guid, this.parseVersionNumber(newVersionNumber).join('.'))
-        .then(viewAllCourses);
+        .then(viewAllCourses)
+        .catch((err) => {
+          this.setState({ newVersionErrorMessage: err.message });
+          // Reject promise just to set the failure icon of the create version button
+          return Promise.reject();
+        });
     }
+
+    return Promise.reject();
   }
 
   parseVersionNumber(versionNumber: string) {
     return versionNumber.split('.').map(s => parseInt(s, 10));
   }
 
-  validateVersionNumber(newVersionNumber: string) {
+  onValidateVersionNumber = (newVersionNumber: string) => {
     // Validate version number under semantic versioning syntax
     // Valid version numbers are major minor (1.1) or major minor patch (1.1.0)
     const isValid = parsed => (parsed.length === 2 || parsed.length === 3)
@@ -295,14 +293,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   removePackage() {
+    const { viewAllCourses, onShowMessage } = this.props;
+
     persistence.deleteCoursePackage(this.props.model.guid)
-      .then((document) => {
-        this.props.viewAllCourses();
-      })
-      .catch(err => console.error(err));
+      .then(document => viewAllCourses())
+      .catch(err => onShowMessage(
+        buildGeneralErrorMessage(`Error removing package: ${err.message}`)));
   }
 
-  displayRemovePackageModal() {
+  onDisplayRemovePackageModal = () => {
     this.props.onDisplayModal(<ModalPrompt
       text={'Are you sure you want to permanently delete this course package? \
           This action cannot be undone.'}
@@ -321,7 +320,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       <Typeahead
         disabled={!this.props.editMode}
         multiple
-        renderMenuItemChildren={this.renderMenuItemChildren}
+        renderMenuItemChildren={this.onRenderMenuItemChildren}
         onChange={this.onEditDevelopers}
         options={developers}
         labelKey={(d: UserInfo) => `${d.firstName} ${d.lastName} (${d.email})`}
@@ -330,7 +329,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  renderMenuItemChildren(dev: UserInfo, props, index) {
+  onRenderMenuItemChildren = (dev: UserInfo, props, index) => {
     const name = dev.firstName + ' ' + dev.lastName;
     return [
       <strong key="name">{name}</strong>,
@@ -465,14 +464,16 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     return actions;
   }
 
-  onRequestDeployment(stage: DeployStage, redeploy: boolean) {
-    const { model, courseChanged } = this.props;
+  onRequestDeployment = (stage: DeployStage, redeploy: boolean) => {
+    const { model, courseChanged, onShowMessage } = this.props;
 
     return persistence.requestDeployment(model.guid, stage, redeploy)
       .then((deployStatusObj) => {
         const deploymentStatus = (deployStatusObj as any).deployStatus;
         courseChanged(model.with({ deploymentStatus }));
-      });
+      })
+      .catch(err => onShowMessage(buildGeneralErrorMessage(
+        `There was an error requesting course deployment: ${err.message}`)));
   }
 
   renderLicenseSelect() {
@@ -511,6 +512,24 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     persistence.persistDocument(doc);
   }
 
+  renderNewVersionValidationError() {
+    const { newVersionNumber, isNewVersionValid } = this.state;
+
+    let content: JSX.Element = null;
+
+    if (newVersionNumber !== '' && !isNewVersionValid) {
+      content = <span>Should look like <code>1.1</code> or <code>1.1.1</code></span>;
+    }
+
+    return <div className="localized-error">{content}</div>;
+  }
+
+  renderNewVersionCreationError() {
+    const { newVersionErrorMessage } = this.state;
+
+    return <div className="localized-error">{newVersionErrorMessage}</div>;
+  }
+
   renderAdminDetails() {
     return (
       <div className="row">
@@ -526,7 +545,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <Button
             editMode
             type="outline-danger"
-            onClick={this.displayRemovePackageModal}>
+            onClick={this.onDisplayRemovePackageModal}>
             Delete Course Package
           </Button>
           <br /><br />
@@ -550,12 +569,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             label="New Version Number (e.g. 1.1)"
             type="text"
             value={this.state.newVersionNumber}
-            onEdit={this.validateVersionNumber}
+            onEdit={this.onValidateVersionNumber}
             hasError={this.state.newVersionNumber !== '' && !this.state.isNewVersionValid}
           />
-          <br />
+          {/* Two error locations for new version - syntax validations (performed locally),
+          and server errors when the form is submitted */}
+          {this.renderNewVersionValidationError()}
           <RequestButton text="Create Version" className="btn-primary createVersion"
-            onClick={() => this.onClickNewVersion()} />
+            onClick={this.onCreateNewVersion} />
+          {this.renderNewVersionCreationError()}
         </div>
       </div>
     );
