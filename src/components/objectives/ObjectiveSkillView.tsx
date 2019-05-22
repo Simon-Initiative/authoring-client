@@ -80,52 +80,82 @@ export const reduceObjectiveWorkbookPageRefs = (
   return Immutable.Map<string, Immutable.List<string>>(entries);
 };
 
-export const reduceSkillFormativeQuestionRefs = (
+
+// Take an array of assessment to skill edges and create
+// a map of the skills to the set of assessments, but ommitting assessments
+// that do not exist in this organization. We strive
+// for ultra efficiency here - so we advoid Immutable collections
+// and go raw JS objects as maps.
+function skillToAssessmentMap(skillEdges: Edge[], isInOrg: (string) => boolean) {
+
+  const skills = {};
+  skillEdges.forEach((e) => {
+    if (skills[e.destinationId] === undefined) {
+      skills[e.destinationId] = [];
+    }
+    if (isInOrg(e.sourceId)) {
+      skills[e.destinationId].push(e);
+    }
+  });
+  return skills;
+}
+
+
+function reduceSkillToQuestionRefs(
+  skills: Immutable.OrderedMap<string, contentTypes.Skill>,
+  assessmentToSkillEdges: Edge[],
+  resourceType: LegacyTypes,
+  isInOrg = resourceId => true,
+) {
+
+  // Create a map of the skills to the assessments in this org that
+  // target the skill
+  const skillMap = skillToAssessmentMap(assessmentToSkillEdges, isInOrg);
+
+
+  const results = skills.toArray()
+    .map((skill) => {
+
+      // Now for each skill, get the assessment edges
+      const edges: Edge[] = skillMap[skill.id];
+      const refs = [];
+
+      // edges will be undefined if a skill simply has no assessments in
+      // this current org that target it
+      if (edges !== undefined) {
+
+        // Collect all of the question refs for this skill and assessment
+        edges.forEach((edge) => {
+          getQuestionRefFromSkillEdge(
+            edge, resourceType, resourceId(edge.sourceId)).lift(ref => refs.push(ref));
+        });
+      }
+
+      return [skill.id, Immutable.List<QuestionRef>(refs)];
+    });
+
+  return Immutable.Map<string, Immutable.List<QuestionRef>>(results);
+}
+
+
+function reduceSkillFormativeQuestionRefs(
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
   formativeToSkillEdges: Edge[],
-  isValidResource = resourceId => true,
-) => skills.reduce(
-  (acc, skill) => acc.set(
-    skill.id,
-    (acc.get(skill.id) || Immutable.List<QuestionRef>())
-      .concat(
-        formativeToSkillEdges.filter(edge => isValidResource(resourceId(edge.sourceId))
-          && resourceId(edge.destinationId) === skill.id)
-          .map(edge =>
-            getQuestionRefFromSkillEdge(
-              edge, LegacyTypes.inline, resourceId(edge.sourceId)))
-          .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
-            just: ref => true,
-            nothing: () => false,
-          }))
-          .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
-      ).toList(),
-  ),
-  Immutable.Map<string, Immutable.List<QuestionRef>>(),
-);
+  isInOrg = resourceId => true) {
 
-export const reduceSkillSummativeQuestionRefs = (
+  return reduceSkillToQuestionRefs(skills, formativeToSkillEdges, LegacyTypes.inline, isInOrg);
+}
+
+
+function reduceSkillSummativeQuestionRefs(
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
-  summativeToSkillEdges: Edge[],
-  isValidResource = resourceId => true,
-) => skills.reduce(
-  (acc, skill) => acc.set(
-    skill.id,
-    (acc.get(skill.id) || Immutable.List<QuestionRef>())
-      .concat(
-        summativeToSkillEdges.filter(edge => isValidResource(resourceId(edge.sourceId))
-          && resourceId(edge.destinationId) === skill.id)
-          .map(edge => getQuestionRefFromSkillEdge(
-            edge, LegacyTypes.assessment2, resourceId(edge.sourceId)))
-          .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
-            just: ref => true,
-            nothing: () => false,
-          }))
-          .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
-      ).toList(),
-  ),
-  Immutable.Map<string, Immutable.List<QuestionRef>>(),
-);
+  formativeToSkillEdges: Edge[],
+  isInOrg = resourceId => true) {
+
+  return reduceSkillToQuestionRefs(skills, formativeToSkillEdges, LegacyTypes.assessment2, isInOrg);
+}
+
+
 
 export const reduceSkillPoolQuestionRefs = (
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
