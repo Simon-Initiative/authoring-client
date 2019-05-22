@@ -32,8 +32,8 @@ export interface QuestionRef {
   assessmentType: LegacyTypes;
   assessmentId: string;
   poolInfo: Maybe<PoolInfo>;
-  parts: List<Part>;
-  body: ContentElements;
+  parts: () => List<Part>;
+  body: () => ContentElements;
   label: string;
 }
 
@@ -56,11 +56,11 @@ const getPoolQuestionCount = (pathItem: SkillPathElement) => {
 };
 
 const getParts = (pathItem: SkillPathElement) => pathItem.parts
-  ? List<Part>(pathItem.parts.map(p => Part.fromPersistence(p, guid(), () => {})))
+  ? List<Part>(pathItem.parts.map(p => Part.fromPersistence(p, guid(), () => { })))
   : List<Part>();
 
 const getBody = (pathItem: SkillPathElement) => pathItem['body'] && ContentElements.fromPersistence(
-  pathItem['body'], guid(), QUESTION_BODY_ELEMENTS, null, () => {});
+  pathItem['body'], guid(), QUESTION_BODY_ELEMENTS, null, () => { });
 
 export const getQuestionRefFromPathInfo = (
   pathItem: SkillPathElement, assessmentType: LegacyTypes,
@@ -77,8 +77,8 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
-        parts: getParts(pathItem),
-        body: getBody(pathItem),
+        parts: () => getParts(pathItem),
+        body: () => getBody(pathItem),
         label: pathItem.label,
       });
     case 'short_answer':
@@ -91,8 +91,8 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
-        parts: getParts(pathItem),
-        body: getBody(pathItem),
+        parts: () => getParts(pathItem),
+        body: () => getBody(pathItem),
         label: pathItem.label,
       });
     case 'fill_in_the_blank':
@@ -105,8 +105,8 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
-        parts: getParts(pathItem),
-        body: getBody(pathItem),
+        parts: () => getParts(pathItem),
+        body: () => getBody(pathItem),
         label: pathItem.label,
       });
     case 'image_hotspot':
@@ -119,8 +119,8 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
-        parts: getParts(pathItem),
-        body: getBody(pathItem),
+        parts: () => getParts(pathItem),
+        body: () => getBody(pathItem),
         label: pathItem.label,
       });
     case 'multiple_choice':
@@ -133,8 +133,8 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
-        parts: getParts(pathItem),
-        body: getBody(pathItem),
+        parts: () => getParts(pathItem),
+        body: () => getBody(pathItem),
         label: pathItem.label,
       });
     case 'numeric':
@@ -147,8 +147,8 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
-        parts: getParts(pathItem),
-        body: getBody(pathItem),
+        parts: () => getParts(pathItem),
+        body: () => getBody(pathItem),
         label: pathItem.label,
       });
     case 'ordering':
@@ -161,8 +161,8 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
-        parts: getParts(pathItem),
-        body: getBody(pathItem),
+        parts: () => getParts(pathItem),
+        body: () => getBody(pathItem),
         label: pathItem.label,
       });
     case 'question':
@@ -175,8 +175,8 @@ export const getQuestionRefFromPathInfo = (
         assessmentType,
         assessmentId,
         poolInfo: getPoolQuestionCount(pathItem),
-        parts: getParts(pathItem),
-        body: getBody(pathItem),
+        parts: () => getParts(pathItem),
+        body: () => getBody(pathItem),
         label: pathItem.label,
       });
     default:
