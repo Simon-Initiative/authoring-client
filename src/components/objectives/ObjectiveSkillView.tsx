@@ -90,11 +90,13 @@ function skillToAssessmentMap(skillEdges: Edge[], isInOrg: (string) => boolean) 
 
   const skills = {};
   skillEdges.forEach((e) => {
-    if (skills[e.destinationId] === undefined) {
-      skills[e.destinationId] = [];
+
+    const id = resourceId(e.destinationId);
+    if (skills[id] === undefined) {
+      skills[id] = [];
     }
-    if (isInOrg(e.sourceId)) {
-      skills[e.destinationId].push(e);
+    if (isInOrg(resourceId(e.sourceId))) {
+      skills[id].push(e);
     }
   });
   return skills;
@@ -117,7 +119,7 @@ function reduceSkillToQuestionRefs(
     .map((skill) => {
 
       // Now for each skill, get the assessment edges
-      const edges: Edge[] = skillMap[skill.id];
+      const edges: Edge[] = skillMap[resourceId(skill.id)];
       const refs = [];
 
       // edges will be undefined if a skill simply has no assessments in
