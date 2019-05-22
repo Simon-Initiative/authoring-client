@@ -237,7 +237,7 @@ function applyChange(
 
           // When the server rejects our change due to a conflict, we always
           // request the latest view of the document:
-          if (err === 'Conflict') {
+          if (err.statusText === 'Conflict') {
             persistence.retrieveDocument(courseId, doc.model.guid, () => { })
               .then((latestDoc) => {
 
