@@ -48,7 +48,6 @@ function createPlaceholderPage(courseId: string) {
 
   const resource = WorkbookPageModel.createNew(
     PLACEHOLDER_ITEM_ID, 'Placeholder', NEW_PAGE_CONTENT);
-
   persistence.createDocument(courseId, resource);
 
   return resource;
