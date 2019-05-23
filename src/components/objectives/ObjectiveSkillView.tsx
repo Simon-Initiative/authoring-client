@@ -64,12 +64,14 @@ const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<Po
 export const reduceObjectiveWorkbookPageRefs = (
   objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>,
   workbookpageToObjectiveEdges: Edge[],
+  isValidResource = resourceId => true,
 ) => {
   const entries = [];
   objectives.toArray().forEach((objective) => {
     const items = workbookpageToObjectiveEdges
       // filter out edges that dont point to this objective
-      .filter(edge => resourceId(edge.destinationId) === objective.id)
+      .filter(edge => isValidResource(resourceId(edge.sourceId))
+        && resourceId(edge.destinationId) === objective.id)
       // map to workbook page ids
       .map(edge => resourceId(edge.sourceId));
     entries.push([objective.id, Immutable.List<string>(items)]);
@@ -78,59 +80,97 @@ export const reduceObjectiveWorkbookPageRefs = (
   return Immutable.Map<string, Immutable.List<string>>(entries);
 };
 
-export const reduceSkillFormativeQuestionRefs = (
+
+// Take an array of assessment to skill edges and create
+// a map of the skills to the set of assessments, but ommitting assessments
+// that do not exist in this organization. We strive
+// for ultra efficiency here - so we advoid Immutable collections
+// and go raw JS objects as maps.
+function skillToAssessmentMap(skillEdges: Edge[], isInOrg: (string) => boolean) {
+
+  const skills = {};
+  skillEdges.forEach((e) => {
+
+    const id = resourceId(e.destinationId);
+    if (skills[id] === undefined) {
+      skills[id] = [];
+    }
+    if (isInOrg(resourceId(e.sourceId))) {
+      skills[id].push(e);
+    }
+  });
+  return skills;
+}
+
+
+function reduceSkillToQuestionRefs(
+  skills: Immutable.OrderedMap<string, contentTypes.Skill>,
+  assessmentToSkillEdges: Edge[],
+  resourceType: LegacyTypes,
+  isInOrg = resourceId => true,
+) {
+
+  // Create a map of the skills to the assessments in this org that
+  // target the skill
+  const skillMap = skillToAssessmentMap(assessmentToSkillEdges, isInOrg);
+
+
+  const results = skills.toArray()
+    .map((skill) => {
+
+      // Now for each skill, get the assessment edges
+      const edges: Edge[] = skillMap[resourceId(skill.id)];
+      const refs = [];
+
+      // edges will be undefined if a skill simply has no assessments in
+      // this current org that target it
+      if (edges !== undefined) {
+
+        // Collect all of the question refs for this skill and assessment
+        edges.forEach((edge) => {
+          getQuestionRefFromSkillEdge(
+            edge, resourceType, resourceId(edge.sourceId)).lift(ref => refs.push(ref));
+        });
+      }
+
+      return [skill.id, Immutable.List<QuestionRef>(refs)];
+    });
+
+  return Immutable.Map<string, Immutable.List<QuestionRef>>(results);
+}
+
+
+function reduceSkillFormativeQuestionRefs(
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
   formativeToSkillEdges: Edge[],
-) => skills.reduce(
-  (acc, skill) => acc.set(
-    skill.id,
-    (acc.get(skill.id) || Immutable.List<QuestionRef>())
-      .concat(
-        formativeToSkillEdges.filter(edge => resourceId(edge.destinationId) === skill.id)
-          .map(edge =>
-            getQuestionRefFromSkillEdge(
-              edge, LegacyTypes.inline, resourceId(edge.sourceId)))
-          .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
-            just: ref => true,
-            nothing: () => false,
-          }))
-          .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
-      ).toList(),
-  ),
-  Immutable.Map<string, Immutable.List<QuestionRef>>(),
-);
+  isInOrg = resourceId => true) {
 
-export const reduceSkillSummativeQuestionRefs = (
+  return reduceSkillToQuestionRefs(skills, formativeToSkillEdges, LegacyTypes.inline, isInOrg);
+}
+
+
+function reduceSkillSummativeQuestionRefs(
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
-  summativeToSkillEdges: Edge[],
-) => skills.reduce(
-  (acc, skill) => acc.set(
-    skill.id,
-    (acc.get(skill.id) || Immutable.List<QuestionRef>())
-      .concat(
-        summativeToSkillEdges.filter(edge => resourceId(edge.destinationId) === skill.id)
-          .map(edge => getQuestionRefFromSkillEdge(
-            edge, LegacyTypes.assessment2, resourceId(edge.sourceId)))
-          .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
-            just: ref => true,
-            nothing: () => false,
-          }))
-          .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
-      ).toList(),
-  ),
-  Immutable.Map<string, Immutable.List<QuestionRef>>(),
-);
+  formativeToSkillEdges: Edge[],
+  isInOrg = resourceId => true) {
+
+  return reduceSkillToQuestionRefs(skills, formativeToSkillEdges, LegacyTypes.assessment2, isInOrg);
+}
+
+
 
 export const reduceSkillPoolQuestionRefs = (
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
   poolToSkillEdges: Edge[],
   assessmentToPoolEdges: Edge[],
+  isValidResource = resourceId => true,
 ) => skills.reduce(
   (acc, skill) => acc.set(
     skill.id,
     (acc.get(skill.id) || Immutable.List<QuestionRef>())
       .concat(
-        poolToSkillEdges.filter(edge => resourceId(edge.destinationId) === skill.id)
+        poolToSkillEdges.filter(edge => isValidResource(resourceId(edge.sourceId))
+          && resourceId(edge.destinationId) === skill.id)
           .map(edge => getQuestionRefFromSkillEdge(
             edge, LegacyTypes.assessment2_pool, resourceId(edge.sourceId)))
           .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
@@ -183,7 +223,7 @@ interface ObjectiveSkillViewState {
   overrideExpanded: boolean;
   isSavePending: boolean;
   loading: boolean;
-  organizationResourceMap: Maybe<Immutable.Map<string, Immutable.List<string>>>;
+  organizationResourceMap: Maybe<Immutable.OrderedMap<string, string>>;
   skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
   workbookPageRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
   searchText: string;
@@ -249,13 +289,20 @@ class ObjectiveSkillView
 
   componentWillUpdate(
     nextProps: Readonly<ObjectiveSkillViewProps>, nextState: Readonly<ObjectiveSkillViewState>) {
+
+    const obj = this.props.selectedOrganization.caseOf({
+      just: o => o,
+      nothing: () => null,
+    });
+
     // this assumes that aggregateModel, skills, objectives are all set together
     if (nextState.aggregateModel !== null
       && nextState.aggregateModel !== this.state.aggregateModel) {
-      this.fetchAllRefs(this.props.skills, nextState.objectives);
+
+      this.fetchAllRefs(this.props.skills, nextState.objectives, obj);
 
     } else if (this.state.aggregateModel !== null && nextProps.skills !== this.props.skills) {
-      this.fetchAllRefs(nextProps.skills, this.state.objectives);
+      this.fetchAllRefs(nextProps.skills, this.state.objectives, obj);
     }
   }
 
@@ -282,12 +329,13 @@ class ObjectiveSkillView
   fetchAllRefs(
     skills: Immutable.OrderedMap<string, contentTypes.Skill>,
     objectivesModel: UnifiedObjectivesModel,
+    org: models.OrganizationModel,
   ) {
     const { course } = this.props;
 
-    // fetch all organizations for course
-    const fetchAllOrgResources = persistence.bulkFetchDocuments(
-      course.guid, [LegacyTypes.organization], 'byTypes');
+    const directResources = org.getFlattenedResources().toArray();
+    const directLookup = Immutable.Set<string>(directResources);
+
 
     // fetch workbook page to inline assessment edges
     const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.guid, {
@@ -311,23 +359,16 @@ class ObjectiveSkillView
     const fetchWorkbookPageToObjectiveEdges = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.workbook_page,
       destinationType: LegacyTypes.learning_objective,
-    }).then((workbookpageToObjectiveEdges) => {
-      return reduceObjectiveWorkbookPageRefs(
-        objectivesModel.objectives, workbookpageToObjectiveEdges);
     });
 
     // fetch all formative assessment edges and build skill-formative refs map
     const fetchFormativeRefs = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.inline,
-    }).then((formativeToSkillEdges) => {
-      return reduceSkillFormativeQuestionRefs(skills, formativeToSkillEdges);
     });
 
     // fetch all summative assessment edges and build skill-summative refs map
     const fetchSummativeRefs = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.assessment2,
-    }).then((summativeToSkillEdges) => {
-      return reduceSkillSummativeQuestionRefs(skills, summativeToSkillEdges);
     });
 
     // fetch all question pool assessment edges and build skill-pool refs map
@@ -344,12 +385,9 @@ class ObjectiveSkillView
             assessmentToPoolEdges,
           };
         });
-    }).then(({ poolToSkillEdges, assessmentToPoolEdges }) => {
-      return reduceSkillPoolQuestionRefs(skills, poolToSkillEdges, assessmentToPoolEdges);
     });
 
     Promise.all([
-      fetchAllOrgResources,
       fetchWorkbookPageToObjectiveEdges,
       fetchWorkbookPageToInlineEdges,
       fetchWorkbookPageToSummativeEdges,
@@ -358,38 +396,59 @@ class ObjectiveSkillView
       fetchSummativeRefs,
       fetchPoolRefs,
     ]).then(([
-      orgDocs,
-      workbookPageRefs,
+      workbookpageToObjectiveEdges,
       workbookPageToInlineEdges,
       workbookPageToSummativeEdges,
       summativeToPoolEdges,
-      skillFormativeQuestionRefs,
-      skillSummativeQuestionRefs,
-      skillPoolQuestionRefs,
+      formativeToSkillEdges,
+      summativeToSkillEdges,
+      poolEdges,
     ]) => {
-      // compute org resources map
+
+      // Combine all of the edges into one array
       const combinedEdges = [
         ...workbookPageToInlineEdges,
         ...workbookPageToSummativeEdges,
         ...summativeToPoolEdges,
       ];
-      const organizationResourceMap = orgDocs.reduce(
-        (orgAcc, orgDoc) => {
-          const org = orgDoc.model as models.OrganizationModel;
-          const orgResources = org.getFlattenedResources();
 
-          return orgAcc.set(
-            org.resource.id,
-            orgResources.concat(
-              combinedEdges
-                .filter(edge => orgResources.contains(resourceId(edge.sourceId)))
-                .map(edge => resourceId(edge.destinationId)),
-            ).toList(),
-          );
-        },
-        Immutable.Map<string, Immutable.List<string>>(),
-      );
+      // Now compute the full list of all resources in this
+      // organization, by combining the resources directly linked
+      // from the org with those resources not directly linked
+      const transitiveResources = [
+        ...directResources,
+        ...combinedEdges
+          // Filter down to those resources that aren't directly linked but
+          // that are linked to one of the resources that is directly linked
+          .filter(edge => !directLookup.has(resourceId(edge.destinationId))
+            && directLookup.has(resourceId(edge.sourceId)))
+          .map(edge => resourceId(edge.destinationId)),
+      ];
 
+
+      const organizationResourceMap = Immutable.OrderedMap<string, string>(
+        transitiveResources.map(r => [r, r]));
+
+      // Now that we have the full transitive set of this organization's
+      // resources, we can use that to filter down the pages and questions
+      // to those that are included in this selected organization
+      const isValidResource = (resourceId) => {
+        return organizationResourceMap.has(resourceId);
+      };
+
+      const workbookPageRefs = reduceObjectiveWorkbookPageRefs(
+        objectivesModel.objectives, workbookpageToObjectiveEdges, isValidResource);
+      const skillFormativeQuestionRefs = reduceSkillFormativeQuestionRefs(
+        skills, formativeToSkillEdges, isValidResource);
+      const skillSummativeQuestionRefs = reduceSkillSummativeQuestionRefs(
+        skills, summativeToSkillEdges, isValidResource);
+
+      const { poolToSkillEdges, assessmentToPoolEdges } = poolEdges;
+      const skillPoolQuestionRefs = reduceSkillPoolQuestionRefs(
+        skills, poolToSkillEdges, assessmentToPoolEdges, isValidResource);
+
+      // At this point we have everything that we need, so now it is just a matter
+      // of bundling things up and calling setState to re-render the UI
       this.setState({
         organizationResourceMap: Maybe.just(organizationResourceMap),
         workbookPageRefs: Maybe.just(workbookPageRefs),
@@ -1071,7 +1130,6 @@ class ObjectiveSkillView
     const { onPushRoute, selectedOrganization } = this.props;
     const {
       overrideExpanded, searchText, skillQuestionRefs, workbookPageRefs,
-      organizationResourceMap,
     } = this.state;
 
     return selectedOrganization.caseOf({
@@ -1098,6 +1156,13 @@ class ObjectiveSkillView
           .toArray()
           .forEach((objective: contentTypes.LearningObjective) => {
 
+            const wbs = Maybe.just(
+              workbookPageRefs.caseOf({
+                just: w => w.get(objective.id),
+                nothing: () => Immutable.List<string>(),
+              }),
+            );
+
             rows.push(
               <Objective
                 key={objective.id}
@@ -1109,8 +1174,7 @@ class ObjectiveSkillView
                 onBeginExternalEdit={this.onBeginExternalEdit}
                 onPushRoute={onPushRoute}
                 skillQuestionRefs={skillQuestionRefs}
-                workbookPageRefs={workbookPageRefs}
-                organizationResourceMap={organizationResourceMap}
+                workbookPageRefs={wbs}
                 objective={objective}
                 organization={organization}
                 highlightText={searchText}
@@ -1166,7 +1230,12 @@ class ObjectiveSkillView
 
     unified.newBucket = document;
 
-    this.setState({ objectives: unified });
+    const workbookPageRefs = this.state.workbookPageRefs.caseOf({
+      just: m => Maybe.just(m.set(obj.id, Immutable.List<string>())),
+      nothing: () => Maybe.nothing<Immutable.Map<string, Immutable.List<string>>>(),
+    });
+
+    this.setState({ objectives: unified, workbookPageRefs });
 
     this.props.onUpdateObjectives(Immutable.OrderedMap(
       [[obj.get('id'), obj]]));
