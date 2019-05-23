@@ -6,6 +6,12 @@
     padding: 30px 15px;
     margin: 0 20px;
 
+    .localized-error {
+        color: darkred;
+        height: 40px;
+        line-height: 40px;
+    }
+
     .fa.fa-circle-o-notch.fa-spin.fa-1x.fa-fw {
         color: gray();
     }
@@ -51,12 +57,11 @@
         .row {
             margin: 0;
         }
-
     }
 
     .course-status {
-      display: flex;
-      justify-content: center;
+        display: flex;
+        justify-content: center;
     }
 
     .info {
@@ -73,6 +78,14 @@
 
                 .btn-primary {
                     color: white;
+                }
+
+                .btn-secondary {
+                    color: $primary;
+
+                    &:hover {
+                        color: white;
+                    }
                 }
             }
 

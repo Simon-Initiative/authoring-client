@@ -6,6 +6,7 @@ import {
   DataSet, DatasetStatus, AnalyticsByResource, AnalyticsByPart, AnalyticsBySkill,
 } from 'types/analytics/dataset';
 import { caseOf } from 'utils/utils';
+import { getFormHeaders, credentials } from 'actions/utils/credentials';
 
 const parseDatasetJson = (json: any): DataSet => ({
   byResource: json.datasetBlob
@@ -81,3 +82,19 @@ export function createDataSet(courseId: string): Promise<CreateDatasetResponse> 
     });
 }
 
+export function downloadDataset(
+  dataSetGuid: string, title: string, version: string): Promise<void> {
+  const url = `${configuration.baseUrl}/analytics/dataset/${dataSetGuid}/export`;
+  const method = 'GET';
+  const headers = getFormHeaders(credentials);
+
+  return fetch(url, { method, headers })
+    .then(response => response.blob())
+    .then((blob) => {
+      const dlUrl = (window as any).URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = dlUrl;
+      a.download = `${title} v${version} Dataset.zip`;
+      a.click();
+    });
+}
