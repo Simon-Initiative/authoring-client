@@ -79,6 +79,14 @@
                 .btn-primary {
                     color: white;
                 }
+
+                .btn-secondary {
+                    color: $primary;
+
+                    &:hover {
+                        color: white;
+                    }
+                }
             }
 
             // Auto-prefixed CSS from https://semantic-ui.com/elements/step.html
