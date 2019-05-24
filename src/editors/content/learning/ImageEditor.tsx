@@ -9,7 +9,7 @@ import { StyledComponentProps } from 'types/component';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { MediaItem } from 'types/media';
-import { adjustPath } from 'editors/content/media/utils';
+import { adjustPath, extractFileName } from 'editors/content/media/utils';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
@@ -29,6 +29,7 @@ const IMAGE = require('../../../../assets/400x300.png');
 
 import { styles } from './MediaElement.styles';
 import { CaptionTextEditor } from './contiguoustext/CaptionTextEditor';
+import { Tooltip } from 'utils/tooltip';
 
 export interface ImageSizeSidebarProps {
   services: AppServices;
@@ -168,10 +169,25 @@ export class ImageSizeSidebar extends
 
   render() {
     const { editMode } = this.props;
-    const { width, height } = this.props.model;
+    const { width, height, src } = this.props.model;
+
+    const fileName = extractFileName(src);
+    const titleDisplay = (
+      <SidebarGroup label="Image Name">
+        <SidebarRow>
+          <Tooltip title={fileName}
+            delay={150} distance={5} size="small" arrowSize="small">
+            {fileName.length > 30
+              ? fileName.substr(0, 30) + '...'
+              : fileName}
+          </Tooltip>
+        </SidebarRow>
+      </SidebarGroup>
+    );
 
     return (
       <div>
+        {titleDisplay}
         <SidebarGroup label="">
           <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
             <div>{getContentIcon(insertableContentTypes.Image)}</div>
