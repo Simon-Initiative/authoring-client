@@ -5,13 +5,13 @@ import * as models from '../models';
 import { Resource } from '../content/resource';
 import { DeployStage } from 'data/models/course.ts';
 
-export function importPackage(repositoryUrl: string): void {
+export function importPackage(repositoryUrl: string): Promise<{}> {
 
   const url = `${configuration.baseUrl}/packages/import`;
   const body = JSON.stringify({ repositoryUrl });
   const method = 'POST';
 
-  authenticatedFetch({ url, body, method });
+  return authenticatedFetch({ url, body, method });
 }
 
 export function getEditablePackages(): Promise<models.CourseModel[]> {
@@ -35,15 +35,14 @@ export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
     }));
 }
 
-export function deleteCoursePackage(courseId: CourseId): Promise<string> {
+export function deleteCoursePackage(courseId: CourseId): Promise<{}> {
 
   const url = `${configuration.baseUrl}/packages/set/visible?visible=false`;
   const method = 'POST';
 
   const body = JSON.stringify([courseId]);
 
-  return authenticatedFetch({ url, method, body })
-    .then((json: any) => json.message);
+  return authenticatedFetch({ url, method, body });
 }
 
 export type CourseResource = {

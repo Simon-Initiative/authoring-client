@@ -8,6 +8,7 @@ import * as Messages from 'types/messages';
 import './ImportCourseView.scss';
 import { Severity, Toast } from 'components/common/Toast';
 import { CourseCreation } from 'components/CourseCreation';
+import { buildGeneralErrorMessage } from 'utils/error';
 
 export interface ImportCourseViewProps {
   dispatch: any;
@@ -43,9 +44,15 @@ export class ImportCourseView
   }
 
   onImport(inputText: string) {
-    persistence.importPackage(inputText);
-    this.props.dispatch(viewActions.viewAllCourses());
-    this.props.dispatch(showMessage(buildImportMessage()));
+    const { dispatch } = this.props;
+
+    persistence.importPackage(inputText)
+      .then((_) => {
+        dispatch(viewActions.viewAllCourses());
+        dispatch(showMessage(buildImportMessage()));
+      })
+      .catch(err => dispatch(showMessage(
+        buildGeneralErrorMessage(`There was an error importing the course: ${err.message}`))));
   }
 
   render() {

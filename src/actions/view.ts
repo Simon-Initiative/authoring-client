@@ -78,8 +78,9 @@ export type ViewActions = {
   viewDocument: (documentId: string, courseId: string, orgId: string) => void,
   viewSkills: (courseId: string, orgId: string) => void,
   viewObjectives: (courseId: string, orgId: string) => void,
-  viewOrganizations: (courseId: string, orgId: string) => void,
   viewAllResources: (courseId: string, orgId: string) => void,
+  viewOrganizations: (courseId: string, orgId: string) => void,
+  viewCourse: (courseId: string) => void,
 };
 
 // The view transition actions:
@@ -90,6 +91,10 @@ export function viewCreateCourse() {
 
 export function viewImportCourse() {
   return transitionApplicationView.bind(undefined, '/import');
+}
+
+export function viewAllCourses() {
+  return transitionApplicationView.bind(undefined, '/');
 }
 
 export function viewDocument(documentId: string, courseId: string, orgId: string) {
@@ -106,6 +111,11 @@ export function viewSkills(courseId: string, orgId: string) {
     .bind(undefined, '/skills-' + courseId + '-' + orgId, courseId, orgId);
 }
 
+export function viewObjectives(courseId: string, orgId: string) {
+  return transitionCourseView
+    .bind(undefined, '/objectives-' + courseId + '-' + orgId, courseId, orgId);
+}
+
 export function viewAllResources(courseId: string, orgId: string) {
   return transitionCourseView
     .bind(undefined, '/resources-' + courseId + '-' + orgId, courseId, orgId);
@@ -115,16 +125,6 @@ export function viewOrganizations(courseId: string, orgId: string) {
   return transitionCourseView
     .bind(undefined, '/organizations-' + courseId + '-' + orgId, courseId, orgId);
 }
-
-export function viewObjectives(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/objectives-' + courseId + '-' + orgId, courseId, orgId);
-}
-
-export function viewAllCourses() {
-  return transitionApplicationView.bind(undefined, '/');
-}
-
 
 export function viewCourse(courseId: string) {
   return function (dispatch, getState: () => State) {

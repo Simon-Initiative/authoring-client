@@ -522,7 +522,7 @@ class Analytics
     question: QuestionRef, skill: SkillRef, organization: models.OrganizationModel) {
     const { classes, course, analytics, onPushRoute } = this.props;
 
-    const parts = getOrderedParts(question.body, question.parts)
+    const parts = getOrderedParts(question.body(), question.parts())
       // get ordered index of part, because we will filter out parts without this skill
       .map((part, index) => ({
         index,
@@ -563,7 +563,7 @@ class Analytics
 
   renderQuestion(question: QuestionRef, skill: SkillRef, organization: models.OrganizationModel) {
     const { classes, course, analytics, onPushRoute } = this.props;
-
+    const parts = question.parts();
     return (
       <div key={question.key} className={classes.question}>
         <div key={question.key} className={classes.questionTitle}>
@@ -575,8 +575,8 @@ class Analytics
               + `?questionId=${question.id}`)}>
             {question.title.valueOr(getReadableTitleFromType(question.type))}
           </div>
-          {question.parts.size === 1 && (
-            Maybe.maybe(question.parts.first()).caseOf({
+          {parts.size === 1 && (
+            Maybe.maybe(parts.first()).caseOf({
               just: part => analytics.dataSet.caseOf({
                 just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
                   just: byResourcePart => Maybe.maybe(
@@ -593,7 +593,7 @@ class Analytics
             })
           )}
         </div>
-        {question.parts.size > 1 && this.renderMultipleParts(question, skill, organization)}
+        {parts.size > 1 && this.renderMultipleParts(question, skill, organization)}
       </div>
     );
   }

@@ -21,6 +21,22 @@ export function buildReportProblemAction(
   };
 }
 
+export function buildGeneralErrorMessage(error: string) {
+  const content = new Messages.TitledContent().with({
+    title: 'Something went wrong',
+    message: error,
+  });
+
+  return new Messages.Message().with({
+    content,
+    guid: 'PersistenceConflict',
+    scope: Messages.Scope.CoursePackage,
+    severity: Messages.Severity.Error,
+    canUserDismiss: true,
+    actions: Immutable.List([buildReportProblemAction(error, '', '')]),
+  });
+}
+
 export function buildConflictMessage() {
 
   const content = new Messages.TitledContent().with({
@@ -38,12 +54,12 @@ export function buildConflictMessage() {
 
 }
 
-export function buildPersistenceFailureMessage(reason: string, user: UserProfile) {
+export function buildPersistenceFailureMessage(
+  reason: string, user: UserProfile, isntResource = false) {
 
   const name = user.firstName + ' ' + user.lastName;
 
   if (reason === 'Bad Request') {
-
     const content = new Messages.TitledContent().with({
       title: 'Cannot save',
       message: 'There was a problem saving your changes. Try reverting recent changes.',
@@ -51,12 +67,11 @@ export function buildPersistenceFailureMessage(reason: string, user: UserProfile
     return new Messages.Message().with({
       content,
       guid: 'PersistenceProblem',
-      scope: Messages.Scope.Resource,
+      scope: isntResource ? Messages.Scope.Application : Messages.Scope.Resource,
       severity: Messages.Severity.Error,
       canUserDismiss: false,
       actions: Immutable.List([buildReportProblemAction(reason, name, user.email)]),
     });
-
   }
 
   const content = new Messages.TitledContent().with({
@@ -66,13 +81,11 @@ export function buildPersistenceFailureMessage(reason: string, user: UserProfile
   return new Messages.Message().with({
     content,
     guid: 'UnknownError',
-    scope: Messages.Scope.Resource,
+    scope: isntResource ? Messages.Scope.Application : Messages.Scope.Resource,
     severity: Messages.Severity.Error,
     canUserDismiss: true,
     actions: Immutable.List([buildReportProblemAction(reason, name, user.email)]),
   });
-
-
 }
 
 function buildModalMessageAction(label, text): Messages.MessageAction {
