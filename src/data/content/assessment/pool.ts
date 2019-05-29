@@ -84,9 +84,23 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
           });
           break;
         case 'section':
-          model = model.with({
-            sections: model.sections.set(id, Unsupported.fromPersistence(item, id, notify)),
+
+          // Parse thru sections to get to the child questions. After saving
+          // back to the server, this effectively strips out sections but maintains
+          // the questions that the sections contained
+          const sectionChildren = getChildren(item['section']);
+
+          sectionChildren.forEach((child) => {
+            const childKey = getKey(child);
+
+            if (childKey === 'question') {
+              const id = createGuid();
+              model = model.with({
+                questions: model.questions.set(id, Question.fromPersistence(child, id, notify)),
+              });
+            }
           });
+
           break;
         default:
 
