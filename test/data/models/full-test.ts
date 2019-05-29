@@ -2,8 +2,8 @@
 // serialize to JSON and can correctly deserialize back from JSON
 
 import * as contentTypes from 'data/contentTypes';
-import { Maybe } from 'tsmonad';
 import { WorkbookPageModel } from 'data/models/workbook';
+import { PoolModel } from 'data/models/pool';
 
 import { registerContentTypes } from 'data/registrar';
 import { ContiguousText } from 'data/content/learning/contiguous';
@@ -20,7 +20,7 @@ it('Single, top-level section', () => {
   expect(body.length).toBe(1);
   expect(body[0] instanceof contentTypes.WorkbookSection).toBe(true);
 
-  const section : contentTypes.WorkbookSection = ((body[0] as any) as contentTypes.WorkbookSection);
+  const section: contentTypes.WorkbookSection = ((body[0] as any) as contentTypes.WorkbookSection);
 
   const sectionBodyElements = section.body.content.toArray();
 
@@ -37,5 +37,17 @@ it('Single, top-level section', () => {
     fail('Should have been a pullout element, was: ' + p.contentType);
   }
 
+
+});
+
+
+it('handles pools with sections', () => {
+
+  const pool = require('./pool-with-sections.json');
+  const model = PoolModel.fromPersistence(pool, () => null);
+
+  const questions = model.pool.questions;
+
+  expect(questions.size).toBe(16);
 
 });

@@ -1,0 +1,1593 @@
+{
+  "rev": 1,
+  "guid": "2c92808a683dce6d01684928f2194709",
+  "id": "human_inheritance_pool",
+  "type": "x-oli-assessment2-pool",
+  "title": "Human Inheritance Pool",
+  "shortTitle": null,
+  "lastRevision": {
+    "rev": 0,
+    "guid": "9c4bb72bf50748c78939873a7c6c4b18",
+    "revisionNumber": 1,
+    "previousRevision": "4c640b6c3a464f92bfff2696a28c51bc",
+    "md5": "59fa01407ee8e9bfe73be3b1dbff03ce",
+    "author": "Import",
+    "revisionType": "SYSTEM",
+    "dateCreated": "May 3, 2019 4:50:43 PM",
+    "dateUpdated": "May 3, 2019 4:50:43 PM"
+  },
+  "lastSession": null,
+  "metadata": null,
+  "dateCreated": "Mar 20, 2019 5:35:02 PM",
+  "dateUpdated": "May 3, 2019 4:50:47 PM",
+  "resourceState": "ACTIVE",
+  "fileNode": {
+    "rev": 0,
+    "guid": "2c92808a6a75f2af016a7e9ad9db759b",
+    "pathTo": "content\/_u870_classical_genetics\/_m2_Human_Inheritance\/x-oli-assessment2-pool\/human_inheritance_pool.json",
+    "pathFrom": "content\/_u870_classical_genetics\/_m2_Human_Inheritance\/x-oli-assessment2-pool\/human_inheritance_pool.xml",
+    "fileName": "human_inheritance_pool.xml",
+    "mimeType": "application\/json",
+    "fileSize": 0,
+    "dateCreated": "May 3, 2019 4:50:43 PM",
+    "dateUpdated": "May 3, 2019 4:50:43 PM"
+  },
+  "doc": {
+    "pool": {
+      "@id": "human_inheritance_pool",
+      "#array": [
+        {
+          "title": {
+            "#text": "Human Inheritance Pool"
+          }
+        },
+        {
+          "section": {
+            "@id": "q1",
+            "question": {
+              "@id": "human_inheritance_pool_q1_dominant",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "A genetic disorder that is sex-linked cannot also be ___________________. "
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "dominant",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "recessive",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "autosomal",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "all of these are possible",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "true"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Sex-linked refers to disorders found on the X or Y chromosomes. These disorders can be either dominant or recessive."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Sex-linked refers to disorders found on the X or Y chromosomes. These disorders can be either dominant or recessive."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. Sex-linked refers to disorders found on the X or Y chromosomes, whereas autosomal disorders are not found on the sex chromosomes."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Sex-linked refers to disorders found on the X or Y chromosomes. These disorders can be either dominant or recessive. Autosomal disorders are not found on the sex chromosomes."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "q2",
+            "question": {
+              "@id": "human_inheritance_pool_q2_determination",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "In humans, how many alleles of genes found on the X chromosome do male have?"
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "0",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "1",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "2",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "4",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "false"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Males have an X chromosome"
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. Males have only one X chromosome"
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Males have only one X chromosome"
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Males have only one X chromosome"
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "q3",
+            "#array": [
+              {
+                "question": {
+                  "@id": "human_inheritance_pool_q3_phenotypes",
+                  "#array": [
+                    {
+                      "body": {
+                        "#array": [
+                          {
+                            "p": {
+                              "#text": "Use the following information to answer the next two questions. "
+                            }
+                          },
+                          {
+                            "#text": " In humans, the condition for normal blood clotting (H) is dominant to hemophilia (h). Suppose William, who has hemophilia, and Linda, who is a carrier for hemophilia, have a son, Mark. What is the probability that Mark will have this condition?"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "multiple_choice": {
+                        "#array": [
+                          {
+                            "choice": {
+                              "#text": "100%",
+                              "@value": "A"
+                            }
+                          },
+                          {
+                            "choice": {
+                              "#text": "75%",
+                              "@value": "B"
+                            }
+                          },
+                          {
+                            "choice": {
+                              "#text": "50%",
+                              "@value": "C"
+                            }
+                          },
+                          {
+                            "choice": {
+                              "#text": "0%",
+                              "@value": "D"
+                            }
+                          }
+                        ],
+                        "@select": "single",
+                        "@shuffle": "false"
+                      }
+                    },
+                    {
+                      "part": {
+                        "#array": [
+                          {
+                            "response": {
+                              "@match": "A",
+                              "@score": "0",
+                              "feedback": {
+                                "#text": "Incorrect. From the information provided, we can determine William\u2019s and Linda\u2019s genotypes. William is hemophilic and must be XhY. Linda, a carrier, is heterozygous, so she must be XHXh. Crossing XhY and XHXh results in 50% of sons that are XHY and do not have the condition, and 50% that are XhY and do have the condition."
+                              }
+                            }
+                          },
+                          {
+                            "response": {
+                              "@match": "B",
+                              "@score": "0",
+                              "feedback": {
+                                "#text": "Incorrect. From the information provided, we can determine William\u2019s and Linda\u2019s genotypes. William is hemophilic and must be XhY. Linda, a carrier, is heterozygous, so she must be XHXh. Crossing XhY and XHXh results in 50% of sons that are XHY and do not have the condition, and 50% that are XhY and do have the condition."
+                              }
+                            }
+                          },
+                          {
+                            "response": {
+                              "@match": "C",
+                              "@score": "10",
+                              "feedback": {
+                                "#text": "Correct. From the information provided, we can determine William\u2019s and Linda\u2019s genotypes. William is hemophilic and must be XhY. Linda, a carrier, is heterozygous, so she must be XHXh. Crossing XhY and XHXh results in 50% of sons that are XHY and do not have the condition, and 50% that are XhY and do have the condition."
+                              }
+                            }
+                          },
+                          {
+                            "response": {
+                              "@match": "D",
+                              "@score": "0",
+                              "feedback": {
+                                "#text": "Incorrect. From the information provided, we can determine William\u2019s and Linda\u2019s genotypes. William is hemophilic and must be XhY. Linda, a carrier, is heterozygous, so she must be XHXh. Crossing XhY and XHXh results in 50% of sons that are XHY and do not have the condition, and 50% that are XhY and do have the condition."
+                              }
+                            }
+                          },
+                          {
+                            "no_response": {
+                              "feedback": {
+                                "#text": "You did not respond to this question. "
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "question": {
+                  "@id": "human_inheritance_pool_q4_phenotypes",
+                  "#array": [
+                    {
+                      "body": {
+                        "#text": "If William and Linda have a daughter, what is the probability that she will have this condition?"
+                      }
+                    },
+                    {
+                      "multiple_choice": {
+                        "#array": [
+                          {
+                            "choice": {
+                              "#text": "100%",
+                              "@value": "A"
+                            }
+                          },
+                          {
+                            "choice": {
+                              "#text": "75%",
+                              "@value": "B"
+                            }
+                          },
+                          {
+                            "choice": {
+                              "#text": "50%",
+                              "@value": "C"
+                            }
+                          },
+                          {
+                            "choice": {
+                              "#text": "0%",
+                              "@value": "D"
+                            }
+                          }
+                        ],
+                        "@select": "single",
+                        "@shuffle": "true"
+                      }
+                    },
+                    {
+                      "part": {
+                        "#array": [
+                          {
+                            "response": {
+                              "@match": "A",
+                              "@score": "0",
+                              "feedback": {
+                                "#text": "Incorrect. We know William\u2019s genotype is XhY, and Linda\u2019s is XHXh. Crossing XhY and XHXh results in 50% of daughters that are XHXh and do not have the condition (but are carriers), and 50% that are XhXh and do have the condition."
+                              }
+                            }
+                          },
+                          {
+                            "response": {
+                              "@match": "B",
+                              "@score": "0",
+                              "feedback": {
+                                "#text": "Incorrect. We know William\u2019s genotype is XhY, and Linda\u2019s is XHXh. Crossing XhY and XHXh results in 50% of daughters that are XHXh and do not have the condition (but are carriers), and 50% that are XhXh and do have the condition."
+                              }
+                            }
+                          },
+                          {
+                            "response": {
+                              "@match": "C",
+                              "@score": "10",
+                              "feedback": {
+                                "#text": "Correct. We know William\u2019s genotype is XhY, and Linda\u2019s is XHXh. Crossing XhY and XHXh results in 50% of daughters that are XHXh and do not have the condition (but are carriers), and 50% that are XhXh and do have the condition."
+                              }
+                            }
+                          },
+                          {
+                            "response": {
+                              "@match": "D",
+                              "@score": "0",
+                              "feedback": {
+                                "#text": "Incorrect. We know William\u2019s genotype is XhY, and Linda\u2019s is XHXh. Crossing XhY and XHXh results in 50% of daughters that are XHXh and do not have the condition (but are carriers), and 50% that are XhXh and do have the condition."
+                              }
+                            }
+                          },
+                          {
+                            "no_response": {
+                              "feedback": {
+                                "#text": "You did not respond to this question. "
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "section": {
+            "@id": "q5",
+            "question": {
+              "@id": "human_inheritance_pool_q5_aneuploidy",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "Nondisjunction in meiosis I results in"
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "two cells missing a chromosome and two healthy cells.",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "two cells with an additional chromosome and two healthy cells",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "two cells missing a chromosome and two cells with an additional chromosome",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "one cell missing a chromosome, one cell with missing a chromosome and two healthy cells.",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "true"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. This result is not possible."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. This result is not possible"
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. Meiosis I results in a homologous pair separating improperly."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. This would be the result of nondisjunction in meiosis II."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "q6",
+            "question": {
+              "@id": "human_inheritance_pool_q6_pedigree",
+              "#array": [
+                {
+                  "body": {
+                    "#array": [
+                      {
+                        "#text": "According to the pedigree below, this trait is ____________________. "
+                      },
+                      {
+                        "image": {
+                          "@src": "..\/webcontent\/quiz_pedigree.png"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "autosomal dominant",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "autosomal recessive",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "Sex-linked dominant",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "Sex-linked recessive",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "true"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. The female on the bottom left row has the trait and neither of her parents has it. Therefore, the trait is recessive."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. The female on the bottom left row has the trait and neither of her parents has it. Therefore, the trait is recessive."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. This trait is not more common in males."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. This trait is not more common in males."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "q7",
+            "question": {
+              "@id": "human_inheritance_pool_q7_symbolize",
+              "#array": [
+                {
+                  "body": {
+                    "#array": [
+                      {
+                        "#text": "What is the genotype of the shaded individuals in the following pedigree? "
+                      },
+                      {
+                        "image": {
+                          "@src": "..\/webcontent\/quiz_pedigree.png"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "AA",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "Aa",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "aa",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "Either AA or Aa",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "true"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. We know this trait is recessive because the female on the bottom left row has the trait and neither of her parents has it. Therefore the shaded individuals are aa."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. We know this trait is recessive because the female on the bottom left row has the trait and neither of her parents has it. Therefore the shaded individuals are aa."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. We know this trait is recessive because the female on the bottom left row has the trait and neither of her parents has it. Therefore the shaded individuals are aa."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. We know this trait is recessive because the female on the bottom left row has the trait and neither of her parents has it. Therefore the shaded individuals are aa."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "q8",
+            "question": {
+              "@id": "human_inheritance_pool_q8_symbolize",
+              "#array": [
+                {
+                  "body": {
+                    "#array": [
+                      {
+                        "#text": "What is the genotype of the unshaded individuals in the pedigree below? "
+                      },
+                      {
+                        "image": {
+                          "@src": "..\/webcontent\/quiz_pedigree.png"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "AA",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "Aa",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "aa",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "Either AA or Aa",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "true"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. This trait is recessive because the female on the bottom left row has the trait and neither of her parents has it. Therefore, the unshaded (recessive) individuals are \"aa\". "
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. This trait is recessive because the female on the bottom left row has the trait and neither of her parents has it. Therefore the unshaded (recessive) individuals are \"aa\". "
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. This trait is recessive because the female on the bottom left row has the trait and neither of her parents has it. Therefore, the unshaded (recessive) individuals are \"aa\". "
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. This trait is recessive because the female on the bottom left row has the trait and neither of her parents has it. Therefore, the unshaded (recessive) individuals are \"aa\". "
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "s1",
+            "question": {
+              "@id": "human_inheritance_pool_q9",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "Sickle cell anemia is an autosomal recessive disorder. If two heterozygous individuals breed, what is the chance that their offspring will develop Sickle cell anemia? "
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "100%",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "75%",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "50%",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "25%",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "false"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. A cross of Aa x Aa produces 25% aa (which will develop the disorder). It also produces 25% AA and 50% Aa (these will not develop the disorder). "
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. A cross of Aa x Aa produces 25% aa (which will develop the disorder). It also produces 25% AA and 50% Aa (these will not develop the disorder)."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. A cross of Aa x Aa produces 25% aa (which will develop the disorder). It also produces 25% AA and 50% Aa (these will not develop the disorder)."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. A cross of Aa x Aa produces 25% aa (which will develop the disorder). It also produces 25% AA and 50% Aa (these will not develop the disorder)."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "s2",
+            "question": {
+              "@id": "human_inheritance_pool_q10",
+              "#array": [
+                {
+                  "body": {
+                    "#array": [
+                      {
+                        "#text": "Sickle cell anemia is an autosomal recessive disorder. A person with the disorder and a person that is a carrier mate. ("
+                      },
+                      {
+                        "em": {
+                          "#text": "A carrier has the allele for the trait but does not express it",
+                          "@style": "italic"
+                        }
+                      },
+                      {
+                        "#text": ".) "
+                      },
+                      {
+                        "p": {
+                          "#text": "What is the chance that their offspring will develop sickle cell anemia?"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "100%",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "75%",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "50%",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "25%",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "false"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. A cross of Aa x aa produces 50% aa (who will develop the disorder) and 50% Aa (who will not develop the disorder)."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. A cross of Aa x aa produces 50% aa (who will develop the disorder) and 50% Aa (who will not develop the disorder)."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. A cross of Aa x aa produces 50% aa (who will develop the disorder) and 50% Aa (who will not develop the disorder)."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. A cross of Aa x aa produces 50% aa (who will develop the disorder) and 50% Aa (who will not develop the disorder)."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "s3",
+            "question": {
+              "@id": "human_inheritance_pool_q11",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "Hemophilia is a recessive disorder and is on the X chromosome. Hemophilia is _____________________."
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "found more often in males than females",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "found more often in females than males",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "equally common in males and females",
+                          "@value": "C"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "false"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. Males only have 1 X chromosome while females have 2, therefore males are more likely to develop the disorder."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Males only have 1 X chromosome while females have 2, therefore males are more likely to develop the disorder."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Males only have 1 X chromosome while females have 2, therefore males are more likely to develop the disorder."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "s4",
+            "question": {
+              "@id": "human_inheritance_pool_q12",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "Genes on the X chromosome are called ______________."
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "autosomal",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "somatic",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "sex-linked",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "epistatic",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "true"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Autosomal genes are found on chromosomes other than the X or Y."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Somatic relates to cells other than gametes."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. Sex-linked genes are found on the sex determining chromosomes."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Epistatic is when one gene affects the expression of another."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "s5",
+            "question": {
+              "@id": "human_inheritance_pool_q13",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "The sex of the offspring is determined by _____________. "
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "the mother only",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "the father only",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "both the mother and the father",
+                          "@value": "C"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "false"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. The mother is XX and will only produce gametes with an X chromosome."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. The father is XY and can either produce gametes with an X chromosome (which will be female) or gametes with a Y chromosome (which will be male)."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. The mother can only produce gametes with an X chromosome, the father will determine the sex of the offspring."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "s6",
+            "question": {
+              "@id": "human_inheritance_pool_q14",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "Nondisjunction in meiosis II results in: ______________________ "
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "Two cells missing a chromosome and two healthy cells. ",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "Two cells with an additional chromosome and two healthy cells.",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "Two cells missing a chromosome and two cells with an additional chromosome.",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "One cell missing a chromosome, one cell with missing a chromosome and two healthy cells.",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "true"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Nondisjunction produces a cell with an extra chromosome for every cell that is missing a chromosome because the chromosomes sorted incorrectly."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Nondisjunction produces a cell with a missing chromosome for every cell that has an extra chromosome because the chromosomes sorted incorrectly."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. Nondisjunction in meiosis II will result in 2 normal cells."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. Meiosis I occurred correctly, so 2 of the cells will have the correct number of chromosomes."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "s7",
+            "question": {
+              "@id": "human_inheritance_pool_q15",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "Traits that are sex-linked and recessive are ________________________. "
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "more common in males",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "more common in females",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "equally common in both males and females",
+                          "@value": "C"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "false"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. Males only have 1 X chromosome, while females have 2. So, recessive sex-linked traits tend to be more prominent in males."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect."
+                          }
+                        }
+                      },
+                      {
+                        "no_response": {
+                          "feedback": {
+                            "#text": "You did not respond to this question. "
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "section": {
+            "@id": "s8",
+            "question": {
+              "@id": "human_inheritance_pool_q16",
+              "#array": [
+                {
+                  "body": {
+                    "#text": "A gene that encodes an enzyme required for ribose synthesis is found on the X chromosome. Females that are heterozygous for the wild-type and defective mutant allele of this gene will show:"
+                  }
+                },
+                {
+                  "multiple_choice": {
+                    "#array": [
+                      {
+                        "choice": {
+                          "#text": "50% of the enzyme activity in their cells, since one allele is inactive.",
+                          "@value": "A"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "100% of the enzyme activity in their cells, since the X-chromosome with the inactive gene will be condensed.",
+                          "@value": "B"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "50% of their cells will lack enzymatic activity, the other 50% will be active.",
+                          "@value": "C"
+                        }
+                      },
+                      {
+                        "choice": {
+                          "#text": "None of their cells will have the enzyme activity since the chromosome with the inactive allele will cause the other X-chromosome to become condensed.",
+                          "@value": "D"
+                        }
+                      }
+                    ],
+                    "@select": "single",
+                    "@shuffle": "true"
+                  }
+                },
+                {
+                  "part": {
+                    "#array": [
+                      {
+                        "response": {
+                          "@match": "A",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. In any give cell only one of the X-chromosomes is condensed, thus a cell will show normal enzyme activity, or none at all."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "B",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. The inactivation is random, thus a cell will show normal enzyme activity, or none at all."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "C",
+                          "@score": "10",
+                          "feedback": {
+                            "#text": "Correct. The condensation of the X-chromosome is random, so the activity present in the cell will depend on which X-chromosome is condensed. Half the cells will express the normal gene, the other half the defective gene."
+                          }
+                        }
+                      },
+                      {
+                        "response": {
+                          "@match": "D",
+                          "@score": "0",
+                          "feedback": {
+                            "#text": "Incorrect. The inactivation is random, thus a cell will show normal enzyme activity, or none at all."
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "lock": {
+    "lockMaxDuration": 300000,
+    "lockId": "19af10350e6e4083aa7232614d3a9db9",
+    "resourceId": "2c92808a683dce6d01684928f2194709",
+    "lockedBy": "manager",
+    "lockedAt": 1559140453212
+  }
+}
