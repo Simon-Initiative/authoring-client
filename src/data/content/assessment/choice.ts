@@ -1,7 +1,8 @@
 import * as Immutable from 'immutable';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 
-import { augment } from '../common';
+import { augment, getChildren } from '../common';
+import { getKey } from '../../common';
 
 export type ChoiceParams = {
   value?: string,
@@ -19,7 +20,7 @@ const defaultContent = {
   guid: '',
 };
 
-function simplifyBody(body: Object) : Object {
+function simplifyBody(body: Object): Object {
 
   let arr = null;
   if (body['#array'] !== undefined) {
@@ -33,6 +34,16 @@ function simplifyBody(body: Object) : Object {
       return { '#text': arr[0].p['#text'] };
     }
     if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
+
+      const containsSimpleMarkup = getChildren(arr[0].p).every((c) => {
+        const key = getKey(c);
+        return key !== '#math';
+      });
+
+      if (!containsSimpleMarkup) {
+        return { '#array': arr };
+      }
+
       const c = arr[0].p;
       delete c['@id'];
       delete c['@title'];
@@ -61,13 +72,13 @@ export class Choice extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Choice {
+  clone(): Choice {
     return this.with({
       body: this.body.clone(),
     });
   }
 
-  static fromText(text: string, guid: string) : Choice {
+  static fromText(text: string, guid: string): Choice {
     return new Choice().with({
       guid,
       body: ContentElements.fromText(text, '', Immutable.List(FLOW_ELEMENTS).toArray()),
@@ -96,7 +107,7 @@ export class Choice extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const body = this.body.toPersistence();
 
