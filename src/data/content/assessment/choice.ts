@@ -1,7 +1,8 @@
 import * as Immutable from 'immutable';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 
-import { augment } from '../common';
+import { augment, getChildren } from '../common';
+import { getKey } from '../../common';
 
 export type ChoiceParams = {
   value?: string,
@@ -19,7 +20,7 @@ const defaultContent = {
   guid: '',
 };
 
-function simplifyBody(body: Object) : Object {
+function simplifyBody(body: Object): Object {
 
   let arr = null;
   if (body['#array'] !== undefined) {
@@ -29,10 +30,32 @@ function simplifyBody(body: Object) : Object {
   }
 
   if (arr !== null && arr.length === 1) {
+
+    // This is the case where a paragraph contains just simple text
     if (arr[0].p !== undefined && arr[0].p['#text'] !== undefined) {
       return { '#text': arr[0].p['#text'] };
     }
+
+    // This handles the case that the paragraph contains a collection
+    // of elements, probably some text and some markup like <em> elements
+    // or perhaps an inline MathML
     if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
+
+      // Look at all of the child elements of this paragraph to determine
+      // if it contains 'simple' markup - that is, markup that can standalone outside
+      // of a paragraph
+      const containsSimpleMarkup = getChildren(arr[0].p).every((c) => {
+        const key = getKey(c);
+        return key !== '#math';
+      });
+
+      // If this paragraph is required due to non-simple markup, then leave
+      // the paragraph in place
+      if (!containsSimpleMarkup) {
+        return { '#array': arr };
+      }
+
+      // Strip out the parent paragraph, leaving just the array of elements in place
       const c = arr[0].p;
       delete c['@id'];
       delete c['@title'];
@@ -61,13 +84,13 @@ export class Choice extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Choice {
+  clone(): Choice {
     return this.with({
       body: this.body.clone(),
     });
   }
 
-  static fromText(text: string, guid: string) : Choice {
+  static fromText(text: string, guid: string): Choice {
     return new Choice().with({
       guid,
       body: ContentElements.fromText(text, '', Immutable.List(FLOW_ELEMENTS).toArray()),
@@ -96,7 +119,7 @@ export class Choice extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const body = this.body.toPersistence();
 
