@@ -27,31 +27,40 @@ import { modalActions } from 'actions/modal';
 import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
 import { Remove } from 'components/common/Remove';
 import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
+import { PartAnalytics } from 'editors/document/analytics/PartAnalytics';
+import { AnalyticsState } from 'reducers/analytics';
+import { DatasetStatus } from 'types/analytics/dataset';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
   + 'Please add another question or pool before removing this one';
 
-export interface QuestionProps<ModelType>
+export interface OwnQuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
-  onBodyEdit: (...args: any[]) => any;
-  onFocus: (child, model, textSelection) => void;
-  onItemFocus: (itemId: string) => void;
   body: any;
   grading: any;
-  onGradingChange: (value) => void;
-  onVariablesChange: (vars: Immutable.OrderedMap<string, contentTypes.Variable>) => void;
   hideGradingCriteria: boolean;
   hideVariables: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   model: contentTypes.Question;
   canRemoveQuestion: boolean;
-  onRemoveQuestion: () => void;
-  onDuplicate: () => void;
   activeContentGuid: string;
   hover: string;
-  onUpdateHover: (hover: string) => void;
   branchingQuestions: Maybe<number[]>;
+  onBodyEdit: (...args: any[]) => any;
+  onFocus: (child, model, textSelection) => void;
+  onItemFocus: (itemId: string) => void;
+  onGradingChange: (value) => void;
+  onVariablesChange: (vars: Immutable.OrderedMap<string, contentTypes.Variable>) => void;
+  onRemoveQuestion: () => void;
+  onDuplicate: () => void;
+  onUpdateHover: (hover: string) => void;
+}
+
+export interface QuestionProps<ModelType>
+  extends OwnQuestionProps<ModelType> {
+  analytics: AnalyticsState;
+  assessmentId: string;
 }
 
 export interface QuestionState {
@@ -410,6 +419,49 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     );
   }
 
+  renderAnalytics() {
+    const { model, assessmentId, analytics } = this.props;
+
+    const part = model.parts.first();
+
+    // return (
+    //   <React.Fragment>
+    //     <TabSection key="choices" className="choices">
+    //       <TabSectionHeader title="Analytics"/>
+    //       <TabSectionContent>
+    //         {analytics.dataSet.caseOf({
+    //           just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+    //             just: byResourcePart => Maybe.maybe(
+    //               analyticsDataSet.status === DatasetStatus.DONE
+    //               && byResourcePart.getIn([assessmentId, part.id]),
+    //             ).caseOf({
+    //               just: partAnalytics => <PartAnalytics partAnalytics={partAnalytics} />,
+    //               nothing: () => null,
+    //             }),
+    //             nothing: () => null,
+    //           }),
+    //           nothing: () => null,
+    //         })}
+    //       </TabSectionContent>
+    //     </TabSection>
+    //   </React.Fragment>
+    // );
+
+    return analytics.dataSet.caseOf({
+      just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+        just: byResourcePart => Maybe.maybe(
+          analyticsDataSet.status === DatasetStatus.DONE
+          && byResourcePart.getIn([assessmentId, part.id]),
+        ).caseOf({
+          just: partAnalytics => <PartAnalytics partAnalytics={partAnalytics} />,
+          nothing: () => null,
+        }),
+        nothing: () => null,
+      }),
+      nothing: () => null,
+    });
+  }
+
   renderDetailsTab() {
     return (
       <Tab className="details-tab">
@@ -534,6 +586,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             ...(showAdditionalTabs
               && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
+          ]}
+          controls={[
+            this.renderAnalytics(),
           ]}>
 
           {this.renderDetails() ? this.renderDetailsTab() : null}

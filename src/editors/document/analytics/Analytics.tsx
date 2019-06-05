@@ -17,15 +17,12 @@ import colors from 'styles/colors';
 import { disableSelect, ellipsizeOverflow, link } from 'styles/mixins';
 import { extractFullText } from 'data/content/objectives/objective';
 import { dedupeArray } from 'utils/utils';
-import flatui from 'styles/palettes/flatui';
-import { Tooltip } from 'utils/tooltip';
 import { AnalyticsState as ReduxAnalyticsState } from 'reducers/analytics';
-import { convert } from 'utils/format';
-import * as chroma from 'chroma-js';
 import { ContentElements } from 'data/content/common/elements';
 import { map } from 'data/utils/map';
 import { EntityTypes } from 'data/content/learning/common';
 import { DatasetStatus } from 'types/analytics/dataset';
+import { PartAnalytics } from './PartAnalytics';
 
 const getOrderedParts = (body: ContentElements, parts: List<contentTypes.Part>) => {
   return body.content.reduce(
@@ -158,47 +155,6 @@ const styles: JSSStyles = {
   questionStats: {
     display: 'flex',
     flexDirection: 'row',
-  },
-  stat: {
-    display: 'inline-block',
-    margin: [0, 4],
-    minWidth: 60,
-
-    '& i': {
-      marginRight: 4,
-    },
-  },
-  firstTryCorrect: {
-    border: [1, 'solid', colors.grayDark],
-    fontSize: 10,
-    margin: [3, 8],
-    verticalAlign: 'top',
-    width: 60,
-    textAlign: 'center',
-    fontWeight: 700,
-  },
-  eventuallyCorrect: {
-    '& i': {
-      color: flatui.pomegranite,
-    },
-  },
-  practice: {
-    '& i': {
-      color: flatui.wetAsphalt,
-    },
-  },
-  avgHelpNeeded: {
-    '& i': {
-      color: flatui.wetAsphalt,
-    },
-  },
-  accuracyRate: {
-    '& i': {
-      color: flatui.nephritis,
-    },
-  },
-  analyticsTooltipContent: {
-    textAlign: 'start',
   },
   noStats: {
     color: colors.grayDark,
@@ -379,145 +335,6 @@ class Analytics
     );
   }
 
-  renderPartStats(partAnalytics) {
-    const { classes } = this.props;
-
-    const renderEventuallyCorrectIcon = (completionRate: number) => {
-      return completionRate > .80
-        ? (
-          <i className="fas fa-check-circle" style={{ color: flatui.nephritis }} />
-        )
-        : (
-          <i className="fa fa-times-circle" style={{ color: flatui.pomegranite }} />
-        );
-    };
-
-    const renderAccuracyRateBar = (accuracyRate: number) => {
-      const rate = Math.min(Math.max(0, accuracyRate), 1);
-
-      // generate a background color on a scale of [red -> orange -> yellow -> green]
-      const hue = rate * 145;
-      const sat = (-1.1 * (rate * rate)) + (0.9 * rate) + .63;
-      const backgroundColor = chroma.hsl(hue, sat, .5).hex();
-
-      // minimum contrast ratio for text visibility is 4.5
-      const color = chroma.contrast(backgroundColor, colors.black) > 4.5
-        ? colors.black : colors.white;
-      const borderColor = chroma(backgroundColor).darken(0.5).hex();
-
-      return (
-        <div className={classNames([classes.stat, classes.firstTryCorrect])}
-          style={{ backgroundColor, color, borderColor }}>
-          {convert.toPercentage(accuracyRate)}
-        </div>
-      );
-    };
-
-    return (
-      <div className={classes.questionStats}>
-        <Tooltip
-          html={(
-            <div className={classes.analyticsTooltipContent}>
-              <div>
-                <b>Number of attempts:</b>
-                <div className={classNames([classes.stat, classes.practice])}>
-                  <i className="fa fa-users" />
-                  {partAnalytics.practice}
-                </div>
-              </div>
-              <div>
-                The number of times a student submitted an answer
-                for this question.
-              </div>
-            </div>
-          )}
-          theme="light"
-          delay={250}
-          size="small"
-          arrowSize="small">
-          <div className={classNames([classes.stat, classes.practice])}>
-            <i className="fa fa-users" />
-            {partAnalytics.practice}
-          </div>
-        </Tooltip>
-
-        <Tooltip
-          html={(
-            <div className={classNames([classes.stat, classes.analyticsTooltipContent])}>
-              <div>
-                <b>Relative difficulty:</b>
-                <div className={classNames([classes.stat, classes.avgHelpNeeded])}>
-                  <i className="fa fa-life-ring" />
-                  {Number.parseFloat(partAnalytics.avgHelpNeeded).toFixed(2)}
-                </div>
-              </div>
-              <div>
-                The ratio of times a student either requested a hint or gave an incorrect answer
-                to the total number of question interactions.
-                A higher number indicates a lower proportion of correct answers,
-                and a more difficult question.
-              </div>
-            </div>
-          )}
-          theme="light"
-          delay={250}
-          size="small"
-          arrowSize="small">
-          <div className={classNames([classes.stat, classes.avgHelpNeeded])}>
-            <i className="fa fa-life-ring" />
-            {Number.parseFloat(partAnalytics.avgHelpNeeded).toFixed(2)}
-          </div>
-        </Tooltip>
-
-        <Tooltip
-          html={(
-            <div className={classes.analyticsTooltipContent}>
-              <div>
-                <b>Eventually correct:</b>
-                <div className={classNames([classes.stat, classes.eventuallyCorrect])}>
-                  {renderEventuallyCorrectIcon(partAnalytics.completionRate)}
-                  {convert.toPercentage(partAnalytics.completionRate)}
-                </div>
-              </div>
-              <div>
-                The percentage of students who eventually answered
-                this question correctly.
-              </div>
-            </div>
-          )}
-          theme="light"
-          delay={250}
-          size="small"
-          arrowSize="small">
-          <div className={classNames([classes.stat, classes.eventuallyCorrect])}>
-            {renderEventuallyCorrectIcon(partAnalytics.completionRate)}
-            {convert.toPercentage(partAnalytics.completionRate)}
-          </div>
-        </Tooltip>
-
-        <Tooltip
-          html={(
-            <div className={classes.analyticsTooltipContent}>
-              <div>
-                <b>First try correct:</b>
-                {renderAccuracyRateBar(partAnalytics.accuracyRate)}
-              </div>
-              <div>
-                The percentage of students who answered this question
-                correctly on the first attempt.
-              </div>
-            </div>
-          )}
-          theme="light"
-          delay={250}
-          size="small"
-          arrowSize="small">
-          {renderAccuracyRateBar(partAnalytics.accuracyRate)}
-        </Tooltip>
-      </div>
-    );
-  }
-
   renderMultipleParts(
     question: QuestionRef, skill: SkillRef, organization: models.OrganizationModel) {
     const { classes, course, analytics, onPushRoute } = this.props;
@@ -550,7 +367,7 @@ class Analytics
               analyticsDataSet.status === DatasetStatus.DONE
               && byResourcePart.getIn([question.assessmentId, part.id]),
             ).caseOf({
-              just: partAnalytics => this.renderPartStats(partAnalytics),
+              just: partAnalytics => <PartAnalytics partAnalytics={partAnalytics} />,
               nothing: () => this.renderNoAnalyticsMsg(),
             }),
             nothing: () => this.renderNoAnalyticsMsg(),
@@ -582,7 +399,7 @@ class Analytics
                   just: byResourcePart => Maybe.maybe(
                     byResourcePart.getIn([question.assessmentId, part.id]),
                   ).caseOf({
-                    just: partAnalytics => this.renderPartStats(partAnalytics),
+                    just: partAnalytics => <PartAnalytics partAnalytics={partAnalytics} />,
                     nothing: () => this.renderNoAnalyticsMsg(),
                   }),
                   nothing: () => this.renderNoAnalyticsMsg(),
