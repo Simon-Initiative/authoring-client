@@ -27,9 +27,14 @@ import { modalActions } from 'actions/modal';
 import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
 import { Remove } from 'components/common/Remove';
 import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
-import { PartAnalytics } from 'editors/document/analytics/PartAnalytics';
+import {
+  PartAnalytics, calculateAccuracyRateColor,
+} from 'editors/document/analytics/PartAnalytics';
 import { AnalyticsState } from 'reducers/analytics';
 import { DatasetStatus } from 'types/analytics/dataset';
+import { convert } from 'utils/format';
+import * as chroma from 'chroma-js';
+import colors from 'styles/colors';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
@@ -419,33 +424,12 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     );
   }
 
-  renderAnalytics() {
+  renderAnalyticsLabel(partIndex?: number) {
     const { model, assessmentId, analytics } = this.props;
 
-    const part = model.parts.first();
-
-    // return (
-    //   <React.Fragment>
-    //     <TabSection key="choices" className="choices">
-    //       <TabSectionHeader title="Analytics"/>
-    //       <TabSectionContent>
-    //         {analytics.dataSet.caseOf({
-    //           just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
-    //             just: byResourcePart => Maybe.maybe(
-    //               analyticsDataSet.status === DatasetStatus.DONE
-    //               && byResourcePart.getIn([assessmentId, part.id]),
-    //             ).caseOf({
-    //               just: partAnalytics => <PartAnalytics partAnalytics={partAnalytics} />,
-    //               nothing: () => null,
-    //             }),
-    //             nothing: () => null,
-    //           }),
-    //           nothing: () => null,
-    //         })}
-    //       </TabSectionContent>
-    //     </TabSection>
-    //   </React.Fragment>
-    // );
+    const part = partIndex
+      ? model.parts.valueSeq().get(partIndex)
+      : model.parts.first();
 
     return analytics.dataSet.caseOf({
       just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
@@ -453,7 +437,57 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           analyticsDataSet.status === DatasetStatus.DONE
           && byResourcePart.getIn([assessmentId, part.id]),
         ).caseOf({
-          just: partAnalytics => <PartAnalytics partAnalytics={partAnalytics} />,
+          just: (partAnalytics) => {
+            const backgroundColor = calculateAccuracyRateColor(partAnalytics.accuracyRate);
+
+            // minimum contrast ratio for text visibility is 4.5
+            const textColor = chroma.contrast(backgroundColor, colors.black) > 4.5
+              ? colors.black : colors.white;
+
+            return (
+              <span key="analytics">Analytics <Badge color={backgroundColor} textColor={textColor}>
+                {convert.toPercentage(partAnalytics.accuracyRate)}
+              </Badge>
+              </span>
+            );
+          },
+          nothing: () => null,
+        }),
+        nothing: () => null,
+      }),
+      nothing: () => null,
+    });
+  }
+
+  renderAnalytics(partIndex?: number) {
+    const { model, assessmentId, analytics } = this.props;
+
+    const part = partIndex
+      ? model.parts.valueSeq().get(partIndex)
+      : model.parts.first();
+
+    return analytics.dataSet.caseOf({
+      just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+        just: byResourcePart => Maybe.maybe(
+          analyticsDataSet.status === DatasetStatus.DONE
+          && byResourcePart.getIn([assessmentId, part.id]),
+        ).caseOf({
+          just: partAnalytics => (
+            <Tab className="analytics-tab">
+              <TabSection key="analytics" className="analytics">
+                <TabSectionHeader title="Analytics"/>
+                <TabSectionContent>
+                  <PartAnalytics partAnalytics={partAnalytics} expandedView />
+                  <div className="instruction-label" style={{ marginTop: 10 }}>
+                    Analytics are calculated using data collected
+                    from several different sections of students who submitted responses
+                    to this question. This data can be used to evaluate the effectiveness
+                    and improve the content of this question.
+                  </div>
+                </TabSectionContent>
+              </TabSection>
+            </Tab>
+          ),
           nothing: () => null,
         }),
         nothing: () => null,
@@ -570,7 +604,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       && this.renderAdditionalTabs() !== false;
 
     const renderSkillsLabel = (part: contentTypes.Part) => (
-      <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
+      <span key="skills">Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
         {part.skills.size}
       </Badge>
       </span>
@@ -584,11 +618,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
             ...(this.renderSkillsTab(item, parts[index]) ? [renderSkillsLabel(parts[index])] : []),
             ...(this.renderHintsTab(item, parts[index]) ? ['Hints'] : []),
             ...(!hideGradingCriteria ? ['Criteria'] : []),
+            ...(this.renderAnalytics() ? [this.renderAnalyticsLabel()] : []),
             ...(showAdditionalTabs
               && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
-          ]}
-          controls={[
-            this.renderAnalytics(),
           ]}>
 
           {this.renderDetails() ? this.renderDetailsTab() : null}
@@ -597,6 +629,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {this.renderHintsTab(item, parts[index]) ?
             this.renderHintsTab(item, parts[index]) : null}
           {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
+          {this.renderAnalytics() ? this.renderAnalytics() : null}
           {showAdditionalTabs && (this.renderAdditionalTabs() as TabElement[])
             .map(tab => tab.content)}
         </TabContainer>
