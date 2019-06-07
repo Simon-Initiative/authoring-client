@@ -7,11 +7,11 @@ import {
 import guid from 'utils/guid';
 import { ContentElements } from 'data/content/common/elements';
 import { MultipleChoice } from 'editors/content/question/multiplechoice/MultipleChoice.controller';
-import { Essay } from 'editors/content/question/essay/Essay';
+import { Essay } from 'editors/content/question/essay/Essay.controller';
 import { CheckAllThatApply } from
   'editors/content/question/checkallthatapply/CheckAllThatApply.controller';
 import { ImageHotspot } from 'editors/content/question/imagehotspot/ImageHotspot.controller';
-import { ShortAnswer } from 'editors/content/question/shortanswer/ShortAnswer';
+import { ShortAnswer } from 'editors/content/question/shortanswer/ShortAnswer.controller';
 import { Ordering } from 'editors/content/question/ordering/Ordering.controller';
 import { DynaDropInput } from 'editors/content/question/draganddrop/DynaDropInput.controller';
 import { MultipartInput } from 'editors/content/question/multipart/MultipartInput.controller';

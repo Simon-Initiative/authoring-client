@@ -6,6 +6,7 @@ import { styles } from './Badge.styles';
 
 export interface BadgeProps {
   color?: string;
+  textColor?: string;
 }
 
 /**
@@ -13,12 +14,12 @@ export interface BadgeProps {
  */
 const Badge:
 React.StatelessComponent<StyledComponentProps<BadgeProps, typeof styles>> = ({
-  className, classes, children, color,
+  className, classes, children, color, textColor,
 }) => {
   return (
     <span
       className={classNames(['Badge', classes.Badge, className])}
-      style={{ backgroundColor: color }}>
+      style={{ backgroundColor: color, color: textColor }}>
       {children}
     </span>
   );

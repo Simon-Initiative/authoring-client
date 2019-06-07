@@ -27,31 +27,45 @@ import { modalActions } from 'actions/modal';
 import ModalSelection, { sizes } from 'utils/selection/ModalSelection';
 import { Remove } from 'components/common/Remove';
 import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
+import {
+  PartAnalytics, calculateAccuracyRateColor,
+} from 'editors/document/analytics/PartAnalytics';
+import { AnalyticsState } from 'reducers/analytics';
+import { DatasetStatus } from 'types/analytics/dataset';
+import { convert } from 'utils/format';
+import * as chroma from 'chroma-js';
+import colors from 'styles/colors';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
   + 'Please add another question or pool before removing this one';
 
-export interface QuestionProps<ModelType>
+export interface OwnQuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
-  onBodyEdit: (...args: any[]) => any;
-  onFocus: (child, model, textSelection) => void;
-  onItemFocus: (itemId: string) => void;
   body: any;
   grading: any;
-  onGradingChange: (value) => void;
-  onVariablesChange: (vars: Immutable.OrderedMap<string, contentTypes.Variable>) => void;
   hideGradingCriteria: boolean;
   hideVariables: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   model: contentTypes.Question;
   canRemoveQuestion: boolean;
-  onRemoveQuestion: () => void;
-  onDuplicate: () => void;
   activeContentGuid: string;
   hover: string;
-  onUpdateHover: (hover: string) => void;
   branchingQuestions: Maybe<number[]>;
+  onBodyEdit: (...args: any[]) => any;
+  onFocus: (child, model, textSelection) => void;
+  onItemFocus: (itemId: string) => void;
+  onGradingChange: (value) => void;
+  onVariablesChange: (vars: Immutable.OrderedMap<string, contentTypes.Variable>) => void;
+  onRemoveQuestion: () => void;
+  onDuplicate: () => void;
+  onUpdateHover: (hover: string) => void;
+}
+
+export interface QuestionProps<ModelType>
+  extends OwnQuestionProps<ModelType> {
+  analytics: AnalyticsState;
+  assessmentId: string;
 }
 
 export interface QuestionState {
@@ -410,6 +424,78 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     );
   }
 
+  renderAnalyticsLabel(partIndex?: number) {
+    const { model, assessmentId, analytics } = this.props;
+
+    const part = partIndex
+      ? model.parts.valueSeq().get(partIndex)
+      : model.parts.first();
+
+    return analytics.dataSet.caseOf({
+      just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+        just: byResourcePart => Maybe.maybe(
+          analyticsDataSet.status === DatasetStatus.DONE
+          && byResourcePart.getIn([assessmentId, part.id]),
+        ).caseOf({
+          just: (partAnalytics) => {
+            const backgroundColor = calculateAccuracyRateColor(partAnalytics.accuracyRate);
+
+            // minimum contrast ratio for text visibility is 4.5
+            const textColor = chroma.contrast(backgroundColor, colors.black) > 4.5
+              ? colors.black : colors.white;
+
+            return (
+              <span key="analytics">Analytics <Badge color={backgroundColor} textColor={textColor}>
+                {convert.toPercentage(partAnalytics.accuracyRate)}
+              </Badge>
+              </span>
+            );
+          },
+          nothing: () => null,
+        }),
+        nothing: () => null,
+      }),
+      nothing: () => null,
+    });
+  }
+
+  renderAnalytics(partIndex?: number) {
+    const { model, assessmentId, analytics } = this.props;
+
+    const part = partIndex
+      ? model.parts.valueSeq().get(partIndex)
+      : model.parts.first();
+
+    return analytics.dataSet.caseOf({
+      just: analyticsDataSet => analyticsDataSet.byResourcePart.caseOf({
+        just: byResourcePart => Maybe.maybe(
+          analyticsDataSet.status === DatasetStatus.DONE
+          && byResourcePart.getIn([assessmentId, part.id]),
+        ).caseOf({
+          just: partAnalytics => (
+            <Tab className="analytics-tab">
+              <TabSection key="analytics" className="analytics">
+                <TabSectionHeader title="Analytics"/>
+                <TabSectionContent>
+                  <PartAnalytics partAnalytics={partAnalytics} expandedView />
+                  <div className="instruction-label" style={{ marginTop: 10 }}>
+                    Analytics are calculated using data collected
+                    from several different sections of students who submitted responses
+                    to this question. This data can be used to evaluate the effectiveness
+                    and improve the content of this question.
+                  </div>
+                </TabSectionContent>
+              </TabSection>
+            </Tab>
+          ),
+          nothing: () => null,
+        }),
+        nothing: () => null,
+      }),
+      nothing: () => null,
+    });
+  }
+
   renderDetailsTab() {
     return (
       <Tab className="details-tab">
@@ -518,7 +604,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       && this.renderAdditionalTabs() !== false;
 
     const renderSkillsLabel = (part: contentTypes.Part) => (
-      <span>Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
+      <span key="skills">Skills <Badge color={part.skills.size > 0 ? '#2ecc71' : '#e74c3c'}>
         {part.skills.size}
       </Badge>
       </span>
@@ -532,6 +618,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
             ...(this.renderSkillsTab(item, parts[index]) ? [renderSkillsLabel(parts[index])] : []),
             ...(this.renderHintsTab(item, parts[index]) ? ['Hints'] : []),
             ...(!hideGradingCriteria ? ['Criteria'] : []),
+            ...(this.renderAnalytics() ? [this.renderAnalyticsLabel()] : []),
             ...(showAdditionalTabs
               && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
           ]}>
@@ -542,6 +629,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {this.renderHintsTab(item, parts[index]) ?
             this.renderHintsTab(item, parts[index]) : null}
           {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
+          {this.renderAnalytics() ? this.renderAnalytics() : null}
           {showAdditionalTabs && (this.renderAdditionalTabs() as TabElement[])
             .map(tab => tab.content)}
         </TabContainer>

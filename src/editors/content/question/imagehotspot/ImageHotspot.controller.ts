@@ -3,18 +3,22 @@ import { ImageHotspot } from './ImageHotspot';
 import * as contentTypes from 'data/contentTypes';
 import { toggleAdvancedScoring } from 'actions/questionEditor';
 import { State } from 'reducers';
-import { QuestionProps } from '../question/Question';
+import { OwnQuestionProps } from '../question/Question';
+import { AnalyticsState } from 'reducers/analytics';
+import { AssessmentModel } from 'data/models';
 
 interface StateProps {
   advancedScoringInitialized: boolean;
   advancedScoring: boolean;
+  analytics: AnalyticsState;
+  assessmentId: string;
 }
 
 interface DispatchProps {
   onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
-interface OwnProps extends QuestionProps<contentTypes.ImageHotspot> {
+interface OwnProps extends OwnQuestionProps<contentTypes.ImageHotspot> {
 
 }
 
@@ -22,6 +26,9 @@ const mapStateToProps = (state: State, props: OwnProps): StateProps => {
   return {
     advancedScoringInitialized: state.questionEditor.hasIn(['scoring', props.model.guid]),
     advancedScoring: state.questionEditor.getIn(['scoring', props.model.guid]),
+    analytics: state.analytics,
+    // this line assumes this component is only used within an assessment and document is loaded
+    assessmentId: (state.documents.first().document.model as AssessmentModel).resource.id,
   };
 };
 
