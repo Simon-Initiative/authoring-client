@@ -16,7 +16,7 @@ import * as viewActions from 'actions/view';
 import { UndoRedoToolbar } from 'editors/document/common/UndoRedoToolbar';
 import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
-import { Analytics } from './Analytics.controller';
+import { Analytics } from '../analytics/Analytics.controller';
 import { Remove } from 'components/common/Remove';
 
 export interface OrgComponentEditorProps {

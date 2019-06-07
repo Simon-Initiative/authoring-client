@@ -392,6 +392,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
                   renderSkillsLabel(parts[index]),
                   'Hints',
                   ...(!hideGradingCriteria ? ['Criteria'] : []),
+                  ...(this.renderAnalytics(index) ? [this.renderAnalyticsLabel(index)] : []),
                 ]}
                 controls={[
                   <Button
@@ -407,6 +408,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
                 {this.renderSkillsTab(item, parts[index])}
                 {this.renderHintsTab(item, parts[index])}
                 {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
+                {this.renderAnalytics() ? this.renderAnalytics(index) : null}
               </TabContainer>
             </div>
           );

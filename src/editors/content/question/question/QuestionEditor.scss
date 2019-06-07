@@ -65,6 +65,10 @@
       font-weight: 600;
       margin: 10px 0;
     }
+
+    .tab-control:last-child {
+      padding-right: 0;
+    }
   }
 
   .tab-container {
