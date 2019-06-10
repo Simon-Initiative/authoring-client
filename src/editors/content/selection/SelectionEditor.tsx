@@ -15,6 +15,7 @@ import { REMOVE_QUESTION_DISABLED_MSG } from 'editors/content/question/question/
 
 import './SelectionEditor.scss';
 import { LegacyTypes } from 'data/types';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
@@ -65,7 +66,7 @@ export class SelectionEditor
     this.props.onEdit(this.props.model.with({ scope }));
   }
 
-  onCountEdit(selectionCount) {
+  onCountEdit(selectionCount: string) {
     this.props.onEdit(this.props.model.with({ selectionCount }));
   }
 
@@ -147,38 +148,67 @@ export class SelectionEditor
             </div>
           )
         }
-        <form className="form-inline">
-          <Select editMode={this.props.editMode}
-            label="Selection Strategy" value={this.props.model.strategy}
-            onChange={this.onStrategyChange}>
-            <option value="random">Random</option>
-            <option value="random_with_replace">Random (allow duplicates)</option>
-            <option value="ordered">In order</option>
-          </Select>
-          <Select editMode={this.props.editMode}
-            label="On Question Exhaustion" value={this.props.model.exhaustion}
-            onChange={this.onExhaustionChange}>
-            <option value="reuse">Reuse</option>
-            <option value="skip">Skip</option>
-            <option value="fail">Fail</option>
-          </Select>
-          <Select editMode={this.props.editMode}
-            label="Scope" value={this.props.model.scope}
-            onChange={this.onScopeChange}>
-            <option value="section">Section</option>
-            <option value="resource">Resource</option>
-          </Select>
+        <div className="pool-options">
+          <div className="option">
+            <Select editMode={this.props.editMode}
+              label="Selection Strategy" value={this.props.model.strategy}
+              onChange={this.onStrategyChange}>
+              <option value="random">Random</option>
+              <option value="random_with_replace">Random (allow duplicates)</option>
+              <option value="ordered">In order</option>
+            </Select>
+          </div>
+          <div className="option">
+            <Select editMode={this.props.editMode}
+              label="On Question Exhaustion" value={this.props.model.exhaustion}
+              onChange={this.onExhaustionChange}>
+              <option value="reuse">Reuse</option>
+              <option value="skip">Skip</option>
+              <option value="fail">Fail</option>
+            </Select>
+          </div>
+          <div className="option">
+            <Select editMode={this.props.editMode}
+              label="Scope" value={this.props.model.scope}
+              onChange={this.onScopeChange}>
+              <option value="section">Section</option>
+              <option value="resource">Resource</option>
+            </Select>
+          </div>
+          <div className="option">
+            <div>Question Count</div>
+            <div>
+              <TextInput
+                editMode={this.props.editMode && this.props.model.selectionCount !== '*'}
+                width="75px"
+                label=""
+                style={{ display: 'inline', marginRight: 10 }}
+                value={this.props.model.selectionCount === '*'
+                  ? ''
+                  : this.props.model.selectionCount
+                }
+                type="number"
+                onEdit={(value) => {
+                  if (Number(value) < 0) {
+                    return;
+                  }
+                  this.onCountEdit(value);
+                }} />
 
-          Question Count&nbsp;&nbsp;&nbsp;
-          <TextInput
-            editMode={this.props.editMode}
-            width="75px"
-            label="Count"
-            value={this.props.model.selectionCount}
-            type="number"
-            onEdit={this.onCountEdit}
-          />
-        </form>
+              <ToggleSwitch
+                checked={this.props.model.selectionCount === '*'}
+                editMode={this.props.editMode}
+                label="Include all questions from this pool"
+                onClick={() => {
+                  if (this.props.model.selectionCount === '*') {
+                    this.onCountEdit('1');
+                  } else {
+                    this.onCountEdit('*');
+                  }
+                }} />
+            </div>
+            </div>
+        </div>
       </div>);
 
     let titleEditor = null;
@@ -200,9 +230,9 @@ export class SelectionEditor
 
         {titleEditor}
 
-        {controls}
-
         {this.renderSource()}
+
+        {controls}
 
       </div>
     );

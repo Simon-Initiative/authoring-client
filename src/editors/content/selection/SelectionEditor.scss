@@ -18,5 +18,15 @@
         list-style-type: disc;
       }
     }
+
+    .pool-options {
+      display: flex;
+      flex-direction: column;
+
+      .option {
+        display: block;
+        margin-top: 10px;
+      }
+    }
   }
 }

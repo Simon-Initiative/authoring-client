@@ -19,7 +19,7 @@ export type SkillPathElement = PathElement & {
 
 export interface PoolInfo {
   questionCount?: number;
-  count?: number;
+  count?: string;
   exhaustion?: string;
   strategy?: string;
 }

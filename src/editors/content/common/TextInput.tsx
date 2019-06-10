@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 export interface TextInputProps {
+  style?: any;
   editMode: boolean;
   width?: string;
   label: string;
@@ -32,7 +33,7 @@ export class TextInput extends React.PureComponent<TextInputProps, TextInputStat
     return (
       <input
         disabled={!this.props.editMode}
-        style={{ width: this.props.width }}
+        style={Object.assign((this.props.style || {}), { width: this.props.width })}
         placeholder={this.props.label}
         onChange={this.onChange}
         className={`form-control form-control-sm ${this.props.hasError ? 'is-invalid' : ''}`}
