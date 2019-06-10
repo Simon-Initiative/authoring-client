@@ -72,7 +72,7 @@ inlineTerminalTags['input_ref'] = (item, provider) => {
       return ' ' + questionItem.contentType + ' ';
     }
   }
-  return ' Unknown ';
+  return ' Input ';
 };
 
 

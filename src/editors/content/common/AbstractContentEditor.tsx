@@ -31,6 +31,13 @@ export interface AbstractContentEditorProps<ModelType> {
   hover: string;
   onUpdateHover: (hover: string) => void;
   onHandleClick?: (e: React.MouseEvent<HTMLElement>) => void;
+
+  // Callback for selection of and the current active selected entity.
+  // These are only used by the ContiguousTextEditor components, but
+  // must exist here at this level so that these props can be passed
+  // through non CTE elements (like a Table) to child CTEs.
+  onEntitySelected?: (key: string, data: Object) => void;
+  selectedEntity?: Maybe<string>;
 }
 
 export interface AbstractContentEditorState { }
@@ -53,6 +60,7 @@ export abstract class
       || this.props.editMode !== nextProps.editMode
       || this.props.styles !== nextProps.styles
       || this.props.activeContentGuid !== nextProps.activeContentGuid
+      || this.props.selectedEntity !== nextProps.selectedEntity
       || this.props.hover !== nextProps.hover;
   }
 

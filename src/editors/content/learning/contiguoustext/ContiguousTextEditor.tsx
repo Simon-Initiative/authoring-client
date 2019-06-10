@@ -23,12 +23,6 @@ export interface ContiguousTextEditorProps
   onTextSelectionChange?: (selection: any) => void;
   onInsertParsedContent: (resourcePath: string, o) => void;
 
-  // Optional callback for tracking entity selections. It is up to the
-  // entity impl to determine how it interprets 'selection'
-  onEntitySelected?: (key: string, data: Object) => void;
-
-  // Optional active entity key
-  selectedEntity?: Maybe<string>;
 }
 
 export interface ContiguousTextEditorState {
