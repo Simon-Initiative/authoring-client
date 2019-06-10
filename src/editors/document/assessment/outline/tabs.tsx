@@ -167,9 +167,9 @@ const PoolTab = (props: TabProps) => {
   const previewText = pool
     ? pool.title.text.extractPlainText().caseOf({
       just: t => t,
-      nothing: () => '',
-    }) + ' (' + selection(p) + ')'
-    : selection(p);
+      nothing: () => '(No Title)',
+    })
+    : '(No Title)';
 
   return (
     <Tab
@@ -186,8 +186,8 @@ const PoolRefTab = (props: TabProps) => {
   const pool = p.source as PoolRef;
 
   const previewText = pool
-    ? props.course.resourcesById.get(pool.idref).title + ' (' + selection(p) + ')'
-    : selection(p);
+    ? props.course.resourcesById.get(pool.idref).title
+    : '(No Title)';
 
   return (
     <Tab
