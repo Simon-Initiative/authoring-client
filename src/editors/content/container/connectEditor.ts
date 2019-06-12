@@ -51,5 +51,5 @@ export const connectPopupEditor = (component) => {
     };
   };
 
-  return connect(mapStateToProps, mapDispatchToProps)(component);
+  return component;
 };

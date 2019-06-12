@@ -19,9 +19,11 @@ const numPoolQuestionsWithoutSkill = (
 
 // Guaranteed pool question count = SUM g(x) for all x e {...pools} where
 // g(x) = MIN( MAX(count - numDontHaveSkill(x), 0), numHaveSkill(x))
-const guaranteedPoolQuestionCountMap = (skillQuestionRefs: QuestionRef[]) =>
+const guaranteedPoolQuestionCountMap = (skillQuestionRefs: QuestionRef[]): Map<string, number> =>
   skillQuestionRefs
+    // filter out anything that is not a question pool
     .filter(ref => ref.assessmentType === LegacyTypes.assessment2_pool)
+    // reduce a map of guaranteed pool question counts, memoize results to improve performance
     .reduce(
       (acc, poolRef) => poolRef.poolInfo.caseOf({
         just: poolInfo => acc.has(poolRef.assessmentId)
@@ -31,15 +33,17 @@ const guaranteedPoolQuestionCountMap = (skillQuestionRefs: QuestionRef[]) =>
           // if we havent, perform the calculation and store in the map
           : acc.set(
             poolRef.assessmentId,
-            Math.min(
-              Math.max(
-                poolInfo.count - numPoolQuestionsWithoutSkill(
-                  skillQuestionRefs,
-                  poolInfo.questionCount, poolRef.assessmentId),
-                0,
+            poolInfo.count === '*'
+              ? numPoolQuestionsWithSkill(skillQuestionRefs, poolRef.assessmentId)
+              : Math.min(
+                Math.max(
+                  (Number(poolInfo.count) || 0) - numPoolQuestionsWithoutSkill(
+                    skillQuestionRefs,
+                    poolInfo.questionCount, poolRef.assessmentId),
+                  0,
+                ),
+                numPoolQuestionsWithSkill(skillQuestionRefs, poolRef.assessmentId),
               ),
-              numPoolQuestionsWithSkill(skillQuestionRefs, poolRef.assessmentId),
-            ),
           ),
         nothing: () => acc,
       }),

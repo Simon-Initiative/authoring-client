@@ -55,7 +55,7 @@ const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<Po
   const pathInfo = edge.metadata.jsonObject.pathInfo;
   return Maybe.just({
     questionCount,
-    count: Number(pathInfo.parent['@count']),
+    count: pathInfo.parent['@count'],
     exhaustion: pathInfo.parent['@exhaustion'],
     strategy: pathInfo.parent['@strategy'],
   });
@@ -157,8 +157,9 @@ function reduceSkillSummativeQuestionRefs(
   return reduceSkillToQuestionRefs(skills, formativeToSkillEdges, LegacyTypes.assessment2, isInOrg);
 }
 
-
-
+/**
+ * Returns a map from skill to list of QuestionRefs
+ */
 export const reduceSkillPoolQuestionRefs = (
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
   poolToSkillEdges: Edge[],
@@ -169,14 +170,19 @@ export const reduceSkillPoolQuestionRefs = (
     skill.id,
     (acc.get(skill.id) || Immutable.List<QuestionRef>())
       .concat(
+        // ensure that all pool to skill edges are valid and belong to this skill
         poolToSkillEdges.filter(edge => isValidResource(resourceId(edge.sourceId))
-          && resourceId(edge.destinationId) === skill.id)
+            && resourceId(edge.destinationId) === skill.id)
+          // map skill edge to a more usable QuestionRef
           .map(edge => getQuestionRefFromSkillEdge(
             edge, LegacyTypes.assessment2_pool, resourceId(edge.sourceId)))
+          // filter out any QuestionRefs that didnt have sufficient edge information
+          // (a.k.a. any items that are Maybe<QuestionRef>.nothing)
           .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
             just: ref => true,
             nothing: () => false,
           }))
+          // map QuestionRefs, adding pool info to each QuestionRef
           .map(maybeQuestionRef => maybeQuestionRef.bind(questionRef => Maybe.just({
             ...questionRef,
             poolInfo: getPoolInfoFromPoolRefEdge(
@@ -185,6 +191,8 @@ export const reduceSkillPoolQuestionRefs = (
               questionRef.poolInfo.valueOr({ questionCount: 0 }).questionCount,
             ),
           })))
+          // all maybeQuestionRefs at this point are guaranteed to have values,
+          // so unwrap their value or throw and error if they dont
           .map(maybeQuestionRef => maybeQuestionRef.valueOrThrow()),
       ).toList(),
   ),
@@ -420,11 +428,24 @@ class ObjectiveSkillView
         ...combinedEdges
           // Filter down to those resources that aren't directly linked but
           // that are linked to one of the resources that is directly linked
-          .filter(edge => !directLookup.has(resourceId(edge.destinationId))
-            && directLookup.has(resourceId(edge.sourceId)))
+          .filter((edge) => {
+            // special case is summative to pool edge. We need to check if
+            // the summative is deep linked from a workbook page activity
+            if (edge.sourceType === LegacyTypes.assessment2) {
+              // find all edges that have a destinationId linked to this sourceId
+              const linkedEdges = combinedEdges.filter(e => e.destinationId === edge.sourceId);
+              const isDeepLinked = linkedEdges.some(e => directLookup.has(resourceId(e.sourceId)));
+
+              if (isDeepLinked) {
+                return true;
+              }
+            }
+
+            return !directLookup.has(resourceId(edge.destinationId))
+              && directLookup.has(resourceId(edge.sourceId));
+          })
           .map(edge => resourceId(edge.destinationId)),
       ];
-
 
       const organizationResourceMap = Immutable.OrderedMap<string, string>(
         transitiveResources.map(r => [r, r]));

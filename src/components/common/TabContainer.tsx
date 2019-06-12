@@ -49,7 +49,10 @@ export class TabContainer
       .map((title, index) => {
         const active = index === this.state.currentTabIndex ? 'active' : '';
         const classes = 'nav-link ' + active;
-        return <a key={`${title}`} className={classes}
+        const key = typeof title === 'string'
+          ? title
+          : title.key;
+        return <a key={key} className={classes}
           onClick={this.onTabClick.bind(this, index)}>{title}</a>;
       });
 

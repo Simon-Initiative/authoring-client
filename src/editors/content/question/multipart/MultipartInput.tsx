@@ -19,6 +19,7 @@ import { Badge } from '../../common/Badge';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
 import { RouterState } from 'reducers/router';
+import { map } from 'data/utils/map';
 
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
@@ -67,8 +68,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       activeContext.container.lift((p) => {
         activeContext.activeChild.lift((c) => {
 
-          if (this.props.model.body.content.has((c as any).guid)
-            && (c instanceof contentTypes.ContiguousText)) {
+          if (c instanceof contentTypes.ContiguousText) {
 
             const selection = activeContext.textSelection.caseOf({
               just: s => s,
@@ -85,16 +85,20 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               ? ' Dropdown '
               : ' ' + type + ' ';
 
-            const updated = (c as contentTypes.ContiguousText).insertEntity(
-              EntityTypes.input_ref, false, data, selection, backingText);
+            const mapFn = (e: ContentElement) => {
+              if (e.guid === c.guid) {
+                return (c as contentTypes.ContiguousText).insertEntity(
+                  EntityTypes.input_ref, false, data, selection, backingText);
+              }
+              return e;
+            };
 
-            result = [this.props.model.body.with({
-              content:
-                this.props.model.body.content.set(updated.guid, updated),
-            }), input];
+            result = [map(mapFn, this.props.body), input];
 
             this.props.setActiveItemIdActionAction(input);
+
           }
+
         });
       });
     }
@@ -244,16 +248,6 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       setActiveItemIdActionAction(data['@input']);
     };
 
-    const bindSelections = (model: ContentElement) => {
-      if (model.contentType === 'ContiguousText') {
-        return [{
-          propertyName: 'onEntitySelected',
-          value: onEntitySelected,
-        }];
-      }
-      return [];
-    };
-
     return (
       <div className="question-body" key="question">
         <div className="control insert-item">
@@ -276,7 +270,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
         </div>
         <ContentContainer
-          bindProperties={bindSelections}
+          onEntitySelected={onEntitySelected}
           activeContentGuid={this.props.activeContentGuid}
           hover={this.props.hover}
           onUpdateHover={this.props.onUpdateHover}
@@ -392,6 +386,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
                   renderSkillsLabel(parts[index]),
                   'Hints',
                   ...(!hideGradingCriteria ? ['Criteria'] : []),
+                  ...(this.renderAnalytics(index) ? [this.renderAnalyticsLabel(index)] : []),
                 ]}
                 controls={[
                   <Button
@@ -407,6 +402,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
                 {this.renderSkillsTab(item, parts[index])}
                 {this.renderHintsTab(item, parts[index])}
                 {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
+                {this.renderAnalytics() ? this.renderAnalytics(index) : null}
               </TabContainer>
             </div>
           );
