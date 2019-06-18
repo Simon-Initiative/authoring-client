@@ -38,15 +38,12 @@ function buildMoreInfoAction(display, dismiss) {
 
 function buildUnitsMessage(display, dismiss, labels: contentTypes.Labels) {
 
-  // Note that this could lead to incorrect pluralization, in cases
-  // where the user specifies something like 'Fish' or 'Deer' as the
-  // customized label.  After careful consideration, we feel that this
-  // an acceptable trade off to make. s
-  const lowerCasedPlural = labels.module.toLowerCase() + 's';
+  const lowerCased = labels.module.toLowerCase();
 
   const content = new Messages.TitledContent().with({
-    title: `No ${lowerCasedPlural}.`,
-    message: `Organizations without ${lowerCasedPlural} have learning dashboard limitations in OLI`,
+    title: `No ${lowerCased} found.`,
+    message:
+      `Organizations without at least one ${lowerCased} have learning dashboard limitations in OLI`,
   });
 
   return new Messages.Message().with({
