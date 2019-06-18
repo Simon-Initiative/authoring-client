@@ -36,10 +36,13 @@ function buildMoreInfoAction(display, dismiss) {
   return moreInfoAction;
 }
 
-function buildUnitsMessage(display, dismiss) {
+function buildUnitsMessage(display, dismiss, labels: contentTypes.Labels) {
+
+  const lowerCasedPlural = labels.module.toLowerCase() + 's';
+
   const content = new Messages.TitledContent().with({
-    title: 'No modules.',
-    message: 'Organizations without modules have learning dashboard limitations in OLI',
+    title: `No ${lowerCasedPlural}.`,
+    message: `Organizations without ${lowerCasedPlural} have learning dashboard limitations in OLI`,
   });
 
   return new Messages.Message().with({
@@ -120,11 +123,13 @@ export class OrgDetailsEditor
 
       if (!containsOnly) {
         this.unitsMessageDisplayed = false;
-        props.dismissMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
+        props.dismissMessage(buildUnitsMessage(
+          props.displayModal, props.dismissModal, model.labels));
 
       } else if (!this.unitsMessageDisplayed && containsOnly) {
         this.unitsMessageDisplayed = true;
-        props.showMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
+        props.showMessage(buildUnitsMessage(
+          props.displayModal, props.dismissModal, model.labels));
       }
     });
   }
