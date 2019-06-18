@@ -38,6 +38,10 @@ function buildMoreInfoAction(display, dismiss) {
 
 function buildUnitsMessage(display, dismiss, labels: contentTypes.Labels) {
 
+  // Note that this could lead to incorrect pluralization, in cases
+  // where the user specifies something like 'Fish' or 'Deer' as the
+  // customized label.  After careful consideration, we feel that this
+  // an acceptable trade off to make. s
   const lowerCasedPlural = labels.module.toLowerCase() + 's';
 
   const content = new Messages.TitledContent().with({
