@@ -29,6 +29,7 @@ import flatui from 'styles/palettes/flatui';
 import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { buildGeneralErrorMessage } from 'utils/error';
+import { configuration } from 'actions/utils/config';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -50,6 +51,8 @@ export interface CourseEditorProps {
 type ThemeSelection = {
   id: string,
   selected: boolean,
+  thumbnail: string,
+  image: string,
 };
 
 interface CourseEditorState {
@@ -145,7 +148,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           // The course may have a default theme set under the 'theme' property of the model.
           // If not, use the global default theme as the selected option
           .map(theme => ({
-            id: theme.id,
+            ...theme,
             selected: model.theme
               ? theme.id === model.theme
               : theme.default,
@@ -342,24 +345,49 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderThemes() {
     const { themes } = this.state;
 
-    const option = (theme: ThemeSelection) =>
-      <option
-        key={theme.id}
-        value={theme.id}>
-        {theme.id}
-      </option>;
+    const urlPrefix = configuration.protocol + configuration.hostname + '/';
 
-    const options = themes.map(option);
-    const selectedTheme = themes.find(theme => theme.selected);
+    const cursor = 'pointer';
+    const marginLeft = '15px';
+
+    const selected = {
+      borderWidth: 8,
+      border: 'solid',
+      borderColor: 'blue',
+      cursor,
+      marginLeft,
+    };
+
+    const notSelected = {
+      borderWidth: 8,
+      border: 'solid',
+      borderColor: 'lightgray',
+      cursor,
+      marginLeft,
+      opacity: 0.5,
+    };
+
+    const toImage = (theme: ThemeSelection) =>
+      <div className="d-flex flex-column">
+        <img
+          style={theme.selected ? selected : notSelected}
+          onClick={this.onEditTheme.bind(this, theme.id)}
+          key={theme.id}
+          src={urlPrefix + theme.thumbnail} />
+        <div style={{ textAlign: 'center' }}>{theme.id}</div>
+      </div>;
+
+    const images = themes.map(toImage);
 
     return (
-      <Select
-        {...this.props}
-        className="themeSelect"
-        value={selectedTheme && selectedTheme.id}
-        onChange={this.onEditTheme}>
-        {options}
-      </Select>
+      <div>
+        <p>Select the look and feel for the course when viewed from
+          a student and instructor perspective.
+        </p>
+        <div className="d-flex flex-row">
+          {images}
+        </div>
+      </div>
     );
   }
 
@@ -740,7 +768,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-    To get the most recent data for analytics, create a new dataset.
+                            To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
