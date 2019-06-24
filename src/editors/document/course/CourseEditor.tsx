@@ -8,6 +8,7 @@ import { UserInfo } from 'data//contentTypes';
 import { Button } from 'editors/content/common/Button';
 import { Select } from 'editors/content/common/Select';
 import { Document } from 'data/persistence/common';
+import { Collapse } from 'editors/content/common/Collapse';
 import './CourseEditor.scss';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { DeploymentStatus, DeployStage } from 'data/models/course';
@@ -62,6 +63,7 @@ interface CourseEditorState {
   newVersionNumber: string;
   isNewVersionValid: boolean;
   newVersionErrorMessage: string;
+  // showAdvancedDetails: boolean; // KEVIN commenting out to use Collapse implementation instead
 }
 
 interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
@@ -135,6 +137,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         resource.type === LegacyTypes.organization &&
         resource.resourceState !== ResourceState.DELETED)
       .toArray();
+      // KEVIN - commenting out to use Collapse implementation instead
+      // this.toggleAdvancedDetails = this.toggleAdvancedDetails.bind(this);
+
   }
 
   // Fetch all globally available themes, sort alphabetically, and choose one to be selected
@@ -611,6 +616,14 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  // KEVIN don't need this, using "Collapse" Element instead
+  /*toggleAdvancedDetails() {
+    console.log("Toggling advanced details");
+    this.setState({
+      showAdvancedDetails: !this.state.showAdvancedDetails
+    })
+  }*/
+
   renderDetails() {
     const { model } = this.props;
 
@@ -654,36 +667,61 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <div className="col-3">Team members</div>
           <div className="col-9">{this.renderDevelopers()}</div>
         </div>
-        <div className="row">
-          <div className="col-3">Theme</div>
-          <div className="col-9">{this.renderThemes()}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">Version</div>
-          <div className="col-9">{model.version}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">License <HelpPopover activateOnClick>
-            <div><img src={CC_LICENSES} />
-              <br /><br />
-              <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
-                target="_blank">
-                More information
-              </a>
-            </div>
-          </HelpPopover>
+
+        {
+          // Kevin -- I commented out my first implementation which uses the button component
+        }
+        {/*<div className="row">
+          <div className="col-3"></div>
+          <div className="col-9">
+              <Button
+              // KEVIN... could also use <button>
+                editMode={true}
+                className="btn-primary actionButton"
+                onClick={() => this.toggleAdvancedDetails()}>
+                {this.state.showAdvancedDetails ?
+                  "Hide Advanced Details" : "Show Advanced Details"}
+              </Button>
           </div>
-          <div className="col-9">{this.renderLicenseSelect()}</div>
-        </div>
+        </div>*/}
+        {//this.state.showAdvancedDetails &&
+        <Collapse caption="Advanced Details"
+          parentClass="row"
+          buttonClass="col-3"
+          buttonSibling={<div className="col-9"></div>}>
+          <div className="row">
+            <div className="col-3">Theme</div>
+            <div className="col-9">{this.renderThemes()}</div>
+          </div>
+          <div className="row">
+            <div className="col-3">Version</div>
+            <div className="col-9">{model.version}</div>
+          </div>
+          <div className="row">
+            <div className="col-3">License <HelpPopover activateOnClick>
+              <div><img src={CC_LICENSES} />
+                <br /><br />
+                <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                  target="_blank">
+                  More information
+                </a>
+              </div>
+            </HelpPopover>
+            </div>
+            <div className="col-9">{this.renderLicenseSelect()}</div>
+          </div>
+          <div className="row">
+            <div className="col-3">Unique ID</div>
+            <div className="col-9">{model.id}</div>
+          </div>
+          <div className="row">
+            <div className="col-3">Package Location</div>
+            <div className="col-9">{model.svnLocation}</div>
+          </div>
+          </Collapse>
+        }
+
         <hr />
-        <div className="row">
-          <div className="col-3">Unique ID</div>
-          <div className="col-9">{model.id}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">Package Location</div>
-          <div className="col-9">{model.svnLocation}</div>
-        </div>
         {/* <div className="row">
           <div className="col-3">Thumbnail<br /><br />
           </div>
