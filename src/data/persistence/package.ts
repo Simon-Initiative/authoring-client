@@ -78,6 +78,8 @@ export type Theme = {
   id: string,
   location: string,
   default: boolean,
+  thumbnail: string,  // The partial url for thumbnail image
+  image: string,  // The partial url for the full-size image
 };
 
 export function fetchCourseThemes(course: string): Promise<Theme[]> {
