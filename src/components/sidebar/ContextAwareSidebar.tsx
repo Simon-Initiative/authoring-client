@@ -2,6 +2,7 @@ import * as React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
+import * as persistence from 'data/persistence';
 import { Maybe } from 'tsmonad';
 import { StyledComponentProps } from 'types/component';
 import { withStyles, classNames } from 'styles/jss';
@@ -33,6 +34,7 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 import { CombinationsMap } from 'types/combinations';
+import { Edge } from 'types/edge';
 
 interface SidebarRowProps {
   label?: string;
@@ -145,6 +147,7 @@ export interface ContextAwareSidebarProps {
 
 export interface ContextAwareSidebarState {
 
+  assessmentRefs: Maybe<Edge[]>; // KEVIN-1936 this should change based on the type of resource (see switch (model.modelType))
 }
 
 /**
@@ -157,10 +160,50 @@ class ContextAwareSidebar
   constructor(props) {
     super(props);
 
+    this.state = {
+      assessmentRefs: Maybe.nothing()
+    };
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
     this.onToggleBranching = this.onToggleBranching.bind(this);
+  }
+
+  componentDidMount() {
+
+    console.log("component mounted");
+
+    this.fetchRefs();
+
+  }
+
+  fetchRefs() {
+    const { course, resource } = this.props;
+
+//    const org = this.props.selectedOrganization;
+//    const directResources = org
+
+    console.log("fetching Refs");
+
+      // KEVIN-1936 this is the magic
+      // fetch summative assessment to pool edges
+    const fetchSummativeToPoolEdges = persistence.fetchEdges(course.guid, {
+      sourceType: LegacyTypes.assessment2,
+      destinationType: LegacyTypes.assessment2_pool,
+    }).then((edges) => {
+
+      console.log(edges);
+      console.log(resource);
+      const assessments = edges.filter((edge) => edge.destinationId.indexOf(resource.id) >= 0);
+
+      console.log("setting pool edges: ");
+      console.log(assessments);
+      this.setState({
+        assessmentRefs: Maybe.just(assessments)
+      })
+    });
+
+
   }
 
   onRemovePage(page: contentTypes.Page) {
@@ -249,8 +292,12 @@ class ContextAwareSidebar
   renderPageDetails() {
     const {
       model, resource, editMode, currentPage, onSetCurrentNodeOrPage,
-      onEditModel, classes,
+      onEditModel, classes, course
     } = this.props;
+
+    const { assessmentRefs } = this.state;
+    console.log("assessmentRefs:");
+    console.log(assessmentRefs);
 
     const adjusted = (date: Date): Date => adjustForSkew(date, this.props.timeSkewInMs);
 
@@ -273,6 +320,78 @@ class ContextAwareSidebar
         </SidebarRow>
       </SidebarGroup>
     );
+
+    // KEVIN-1936 CONTINUE HERE: paste it here
+    const tempAssessmentRefs = [
+        "1",
+        "2"
+    ];
+
+    console.log(" --- course --- ")
+    console.log(course);
+
+    const getRefGuidFromRef = (ref: Edge) => {
+      console.log(ref)
+      console.log(ref.sourceId);
+      console.log(ref.sourceGuid);
+      return ref.sourceGuid;
+    }
+
+    const stripId = (id: string) => {
+      let splits = id.split(":");
+      if (splits.length == 3) {
+        return splits[2];
+      }
+    }
+
+    const getRefTitleFromRef = (ref: Edge) => {
+
+      console.log("id: " + ref.sourceId);
+      console.log("guid: " + ref.sourceGuid);
+      let id = stripId(ref.sourceId);
+
+      return Maybe.maybe(course.resourcesById.get(id)).caseOf({
+        just: resource => resource.title,
+        nothing: () => '[Error loading page title]'
+      })
+    }
+
+    // KEVIN-1936 this should actually display things
+    // how to make an async API call???
+    const referenceLocations = (
+      <SidebarGroup label="Referenced Locations">
+        <SidebarRow>
+          <div className="page-list">
+            {assessmentRefs.caseOf({
+              just: (refs) => {
+                return refs.length > 0
+                ? (
+                  <div className="container">
+                    {refs.map(ref => (
+                      <div key={ref.guid} className="ref-thing">
+                        <ul> {/* KEVIN-1936 NEXT NEXT NEXT make this look nice */}
+                          <li>GUID: {ref.guid}</li>
+                          <li>REF GUID: {getRefGuidFromRef(ref)}</li>
+                          <li>TITLE: {getRefTitleFromRef(ref)}</li>
+                        </ul>
+
+                        {/*getAssessmentTitleFromRefId(ref.guid)*/}
+                        {/*getAssessmentTitleFromRef(ref)*/}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div>No references found</div>
+                )
+              },
+              nothing: () => <div>Error loading</div>
+            }
+            )
+            }
+          </div>
+        </SidebarRow>
+      </SidebarGroup>
+    )
 
     switch (model.modelType) {
       case ModelTypes.WorkbookPageModel:
@@ -444,6 +563,7 @@ class ContextAwareSidebar
             </SidebarGroup>
           </SidebarContent>
         );
+// KEVIN-1936 this is where the use locations of the Pool will be displayed
       case ModelTypes.PoolModel:
         return (
           <SidebarContent title="Question Pool" onHide={this.props.onHide}>
@@ -462,6 +582,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {referenceLocations} {/* take src type as an argument?*/}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
