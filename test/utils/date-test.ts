@@ -1,15 +1,28 @@
 import { parseDate, compareDates, relativeTo } from 'utils/date';
 
 // must include Z in date constructor to avoid timezone weirdness
+// parseDate is simply new Date() without timezone correction
+// however, parseDate is far less robust and requires a very specific input format
 it('parseDate test', () => {
-  console.log(parseDate('May 5, 2019 3:24:00 AM'));
-  console.log(new Date('May 5, 2019 3:24:00 AM'));
   expect(parseDate('May 5, 2019 3:24:00 AM')).toStrictEqual(new Date('2019-05-05T03:24:00Z'));
-  expect(parseDate('May 5, 2019 3:24:00 AM')).toStrictEqual(new Date('May 5, 2019 3:24:00 AM'));
+  expect(parseDate('Nov 13, 1987 3:51:40 PM')).toStrictEqual(new Date('1987-11-13T15:51:40Z'));
+  expect(parseDate('Jan 1, 2077 12:00:00 AM')).toStrictEqual(new Date('2077-01-01T00:00:00Z'));
+  expect(parseDate('Dec 31, 1 11:59:59 PM')).toStrictEqual(new Date('1901-12-31T23:59:59Z'));
 });
 
+// just subtracts two dates as ms numbers
 it('compareDates test', () => {
   expect(compareDates(new Date(), new Date())).toBe(0);
+  expect(compareDates(new Date(500000001999), new Date(500000000000))).toBe(1999);
+  expect(compareDates(new Date(500000000000), new Date(500000001999))).toBe(-1999);
+  expect(compareDates(new Date('2019-05-05T03:24:00Z'), new Date('May 5, 2019 3:24:00 AM'))).toBe(
+                      -(new Date('2019-05-05T03:24:00Z').getTimezoneOffset() * 60000));
+  expect(compareDates(new Date('June 19, 1965 7:37:07 PM'), new Date('1965-06-19T19:37:07Z'))).toBe(
+                      (new Date().getTimezoneOffset() * 60000));
+  expect(compareDates(new Date('2079-05-05T03:24:00Z'), new Date('2019-05-05T03:24:00Z'))).toBe(
+                      1893456000000);
+
+
 
 
 });
