@@ -1,7 +1,11 @@
 import { parseDate, compareDates, relativeTo } from 'utils/date';
 
+// must include Z in date constructor to avoid timezone weirdness
 it('parseDate test', () => {
-  expect(parseDate('May 5, 2019 3:24:00 AM')).toBe(new Date('2019-5-17T03:24:00'));
+  console.log(parseDate('May 5, 2019 3:24:00 AM'));
+  console.log(new Date('May 5, 2019 3:24:00 AM'));
+  expect(parseDate('May 5, 2019 3:24:00 AM')).toStrictEqual(new Date('2019-05-05T03:24:00Z'));
+  expect(parseDate('May 5, 2019 3:24:00 AM')).toStrictEqual(new Date('May 5, 2019 3:24:00 AM'));
 });
 
 it('compareDates test', () => {
