@@ -9,7 +9,7 @@ import { State } from 'reducers';
 import { Dispatch } from 'redux';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-import { filter } from 'data/utils/map';
+import { filter, map } from 'data/utils/map';
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
 
@@ -87,6 +87,7 @@ export function paste() {
         elementToPaste = factoryFn(savedData, guid());
       }
 
+      // KEVIN-1943 this may be all we need... to just check this conditional
       const isSupported = activeContext.container.caseOf({
         just: parent => parent.supportedElements.contains(elementType),
         nothing: () => false,
@@ -97,7 +98,41 @@ export function paste() {
         // a duplicate inline - which breaks validation
         const filtered = filter(
           e => e.contentType !== 'WbInline' && e.contentType !== 'Multipanel', elementToPaste);
-        parent.onPaste(filtered, textSelection);
+
+        let removed = [];
+
+        map(
+          (e) => {
+            if (e.contentType === 'WbInline' || e.contentType === 'Multipanel') {
+              if (!removed.includes(e.contentType))
+                removed.push(e.contentType);
+            }
+            return e;
+          },
+          elementToPaste);
+
+          const disallowDuplicates = ['Multipanel', 'WbInline', 'Activity', 'Speaker', 'Line', 'Hint'];
+
+        console.log("filtered:");
+        console.log(filtered);
+        console.log("removed: " + removed);
+
+        if (removed.length > 0) {
+          // KEVIN-1943 NEXT NEXT NEXT make this look better
+
+          let message = 'WARNING: the following content types will not be pasted.<br><ul>';
+          removed.forEach(r => {
+            message += `<li>${r}</li>`;
+          });
+          message += '</ul>';
+          displayModalMessasge(
+            dispatch,
+            message
+            );
+
+        }
+
+        parent.onPaste(filtered, textSelection); // KEVIN-1943 is this just a function??
       }
     }
   };
