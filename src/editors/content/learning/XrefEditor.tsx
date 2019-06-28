@@ -123,7 +123,7 @@ export default class XrefEditor
   renderSidebar() {
     const { editMode, model, onEdit, target } = this.props;
 
-    const pageOptions = this.pages.map(r => <option key={r.guid} value={r.guid}>{r.title}</option>);
+    const pageOptions = this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>);
 
     return (
       <SidebarContent title="Cross Reference">
