@@ -4,6 +4,7 @@ export { acquireLock, statusLock, releaseLock } from './persistence/lock';
 export { skillsDownload } from './persistence/skills';
 
 export {
+  Theme,
   fetchCourseResources,
   fetchCourseThemes,
   setCourseTheme,
