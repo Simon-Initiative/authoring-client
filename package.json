@@ -45,7 +45,7 @@
     "tslint": "^5.8.0",
     "tslint-config-airbnb": "^5.4.2",
     "tsmonad": "^0.7.2",
-    "typescript": "^3.4.3",
+    "typescript": "3.4.5",
     "uglifyjs-webpack-plugin": "^1.1.6",
     "underscore-template-loader": "^1.0.0",
     "upath": "^1.1.0",
@@ -59,6 +59,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.41",
+    "@types/jest": "^24.0.15",
     "@types/node": "^8.0.5",
     "babel-core": "^6.22.1",
     "babel-loader": "^7.1.4",
@@ -76,11 +77,12 @@
     "html-webpack-plugin": "^3.2.0",
     "jasmine": "^2.5.3",
     "jasmine-reporters": "^2.2.0",
-    "jest": "^18.1.0",
+    "jest": "23.6.0",
     "jest-html-reporter": "^0.6.0",
     "jss": "^9.8.7",
     "jss-preset-default": "^10.0.0-alpha.14",
-    "jsx-loader": "^0.13.2"
+    "jsx-loader": "^0.13.2",
+    "ts-jest": "^24.0.2"
   },
   "jest": {
     "verbose": true,
