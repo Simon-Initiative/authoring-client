@@ -614,7 +614,7 @@ class Objective
                   workbookPageRefs.caseOf({
                     just: refs => (
                       <span className={classNames(['badge badge-light', classes.countBadge])}>
-                        {refs.size} {/* KEVIN-1936 number of references */}
+                        {refs.size}
                       </span>
                     ),
                     nothing: () => null,
@@ -626,7 +626,6 @@ class Objective
                   return refs.size > 0
                     ? (
                       <div className={classes.pageList}>
-                        {/* KEVIN-1936 NEXT NEXT NEXT copy from here */}
                         {refs.toArray().map(refGuid => (
                           <div key={refGuid} className={classes.pageTitle}>
                             <a href={`#${getRefGuidFromRefId(refGuid)}-${course.guid}`

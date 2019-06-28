@@ -7,7 +7,7 @@ import { Edge } from 'types/edge';
  * Fetches all references for the course or resource, returns a Promise to resolve to
  * a list of edges
  */
-export function fetchEdges( // KEVIN-1936 trace and log this
+export function fetchEdges(
   packageId: string,
   queryParams: {
     relationship?: string,
@@ -32,7 +32,6 @@ export function fetchEdges( // KEVIN-1936 trace and log this
     status,
   } = queryParams;
 
-  // KEVIN-1936 -- this is where the API call is made
   const method = 'GET';
   const url = byResource
     ? `${configuration.baseUrl}/${packageId}/resources/edges/${resourceId}`

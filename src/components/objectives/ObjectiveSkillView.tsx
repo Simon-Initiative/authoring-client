@@ -61,7 +61,7 @@ const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<Po
   });
 };
 
-// KEVIN-1936 CONTINUE copy here...
+// KEVIN-1936 may be needed to filter Edges by type?...
 export const reduceObjectiveWorkbookPageRefs = (
   objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>,
   workbookpageToObjectiveEdges: Edge[],
@@ -234,7 +234,7 @@ interface ObjectiveSkillViewState {
   loading: boolean;
   organizationResourceMap: Maybe<Immutable.OrderedMap<string, string>>;
   skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
-  workbookPageRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>; // KEVIN-1936 where does this come from?
+  workbookPageRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
   searchText: string;
 }
 
@@ -267,7 +267,7 @@ class ObjectiveSkillView
       loading: false,
       organizationResourceMap: Maybe.nothing(),
       skillQuestionRefs: Maybe.nothing(),
-      workbookPageRefs: Maybe.nothing(), // KEVIN-1936 initialized as nothing
+      workbookPageRefs: Maybe.nothing(), // KEVIN-1936 (BBB) workbookPageRefs initialized as nothing
       searchText: '',
     };
     this.unmounted = false;
@@ -308,7 +308,6 @@ class ObjectiveSkillView
     if (nextState.aggregateModel !== null
       && nextState.aggregateModel !== this.state.aggregateModel) {
 
-      // KEVIN-1936 CONTINUE HERE... call this
       this.fetchAllRefs(this.props.skills, nextState.objectives, obj);
 
     } else if (this.state.aggregateModel !== null && nextProps.skills !== this.props.skills) {
@@ -336,7 +335,7 @@ class ObjectiveSkillView
     onFetchSkills(course.id);
   }
 
-  // KEVIN-1936 CONTINUE HERE: this may be better off in a util class or something..
+  // KEVIN-1936 this may be better off in a shared util class or something..
   fetchAllRefs(
     skills: Immutable.OrderedMap<string, contentTypes.Skill>,
     objectivesModel: UnifiedObjectivesModel,
@@ -352,6 +351,7 @@ class ObjectiveSkillView
 
 
     // KEVIN-1936 replicate this call to get references to QuestionPool
+    // KEVIN-1936 (AAA) replicate the rest of these calls
     // fetch workbook page to inline assessment edges
     const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.workbook_page,
@@ -411,7 +411,6 @@ class ObjectiveSkillView
       fetchSummativeRefs,
       fetchPoolRefs,
     ]).then(([
-      // KEVIN-1936 where do all these results get used?
       workbookpageToObjectiveEdges,
       workbookPageToInlineEdges,
       workbookPageToSummativeEdges,
@@ -469,7 +468,7 @@ class ObjectiveSkillView
       };
 
       const workbookPageRefs = reduceObjectiveWorkbookPageRefs(
-        objectivesModel.objectives, workbookpageToObjectiveEdges, isValidResource); // KEVIN-1936 here
+        objectivesModel.objectives, workbookpageToObjectiveEdges, isValidResource); // KEVIN-1936 filter results here
       const skillFormativeQuestionRefs = reduceSkillFormativeQuestionRefs(
         skills, formativeToSkillEdges, isValidResource);
       const skillSummativeQuestionRefs = reduceSkillSummativeQuestionRefs(
@@ -483,7 +482,7 @@ class ObjectiveSkillView
       // of bundling things up and calling setState to re-render the UI
       this.setState({
         organizationResourceMap: Maybe.just(organizationResourceMap),
-        workbookPageRefs: Maybe.just(workbookPageRefs), // KEVIN-1936 here
+        workbookPageRefs: Maybe.just(workbookPageRefs), // KEVIN-1936 (CCC) set state here
         skillQuestionRefs: Maybe.just(
           skills.reduce(
             (acc, skill) => acc.set(
@@ -1160,7 +1159,7 @@ class ObjectiveSkillView
 
   renderObjectives() {
     const { onPushRoute, selectedOrganization } = this.props;
-    // KEVIN-1936 workbookPageRefs are in state
+    // KEVIN-1936 workbookPageRefs are stored in state
     const {
       overrideExpanded, searchText, skillQuestionRefs, workbookPageRefs,
     } = this.state;
@@ -1188,8 +1187,6 @@ class ObjectiveSkillView
         objectives
           .toArray()
           .forEach((objective: contentTypes.LearningObjective) => {
-
-            // KEVIN-1936 where do these come from?
             const wbs = Maybe.just(
               workbookPageRefs.caseOf({
                 just: w => w.get(objective.id),
@@ -1197,7 +1194,6 @@ class ObjectiveSkillView
               }),
             );
 
-          // KEVIN-1936 where the Objective is displayed. Look at workbookPageRefs
             rows.push(
               <Objective
                 key={objective.id}
@@ -1209,7 +1205,7 @@ class ObjectiveSkillView
                 onBeginExternalEdit={this.onBeginExternalEdit}
                 onPushRoute={onPushRoute}
                 skillQuestionRefs={skillQuestionRefs}
-                workbookPageRefs={wbs} // KEVIN-1936 where workbookPageRefs is passed to Objective
+                workbookPageRefs={wbs}
                 objective={objective}
                 organization={organization}
                 highlightText={searchText}

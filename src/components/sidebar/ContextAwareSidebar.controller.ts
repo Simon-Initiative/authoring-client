@@ -12,11 +12,12 @@ import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentElement } from 'data/content/common/interfaces';
-import { ContentModel, CourseModel, Node } from 'data/models';
+import { ContentModel, CourseModel, Node, ModelTypes } from 'data/models';
 import { modalActions } from 'actions/modal';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
 import { duplicate } from 'actions/duplication';
+import { OrganizationModel }from 'data/models';
 
 interface StateProps {
   content: Maybe<ContentElement>;
@@ -28,6 +29,7 @@ interface StateProps {
   resource: Resource;
   currentPage: string;
   timeSkewInMs: number;
+  selectedOrganization: Maybe<OrganizationModel>;
 }
 
 interface DispatchProps {
@@ -53,6 +55,8 @@ interface OwnProps {
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const activeContext: ActiveContextState = state.activeContext;
 
+  const { orgs } = state;
+
   const documentId = activeContext.documentId.caseOf({ just: d => d, nothing: () => '' });
   const resource = (state.documents.get(documentId).document.model as any).resource;
 
@@ -76,6 +80,8 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
       just: docId => state.documents.get(docId).currentPage.valueOr(null),
       nothing: null,
     }),
+    selectedOrganization: orgs.activeOrg.lift(doc =>
+      (doc.model as OrganizationModel))
   };
 };
 

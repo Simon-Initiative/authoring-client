@@ -13,7 +13,7 @@ import { ParentContainer } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { Resource } from 'data/content/resource';
 import {
-  ModelTypes, ContentModel, AssessmentModel, CourseModel,
+  ModelTypes, ContentModel, AssessmentModel, CourseModel, OrganizationModel
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
@@ -130,6 +130,7 @@ export interface ContextAwareSidebarProps {
   resource: Resource;
   model: ContentModel;
   currentPage: string;
+  selectedOrganization: Maybe<OrganizationModel>
   onEditModel: (model: ContentModel) => void;
   supportedElements: Immutable.List<string>;
   show: boolean;
@@ -161,7 +162,7 @@ class ContextAwareSidebar
     super(props);
 
     this.state = {
-      assessmentRefs: Maybe.nothing()
+      assessmentRefs: Maybe.nothing() // KEVIN-1936 (BBB) initialize state as nothing
     };
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
@@ -185,7 +186,7 @@ class ContextAwareSidebar
 
     console.log("fetching Refs");
 
-      // KEVIN-1936 this is the magic
+      // KEVIN-1936 see (AAA) to see what call to replicate
       // fetch summative assessment to pool edges
     const fetchSummativeToPoolEdges = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.assessment2,
@@ -199,7 +200,7 @@ class ContextAwareSidebar
       console.log("setting pool edges: ");
       console.log(assessments);
       this.setState({
-        assessmentRefs: Maybe.just(assessments)
+        assessmentRefs: Maybe.just(assessments) // KEVIN-1936 (CCC)
       })
     });
 
@@ -292,7 +293,7 @@ class ContextAwareSidebar
   renderPageDetails() {
     const {
       model, resource, editMode, currentPage, onSetCurrentNodeOrPage,
-      onEditModel, classes, course
+      onEditModel, classes, course, selectedOrganization
     } = this.props;
 
     const { assessmentRefs } = this.state;
@@ -321,20 +322,18 @@ class ContextAwareSidebar
       </SidebarGroup>
     );
 
-    // KEVIN-1936 CONTINUE HERE: paste it here
-    const tempAssessmentRefs = [
-        "1",
-        "2"
-    ];
-
     console.log(" --- course --- ")
     console.log(course);
 
     const getRefGuidFromRef = (ref: Edge) => {
       console.log(ref)
       console.log(ref.sourceId);
-      console.log(ref.sourceGuid);
-      return ref.sourceGuid;
+      const id = stripId(ref.sourceId);
+
+      return Maybe.maybe(course.resourcesById.get(id)).caseOf({
+        just: resource => resource.guid,
+        nothing: () => '',
+      });
     }
 
     const stripId = (id: string) => {
@@ -356,8 +355,11 @@ class ContextAwareSidebar
       })
     }
 
-    // KEVIN-1936 this should actually display things
-    // how to make an async API call???
+    const orgGuid = selectedOrganization.caseOf({
+      just: (organization) => organization.guid,
+      nothing: () => ""
+    })
+
     const referenceLocations = (
       <SidebarGroup label="Referenced Locations">
         <SidebarRow>
@@ -367,16 +369,15 @@ class ContextAwareSidebar
                 return refs.length > 0
                 ? (
                   <div className="container">
+
                     {refs.map(ref => (
                       <div key={ref.guid} className="ref-thing">
-                        <ul> {/* KEVIN-1936 NEXT NEXT NEXT make this look nice */}
-                          <li>GUID: {ref.guid}</li>
-                          <li>REF GUID: {getRefGuidFromRef(ref)}</li>
-                          <li>TITLE: {getRefTitleFromRef(ref)}</li>
-                        </ul>
-
-                        {/*getAssessmentTitleFromRefId(ref.guid)*/}
-                        {/*getAssessmentTitleFromRef(ref)*/}
+                        <a href={`#${getRefGuidFromRef(ref)}-${course.guid}`
+                              + `${orgGuid ? "-" + orgGuid : ""}`}>
+                            <i className={classNames(/* KEVIN-1936 icon should change based on type*/
+                              ['fa fa-check', classes.detailsSectionIcon])} />
+                            {getRefTitleFromRef(ref)}
+                        </a>
                       </div>
                     ))}
                   </div>
@@ -412,6 +413,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {/*referenceLocations*/} {/* make this special for WorkbookPageModel */}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
@@ -455,6 +457,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {/*referenceLocations*/} {/* make this special for Assessment */}
             {/* Branching assessments require a specific page structuring,
             so they cannot be modified by the user */}
             {model.branching
@@ -563,7 +566,6 @@ class ContextAwareSidebar
             </SidebarGroup>
           </SidebarContent>
         );
-// KEVIN-1936 this is where the use locations of the Pool will be displayed
       case ModelTypes.PoolModel:
         return (
           <SidebarContent title="Question Pool" onHide={this.props.onHide}>
@@ -622,6 +624,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {/*referenceLocations*/} {/* make this special for Feedback */}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
