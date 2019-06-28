@@ -60,7 +60,7 @@ export default class WbInlineEditor
       .get(this.props.model.idref).guid;
 
     this.props.services.viewDocument(
-      guid, this.props.context.courseId, this.props.context.orgId);
+      guid, this.props.context.courseModel.identifier, Maybe.just(this.props.context.orgId));
   }
 
   renderSidebar() {

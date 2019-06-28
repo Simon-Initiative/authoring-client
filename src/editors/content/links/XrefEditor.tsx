@@ -40,8 +40,8 @@ export class XrefEditor
   }
 
   componentDidMount() {
-    persistence.fetchCourseResources(this.props.context.courseId)
-    .then(resources => this.setState({ resources }));
+    persistence.fetchCourseResources(this.props.context.courseModel.identifier)
+      .then(resources => this.setState({ resources }));
   }
 
   onTargetEdit(target) {
@@ -64,7 +64,7 @@ export class XrefEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { target } = this.props.model;
 

@@ -76,7 +76,7 @@ export default class DeleteResourceModal extends
   onDelete() {
     const { course, resource, onDeleteResource, orgId } = this.props;
 
-    persistence.deleteResource(course.guid, resource.guid)
+    persistence.deleteResource(course.identifier, resource.guid)
       .then(_ => onDeleteResource(resource, course, orgId));
   }
 

@@ -207,7 +207,7 @@ export class OrgDetailsEditor
 
     function dupe() {
       dispatch(duplicate(model)).then((doc) => {
-        updateActiveOrgPref(course.guid, user.profile.username, doc.model.guid);
+        updateActiveOrgPref(course.identifier, user.profile.username, doc.model.guid);
       });
     }
 

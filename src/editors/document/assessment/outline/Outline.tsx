@@ -9,6 +9,7 @@ import { findNodeByGuid } from 'editors/document/assessment/utils';
 import { CourseModel } from 'data/models';
 import { Question } from 'data/content/assessment/question';
 import './Outline.scss';
+import { CourseState } from 'reducers/course';
 
 export interface EditDetails {
   sourceModel: Node;

@@ -4,6 +4,7 @@ import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
 import { parseDate } from 'utils/date';
 import { DatasetStatus } from 'types/analytics/dataset';
+import { CourseIdV, CourseGuid } from 'data/types';
 
 // Must match DeployStage enum values in ContentService
 export enum DeployStage {
@@ -22,9 +23,10 @@ export enum DeploymentStatus {
 
 export type CourseModelParams = {
   rev?: number,
-  guid?: string,
+  guid?: CourseGuid,
   id?: string,
   version?: string,
+  idv?: CourseIdV,
   editable?: boolean;
   title?: string,
   type?: string,
@@ -53,8 +55,9 @@ const defaultCourseModel = {
   modelType: 'CourseModel',
   rev: 0,
   guid: '',
-  id: '',
+  id: CourseGuid.of(''),
   version: '',
+  idv: CourseIdV.of('', '1.0'),
   editable: true,
   type: LegacyTypes.package,
   title: '',
@@ -99,9 +102,10 @@ function buildResourceMap(params: CourseModelParams): CourseModelParams {
 export class CourseModel extends Immutable.Record(defaultCourseModel) {
   modelType: 'CourseModel';
   rev: number;
-  guid: string;
+  guid: CourseGuid;
   id: string;
   version: string;
+  idv: CourseIdV;
   editable: boolean;
   title: string;
   type: string;
@@ -166,9 +170,10 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
 
     const model = new CourseModel({
       rev: c.rev,
-      guid: c.guid,
+      guid: CourseGuid.of(c.guid),
       id: c.id,
       version: c.version,
+      idv: CourseIdV.of(c.id, c.version),
       editable: c.editable,
       title: c.title,
       type: c.type,
@@ -205,7 +210,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     }];
     const values = {
       modelType: 'CourseModel',
-      guid: this.guid,
+      guid: this.guid.value(),
       id: this.id,
       version: this.version,
       title: this.title,

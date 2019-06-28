@@ -9,6 +9,7 @@ import { updateCourseResources } from 'actions/course';
 import * as viewActions from 'actions/view';
 import { modalActions } from 'actions/modal';
 import { LegacyTypes } from 'data/types';
+import { CourseState } from 'reducers/course';
 
 interface StateProps {
 
@@ -20,7 +21,7 @@ interface DispatchProps {
 
 interface OwnProps {
   resource: Resource;
-  course: CourseModel;
+  course: CourseState;
   onDismissModal: () => void;
 }
 

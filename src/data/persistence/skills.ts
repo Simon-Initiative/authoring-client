@@ -1,9 +1,10 @@
 import { configuration } from '../../actions/utils/config';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
+import { CourseGuid, CourseIdV } from 'data/types';
 
-export function skillsDownload(courseId: string): Promise<void> {
+export function skillsDownload(course: CourseGuid | CourseIdV): Promise<void> {
   const method = 'GET';
-  const url = `${configuration.baseUrl}/${courseId}/ldmodel/export`;
+  const url = `${configuration.baseUrl}/${course.value()}/ldmodel/export`;
   const headers = getFormHeaders(credentials);
 
   // tslint:disable-next-line:max-line-length

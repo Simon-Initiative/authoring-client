@@ -12,6 +12,7 @@ import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
 import { buildGeneralErrorMessage } from 'utils/error';
+import { CourseIdentifier } from 'data/types';
 
 function reportProblemAction(): Messages.MessageAction {
 
@@ -54,7 +55,7 @@ export type CoursesViewProps = {
   userId: string,
   createCourse: () => any,
   importCourse: () => any,
-  onSelect: (string) => any, // the id of the course to be viewed
+  onSelect: (id: CourseIdV) => any, // the id of the course to be viewed
   sendMessage: (msg: Messages.Message) => any;
 };
 
@@ -226,7 +227,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   const link = course => span =>
     <button disabled={course.buildStatus !== 'READY'}
-      onClick={() => onSelect(course.guid)}
+      onClick={() => onSelect(course.identifier)}
       className="btn btn-link">{span}</button>;
 
   const columnRenderers = [

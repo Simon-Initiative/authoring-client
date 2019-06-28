@@ -100,7 +100,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.pendingHighlightedNodes = null;
 
     if (hasMissingResource(props.model, props.context.courseModel)) {
-      props.services.refreshCourse(props.context.courseId);
+      props.services.refreshCourse(props.context.courseModel.guid);
     }
 
     this.state = {
@@ -231,7 +231,8 @@ class OrgEditor extends React.Component<OrgEditorProps,
     if (model.contentType === 'Item') {
       this.props.services.fetchGuidById(model.resourceref.idref)
         .then(guid => this.props.dispatch(
-          viewDocument(guid, this.props.context.courseId, this.props.model.guid)));
+          viewDocument(guid,
+            this.props.context.courseModel.identifier, Maybe.just(this.props.model.guid))));
     } else {
       const id = this.props.selectedItem.caseOf({
         just: (item) => {
@@ -248,7 +249,8 @@ class OrgEditor extends React.Component<OrgEditorProps,
         this.toggleExpanded(componentId);
       } else {
         this.props.dispatch(
-          viewDocument(componentId, this.props.context.courseId, this.props.model.guid));
+          viewDocument(componentId,
+            this.props.context.courseModel.identifier, Maybe.just(this.props.model.guid)));
       }
 
     }

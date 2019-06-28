@@ -41,12 +41,12 @@ export class ActivityLinkEditor
   }
 
   componentDidMount() {
-    persistence.fetchCourseResources(this.props.context.courseId)
-    .then((resources) => {
-      return resources;
-    })
-    .then(resources => resources.filter(r => r.type === LegacyTypes.inline))
-    .then(activities => this.setState({ activities }));
+    persistence.fetchCourseResources(this.props.context.courseModel.identifier)
+      .then((resources) => {
+        return resources;
+      })
+      .then(resources => resources.filter(r => r.type === LegacyTypes.inline))
+      .then(activities => this.setState({ activities }));
   }
 
   shouldComponentUpdate(nextProps, nextState: ActivityLinkEditorState) {
@@ -91,7 +91,7 @@ export class ActivityLinkEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { purpose, target } = this.props.model;
 

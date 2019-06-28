@@ -11,6 +11,7 @@ export {
   getEditablePackages,
   retrieveCoursePackage,
   deleteCoursePackage,
+  createPackage,
   importPackage,
   requestDeployment,
   createNewVersion,

@@ -9,29 +9,26 @@ import { DeferredPersistenceStrategy }
   from 'editors/manager/persistence/DeferredPersistenceStrategy';
 import { buildPersistenceFailureMessage } from 'utils/error';
 import { ServerName } from 'data/persistence/document';
+import { CourseIdV } from 'data/types';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(orgId: string, isRefreshAttempt: boolean, server?: ServerName) {
-  return function (dispatch, getState): Promise<persistence.PreviewResult> {
-
-    const { course } = getState();
-
-    return persistence.initiatePreview(course.guid, orgId, isRefreshAttempt, server);
-  };
+function invokePreview(CourseIdV: CourseIdV, orgId: string,
+  isRefreshAttempt: boolean, server?: ServerName) {
+  return persistence.initiatePreview(CourseIdV, orgId, isRefreshAttempt, server);
 }
 
 export function preview(
-  courseId: string, organizationId: string, isRefreshAttempt: boolean, redeploy: boolean = true,
-  server?: ServerName) {
+  courseId: CourseIdV, organizationId: string,
+  isRefreshAttempt: boolean, redeploy: boolean = true, server?: ServerName) {
 
   return function (dispatch): Promise<any> {
 
     const OPEN_IN_NEW_WINDOW_ALWAYS = '';
 
-    return dispatch(invokePreview(organizationId, isRefreshAttempt, server))
+    return invokePreview(courseId, organizationId, isRefreshAttempt, server)
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
-          const message = buildMissingFromOrgMessage(courseId);
+          const message = buildMissingFromOrgMessage();
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewNotSetUp') {
           const message = buildNotSetUpMessage();
@@ -40,14 +37,15 @@ export function preview(
           const refresh = result.message === 'pending';
 
           window.open(
-            '/#preview' + organizationId + '-' + courseId
+            '/#preview' + organizationId + '-' + courseId.value()
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
             + (refresh ? '&refresh=true' : '')
             + (redeploy ? '&redeploy=true' : ''),
             OPEN_IN_NEW_WINDOW_ALWAYS);
 
         } else if (result.type === 'PreviewPending') {
-          window.open('/#preview' + organizationId + '-' + courseId, OPEN_IN_NEW_WINDOW_ALWAYS);
+          window.open('/#preview' + organizationId + '-' +
+            courseId.value(), OPEN_IN_NEW_WINDOW_ALWAYS);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);
@@ -78,7 +76,7 @@ export function quickPreview(courseId: string, resource: Resource) {
   };
 }
 
-function buildMissingFromOrgMessage(courseId) {
+function buildMissingFromOrgMessage() {
 
   const actions = [];
 

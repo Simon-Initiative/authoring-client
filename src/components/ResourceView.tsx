@@ -16,6 +16,7 @@ import { caseOf } from 'utils/utils';
 import guid from 'utils/guid';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
+import { Maybe } from 'tsmonad';
 
 type TitleIcon = {
   name: string,
@@ -129,7 +130,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   onClickResource(id) {
     const { course, currentOrg, dispatch } = this.props;
 
-    dispatch(viewActions.viewDocument(id, course.guid, currentOrg));
+    dispatch(viewActions.viewDocument(id, course.identifier, Maybe.just(currentOrg)));
   }
 
   onCreateResource = (type: LegacyTypes) => {
@@ -173,7 +174,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       newItemTitle: '',
     });
 
-    persistence.createDocument(this.props.course.guid, resource)
+    persistence.createDocument(this.props.course.identifier, resource)
       .then((result) => {
         const r = (result as any).model.resource;
 

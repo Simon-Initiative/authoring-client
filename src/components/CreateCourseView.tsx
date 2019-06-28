@@ -37,15 +37,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     const id = title.toLowerCase().split(' ')[0] + '-' + g.substring(g.lastIndexOf('-') + 1);
     const model = new models.CourseModel({ id, title, version: '1.0' });
 
-    persistence.createDocument(null, model)
-      .then((document) => {
-        // Get an updated course content package payload
-        if (document.model.modelType === models.ModelTypes.CourseModel) {
-          this.props.dispatch(viewActions.viewCourse(document._courseId));
-        }
-
-        return buildAggregateModel(document._courseId, this.props.userName);
-      })
+    persistence.createPackage(model)
       .catch((err) => {
         this.setState({ waiting: false, error: true });
       });

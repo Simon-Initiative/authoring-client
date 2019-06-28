@@ -29,15 +29,15 @@ export class InsertAssessmentCommand extends AbstractCommand<EditorState> {
 
   execute(
     editorState: EditorState, context: AppContext,
-    services: AppServices) : Promise<EditorState> {
+    services: AppServices): Promise<EditorState> {
 
     return new Promise((resolve, reject) => {
       services.displayModal(
         <AssessmentSelection
-          courseId={context.courseId}
+          courseIdentifier={context.courseModel.identifier}
           toDisplay={AssessmentsToDisplay.Formative}
           onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)}
-          onCancel={this.onCancel.bind(this, services)}/>);
+          onCancel={this.onCancel.bind(this, services)} />);
     });
   }
 }

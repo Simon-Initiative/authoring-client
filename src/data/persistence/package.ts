@@ -1,9 +1,20 @@
 import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
-import { CourseId } from '../types';
 import * as models from '../models';
 import { Resource } from '../content/resource';
 import { DeployStage } from 'data/models/course.ts';
+import { CourseModel } from 'data/models/course';
+import { CourseGuid, CourseIdV } from 'data/types';
+
+export function createPackage(course: CourseModel): Promise<CourseModel> {
+
+  const url = `${configuration.baseUrl}/packages/`;
+  const body = JSON.stringify(course.toPersistence());
+  const method = 'POST';
+
+  return authenticatedFetch({ url, body, method })
+    .then(CourseModel.fromPersistence);
+}
 
 export function importPackage(repositoryUrl: string): Promise<{}> {
 
@@ -22,25 +33,25 @@ export function getEditablePackages(): Promise<models.CourseModel[]> {
     .then((json: any) => json.map(m => models.createModel(m)));
 }
 
-export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
+export function retrieveCoursePackage(course: CourseGuid | CourseIdV): Promise<Document> {
 
-  const url = `${configuration.baseUrl}/packages/${courseId}/details`;
+  const url = `${configuration.baseUrl}/packages/${course.value()}/details`;
 
   return authenticatedFetch({ url })
     .then((json: any) => new Document({
-      _courseId: courseId,
+      _courseId: course,
       _id: json.guid,
       _rev: json.rev,
       model: models.createModel(json),
     }));
 }
 
-export function deleteCoursePackage(courseId: CourseId): Promise<{}> {
+export function deleteCoursePackage(courseId: CourseIdV): Promise<{}> {
 
   const url = `${configuration.baseUrl}/packages/set/visible?visible=false`;
   const method = 'POST';
 
-  const body = JSON.stringify([courseId]);
+  const body = JSON.stringify([courseId.value()]);
 
   return authenticatedFetch({ url, method, body });
 }
@@ -51,12 +62,12 @@ export type CourseResource = {
   type: string,
 };
 
-export function fetchCourseResources(courseId: string): Promise<CourseResource[]> {
+export function fetchCourseResources(course: CourseGuidOrIdentifier): Promise<CourseResource[]> {
   return new Promise((resolve, reject) => {
 
     try {
 
-      retrieveCoursePackage(courseId)
+      retrieveCoursePackage(course)
         .then((doc) => {
           switch (doc.model.modelType) {
             case 'CourseModel':

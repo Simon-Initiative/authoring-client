@@ -33,6 +33,7 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 import { CombinationsMap } from 'types/combinations';
+import { CourseState } from 'reducers/course';
 
 interface SidebarRowProps {
   label?: string;
@@ -122,7 +123,7 @@ export interface ContextAwareSidebarProps {
   content: Maybe<ContentElement>;
   container: Maybe<ParentContainer>;
   context: AppContext;
-  course: CourseModel;
+  course: CourseState;
   editMode: boolean;
   services: AppServices;
   resource: Resource;

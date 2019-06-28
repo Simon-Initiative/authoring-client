@@ -74,16 +74,17 @@ export class TrackEditor
   onFileChange(e) {
     const file = e.target.files[0];
 
-    persistence.createWebContent(this.props.context.courseId, file)
-    .then((result) => {
-      this.setState(
-        { failure: false },
-        () => this.props.onEdit(this.props.model.with({
-          src: adjustPath(result, this.props.context.resourcePath) })));
-    })
-    .catch((err) => {
-      this.setState({ failure: true });
-    });
+    persistence.createWebContent(this.props.context.courseModel.identifier, file)
+      .then((result) => {
+        this.setState(
+          { failure: false },
+          () => this.props.onEdit(this.props.model.with({
+            src: adjustPath(result, this.props.context.resourcePath),
+          })));
+      })
+      .catch((err) => {
+        this.setState({ failure: true });
+      });
   }
 
   openFileDialog(id) {
@@ -97,7 +98,7 @@ export class TrackEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { src, kind, label, srclang } = this.props.model;
     let srcDisplay;
@@ -109,14 +110,14 @@ export class TrackEditor
           <strong>Failed</strong> Rename the file and try again
         </div>;
     }
-    const id : string = guid();
+    const id: string = guid();
 
     return (
       <tr>
         <td>
           <input
             id={id}
-            style={ { display: 'none' } }
+            style={{ display: 'none' }}
             accept={this.props.accept}
             onChange={this.onFileChange}
             type="file"
@@ -131,25 +132,25 @@ export class TrackEditor
           <TextInput width="75px" label=""
             editMode={this.props.editMode}
             onEdit={this.onKindEdit}
-            value={kind} type="text"/>
+            value={kind} type="text" />
         </td>
         <td>
           <TextInput width="75px" label=""
             editMode={this.props.editMode}
             onEdit={this.onLabelEdit}
-            value={label} type="text"/>
+            value={label} type="text" />
         </td>
         <td>
           <TextInput width="75px" label=""
             editMode={this.props.editMode}
             onEdit={this.onLangEdit}
-            value={srclang} type="text"/>
+            value={srclang} type="text" />
         </td>
         <td>
           <TextInput width="75px" label=""
             editMode={this.props.editMode}
             onEdit={this.onDefaultEdit}
-            value={this.props.model.default} type="text"/>
+            value={this.props.model.default} type="text" />
         </td>
         <td>
           <span

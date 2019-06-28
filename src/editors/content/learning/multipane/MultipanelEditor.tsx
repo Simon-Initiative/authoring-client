@@ -232,7 +232,7 @@ class MultipanelEditor
 
     Maybe.maybe(context.courseModel.resourcesById.get(model.inline.idref))
       .lift((inline) => {
-        retrieveDocument(context.courseId, inline.guid)
+        retrieveDocument(context.courseModel.identifier, inline.guid)
           .then((inline) => {
             this.setState({
               isLoadingActivity: false,
@@ -361,7 +361,7 @@ class MultipanelEditor
           res.type === LegacyTypes.inline
           && res.resourceState !== ResourceState.DELETED
           && !existingInlines.has(res.id)}
-        courseId={context.courseId}
+        courseId={context.courseModel.guid}
         noResourcesMessage={
           <React.Fragment>
             No assessments are available for this activity.
@@ -547,8 +547,8 @@ class MultipanelEditor
                 onClick={() => {
                   const guid = context.courseModel.resourcesById
                     .get(model.inline.idref).guid;
-                  services.viewDocument(
-                    guid, this.props.context.courseId, this.props.context.orgId);
+                  services.viewDocument(guid, this.props.context.courseModel.identifier,
+                    Maybe.just(this.props.context.orgId));
                 }}
                 type="button"
                 style={{ colors: flatui.emerald } as React.CSSProperties}

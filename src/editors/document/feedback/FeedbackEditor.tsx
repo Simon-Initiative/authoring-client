@@ -28,6 +28,7 @@ import { FeedbackQuestion } from 'data/content/feedback/feedback_questions';
 
 import './FeedbackEditor.scss';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
+import { CourseState } from 'reducers/course';
 
 interface Props extends AbstractEditorProps<models.FeedbackModel> {
   activeContext: ActiveContext;
@@ -39,7 +40,7 @@ interface Props extends AbstractEditorProps<models.FeedbackModel> {
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
-  course: models.CourseModel;
+  course: CourseState;
   currentNode: models.FeedbackQuestionNode;
   onSetCurrentNode: (documentId: string, node: Node) => void;
 }

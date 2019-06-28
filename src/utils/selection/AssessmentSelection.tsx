@@ -6,6 +6,7 @@ import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import ModalSelection from './ModalSelection';
 import guid from '../guid';
+import { CourseIdV } from 'data/types';
 
 export enum AssessmentsToDisplay {
   Formative,
@@ -13,12 +14,8 @@ export enum AssessmentsToDisplay {
   Both,
 }
 
-export interface AssessmentSelection {
-
-}
-
 export interface AssessmentSelectionProps {
-  courseId: string;
+  CourseIdV: CourseIdentifier;
   toDisplay: AssessmentsToDisplay;
   onInsert: (assessment: models.AssessmentModel) => void;
   onCancel: () => void;
@@ -53,7 +50,7 @@ export class AssessmentSelection
   }
 
   fetchAssessments() {
-    persistence.fetchCourseResources(this.props.courseId)
+    persistence.fetchCourseResources(this.props.CourseIdV)
       .then((resources) => {
         this.setState({
           assessments: resources
@@ -97,7 +94,7 @@ export class AssessmentSelection
       title: new contentTypes.Title({ text: resource.title }),
     });
 
-    persistence.createDocument(this.props.courseId, assessment)
+    persistence.createDocument(this.props.courseIdentifier, assessment)
       .then(result => this.props.onInsert(result.model as models.AssessmentModel));
   }
 
@@ -119,7 +116,7 @@ export class AssessmentSelection
   }
 
   onInsert(id: string) {
-    persistence.retrieveDocument(this.props.courseId, id)
+    persistence.retrieveDocument(this.props.courseIdentifier, id)
       .then(result => this.props.onInsert(result.model as models.AssessmentModel));
   }
 

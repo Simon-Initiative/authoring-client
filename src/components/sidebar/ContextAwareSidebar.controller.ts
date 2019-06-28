@@ -17,11 +17,12 @@ import { modalActions } from 'actions/modal';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
 import { duplicate } from 'actions/duplication';
+import { CourseState } from 'reducers/course';
 
 interface StateProps {
   content: Maybe<ContentElement>;
   container: Maybe<ParentContainer>;
-  course: CourseModel;
+  course: CourseState;
   supportedElements: Immutable.List<string>;
   show: boolean;
   sidebarContent: JSX.Element;

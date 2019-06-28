@@ -3,7 +3,7 @@ import { Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { FileNode } from 'data/content/file_node';
 import * as persistence from 'data/persistence';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, CourseIdV } from 'data/types';
 import { Maybe } from 'tsmonad';
 import { MediaItem, MediaRef } from 'types/media';
 import * as messageActions from 'actions/messages';
@@ -17,25 +17,26 @@ export const FETCH_MEDIA_PAGE: FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
 
 export type FetchMediaPageAction = {
   type: FETCH_MEDIA_PAGE,
-  courseId: string,
+  courseId: CourseIdV,
   reqId: string,
 };
 
-export const fetchMediaPage = (courseId: string, reqId: string): FetchMediaPageAction => ({
-  type: FETCH_MEDIA_PAGE,
-  courseId,
-  reqId,
-});
+export const fetchMediaPage = (courseId: CourseIdV, reqId: string):
+  FetchMediaPageAction => ({
+    type: FETCH_MEDIA_PAGE,
+    courseId,
+    reqId,
+  });
 
 export type RESET_MEDIA = 'media/RESET_MEDIA';
 export const RESET_MEDIA: RESET_MEDIA = 'media/RESET_MEDIA';
 
 export type ResetMediaAction = {
   type: RESET_MEDIA,
-  courseId: string,
+  courseId: CourseIdV,
 };
 
-export const resetMedia = (courseId: string): ResetMediaAction => ({
+export const resetMedia = (courseId: CourseIdV): ResetMediaAction => ({
   type: RESET_MEDIA,
   courseId,
 });
@@ -45,13 +46,14 @@ export const RECEIVE_MEDIA_PAGE: RECEIVE_MEDIA_PAGE = 'media/RECEIVE_MEDIA_PAGE'
 
 export type ReceiveMediaPageAction = {
   type: RECEIVE_MEDIA_PAGE,
-  courseId: string,
+  courseId: CourseIdV,
   items: List<MediaItem>,
   totalItems: number,
 };
 
 export const receiveMediaPage = (
-  courseId: string, items: List<MediaItem>, totalItems: number): ReceiveMediaPageAction => ({
+  courseId: CourseIdV, items: List<MediaItem>, totalItems: number):
+  ReceiveMediaPageAction => ({
     type: RECEIVE_MEDIA_PAGE,
     courseId,
     items,
@@ -63,12 +65,12 @@ export const SIDELOAD_DATA: SIDELOAD_DATA = 'media/SIDELOAD_DATA';
 
 export type SideloadDataAction = {
   type: SIDELOAD_DATA,
-  courseId: string,
+  courseId: CourseIdV,
   data: Map<string, MediaItem>,
 };
 
 export const sideloadData = (
-  courseId: string, data: Map<string, MediaItem>): SideloadDataAction => ({
+  courseId: CourseIdV, data: Map<string, MediaItem>): SideloadDataAction => ({
     type: SIDELOAD_DATA,
     courseId,
     data,
@@ -79,18 +81,19 @@ export const LOAD_MEDIA_REFS: LOAD_MEDIA_REFS = 'media/LOAD_MEDIA_REFS';
 
 export type LoadMediaReferencesAction = {
   type: LOAD_MEDIA_REFS,
-  courseId: string,
+  courseId: CourseIdV,
   references: Map<string, List<MediaRef>>,
 };
 
 export const loadMediaReferences = (
-  courseId: string, references: Map<string, List<MediaRef>>): LoadMediaReferencesAction => ({
+  courseId: CourseIdV, references: Map<string, List<MediaRef>>):
+  LoadMediaReferencesAction => ({
     type: LOAD_MEDIA_REFS,
     courseId,
     references,
   });
 
-export const fetchMediaReferences = (courseId: string) => (
+export const fetchMediaReferences = (courseId: CourseIdV) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Map<string, List<MediaRef>>> => {
     return persistence.fetchWebContentReferences(courseId, {
       destinationType: LegacyTypes.webcontent,
@@ -109,7 +112,7 @@ export const fetchMediaReferences = (courseId: string) => (
           },
           Map<string, List<MediaRef>>());
 
-        const references = getState().media.get(courseId).data.toArray()
+        const references = getState().media.get(courseId.value()).data.toArray()
           .reduce(
             (acc, i) => (
               acc.set(i.guid, webcontentPathToSourceMap.get(i.pathTo) || List<MediaRef>())
@@ -124,7 +127,7 @@ export const fetchMediaReferences = (courseId: string) => (
 );
 
 export const fetchCourseMedia = (
-  courseId: string, offset?: number, limit?: number, mimeFilter?: string,
+  courseId: CourseIdV, offset?: number, limit?: number, mimeFilter?: string,
   searchText?: string, orderBy?: string, order?: string) => (
     (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
       const reqId = guid();
@@ -137,7 +140,7 @@ export const fetchCourseMedia = (
             response.results.map(item => new FileNode(item.fileNode)));
 
           // check if the response is for the latest request
-          if (getState().media.get(courseId).lastReqId === reqId) {
+          if (getState().media.get(courseId.value()).lastReqId === reqId) {
             // request is latest, update state
             dispatch(receiveMediaPage(courseId, items, response.totalResults));
             dispatch(fetchMediaReferences(courseId) as any);
@@ -167,19 +170,19 @@ export const fetchCourseMedia = (
   );
 
 export const fetchCourseMediaNextPage = (
-  courseId: string, mimeFilter?: string, searchText?: string,
+  courseId: CourseIdV, mimeFilter?: string, searchText?: string,
   orderBy?: string, order?: string) => (
     (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
       const limit = MEDIA_PAGE_SIZE;
-      const offset = getState().media.get(courseId)
-        ? getState().media.get(courseId).items.size
+      const offset = getState().media.get(courseId.value())
+        ? getState().media.get(courseId.value()).items.size
         : 0;
       return dispatch(fetchCourseMedia(
         courseId, offset, limit, mimeFilter, searchText, orderBy, order) as any);
     }
   );
 
-export const fetchMediaItemByPath = (courseId: string, path: string) => (
+export const fetchMediaItemByPath = (courseId: CourseIdV, path: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<MediaItem>> => {
     const limit = 1;
     const offset = 0;

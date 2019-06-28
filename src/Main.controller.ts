@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { Maybe } from 'tsmonad';
 import { UserState } from 'reducers/user';
 import { ModalState } from 'reducers/modal';
 import { CourseState } from 'reducers/course';
@@ -17,11 +16,13 @@ import { loadCourse, updateCourseResources } from 'actions/course';
 import * as viewActions from 'actions/view';
 import * as models from 'data/models';
 import { bindActionCreators } from 'redux';
+import { State } from 'reducers/index';
+import { CourseIdentifier } from 'data/types';
 
 interface StateProps {
   user: UserState;
   modal: ModalState;
-  course: Maybe<CourseState>;
+  course: CourseState;
   expanded: ExpandedState;
   router: RouterState;
   server: ServerState;
@@ -29,11 +30,11 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onLoad: (courseId: CourseIdV, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
-  onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onLoadOrg: (courseId: CourseIdV, documentId: string) => Promise<persistence.Document>;
   onSetServerTimeSkew: () => void;
-  onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
+  onLoadCourse: (courseId: CourseIdV) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
   onUpdateCourseResources: (updated) => void;
@@ -44,7 +45,7 @@ interface OwnProps {
 
 }
 
-const mapStateToProps = (state): StateProps => {
+const mapStateToProps = (state: State): StateProps => {
   const {
     user,
     modal,
@@ -57,7 +58,7 @@ const mapStateToProps = (state): StateProps => {
   return {
     user,
     modal,
-    course: Maybe.maybe(course),
+    course,
     expanded,
     router,
     server,
@@ -74,11 +75,13 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     {});
 
   return {
-    onLoad: (courseId: string, documentId: string) => dispatch(load(courseId, documentId)),
+    onLoad: (courseId: CourseIdV, documentId: string) =>
+      dispatch(load(courseId, documentId)),
     onRelease: (documentId: string) => dispatch(release(documentId)),
-    onLoadOrg: (courseId: string, documentId: string) => dispatch(loadOrg(courseId, documentId)),
+    onLoadOrg: (courseId: CourseIdV, documentId: string) =>
+      dispatch(loadOrg(courseId, documentId)),
     onSetServerTimeSkew: () => dispatch(setServerTimeSkew()),
-    onLoadCourse: (courseId: string) => dispatch(loadCourse(courseId)),
+    onLoadCourse: (courseId: CourseIdV) => dispatch(loadCourse(courseId)),
     onDispatch: dispatch,
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));

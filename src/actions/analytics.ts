@@ -45,9 +45,10 @@ export const dataSetReceived = (
 
 export const createNewDataSet = () =>
   async (dispatch: Dispatch<any>, getState: () => State) => {
-    const packageId = getState().course.guid;
-    const { guid } = await createDataSet(packageId);
-    dispatch(requestDataSet(guid, true));
+    getState().course.lift(async (c) => {
+      const { guid } = await createDataSet(c.identifier);
+      dispatch(requestDataSet(guid, true));
+    });
   };
 
 

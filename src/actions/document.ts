@@ -27,6 +27,7 @@ import { WritelockModal } from 'components/WritelockModal.controller';
 import { ConflictModal } from 'components/ConflictModal.controller';
 import { State } from 'reducers';
 import { IdentifiableContentElement, ContentElement } from 'data/content/common/interfaces';
+import { CourseIdV } from 'data/types';
 
 export type DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
 export const DOCUMENT_REQUESTED: DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
@@ -264,7 +265,7 @@ export function createNew(model: models.ContentModel) {
   };
 }
 
-export function load(courseId: string, documentId: string) {
+export function load(courseId: CourseIdV, documentId: string) {
   return function (dispatch, getState): Promise<persistence.Document> {
 
     const userName = getState().user.profile.username;

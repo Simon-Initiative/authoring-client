@@ -9,6 +9,7 @@ import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 import { requestDataSet } from './analytics';
 import { buildGeneralErrorMessage } from 'utils/error';
 import { showMessage } from 'actions/messages';
+import { CourseIdV } from 'data/types';
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
 export const COURSE_CHANGED: COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -44,7 +45,7 @@ export const courseChanged = (model: CourseModel) => (dispatch) => {
   });
 };
 
-function createPlaceholderPage(courseId: string) {
+function createPlaceholderPage(courseId: CourseIdV) {
 
   const resource = WorkbookPageModel.createNew(
     PLACEHOLDER_ITEM_ID, 'Placeholder', NEW_PAGE_CONTENT);
@@ -53,7 +54,7 @@ function createPlaceholderPage(courseId: string) {
   return resource;
 }
 
-export function loadCourse(courseId: string) {
+export function loadCourse(courseId: CourseIdV) {
   return function (dispatch: any) {
 
     return persistence.retrieveCoursePackage(courseId)

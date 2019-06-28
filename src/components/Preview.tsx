@@ -5,11 +5,12 @@ import * as persistence from 'data/persistence';
 import * as Messages from 'types/messages';
 
 import './Preview.scss';
+import { CourseIdentifier } from 'data/types';
 
 export interface PreviewProps {
   email: string;
   documentId?: string;
-  courseId?: string;
+  CourseIdV?: CourseIdV;
   previewUrl: Maybe<string>;
   shouldRefresh: boolean;
   showMessage: (m: Messages.Message) => void;
@@ -51,9 +52,9 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
 
     this.timerId = Maybe.nothing();
 
-    const { courseId, documentId } = this.props;
+    const { courseIdentifier, documentId } = this.props;
 
-    persistence.initiatePreview(courseId, documentId, true)
+    persistence.initiatePreview(courseIdentifier, documentId, true)
       .then((result) => {
         this.props.dismissMessage(buildPreviewMessage());
 

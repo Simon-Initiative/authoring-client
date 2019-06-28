@@ -30,7 +30,7 @@ import { SkillsModel } from 'data/models/skill';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, CourseIdentifier } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
@@ -42,6 +42,7 @@ import './ObjectiveSkillView.scss';
 import { extractFullText } from 'data/content/objectives/objective';
 import { WritelockModal } from 'components/WritelockModal';
 import { ConflictModal } from 'components/ConflictModal.controller';
+import { fromCourseIdentifier } from 'data/utils/idwrappers';
 
 const getQuestionRefFromSkillEdge = (
   edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
@@ -172,7 +173,7 @@ export const reduceSkillPoolQuestionRefs = (
       .concat(
         // ensure that all pool to skill edges are valid and belong to this skill
         poolToSkillEdges.filter(edge => isValidResource(resourceId(edge.sourceId))
-            && resourceId(edge.destinationId) === skill.id)
+          && resourceId(edge.destinationId) === skill.id)
           // map skill edge to a more usable QuestionRef
           .map(edge => getQuestionRefFromSkillEdge(
             edge, LegacyTypes.assessment2_pool, resourceId(edge.sourceId)))
@@ -206,7 +207,7 @@ export interface ObjectiveSkillViewProps {
   dispatch: any;
   expanded: ExpandedState;
   skills: Immutable.OrderedMap<string, contentTypes.Skill>;
-  onFetchSkills: (courseId: string) => any;
+  onFetchSkills: (courseId: CourseIdV) => any;
   onSetSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
   onUpdateSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
   onSetObjectives: (objectives: Immutable.OrderedMap<string,
@@ -331,7 +332,7 @@ class ObjectiveSkillView
 
   fetchSkills() {
     const { course, onFetchSkills } = this.props;
-    onFetchSkills(course.id);
+    onFetchSkills(course.identifier);
   }
 
   fetchAllRefs(
@@ -506,7 +507,7 @@ class ObjectiveSkillView
 
   buildModels() {
 
-    const courseId = this.props.course.guid;
+    const courseId = this.props.course.identifier;
     const userName = this.props.userName;
 
     return buildAggregateModel(courseId, userName)
@@ -527,7 +528,10 @@ class ObjectiveSkillView
           if (aggregateModel.isLocked) {
 
             const locks = [...aggregateModel.objectives, ...aggregateModel.skills]
-              .map(d => ({ courseId: this.props.course.guid, documentId: d._id }));
+              .map(d => ({
+                courseId: this.props.course.identifier,
+                documentId: typeof d._id === 'string' ? d._id : fromCourseIdentifier(d._id),
+              }));
             this.props.registerLocks(locks);
 
           } else {
@@ -942,7 +946,7 @@ class ObjectiveSkillView
       loading: true,
     });
 
-    return persistence.fetchWebContentReferences(course.guid, { destinationId: obj.id })
+    return persistence.fetchWebContentReferences(course.identifier, { destinationId: obj.id })
       .then((edges) => {
         this.setState({
           loading: false,
@@ -978,7 +982,7 @@ class ObjectiveSkillView
       loading: true,
     });
 
-    return persistence.fetchWebContentReferences(course.guid, { destinationId: skill.id })
+    return persistence.fetchWebContentReferences(course.identifier, { destinationId: skill.id })
       .then((edges) => {
 
         this.setState({

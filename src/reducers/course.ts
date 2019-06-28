@@ -1,12 +1,12 @@
 import { CourseModel } from 'data/models';
 import {
-    COURSE_CHANGED, CourseChangedAction, UPDATE_COURSE_RESOURCES,
-    UpdateCourseResourcesAction,
+  COURSE_CHANGED, CourseChangedAction, UPDATE_COURSE_RESOURCES,
+  UpdateCourseResourcesAction,
 } from 'actions/course';
 
-import { ENTER_APPLICATION_VIEW, EnterApplicationViewAction } from 'actions/view';
-
 import { OtherAction } from './utils';
+import { Maybe } from 'tsmonad';
+import { ENTER_APPLICATION_VIEW, EnterApplicationViewAction } from 'actions/router';
 
 type ActionTypes =
   EnterApplicationViewAction
@@ -14,7 +14,7 @@ type ActionTypes =
   | UpdateCourseResourcesAction
   | OtherAction;
 
-export type CourseState = CourseModel;
+export type CourseState = Maybe<CourseModel>;
 
 const initialState = null;
 
@@ -24,9 +24,9 @@ export const course = (
 ): CourseState => {
   switch (action.type) {
     case COURSE_CHANGED:
-      return action.model;
+      return Maybe.just(action.model);
     case UPDATE_COURSE_RESOURCES:
-      return state.with({ resources: state.resources.merge(action.resources) });
+      return state.lift(c => c.with({ resources: c.resources.merge(action.resources) }));
     case ENTER_APPLICATION_VIEW:
       return initialState;
     default:

@@ -11,7 +11,6 @@ import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import * as chroma from 'chroma-js';
 import { RouterState } from 'reducers/router';
-import { ROUTE } from 'actions/router';
 
 const OLI_ICON = require('../../assets/oli-icon.png');
 
@@ -248,7 +247,10 @@ class Header
     return (
       <span>
         <a className={classes.headerLink}
-          onClick={(e) => { e.preventDefault(); viewActions.viewCourse(course.guid); }}>
+          onClick={(e) => {
+            e.preventDefault();
+            viewActions.viewCourse(course.identifier, Maybe.nothing());
+          }}>
           {course.title}
         </a> <span className={classes.version}>v{course.version}</span>
       </span>
@@ -266,7 +268,7 @@ class Header
       <div className={classNames(['Header', classes.Header])}>
         <div className={classes.headerLogo}>
           <Link className={classes.headerLogoLink} action={this.props.viewActions.viewAllCourses}>
-            {router.route !== ROUTE.ROOT
+            {router.route.type !== 'RouteRoot'
               ? <i className="fa fa-chevron-left" style={{ marginRight: 10 }} />
               : undefined
             }

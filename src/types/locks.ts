@@ -1,5 +1,6 @@
+import { CourseIdV } from 'data/types';
 export type AcquiredLock = {
-  courseId: string,
+  courseId: CourseIdV,
   documentId: string,
 };
 

@@ -8,19 +8,14 @@ import { dismissScopedMessages } from './messages';
 import { Scope } from 'types/messages';
 import * as courseActions from 'actions/course';
 import * as orgActions from 'actions/orgs';
-import {
-  LegacyTypes, ResourceId, CourseIdentifier,
-} from 'data/types';
 import { Maybe } from 'tsmonad';
 import { loadFromLocalStorage } from 'utils/localstorage';
 import { activeOrgUserKey, ACTIVE_ORG_STORAGE_KEY } from './utils/activeOrganization';
 import * as router from 'types/router';
-import {
-  compareCourseIdentifier, toResourceId,
-} from 'data/utils/idwrappers';
 import { ResourceState } from 'data/content/resource';
 import { UserState } from 'reducers/user';
 import { buildUrlFromRoute } from 'actions/view';
+import { LegacyTypes, CourseIdV } from 'data/types';
 
 export type UPDATE_ROUTE_ACTION = 'route/UPDATE_ROUTE_ACTION';
 export const UPDATE_ROUTE_ACTION: UPDATE_ROUTE_ACTION = 'route/UPDATE_ROUTE_ACTION';
@@ -85,17 +80,17 @@ export function enterApplicationView(): EnterApplicationViewAction {
 function transitionCourseView(
   routeOption: router.RouteCourse, dispatch, getState: () => State) {
   const { course: loadedCourse, router: loadedRoute, user } = getState();
-  const { course: requestedCourseId, organization } = routeOption;
+  const { courseId: requestedCourseId, orgId } = routeOption;
 
-  const requestedOrg: Maybe<ResourceId> = organization.caseOf({
-    just: _ => organization,
+  const requestedOrg: Maybe<string> = orgId.caseOf({
+    just: _ => orgId,
     nothing: () => getActiveOrgFromLocalStorage(user, requestedCourseId),
   });
 
   loadedCourse.caseOf({
     nothing: () => routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption),
     just: (course) => {
-      return isDifferentCourse(course.identifier, requestedCourseId)
+      return isDifferentCourse(course.idv, requestedCourseId)
         ? routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption)
         : isSameOrg(loadedRoute.route, requestedOrg)
           ? routeSameCourseSameOrg(dispatch)
@@ -110,8 +105,8 @@ function routeSameCourseSameOrg(dispatch) {
 }
 
 function routeSameCourseDifferentOrg(
-  dispatch, course: models.CourseModel, courseId: CourseIdentifier,
-  org: Maybe<ResourceId>, route: router.RouteCourse) {
+  dispatch, course: models.CourseModel, courseId: CourseIdV,
+  org: Maybe<string>, route: router.RouteCourse) {
   org.caseOf({
     just: (org) => {
       dispatch(dismissScopedMessages(Scope.Organization));
@@ -119,13 +114,13 @@ function routeSameCourseDifferentOrg(
     },
     nothing: () => history.push(buildUrlFromRoute({
       ...route,
-      organization: Maybe.just(firstOrg(course)),
+      orgId: Maybe.just(firstOrg(course)),
     })),
   });
 }
 
 function routeDifferentCourse(
-  dispatch, courseId: CourseIdentifier, requestedOrg: Maybe<ResourceId>,
+  dispatch, courseId: CourseIdV, requestedOrg: Maybe<string>,
   route: router.RouteCourse) {
   dispatch(dismissScopedMessages(Scope.PackageDetails));
   dispatch(courseActions.loadCourse(courseId))
@@ -135,28 +130,29 @@ function routeDifferentCourse(
         // If we have a url without an org, push a new url with the first org
         nothing: () => history.push(buildUrlFromRoute({
           ...route,
-          organization: Maybe.just(firstOrg(course)),
+          orgId: Maybe.just(firstOrg(course)),
         })),
       });
     });
 }
 
-const getActiveOrgFromLocalStorage = (user: UserState, course: CourseIdentifier) =>
+const getActiveOrgFromLocalStorage = (user: UserState, courseId: CourseIdV) =>
   Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
-    .bind(coursePrefs => Maybe.maybe(coursePrefs[activeOrgUserKey(user.profile.username, course)])
-      .lift(activeOrg => toResourceId(activeOrg)));
+    .bind(coursePrefs =>
+      Maybe.maybe(coursePrefs[activeOrgUserKey(user.profile.username, courseId)])
+        .lift(activeOrg => activeOrg));
 
-const isDifferentCourse = (id1: CourseIdentifier, id2: CourseIdentifier) =>
-  !compareCourseIdentifier(id1, id2);
+const isDifferentCourse = (id1: CourseIdV, id2: CourseIdV) =>
+  id1.eq(id2);
 
-function isSameOrg(route: router.RouteOption, requestedOrgId: Maybe<ResourceId>): boolean {
+function isSameOrg(route: router.RouteOption, requestedOrgId: Maybe<string>): boolean {
   return requestedOrgId.caseOf({
     just: (requestedOrgId) => {
       // Only course routes store an organization
       if (route.type !== 'RouteCourse') {
         return false;
       }
-      return route.organization.caseOf({
+      return route.orgId.caseOf({
         just: loadedOrg => loadedOrg === requestedOrgId,
         nothing: () => false,
       });

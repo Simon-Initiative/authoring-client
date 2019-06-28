@@ -29,15 +29,18 @@ function setTargetNode(node): SetXrefTargetAction {
 export function fetchAndSetTargetNode(targetId: string, documentId: string) {
   return (dispatch: Dispatch, getState: () => State): Promise<any> => {
     const { course } = getState();
-    return persistence.retrieveDocument(course.guid, documentId).then((doc) => {
-      const wbpage = doc.model as WorkbookPageModel;
-      // Find the target node in the workbook page's content tree
-      const node = findNodes(
-        wbpage,
-        node => node.contentType === 'ContiguousText'
-          ? (node as ContiguousText).getFirstReferenceId() === targetId
-          : node.id === targetId)[0];
-      dispatch(setTargetNode(node ? Either.right(node) : Either.left(targetId)));
+    return course.caseOf({
+      nothing: () => Promise.reject(),
+      just: course => persistence.retrieveDocument(course.identifier, documentId).then((doc) => {
+        const wbpage = doc.model as WorkbookPageModel;
+        // Find the target node in the workbook page's content tree
+        const node = findNodes(
+          wbpage,
+          node => node.contentType === 'ContiguousText'
+            ? (node as ContiguousText).getFirstReferenceId() === targetId
+            : node.id === targetId)[0];
+        dispatch(setTargetNode(node ? Either.right(node) : Either.left(targetId)));
+      }),
     });
   };
 }

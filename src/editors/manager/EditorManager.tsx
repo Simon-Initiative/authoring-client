@@ -83,8 +83,6 @@ export default class EditorManager
     const { course, documentId, expanded, userId, onDispatch,
       editingAllowed, undoRedoGuid } = this.props;
 
-    const courseId = (course as models.CourseModel).guid;
-
     const childProps: AbstractEditorProps<any> = {
       model: document.model,
       expanded: expanded.has(documentId)
@@ -94,7 +92,6 @@ export default class EditorManager
         orgId: this.props.orgId,
         documentId,
         userId,
-        courseId,
         undoRedoGuid,
         resourcePath: this.determineBaseUrl((document.model as any).resource),
         baseUrl: configuration.protocol + configuration.hostname + '/webcontents',

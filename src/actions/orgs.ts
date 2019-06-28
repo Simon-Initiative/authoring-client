@@ -9,6 +9,8 @@ import * as viewActions from 'actions/view';
 import { showMessage, dismissSpecificMessage } from 'actions/messages';
 
 import { buildConflictMessage } from 'utils/error';
+import { CourseIdV } from 'data/types';
+import { Maybe } from 'tsmonad';
 
 enum ChangeType {
   Normal,
@@ -177,7 +179,7 @@ export const modelUpdated = (
 
 
 
-export function load(courseId: string, organizationId: string) {
+export function load(courseId: CourseIdV, organizationId: string) {
   return function (dispatch): Promise<persistence.Document> {
 
     const holder = { changeMade: false };
@@ -198,7 +200,7 @@ export function load(courseId: string, organizationId: string) {
 function applyChange(
   dispatch,
   doc: persistence.Document,
-  courseId: string,
+  courseId: CourseIdV,
   change: org.OrgChangeRequest,
   retriesRemaining: number,
   changeType: ChangeType) {
@@ -274,7 +276,7 @@ function applyChange(
       // org component. TODO: improve this and only transition the view away if
       // the component no longer exists.
       const orgId = doc.model.guid;
-      dispatch(viewActions.viewDocument(courseId, courseId, orgId));
+      dispatch(viewActions.viewCourse(courseId, Maybe.just(orgId)));
     },
 
   });

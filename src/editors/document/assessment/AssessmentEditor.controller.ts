@@ -15,18 +15,20 @@ import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
 import { RouterState } from 'reducers/router';
 import { setSearchParam, clearSearchParam } from 'actions/router';
+import { CourseState } from 'reducers/course';
+import { CourseIdV } from 'data/types';
 
 interface StateProps {
   activeContext: any;
   hover: string;
-  course: CourseModel;
+  course: CourseState;
   currentPage: string;
   currentNode: contentTypes.Node;
   router: RouterState;
 }
 
 interface DispatchProps {
-  onFetchSkills: (courseId: string) => any;
+  onFetchSkills: (courseId: CourseIdV) => any;
   onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
@@ -62,7 +64,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onFetchSkills: (courseId: string) => {
+    onFetchSkills: (courseId: CourseIdV) => {
       return dispatch(fetchSkills(courseId));
     },
     onUpdateContent: (documentId: string, content: ContentElement) => {

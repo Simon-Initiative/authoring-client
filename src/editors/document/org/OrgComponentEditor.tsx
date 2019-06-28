@@ -120,7 +120,8 @@ export class OrgComponentEditor
 
     this.props.org.lift((o) => {
       this.props.onDispatch(
-        viewActions.viewDocument(componentOrResourceId, this.props.course.guid, o.guid));
+        viewActions.viewDocument(
+          componentOrResourceId, this.props.course.identifier, Maybe.just(o.guid)));
     });
 
   }

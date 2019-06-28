@@ -2,6 +2,7 @@ import * as persistence from 'data/persistence';
 import {
   AbstractPersistenceStrategy,
 } from 'editors/manager/persistence/AbstractPersistenceStrategy';
+import { toCourseGuid } from 'data/utils/idwrappers';
 
 /**
  * A persistence strategy that applies changes immediately, and will auto
@@ -39,8 +40,8 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
    * to seamlessly handle conflicts.
    */
   saveDocument(initialDoc: persistence.Document,
-               remainingRetries: number,
-               initialResolve: any, initialReject: any)
+    remainingRetries: number,
+    initialResolve: any, initialReject: any)
     : Promise<persistence.Document> {
 
     return new Promise((resolve, reject) => {
@@ -48,26 +49,32 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
       const toSave = initialDoc;
 
       persistence.persistDocument(toSave)
-          .then((result) => {
-            initialResolve !== undefined ? initialResolve(result) : resolve(result);
-          })
-          .catch((err) => {
-            if (remainingRetries === 0) {
-              initialReject !== undefined ? initialReject(err) : reject(err);
-            } else {
-              persistence.retrieveDocument(initialDoc._courseId, initialDoc._id)
-                .then((doc) => {
-                  const updated = toSave.with({ _rev: doc._rev });
-                  this.saveDocument(updated, (remainingRetries - 1),
-                                    initialResolve === undefined ? resolve : initialResolve,
-                                    initialReject === undefined ? reject : initialReject);
-                })
-                .catch((err) => {
-                  initialReject !== undefined ? initialReject(err) : reject(err);
-                });
-            }
+        .then((result) => {
+          initialResolve !== undefined ? initialResolve(result) : resolve(result);
+        })
+        .catch((err) => {
+          if (remainingRetries === 0) {
+            initialReject !== undefined ? initialReject(err) : reject(err);
+          } else {
+            persistence.retrieveDocument(
+              typeof initialDoc._courseId === 'string'
+                ? toCourseGuid(initialDoc._courseId)
+                : initialDoc._courseId,
+              typeof initialDoc._id === 'string'
+                ? initialDoc._id
+                : '')
+              .then((doc) => {
+                const updated = toSave.with({ _rev: doc._rev });
+                this.saveDocument(updated, (remainingRetries - 1),
+                  initialResolve === undefined ? resolve : initialResolve,
+                  initialReject === undefined ? reject : initialReject);
+              })
+              .catch((err) => {
+                initialReject !== undefined ? initialReject(err) : reject(err);
+              });
+          }
 
-          });
+        });
     });
   }
 
