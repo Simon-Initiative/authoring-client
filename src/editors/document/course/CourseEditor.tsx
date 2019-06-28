@@ -8,7 +8,6 @@ import { UserInfo } from 'data//contentTypes';
 import { Button } from 'editors/content/common/Button';
 import { Select } from 'editors/content/common/Select';
 import { Document } from 'data/persistence/common';
-import { Collapse } from 'editors/content/common/Collapse';
 import './CourseEditor.scss';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { DeploymentStatus, DeployStage } from 'data/models/course';
@@ -63,7 +62,7 @@ interface CourseEditorState {
   newVersionNumber: string;
   isNewVersionValid: boolean;
   newVersionErrorMessage: string;
-  // showAdvancedDetails: boolean; // KEVIN commenting out to use Collapse implementation instead
+  showAdvancedDetails: boolean;
 }
 
 interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
@@ -137,9 +136,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         resource.type === LegacyTypes.organization &&
         resource.resourceState !== ResourceState.DELETED)
       .toArray();
-      // KEVIN - commenting out to use Collapse implementation instead
-      // this.toggleAdvancedDetails = this.toggleAdvancedDetails.bind(this);
-
+    this.toggleAdvancedDetails = this.toggleAdvancedDetails.bind(this);
   }
 
   // Fetch all globally available themes, sort alphabetically, and choose one to be selected
@@ -587,7 +584,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             You can create a copy of this course package as a new version, allowing you to develop
             content independently of the original. This is useful when you want to get started
             on the next generation of a course without changing an existing course that's already
-            in use.
+            in use.s
             <br />
             <br />
             New version numbers must adhere to&nbsp;
@@ -616,18 +613,19 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  // KEVIN don't need this, using "Collapse" Element instead
-  /*toggleAdvancedDetails() {
-    console.log("Toggling advanced details");
+  // Either Show or Hide the Advanced options in the Details page
+  toggleAdvancedDetails() {
     this.setState({
       showAdvancedDetails: !this.state.showAdvancedDetails
     })
-  }*/
+  }
 
   renderDetails() {
     const { model } = this.props;
 
     const isAdmin = hasRole('admin');
+
+    const collapseIndicator = this.state.showAdvancedDetails ? '-' : '+';
 
     return (
       <div className="infoContain">
@@ -669,26 +667,22 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         </div>
 
         {
-          // Kevin -- I commented out my first implementation which uses the button component
+          // Note that the implementation of this toggle is very similar to the
+          // Collapse element. But this required too many changes to Collapse code.
         }
-        {/*<div className="row">
-          <div className="col-3"></div>
-          <div className="col-9">
-              <Button
-              // KEVIN... could also use <button>
-                editMode={true}
-                className="btn-primary actionButton"
+        <div className="row">
+          <div className="col-3">
+              <button
+                type="button"
+                className="btn btn-link"
                 onClick={() => this.toggleAdvancedDetails()}>
-                {this.state.showAdvancedDetails ?
-                  "Hide Advanced Details" : "Show Advanced Details"}
-              </Button>
+                Advanced Details {collapseIndicator}
+              </button>
           </div>
-        </div>*/}
-        {//this.state.showAdvancedDetails &&
-        <Collapse caption="Advanced Details"
-          parentClass="row"
-          buttonClass="col-3"
-          buttonSibling={<div className="col-9"></div>}>
+          <div className="col-9"></div>
+        </div>
+        {this.state.showAdvancedDetails &&
+          <div className="advanced">
           <div className="row">
             <div className="col-3">Theme</div>
             <div className="col-9">{this.renderThemes()}</div>
@@ -718,7 +712,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             <div className="col-3">Package Location</div>
             <div className="col-9">{model.svnLocation}</div>
           </div>
-          </Collapse>
+          </div>
         }
 
         <hr />
