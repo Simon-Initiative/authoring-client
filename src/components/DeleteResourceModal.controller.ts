@@ -10,6 +10,7 @@ import * as viewActions from 'actions/view';
 import { modalActions } from 'actions/modal';
 import { LegacyTypes } from 'data/types';
 import { CourseState } from 'reducers/course';
+import { Maybe } from 'tsmonad';
 
 interface StateProps {
 
@@ -36,7 +37,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
+const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
   return {
     onDeleteResource: (resource: Resource, course: CourseModel, orgId: string) => {
       const updatedResource = resource.with({ resourceState: ResourceState.DELETED });
@@ -53,7 +54,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
         )[0].guid;
       }
 
-      dispatch(viewActions.viewAllResources(course.guid, orgToView));
+      viewActions.viewAllResources(course.idvers, Maybe.just(orgToView));
       dispatch(modalActions.dismiss());
 
     },

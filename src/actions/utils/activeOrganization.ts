@@ -1,14 +1,14 @@
 import { Maybe } from 'tsmonad';
 import { loadFromLocalStorage, saveToLocalStorage } from 'utils/localstorage';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 export const ACTIVE_ORG_STORAGE_KEY = 'activeOrganization';
-export const activeOrgUserKey = (username: string, courseId: CourseIdV) =>
+export const activeOrgUserKey = (username: string, courseId: CourseIdVers) =>
   username + ':' + courseId;
 
 
 export function updateActiveOrgPref(
-  courseId: CourseIdV, username: string, organizationId: string) {
+  courseId: CourseIdVers, username: string, organizationId: string) {
 
   const userKey = activeOrgUserKey(username, courseId);
 

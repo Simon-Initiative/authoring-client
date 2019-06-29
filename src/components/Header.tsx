@@ -249,7 +249,7 @@ class Header
         <a className={classes.headerLink}
           onClick={(e) => {
             e.preventDefault();
-            viewActions.viewCourse(course.identifier, Maybe.nothing());
+            viewActions.viewCourse(course.idvers, Maybe.nothing());
           }}>
           {course.title}
         </a> <span className={classes.version}>v{course.version}</span>

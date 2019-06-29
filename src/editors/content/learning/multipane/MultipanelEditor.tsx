@@ -232,7 +232,7 @@ class MultipanelEditor
 
     Maybe.maybe(context.courseModel.resourcesById.get(model.inline.idref))
       .lift((inline) => {
-        retrieveDocument(context.courseModel.identifier, inline.guid)
+        retrieveDocument(context.courseModel.idvers, inline.guid)
           .then((inline) => {
             this.setState({
               isLoadingActivity: false,
@@ -547,7 +547,7 @@ class MultipanelEditor
                 onClick={() => {
                   const guid = context.courseModel.resourcesById
                     .get(model.inline.idref).guid;
-                  services.viewDocument(guid, this.props.context.courseModel.identifier,
+                  services.viewDocument(guid, this.props.context.courseModel.idvers,
                     Maybe.just(this.props.context.orgId));
                 }}
                 type="button"

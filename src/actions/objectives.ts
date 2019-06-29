@@ -2,7 +2,7 @@ import { LearningObjective } from 'data/contentTypes';
 import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 
-import { LegacyTypes, CourseIdV } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 
 export type SET_OBJECTIVES = 'SET_OBJECTIVES';
 export const SET_OBJECTIVES = 'SET_OBJECTIVES';
@@ -36,7 +36,7 @@ export function updateObjectives(
   };
 }
 
-export const fetchObjectives = (courseId: CourseIdV) =>
+export const fetchObjectives = (courseId: CourseIdVers) =>
   (dispatch): Promise<any> => {
 
     return persistence.bulkFetchDocuments(courseId, [LegacyTypes.learning_objectives], 'byTypes')

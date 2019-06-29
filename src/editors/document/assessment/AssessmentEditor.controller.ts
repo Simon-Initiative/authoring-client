@@ -16,7 +16,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { RouterState } from 'reducers/router';
 import { setSearchParam, clearSearchParam } from 'actions/router';
 import { CourseState } from 'reducers/course';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 interface StateProps {
   activeContext: any;
@@ -28,7 +28,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onFetchSkills: (courseId: CourseIdV) => any;
+  onFetchSkills: (courseId: CourseIdVers) => any;
   onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
@@ -64,7 +64,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onFetchSkills: (courseId: CourseIdV) => {
+    onFetchSkills: (courseId: CourseIdVers) => {
       return dispatch(fetchSkills(courseId));
     },
     onUpdateContent: (documentId: string, content: ContentElement) => {

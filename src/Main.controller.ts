@@ -17,7 +17,7 @@ import * as viewActions from 'actions/view';
 import * as models from 'data/models';
 import { bindActionCreators } from 'redux';
 import { State } from 'reducers/index';
-import { CourseIdentifier } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 interface StateProps {
   user: UserState;
@@ -30,11 +30,11 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onLoad: (courseId: CourseIdV, documentId: string) => Promise<persistence.Document>;
+  onLoad: (courseId: CourseIdVers, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
-  onLoadOrg: (courseId: CourseIdV, documentId: string) => Promise<persistence.Document>;
+  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<persistence.Document>;
   onSetServerTimeSkew: () => void;
-  onLoadCourse: (courseId: CourseIdV) => Promise<models.CourseModel>;
+  onLoadCourse: (courseId: CourseIdVers) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
   onUpdateCourseResources: (updated) => void;
@@ -75,13 +75,13 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     {});
 
   return {
-    onLoad: (courseId: CourseIdV, documentId: string) =>
+    onLoad: (courseId: CourseIdVers, documentId: string) =>
       dispatch(load(courseId, documentId)),
     onRelease: (documentId: string) => dispatch(release(documentId)),
-    onLoadOrg: (courseId: CourseIdV, documentId: string) =>
+    onLoadOrg: (courseId: CourseIdVers, documentId: string) =>
       dispatch(loadOrg(courseId, documentId)),
     onSetServerTimeSkew: () => dispatch(setServerTimeSkew()),
-    onLoadCourse: (courseId: CourseIdV) => dispatch(loadCourse(courseId)),
+    onLoadCourse: (courseId: CourseIdVers) => dispatch(loadCourse(courseId)),
     onDispatch: dispatch,
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));

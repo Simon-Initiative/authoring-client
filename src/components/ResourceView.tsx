@@ -128,9 +128,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   onClickResource(id) {
-    const { course, currentOrg, dispatch } = this.props;
+    const { course, currentOrg } = this.props;
 
-    dispatch(viewActions.viewDocument(id, course.identifier, Maybe.just(currentOrg)));
+    viewActions.viewDocument(id, course.idvers, Maybe.just(currentOrg));
   }
 
   onCreateResource = (type: LegacyTypes) => {
@@ -174,7 +174,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       newItemTitle: '',
     });
 
-    persistence.createDocument(this.props.course.identifier, resource)
+    persistence.createDocument(this.props.course.idvers, resource)
       .then((result) => {
         const r = (result as any).model.resource;
 
@@ -230,7 +230,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     };
 
     const link = resource => span =>
-      <button onClick={this.onClickResource.bind(this, resource.guid)}
+      <button onClick={this.onClickResource.bind(this, resource.id)}
         className="btn btn-link title-btn">{span}</button>;
 
     const columnRenderers = [

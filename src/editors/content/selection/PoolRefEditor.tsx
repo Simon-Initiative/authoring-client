@@ -94,7 +94,7 @@ export class PoolRefEditor
     if (this.guid !== null) {
       this.props.services.viewDocument(
         this.guid,
-        this.props.context.courseModel.identifier,
+        this.props.context.courseModel.idvers,
         Maybe.just(this.props.context.orgId));
     }
   }

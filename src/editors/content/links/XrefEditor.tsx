@@ -40,7 +40,7 @@ export class XrefEditor
   }
 
   componentDidMount() {
-    persistence.fetchCourseResources(this.props.context.courseModel.identifier)
+    persistence.fetchCourseResources(this.props.context.courseModel.idvers)
       .then(resources => this.setState({ resources }));
   }
 

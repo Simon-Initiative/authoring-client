@@ -10,6 +10,8 @@ import './DeleteResourceModal.scss';
 import { LegacyTypes } from 'data/types';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import { Severity, Toast } from 'components/common/Toast';
+import * as viewActions from 'actions/view';
+import { Maybe } from 'tsmonad';
 
 export interface DeleteResourceModalProps {
   resource: Resource;
@@ -76,7 +78,7 @@ export default class DeleteResourceModal extends
   onDelete() {
     const { course, resource, onDeleteResource, orgId } = this.props;
 
-    persistence.deleteResource(course.identifier, resource.guid)
+    persistence.deleteResource(course.idvers, resource.guid)
       .then(_ => onDeleteResource(resource, course, orgId));
   }
 
@@ -148,8 +150,12 @@ export default class DeleteResourceModal extends
         : this.props.orgId;
 
       return (text: string) =>
-        <a onClick={this.props.onDismissModal}
-          href={`/#${edgeResource.guid}-${course.guid}-${orgId}`}
+        <a onClick={(e) => {
+          e.preventDefault();
+          this.props.onDismissModal;
+          viewActions.viewDocument(edgeResource.id, course.idvers, Maybe.just(orgId));
+        }}
+          href="#"
           className="btn btn-link">
           {text}
         </a>;

@@ -1,6 +1,6 @@
 import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
-import { toCourseGuid } from 'data/utils/idwrappers';
+import { CourseGuid } from 'data/types';
 
 import {
   onFailureCallback, onSaveCompletedCallback,
@@ -39,7 +39,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     // the document first to get the most up to date version
 
     if (this.writeLockedDocumentId !== null) {
-      return persistence.releaseLock(toCourseGuid(this.courseId), this.writeLockedDocumentId);
+      return persistence.releaseLock(CourseGuid.of(this.courseId), this.writeLockedDocumentId);
     }
     return Promise.resolve({});
   }
@@ -63,7 +63,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     return new Promise((resolve, reject) => {
       persistence.acquireLock(
         typeof doc._courseId === 'string'
-          ? toCourseGuid(doc._courseId)
+          ? CourseGuid.of(doc._courseId)
           : doc._courseId,
         typeof doc._id === 'string'
           ? doc._id

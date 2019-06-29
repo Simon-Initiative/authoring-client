@@ -89,6 +89,7 @@ export class OrgComponentEditor
   }
 
   findComponentModel(props: OrgComponentEditorProps) {
+    console.log('props.org', props.org)
     props.org.caseOf({
       just: (org) => {
         // Find the component, use sequences as the default
@@ -121,7 +122,7 @@ export class OrgComponentEditor
     this.props.org.lift((o) => {
       this.props.onDispatch(
         viewActions.viewDocument(
-          componentOrResourceId, this.props.course.identifier, Maybe.just(o.guid)));
+          componentOrResourceId, this.props.course.idvers, Maybe.just(o.id)));
     });
 
   }

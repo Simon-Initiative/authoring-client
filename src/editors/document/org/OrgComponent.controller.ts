@@ -40,7 +40,7 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { skills, objectives, course, orgs } = state;
+  const { skills, objectives, orgs } = state;
   const org = orgs.activeOrg.map(v => (v.model as models.OrganizationModel));
   const { undoStack, redoStack, requestInFlight } = orgs;
 
@@ -50,6 +50,8 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const canRedo = redoStack.size > 0 && !requestInFlight;
 
   const placements = orgs.placements;
+
+  console.log('org in orgcomponentcontroller', org)
 
   return {
     org,

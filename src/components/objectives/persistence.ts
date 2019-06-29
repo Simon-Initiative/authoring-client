@@ -6,7 +6,7 @@ import { Resource } from '../../data/content/resource';
 import guid from '../../utils/guid';
 import { LegacyTypes } from '../../data/types';
 import { LockDetails } from '../../utils/lock';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 const NEW_BUCKET_TITLE = 'Created In Editor';
 
@@ -14,12 +14,12 @@ const NEW_BUCKET_TITLE = 'Created In Editor';
 
 
 
-function retrieveObjectives(courseId: CourseIdV): Promise<persistence.Document[]> {
+function retrieveObjectives(courseId: CourseIdVers): Promise<persistence.Document[]> {
   return persistence.bulkFetchDocuments(
     courseId, [LegacyTypes.learning_objectives], 'byTypes');
 }
 
-function retrieveSkills(courseId: CourseIdV): Promise<persistence.Document[]> {
+function retrieveSkills(courseId: CourseIdVers): Promise<persistence.Document[]> {
   return persistence.bulkFetchDocuments(
     courseId, [LegacyTypes.skills_model], 'byTypes');
 }
@@ -50,7 +50,7 @@ type BucketCreationResult = {
 };
 
 function createNewBucket(
-  courseId: CourseIdV, docs: persistence.Document[], createFn, userName: string)
+  courseId: CourseIdVers, docs: persistence.Document[], createFn, userName: string)
   : Promise<BucketCreationResult> {
 
   return new Promise((resolve, reject) => {
@@ -70,7 +70,7 @@ function createNewBucket(
   });
 }
 
-export function retrieveAllObjectives(courseId: CourseIdV)
+export function retrieveAllObjectives(courseId: CourseIdVers)
   : Promise<Immutable.List<contentTypes.LearningObjective>> {
 
   return retrieveObjectives(courseId)
@@ -85,7 +85,8 @@ export function retrieveAllObjectives(courseId: CourseIdV)
     });
 }
 
-export function buildAggregateModel(courseId: CourseIdV, userName: string): Promise<AggregateModel> {
+export function buildAggregateModel(courseId: CourseIdVers, userName: string):
+  Promise<AggregateModel> {
   return new Promise((resolve, reject) => {
 
     let objectives: persistence.Document[] = null;

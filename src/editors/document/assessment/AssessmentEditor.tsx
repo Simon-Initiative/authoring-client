@@ -7,7 +7,7 @@ import {
 import { TextInput } from 'editors/content/common/TextInput';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-import { LegacyTypes, CourseIdV } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 import guid from 'utils/guid';
 import {
   locateNextOfKin, findNodeByGuid, findQuestionById,
@@ -37,7 +37,7 @@ import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import { CourseState } from 'reducers/course';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
-  onFetchSkills: (courseId: CourseIdV) => void;
+  onFetchSkills: (courseId: CourseIdVers) => void;
   activeContext: ActiveContext;
   onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
@@ -203,7 +203,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
 
   fetchSkillsIfMissing = (props: AssessmentEditorProps) => {
     if (hasUnknownSkill(props.model, props.context.skills)) {
-      props.onFetchSkills(props.context.courseModel.identifier);
+      props.onFetchSkills(props.context.courseModel.idvers);
     }
   }
 
@@ -218,7 +218,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
 
     if (hasNoskills) {
       this.noSkillsMessage = buildMissingSkillsMessage(
-        this.props.context.courseModel.identifier,
+        this.props.context.courseModel.idvers,
         this.props.context.orgId);
       this.props.showMessage(this.noSkillsMessage);
     }

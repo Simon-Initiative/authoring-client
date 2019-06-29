@@ -3,7 +3,7 @@ import { ContentDependency, Base64EncodedBlob, RemoteResource } from './common/t
 import { createWebContent } from 'data/persistence';
 import { adjustPath } from 'editors/content/media/utils';
 import createGuid from 'utils/guid';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 const fetch = (window as any).fetch;
 
@@ -33,7 +33,7 @@ const promiseSerial = funcs =>
 // Resolve all dependencies in series.
 export function resolveDependencies(
   dependencies: Immutable.List<ContentDependency>,
-  courseId: CourseIdV,
+  courseId: CourseIdVers,
   resourcePath: string,
   progressCallback: ProgressCallback)
   : Promise<Immutable.List<ResolvedDependency>> {
@@ -58,14 +58,14 @@ function blobToFile(theBlob: Blob, fileName: string): File {
 }
 
 function resolveBlob(
-  dependency: Base64EncodedBlob, courseId: CourseIdV,
+  dependency: Base64EncodedBlob, courseId: CourseIdVers,
   resourcePath: string): Promise<ResolvedDependency> {
   // Stub
   return Promise.resolve({ dependency, src: '' });
 }
 
 function resolveRemote(
-  dependency: RemoteResource, courseId: CourseIdV,
+  dependency: RemoteResource, courseId: CourseIdVers,
   resourcePath: string, progressCallback: ProgressCallback): Promise<ResolvedDependency> {
 
   // Fetch the remote file, then upload it as webcontent

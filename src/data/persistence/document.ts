@@ -2,7 +2,7 @@ import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
 import { DocumentId, LegacyTypes } from '../types';
 import * as models from '../models';
-import { CourseIdV, CourseGuid } from 'data/types';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 /**
  * Retrieve a document, given a course and document id.
@@ -10,7 +10,9 @@ import { CourseIdV, CourseGuid } from 'data/types';
  * @param documentId the document guid
  */
 export function retrieveDocument(
-  course: CourseGuid | CourseIdV, documentId: DocumentId, notify?: () => void): Promise<Document> {
+  course: CourseGuid | CourseIdVers, documentId: DocumentId, notify?: () => void):
+  Promise<Document> {
+  console.log('retrieving document', course, documentId)
 
   // tslint:disable-next-line:max-line-length
   const url = `${configuration.baseUrl}/${course.value()}/resources/${documentId}`;
@@ -67,7 +69,7 @@ export type PreviewResult =
  * @param documentId the document guid to preview
  */
 export function initiatePreview(
-  course: CourseGuid | CourseIdV, documentId: DocumentId,
+  course: CourseGuid | CourseIdVers, documentId: DocumentId,
   isRefresh: boolean, server?: ServerName): Promise<PreviewResult> {
 
   const url = `${configuration.baseUrl}/${course.value()}/resources/preview/${documentId}`
@@ -111,7 +113,7 @@ export function initiatePreview(
     });
 }
 
-export function initiateQuickPreview(course: CourseGuid | CourseIdV, documentId: DocumentId) {
+export function initiateQuickPreview(course: CourseGuid | CourseIdVers, documentId: DocumentId) {
   const protocol = window.location.protocol + '//';
   const hostname = window.location.host;
   const prefix = 'content-service/api';
@@ -121,7 +123,7 @@ export function initiateQuickPreview(course: CourseGuid | CourseIdV, documentId:
 }
 
 export function bulkFetchDocuments(
-  course: CourseGuid | CourseIdV, filters: string[], action: string): Promise<Document[]> {
+  course: CourseGuid | CourseIdVers, filters: string[], action: string): Promise<Document[]> {
 
   // Valid values for 'action' is limited to 'byIds' or 'byTypes'
   // tslint:disable-next-line:max-line-length
@@ -174,7 +176,7 @@ export function listenToDocument(doc: Document): Promise<Document> {
     });
 }
 
-export function createDocument(course: CourseGuid | CourseIdV, content: models.ContentModel):
+export function createDocument(course: CourseGuid | CourseIdVers, content: models.ContentModel):
   Promise<Document> {
 
   // tslint:disable-next-line:max-line-length

@@ -34,79 +34,77 @@ function buildMessage() {
 
 export function duplicate(model: ContentModel) {
   return function (dispatch, getState: () => State) {
-    getState().course.lift((course) => {
 
-      if (model.modelType === 'AssessmentModel'
-        || model.modelType === 'WorkbookPageModel'
-        || model.modelType === 'PoolModel'
-        || model.modelType === 'FeedbackModel'
-        || model.modelType === 'OrganizationModel') {
+    if (model.modelType === 'AssessmentModel'
+      || model.modelType === 'WorkbookPageModel'
+      || model.modelType === 'PoolModel'
+      || model.modelType === 'FeedbackModel'
+      || model.modelType === 'OrganizationModel') {
 
-        const courseId = course.identifier;
+      const courseId = getState().course.idvers;
 
-        // Adjust the title to reflect that it is a copy
-        const title = model.resource.title + ' (copy)';
-        const resource = model.resource.with({ id: guid(), title });
-        let updated = model.with({ resource });
+      // Adjust the title to reflect that it is a copy
+      const title = model.resource.title + ' (copy)';
+      const resource = model.resource.with({ id: guid(), title });
+      let updated = model.with({ resource });
 
-        // For certain resources the title is in other places beyond
-        // the resource:
-        if (updated.modelType === 'WorkbookPageModel') {
-          const head = updated.head.with({ title: Title.fromText(title) });
-          updated = updated.with({ head });
-        } else if (updated.modelType === 'FeedbackModel') {
-          updated = updated.with({ title: Title.fromText(title) });
-        } else if (updated.modelType === 'AssessmentModel') {
-          updated = updated.with({ title: Title.fromText(title) });
-        } else if (updated.modelType === 'PoolModel') {
-          updated = updated.with({ id: resource.id });
-          updated = updated.with({ pool: updated.pool.with({ id: resource.id }) });
-        } else if (model.modelType === 'OrganizationModel') {
-          const id = updated.id;
-          updated = updated.with({
-            title,
-            guid: id,
-            id: courseId + '_' + title.toLowerCase().split(' ')[0] +
-              '_' + id.substring(id.lastIndexOf('-') + 1),
-            sequences: dupeOrgNode(model.sequences) as Sequences,
-          });
-        }
-
-        return persistence.createDocument(courseId, updated)
-          .then((doc) => {
-
-            // Use the current org from the router, if one present (which
-            // it should be), otherwise just grab the first org we find
-            // in the course
-            const { router } = getState();
-            let orgId = Maybe.nothing<string>();
-            if (router.route.type === 'RouteCourse') {
-              orgId = router.route.orgId;
-            }
-            // If we are duplicating an org, switch to it
-            if (doc.model.modelType === 'OrganizationModel') {
-              orgId = Maybe.just(doc.model.id);
-              // This is required to keep the app in sync with the newly active org
-              dispatch(orgLoaded(doc));
-            }
-
-            const updatedResources = Immutable.OrderedMap<string, Resource>(
-              [[(doc as any).model.resource.guid, (doc as any).model.resource]]);
-            dispatch(courseActions.updateCourseResources(updatedResources));
-            dispatch(viewActions.viewDocument(
-              typeof doc._id === 'string' ? doc._id : '', courseId, orgId));
-
-            // This is unfortunate, but we must delay showing the message until
-            // we suspec that the view has been completely transitioned, otherwise
-            // the view transition will dismiss resource scoped messages
-            setTimeout(
-              () => dispatch(messageActions.showMessage(buildMessage())),
-              2000);
-
-            return doc;
-          });
+      // For certain resources the title is in other places beyond
+      // the resource:
+      if (updated.modelType === 'WorkbookPageModel') {
+        const head = updated.head.with({ title: Title.fromText(title) });
+        updated = updated.with({ head });
+      } else if (updated.modelType === 'FeedbackModel') {
+        updated = updated.with({ title: Title.fromText(title) });
+      } else if (updated.modelType === 'AssessmentModel') {
+        updated = updated.with({ title: Title.fromText(title) });
+      } else if (updated.modelType === 'PoolModel') {
+        updated = updated.with({ id: resource.id });
+        updated = updated.with({ pool: updated.pool.with({ id: resource.id }) });
+      } else if (model.modelType === 'OrganizationModel') {
+        const id = updated.id;
+        updated = updated.with({
+          title,
+          guid: id,
+          id: courseId + '_' + title.toLowerCase().split(' ')[0] +
+            '_' + id.substring(id.lastIndexOf('-') + 1),
+          sequences: dupeOrgNode(model.sequences) as Sequences,
+        });
       }
-    });
+
+      return persistence.createDocument(courseId, updated)
+        .then((doc) => {
+
+          // Use the current org from the router, if one present (which
+          // it should be), otherwise just grab the first org we find
+          // in the course
+          const { router } = getState();
+          let orgId = Maybe.nothing<string>();
+          if (router.route.type === 'RouteCourse') {
+            orgId = router.route.orgId;
+          }
+          // If we are duplicating an org, switch to it
+          if (doc.model.modelType === 'OrganizationModel') {
+            orgId = Maybe.just(doc.model.id);
+            // This is required to keep the app in sync with the newly active org
+            dispatch(orgLoaded(doc));
+          }
+
+          const updatedResources = Immutable.OrderedMap<string, Resource>(
+            [[(doc as any).model.resource.guid, (doc as any).model.resource]]);
+          dispatch(courseActions.updateCourseResources(updatedResources));
+          viewActions.viewDocument(
+            typeof doc._id === 'string' ? doc._id : '', courseId, orgId);
+
+          // This is unfortunate, but we must delay showing the message until
+          // we suspec that the view has been completely transitioned, otherwise
+          // the view transition will dismiss resource scoped messages
+          setTimeout(
+            () => dispatch(messageActions.showMessage(buildMessage())),
+            2000);
+
+          return doc;
+        });
+    }
 
   };
 }

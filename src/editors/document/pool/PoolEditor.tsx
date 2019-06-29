@@ -24,7 +24,7 @@ import { buildMissingSkillsMessage } from 'utils/error';
 import { RouterState } from 'reducers/router';
 
 import './PoolEditor.scss';
-import { LegacyTypes, CourseIdV } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
@@ -34,7 +34,7 @@ interface PoolEditor {
 }
 
 export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
-  onFetchSkills: (courseId: CourseIdV) => void;
+  onFetchSkills: (courseId: CourseIdVers) => void;
   skills: Immutable.OrderedMap<string, Skill>;
   activeContext: ActiveContext;
   onUpdateContent: (documentId: string, content: Object) => void;
@@ -96,7 +96,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     if (hasNoskills) {
       this.noSkillsMessage = buildMissingSkillsMessage(
-        this.props.context.courseModel.identifier,
+        this.props.context.courseModel.idvers,
         this.props.context.orgId);
       this.props.showMessage(this.noSkillsMessage);
     }

@@ -30,7 +30,7 @@ import { SkillsModel } from 'data/models/skill';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
-import { LegacyTypes, CourseIdentifier } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
@@ -42,7 +42,6 @@ import './ObjectiveSkillView.scss';
 import { extractFullText } from 'data/content/objectives/objective';
 import { WritelockModal } from 'components/WritelockModal';
 import { ConflictModal } from 'components/ConflictModal.controller';
-import { fromCourseIdentifier } from 'data/utils/idwrappers';
 
 const getQuestionRefFromSkillEdge = (
   edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
@@ -207,7 +206,7 @@ export interface ObjectiveSkillViewProps {
   dispatch: any;
   expanded: ExpandedState;
   skills: Immutable.OrderedMap<string, contentTypes.Skill>;
-  onFetchSkills: (courseId: CourseIdV) => any;
+  onFetchSkills: (courseId: CourseIdVers) => any;
   onSetSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
   onUpdateSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
   onSetObjectives: (objectives: Immutable.OrderedMap<string,
@@ -332,7 +331,7 @@ class ObjectiveSkillView
 
   fetchSkills() {
     const { course, onFetchSkills } = this.props;
-    onFetchSkills(course.identifier);
+    onFetchSkills(course.idvers);
   }
 
   fetchAllRefs(
@@ -507,7 +506,7 @@ class ObjectiveSkillView
 
   buildModels() {
 
-    const courseId = this.props.course.identifier;
+    const courseId = this.props.course.idvers;
     const userName = this.props.userName;
 
     return buildAggregateModel(courseId, userName)
@@ -529,8 +528,8 @@ class ObjectiveSkillView
 
             const locks = [...aggregateModel.objectives, ...aggregateModel.skills]
               .map(d => ({
-                courseId: this.props.course.identifier,
-                documentId: typeof d._id === 'string' ? d._id : fromCourseIdentifier(d._id),
+                courseId: this.props.course.idvers,
+                documentId: typeof d._id === 'string' ? d._id : d._id.value(),
               }));
             this.props.registerLocks(locks);
 
@@ -946,7 +945,7 @@ class ObjectiveSkillView
       loading: true,
     });
 
-    return persistence.fetchWebContentReferences(course.identifier, { destinationId: obj.id })
+    return persistence.fetchWebContentReferences(course.idvers, { destinationId: obj.id })
       .then((edges) => {
         this.setState({
           loading: false,
@@ -982,7 +981,7 @@ class ObjectiveSkillView
       loading: true,
     });
 
-    return persistence.fetchWebContentReferences(course.identifier, { destinationId: skill.id })
+    return persistence.fetchWebContentReferences(course.idvers, { destinationId: skill.id })
       .then((edges) => {
 
         this.setState({
@@ -1319,8 +1318,10 @@ class ObjectiveSkillView
       just: org => (
         <div className="filter-bar table-toolbar">
           <div className="selected-org-info">
-            Metrics shown are based on the selected organization: <a href={
-              `#${org.guid}-${course.guid}-${org.guid}`}>
+            Metrics shown are based on the selected organization: <a href="#" onClick={(e) => {
+              e.preventDefault();
+              viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
+            }}>
               {org.title}
             </a>
             <div className="flex-spacer" />

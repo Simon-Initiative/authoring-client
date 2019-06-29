@@ -9,8 +9,9 @@ import * as viewActions from 'actions/view';
 import { showMessage, dismissSpecificMessage } from 'actions/messages';
 
 import { buildConflictMessage } from 'utils/error';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 import { Maybe } from 'tsmonad';
+import { State } from 'reducers';
 
 enum ChangeType {
   Normal,
@@ -179,7 +180,7 @@ export const modelUpdated = (
 
 
 
-export function load(courseId: CourseIdV, organizationId: string) {
+export function load(courseId: CourseIdVers, organizationId: string) {
   return function (dispatch): Promise<persistence.Document> {
 
     const holder = { changeMade: false };
@@ -200,7 +201,7 @@ export function load(courseId: CourseIdV, organizationId: string) {
 function applyChange(
   dispatch,
   doc: persistence.Document,
-  courseId: CourseIdV,
+  courseId: CourseIdVers,
   change: org.OrgChangeRequest,
   retriesRemaining: number,
   changeType: ChangeType) {
@@ -232,7 +233,7 @@ function applyChange(
 
       persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
         .then(() => {
-          dispatch(orgChangeSucceeded(doc.model.guid));
+          dispatch(orgChangeSucceeded(m.guid));
           dispatch(dismissSpecificMessage(buildConflictMessage()));
         })
         .catch((err) => {
@@ -240,7 +241,7 @@ function applyChange(
           // When the server rejects our change due to a conflict, we always
           // request the latest view of the document:
           if (err.statusText === 'Conflict') {
-            persistence.retrieveDocument(courseId, doc.model.guid, () => { })
+            persistence.retrieveDocument(courseId, m.guid, () => { })
               .then((latestDoc) => {
 
                 // If we have retry attempts remaining, then try applying the change
@@ -252,13 +253,13 @@ function applyChange(
                   // If no retry attempts remaining, we simply update the model to reflect
                   // the latest from the server's perspective.
                   // Track that this change failed
-                  dispatch(orgChangeFailed(doc.model.guid, err));
+                  dispatch(orgChangeFailed(m.guid, err));
                   dispatch(modelUpdated(latestDoc.model as models.OrganizationModel));
                   dispatch(showMessage(buildConflictMessage()));
                 }
               });
           } else {
-            dispatch(orgChangeFailed(doc.model.guid, err));
+            dispatch(orgChangeFailed(m.guid, err));
           }
         });
     },
@@ -266,8 +267,8 @@ function applyChange(
       // We could not apply the change to our current view of the model. We get here
       // only after reaching a conflict and refetching the model - so it does no good
       // to continue to retry.  Just give the user notification and access to the new model.
-      dispatch(modelUpdated(doc.model as models.OrganizationModel));
-      dispatch(orgChangeFailed(doc.model.guid, 'Conflict'));
+      dispatch(modelUpdated(m));
+      dispatch(orgChangeFailed(m.guid, 'Conflict'));
       dispatch(showMessage(buildConflictMessage()));
 
       // Transition the view back to the course overview page.  This avoids the most
@@ -275,8 +276,7 @@ function applyChange(
       // that no longer exists.  We need to transition away from viewing that missing
       // org component. TODO: improve this and only transition the view away if
       // the component no longer exists.
-      const orgId = doc.model.guid;
-      dispatch(viewActions.viewCourse(courseId, Maybe.just(orgId)));
+      viewActions.viewCourse(courseId, Maybe.just(m.guid));
     },
 
   });
@@ -284,8 +284,7 @@ function applyChange(
 }
 
 export function change(change: org.OrgChangeRequest, changeType = ChangeType.Normal) {
-  return function (dispatch, getState) {
-
+  return function (dispatch, getState: () => State) {
     getState().orgs.activeOrg.lift((doc) => {
       const courseId = getState().course.guid;
       dispatch(requestInitiated());

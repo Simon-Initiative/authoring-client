@@ -4,7 +4,7 @@ import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
 import { parseDate } from 'utils/date';
 import { DatasetStatus } from 'types/analytics/dataset';
-import { CourseIdV, CourseGuid } from 'data/types';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 // Must match DeployStage enum values in ContentService
 export enum DeployStage {
@@ -26,7 +26,7 @@ export type CourseModelParams = {
   guid?: CourseGuid,
   id?: string,
   version?: string,
-  idv?: CourseIdV,
+  idvers?: CourseIdVers,
   editable?: boolean;
   title?: string,
   type?: string,
@@ -57,7 +57,7 @@ const defaultCourseModel = {
   guid: '',
   id: CourseGuid.of(''),
   version: '',
-  idv: CourseIdV.of('', '1.0'),
+  idvers: CourseIdVers.of('', '1.0'),
   editable: true,
   type: LegacyTypes.package,
   title: '',
@@ -105,7 +105,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   guid: CourseGuid;
   id: string;
   version: string;
-  idv: CourseIdV;
+  idvers: CourseIdVers;
   editable: boolean;
   title: string;
   type: string;
@@ -173,7 +173,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       guid: CourseGuid.of(c.guid),
       id: c.id,
       version: c.version,
-      idv: CourseIdV.of(c.id, c.version),
+      idvers: CourseIdVers.of(c.id, c.version),
       editable: c.editable,
       title: c.title,
       type: c.type,

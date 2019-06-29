@@ -2,10 +2,10 @@ import * as persistence from 'data/persistence';
 import * as courseActions from 'actions/course';
 import * as Immutable from 'immutable';
 import { Resource } from 'data/content/resource';
-import { CourseIdentifier } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 export function createResource(
-  courseId: CourseIdentifier, resource, dispatch): Promise<persistence.Document> {
+  courseId: CourseIdVers, resource, dispatch): Promise<persistence.Document> {
 
   return new Promise((resolve, reject) => {
 

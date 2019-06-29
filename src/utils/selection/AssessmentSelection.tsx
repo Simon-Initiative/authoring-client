@@ -6,7 +6,7 @@ import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import ModalSelection from './ModalSelection';
 import guid from '../guid';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 export enum AssessmentsToDisplay {
   Formative,
@@ -15,7 +15,7 @@ export enum AssessmentsToDisplay {
 }
 
 export interface AssessmentSelectionProps {
-  CourseIdV: CourseIdentifier;
+  courseIdVers: CourseIdVers;
   toDisplay: AssessmentsToDisplay;
   onInsert: (assessment: models.AssessmentModel) => void;
   onCancel: () => void;
@@ -50,7 +50,7 @@ export class AssessmentSelection
   }
 
   fetchAssessments() {
-    persistence.fetchCourseResources(this.props.CourseIdV)
+    persistence.fetchCourseResources(this.props.courseIdVers)
       .then((resources) => {
         this.setState({
           assessments: resources
@@ -94,7 +94,7 @@ export class AssessmentSelection
       title: new contentTypes.Title({ text: resource.title }),
     });
 
-    persistence.createDocument(this.props.courseIdentifier, assessment)
+    persistence.createDocument(this.props.courseIdVers, assessment)
       .then(result => this.props.onInsert(result.model as models.AssessmentModel));
   }
 
@@ -116,7 +116,7 @@ export class AssessmentSelection
   }
 
   onInsert(id: string) {
-    persistence.retrieveDocument(this.props.courseIdentifier, id)
+    persistence.retrieveDocument(this.props.courseIdVers, id)
       .then(result => this.props.onInsert(result.model as models.AssessmentModel));
   }
 

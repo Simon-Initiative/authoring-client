@@ -16,7 +16,6 @@ import { MapFn } from 'data/utils/map';
 import { fetchSkills } from 'actions/skills';
 import { fetchObjectives } from 'actions//objectives';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
-import { CourseIdentifier } from 'data/types';
 
 /**
  * An interface that defines the  'services' that are available to
@@ -29,17 +28,17 @@ import { CourseIdentifier } from 'data/types';
 export interface AppServices {
 
   // Request to view a document with the specified document id.
-  viewDocument: (documentId: types.DocumentId, courseId: types.CourseIdV,
+  viewDocument: (documentId: types.DocumentId, courseId: types.CourseIdVers,
     orgId: Maybe<string>) => void;
 
   displayMessage: (message: Messages.Message) => void;
 
   dismissMessage: (message: Messages.Message) => void;
 
-  createWorkbookPage: (title: string, courseId: types.CourseGuidOrIdentifier) =>
+  createWorkbookPage: (title: string, courseId: types.CourseGuid | types.CourseIdVers) =>
     Promise<persistence.Document>;
 
-  createAssessment: (title: string, courseId: types.CourseGuidOrIdentifier) =>
+  createAssessment: (title: string, courseId: types.CourseGuid | types.CourseIdVers) =>
     Promise<persistence.Document>;
 
   // Display the given component in a modal dialog.
@@ -70,11 +69,11 @@ export interface AppServices {
 
   updateCourseResource: (resource: contentTypes.Resource) => void;
 
-  refreshSkills: (courseId: CourseIdV) => void;
+  refreshSkills: (courseId: types.CourseIdVers) => void;
 
-  refreshObjectives: (courseId: CourseIdV) => void;
+  refreshObjectives: (courseId: types.CourseIdVers) => void;
 
-  refreshCourse: (courseId: CourseIdV) => void;
+  refreshCourse: (courseId: types.CourseIdVers) => void;
 
   mapAndSave: (fn: MapFn, documentId: string) => void;
 }
@@ -99,18 +98,18 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(messageActions.dismissSpecificMessage(message));
   }
 
-  viewDocument(documentId: string, courseId: types.CourseIdV, orgId: Maybe<string>) {
-    this.dispatch(view.viewDocument(documentId, courseId, orgId));
+  viewDocument(documentId: string, courseId: types.CourseIdVers, orgId: Maybe<string>) {
+    view.viewDocument(documentId, courseId, orgId);
   }
 
-  createWorkbookPage(title: string, courseId: types.CourseGuidOrIdentifier):
+  createWorkbookPage(title: string, courseId: types.CourseGuid | types.CourseIdVers):
     Promise<persistence.Document> {
     const resource = models.WorkbookPageModel.createNew(
       guid(), 'New Page', NEW_PAGE_CONTENT);
     return this.createResource(courseId, resource);
   }
 
-  createAssessment(title: string, courseId: types.CourseGuidOrIdentifier):
+  createAssessment(title: string, courseId: types.CourseGuid | types.CourseIdVers):
     Promise<persistence.Document> {
     const resource = new models.AssessmentModel({
       type: types.LegacyTypes.assessment2,
@@ -132,15 +131,15 @@ export class DispatchBasedServices implements AppServices {
       Immutable.OrderedMap<string, contentTypes.Resource>([[resource.guid, resource]])));
   }
 
-  refreshSkills(courseId: CourseIdV) {
+  refreshSkills(courseId: types.CourseIdVers) {
     this.dispatch(fetchSkills(courseId));
   }
 
-  refreshObjectives(courseId: CourseIdV) {
+  refreshObjectives(courseId: types.CourseIdVers) {
     this.dispatch(fetchObjectives(courseId));
   }
 
-  refreshCourse(courseId: CourseIdV) {
+  refreshCourse(courseId: types.CourseIdVers) {
     this.dispatch(courseActions.loadCourse(courseId));
   }
 
@@ -173,7 +172,8 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(docActions.mapAndSave(fn, documentId));
   }
 
-  createResource(courseId: types.CourseGuidOrIdentifier, resource): Promise<persistence.Document> {
+  createResource(courseId: types.CourseGuid | types.CourseIdVers, resource):
+    Promise<persistence.Document> {
     return new Promise((resolve, reject) => {
 
       let creationResult: persistence.Document = null;
@@ -219,7 +219,7 @@ export class DispatchBasedServices implements AppServices {
     }
 
     return new Promise((resolve, reject) => {
-      persistence.retrieveCoursePackage(this.courseModel.identifier)
+      persistence.retrieveCoursePackage(this.courseModel.idvers)
         .then((doc) => {
 
           if (doc.model.modelType === 'CourseModel') {

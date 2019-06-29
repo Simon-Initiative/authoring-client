@@ -13,7 +13,7 @@ import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
 import { setOrderedIds } from 'actions/bibliography';
-import { CourseIdentifier } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 interface StateProps {
   activeContext: any;
@@ -21,7 +21,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  fetchObjectives: (courseId: CourseIdV) => void;
+  fetchObjectives: (courseId: CourseIdVers) => void;
   onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
@@ -46,7 +46,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    fetchObjectives: (courseId: CourseIdV) => {
+    fetchObjectives: (courseId: CourseIdVers) => {
       return dispatch(fetchObjectives(courseId) as any);
     },
     onUpdateContent: (documentId: string, content: ContentElement) => {

@@ -41,7 +41,7 @@ export class ActivityLinkEditor
   }
 
   componentDidMount() {
-    persistence.fetchCourseResources(this.props.context.courseModel.identifier)
+    persistence.fetchCourseResources(this.props.context.courseModel.idvers)
       .then((resources) => {
         return resources;
       })

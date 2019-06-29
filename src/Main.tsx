@@ -38,7 +38,7 @@ import * as viewActions from 'actions/view';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 import { FourZeroFour } from 'components/404';
 import { OrganizationModel } from 'data/models/org';
-import { LegacyTypes, CourseIdV } from 'data/types';
+import { LegacyTypes, CourseIdVers, CourseGuid } from 'data/types';
 
 interface MainProps {
   user: UserState;
@@ -48,11 +48,11 @@ interface MainProps {
   router: RouterState;
   server: ServerState;
   hover: HoverState;
-  onLoad: (courseId: CourseIdV, documentId: string) => Promise<persistence.Document>;
+  onLoad: (courseId: CourseIdVers, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
-  onLoadOrg: (courseId: CourseIdV, documentId: string) => Promise<persistence.Document>;
+  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<persistence.Document>;
   onSetServerTimeSkew: () => void;
-  onLoadCourse: (courseId: CourseIdV) => Promise<models.CourseModel>;
+  onLoadCourse: (courseId: CourseIdVers) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
   onUpdateCourseResources: (updated) => void;
@@ -94,23 +94,21 @@ export default class Main extends React.Component<MainProps, MainState> {
   onCreateOrg = () => {
     const { course, onUpdateCourseResources, viewActions } = this.props;
 
-    course.lift((c) => {
-      const title = 'New Organization';
-      const wbId = guid();
-      const body = NEW_PAGE_CONTENT;
-      const wb = models.WorkbookPageModel.createNew(wbId, 'Welcome', body);
-      persistence.createDocument(c.identifier, wb)
-        .then((result) => {
-          const resource = createOrg(c.guid, title, c.title, wbId);
-          persistence.createDocument(c.identifier, resource)
-            .then((result) => {
-              const r = (result.model as OrganizationModel).resource;
-              const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
-              onUpdateCourseResources(updated);
-              viewActions.viewDocument(r.id, c.identifier, Maybe.just(r.id));
-            });
-        });
-    });
+    const title = 'New Organization';
+    const wbId = guid();
+    const body = NEW_PAGE_CONTENT;
+    const wb = models.WorkbookPageModel.createNew(wbId, 'Welcome', body);
+    persistence.createDocument(course.idvers, wb)
+      .then((result) => {
+        const resource = createOrg(course.guid, title, course.title, wbId);
+        persistence.createDocument(course.idvers, resource)
+          .then((result) => {
+            const r = (result.model as OrganizationModel).resource;
+            const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
+            onUpdateCourseResources(updated);
+            viewActions.viewDocument(r.id, course.idvers, Maybe.just(r.id));
+          });
+      });
   }
 
   render(): JSX.Element {
@@ -146,6 +144,7 @@ export default class Main extends React.Component<MainProps, MainState> {
         })}
         <div className="main-content">
           {(() => {
+            console.log('route in main', route)
             switch (route.type) {
               case 'RouteRoot':
                 return <CoursesViewSearchable
@@ -167,14 +166,14 @@ export default class Main extends React.Component<MainProps, MainState> {
                       shouldRefresh={router.params.get('refresh') === 'true'}
                       previewUrl={Maybe.maybe(router.params.get('url'))}
                       documentId={route.route.resourceId}
-                      courseIdentifier={route.courseIdentifier} />;
+                      courseIdVers={route.courseId} />;
                   case 'RouteAllResources':
                   case 'RouteCourseOverview':
                   case 'RouteObjectives':
                   case 'RouteOrganizations':
                   case 'RouteResource':
                   case 'RouteSkills':
-                    return course.caseOf({
+                    return Maybe.maybe(course).caseOf({
                       nothing: () => <ResourceLoading />,
                       just: loadedCourse => (
                         <div className="main-splitview">
@@ -217,14 +216,14 @@ export default class Main extends React.Component<MainProps, MainState> {
                                     return <OrgDetailsEditor course={loadedCourse} />;
                                   }
 
-                                  Maybe.maybe(loadedCourse.resourcesById
+                                  return Maybe.maybe(loadedCourse.resourcesById
                                     .get(routeResource.resourceId))
                                     .caseOf({
                                       just: resource =>
-                                        // Org component
+                                        // Regular resource
                                         <DocumentView
                                           onLoad={(docId: string) =>
-                                            onLoad(loadedCourse.identifier, docId)}
+                                            onLoad(loadedCourse.idvers, docId)}
                                           onRelease={(docId: string) => onRelease(docId)}
                                           profile={user.profile}
                                           orgId={route.orgId.valueOr('')}
@@ -232,8 +231,8 @@ export default class Main extends React.Component<MainProps, MainState> {
                                           userId={user.userId}
                                           userName={user.user}
                                           documentId={routeResource.resourceId} />,
-                                      // Regular resource
                                       nothing: () =>
+                                        // Org component
                                         <OrgComponentEditor
                                           course={loadedCourse}
                                           componentId={routeResource.resourceId}
@@ -257,9 +256,9 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 }
 
-const createOrg = (courseGuid: string, title, courseTitle: string, wbId: string) => {
+const createOrg = (courseGuid: CourseGuid, title, courseTitle: string, wbId: string) => {
   const g = guid();
-  const id = courseGuid + '_' +
+  const id = courseGuid.value() + '_' +
     title.toLowerCase().split(' ')[0] + '_'
     + g.substring(g.lastIndexOf('-') + 1);
 

@@ -1,8 +1,7 @@
 import * as persistence from 'data/persistence';
-import {
-  AbstractPersistenceStrategy,
-} from 'editors/manager/persistence/AbstractPersistenceStrategy';
-import { toCourseGuid } from 'data/utils/idwrappers';
+import { AbstractPersistenceStrategy } from
+  'editors/manager/persistence/AbstractPersistenceStrategy';
+import { CourseGuid } from 'data/types';
 
 /**
  * A persistence strategy that applies changes immediately, and will auto
@@ -58,7 +57,7 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
           } else {
             persistence.retrieveDocument(
               typeof initialDoc._courseId === 'string'
-                ? toCourseGuid(initialDoc._courseId)
+                ? CourseGuid.of(initialDoc._courseId)
                 : initialDoc._courseId,
               typeof initialDoc._id === 'string'
                 ? initialDoc._id

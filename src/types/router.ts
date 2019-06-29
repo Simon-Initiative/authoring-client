@@ -1,5 +1,5 @@
 import { Maybe } from 'tsmonad';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 export type RouteOption =
   | RouteApplicationOption
@@ -14,7 +14,7 @@ export type RouteApplicationOption =
 
 export type RouteCourse = {
   type: 'RouteCourse',
-  courseId: CourseIdV,
+  courseId: CourseIdVers,
   orgId: Maybe<string>,
   route: RouteCourseOption,
 };
@@ -28,7 +28,7 @@ export type RouteCourseOption =
   | RouteOrganizations
   | RouteObjectives;
 
-export function toRouteCourse(courseId: CourseIdV,
+export function toRouteCourse(courseId: CourseIdVers,
   orgId: Maybe<string>, route: RouteCourseOption): RouteCourse {
   return {
     type: 'RouteCourse',

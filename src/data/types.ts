@@ -13,11 +13,14 @@ class Id {
   }
 
   // canonicalize can be used to trim or parse wrapped strings
-  static create = (canonicalize: <T>(t: T) => T, type: string, s: string) =>
+  static create = (
+    canonicalize: <T>(t: T) => T,
+    type: string,
+    s: string) =>
     new Id(type, canonicalize(s))
 
   apply = f => f(this.val);
-  value: () => string = this.apply(identity);
+  value: () => string = () => this.apply(identity);
   eq = (x: Id) => this.type === x.type && this.val === x.val;
 }
 
@@ -36,7 +39,7 @@ export class CourseId extends Id {
 export class CourseGuid extends Id {
   static of = (guid: string) => Id.create(identity, 'CourseGuid', guid);
 }
-export class CourseIdV extends Id {
+export class CourseIdVers extends Id {
   static of = (id: string, v: string) => {
     const courseIdentifier = id + '-' + v;
     return Id.create(identity, 'CourseIdentifier', courseIdentifier);

@@ -2,7 +2,7 @@ import { Map } from 'immutable';
 import { Maybe, maybe } from 'tsmonad';
 import { logger, LogTag } from 'utils/logger';
 import * as routerTypes from 'types/router';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 
 export function parseUrl(url: string, search: string):
@@ -62,6 +62,7 @@ export const parseUrlParams = (search: string): Map<string, string> =>
 function parseRoute(
   path: string, params: Map<string, string>): Maybe<routerTypes.RouteOption> {
 
+
   const routeParts = path.split('/');
   switch (routeParts[0]) {
 
@@ -70,30 +71,34 @@ function parseRoute(
     case 'create': return maybe(routerTypes.toRouteCreate());
     case 'import': return maybe(routerTypes.toRouteImport());
 
+    // Todo: this is not type-safe
+
     // Course routes
     default: {
       // If it's a course route, routeParts[0] should be courseId-courseVersion
       const [id, version] = routeParts[0].split('-');
-      CourseIdV.of(id, version).caseOf({
-        // Couldn't parse route Id - not a valid route
-        nothing: () => Maybe.nothing(),
-        just: (courseIdentifier) => {
-          return maybe(routerTypes.toRouteCourse(
-            courseIdentifier,
-            maybe(params.get('organization')),
-            parseCoursePage(routeParts[1]),
-          ));
-        },
-      });
+      if (!id || !version) {
+        return Maybe.nothing();
+      }
+      const parsed = version.split('.').map(s => parseInt(s, 10));
+      if ((parsed.length === 2 || parsed.length === 3)
+        && parsed.find(isNaN) === undefined) {
+        return maybe(routerTypes.toRouteCourse(
+          CourseIdVers.of(id, version),
+          maybe(params.get('organization')),
+          parseCoursePage(routeParts[1]),
+        ));
+      }
+      return Maybe.nothing();
     }
   }
-
-  return Maybe.nothing();
 }
 
 function parseCoursePage(page: string): routerTypes.RouteCourseOption {
+  console.log('page', page)
   switch (page) {
-    case '': return routerTypes.toRouteCourseOverview();
+    case '':
+    case undefined: return routerTypes.toRouteCourseOverview();
     case 'skills': return routerTypes.toRouteSkills();
     case 'resources': return routerTypes.toRouteAllResources();
     case 'organizations': return routerTypes.toRouteOrganizations();

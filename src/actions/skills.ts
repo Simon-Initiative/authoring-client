@@ -2,7 +2,7 @@ import { Skill } from 'data/contentTypes';
 import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 
-import { LegacyTypes, CourseIdV } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 
 export type SET_SKILLS = 'SET_SKILLS';
 export const SET_SKILLS = 'SET_SKILLS';
@@ -34,7 +34,7 @@ export function updateSkills(skills: Immutable.OrderedMap<string, Skill>): Updat
   };
 }
 
-export const fetchSkills = (courseId: CourseIdV) =>
+export const fetchSkills = (courseId: CourseIdVers) =>
   (dispatch): Promise<any> => {
 
     return persistence.bulkFetchDocuments(courseId, [LegacyTypes.skills_model], 'byTypes')

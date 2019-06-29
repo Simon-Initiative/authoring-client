@@ -227,12 +227,11 @@ class OrgEditor extends React.Component<OrgEditorProps,
   }
 
   onClickComponent(model: NodeTypes) {
+    console.log('clicked item', model)
 
     if (model.contentType === 'Item') {
-      this.props.services.fetchGuidById(model.resourceref.idref)
-        .then(guid => this.props.dispatch(
-          viewDocument(guid,
-            this.props.context.courseModel.identifier, Maybe.just(this.props.model.guid))));
+      viewDocument(model.resourceref.idref,
+        this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
     } else {
       const id = this.props.selectedItem.caseOf({
         just: (item) => {
@@ -248,9 +247,9 @@ class OrgEditor extends React.Component<OrgEditorProps,
       if (componentId === id) {
         this.toggleExpanded(componentId);
       } else {
-        this.props.dispatch(
-          viewDocument(componentId,
-            this.props.context.courseModel.identifier, Maybe.just(this.props.model.guid)));
+        console.log('in orgEditor, props.model is', this.props.model)
+        viewDocument(componentId,
+          this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
       }
 
     }
@@ -263,6 +262,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
   renderContent() {
 
     const { selectedItem } = this.props;
+    console.log('selectedItem', selectedItem)
     const isExpanded = guid => this.props.expanded.caseOf({
       just: v => v.has(guid),
       nothing: () => false,
@@ -285,7 +285,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
       if (node.contentType === 'Item') {
         const res = this.props.context.courseModel
           .resourcesById.get(node.resourceref.idref);
-        isSelected = res !== undefined ? res.guid === id : false;
+        isSelected = res !== undefined ? res.id === id : false;
       } else {
         isSelected = node.id === id;
       }

@@ -3,7 +3,7 @@ import { DocumentId } from '../types';
 import * as models from '../models';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
 import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak';
-import { CourseIdV, CourseGuid } from 'data/types';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 const fetch = (window as any).fetch;
 
@@ -86,10 +86,10 @@ export type RevisionId = string;
 
 export type DocumentParams = {
   // string is course.guid, db guid
-  _courseId?: string | CourseGuid | CourseIdV,
+  _courseId?: string | CourseGuid | CourseIdVers,
   // A course might be the document being edited (CourseEditor.tsx)
   // documentId is generally resource.guid
-  _id?: DocumentId | CourseIdV,
+  _id?: DocumentId | CourseIdVers,
   _rev?: RevisionId,
   model?: models.ContentModel,
 };
@@ -104,8 +104,8 @@ const defaultDocumentParams = {
 export class Document extends Immutable.Record(defaultDocumentParams) {
 
   /* tslint:disable */
-  _courseId?: string | CourseGuid | CourseIdV;
-  _id: DocumentId | CourseIdV;
+  _courseId?: string | CourseGuid | CourseIdVers;
+  _id: DocumentId | CourseIdVers;
   _rev: RevisionId;
   /* tslint:enable */
 

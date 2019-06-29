@@ -15,7 +15,7 @@ import * as router from 'types/router';
 import { ResourceState } from 'data/content/resource';
 import { UserState } from 'reducers/user';
 import { buildUrlFromRoute } from 'actions/view';
-import { LegacyTypes, CourseIdV } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 
 export type UPDATE_ROUTE_ACTION = 'route/UPDATE_ROUTE_ACTION';
 export const UPDATE_ROUTE_ACTION: UPDATE_ROUTE_ACTION = 'route/UPDATE_ROUTE_ACTION';
@@ -87,10 +87,10 @@ function transitionCourseView(
     nothing: () => getActiveOrgFromLocalStorage(user, requestedCourseId),
   });
 
-  loadedCourse.caseOf({
+  Maybe.maybe(loadedCourse).caseOf({
     nothing: () => routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption),
     just: (course) => {
-      return isDifferentCourse(course.idv, requestedCourseId)
+      return isDifferentCourse(course.idvers, requestedCourseId)
         ? routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption)
         : isSameOrg(loadedRoute.route, requestedOrg)
           ? routeSameCourseSameOrg(dispatch)
@@ -105,7 +105,7 @@ function routeSameCourseSameOrg(dispatch) {
 }
 
 function routeSameCourseDifferentOrg(
-  dispatch, course: models.CourseModel, courseId: CourseIdV,
+  dispatch, course: models.CourseModel, courseId: CourseIdVers,
   org: Maybe<string>, route: router.RouteCourse) {
   org.caseOf({
     just: (org) => {
@@ -120,7 +120,7 @@ function routeSameCourseDifferentOrg(
 }
 
 function routeDifferentCourse(
-  dispatch, courseId: CourseIdV, requestedOrg: Maybe<string>,
+  dispatch, courseId: CourseIdVers, requestedOrg: Maybe<string>,
   route: router.RouteCourse) {
   dispatch(dismissScopedMessages(Scope.PackageDetails));
   dispatch(courseActions.loadCourse(courseId))
@@ -136,13 +136,13 @@ function routeDifferentCourse(
     });
 }
 
-const getActiveOrgFromLocalStorage = (user: UserState, courseId: CourseIdV) =>
+const getActiveOrgFromLocalStorage = (user: UserState, courseId: CourseIdVers) =>
   Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
     .bind(coursePrefs =>
       Maybe.maybe(coursePrefs[activeOrgUserKey(user.profile.username, courseId)])
         .lift(activeOrg => activeOrg));
 
-const isDifferentCourse = (id1: CourseIdV, id2: CourseIdV) =>
+const isDifferentCourse = (id1: CourseIdVers, id2: CourseIdVers) =>
   id1.eq(id2);
 
 function isSameOrg(route: router.RouteOption, requestedOrgId: Maybe<string>): boolean {

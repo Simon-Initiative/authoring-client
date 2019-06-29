@@ -7,7 +7,7 @@ import {
 } from 'types/analytics/dataset';
 import { caseOf } from 'utils/utils';
 import { getFormHeaders, credentials } from 'actions/utils/credentials';
-import { CourseIdV, CourseGuid } from 'data/types';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 const parseDatasetJson = (json: any): DataSet => ({
   byResource: json.datasetBlob
@@ -56,7 +56,7 @@ export function fetchDataSet(dataSetId: string): Promise<FetchDataSetResponse> {
 
 type GetAllDataSetsResponse = DataSet[];
 
-export function getAllDataSets(course: CourseGuid | CourseIdV): Promise<GetAllDataSetsResponse> {
+export function getAllDataSets(course: CourseGuid | CourseIdVers): Promise<GetAllDataSetsResponse> {
 
   const url = `${configuration.baseUrl}/analytics/${course.value()}`;
   const method = 'GET';
@@ -72,7 +72,7 @@ type CreateDatasetResponse = {
   message: string,
 };
 
-export function createDataSet(course: CourseGuid | CourseIdV): Promise<CreateDatasetResponse> {
+export function createDataSet(course: CourseGuid | CourseIdVers): Promise<CreateDatasetResponse> {
 
   const url = `${configuration.baseUrl}/analytics/dataset/${course.value()}`;
   const method = 'POST';

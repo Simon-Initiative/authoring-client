@@ -6,7 +6,7 @@ import { State } from 'reducers';
 import { Document } from 'data/persistence';
 import { UserProfile } from 'types/user';
 import { load as loadOrg, releaseOrg } from 'actions/orgs';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 import { preview } from 'actions/preview';
 import { RouteCourse } from 'types/router';
 import { CourseModel } from 'data/models/course';
@@ -16,9 +16,9 @@ interface StateProps {
 
 interface DispatchProps {
   viewActions: viewActions.ViewActions;
-  onLoadOrg: (courseId: CourseIdV, documentId: string) => Promise<Document>;
+  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
-  onPreview: (courseId: CourseIdV, organizationId: string, redeploy: boolean) =>
+  onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
     Promise<any>;
 }
 
@@ -48,10 +48,10 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 
   return {
     viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
-    onLoadOrg: (courseId: CourseIdV, documentId: string) =>
+    onLoadOrg: (courseId: CourseIdVers, documentId: string) =>
       dispatch(loadOrg(courseId, documentId)),
     onReleaseOrg: () => dispatch(releaseOrg() as any),
-    onPreview: (courseId: CourseIdV, organizationId: string, redeploy: boolean) =>
+    onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
       dispatch(preview(courseId, organizationId, false, redeploy)),
   };
 };

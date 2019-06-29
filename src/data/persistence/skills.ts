@@ -1,8 +1,8 @@
 import { configuration } from '../../actions/utils/config';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
-import { CourseGuid, CourseIdV } from 'data/types';
+import { CourseGuid, CourseIdVers } from 'data/types';
 
-export function skillsDownload(course: CourseGuid | CourseIdV): Promise<void> {
+export function skillsDownload(course: CourseGuid | CourseIdVers): Promise<void> {
   const method = 'GET';
   const url = `${configuration.baseUrl}/${course.value()}/ldmodel/export`;
   const headers = getFormHeaders(credentials);

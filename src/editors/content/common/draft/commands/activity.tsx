@@ -35,7 +35,7 @@ export class InsertActivityCommand extends AbstractCommand<EditorState> {
       services.displayModal(
         <AssessmentSelection
           toDisplay={AssessmentsToDisplay.Summative}
-          courseIdentifier={context.courseModel.identifier}
+          courseIdVers={context.courseModel.idvers}
           onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)}
           onCancel={this.onCancel.bind(this, services)} />);
     });

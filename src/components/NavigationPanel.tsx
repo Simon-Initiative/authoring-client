@@ -14,11 +14,11 @@ import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
 import { RequestButton } from 'editors/document/course/CourseEditor';
-import { CourseIdentifier } from 'data/types';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { Resource } from 'data/contentTypes';
 import { RouteCourse } from 'types/router';
+import { CourseIdVers } from 'data/types';
 
 
 const DEFAULT_WIDTH_PX = 400;
@@ -272,9 +272,9 @@ export interface NavigationPanelProps {
   userId: string;
   userName: string;
   onCreateOrg: () => void;
-  onLoadOrg: (courseId: CourseIdV, documentId: string) => Promise<Document>;
+  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
-  onPreview: (courseId: CourseIdV, organizationId: string, redeploy: boolean) =>
+  onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
     Promise<any>;
 }
 
@@ -394,7 +394,7 @@ class NavigationPanel
     const { route, onPreview, course } = this.props;
 
     return route.orgId.caseOf({
-      just: orgId => onPreview(course.identifier, orgId, redeploy)
+      just: orgId => onPreview(course.idvers, orgId, redeploy)
         .catch(err => console.error('Full preview error:', err)),
       nothing: () => Promise.reject(null),
     });
@@ -442,7 +442,7 @@ class NavigationPanel
             classes.navItem,
             route.route.type === 'RouteCourseOverview' && classes.selectedNavItem,
           ])}
-          onClick={() => viewActions.viewCourse(course.identifier, Maybe.just(currentOrg.guid))}>
+          onClick={() => viewActions.viewCourse(course.idvers, Maybe.just(currentOrg.id))}>
           <i className="fa fa-book" />{!collapsed && ' Overview'}
         </div>
       </Tooltip>
@@ -460,7 +460,7 @@ class NavigationPanel
           route.route.type === 'RouteObjectives' && classes.selectedNavItem,
         ])}
           onClick={() =>
-            viewActions.viewObjectives(course.identifier, Maybe.just(currentOrg.guid))}>
+            viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id))}>
           <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
         </div>
       </Tooltip>
@@ -479,7 +479,7 @@ class NavigationPanel
             route.route.type === 'RouteAllResources' && classes.selectedNavItem,
           ])}
           onClick={() =>
-            viewActions.viewAllResources(course.identifier, Maybe.just(currentOrg.guid))}>
+            viewActions.viewAllResources(course.idvers, Maybe.just(currentOrg.id))}>
           <i className="fas fa-folder-open" />{!collapsed && ' All Resources'}
         </div>
       </Tooltip>
@@ -498,7 +498,7 @@ class NavigationPanel
         <div className={classNames([
           classes.navItemDropdown,
           route.orgId.caseOf({
-            just: id => id === currentOrg.guid && classes.selectedNavItem,
+            just: id => id === currentOrg.id && classes.selectedNavItem,
             nothing: () => null,
           }),
         ])}>
@@ -513,7 +513,7 @@ class NavigationPanel
               collapsed && classes.dropdownTextCollapsed,
             ])}
               onClick={() => viewActions.viewDocument(
-                currentOrg.guid, course.identifier, Maybe.just(currentOrg.guid))}>
+                currentOrg.id, course.idvers, Maybe.just(currentOrg.id))}>
               <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
             </div>
           </Tooltip>
@@ -535,9 +535,9 @@ class NavigationPanel
               onClick={() => {
                 if (org.id !== currentOrg.id) {
                   this.props.onReleaseOrg();
-                  updateActiveOrgPref(course.identifier, profile.username, org.id);
-                  this.props.onLoadOrg(course.identifier, org.guid);
-                  viewActions.viewDocument(org.guid, course.identifier, Maybe.just(org.guid));
+                  updateActiveOrgPref(course.idvers, profile.username, org.id);
+                  this.props.onLoadOrg(course.idvers, org.guid);
+                  viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
                 }
 
               }}>
@@ -588,7 +588,7 @@ class NavigationPanel
             : (
               <OrgEditorManager
                 {...this.props}
-                documentId={currentOrg.guid}
+                documentId={currentOrg.id}
                 selectedItem={selectedItem}
               />
             )
@@ -632,16 +632,22 @@ class NavigationPanel
     if (!course) return null;
 
     // get org id from router or select the first organization
-    const currentOrg = route.orgId.caseOf({
-      just: guid => course.resources.find(r => r.guid === guid),
-      nothing: () => course.resources.find(r => r.type === 'x-oli-organization'),
-    });
 
     let selectedItem: Maybe<nav.NavigationItem> = Maybe.just(nav.makePackageOverview());
     if (route.route.type === 'RouteObjectives') {
       selectedItem = Maybe.just(nav.makeLearningObjectives());
     } else if (route.route.type === 'RouteResource') {
       selectedItem = Maybe.just(nav.makeOrganizationItem(route.route.resourceId));
+    }
+
+    const currentOrg = route.orgId.caseOf({
+      just: id => course.resourcesById.find(r => r.id === id),
+      nothing: () => course.resourcesById.find(r => r.type === 'x-oli-organization'),
+    });
+
+    if (!currentOrg) {
+      viewActions.viewMissingPage();
+      return null;
     }
 
     return (

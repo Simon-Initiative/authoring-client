@@ -45,9 +45,12 @@ export const router = (
   state: RouterState = initialState,
   action: ActionTypes,
 ): RouterState => {
+  if (action.type === UPDATE_ROUTE_ACTION) {
+    console.log('state with action', state.with({ path: action.path, params: action.params, route: action.route }))
+  }
   switch (action.type) {
     case UPDATE_ROUTE_ACTION:
-      return state.with({
+      return new RouterState({
         path: action.path,
         params: action.params,
         route: action.route,

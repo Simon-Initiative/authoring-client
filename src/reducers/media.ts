@@ -12,7 +12,6 @@ import {
   LoadMediaReferencesAction,
 } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
-import { fromCourseIdentifier } from 'data/utils/idwrappers';
 
 export type ActionTypes = FetchMediaPageAction | ResetMediaAction | ReceiveMediaPageAction
   | SideloadDataAction | LoadMediaReferencesAction;
@@ -28,7 +27,7 @@ export const media = (
   switch (action.type) {
     case FETCH_MEDIA_PAGE: {
       const { courseId, reqId } = action;
-      const id = fromCourseIdentifier(courseId);
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
       const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
@@ -43,7 +42,7 @@ export const media = (
     }
     case RESET_MEDIA: {
       const { courseId } = action;
-      const id = fromCourseIdentifier(courseId);
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
       const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
@@ -55,7 +54,7 @@ export const media = (
     }
     case RECEIVE_MEDIA_PAGE: {
       const { courseId, items, totalItems } = action;
-      const id = fromCourseIdentifier(courseId);
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
       const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
@@ -69,7 +68,7 @@ export const media = (
     }
     case SIDELOAD_DATA: {
       const { courseId, data } = action;
-      const id = fromCourseIdentifier(courseId);
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
       const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
@@ -81,7 +80,7 @@ export const media = (
     }
     case LOAD_MEDIA_REFS: {
       const { courseId, references } = action;
-      const id = fromCourseIdentifier(courseId);
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
       const mediaLibrary = state.get(id) || new OrderedMediaLibrary();

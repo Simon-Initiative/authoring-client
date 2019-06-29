@@ -9,16 +9,16 @@ import { DeferredPersistenceStrategy }
   from 'editors/manager/persistence/DeferredPersistenceStrategy';
 import { buildPersistenceFailureMessage } from 'utils/error';
 import { ServerName } from 'data/persistence/document';
-import { CourseIdV } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(CourseIdV: CourseIdV, orgId: string,
+function invokePreview(CourseIdVers: CourseIdVers, orgId: string,
   isRefreshAttempt: boolean, server?: ServerName) {
-  return persistence.initiatePreview(CourseIdV, orgId, isRefreshAttempt, server);
+  return persistence.initiatePreview(CourseIdVers, orgId, isRefreshAttempt, server);
 }
 
 export function preview(
-  courseId: CourseIdV, organizationId: string,
+  courseId: CourseIdVers, organizationId: string,
   isRefreshAttempt: boolean, redeploy: boolean = true, server?: ServerName) {
 
   return function (dispatch): Promise<any> {
