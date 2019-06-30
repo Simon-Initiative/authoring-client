@@ -6,7 +6,6 @@ import colors from 'styles/colors';
 import * as viewActions from 'actions/view';
 import { CourseModel } from 'data/models';
 import { UserProfile } from 'types/user';
-import { RouterState } from 'reducers/router';
 import { disableSelect } from 'styles/mixins';
 import { Document } from 'data/persistence';
 import * as nav from 'types/navigation';
@@ -266,7 +265,6 @@ export const styles: JSSStyles = {
 export interface NavigationPanelProps {
   className?: string;
   course: CourseModel;
-  viewActions: viewActions.ViewActions;
   route: RouteCourse;
   profile: UserProfile;
   userId: string;
@@ -432,7 +430,7 @@ class NavigationPanel
   }
 
   renderOverview(currentOrg: Resource) {
-    const { classes, viewActions, course, route } = this.props;
+    const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
     return (
@@ -450,7 +448,7 @@ class NavigationPanel
   }
 
   renderObjectives(currentOrg: Resource) {
-    const { classes, viewActions, course, route } = this.props;
+    const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
     return (
@@ -468,7 +466,7 @@ class NavigationPanel
   }
 
   renderAllResources(currentOrg: Resource) {
-    const { classes, viewActions, course, route } = this.props;
+    const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
     return (
@@ -488,7 +486,7 @@ class NavigationPanel
   }
 
   renderOrgDropdown(currentOrg: Resource) {
-    const { classes, viewActions, route, profile, course, onCreateOrg } = this.props;
+    const { classes, route, profile, course, onCreateOrg } = this.props;
     const { showOrgDropdown, collapsed } = this.state;
 
     const availableOrgs = r => r.type === 'x-oli-organization' && r.resourceState !== 'DELETED';
@@ -497,10 +495,9 @@ class NavigationPanel
       <div className="dropdown">
         <div className={classNames([
           classes.navItemDropdown,
-          route.orgId.caseOf({
-            just: id => id === currentOrg.id && classes.selectedNavItem,
-            nothing: () => null,
-          }),
+          route.route.type === 'RouteResource'
+          && route.route.resourceId === currentOrg.id
+          && classes.selectedNavItem,
         ])}>
           <Tooltip
             disabled={!collapsed}
@@ -531,7 +528,10 @@ class NavigationPanel
         <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
           {course.resources.valueSeq().filter(availableOrgs).map(org => (
             <a key={org.guid}
-              className={classNames(['dropdown-item'])}
+              className={classNames([
+                'dropdown-item',
+                currentOrg.id === org.id && classes.selectedNavItem,
+              ])}
               onClick={() => {
                 if (org.id !== currentOrg.id) {
                   this.props.onReleaseOrg();
@@ -539,7 +539,6 @@ class NavigationPanel
                   this.props.onLoadOrg(course.idvers, org.guid);
                   viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
                 }
-
               }}>
               {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
             </a>
@@ -644,11 +643,6 @@ class NavigationPanel
       just: id => course.resourcesById.find(r => r.id === id),
       nothing: () => course.resourcesById.find(r => r.type === 'x-oli-organization'),
     });
-
-    if (!currentOrg) {
-      viewActions.viewMissingPage();
-      return null;
-    }
 
     return (
       <div

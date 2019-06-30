@@ -20,7 +20,7 @@ export type ViewActions = {
 };
 
 // Application Routes
-export const viewAllCourses = () => pushRoute(router.toRouteImport());
+export const viewAllCourses = () => pushRoute(router.toRouteRoot());
 export const viewCreateCourse = () => pushRoute(router.toRouteCreate());
 export const viewImportCourse = () => pushRoute(router.toRouteImport());
 export const viewMissingPage = () => pushRoute(router.toRouteMissing());

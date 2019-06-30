@@ -274,6 +274,8 @@ export function load(courseId: CourseIdVers, documentId: string) {
     const holder = { changeMade: false };
     const notifyChangeMade = () => holder.changeMade = true;
 
+    console.log('loading document', documentId)
+
     dispatch(documentRequested(documentId));
 
     return persistence.retrieveDocument(courseId, documentId, notifyChangeMade)

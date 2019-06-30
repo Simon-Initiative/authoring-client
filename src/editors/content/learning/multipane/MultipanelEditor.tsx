@@ -232,7 +232,7 @@ class MultipanelEditor
 
     Maybe.maybe(context.courseModel.resourcesById.get(model.inline.idref))
       .lift((inline) => {
-        retrieveDocument(context.courseModel.idvers, inline.guid)
+        retrieveDocument(context.courseModel.idvers, inline.id)
           .then((inline) => {
             this.setState({
               isLoadingActivity: false,

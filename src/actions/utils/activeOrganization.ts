@@ -4,7 +4,7 @@ import { CourseIdVers } from 'data/types';
 
 export const ACTIVE_ORG_STORAGE_KEY = 'activeOrganization';
 export const activeOrgUserKey = (username: string, courseId: CourseIdVers) =>
-  username + ':' + courseId;
+  username + ':' + courseId.value();
 
 
 export function updateActiveOrgPref(

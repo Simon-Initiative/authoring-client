@@ -84,10 +84,12 @@ export function duplicate(model: ContentModel) {
           }
           // If we are duplicating an org, switch to it
           if (doc.model.modelType === 'OrganizationModel') {
-            orgId = Maybe.just(doc.model.id);
+            orgId = Maybe.just(doc.model.resource.id);
             // This is required to keep the app in sync with the newly active org
             dispatch(orgLoaded(doc));
           }
+
+          console.log('new document', doc)
 
           const updatedResources = Immutable.OrderedMap<string, Resource>(
             [[(doc as any).model.resource.guid, (doc as any).model.resource]]);

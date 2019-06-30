@@ -29,7 +29,7 @@ interface OwnProps {
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const { orgs } = state;
   const orgId = orgs.activeOrg.caseOf({
-    just: org => org.model.guid,
+    just: orgDoc => orgDoc._id,
     nothing: () => null,
   });
   return {
@@ -47,14 +47,14 @@ const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
       dispatch(updateCourseResources(resources));
 
       let orgToView = orgId;
-      if (orgToView === updatedResource.guid) {
+      if (orgToView === updatedResource.id) {
         orgToView = ownProps.course.resources.toArray().filter(
           r => r.type === LegacyTypes.organization
-            && r.guid !== orgId && r.resourceState !== 'DELETED',
-        )[0].guid;
+            && r.id !== orgId && r.resourceState !== 'DELETED',
+        )[0].id;
       }
 
-      viewActions.viewAllResources(course.idvers, Maybe.just(orgToView));
+      viewActions.viewCourse(course.idvers, Maybe.just(orgToView));
       dispatch(modalActions.dismiss());
 
     },

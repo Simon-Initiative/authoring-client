@@ -31,8 +31,9 @@ function cleanUrl(url: string): Maybe<string> {
   // Parsed path will be in matches[1]. matches[0] contains a '/' prefix
   const matches = /^\/?([^\?]*)/.exec(url);
 
+  // Root route
   if (!matches || !matches[1]) {
-    return Maybe.nothing();
+    return Maybe.just('');
   }
 
   // handle special case where keycloak redirect contains garbage metadata &state

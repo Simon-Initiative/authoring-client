@@ -15,7 +15,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  viewActions: viewActions.ViewActions;
   onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
   onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
@@ -47,7 +46,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     {});
 
   return {
-    viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
     onLoadOrg: (courseId: CourseIdVers, documentId: string) =>
       dispatch(loadOrg(courseId, documentId)),
     onReleaseOrg: () => dispatch(releaseOrg() as any),

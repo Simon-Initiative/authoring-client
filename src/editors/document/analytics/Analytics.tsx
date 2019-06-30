@@ -355,9 +355,9 @@ class Analytics
         <i className={classNames([classes.partIcon, 'fa fa-marker'])} />
         <div className={classes.questionLink}
           onClick={() => onPushRoute(
-            `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
-            + `-${organization.guid}`
-            + `?questionId=${question.id}`
+            `/${course.idvers.value()}/${question.assessmentId}`
+            + `?organization=${organization.resource.id}`
+            + `&questionId=${question.id}`
             + `&partId=${part.id}`)}>
           Part {part.index + 1}
         </div>
@@ -387,9 +387,9 @@ class Analytics
           <span className={classes.questionLabel}>{question.label}:</span>
           <div className={classes.questionLink}
             onClick={() => onPushRoute(
-              `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
-              + `-${organization.guid}`
-              + `?questionId=${question.id}`)}>
+              `/${course.idvers.value()}/${question.assessmentId}`
+              + `?organization=${organization.resource.id}`
+              + `&questionId=${question.id}`)}>
             {question.title.valueOr(getReadableTitleFromType(question.type))}
           </div>
           {parts.size === 1 && (

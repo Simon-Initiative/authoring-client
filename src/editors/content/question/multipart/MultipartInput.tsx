@@ -248,6 +248,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       setActiveItemIdActionAction(data['@input']);
     };
 
+    console.log('selectedInput', selectedInput)
+
     return (
       <div className="question-body" key="question">
         <div className="control insert-item">

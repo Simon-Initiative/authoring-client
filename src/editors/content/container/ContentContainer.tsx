@@ -265,7 +265,7 @@ export class ContentContainer
     if (model.contentType === 'ContiguousText') {
       const currentTextSelection = this.textSelections.get(model.guid)
         ? Maybe.just(this.textSelections.get(model.guid))
-        : Maybe.nothing();
+        : Maybe.nothing<any>();
       return onFocus(model, this, currentTextSelection);
     }
 

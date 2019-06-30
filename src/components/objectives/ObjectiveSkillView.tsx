@@ -248,7 +248,6 @@ interface ObjectiveSkillViewState {
 class ObjectiveSkillView
   extends React.Component<ObjectiveSkillViewProps, ObjectiveSkillViewState> {
 
-  viewActions: Object;
   services: AppServices;
   unmounted: boolean;
   failureMessage: Maybe<Messages.Message>;
@@ -271,7 +270,6 @@ class ObjectiveSkillView
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
-    this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
     this.createNew = this.createNew.bind(this);
     this.onObjectiveEdit = this.onObjectiveEdit.bind(this);
     this.onSkillEdit = this.onSkillEdit.bind(this);
@@ -1320,7 +1318,7 @@ class ObjectiveSkillView
           <div className="selected-org-info">
             Metrics shown are based on the selected organization: <a href="#" onClick={(e) => {
               e.preventDefault();
-              viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
+              viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.resource.id));
             }}>
               {org.title}
             </a>

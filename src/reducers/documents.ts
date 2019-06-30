@@ -85,10 +85,14 @@ export const documents = (
     case documentActions.DOCUMENT_REQUESTED:
       // Newly requested documents simply get a new record in the map
 
+      console.log('documentID', action.documentId);
+
       return state.set(action.documentId, new EditedDocument()
         .with({ documentId: action.documentId }));
 
     case documentActions.DOCUMENT_LOADED:
+
+      console.log('documentId', action.documentId)
 
       // Successfully loaded documents have to have their doc set and
       // their persistence strategies initialized

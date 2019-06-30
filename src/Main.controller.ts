@@ -38,7 +38,6 @@ interface DispatchProps {
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
   onUpdateCourseResources: (updated) => void;
-  viewActions: viewActions.ViewActions;
 }
 
 interface OwnProps {
@@ -67,13 +66,6 @@ const mapStateToProps = (state: State): StateProps => {
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
-  const actions = Object.keys(viewActions).reduce(
-    (p, c) => {
-      p[c] = viewActions[c];
-      return p;
-    },
-    {});
-
   return {
     onLoad: (courseId: CourseIdVers, documentId: string) =>
       dispatch(load(courseId, documentId)),
@@ -87,7 +79,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       return dispatch(updateHover(hover));
     },
     onUpdateCourseResources: updated => dispatch(updateCourseResources(updated)),
-    viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
   };
 };
 

@@ -56,7 +56,6 @@ interface MainProps {
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
   onUpdateCourseResources: (updated) => void;
-  viewActions: viewActions.ViewActions;
 }
 
 interface MainState {
@@ -92,7 +91,7 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   onCreateOrg = () => {
-    const { course, onUpdateCourseResources, viewActions } = this.props;
+    const { course, onUpdateCourseResources } = this.props;
 
     const title = 'New Organization';
     const wbId = guid();
@@ -137,7 +136,7 @@ export default class Main extends React.Component<MainProps, MainState> {
         </div>
         {Maybe.maybe(modal.peek()).caseOf({
           nothing: () => undefined,
-          just: modal => modal
+          just: m => modal
             .toArray()
             .reverse()
             .map((component, i) => <div key={i}>{component}</div>),
@@ -216,6 +215,13 @@ export default class Main extends React.Component<MainProps, MainState> {
                                     return <OrgDetailsEditor course={loadedCourse} />;
                                   }
 
+                                  // If we stored a resource GUID in the route instead of an ID,
+                                  // use the Id instead
+                                  let resourceId = routeResource.resourceId;
+                                  if (loadedCourse.resources.get(resourceId)) {
+                                    resourceId = loadedCourse.resources.get(resourceId).id;
+                                  }
+
                                   return Maybe.maybe(loadedCourse.resourcesById
                                     .get(routeResource.resourceId))
                                     .caseOf({
@@ -230,12 +236,12 @@ export default class Main extends React.Component<MainProps, MainState> {
                                           course={loadedCourse}
                                           userId={user.userId}
                                           userName={user.user}
-                                          documentId={routeResource.resourceId} />,
+                                          documentId={resourceId} />,
                                       nothing: () =>
                                         // Org component
                                         <OrgComponentEditor
                                           course={loadedCourse}
-                                          componentId={routeResource.resourceId}
+                                          componentId={resourceId}
                                           editMode={loadedCourse.editable}
                                         />,
                                     });

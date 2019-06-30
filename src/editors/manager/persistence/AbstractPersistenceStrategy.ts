@@ -60,6 +60,8 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.failureCallback = onFailure;
     this.stateChangeCallback = onStateChange;
 
+    console.log('initialize docId', doc._id)
+
     return new Promise((resolve, reject) => {
       persistence.acquireLock(
         typeof doc._courseId === 'string'

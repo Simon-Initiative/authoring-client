@@ -12,7 +12,6 @@ import { CourseIdVers, CourseGuid } from 'data/types';
 export function retrieveDocument(
   course: CourseGuid | CourseIdVers, documentId: DocumentId, notify?: () => void):
   Promise<Document> {
-  console.log('retrieving document', course, documentId)
 
   // tslint:disable-next-line:max-line-length
   const url = `${configuration.baseUrl}/${course.value()}/resources/${documentId}`;
@@ -21,7 +20,7 @@ export function retrieveDocument(
     .then((json: any) => {
       return new Document({
         _courseId: course,
-        _id: json.guid,
+        _id: json.id,
         _rev: json.rev,
         model: models.createModel(json, notify),
       });
@@ -186,9 +185,10 @@ export function createDocument(course: CourseGuid | CourseIdVers, content: model
 
   return (authenticatedFetch({ url, body, method }) as any)
     .then((json) => {
+      console.log('json', json)
       return new Document({
         _courseId: course,
-        _id: json.guid,
+        _id: json.id ? json.id : json.guid,
         _rev: json.rev,
         model: models.createModel(json),
       });

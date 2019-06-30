@@ -18,6 +18,7 @@ import { TabContainer, Tab } from 'components/common/TabContainer';
 import './OrgComponent.scss';
 import { Analytics } from '../analytics/Analytics.controller';
 import { Remove } from 'components/common/Remove';
+import { Resource } from 'data/content/resource';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -117,12 +118,14 @@ export class OrgComponentEditor
     this.props.onEdit(org.makeUpdateNode(model.id, n => (n as any).with({ title }), undo));
   }
 
-  onView(componentOrResourceId: string) {
-
+  onView(componentOrResourceId: string) { // guid
+    let resourceId = this.props.course.resources.get(componentOrResourceId, {} as Resource).id;
+    if (!resourceId) {
+      resourceId = componentOrResourceId;
+    }
     this.props.org.lift((o) => {
-      this.props.onDispatch(
-        viewActions.viewDocument(
-          componentOrResourceId, this.props.course.idvers, Maybe.just(o.id)));
+      viewActions.viewDocument(
+        resourceId, this.props.course.idvers, Maybe.just(o.id));
     });
 
   }

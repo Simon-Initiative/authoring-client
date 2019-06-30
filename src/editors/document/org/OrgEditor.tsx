@@ -170,14 +170,14 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.pendingHighlightedNodes = Immutable.Set<string>().add(node.guid);
   }
 
-  toggleExpanded(guid) {
+  toggleExpanded(id) {
 
     const action = this.props.expanded.caseOf({
-      just: set => set.has(guid) ? collapseNodes : expandNodes,
+      just: set => set.has(id) ? collapseNodes : expandNodes,
       nothing: () => expandNodes,
     });
 
-    this.props.dispatch(action(this.props.context.documentId, [guid]));
+    this.props.dispatch(action(this.props.context.documentId, [id]));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -195,10 +195,10 @@ class OrgEditor extends React.Component<OrgEditorProps,
         if (newNodes.length > 0) {
           if (this.pendingHighlightedNodes === null) {
             this.pendingHighlightedNodes
-              = Immutable.Set.of(...newNodes.map(p => p.node.guid));
+              = Immutable.Set.of(...newNodes.map(p => p.node.id));
           } else {
             this.pendingHighlightedNodes = this.pendingHighlightedNodes
-              .union(Immutable.Set.of(...newNodes.map(p => p.node.guid)));
+              .union(Immutable.Set.of(...newNodes.map(p => p.node.id)));
           }
 
           // As long as the new nodes were not the result of an undo or redo,

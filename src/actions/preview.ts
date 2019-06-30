@@ -12,9 +12,10 @@ import { ServerName } from 'data/persistence/document';
 import { CourseIdVers } from 'data/types';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(CourseIdVers: CourseIdVers, orgId: string,
+function invokePreview(courseId: CourseIdVers, orgId: string,
   isRefreshAttempt: boolean, server?: ServerName) {
-  return persistence.initiatePreview(CourseIdVers, orgId, isRefreshAttempt, server);
+  console.log('previewing', courseId, orgId)
+  return persistence.initiatePreview(courseId, orgId, isRefreshAttempt, server);
 }
 
 export function preview(
@@ -67,11 +68,11 @@ export function quickPreview(courseId: string, resource: Resource) {
     // a stale preview page
     if (document.persistence instanceof DeferredPersistenceStrategy) {
       return (document.persistence as DeferredPersistenceStrategy).flushPendingChanges()
-        .then(_ => persistence.initiateQuickPreview(course.guid, resource.guid))
+        .then(_ => persistence.initiateQuickPreview(course.guid, resource.id))
         .catch(err => dispatch(showMessage(buildPersistenceFailureMessage(err, user.profile))));
     }
 
-    persistence.initiateQuickPreview(course.guid, resource.guid);
+    persistence.initiateQuickPreview(course.guid, resource.id);
     return Promise.resolve();
   };
 }

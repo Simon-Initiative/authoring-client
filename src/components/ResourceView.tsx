@@ -64,7 +64,6 @@ interface ResourceViewState {
 }
 
 export default class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
-  viewActions: any;
 
   state = {
     ...this.state,

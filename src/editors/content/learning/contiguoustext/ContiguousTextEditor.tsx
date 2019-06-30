@@ -104,6 +104,8 @@ class ContiguousTextEditor
     const { className, classes, model, parent, editMode, viewOnly,
       hideBorder = false, editorStyles } = this.props;
 
+      console.log('selected entity in cte', this.props.selectedEntity)
+
     const showBorder = !viewOnly && !hideBorder;
 
     return (
