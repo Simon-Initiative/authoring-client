@@ -84,7 +84,7 @@ export function updateRoute(path: string, search: string) {
   };
 }
 
-const redirectToFirstOrg = (route, course) => history.push(buildUrlFromRoute({
+const redirectToFirstOrg = (route, course) => history.replace(buildUrlFromRoute({
   ...route,
   orgId: Maybe.just(firstOrg(course)),
 }));

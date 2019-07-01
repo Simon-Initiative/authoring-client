@@ -567,6 +567,7 @@ class NavigationPanel
     const { classes, profile } = this.props;
     const { width, collapsed } = this.state;
 
+    console.log('selectedItem', selectedItem)
     return (
       <React.Fragment>
         <div className={classes.orgTree}>

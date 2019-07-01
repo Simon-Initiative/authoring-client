@@ -72,7 +72,7 @@ export function fetchCourseResources(course: CourseGuid | CourseIdVers): Promise
           switch (doc.model.modelType) {
             case 'CourseModel':
               resolve(doc.model.resources.toArray().map(
-                (r: Resource) => ({ _id: r.guid, title: r.title, type: r.type })));
+                (r: Resource) => ({ _id: r.id, title: r.title, type: r.type })));
               return;
             default:
           }

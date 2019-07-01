@@ -118,13 +118,14 @@ export class OrgComponentEditor
   }
 
   onView(componentOrResourceId: string) { // guid
+    console.log('viewing componentID', componentOrResourceId)
     let resourceId = this.props.course.resources.get(componentOrResourceId, {} as Resource).id;
     if (!resourceId) {
       resourceId = componentOrResourceId;
     }
     this.props.org.lift((o) => {
       viewActions.viewDocument(
-        resourceId, this.props.course.idvers, Maybe.just(o.id));
+        resourceId, this.props.course.idvers, Maybe.just(o.resource.id));
     });
 
   }

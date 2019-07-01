@@ -91,9 +91,9 @@ export class PoolRefEditor
   }
 
   onViewPool() {
-    if (this.guid !== null) {
+    if (this.props.model.idref !== null) {
       this.props.services.viewDocument(
-        this.guid,
+        this.props.model.idref,
         this.props.context.courseModel.idvers,
         Maybe.just(this.props.context.orgId));
     }

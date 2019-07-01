@@ -545,9 +545,7 @@ class MultipanelEditor
             <div className={classes.wbinlineButtons}>
               <button
                 onClick={() => {
-                  const guid = context.courseModel.resourcesById
-                    .get(model.inline.idref).guid;
-                  services.viewDocument(guid, this.props.context.courseModel.idvers,
+                  services.viewDocument(model.inline.idref, this.props.context.courseModel.idvers,
                     Maybe.just(this.props.context.orgId));
                 }}
                 type="button"
