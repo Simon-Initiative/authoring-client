@@ -43,7 +43,6 @@ export function preview(
           window.open(
             buildUrlFromRoute(toRouteCourse(
               courseId, Maybe.just(organizationId), toRoutePreview()))
-            // '/#preview' + organizationId + '-' + courseId.value()
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
             + (refresh ? '&refresh=true' : '')
             + (redeploy ? '&redeploy=true' : ''),

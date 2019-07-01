@@ -143,7 +143,6 @@ export default class Main extends React.Component<MainProps, MainState> {
         })}
         <div className="main-content">
           {(() => {
-            console.log('route in main', route)
             switch (route.type) {
               case 'RouteRoot':
                 return <CoursesViewSearchable
@@ -164,7 +163,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                       email={this.props.user.profile.email}
                       shouldRefresh={router.params.get('refresh') === 'true'}
                       previewUrl={Maybe.maybe(router.params.get('url'))}
-                      documentId={route.route.resourceId}
+                      documentId={route.orgId.valueOr('')}
                       courseIdVers={route.courseId} />;
                   case 'RouteAllResources':
                   case 'RouteCourseOverview':

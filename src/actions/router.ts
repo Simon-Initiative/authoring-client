@@ -29,7 +29,7 @@ export type UpdateRouteAction = {
 
 /** This function should only be called by history.listen */
 export function updateRoute(path: string, search: string) {
-  return (dispatch: Dispatch<State>, getState: () => State) => {
+  return (dispatch, getState: () => State) => {
     return parseUrl(path, search)
       .caseOf({
         just: (route) => {
@@ -43,10 +43,38 @@ export function updateRoute(path: string, search: string) {
             case 'RouteCreate':
             case 'RouteImport':
             case 'RouteMissing':
-              transitionApplicationView(dispatch);
+              dispatch(dismissScopedMessages(Scope.Application));
+              dispatch(enterApplicationView());
+              dispatch(orgActions.releaseOrg());
               break;
             case 'RouteCourse':
-              transitionCourseView(route.route, dispatch, getState);
+              const { course: loadedCourse, router: loadedRoute, user } = getState();
+              const routeOption = route.route;
+              const { courseId: requestedCourseId, orgId } = route.route;
+
+              const isDifferentCourse = (id1, id2) => id1.eq(id2);
+
+              const requestedOrg: Maybe<string> = orgId.caseOf({
+                just: _ => orgId,
+                nothing: () => getActiveOrgFromLocalStorage(user, requestedCourseId),
+              });
+
+              Maybe.maybe(loadedCourse).caseOf({
+                nothing: () =>
+                  routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption),
+                just: (course) => {
+                  if (isDifferentCourse(course.idvers, requestedCourseId)) {
+                    return routeDifferentCourse(
+                      dispatch, requestedCourseId, requestedOrg, routeOption);
+                  }
+
+                  if (isDifferentOrg(loadedRoute.route, requestedOrg)) {
+                    return routeDifferentOrg(
+                      dispatch, course, requestedCourseId, requestedOrg, routeOption);
+                  }
+                  return dispatch(dismissScopedMessages(Scope.Resource));
+                },
+              });
               break;
             case 'RouteKeycloakGarbage':
           }
@@ -57,54 +85,8 @@ export function updateRoute(path: string, search: string) {
   };
 }
 
-function transitionApplicationView(dispatch) {
-  // Release all redux state relevant to a course.
-  dispatch(dismissScopedMessages(Scope.Application));
-  dispatch(enterApplicationView());
-  dispatch(orgActions.releaseOrg());
-}
 
-export type ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
-export const ENTER_APPLICATION_VIEW: ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
-
-export type EnterApplicationViewAction = {
-  type: ENTER_APPLICATION_VIEW,
-};
-
-export function enterApplicationView(): EnterApplicationViewAction {
-  return {
-    type: ENTER_APPLICATION_VIEW,
-  };
-}
-
-function transitionCourseView(
-  routeOption: router.RouteCourse, dispatch, getState: () => State) {
-  const { course: loadedCourse, router: loadedRoute, user } = getState();
-  const { courseId: requestedCourseId, orgId } = routeOption;
-
-  const requestedOrg: Maybe<string> = orgId.caseOf({
-    just: _ => orgId,
-    nothing: () => getActiveOrgFromLocalStorage(user, requestedCourseId),
-  });
-
-  Maybe.maybe(loadedCourse).caseOf({
-    nothing: () => routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption),
-    just: (course) => {
-      return isDifferentCourse(course.idvers, requestedCourseId)
-        ? routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption)
-        : isSameOrg(loadedRoute.route, requestedOrg)
-          ? routeSameCourseSameOrg(dispatch)
-          : routeSameCourseDifferentOrg(
-            dispatch, course, requestedCourseId, requestedOrg, routeOption);
-    },
-  });
-}
-
-function routeSameCourseSameOrg(dispatch) {
-  dispatch(dismissScopedMessages(Scope.Resource));
-}
-
-function routeSameCourseDifferentOrg(
+function routeDifferentOrg(
   dispatch, course: models.CourseModel, courseId: CourseIdVers,
   org: Maybe<string>, route: router.RouteCourse) {
   org.caseOf({
@@ -152,27 +134,25 @@ function routeDifferentCourse(
     });
 }
 
+
 const getActiveOrgFromLocalStorage = (user: UserState, courseId: CourseIdVers) =>
   Maybe.maybe<JSON | undefined>(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
     .lift<string | undefined>(coursePrefs =>
       coursePrefs[activeOrgUserKey(user.profile.username, courseId)]);
 
-const isDifferentCourse = (id1: CourseIdVers, id2: CourseIdVers) =>
-  id1.eq(id2);
-
-function isSameOrg(route: router.RouteOption, requestedOrgId: Maybe<string>): boolean {
+function isDifferentOrg(route: router.RouteOption, requestedOrgId: Maybe<string>): boolean {
   return requestedOrgId.caseOf({
     just: (requestedOrgId) => {
       // Only course routes store an organization
       if (route.type !== 'RouteCourse') {
-        return false;
+        return true;
       }
       return route.orgId.caseOf({
-        just: loadedOrg => loadedOrg === requestedOrgId,
-        nothing: () => false,
+        just: loadedOrg => loadedOrg !== requestedOrgId,
+        nothing: () => true,
       });
     },
-    nothing: () => false,
+    nothing: () => true,
   });
 }
 
@@ -181,6 +161,19 @@ const firstOrg = (course: models.CourseModel) =>
     r => r.type === LegacyTypes.organization
       && r.resourceState !== ResourceState.DELETED)
     .first().id;
+
+export type ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
+export const ENTER_APPLICATION_VIEW: ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
+
+export type EnterApplicationViewAction = {
+  type: ENTER_APPLICATION_VIEW,
+};
+
+export function enterApplicationView(): EnterApplicationViewAction {
+  return {
+    type: ENTER_APPLICATION_VIEW,
+  };
+}
 
 export type RESET_ROUTE_ACTION = 'route/RESET_ROUTE_ACTION';
 export const RESET_ROUTE_ACTION: RESET_ROUTE_ACTION = 'route/RESET_ROUTE_ACTION';
