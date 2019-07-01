@@ -8,6 +8,7 @@ import './CreateCourseView.scss';
 import { Toast, Severity } from 'components/common/Toast';
 import { CourseCreation } from 'components/CourseCreation';
 import { buildAggregateModel } from './objectives/persistence';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 export interface CreateCourseViewProps {
   userName: string;
@@ -35,7 +36,9 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
   startCreation(title: string) {
     const g = guid();
     const id = title.toLowerCase().split(' ')[0] + '-' + g.substring(g.lastIndexOf('-') + 1);
-    const model = new models.CourseModel({ id, title, version: '1.0' });
+    const model = new models.CourseModel({
+      guid: CourseGuid.of(g), id, title, version: '1.0', idvers: CourseIdVers.of(id, '1.0'),
+    });
 
     persistence.createPackage(model)
       .catch((err) => {

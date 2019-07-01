@@ -11,6 +11,9 @@ import { buildPersistenceFailureMessage } from 'utils/error';
 import { ServerName } from 'data/persistence/document';
 import { CourseIdVers } from 'data/types';
 import { State } from 'reducers';
+import { buildUrlFromRoute } from 'actions/view';
+import { toRoutePreview, toRouteCourse } from 'types/router';
+import { Maybe } from 'tsmonad';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
 function invokePreview(courseId: CourseIdVers, orgId: string,
@@ -38,15 +41,18 @@ export function preview(
           const refresh = result.message === 'pending';
 
           window.open(
-            '/#preview' + organizationId + '-' + courseId.value()
+            buildUrlFromRoute(toRouteCourse(
+              courseId, Maybe.just(organizationId), toRoutePreview()))
+            // '/#preview' + organizationId + '-' + courseId.value()
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
             + (refresh ? '&refresh=true' : '')
             + (redeploy ? '&redeploy=true' : ''),
             OPEN_IN_NEW_WINDOW_ALWAYS);
 
         } else if (result.type === 'PreviewPending') {
-          window.open('/#preview' + organizationId + '-' +
-            courseId.value(), OPEN_IN_NEW_WINDOW_ALWAYS);
+          window.open(buildUrlFromRoute(toRouteCourse(
+            courseId, Maybe.just(organizationId), toRoutePreview())),
+            OPEN_IN_NEW_WINDOW_ALWAYS);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);
@@ -63,9 +69,6 @@ export function quickPreview(courseId: string, resource: Resource) {
   return function (dispatch, getState: () => State): Promise<any> {
     const { course, documents, user } = getState();
     const document: EditedDocument = documents.get(resource.id);
-    console.log('document', document)
-    console.log('documents', documents)
-    console.log('resource', resource)
 
     // Flush pending changes before initiating the preview so that the user doesn't see
     // a stale preview page

@@ -18,6 +18,7 @@ import { UserState } from 'reducers/user';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { duplicate } from 'actions/duplication';
 import UndoRedoToolbar from 'editors/document/common/UndoRedoToolbar';
+import { Document } from 'data/persistence';
 
 function buildMoreInfoAction(display, dismiss) {
   const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
@@ -206,8 +207,10 @@ export class OrgDetailsEditor
     const { dispatch, course, user } = this.props;
 
     function dupe() {
-      dispatch(duplicate(model)).then((doc) => {
-        updateActiveOrgPref(course.idvers, user.profile.username, doc.model.id);
+      dispatch(duplicate(model)).then((doc: Document) => {
+        updateActiveOrgPref(
+          course.idvers, user.profile.username,
+          (doc.model as models.OrganizationModel).resource.id);
       });
     }
 

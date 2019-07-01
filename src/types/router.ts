@@ -87,12 +87,10 @@ export function toRouteResource(resourceId: string): RouteResource {
 
 export type RoutePreview = {
   type: 'RoutePreview',
-  resourceId: string,
 };
-export function toRoutePreview(resourceId: string): RoutePreview {
+export function toRoutePreview(): RoutePreview {
   return {
     type: 'RoutePreview',
-    resourceId,
   };
 }
 

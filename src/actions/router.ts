@@ -109,8 +109,15 @@ function routeSameCourseDifferentOrg(
   org: Maybe<string>, route: router.RouteCourse) {
   org.caseOf({
     just: (org) => {
-      dispatch(dismissScopedMessages(Scope.Organization));
-      dispatch(orgActions.load(courseId, org));
+      if (course.resourcesById.get(org)) {
+        dispatch(dismissScopedMessages(Scope.Organization));
+        dispatch(orgActions.load(courseId, org));
+      } else {
+        history.push(buildUrlFromRoute({
+          ...route,
+          orgId: Maybe.just(firstOrg(course)),
+        }));
+      }
     },
     nothing: () => history.push(buildUrlFromRoute({
       ...route,
@@ -126,7 +133,16 @@ function routeDifferentCourse(
   dispatch(courseActions.loadCourse(courseId))
     .then((course: models.CourseModel) => {
       requestedOrg.caseOf({
-        just: org => dispatch(orgActions.load(courseId, org)),
+        just: (org) => {
+          if (course.resourcesById.get(org)) {
+            dispatch(orgActions.load(courseId, org));
+          } else {
+            history.push(buildUrlFromRoute({
+              ...route,
+              orgId: Maybe.just(firstOrg(course)),
+            }));
+          }
+        },
         // If we have a url without an org, push a new url with the first org
         nothing: () => history.push(buildUrlFromRoute({
           ...route,
@@ -207,6 +223,7 @@ export type ReplaceRouteAction = {
 };
 
 export const replace = (path: string, state?: any): ReplaceRouteAction => {
+  console.log('replacing fully: ' + path, state)
   history.replace(path, state);
 
   return {
@@ -232,11 +249,12 @@ export const setSearchParam =
       const newUrlParams = value
         ? params.set(name, value) : params.remove(name);
       const newSearch = stringifyUrlParams(newUrlParams);
+      console.log('pushing', path + newSearch)
 
       if (replaceRoute) {
-        replace(path + newSearch);
+        replace('/' + path + newSearch);
       } else {
-        push(path + newSearch);
+        push('/' + path + newSearch);
       }
 
       return dispatch({
@@ -263,9 +281,9 @@ export const setSearchParams =
       const newSearch = stringifyUrlParams(newUrlParams);
 
       if (replaceRoute) {
-        replace(path + newSearch);
+        replace('/' + path + newSearch);
       } else {
-        push(path + newSearch);
+        push('/' + path + newSearch);
       }
 
       return dispatch({
@@ -292,9 +310,9 @@ export const clearSearchParam =
       const newSearch = stringifyUrlParams(newUrlParams);
 
       if (replaceRoute) {
-        replace(path + newSearch);
+        replace('/' + path + newSearch);
       } else {
-        push(path + newSearch);
+        push('/' + path + newSearch);
       }
 
       return dispatch({
