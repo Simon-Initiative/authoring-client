@@ -648,9 +648,15 @@ class NavigationPanel
       selectedItem = Maybe.just(nav.makeOrganizationItem(route.route.resourceId));
     }
 
+    const firstOrganization = () => course.resourcesById.find(r => r.type === 'x-oli-organization');
+
     const currentOrg = route.orgId.caseOf({
-      just: id => course.resourcesById.find(r => r.id === id),
-      nothing: () => course.resourcesById.find(r => r.type === 'x-oli-organization'),
+      just: id => Maybe.maybe(course.resourcesById.find(r => r.id === id))
+        .caseOf({
+          just: resource => resource,
+          nothing: () => firstOrganization(),
+        }),
+      nothing: () => firstOrganization(),
     });
 
     return (
