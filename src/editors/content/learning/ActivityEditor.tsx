@@ -74,7 +74,8 @@ class ActivityEditor
 
   onClick(): void {
     this.props.services.viewDocument(
-      this.props.model.idref, this.props.context.courseModel.idvers, Maybe.just(this.props.context.orgId));
+      this.props.model.idref,
+      this.props.context.courseModel.idvers, Maybe.just(this.props.context.orgId));
   }
 
   renderSidebar() {
