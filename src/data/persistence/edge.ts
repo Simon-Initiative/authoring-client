@@ -96,6 +96,6 @@ export function fetchEdgesByIds(
   );
 
   return authenticatedFetch({
-    method, url, headers, query, body: JSON.stringify(body)
+    method, url, headers, query, body: JSON.stringify(body),
   }).then(res => (res as Edge[]));
 }

@@ -41,7 +41,7 @@ export function preview(
           const refresh = result.message === 'pending';
 
           window.open(
-            buildUrlFromRoute(toRouteCourse(
+            '#' + buildUrlFromRoute(toRouteCourse(
               courseId, Maybe.just(organizationId), toRoutePreview()))
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
             + (refresh ? '&refresh=true' : '')
@@ -49,7 +49,7 @@ export function preview(
             OPEN_IN_NEW_WINDOW_ALWAYS);
 
         } else if (result.type === 'PreviewPending') {
-          window.open(buildUrlFromRoute(toRouteCourse(
+          window.open('#' + buildUrlFromRoute(toRouteCourse(
             courseId, Maybe.just(organizationId), toRoutePreview())),
             OPEN_IN_NEW_WINDOW_ALWAYS);
         }
