@@ -427,9 +427,9 @@ class Objective
                       className={classes.assessmentLink}
                       transform="translate(10, 2)"
                       onClick={() => onPushRoute(
-                        `/${course.resourcesById.get(question.assessmentId).guid}-${course.guid}`
-                        + `-${organization.guid}`
-                        + `?questionId=${question.id}`)}>
+                        `/${course.idvers.value()}/${question.assessmentId}`
+                        + `?organization=${organization.resource.id}`
+                        + `&questionId=${question.id}`)}>
                       {stringFormat.ellipsizePx(
                         question.title.valueOr(
                           getReadableTitleFromType(question.type)),
@@ -575,11 +575,6 @@ class Objective
       { disabled: skillQuestionRefs.caseOf({ just: () => false, nothing: () => true }) },
     );
 
-    const getRefGuidFromRefId = (id: string) =>
-      Maybe.maybe(course.resourcesById.get(id)).caseOf({
-        just: resource => resource.guid,
-        nothing: () => '',
-      });
     const getWBPTitleFromRefId = (id: string) =>
       Maybe.maybe(course.resourcesById.get(id)).caseOf({
         just: resource => resource.title,
@@ -625,8 +620,9 @@ class Objective
                       <div className={classes.pageList}>
                         {refs.toArray().map(refGuid => (
                           <div key={refGuid} className={classes.pageTitle}>
-                            <a href={`#${getRefGuidFromRefId(refGuid)}-${course.guid}`
-                              + `-${organization.guid}`}>
+                            <a href={
+                              `#${course.idvers.value()}/${refGuid}`
+                              + `?organization=${organization.resource.id}`}>
                               <i className={classNames(
                                 ['far fa-file', classes.detailsSectionIcon])} />
                               {getWBPTitleFromRefId(refGuid)}

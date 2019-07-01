@@ -1,11 +1,12 @@
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { UserInfo } from '../content/user_info';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
-export function developerRegistration(courseId: string,
-                                      userNames: string[], action: string): Promise<UserInfo[]> {
+export function developerRegistration(course: CourseGuid | CourseIdVers,
+  userNames: string[], action: string): Promise<UserInfo[]> {
   // Valid values for 'action' is limited to 'add' or 'remove'
-  const url = `${configuration.baseUrl}/${courseId}/developers/registration?action=${action}`;
+  const url = `${configuration.baseUrl}/${course.value()}/developers/registration?action=${action}`;
   const body = JSON.stringify(userNames);
   const method = 'POST';
 

@@ -56,11 +56,9 @@ export default class WbInlineEditor
   }
 
   onClick(): void {
-    const guid = this.props.context.courseModel.resourcesById
-      .get(this.props.model.idref).guid;
-
     this.props.services.viewDocument(
-      guid, this.props.context.courseId, this.props.context.orgId);
+      this.props.model.idref,
+      this.props.context.courseModel.idvers, Maybe.just(this.props.context.orgId));
   }
 
   renderSidebar() {

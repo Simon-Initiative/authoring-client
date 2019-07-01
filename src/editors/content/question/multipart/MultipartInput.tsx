@@ -180,8 +180,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   setRoutedOrFirstItemActive = () => {
     const { model, router, setActiveItemIdActionAction, onClearSearchParam } = this.props;
 
-    if (router.urlParams.has('partId')) {
-      const partId = router.urlParams.get('partId');
+    if (router.params.has('partId')) {
+      const partId = router.params.get('partId');
       const index = model.parts.toList().findIndex(part => part.id === partId);
       const items = model.items.toList();
       const item = items.get(index);

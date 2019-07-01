@@ -18,7 +18,6 @@ interface StateProps {
   objectives: Map<string, t.LearningObjective>;
   model: Maybe<models.OrganizationModel>;
   editMode: boolean;
-  course: models.CourseModel;
   placements: org.Placements;
   canUndo: boolean;
   canRedo: boolean;
@@ -37,21 +36,21 @@ interface DispatchProps {
 }
 
 interface OwnProps {
+  course: models.CourseModel;
 }
 
 
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { orgs, course, skills, objectives, user } = state;
+  const { orgs, skills, objectives, user } = state;
   const { requestInFlight } = orgs;
 
   return {
     skills,
     objectives,
     model: orgs.activeOrg.map(d => d.model as models.OrganizationModel),
-    course,
-    editMode: course.editable && !requestInFlight,
+    editMode: ownProps.course.editable && !requestInFlight,
     placements: orgs.placements,
     canUndo: orgs.undoStack.size > 0 && !requestInFlight,
     canRedo: orgs.redoStack.size > 0 && !requestInFlight,

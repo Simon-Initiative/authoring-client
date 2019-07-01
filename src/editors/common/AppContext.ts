@@ -4,7 +4,6 @@ import { LearningObjective, Skill } from 'data/contentTypes';
 
 export type AppContext = {
   userId: string;
-  courseId: string;
   documentId: string;
   orgId: string;
   baseUrl: string;

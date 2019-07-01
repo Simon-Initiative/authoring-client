@@ -1,188 +1,188 @@
 import { Map } from 'immutable';
-import { Maybe } from 'tsmonad';
-import { logger, LogTag } from 'utils/logger';
-import history from 'utils/history';
 import { Dispatch } from 'react-redux';
 import { State } from 'reducers';
-
-export enum ROUTE {
-  ROOT = '',
-  RESOURCE = 'resource',
-  CREATE = 'create',
-  IMPORT = 'import',
-  PREVIEW = 'preview',
-  SKILLS = 'skills',
-  ALL_RESOURCES = 'resources',
-  ORGANIZATIONS = 'organizations',
-  OBJECTIVES = 'objectives',
-}
-
-export const getUrlParams = (search: string): Map<string, string> =>
-  search ? search.replace('?', '').split('&').reduce(
-    (acc, val) => {
-      const [param, value] = val.split('=');
-      if (!param || !value) {
-        logger.error(LogTag.EDITOR, 'Unable to parse parameter: ' + val);
-        return acc;
-      }
-
-      return acc.set(param, value);
-    },
-    Map<string, string>(),
-  )
-    : Map<string, string>();
-
-export const stringifyUrlParams = (urlParams: Map<string, string>): string =>
-  urlParams.keySeq().reduce(
-    (acc, name, index) => {
-      return `${acc}${index > 0 ? '&' : ''}${name}=${urlParams.get(name)}`;
-    },
-    '?',
-  );
-
-export const getRouteFromPath = (path: string, search: string) => {
-  const parseRootPath = (path: string) => {
-    const matches = /^\/?([^\?]*)/.exec(path);
-
-    if (matches && matches[1]) {
-      if (matches[1].startsWith('&state')) {
-        // handle special case where keycloak redirect contains garbage metadata &state
-        return '';
-      }
-
-      return matches[1];
-    }
-
-    return '';
-  };
-
-  const parseCourseResourceIds = (path: string) => {
-    // resourceIds might contain '-', so we parse from the back if an extra hyphen is
-    // detected. The resource id is everything before the last two hyphen-separated strings.
-
-    const pathParts = parseRootPath(path).split('-');
-
-    // Length <= 3 indicates a "normal," well-formed route
-    if (pathParts.length <= 3) {
-      return {
-        resourceId: Maybe.maybe<string>(pathParts[0]),
-        courseId: Maybe.maybe<string>(pathParts[1]),
-        orgId: Maybe.maybe<string>(pathParts[2]),
-      };
-    }
-
-    // Length > 3 indicates an extra hyphen in the resource identifier
-    return {
-      resourceId: Maybe.maybe<string>(pathParts.slice(0, pathParts.length - 2).join('-')),
-      courseId: Maybe.maybe<string>(pathParts[pathParts.length - 2]),
-      orgId: Maybe.maybe<string>(pathParts[pathParts.length - 1]),
-    };
-  };
-
-  const { route, courseId, resourceId, orgId } = (() => {
-    switch (parseRootPath(path).split('-')[0]) {
-      case '':
-        return {
-          route: ROUTE.ROOT,
-          resourceId: Maybe.nothing<string>(),
-          courseId: Maybe.nothing<string>(),
-          orgId: Maybe.nothing<string>(),
-        };
-      case 'create':
-        return {
-          route: ROUTE.CREATE,
-          resourceId: Maybe.nothing<string>(),
-          courseId: Maybe.nothing<string>(),
-          orgId: Maybe.nothing<string>(),
-        };
-      case 'import':
-        return {
-          route: ROUTE.IMPORT,
-          resourceId: Maybe.nothing<string>(),
-          courseId: Maybe.nothing<string>(),
-          orgId: Maybe.nothing<string>(),
-        };
-      case 'skills':
-        return {
-          route: ROUTE.SKILLS,
-          ...parseCourseResourceIds(path),
-        };
-      case 'resources':
-        return {
-          route: ROUTE.ALL_RESOURCES,
-          ...parseCourseResourceIds(path),
-        };
-      case 'organizations':
-        return {
-          route: ROUTE.ORGANIZATIONS,
-          ...parseCourseResourceIds(path),
-        };
-      case 'objectives':
-        return {
-          route: ROUTE.OBJECTIVES,
-          ...parseCourseResourceIds(path),
-        };
-      default:
-        if (path.startsWith('preview')) {
-          return {
-            route: ROUTE.PREVIEW,
-            ...parseCourseResourceIds(path.replace(/^preview/, '')),
-          };
-        }
-
-        return {
-          route: ROUTE.RESOURCE,
-          ...parseCourseResourceIds(path),
-        };
-    }
-  })();
-
-  const urlParams = getUrlParams(search);
-
-  return ({
-    route,
-    courseId,
-    resourceId,
-    orgId,
-    urlParams,
-  });
-};
+import { parseUrl, stringifyUrlParams } from 'actions/utils/router';
+import history from 'utils/history';
+import * as models from 'data/models';
+import { dismissScopedMessages } from './messages';
+import { Scope } from 'types/messages';
+import * as courseActions from 'actions/course';
+import * as orgActions from 'actions/orgs';
+import { Maybe } from 'tsmonad';
+import { loadFromLocalStorage } from 'utils/localstorage';
+import { activeOrgUserKey, ACTIVE_ORG_STORAGE_KEY } from './utils/activeOrganization';
+import * as router from 'types/router';
+import { ResourceState } from 'data/content/resource';
+import { UserState } from 'reducers/user';
+import { buildUrlFromRoute } from 'actions/view';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 
 export type UPDATE_ROUTE_ACTION = 'route/UPDATE_ROUTE_ACTION';
 export const UPDATE_ROUTE_ACTION: UPDATE_ROUTE_ACTION = 'route/UPDATE_ROUTE_ACTION';
 
 export type UpdateRouteAction = {
   type: UPDATE_ROUTE_ACTION,
-  route: ROUTE,
   path: string,
-  search: string,
-  courseId: Maybe<string>,
-  resourceId: Maybe<string>,
-  orgId: Maybe<string>,
-  urlParams: Map<string, string>,
+  params: Map<string, string>,
+  route: router.RouteOption,
 };
 
 /** This function should only be called by history.listen */
-export const updateRoute = (path: string, search: string): UpdateRouteAction => {
-  const {
-    route,
-    courseId,
-    resourceId,
-    orgId,
-    urlParams,
-  } = getRouteFromPath(path, search);
+export function updateRoute(path: string, search: string) {
+  return (dispatch, getState: () => State) => {
+    return parseUrl(path, search)
+      .caseOf({
+        just: (route) => {
+          dispatch({
+            type: UPDATE_ROUTE_ACTION,
+            ...route,
+          });
 
-  return ({
-    type: UPDATE_ROUTE_ACTION,
-    route,
-    path,
-    search,
-    courseId,
-    resourceId,
-    orgId,
-    urlParams,
+          switch (route.route.type) {
+            case 'RouteRoot':
+            case 'RouteCreate':
+            case 'RouteImport':
+            case 'RouteMissing':
+              dispatch(dismissScopedMessages(Scope.Application));
+              dispatch(enterApplicationView());
+              dispatch(orgActions.releaseOrg());
+              break;
+            case 'RouteCourse':
+              const { course: loadedCourse, router: loadedRoute, user } = getState();
+              const routeOption = route.route;
+              const { courseId: requestedCourseId, orgId } = route.route;
+
+              const isDifferentCourse = (id1, id2) => id1.eq(id2);
+
+              const requestedOrg: Maybe<string> = orgId.caseOf({
+                just: _ => orgId,
+                nothing: () => getActiveOrgFromLocalStorage(user, requestedCourseId),
+              });
+
+              return Maybe.maybe(loadedCourse).caseOf({
+                nothing: () =>
+                  routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption),
+                just: (course) => {
+                  if (isDifferentCourse(course.idvers, requestedCourseId)) {
+                    return routeDifferentCourse(
+                      dispatch, requestedCourseId, requestedOrg, routeOption);
+                  }
+
+                  if (isDifferentOrg(loadedRoute.route, requestedOrg)) {
+                    return routeDifferentOrg(
+                      dispatch, course, requestedCourseId, requestedOrg, routeOption);
+                  }
+                  return dispatch(dismissScopedMessages(Scope.Resource));
+                },
+              });
+            case 'RouteKeycloakGarbage':
+          }
+        },
+        // If we get a "keycloak garbage" route, we shouldn't trigger a route update
+        nothing: () => undefined,
+      });
+  };
+}
+
+const redirectToFirstOrg = (route, course) => history.replace(buildUrlFromRoute({
+  ...route,
+  orgId: Maybe.just(firstOrg(course)),
+}));
+
+function routeDifferentOrg(dispatch, course: models.CourseModel, courseId: CourseIdVers,
+  org: Maybe<string>, route: router.RouteCourse) {
+
+  org.caseOf({
+    just: (org) => {
+      if (course.resourcesById.get(org)) {
+        dispatch(dismissScopedMessages(Scope.Organization));
+        dispatch(orgActions.load(courseId, org));
+      } else {
+        redirectToFirstOrg(route, course);
+      }
+    },
+    nothing: () => redirectToFirstOrg(route, course),
   });
+}
+
+function routeDifferentCourse(dispatch, courseId: CourseIdVers, requestedOrg: Maybe<string>,
+  route: router.RouteCourse) {
+
+  dispatch(dismissScopedMessages(Scope.PackageDetails));
+  dispatch(courseActions.loadCourse(courseId))
+    .then((course: models.CourseModel) => {
+      requestedOrg.caseOf({
+        just: (org) => {
+          if (course.resourcesById.get(org)) {
+            dispatch(orgActions.load(courseId, org));
+            route.orgId.caseOf({
+              just: _ => undefined,
+              nothing: () => history.push(buildUrlFromRoute({
+                ...route,
+                orgId: Maybe.just(org),
+              })),
+            });
+          } else {
+            redirectToFirstOrg(route, course);
+          }
+        },
+        // If we have a url without an org, push a new url with the first org
+        nothing: () => redirectToFirstOrg(route, course),
+      });
+    });
+}
+
+const getActiveOrgFromLocalStorage = (user: UserState, courseId: CourseIdVers) =>
+  Maybe.maybe<JSON | undefined>(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
+    .lift<string | undefined>(coursePrefs =>
+      coursePrefs[activeOrgUserKey(user.profile.username, courseId)]);
+
+function isDifferentOrg(route: router.RouteOption, requestedOrgId: Maybe<string>): boolean {
+  return requestedOrgId.caseOf({
+    just: (requestedOrgId) => {
+      // Only course routes store an organization
+      if (route.type !== 'RouteCourse') {
+        return true;
+      }
+      return route.orgId.caseOf({
+        just: loadedOrg => loadedOrg !== requestedOrgId,
+        nothing: () => true,
+      });
+    },
+    nothing: () => true,
+  });
+}
+
+const firstOrg = (course: models.CourseModel) =>
+  course.resourcesById.filter(
+    r => r.type === LegacyTypes.organization
+      && r.resourceState !== ResourceState.DELETED)
+    .first().id;
+
+export type ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
+export const ENTER_APPLICATION_VIEW: ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
+
+export type EnterApplicationViewAction = {
+  type: ENTER_APPLICATION_VIEW,
 };
+
+export function enterApplicationView(): EnterApplicationViewAction {
+  return {
+    type: ENTER_APPLICATION_VIEW,
+  };
+}
+
+export type RESET_ROUTE_ACTION = 'route/RESET_ROUTE_ACTION';
+export const RESET_ROUTE_ACTION: RESET_ROUTE_ACTION = 'route/RESET_ROUTE_ACTION';
+
+export type ResetRouteAction = {
+  type: RESET_ROUTE_ACTION,
+};
+
+export const resetRoute = (): ResetRouteAction => ({
+  type: RESET_ROUTE_ACTION,
+});
+
 
 export type PUSH_ROUTE_ACTION = 'route/PUSH_ROUTE_ACTION';
 export const PUSH_ROUTE_ACTION: PUSH_ROUTE_ACTION = 'route/PUSH_ROUTE_ACTION';
@@ -233,16 +233,16 @@ export type SetSearchParamAction = {
 export const setSearchParam =
   (name: string, value: string, replaceRoute: boolean = true) =>
     (dispatch: Dispatch<State>, getState: () => State) => {
-      const { path, urlParams } = getState().router;
+      const { path, params } = getState().router;
 
       const newUrlParams = value
-        ? urlParams.set(name, value) : urlParams.remove(name);
+        ? params.set(name, value) : params.remove(name);
       const newSearch = stringifyUrlParams(newUrlParams);
 
       if (replaceRoute) {
-        replace(path + newSearch);
+        replace('/' + path + newSearch);
       } else {
-        push(path + newSearch);
+        push('/' + path + newSearch);
       }
 
       return dispatch({
@@ -252,7 +252,8 @@ export const setSearchParam =
     };
 
 export type SET_SEARCH_PARAMS_ACTION = 'route/SET_SEARCH_PARAMS_ACTION';
-export const SET_SEARCH_PARAMS_ACTION: SET_SEARCH_PARAMS_ACTION = 'route/SET_SEARCH_PARAMS_ACTION';
+export const SET_SEARCH_PARAMS_ACTION:
+  SET_SEARCH_PARAMS_ACTION = 'route/SET_SEARCH_PARAMS_ACTION';
 
 export type SetSearchParamsAction = {
   type: SET_SEARCH_PARAMS_ACTION,
@@ -260,17 +261,17 @@ export type SetSearchParamsAction = {
 };
 
 export const setSearchParams =
-  (params: Map<string, string>, replaceRoute: boolean = true) =>
+  (newParams: Map<string, string>, replaceRoute: boolean = true) =>
     (dispatch: Dispatch<State>, getState: () => State) => {
-      const { path, urlParams } = getState().router;
+      const { path, params } = getState().router;
 
-      const newUrlParams = urlParams.merge(params);
+      const newUrlParams = params.merge(newParams);
       const newSearch = stringifyUrlParams(newUrlParams);
 
       if (replaceRoute) {
-        replace(path + newSearch);
+        replace('/' + path + newSearch);
       } else {
-        push(path + newSearch);
+        push('/' + path + newSearch);
       }
 
       return dispatch({
@@ -291,15 +292,15 @@ export type ClearSearchParamAction = {
 export const clearSearchParam =
   (name: string, replaceRoute: boolean = true) =>
     (dispatch: Dispatch<State>, getState: () => State) => {
-      const { path, urlParams } = getState().router;
+      const { path, params } = getState().router;
 
-      const newUrlParams = urlParams.remove(name);
+      const newUrlParams = params.remove(name);
       const newSearch = stringifyUrlParams(newUrlParams);
 
       if (replaceRoute) {
-        replace(path + newSearch);
+        replace('/' + path + newSearch);
       } else {
-        push(path + newSearch);
+        push('/' + path + newSearch);
       }
 
       return dispatch({
@@ -307,14 +308,3 @@ export const clearSearchParam =
         newUrlParams,
       });
     };
-
-export type RESET_ROUTE_ACTION = 'route/RESET_ROUTE_ACTION';
-export const RESET_ROUTE_ACTION: RESET_ROUTE_ACTION = 'route/RESET_ROUTE_ACTION';
-
-export type ResetRouteAction = {
-  type: RESET_ROUTE_ACTION,
-};
-
-export const resetRoute = (): ResetRouteAction => ({
-  type: RESET_ROUTE_ACTION,
-});

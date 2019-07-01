@@ -9,7 +9,7 @@ export interface ImageSize {
 export const fetchImageSize = (src: string, context: AppContext): Promise<ImageSize> => {
   const fullSrc = buildUrl(
     context.baseUrl,
-    context.courseId,
+    context.courseModel.guid,
     context.resourcePath,
     src);
   const img = new (window as any).Image();

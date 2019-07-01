@@ -508,7 +508,7 @@ class InsertToolbar
                             res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
                             && !existingInlines.has(res.id)}
-                          courseId={context.courseId}
+                          courseId={context.courseModel.guid}
                           onInsert={(resource) => {
                             onDismissModal();
                             const resources = context.courseModel.resources.toArray();
@@ -552,7 +552,7 @@ class InsertToolbar
                       res.type === LegacyTypes.workbook_page
                       && res.id !== PLACEHOLDER_ITEM_ID
                       && res.resourceState !== ResourceState.DELETED}
-                    courseId={context.courseId}
+                    courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
                       const resources = context.courseModel.resources.toArray();
@@ -578,7 +578,7 @@ class InsertToolbar
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.assessment2
                       && res.resourceState !== ResourceState.DELETED}
-                    courseId={context.courseId}
+                    courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
                       const resources = context.courseModel.resources.toArray();
@@ -621,7 +621,7 @@ class InsertToolbar
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.feedback
                       && res.resourceState !== ResourceState.DELETED}
-                    courseId={context.courseId}
+                    courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
                       const resources = context.courseModel.resources.toArray();
@@ -689,7 +689,7 @@ class InsertToolbar
                             res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
                             && !existingInlines.has(res.id)}
-                          courseId={context.courseId}
+                          courseId={context.courseModel.guid}
                           noResourcesMessage={
                             <React.Fragment>
                               No assessments are available for this activity.
