@@ -27,7 +27,8 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import './WorkbookPageEditor.scss';
 import { MessageState } from 'reducers/messages';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, LegacyTypes } from 'data/types';
+import { Prerequisites } from 'editors/document/workbook/Prerequisites';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: CourseIdVers) => void;
@@ -76,6 +77,10 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, WorkbookPageEditorState> {
 
   noObjectivesMessage: Messages.Message;
+  workbookPages: Immutable.OrderedMap<string, any>;
+  coursePrereqs: Object;
+  coursePostreqs: Object;
+  prereqRefs: Immutable.List<string>;
 
   constructor(props: WorkbookPageEditorProps) {
     super(props, { collapseInsertPopup: true });
@@ -83,6 +88,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onModelEdit = this.onModelEdit.bind(this);
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
+    this.onPrereqsEdit = this.onPrereqsEdit.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.unFocus = this.unFocus.bind(this);
     this.addEntry = this.addEntry.bind(this);
@@ -96,6 +102,35 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       props.services.refreshCourse(props.context.courseModel.idvers);
     }
 
+    this.coursePrereqs = JSON.parse(localStorage.getItem(this.props.context.courseModel.id
+      + this.props.context.courseModel.version)) || {};
+
+    this.coursePostreqs = this.createPostreqs(this.coursePrereqs);
+
+    this.prereqRefs = this.coursePrereqs && this.coursePrereqs[this.props.model.resource.id]
+      ? Immutable.List<string>(this.coursePrereqs[this.props.model.resource.id])
+      : Immutable.List<string>();
+
+    this.workbookPages = this.props.context.courseModel.resourcesById
+      .filter(r => r.type === LegacyTypes.workbook_page && r.id !== this.props.model.resource.id)
+      .toOrderedMap() as Immutable.OrderedMap<string, any>;
+  }
+
+  createPostreqs = (prereqs: Object) => {
+    const postreqs = {};
+    Object.keys(prereqs).forEach((child) => {
+      const parents = prereqs[child];
+      parents.forEach((parent) => {
+        if (!postreqs[parent]) {
+          postreqs[parent] = [child];
+        } else {
+          if (postreqs[parent].indexOf(child) === -1) {
+            postreqs[parent].push(child);
+          }
+        }
+      });
+    });
+    return postreqs;
   }
 
   hasMissingObjective(
@@ -237,6 +272,24 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(this.props.model.with({ head }));
   }
 
+  onPrereqsEdit(prereqRefs: Immutable.List<string>) {
+    const { context, model } = this.props;
+    const { courseModel } = context;
+
+    const courseKey = courseModel.id + courseModel.version;
+    const anyExistingPrereqs: null | Object = localStorage.getItem(courseKey)
+      && JSON.parse(localStorage.getItem(courseKey));
+
+    if (anyExistingPrereqs) {
+      anyExistingPrereqs[model.resource.id] = prereqRefs.toArray();
+      localStorage.setItem(courseKey, JSON.stringify(anyExistingPrereqs));
+    } else {
+      localStorage.setItem(courseKey, JSON.stringify(
+        { [model.resource.id]: prereqRefs.toArray() },
+      ));
+    }
+  }
+
   renderObjectives() {
     return (
       <Objectives
@@ -247,6 +300,22 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         model={this.props.model.head.objrefs}
         onFocus={() => { }}
         onEdit={this.onObjectivesEdit} />
+    );
+  }
+
+  renderPrerequisites() {
+    return (
+      <Prerequisites
+        {...this.props}
+        activeContentGuid={null}
+        hover={null}
+        onUpdateHover={() => { }}
+        model={this.prereqRefs}
+        workbookPages={this.workbookPages}
+        coursePrereqs={this.coursePrereqs}
+        coursePostreqs={this.coursePostreqs}
+        onFocus={() => { }}
+        onEdit={this.onPrereqsEdit} />
     );
   }
 
@@ -380,6 +449,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               editorStyles={{ fontSize: 32 }} />
 
             {this.renderObjectives()}
+
+            {this.renderPrerequisites()}
 
             <span className="wbLabel">Content</span>
 
