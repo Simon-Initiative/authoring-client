@@ -39,7 +39,8 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     // the document first to get the most up to date version
 
     if (this.writeLockedDocumentId !== null) {
-      return persistence.releaseLock(CourseGuid.of(this.courseId), this.writeLockedDocumentId);
+      return persistence.releaseLock(CourseGuid.of(this.courseId),
+        this.writeLockedDocumentId);
     }
     return Promise.resolve({});
   }

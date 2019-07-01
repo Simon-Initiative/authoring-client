@@ -25,7 +25,7 @@ export type HttpRequestParams = {
   hasTextResult?: boolean,
 };
 
-export function authenticatedFetch(params: HttpRequestParams) {
+export function authenticatedFetch(params: HttpRequestParams): Promise<Object> {
 
   const method = params.method ? params.method : 'GET';
   const headers = params.headers ? params.headers : getHeaders(credentials);

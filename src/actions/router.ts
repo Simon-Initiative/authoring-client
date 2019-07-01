@@ -59,7 +59,7 @@ export function updateRoute(path: string, search: string) {
                 nothing: () => getActiveOrgFromLocalStorage(user, requestedCourseId),
               });
 
-              Maybe.maybe(loadedCourse).caseOf({
+              return Maybe.maybe(loadedCourse).caseOf({
                 nothing: () =>
                   routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption),
                 just: (course) => {
@@ -75,7 +75,6 @@ export function updateRoute(path: string, search: string) {
                   return dispatch(dismissScopedMessages(Scope.Resource));
                 },
               });
-              break;
             case 'RouteKeycloakGarbage':
           }
         },
@@ -85,32 +84,30 @@ export function updateRoute(path: string, search: string) {
   };
 }
 
+const redirectToFirstOrg = (route, course) => history.push(buildUrlFromRoute({
+  ...route,
+  orgId: Maybe.just(firstOrg(course)),
+}));
 
-function routeDifferentOrg(
-  dispatch, course: models.CourseModel, courseId: CourseIdVers,
+function routeDifferentOrg(dispatch, course: models.CourseModel, courseId: CourseIdVers,
   org: Maybe<string>, route: router.RouteCourse) {
+
   org.caseOf({
     just: (org) => {
       if (course.resourcesById.get(org)) {
         dispatch(dismissScopedMessages(Scope.Organization));
         dispatch(orgActions.load(courseId, org));
       } else {
-        history.push(buildUrlFromRoute({
-          ...route,
-          orgId: Maybe.just(firstOrg(course)),
-        }));
+        redirectToFirstOrg(route, course);
       }
     },
-    nothing: () => history.push(buildUrlFromRoute({
-      ...route,
-      orgId: Maybe.just(firstOrg(course)),
-    })),
+    nothing: () => redirectToFirstOrg(route, course),
   });
 }
 
-function routeDifferentCourse(
-  dispatch, courseId: CourseIdVers, requestedOrg: Maybe<string>,
+function routeDifferentCourse(dispatch, courseId: CourseIdVers, requestedOrg: Maybe<string>,
   route: router.RouteCourse) {
+
   dispatch(dismissScopedMessages(Scope.PackageDetails));
   dispatch(courseActions.loadCourse(courseId))
     .then((course: models.CourseModel) => {
@@ -126,21 +123,14 @@ function routeDifferentCourse(
               })),
             });
           } else {
-            history.push(buildUrlFromRoute({
-              ...route,
-              orgId: Maybe.just(firstOrg(course)),
-            }));
+            redirectToFirstOrg(route, course);
           }
         },
         // If we have a url without an org, push a new url with the first org
-        nothing: () => history.push(buildUrlFromRoute({
-          ...route,
-          orgId: Maybe.just(firstOrg(course)),
-        })),
+        nothing: () => redirectToFirstOrg(route, course),
       });
     });
 }
-
 
 const getActiveOrgFromLocalStorage = (user: UserState, courseId: CourseIdVers) =>
   Maybe.maybe<JSON | undefined>(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))

@@ -526,23 +526,32 @@ class NavigationPanel
           </div>
         </div>
         <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
-          {course.resources.valueSeq().filter(availableOrgs).map(org => (
-            <a key={org.guid}
-              className={classNames([
-                'dropdown-item',
-                currentOrg.id === org.id && classes.selectedNavItem,
-              ])}
-              onClick={() => {
-                if (org.id !== currentOrg.id) {
-                  this.props.onReleaseOrg();
-                  updateActiveOrgPref(course.idvers, profile.username, org.id);
-                  this.props.onLoadOrg(course.idvers, org.guid);
-                  viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
-                }
-              }}>
-              {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
-            </a>
-          ))}
+          {course.resources.valueSeq()
+            .filter(availableOrgs)
+            .sort((r1, r2) => {
+              return r1.title.toLowerCase() < r2.title.toLowerCase()
+                ? -1
+                : r1.title.toLowerCase() > r2.title.toLowerCase()
+                  ? 1
+                  : 0;
+            })
+            .map(org => (
+              <a key={org.guid}
+                className={classNames([
+                  'dropdown-item',
+                  currentOrg.id === org.id && classes.selectedNavItem,
+                ])}
+                onClick={() => {
+                  if (org.id !== currentOrg.id) {
+                    this.props.onReleaseOrg();
+                    updateActiveOrgPref(course.idvers, profile.username, org.id);
+                    this.props.onLoadOrg(course.idvers, org.guid);
+                    viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
+                  }
+                }}>
+                {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
+              </a>
+            ))}
           <div className="dropdown-divider" />
           <a key="create-org"
             className={classNames(['dropdown-item'])}
