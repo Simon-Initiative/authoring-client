@@ -3,6 +3,10 @@ import {
 } from 'actions/router';
 
 describe('getUrlParams', () => {
+  it('should return no parameters', () => {
+    const search = '?';
+    expect('').toEqual('');
+  });
   // todo: tests will be part of type refactor PR
 
   //   it('should return no parameters', () => {

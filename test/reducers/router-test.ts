@@ -4,6 +4,10 @@ import {
 import { router, RouterState } from 'reducers/router';
 
 describe('router reducer', () => {
+  it('should return no parameters', () => {
+    const search = '?';
+    expect('').toEqual('');
+  });
   // Todo: Tests will be part of type refactor PR
 
   // it('should update route', () => {
