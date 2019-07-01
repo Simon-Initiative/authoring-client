@@ -18,6 +18,7 @@ import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
 import { duplicate } from 'actions/duplication';
 import { CourseState } from 'reducers/course';
+import { RouterState } from 'reducers/router';
 
 interface StateProps {
   content: Maybe<ContentElement>;
@@ -29,6 +30,7 @@ interface StateProps {
   resource: Resource;
   currentPage: string;
   timeSkewInMs: number;
+  router: RouterState;
 }
 
 interface DispatchProps {
@@ -62,7 +64,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     nothing: () => Immutable.List<string>(),
   });
 
-  const { server: { timeSkewInMs } } = state;
+  const { server: { timeSkewInMs }, router } = state;
 
   return {
     content: activeContext.activeChild,
@@ -77,6 +79,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
       just: docId => state.documents.get(docId).currentPage.valueOr(null),
       nothing: null,
     }),
+    router,
   };
 };
 

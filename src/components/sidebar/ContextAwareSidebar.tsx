@@ -34,6 +34,8 @@ import ModalPrompt from 'utils/selection/ModalPrompt';
 import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 import { CombinationsMap } from 'types/combinations';
 import { CourseState } from 'reducers/course';
+import { RouterState } from 'reducers/router';
+import { Title } from 'components/objectives/Title';
 
 interface SidebarRowProps {
   label?: string;
@@ -142,10 +144,12 @@ export interface ContextAwareSidebarProps {
   timeSkewInMs: number;
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
   onDuplicate: (model: ContentModel) => void;
+  router: RouterState;
 }
 
 export interface ContextAwareSidebarState {
-
+  resourceIdTest: string;
+  questionIdTest: string;
 }
 
 /**
@@ -162,6 +166,11 @@ class ContextAwareSidebar
     this.onPageEdit = this.onPageEdit.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
     this.onToggleBranching = this.onToggleBranching.bind(this);
+
+    this.state = {
+      resourceIdTest: '',
+      questionIdTest: '',
+    };
   }
 
   onRemovePage(page: contentTypes.Page) {
@@ -250,7 +259,7 @@ class ContextAwareSidebar
   renderPageDetails() {
     const {
       model, resource, editMode, currentPage, onSetCurrentNodeOrPage,
-      onEditModel, classes,
+      onEditModel, classes, router,
     } = this.props;
 
     const adjusted = (date: Date): Date => adjustForSkew(date, this.props.timeSkewInMs);
@@ -265,7 +274,7 @@ class ContextAwareSidebar
     };
 
     const idDisplay = (
-      <SidebarGroup label="OLI Identifier">
+      <SidebarGroup label="OLI Resource Identifier">
         <SidebarRow>
           <Tooltip title={resource.id}
             delay={150} distance={5} size="small" arrowSize="small">
@@ -320,6 +329,24 @@ class ContextAwareSidebar
           ? 'Formative Assessment'
           : 'Summative Assessment';
 
+        const resourceIdTest = this.state.resourceIdTest
+          ? this.state.resourceIdTest.length > 20
+            ? this.state.resourceIdTest.substr(0, 20) + '...'
+            : this.state.resourceIdTest
+          : resource.id.length > 20
+            ? resource.id.substr(0, 20) + '...'
+            : resource.id;
+
+        const questionIdTest = this.state.questionIdTest
+          ? this.state.questionIdTest.length > 20
+            ? this.state.questionIdTest.substr(0, 20) + '...'
+            : this.state.questionIdTest
+          : router.params.get('questionId')
+            ? router.params.get('questionId').length > 20
+              ? router.params.get('questionId').substr(0, 20) + '...'
+              : router.params.get('questionId')
+            : null;
+
         return (
           <SidebarContent title={title} onHide={this.props.onHide}>
             <SidebarGroup label="General">
@@ -336,7 +363,48 @@ class ContextAwareSidebar
                 </Tooltip>
               </SidebarRow>
             </SidebarGroup>
-            {idDisplay}
+            {<SidebarGroup label="OLI Resource Identifer">
+              <SidebarRow>
+                <Title
+                  title={resourceIdTest}
+                  editMode={this.props.editMode}
+                  onBeginExternallEdit={() => true}
+                  requiresExternalEdit={false}
+                  isHoveredOver={true}
+                  onEdit={(x) => {
+                    this.setState({ resourceIdTest: x });
+                  }}
+                  loading={false}
+                  disableRemoval={true}
+                  editWording="Edit"
+                  onRemove={() => false}
+                >
+                  {resourceIdTest}
+                </Title>
+              </SidebarRow>
+            </SidebarGroup>}
+            {router.params.get('questionId')
+              ? <SidebarGroup label="OLI Question Identifer">
+                <SidebarRow>
+                  <Title
+                    title={questionIdTest}
+                    editMode={this.props.editMode}
+                    onBeginExternallEdit={() => true}
+                    requiresExternalEdit={false}
+                    isHoveredOver={true}
+                    onEdit={(x) => {
+                      this.setState({ questionIdTest: x });
+                    }}
+                    loading={false}
+                    disableRemoval={true}
+                    editWording="Edit"
+                    onRemove={() => false}
+                  >
+                    {questionIdTest}
+                  </Title>
+                </SidebarRow>
+              </SidebarGroup>
+              : null}
             {/* Branching assessments require a specific page structuring,
             so they cannot be modified by the user */}
             {model.branching
@@ -463,6 +531,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {/* {questionIdDisplay} */}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
@@ -502,6 +571,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {/* {questionIdDisplay} */}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
