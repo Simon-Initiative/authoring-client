@@ -216,7 +216,6 @@ export type ReplaceRouteAction = {
 };
 
 export const replace = (path: string, state?: any): ReplaceRouteAction => {
-  console.log('replacing fully: ' + path, state)
   history.replace(path, state);
 
   return {
@@ -242,7 +241,6 @@ export const setSearchParam =
       const newUrlParams = value
         ? params.set(name, value) : params.remove(name);
       const newSearch = stringifyUrlParams(newUrlParams);
-      console.log('pushing', path + newSearch)
 
       if (replaceRoute) {
         replace('/' + path + newSearch);
