@@ -9,6 +9,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 
 interface StateProps {
   activeContext: ActiveContextState;
+  modelId: string;
 }
 
 interface DispatchProps {
@@ -25,8 +26,14 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state: State): StateProps => {
+
+  const docs = state.documents;
+
   return {
     activeContext: state.activeContext,
+    modelId: docs.size > 0 && (docs.first().document.model as any).resource !== undefined
+      ? (docs.first().document.model as any).resource.id
+      : null,
   };
 };
 

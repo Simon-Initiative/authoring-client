@@ -22,6 +22,7 @@ export interface ItemToolbarProps {
   onRemove: (item: ContentElement) => void;
   parentSupportsElementType: (type: string) => boolean;
   course: CourseModel;
+  modelId: string;
 }
 
 type StyledItemToolbarProps = StyledComponentProps<ItemToolbarProps, typeof styles>;
@@ -65,11 +66,9 @@ class ItemToolbar
   }
 
   getPage() {
-    const { activeContext } = this.props;
-    return activeContext.documentId.caseOf({
-      just: id => id,
-      nothing: () => undefined,
-    });
+    const { modelId } = this.props;
+
+    return modelId === null ? undefined : modelId;
   }
 
   getContainer() {

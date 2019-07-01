@@ -29,7 +29,7 @@ export interface XrefEditorProps
   onShowSidebar: () => void;
   displayModal: (component: any) => void;
   dismissModal: () => void;
-  updateTarget: (targetId: string, documentId: string) => Promise<any>;
+  updateTarget: (targetId: string, documentResourceId: string) => Promise<any>;
   clipboard: Clipboard;
   course: CourseModel;
   target: Either<MissingTargetId, ContentElement>;
