@@ -78,7 +78,7 @@ export function adjustForSkew(a: Date, skewInMs: number) : Date {
  * @param dateFrom the date to compare against
  * @param dateNow the date to compare
  */
-function relativeTo(dateFrom: Date, dateNow: Date) : string {
+export function relativeTo(dateFrom: Date, dateNow: Date) : string {
 
   const delta = dateNow.getTime() - dateFrom.getTime();
 
@@ -100,7 +100,7 @@ function relativeTo(dateFrom: Date, dateNow: Date) : string {
   if (delta >= (MS_IN_MONTH * 2)) {
     return Math.floor(delta / MS_IN_MONTH) + ' months ago';
   }
-  if (delta > (MS_IN_MONTH)) {
+  if (delta >= (MS_IN_MONTH)) {
     return 'a month ago';
   }
   if (delta >= (MS_IN_WEEK * 2)) {

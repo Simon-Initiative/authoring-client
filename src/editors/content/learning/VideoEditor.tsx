@@ -6,7 +6,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
-import { adjustPath } from 'editors/content/media/utils';
+import { adjustPath, extractFileName } from 'editors/content/media/utils';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -110,6 +110,7 @@ export default class VideoEditor
     this.onControlEdit = this.onControlEdit.bind(this);
     this.onSelectPoster = this.onSelectPoster.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
+    this.onSelectSource = this.onSelectSource.bind(this);
   }
 
   onCaptionEdit(content: ContentElements, src) {
@@ -147,12 +148,40 @@ export default class VideoEditor
       });
   }
 
+
+  onSelectSource() {
+    const { context, services, onEdit, model } = this.props;
+
+    const dispatch = (services as any).dispatch;
+    const dismiss = () => dispatch(modalActions.dismiss());
+    const display = c => dispatch(modalActions.display(c));
+
+    selectVideo(
+      model,
+      context.resourcePath, context.courseModel,
+      display, dismiss)
+      .then((video) => {
+        if (video !== null) {
+
+          const updated = this.props.model.with({
+            sources: video.sources,
+          });
+
+          onEdit(updated, updated);
+        }
+      });
+  }
+
   renderSidebar() {
 
     const posterSrc = this.props.model.poster;
     const poster = posterSrc !== ''
       ? posterSrc.substr(posterSrc.lastIndexOf('/') + 1)
       : 'No poster selected';
+
+    const video = this.props.model.sources.size > 0
+      ? extractFileName(this.props.model.sources.first().src)
+      : null;
 
     return (
       <SidebarContent title="Video">
@@ -161,6 +190,14 @@ export default class VideoEditor
             checked={this.props.model.controls}
             onClick={this.onControlEdit}
             label="Display video controls" />
+        </SidebarGroup>
+
+        <SidebarGroup label="Source">
+          <div>{video}</div>
+          <ToolbarButton onClick={this.onSelectSource} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-video" /></div>
+            <div>Change Source</div>
+          </ToolbarButton>
         </SidebarGroup>
 
         <MediaWidthHeightEditor
