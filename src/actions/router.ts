@@ -118,6 +118,13 @@ function routeDifferentCourse(
         just: (org) => {
           if (course.resourcesById.get(org)) {
             dispatch(orgActions.load(courseId, org));
+            route.orgId.caseOf({
+              just: _ => undefined,
+              nothing: () => history.push(buildUrlFromRoute({
+                ...route,
+                orgId: Maybe.just(org),
+              })),
+            });
           } else {
             history.push(buildUrlFromRoute({
               ...route,

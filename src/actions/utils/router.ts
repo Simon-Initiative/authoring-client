@@ -105,7 +105,7 @@ function parseCoursePage(page: string): routerTypes.RouteCourseOption {
     case 'resources': return routerTypes.toRouteAllResources();
     case 'organizations': return routerTypes.toRouteOrganizations();
     case 'objectives': return routerTypes.toRouteObjectives();
-    case 'preview': return routerTypes.toRoutePreview(page);
+    case 'preview': return routerTypes.toRoutePreview();
     default: return routerTypes.toRouteResource(page);
   }
 }
