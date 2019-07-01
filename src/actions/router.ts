@@ -101,7 +101,6 @@ function transitionCourseView(
 }
 
 function routeSameCourseSameOrg(dispatch) {
-  console.log('here')
   dispatch(dismissScopedMessages(Scope.Resource));
 }
 
@@ -124,7 +123,6 @@ function routeDifferentCourse(
   dispatch, courseId: CourseIdVers, requestedOrg: Maybe<string>,
   route: router.RouteCourse) {
   dispatch(dismissScopedMessages(Scope.PackageDetails));
-  console.log('requestedOrg', requestedOrg)
   dispatch(courseActions.loadCourse(courseId))
     .then((course: models.CourseModel) => {
       requestedOrg.caseOf({
@@ -139,9 +137,9 @@ function routeDifferentCourse(
 }
 
 const getActiveOrgFromLocalStorage = (user: UserState, courseId: CourseIdVers) =>
-  Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
-    .bind(coursePrefs =>
-      Maybe.maybe(coursePrefs[activeOrgUserKey(user.profile.username, courseId)]));
+  Maybe.maybe<JSON | undefined>(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
+    .lift<string | undefined>(coursePrefs =>
+      coursePrefs[activeOrgUserKey(user.profile.username, courseId)]);
 
 const isDifferentCourse = (id1: CourseIdVers, id2: CourseIdVers) =>
   id1.eq(id2);

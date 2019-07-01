@@ -172,7 +172,6 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
           }),
           findQuestionById(model.nodes, router.params.get('questionId')),
         );
-      console.log('url selected Question', urlSelectedQuestion)
 
       urlSelectedQuestion.caseOf({
         just: question => onSetCurrentNodeOrPage(documentId, question),
@@ -575,8 +574,6 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
       just: c => c.guid,
       nothing: () => '',
     });
-
-    console.log('selected in AssessmentEditor', currentNode)
 
     return (
       <div className="assessment-editor">

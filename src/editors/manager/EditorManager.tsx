@@ -83,8 +83,6 @@ export default class EditorManager
     const { course, documentId, expanded, userId, onDispatch,
       editingAllowed, undoRedoGuid } = this.props;
 
-    console.log('documentId', documentId)
-
     const childProps: AbstractEditorProps<any> = {
       model: document.model,
       expanded: expanded.has(documentId)
@@ -110,7 +108,6 @@ export default class EditorManager
       editMode: editingAllowed,
     };
 
-    console.log('document model', document.model)
     const registeredEditor = lookUpByName(document.model.modelType);
     return React.createElement((registeredEditor.component as any), childProps);
   }

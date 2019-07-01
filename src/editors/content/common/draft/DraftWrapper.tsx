@@ -358,7 +358,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       props.onSelectionChange(ss, true);
     };
-    console.log('selectedEntity', props.selectedEntity)
     const compositeDecorator = buildCompositeDecorator({
       selectedEntity: props.selectedEntity,
       services: props.services,

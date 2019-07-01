@@ -51,8 +51,6 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   const placements = orgs.placements;
 
-  console.log('org in orgcomponentcontroller', org)
-
   return {
     org,
     skills,

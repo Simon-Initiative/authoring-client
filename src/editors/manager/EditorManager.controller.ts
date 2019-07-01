@@ -37,7 +37,6 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   const { expanded, skills, objectives, documents } = state;
 
-  console.log('documents', documents)
   const ed = documents.get(ownProps.documentId);
 
   let document = null;

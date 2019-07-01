@@ -90,7 +90,6 @@ export class OrgComponentEditor
   }
 
   findComponentModel(props: OrgComponentEditorProps) {
-    console.log('props.org', props.org)
     props.org.caseOf({
       just: (org) => {
         // Find the component, use sequences as the default

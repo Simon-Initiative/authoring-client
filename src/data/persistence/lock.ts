@@ -21,7 +21,6 @@ export function statusLock(course: CourseGuid | CourseIdVers, id: DocumentId): P
 }
 
 export function acquireLock(course: CourseGuid | CourseIdVers, id: DocumentId): Promise<Object> {
-  console.log('acquiring documentId', id)
   return lock(course, id, 'AQUIRE', false);
 }
 

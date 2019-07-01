@@ -77,7 +77,9 @@ function parseRoute(
     // Course routes
     default: {
       // If it's a course route, routeParts[0] should be courseId-courseVersion
-      const [id, version] = routeParts[0].split('-');
+      const idVers = routeParts[0];
+      const version = idVers.slice(idVers.lastIndexOf('-') + 1);
+      const id = idVers.slice(0, idVers.lastIndexOf('-'));
       if (!id || !version) {
         return Maybe.nothing();
       }
@@ -96,7 +98,6 @@ function parseRoute(
 }
 
 function parseCoursePage(page: string): routerTypes.RouteCourseOption {
-  console.log('page', page)
   switch (page) {
     case '':
     case undefined: return routerTypes.toRouteCourseOverview();

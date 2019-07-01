@@ -10,11 +10,11 @@ import { DeferredPersistenceStrategy }
 import { buildPersistenceFailureMessage } from 'utils/error';
 import { ServerName } from 'data/persistence/document';
 import { CourseIdVers } from 'data/types';
+import { State } from 'reducers';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
 function invokePreview(courseId: CourseIdVers, orgId: string,
   isRefreshAttempt: boolean, server?: ServerName) {
-  console.log('previewing', courseId, orgId)
   return persistence.initiatePreview(courseId, orgId, isRefreshAttempt, server);
 }
 
@@ -60,19 +60,22 @@ export function preview(
 // the workbook page contents.
 export function quickPreview(courseId: string, resource: Resource) {
 
-  return function (dispatch, getState): Promise<any> {
+  return function (dispatch, getState: () => State): Promise<any> {
     const { course, documents, user } = getState();
-    const document: EditedDocument = documents.get(resource.guid);
+    const document: EditedDocument = documents.get(resource.id);
+    console.log('document', document)
+    console.log('documents', documents)
+    console.log('resource', resource)
 
     // Flush pending changes before initiating the preview so that the user doesn't see
     // a stale preview page
     if (document.persistence instanceof DeferredPersistenceStrategy) {
       return (document.persistence as DeferredPersistenceStrategy).flushPendingChanges()
-        .then(_ => persistence.initiateQuickPreview(course.guid, resource.id))
+        .then(_ => persistence.initiateQuickPreview(course.guid, resource.guid))
         .catch(err => dispatch(showMessage(buildPersistenceFailureMessage(err, user.profile))));
     }
 
-    persistence.initiateQuickPreview(course.guid, resource.id);
+    persistence.initiateQuickPreview(course.guid, resource.guid);
     return Promise.resolve();
   };
 }

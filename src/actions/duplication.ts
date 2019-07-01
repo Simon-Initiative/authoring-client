@@ -89,8 +89,6 @@ export function duplicate(model: ContentModel) {
             dispatch(orgLoaded(doc));
           }
 
-          console.log('new document', doc)
-
           const updatedResources = Immutable.OrderedMap<string, Resource>(
             [[(doc as any).model.resource.guid, (doc as any).model.resource]]);
           dispatch(courseActions.updateCourseResources(updatedResources));

@@ -112,7 +112,7 @@ export function initiatePreview(
     });
 }
 
-export function initiateQuickPreview(course: CourseGuid | CourseIdVers, documentId: DocumentId) {
+export function initiateQuickPreview(course: CourseGuid, documentId: DocumentId) {
   const protocol = window.location.protocol + '//';
   const hostname = window.location.host;
   const prefix = 'content-service/api';
@@ -185,7 +185,6 @@ export function createDocument(course: CourseGuid | CourseIdVers, content: model
 
   return (authenticatedFetch({ url, body, method }) as any)
     .then((json) => {
-      console.log('json', json)
       return new Document({
         _courseId: course,
         _id: json.id ? json.id : json.guid,

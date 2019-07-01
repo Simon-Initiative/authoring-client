@@ -266,15 +266,12 @@ export function createNew(model: models.ContentModel) {
 }
 
 export function load(courseId: CourseIdVers, documentId: string) {
-  console.log('loading document', courseId, documentId)
   return function (dispatch, getState): Promise<persistence.Document> {
 
     const userName = getState().user.profile.username;
 
     const holder = { changeMade: false };
     const notifyChangeMade = () => holder.changeMade = true;
-
-    console.log('loading document', documentId)
 
     dispatch(documentRequested(documentId));
 
