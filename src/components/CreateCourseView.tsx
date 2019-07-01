@@ -9,6 +9,7 @@ import { Toast, Severity } from 'components/common/Toast';
 import { CourseCreation } from 'components/CourseCreation';
 import { buildAggregateModel } from './objectives/persistence';
 import { CourseIdVers, CourseGuid } from 'data/types';
+import { Maybe } from 'tsmonad';
 
 export interface CreateCourseViewProps {
   userName: string;
@@ -41,6 +42,10 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     });
 
     persistence.createPackage(model)
+      .then((course) => {
+        viewActions.viewCourse(course.idvers, Maybe.nothing());
+        return buildAggregateModel(course.idvers, this.props.userName);
+      })
       .catch((err) => {
         this.setState({ waiting: false, error: true });
       });
