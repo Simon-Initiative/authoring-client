@@ -582,7 +582,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             You can create a copy of this course package as a new version, allowing you to develop
             content independently of the original. This is useful when you want to get started
             on the next generation of a course without changing an existing course that's already
-            in use.s
+            in use.
             <br />
             <br />
             New version numbers must adhere to&nbsp;
