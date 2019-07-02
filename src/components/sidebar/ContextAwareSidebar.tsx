@@ -360,11 +360,14 @@ class ContextAwareSidebar
       nothing: () => ""
     })
 
+    /* KYLE-1936 currently only works for pools, needs to be modified to work for any type
+       best would be to be able to have type provided as input, rather than having multiple functions */
     const referenceLocations = (
       <SidebarGroup label="Referenced Locations">
         <SidebarRow>
           <div className="page-list">
             {assessmentRefs.caseOf({
+            /* KYLE-1936 finding source of assessmentRefs*/
               just: (refs) => {
                 return refs.length > 0
                 ? (
