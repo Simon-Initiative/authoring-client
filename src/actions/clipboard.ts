@@ -8,9 +8,10 @@ import { ParentContainer } from 'types/active';
 import { State } from 'reducers';
 import { Dispatch } from 'redux';
 import { validateRemoval } from 'data/models/utils/validation';
-import { displayModalMessasge, displayModalElement } from 'utils/message';
+import { displayModalMessasge } from 'utils/message';
 import { filter, map } from 'data/utils/map';
-import { generatePasteFailModalElement } from 'components/PasteFailModalElement';
+import { PasteFailModalElement } from 'components/PasteFailModalElement';
+import * as React from 'react';
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
 
@@ -38,7 +39,7 @@ export function cut(item: ContentElement, page: string) {
       dispatch(copy(item, page) as any);
       activeContext.container.lift(parent => parent.onRemove(item));
     } else {
-      displayModalMessasge(
+      displayModalMessasge( // FIXME: actions should not have side effects. Should call "setState".
         dispatch,
         'Cutting this element would leave one or more command elements untargetted.');
     }
@@ -88,7 +89,7 @@ export function paste() {
         elementToPaste = factoryFn(savedData, guid());
       }
 
-      // KEVIN-1943 this may be all we need... to just check this conditional
+      // Not all Element types can be copy/pasted
       const isSupported = activeContext.container.caseOf({
         just: parent => parent.supportedElements.contains(elementType),
         nothing: () => false,
@@ -100,37 +101,32 @@ export function paste() {
         const filtered = filter(
           e => e.contentType !== 'WbInline' && e.contentType !== 'Multipanel', elementToPaste);
 
-        let removed = [];
+        const removed = [];
 
         map(
           (e) => {
+            // Track which Content Types have been removed from the tree
             if (e.contentType === 'WbInline' || e.contentType === 'Multipanel') {
               if (!removed.includes(e.contentType)) {
                 removed.push(e.contentType);
-                console.log(e); // KEVIN-1943 can we display the name as well?
               }
             }
             return e;
           },
           elementToPaste);
 
-        // not used: const disallowDuplicates = ['Multipanel', 'WbInline', 'Activity', 'Speaker', 'Line', 'Hint'];
-
         if (removed.length > 0) {
-          // KEVIN-1943 NEXT NEXT NEXT make this look better
-          console.log(removed);
-
-          let message = 'WARNING: the following content types can not be copied and pasted. '
+          const message = 'WARNING: the following content types can not be copied and pasted. '
                       + 'Please adjust your course accordingly.';
 
-          displayModalElement(
+          // FIXME: actions should not have side effects. Should call "setState".
+          displayModalMessasge(
             dispatch,
-            generatePasteFailModalElement(message, removed)
-            );
-
+            React.createElement(PasteFailModalElement, {message, removed})
+          );
         }
 
-        parent.onPaste(filtered, textSelection); // KEVIN-1943 is this just a function??
+        parent.onPaste(filtered, textSelection);
       }
     }
   };
