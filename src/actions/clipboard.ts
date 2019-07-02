@@ -8,8 +8,9 @@ import { ParentContainer } from 'types/active';
 import { State } from 'reducers';
 import { Dispatch } from 'redux';
 import { validateRemoval } from 'data/models/utils/validation';
-import { displayModalMessasge } from 'utils/message';
+import { displayModalMessasge, displayModalElement } from 'utils/message';
 import { filter, map } from 'data/utils/map';
+import { generatePasteFailModalElement } from 'components/PasteFailModalElement';
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
 
@@ -104,30 +105,27 @@ export function paste() {
         map(
           (e) => {
             if (e.contentType === 'WbInline' || e.contentType === 'Multipanel') {
-              if (!removed.includes(e.contentType))
+              if (!removed.includes(e.contentType)) {
                 removed.push(e.contentType);
+                console.log(e); // KEVIN-1943 can we display the name as well?
+              }
             }
             return e;
           },
           elementToPaste);
 
-          const disallowDuplicates = ['Multipanel', 'WbInline', 'Activity', 'Speaker', 'Line', 'Hint'];
-
-        console.log("filtered:");
-        console.log(filtered);
-        console.log("removed: " + removed);
+        // not used: const disallowDuplicates = ['Multipanel', 'WbInline', 'Activity', 'Speaker', 'Line', 'Hint'];
 
         if (removed.length > 0) {
           // KEVIN-1943 NEXT NEXT NEXT make this look better
+          console.log(removed);
 
-          let message = 'WARNING: the following content types will not be pasted.<br><ul>';
-          removed.forEach(r => {
-            message += `<li>${r}</li>`;
-          });
-          message += '</ul>';
-          displayModalMessasge(
+          let message = 'WARNING: the following content types can not be copied and pasted. '
+                      + 'Please adjust your course accordingly.';
+
+          displayModalElement(
             dispatch,
-            message
+            generatePasteFailModalElement(message, removed)
             );
 
         }
