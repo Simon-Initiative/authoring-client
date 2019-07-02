@@ -133,7 +133,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   onCreateResource = (type: LegacyTypes) => {
-    const { dispatch } = this.props;
+    const { dispatch, course } = this.props;
     const { newItemTitle } = this.state;
 
     if (!newItemTitle) {
@@ -180,9 +180,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
         dispatch(updateCourseResources(updated));
 
-        // update component state and keep current search
-        this.onFilterBySearchText(this.state.searchText);
-      });
+        return r;
+      })
+      .then(resource => viewActions.viewDocument(resource.id, course.idvers, Maybe.nothing()));
   }
 
   onFilterBySearchText = (searchText: string): void => {
