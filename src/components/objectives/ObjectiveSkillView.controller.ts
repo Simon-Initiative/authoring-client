@@ -13,6 +13,7 @@ import { push } from 'actions/router';
 import { State } from 'reducers';
 import { Maybe } from 'tsmonad';
 import * as models from 'data/models';
+import { CourseIdVers } from 'data/types';
 
 interface StateProps {
   skills: any;
@@ -21,7 +22,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onFetchSkills: (courseId: string) => any;
+  onFetchSkills: (courseId: CourseIdVers) => any;
   onSetSkills: (skills: OrderedMap<string, Skill>) => void;
   onUpdateSkills: (skills: OrderedMap<string, Skill>) => void;
   onSetObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
@@ -55,7 +56,7 @@ const mapStateToProps = (state: State): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onFetchSkills: (courseId: string) => {
+    onFetchSkills: (courseId: CourseIdVers) => {
       return dispatch(fetchSkills(courseId));
     },
     onSetSkills: (skills: OrderedMap<string, Skill>) => {

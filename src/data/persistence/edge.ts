@@ -2,13 +2,14 @@ import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
 import { Edge } from 'types/edge';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 /**
  * Fetches all references for the course or resource, returns a Promise to resolve to
  * a list of edges
  */
 export function fetchEdges(
-  packageId: string,
+  packageId: CourseGuid | CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,
@@ -34,8 +35,8 @@ export function fetchEdges(
 
   const method = 'GET';
   const url = byResource
-    ? `${configuration.baseUrl}/${packageId}/resources/edges/${resourceId}`
-    : `${configuration.baseUrl}/${packageId}/edges`;
+    ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId}`
+    : `${configuration.baseUrl}/${packageId.value()}/edges`;
 
   console.log("Fetching Edges");
   console.log(url);
@@ -61,7 +62,7 @@ export function fetchEdges(
  * returns a Promise to resolve to a list of edges
  */
 export function fetchEdgesByIds(
-  packageId: string,
+  packageId: CourseGuid | CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,
@@ -84,7 +85,7 @@ export function fetchEdgesByIds(
   } = queryParams;
 
   const method = 'POST';
-  const url = `${configuration.baseUrl}/${packageId}/edges/by-ids`;
+  const url = `${configuration.baseUrl}/${packageId.value()}/edges/by-ids`;
 
   const headers = getHeaders(credentials);
   const query = Object.assign(
@@ -98,5 +99,6 @@ export function fetchEdgesByIds(
   );
 
   return authenticatedFetch({
-    method, url, headers, query, body: JSON.stringify(body) }).then(res => (res as Edge[]));
+    method, url, headers, query, body: JSON.stringify(body),
+  }).then(res => (res as Edge[]));
 }

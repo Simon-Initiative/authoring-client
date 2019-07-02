@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as persistence from './data/persistence';
 import thunkMiddleware from 'redux-thunk';
-import { applyMiddleware, createStore, Store, compose } from 'redux';
+import { applyMiddleware, createStore, compose } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
@@ -57,14 +57,11 @@ let experimentalOrgEditing = (window as Window)
   // tslint:disable-next-line:no-console
   console.log(`
 Available Commands:
-
   enableExperimentalOrgEditing(enable: boolean)
     Enable experimental support for editing preconditions
-
   showReduxLogs(show: boolean)
     Enable redux logging if show is true, otherwise disable redux logging.
     Setting persists in local storage.
-
   help()
     Show available commands
   `);
@@ -75,8 +72,8 @@ const logger = createLogger({
 });
 
 const middleware = nodeEnv === 'production'
-  ? applyMiddleware(thunkMiddleware, logger)
-  : composeEnhancers(applyMiddleware(thunkMiddleware, logger));
+  ? applyMiddleware(thunkMiddleware)
+  : composeEnhancers(applyMiddleware(thunkMiddleware));
 
 function getPathName(pathname: string): string {
   return pathname.startsWith('/state') ? '' : pathname;
@@ -101,7 +98,6 @@ function tryLogin(): Promise<UserState> {
 }
 
 function render(store): Promise<boolean> {
-
   // Now do the initial rendering
   return new Promise((resolve, reject) => {
     ReactDOM.render(
@@ -110,7 +106,6 @@ function render(store): Promise<boolean> {
       </AppContainer>,
       document.getElementById('app'), () => resolve(true));
   });
-
 }
 
 function main() {
@@ -121,7 +116,7 @@ function main() {
   const redirectFragment = getQueryVariable('redirect_fragment');
   const fullPathname = redirectFragment ? redirectFragment : getPathName(history.location.pathname);
   const [pathname, search] = fullPathname.split('?');
-  let store = null as Store<Partial<State>>;
+  let store = null;
 
   tryLogin()
     .then((user) => {
@@ -134,7 +129,7 @@ function main() {
       render(store);
     })
     .catch((err) => {
-      const store = initStoreWithState({});
+      const store: any = initStoreWithState({});
       registerStore(store);
       store.dispatch(updateRoute(pathname, search));
 
@@ -154,7 +149,8 @@ function main() {
       if (getState().locks.size > 0) {
         getState().locks
           .toArray()
-          .forEach(({ courseId, documentId }) => persistence.releaseLock(courseId, documentId));
+          .forEach(({ courseId, documentId }) =>
+            persistence.releaseLock(courseId, documentId));
       }
     };
   }

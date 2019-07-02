@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { Maybe } from 'tsmonad';
 import { UserState } from 'reducers/user';
 import { ModalState } from 'reducers/modal';
 import { CourseState } from 'reducers/course';
@@ -17,11 +16,13 @@ import { loadCourse, updateCourseResources } from 'actions/course';
 import * as viewActions from 'actions/view';
 import * as models from 'data/models';
 import { bindActionCreators } from 'redux';
+import { State } from 'reducers/index';
+import { CourseIdVers } from 'data/types';
 
 interface StateProps {
   user: UserState;
   modal: ModalState;
-  course: Maybe<CourseState>;
+  course: CourseState;
   expanded: ExpandedState;
   router: RouterState;
   server: ServerState;
@@ -29,22 +30,21 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onLoad: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onLoad: (courseId: CourseIdVers, documentId: string) => Promise<persistence.Document>;
   onRelease: (documentId: string) => Promise<{}>;
-  onLoadOrg: (courseId: string, documentId: string) => Promise<persistence.Document>;
+  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<persistence.Document>;
   onSetServerTimeSkew: () => void;
-  onLoadCourse: (courseId: string) => Promise<models.CourseModel>;
+  onLoadCourse: (courseId: CourseIdVers) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
   onUpdateHover: (hover: string) => void;
   onUpdateCourseResources: (updated) => void;
-  viewActions: viewActions.ViewActions;
 }
 
 interface OwnProps {
 
 }
 
-const mapStateToProps = (state): StateProps => {
+const mapStateToProps = (state: State): StateProps => {
   const {
     user,
     modal,
@@ -57,7 +57,7 @@ const mapStateToProps = (state): StateProps => {
   return {
     user,
     modal,
-    course: Maybe.maybe(course),
+    course,
     expanded,
     router,
     server,
@@ -66,25 +66,19 @@ const mapStateToProps = (state): StateProps => {
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
-  const actions = Object.keys(viewActions).reduce(
-    (p, c) => {
-      p[c] = viewActions[c];
-      return p;
-    },
-    {});
-
   return {
-    onLoad: (courseId: string, documentId: string) => dispatch(load(courseId, documentId)),
+    onLoad: (courseId: CourseIdVers, documentId: string) =>
+      dispatch(load(courseId, documentId)),
     onRelease: (documentId: string) => dispatch(release(documentId)),
-    onLoadOrg: (courseId: string, documentId: string) => dispatch(loadOrg(courseId, documentId)),
+    onLoadOrg: (courseId: CourseIdVers, documentId: string) =>
+      dispatch(loadOrg(courseId, documentId)),
     onSetServerTimeSkew: () => dispatch(setServerTimeSkew()),
-    onLoadCourse: (courseId: string) => dispatch(loadCourse(courseId)),
+    onLoadCourse: (courseId: CourseIdVers) => dispatch(loadCourse(courseId)),
     onDispatch: dispatch,
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));
     },
     onUpdateCourseResources: updated => dispatch(updateCourseResources(updated)),
-    viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
   };
 };
 

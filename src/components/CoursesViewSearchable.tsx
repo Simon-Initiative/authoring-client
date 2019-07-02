@@ -12,6 +12,7 @@ import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
 import { buildGeneralErrorMessage } from 'utils/error';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 function reportProblemAction(): Messages.MessageAction {
 
@@ -40,8 +41,8 @@ function errorMessageAction(): Messages.Message {
 }
 
 export type CourseDescription = {
-  guid: string,
-  id: string,
+  guid: CourseGuid,
+  idvers: CourseIdVers,
   version: string,
   title: string,
   description: string,
@@ -54,7 +55,7 @@ export type CoursesViewProps = {
   userId: string,
   createCourse: () => any,
   importCourse: () => any,
-  onSelect: (string) => any, // the id of the course to be viewed
+  onSelect: (id: CourseIdVers) => any, // the id of the course to be viewed
   sendMessage: (msg: Messages.Message) => any;
 };
 
@@ -85,9 +86,9 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
     const searchText = this.state.searchText;
     const text = searchText.trim().toLowerCase();
     const filterFn = (r: CourseDescription): boolean => {
-      const { title, id, version } = r;
+      const { title, idvers, version } = r;
       const titleLower = title ? title.toLowerCase() : '';
-      const idLower = id ? id.toLowerCase() : '';
+      const idLower = idvers.value() ? idvers.value().toLowerCase() : '';
       const versionLower = version ? version.toLowerCase() : '';
 
       return text === '' ||
@@ -106,7 +107,7 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
       .then((docs) => {
         const courses: CourseDescription[] = docs.map(d => ({
           guid: d.guid,
-          id: d.id,
+          idvers: d.idvers,
           version: d.version,
           title: d.title,
           dateCreated: d.dateCreated,
@@ -213,9 +214,17 @@ const TableToolbar = ({ textChange, createCourse, importCourse }): JSX.Element =
     </div>
   );
 };
-
+interface CoursesViewSearchableTableProps {
+  rows: CourseDescription[];
+  onSelect: (id: CourseIdVers) => void;
+  searchText: string;
+  serverTimeSkewInMs: number;
+  textChange: (s: string) => void;
+  createCourse: () => void;
+  importCourse: () => void;
+}
 const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkewInMs,
-  textChange, createCourse, importCourse }): JSX.Element => {
+  textChange, createCourse, importCourse }: CoursesViewSearchableTableProps): JSX.Element => {
 
   const labels = [
     'Title',
@@ -226,7 +235,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   const link = course => span =>
     <button disabled={course.buildStatus !== 'READY'}
-      onClick={() => onSelect(course.guid)}
+      onClick={() => onSelect(course.idvers)}
       className="btn btn-link">{span}</button>;
 
   const columnRenderers = [
@@ -263,7 +272,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
             textChange={textChange}
             createCourse={createCourse} />
           <SortableTable
-            model={rows.map(r => ({ key: r.guid, data: r }))}
+            model={rows.map(r => ({ key: r.guid.value(), data: r }))}
             columnComparators={comparators}
             columnRenderers={columnRenderers}
             columnLabels={labels} />

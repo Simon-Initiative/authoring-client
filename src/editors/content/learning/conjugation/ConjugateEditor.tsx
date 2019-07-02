@@ -149,7 +149,7 @@ class ConjugateEditor
     const src = model.src;
     fullSrc = buildUrl(
       this.props.context.baseUrl,
-      this.props.context.courseId,
+      this.props.context.courseModel.guid,
       this.props.context.resourcePath,
       src);
 

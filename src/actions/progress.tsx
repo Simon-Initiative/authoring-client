@@ -1,11 +1,12 @@
 import * as modal from './modal';
 import { ModalProgress } from 'components/copypaste/ModalProgress';
 import { ParsedContent } from 'data/parsers/common/types';
+import { CourseIdVers } from 'data/types';
 
 export function resolveWithProgressUI(
   dispatch: any,
   parsedContent: ParsedContent,
-  courseId: string,
+  courseId: CourseIdVers,
   resourcePath: string,
   onComplete: (e) => void,
 ) {

@@ -26,10 +26,11 @@ function setTargetNode(node): SetXrefTargetAction {
 
 // targetId is an id
 // documentId is a guid
-export function fetchAndSetTargetNode(targetId: string, documentId: string) {
+export function fetchAndSetTargetNode(targetId: string, resourceId: string) {
   return (dispatch: Dispatch, getState: () => State): Promise<any> => {
     const { course } = getState();
-    return persistence.retrieveDocument(course.guid, documentId).then((doc) => {
+    const documentId = course.resourcesById.get(resourceId).guid;
+    return persistence.retrieveDocument(course.idvers, documentId).then((doc) => {
       const wbpage = doc.model as WorkbookPageModel;
       // Find the target node in the workbook page's content tree
       const node = findNodes(

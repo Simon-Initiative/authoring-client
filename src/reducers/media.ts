@@ -27,12 +27,13 @@ export const media = (
   switch (action.type) {
     case FETCH_MEDIA_PAGE: {
       const { courseId, reqId } = action;
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+      const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
 
       return state.set(
-        courseId,
+        id,
         mediaLibrary.with({
           isLoading: true,
           lastReqId: reqId,
@@ -41,23 +42,25 @@ export const media = (
     }
     case RESET_MEDIA: {
       const { courseId } = action;
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+      const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
 
       return state.set(
-        courseId,
+        id,
         mediaLibrary.clearItems(),
       );
     }
     case RECEIVE_MEDIA_PAGE: {
       const { courseId, items, totalItems } = action;
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+      const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
 
       return state.set(
-        courseId,
+        id,
         mediaLibrary.load(items, totalItems).with({
           isLoading: false,
         }),
@@ -65,23 +68,25 @@ export const media = (
     }
     case SIDELOAD_DATA: {
       const { courseId, data } = action;
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+      const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
 
       return state.set(
-        courseId,
+        id,
         mediaLibrary.sideloadData(data),
       );
     }
     case LOAD_MEDIA_REFS: {
       const { courseId, references } = action;
+      const id = courseId.value();
 
       // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+      const mediaLibrary = state.get(id) || new OrderedMediaLibrary();
 
       return state.set(
-        courseId,
+        id,
         mediaLibrary.loadReferences(references),
       );
     }

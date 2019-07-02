@@ -7,7 +7,7 @@ import {
 import { TextInput } from 'editors/content/common/TextInput';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 import guid from 'utils/guid';
 import {
   locateNextOfKin, findNodeByGuid, findQuestionById,
@@ -34,9 +34,10 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { RouterState } from 'reducers/router';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
+import { CourseState } from 'reducers/course';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
-  onFetchSkills: (courseId: string) => void;
+  onFetchSkills: (courseId: CourseIdVers) => void;
   activeContext: ActiveContext;
   onUpdateContent: (documentId: string, content: ContentElement) => void;
   onUpdateContentSelection: (
@@ -51,7 +52,7 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
   onSetSearchParam: (name, value) => void;
   onClearSearchParam: (name) => void;
-  course: models.CourseModel;
+  course: CourseState;
   router: RouterState;
 }
 
@@ -162,28 +163,28 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     const { activeContext, onSetCurrentNodeOrPage, model } = this.props;
     const documentId = activeContext.documentId.valueOr(null);
 
-    if (router.urlParams.get('questionId')) {
+    if (router.params.get('questionId')) {
       const urlSelectedQuestion =
         model.pages.reduce(
           (acc, page) => acc.caseOf({
             just: n => Maybe.just(n),
-            nothing: () => findQuestionById(page.nodes, router.urlParams.get('questionId')),
+            nothing: () => findQuestionById(page.nodes, router.params.get('questionId')),
           }),
-          findQuestionById(model.nodes, router.urlParams.get('questionId')),
+          findQuestionById(model.nodes, router.params.get('questionId')),
         );
 
       urlSelectedQuestion.caseOf({
         just: question => onSetCurrentNodeOrPage(documentId, question),
         nothing: () => this.selectFirstQuestion(),
       });
-    } else if (router.urlParams.get('nodeGuid')) {
+    } else if (router.params.get('nodeGuid')) {
       const urlSelectedNode =
         model.pages.reduce(
           (acc, page) => acc.caseOf({
             just: n => Maybe.just(n),
-            nothing: () => findNodeByGuid(page.nodes, router.urlParams.get('nodeGuid')),
+            nothing: () => findNodeByGuid(page.nodes, router.params.get('nodeGuid')),
           }),
-          findNodeByGuid(model.nodes, router.urlParams.get('nodeGuid')),
+          findNodeByGuid(model.nodes, router.params.get('nodeGuid')),
         );
 
       urlSelectedNode.caseOf({
@@ -202,7 +203,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
 
   fetchSkillsIfMissing = (props: AssessmentEditorProps) => {
     if (hasUnknownSkill(props.model, props.context.skills)) {
-      props.onFetchSkills(props.context.courseId);
+      props.onFetchSkills(props.context.courseModel.idvers);
     }
   }
 
@@ -217,7 +218,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
 
     if (hasNoskills) {
       this.noSkillsMessage = buildMissingSkillsMessage(
-        this.props.context.courseId,
+        this.props.context.courseModel.idvers,
         this.props.context.orgId);
       this.props.showMessage(this.noSkillsMessage);
     }
@@ -418,7 +419,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     services.displayModal(
       <ResourceSelection
         filterPredicate={predicate}
-        courseId={context.courseId}
+        courseId={context.courseModel.guid}
         onInsert={this.onInsertPool}
         onCancel={this.onCancelSelectPool} />);
   }

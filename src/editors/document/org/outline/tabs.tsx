@@ -91,7 +91,7 @@ const ItemTab = (props: TabProps) => {
 
   const previewLink = (
     <div>
-      <button className="btn btn-link" onClick={() => props.onView(resource.guid)}>
+      <button className="btn btn-link" onClick={() => props.onView(resource.id)}>
         {title}
       </button>
       <PreconditionsEditor

@@ -12,17 +12,17 @@ import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentElement } from 'data/content/common/interfaces';
-import { ContentModel, CourseModel, Node, ModelTypes } from 'data/models';
+import { ContentModel, CourseModel, Node, ModelTypes, OrganizationModel } from 'data/models';
 import { modalActions } from 'actions/modal';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
 import { duplicate } from 'actions/duplication';
-import { OrganizationModel }from 'data/models';
+import { CourseState } from 'reducers/course';
 
 interface StateProps {
   content: Maybe<ContentElement>;
   container: Maybe<ParentContainer>;
-  course: CourseModel;
+  course: CourseState;
   supportedElements: Immutable.List<string>;
   show: boolean;
   sidebarContent: JSX.Element;

@@ -20,7 +20,7 @@ export class CreateNewWorkbookPageCommand extends AbstractCommand {
       createGuid(), 'New Page', NEW_PAGE_CONTENT);
 
     return new Promise((resolve, reject) => {
-      createResource(courseModel.guid, resource, dispatch)
+      createResource(courseModel.idvers, resource, dispatch)
         .then((doc) => {
           const id = createGuid();
           if (doc.model.modelType === models.ModelTypes.WorkbookPageModel) {

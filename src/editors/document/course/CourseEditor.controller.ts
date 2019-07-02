@@ -40,8 +40,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     courseChanged: (model: CourseModel) =>
       dispatch(courseChanged(model)),
-    viewAllCourses: () =>
-      dispatch(viewActions.viewAllCourses()),
+    viewAllCourses: () => viewActions.viewAllCourses(),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
     onShowMessage: (message: Messages.Message) => dispatch(showMessage(message)),
