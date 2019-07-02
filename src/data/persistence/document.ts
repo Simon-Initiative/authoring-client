@@ -1,7 +1,8 @@
 import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
-import { CourseId, DocumentId, LegacyTypes } from '../types';
+import { DocumentId, LegacyTypes } from '../types';
 import * as models from '../models';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 /**
  * Retrieve a document, given a course and document id.
@@ -9,16 +10,17 @@ import * as models from '../models';
  * @param documentId the document guid
  */
 export function retrieveDocument(
-  courseId: CourseId, documentId: DocumentId, notify?: () => void): Promise<Document> {
+  course: CourseGuid | CourseIdVers, documentId: DocumentId, notify?: () => void):
+  Promise<Document> {
 
-  const url = `${configuration.baseUrl}/${courseId}/resources/${documentId}`;
+  // tslint:disable-next-line:max-line-length
+  const url = `${configuration.baseUrl}/${course.value()}/resources/${documentId}`;
 
   return authenticatedFetch({ url })
     .then((json: any) => {
-      json.courseId = courseId;
       return new Document({
-        _courseId: courseId,
-        _id: json.guid,
+        _courseId: course,
+        _id: json.id,
         _rev: json.rev,
         model: models.createModel(json, notify),
       });
@@ -66,10 +68,10 @@ export type PreviewResult =
  * @param documentId the document guid to preview
  */
 export function initiatePreview(
-  courseId: CourseId, documentId: DocumentId,
+  course: CourseGuid | CourseIdVers, documentId: DocumentId,
   isRefresh: boolean, server?: ServerName): Promise<PreviewResult> {
 
-  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`
+  const url = `${configuration.baseUrl}/${course.value()}/resources/preview/${documentId}`
     + '?redeploy=true'
     + (isRefresh ? '&refresh=true' : '')
     + (server ? '&server=' + server : '');
@@ -110,40 +112,21 @@ export function initiatePreview(
     });
 }
 
-export function initiateQuickPreview(courseId: CourseId, documentId: DocumentId) {
+export function initiateQuickPreview(course: CourseGuid, documentId: DocumentId) {
   const protocol = window.location.protocol + '//';
   const hostname = window.location.host;
   const prefix = 'content-service/api';
-  const src = `${protocol + hostname}/${prefix}/${courseId}/resources/quick_preview/${documentId}`;
+  // tslint:disable-next-line:max-line-length
+  const src = `${protocol + hostname}/${prefix}/${course.value()}/resources/quick_preview/${documentId}`;
   window.open(src, '_blank');
-
-  // Temporarily commenting out until authenticated preview is supported in backend.
-  // const iframe = document.createElement('iframe');
-  // iframe.src = src;
-  // // Styles to make the iframe take up the full window
-  // const stylesString = `
-  //   position:fixed;
-  //   top:0px;
-  //   left:0px;
-  //   bottom:0px;
-  //   right:0px;
-  //   width:100%;
-  //   height:100%;
-  //   border:none;
-  //   margin:0;
-  //   padding:0;
-  //   overflow:hidden;
-  //   z-index:999999;`;
-  // iframe.setAttribute('style', stylesString);
-
-  // win.document.body.appendChild(iframe);
 }
 
 export function bulkFetchDocuments(
-  courseId: string, filters: string[], action: string): Promise<Document[]> {
+  course: CourseGuid | CourseIdVers, filters: string[], action: string): Promise<Document[]> {
 
   // Valid values for 'action' is limited to 'byIds' or 'byTypes'
-  const url = `${configuration.baseUrl}/${courseId}/resources/bulk?action=${action}`;
+  // tslint:disable-next-line:max-line-length
+  const url = `${configuration.baseUrl}/${course.value()}/resources/bulk?action=${action}`;
   const body = JSON.stringify(filters);
   const method = 'POST';
 
@@ -152,14 +135,14 @@ export function bulkFetchDocuments(
       const documents = [];
       if (json instanceof Array) {
         json.forEach(item => documents.push(new Document({
-          _courseId: courseId,
+          _courseId: course,
           _id: item.guid,
           _rev: item.rev,
           model: models.createModel(item),
         })));
       } else {
         documents.push(new Document({
-          _courseId: courseId,
+          _courseId: course,
           _id: json.guid,
           _rev: json.rev,
           model: models.createModel(json),
@@ -192,24 +175,19 @@ export function listenToDocument(doc: Document): Promise<Document> {
     });
 }
 
-export function createDocument(courseId: CourseId, content: models.ContentModel):
+export function createDocument(course: CourseGuid | CourseIdVers, content: models.ContentModel):
   Promise<Document> {
 
-  let url = null;
-  if (content.type === LegacyTypes.package) {
-    url = `${configuration.baseUrl}/packages/`;
-  } else {
-    url = `${configuration.baseUrl}/${courseId}/resources?resourceType=${content.type}`;
-  }
+  // tslint:disable-next-line:max-line-length
+  const url = `${configuration.baseUrl}/${course.value()}/resources?resourceType=${content.type}`;
   const body = JSON.stringify(content.toPersistence());
   const method = 'POST';
 
   return (authenticatedFetch({ url, body, method }) as any)
     .then((json) => {
-      const packageGuid = (content as any).type === LegacyTypes.package ? json.guid : courseId;
       return new Document({
-        _courseId: packageGuid,
-        _id: json.guid,
+        _courseId: course,
+        _id: json.id ? json.id : json.guid,
         _rev: json.rev,
         model: models.createModel(json),
       });
@@ -217,16 +195,21 @@ export function createDocument(courseId: CourseId, content: models.ContentModel)
 }
 
 export function persistDocument(doc: Document): Promise<Document> {
+  const course = typeof doc._courseId === 'string'
+    ? doc._courseId
+    : doc._courseId.value();
+  const resource = typeof doc._id === 'string'
+    ? doc._id
+    : doc._id.value();
 
   let url = null;
-  if ((doc.model as any).type === LegacyTypes.package) {
-    url = `${configuration.baseUrl}/packages/${doc._courseId}`;
+  if (doc.model.type === LegacyTypes.package) {
+    url = `${configuration.baseUrl}/packages/${course}`;
   } else {
-    url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
+    url = `${configuration.baseUrl}/${course}/resources/${resource}`;
   }
 
   try {
-
     const toPersist = doc.model.toPersistence();
     const body = JSON.stringify(toPersist);
     const method = 'PUT';
@@ -250,10 +233,17 @@ export function persistDocument(doc: Document): Promise<Document> {
 
 export function persistRevisionBasedDocument(
   doc: Document, nextRevision: string): Promise<Document> {
+  const course = typeof doc._courseId === 'string'
+    ? doc._courseId
+    : doc._courseId.value();
+  const resource = typeof doc._id === 'string'
+    ? doc._id
+    : doc._id.value();
 
-  const br = (doc as any).model.resource.lastRevisionGuid;
+  const br = (doc.model as any).resource.lastRevisionGuid;
   const url
-    = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}/${br}/${nextRevision}`;
+    // tslint:disable-next-line:max-line-length
+    = `${configuration.baseUrl}/${course}/resources/${resource}/${br}/${nextRevision}`;
 
   try {
     const toPersist = doc.model.toPersistence();

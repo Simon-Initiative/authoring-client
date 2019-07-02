@@ -1,12 +1,11 @@
 import { CourseModel } from 'data/models';
 import {
-    COURSE_CHANGED, CourseChangedAction, UPDATE_COURSE_RESOURCES,
-    UpdateCourseResourcesAction,
+  COURSE_CHANGED, CourseChangedAction, UPDATE_COURSE_RESOURCES,
+  UpdateCourseResourcesAction,
 } from 'actions/course';
 
-import { ENTER_APPLICATION_VIEW, EnterApplicationViewAction } from 'actions/view';
-
 import { OtherAction } from './utils';
+import { ENTER_APPLICATION_VIEW, EnterApplicationViewAction } from 'actions/router';
 
 type ActionTypes =
   EnterApplicationViewAction

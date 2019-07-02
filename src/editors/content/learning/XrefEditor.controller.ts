@@ -19,7 +19,7 @@ interface StateProps {
 interface DispatchProps {
   displayModal: (component: any) => void;
   dismissModal: () => void;
-  updateTarget: (targetId: string, documentId: string) => Promise<any>;
+  updateTarget: (targetId: string, documentResourceId: string) => Promise<any>;
 }
 
 interface OwnProps extends AbstractContentEditorProps<contentTypes.Xref> {

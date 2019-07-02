@@ -333,7 +333,7 @@ class ImageHotspotEditor
                     ? DEFAULT_IMAGE
                     : buildUrl(
                       context.baseUrl,
-                      context.courseId,
+                      context.courseModel.guid,
                       context.resourcePath,
                       model.src,
                     )}

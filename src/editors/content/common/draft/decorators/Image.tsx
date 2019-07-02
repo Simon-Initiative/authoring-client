@@ -39,7 +39,7 @@ class Image extends React.PureComponent<ImageProps, any> {
     } else {
       fullSrc = buildUrl(
         this.props.context.baseUrl,
-        this.props.context.courseId,
+        this.props.context.courseModel.guid,
         this.props.context.resourcePath,
         src);
     }

@@ -23,7 +23,7 @@ export class CreateNewAssessmentCommand extends AbstractCommand {
     });
 
     return new Promise((resolve, reject) => {
-      createResource(courseModel.guid, resource, dispatch)
+      createResource(courseModel.idvers, resource, dispatch)
         .then((document) => {
 
           const id = createGuid();

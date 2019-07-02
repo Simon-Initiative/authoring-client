@@ -92,8 +92,6 @@ export default class OrgEditorManager
     const { course, documentId, expanded, userId, onDispatch,
       editingAllowed, undoRedoGuid } = this.props;
 
-    const courseId = (course as models.CourseModel).guid;
-
     return (
       <OrgEditor
         {...this.props}
@@ -106,7 +104,6 @@ export default class OrgEditorManager
           orgId: documentId,
           documentId,
           userId,
-          courseId,
           undoRedoGuid,
           resourcePath: this.determineBaseUrl((document.model as any).resource),
           baseUrl: configuration.protocol + configuration.hostname + '/webcontents',

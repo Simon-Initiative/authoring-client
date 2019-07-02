@@ -1,171 +1,79 @@
-import * as models from 'data/models';
-import { dismissScopedMessages } from './messages';
-import { Scope } from 'types/messages';
-import * as courseActions from 'actions/course';
-import * as orgActions from 'actions/orgs';
-import { LegacyTypes } from 'data/types';
-import * as router from 'actions/router';
-import { State } from 'reducers';
 import { Maybe } from 'tsmonad';
-import { loadFromLocalStorage } from 'utils/localstorage';
-import { activeOrgUserKey, ACTIVE_ORG_STORAGE_KEY } from './utils/activeOrganization';
-
-function isDifferentCourse(getState, courseId): boolean {
-  const course: models.CourseModel = getState().course;
-  return course === null || course.guid !== courseId;
-}
-
-function isDifferentOrg(getState: () => State, orgId): boolean {
-  const { course } = getState();
-  return getState().router.orgId.caseOf({
-    just: id => course.resourcesById.has(id)
-      && course.resourcesById.get(id).type === LegacyTypes.organization
-      && orgId !== id,
-    nothing: () => true,
-  });
-}
-
-
-export type ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
-export const ENTER_APPLICATION_VIEW: ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
-
-export type EnterApplicationViewAction = {
-  type: ENTER_APPLICATION_VIEW,
-};
-
-function enterApplicationView(): EnterApplicationViewAction {
-  return {
-    type: ENTER_APPLICATION_VIEW,
-  };
-}
-
-// Helpers for defining async view actions that dismiss
-// the appropriately scoped messages:
-
-function transitionCourseView(destination, courseId, orgId, dispatch, getState) {
-
-  if (isDifferentCourse(getState, courseId)) {
-
-    dispatch(dismissScopedMessages(Scope.PackageDetails));
-
-    dispatch(courseActions.loadCourse(courseId)).then((c) => {
-      dispatch(orgActions.releaseOrg());
-      router.push(destination);
-    });
-  } else if (isDifferentOrg(getState, orgId)) {
-    dispatch(orgActions.releaseOrg());
-    dispatch(orgActions.load(courseId, orgId));
-    dispatch(dismissScopedMessages(Scope.Organization));
-    router.push(destination);
-  } else {
-    dispatch(dismissScopedMessages(Scope.Resource));
-    router.push(destination);
-  }
-
-}
-
-function transitionApplicationView(destination, dispatch) {
-  dispatch(dismissScopedMessages(Scope.Application));
-  dispatch(enterApplicationView());
-  router.push(destination);
-}
-
+import history from 'utils/history';
+import * as router from 'types/router';
+import { CourseIdVers, DocumentId, iLiterallyCantEven } from 'data/types';
 
 export type ViewActions = {
+  // Application Routes
+  viewAllCourses: () => void,
   viewCreateCourse: () => void,
   viewImportCourse: () => void,
-  viewAllCourses: () => void,
-  viewDocument: (documentId: string, courseId: string, orgId: string) => void,
-  viewSkills: (courseId: string, orgId: string) => void,
-  viewObjectives: (courseId: string, orgId: string) => void,
-  viewAllResources: (courseId: string, orgId: string) => void,
-  viewOrganizations: (courseId: string, orgId: string) => void,
-  viewCourse: (courseId: string) => void,
+  viewMissingPage: () => void,
+
+  // Course Routes
+  viewCourse: (course: CourseIdVers, orgId: Maybe<string>) => void,
+  viewAllResources: (course: CourseIdVers, orgId: Maybe<string>) => void,
+  viewOrganizations: (course: CourseIdVers, orgId: Maybe<string>) => void,
+  viewObjectives: (course: CourseIdVers, orgId: Maybe<string>) => void,
+  viewSkills: (course: CourseIdVers, orgId: Maybe<string>) => void,
+  viewDocument: (documentId: DocumentId, course: CourseIdVers, orgId: Maybe<string>) => void,
 };
 
-// The view transition actions:
+// Application Routes
+export const viewAllCourses = () => pushRoute(router.toRouteRoot());
+export const viewCreateCourse = () => pushRoute(router.toRouteCreate());
+export const viewImportCourse = () => pushRoute(router.toRouteImport());
+export const viewMissingPage = () => pushRoute(router.toRouteMissing());
 
-export function viewCreateCourse() {
-  return transitionApplicationView.bind(undefined, '/create');
+// Course Routes
+export const viewCourse = (course: CourseIdVers, orgId: Maybe<string>) =>
+  pushRoute(router.toRouteCourse(course, orgId, router.toRouteCourseOverview()));
+
+export const viewAllResources = (course: CourseIdVers, orgId: Maybe<string>) =>
+  pushRoute(router.toRouteCourse(course, orgId, router.toRouteAllResources()));
+
+export const viewOrganizations = (course: CourseIdVers, orgId: Maybe<string>) =>
+  pushRoute(router.toRouteCourse(course, orgId, router.toRouteOrganizations()));
+
+export const viewSkills = (course: CourseIdVers, orgId: Maybe<string>) =>
+  pushRoute(router.toRouteCourse(course, orgId, router.toRouteSkills()));
+
+export const viewObjectives = (course: CourseIdVers, orgId: Maybe<string>) =>
+  pushRoute(router.toRouteCourse(course, orgId, router.toRouteObjectives()));
+
+export const viewDocument =
+  (resourceId: string, course: CourseIdVers, orgId: Maybe<string>) =>
+    pushRoute(router.toRouteCourse(course, orgId, router.toRouteResource(resourceId)));
+
+function pushRoute(route: router.RouteOption) {
+  history.push(buildUrlFromRoute(route));
 }
 
-export function viewImportCourse() {
-  return transitionApplicationView.bind(undefined, '/import');
-}
-
-export function viewAllCourses() {
-  return transitionApplicationView.bind(undefined, '/');
-}
-
-export function viewDocument(documentId: string, courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(
-      undefined,
-      '/' + documentId + '-' + courseId + (orgId ? '-' + orgId : ''),
-      courseId, orgId,
-    );
-}
-
-export function viewSkills(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/skills-' + courseId + '-' + orgId, courseId, orgId);
-}
-
-export function viewObjectives(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/objectives-' + courseId + '-' + orgId, courseId, orgId);
-}
-
-export function viewAllResources(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/resources-' + courseId + '-' + orgId, courseId, orgId);
-}
-
-export function viewOrganizations(courseId: string, orgId: string) {
-  return transitionCourseView
-    .bind(undefined, '/organizations-' + courseId + '-' + orgId, courseId, orgId);
-}
-
-export function viewCourse(courseId: string) {
-  return function (dispatch, getState: () => State) {
-    dispatch(courseActions.loadCourse(courseId)).then((c) => {
-
-      // This ensures that we wipe any messages displayed from
-      // another course
-      dispatch(dismissScopedMessages(Scope.PackageDetails));
-
-      // Make sure we have an org active and that it pertains to
-      // this course
-      const model: models.CourseModel = c as models.CourseModel;
-      const orgs = model.resources.toArray().filter(r => r.type === LegacyTypes.organization);
-
-      getState().router.orgId.caseOf({
-        just: (documentId) => {
-          // Do not use this org if it doesn't belong to this course
-          const currentOrFirst = model.resources.has(documentId) ? documentId : orgs[0].guid;
-          if (currentOrFirst !== documentId) {
-            dispatch(orgActions.releaseOrg());
-            dispatch(orgActions.load(courseId, currentOrFirst));
-          }
-          dispatch(viewDocument(courseId, courseId, currentOrFirst));
-
-        },
-        nothing: () => {
-          dispatch(orgActions.releaseOrg());
-          let savedOrg;
-          Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
-            .lift((prefs) => {
-              const username = getState().user.profile.username;
-              const userKey = activeOrgUserKey(username, courseId);
-              if (prefs[userKey]) {
-                savedOrg = orgs.find(res => res.guid === prefs[userKey]);
-              }
-            });
-          const orgGuid = savedOrg ? savedOrg.guid : orgs[0].guid;
-          dispatch(orgActions.load(courseId, orgGuid));
-          dispatch(viewDocument(courseId, courseId, orgGuid));
-        },
+export function buildUrlFromRoute(route: router.RouteOption) {
+  switch (route.type) {
+    case 'RouteCreate': return '/create';
+    case 'RouteImport': return '/import';
+    case 'RouteRoot': return '/';
+    case 'RouteMissing': return '/404';
+    case 'RouteCourse':
+      const { courseId, orgId } = route;
+      const courseIdVers = courseId.value();
+      const organizationId = orgId.caseOf({
+        just: o => `?organization=${o}`,
+        nothing: () => '',
       });
-    });
-  };
+      switch (route.route.type) {
+        case 'RouteCourseOverview':
+          return `/${courseIdVers}${organizationId}`;
+        case 'RouteResource':
+          const resourceId = route.route.resourceId;
+          return `/${courseIdVers}/${resourceId}${organizationId}`;
+        case 'RoutePreview': return `/${courseIdVers}/preview/${organizationId}`;
+        case 'RouteSkills': return `/${courseIdVers}/skills${organizationId}`;
+        case 'RouteObjectives': return `/${courseIdVers}/objectives${organizationId}`;
+        case 'RouteAllResources': return `/${courseIdVers}/resources${organizationId}`;
+        case 'RouteOrganizations': return `/${courseIdVers}/organizations${organizationId}`;
+      }
+    default: return iLiterallyCantEven(route);
+  }
 }

@@ -12,6 +12,7 @@ import { webContentsPath } from 'editors/content/media/utils';
 import { CourseModel } from 'data/models/course';
 import './MediaManager.scss';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
+import * as viewActions from 'actions/view';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 const MAX_NAME_LENGTH = 26;
@@ -381,7 +382,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
             ))}
             {isLoadingMedia && !allItemsLoaded
               ? <LoadingSpinner key="loading"
-                  size={LoadingSpinnerSize.Small} message={PAGE_LOADING_MESSAGE} />
+                size={LoadingSpinnerSize.Small} message={PAGE_LOADING_MESSAGE} />
               : null
             }
           </div>
@@ -521,7 +522,12 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   {mediaItemRefs.get(selectedItem.guid)
                     && mediaItemRefs.get(selectedItem.guid).map((ref, i) => (
                       <span key={ref.guid}>
-                        <a href={`./#${ref.guid}-${courseModel.guid}`}
+                        <a href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            viewActions.viewDocument(
+                              ref.resourceId, courseModel.idvers, Maybe.nothing());
+                          }}
                           target="_blank">
                           {stringFormat.ellipsize(
                             courseModel.resourcesById.get(ref.resourceId).title, 20, 5)}
