@@ -7,14 +7,28 @@ import './InputRef.scss';
 const InputRef = (props) => {
   const data = props.contentState.getEntity(props.entityKey).getData();
 
-  const selected = props.selectedEntity.caseOf({
-    just: s => s === data['@input'] ? 'input-ref-selected' : '',
-    nothing: () => '',
-  });
+  // Strangely formatted questions (e.g. a short answer with an input ref)
+  // will not have selectedEntity present.
+  const selectedEntity = props.selectedEntity;
+  let selected = '';
+  if (selectedEntity !== undefined) {
+    selected = props.selectedEntity.caseOf({
+      just: s => s === data['@input'] ? 'input-ref-selected' : '',
+      nothing: () => '',
+    });
+  }
+
+
 
   const onClick = (e) => {
+
     e.stopPropagation();
-    props.onDecoratorClick(props.entityKey);
+
+    // Don't even process a click unless we are in a well-formed question
+    if (selectedEntity !== undefined) {
+      props.onDecoratorClick(props.entityKey);
+    }
+
   };
 
   if (data.$type === 'FillInTheBlank') {
