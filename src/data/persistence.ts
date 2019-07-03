@@ -16,6 +16,7 @@ export {
   importPackage,
   requestDeployment,
   createNewVersion,
+  getValidPackageId,
 } from './persistence/package';
 
 export {

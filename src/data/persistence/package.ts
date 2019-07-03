@@ -33,6 +33,13 @@ export function getEditablePackages(): Promise<models.CourseModel[]> {
     .then((json: any) => json.map(m => models.createModel(m)));
 }
 
+export function getValidPackageId(packageId: string): Promise<string> {
+  const url = `${configuration.baseUrl}/packages/validator/${packageId}`;
+
+  return authenticatedFetch({ url })
+    .then((json: string) => json);
+}
+
 export function retrieveCoursePackage(course: CourseGuid | CourseIdVers): Promise<Document> {
 
   const url = `${configuration.baseUrl}/packages/${course.value()}/details`;
