@@ -256,7 +256,7 @@ export default class VideoEditor
       const src = sources.first().src;
       fullSrc = buildUrl(
         this.props.context.baseUrl,
-        this.props.context.courseId,
+        this.props.context.courseModel.guid,
         this.props.context.resourcePath,
         src);
     }

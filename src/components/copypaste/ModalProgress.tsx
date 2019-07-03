@@ -4,10 +4,11 @@ import { ParsedContent } from 'data/parsers/common/types';
 import { resolveDependencies, ResolverProgress } from 'data/parsers/resolvers';
 import { applyResolutions } from 'data/parsers/apply';
 import { ContentElement } from 'data/content/common/interfaces';
+import { CourseIdVers } from 'data/types';
 
 export interface ModalProgressProps {
   parsedContent: ParsedContent;
-  courseId: string;
+  courseId: CourseIdVers;
   resourcePath: string;
   onComplete: (elements: Immutable.List<ContentElement>) => void;
 }
@@ -57,7 +58,7 @@ export class ModalProgress extends React.Component<ModalProgressProps, ModalProg
   renderProgressBar(complete, total) {
 
     const percentage = complete / total;
-    const style : any = { width: ((percentage * 100) + '%') };
+    const style: any = { width: ((percentage * 100) + '%') };
 
     return (
       <div className="progress">
@@ -89,7 +90,7 @@ export class ModalProgress extends React.Component<ModalProgressProps, ModalProg
 
     return (
       <div ref={(modal) => { this.modal = modal; }}
-      data-backdrop="static" className="modal fade">
+        data-backdrop="static" className="modal fade">
         <div className="modal-dialog modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">

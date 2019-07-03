@@ -65,7 +65,7 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
   preview() {
     this.setState(
       { previewing: true },
-      () => this.props.onQuickPreview(this.props.course.guid, this.props.documentResource)
+      () => this.props.onQuickPreview(this.props.course.guid.value(), this.props.documentResource)
         .then(_ => this.setState({ previewing: false }))
         .catch(_ => this.setState({ previewing: false })));
   }

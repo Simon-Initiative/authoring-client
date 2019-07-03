@@ -5,7 +5,6 @@ import { modalActions } from 'actions/modal';
 import { OrganizationModel, CourseModel } from 'data/models';
 
 interface StateProps {
-  course: CourseModel;
 }
 
 interface DispatchProps {
@@ -21,7 +20,6 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
-    course: state.course,
   };
 };
 

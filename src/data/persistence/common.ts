@@ -1,8 +1,9 @@
 import * as Immutable from 'immutable';
-import { CourseId, DocumentId } from '../types';
+import { DocumentId } from '../types';
 import * as models from '../models';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
 import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 const fetch = (window as any).fetch;
 
@@ -24,7 +25,7 @@ export type HttpRequestParams = {
   hasTextResult?: boolean,
 };
 
-export function authenticatedFetch(params: HttpRequestParams) {
+export function authenticatedFetch(params: HttpRequestParams): Promise<Object> {
 
   const method = params.method ? params.method : 'GET';
   const headers = params.headers ? params.headers : getHeaders(credentials);
@@ -61,9 +62,14 @@ export function authenticatedFetch(params: HttpRequestParams) {
           response.text().then((text) => {
             // Error responses from the server should always return
             // objects of type { message: string }
-            let message = JSON.parse(text);
-            if (message.message !== undefined) {
-              message = message.message;
+            let message;
+            try {
+              message = JSON.parse(text);
+              if (message.message !== undefined) {
+                message = message.message;
+              }
+            } catch (e) {
+              message = text;
             }
             reject({
               status: response.status,
@@ -84,8 +90,11 @@ export function authenticatedFetch(params: HttpRequestParams) {
 export type RevisionId = string;
 
 export type DocumentParams = {
-  _courseId?: CourseId,
-  _id?: DocumentId,
+  // string is course.guid, db guid
+  _courseId?: string | CourseGuid | CourseIdVers,
+  // A course might be the document being edited (CourseEditor.tsx)
+  // documentId is generally resource.guid
+  _id?: DocumentId | CourseIdVers,
   _rev?: RevisionId,
   model?: models.ContentModel,
 };
@@ -100,8 +109,8 @@ const defaultDocumentParams = {
 export class Document extends Immutable.Record(defaultDocumentParams) {
 
   /* tslint:disable */
-  _courseId?: CourseId;
-  _id: DocumentId;
+  _courseId?: string | CourseGuid | CourseIdVers;
+  _id: DocumentId | CourseIdVers;
   _rev: RevisionId;
   /* tslint:enable */
 

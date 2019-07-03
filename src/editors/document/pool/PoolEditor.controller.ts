@@ -16,6 +16,7 @@ import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
 import { RouterState } from 'reducers/router';
 import { setSearchParam, clearSearchParam } from 'actions/router';
+import { CourseIdVers } from 'data/types';
 
 interface StateProps {
   skills: OrderedMap<string, Skill>;
@@ -27,7 +28,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onFetchSkills: (courseId: string) => any;
+  onFetchSkills: (courseId: CourseIdVers) => any;
   onUpdateContent: (documentId: string, content: Object) => void;
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
@@ -60,7 +61,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onFetchSkills: (courseId: string) => {
+    onFetchSkills: (courseId: CourseIdVers) => {
       return dispatch(fetchSkills(courseId));
     },
     onUpdateContent: (documentId: string, content: ContentElement) => {
