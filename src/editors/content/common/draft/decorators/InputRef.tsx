@@ -7,10 +7,14 @@ import './InputRef.scss';
 const InputRef = (props) => {
   const data = props.contentState.getEntity(props.entityKey).getData();
 
-  const selected = props.selectedEntity.caseOf({
-    just: s => s === data['@input'] ? 'input-ref-selected' : '',
-    nothing: () => '',
-  });
+  const selectedEntity = props.selectedEntity;
+  let selected = '';
+  if (selectedEntity !== undefined) {
+    selected = props.selectedEntity.caseOf({
+      just: s => s === data['@input'] ? 'input-ref-selected' : '',
+      nothing: () => '',
+    });
+  }
 
   const onClick = (e) => {
     e.stopPropagation();
