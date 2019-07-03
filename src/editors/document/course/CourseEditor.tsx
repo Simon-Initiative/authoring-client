@@ -62,6 +62,7 @@ interface CourseEditorState {
   newVersionNumber: string;
   isNewVersionValid: boolean;
   newVersionErrorMessage: string;
+  showAdvancedDetails: boolean;
 }
 
 interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
@@ -135,6 +136,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         resource.type === LegacyTypes.organization &&
         resource.resourceState !== ResourceState.DELETED)
       .toArray();
+    this.toggleAdvancedDetails = this.toggleAdvancedDetails.bind(this);
   }
 
   // Fetch all globally available themes, sort alphabetically, and choose one to be selected
@@ -609,10 +611,19 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  // Either Show or Hide the Advanced options in the Details page
+  toggleAdvancedDetails() {
+    this.setState({
+      showAdvancedDetails: !this.state.showAdvancedDetails
+    })
+  }
+
   renderDetails() {
     const { model } = this.props;
 
     const isAdmin = hasRole('admin');
+
+    const collapseIndicator = this.state.showAdvancedDetails ? '-' : '+';
 
     return (
       <div className="infoContain">
@@ -652,36 +663,57 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <div className="col-3">Team members</div>
           <div className="col-9">{this.renderDevelopers()}</div>
         </div>
+
+        {
+          // Note that the implementation of this toggle is very similar to the
+          // Collapse element. But this required too many changes to Collapse code.
+        }
         <div className="row">
-          <div className="col-3">Theme</div>
-          <div className="col-9">{this.renderThemes()}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">Version</div>
-          <div className="col-9">{model.version}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">License <HelpPopover activateOnClick>
-            <div><img src={CC_LICENSES} />
-              <br /><br />
-              <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
-                target="_blank">
-                More information
-              </a>
-            </div>
-          </HelpPopover>
+          <div className="col-3">
+              <button
+                type="button"
+                className="btn btn-link"
+                onClick={() => this.toggleAdvancedDetails()}>
+                Advanced Details {collapseIndicator}
+              </button>
           </div>
-          <div className="col-9">{this.renderLicenseSelect()}</div>
+          <div className="col-9"></div>
         </div>
+        {this.state.showAdvancedDetails &&
+          <div className="advanced">
+          <div className="row">
+            <div className="col-3">Theme</div>
+            <div className="col-9">{this.renderThemes()}</div>
+          </div>
+          <div className="row">
+            <div className="col-3">Version</div>
+            <div className="col-9">{model.version}</div>
+          </div>
+          <div className="row">
+            <div className="col-3">License <HelpPopover activateOnClick>
+              <div><img src={CC_LICENSES} />
+                <br /><br />
+                <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                  target="_blank">
+                  More information
+                </a>
+              </div>
+            </HelpPopover>
+            </div>
+            <div className="col-9">{this.renderLicenseSelect()}</div>
+          </div>
+          <div className="row">
+            <div className="col-3">Unique ID</div>
+            <div className="col-9">{model.id}</div>
+          </div>
+          <div className="row">
+            <div className="col-3">Package Location</div>
+            <div className="col-9">{model.svnLocation}</div>
+          </div>
+          </div>
+        }
+
         <hr />
-        <div className="row">
-          <div className="col-3">Unique ID</div>
-          <div className="col-9">{model.id}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">Package Location</div>
-          <div className="col-9">{model.svnLocation}</div>
-        </div>
         {/* <div className="row">
           <div className="col-3">Thumbnail<br /><br />
           </div>
