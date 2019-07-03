@@ -13,7 +13,7 @@ import { ParentContainer } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { Resource } from 'data/content/resource';
 import {
-  ModelTypes, ContentModel, AssessmentModel, CourseModel, OrganizationModel
+  ModelTypes, ContentModel, AssessmentModel, CourseModel, OrganizationModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
@@ -36,11 +36,12 @@ import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 import { CombinationsMap } from 'types/combinations';
 import { Edge } from 'types/edge';
 import { CourseState } from 'reducers/course';
+import { viewDocument } from 'actions/view';
 
 interface SidebarRowProps {
   label?: string;
 }
-
+// KYLE-1936 this is a model usable for the functional component for refs, esp if styles are needed
 export const SidebarRow = withStyles<SidebarRowProps>(styles)(({
   classes, label, children }) => {
   return (
@@ -131,7 +132,7 @@ export interface ContextAwareSidebarProps {
   resource: Resource;
   model: ContentModel;
   currentPage: string;
-  selectedOrganization: Maybe<OrganizationModel>
+  selectedOrganization: Maybe<OrganizationModel>;
   onEditModel: (model: ContentModel) => void;
   supportedElements: Immutable.List<string>;
   show: boolean;
@@ -148,8 +149,8 @@ export interface ContextAwareSidebarProps {
 }
 
 export interface ContextAwareSidebarState {
-
-  assessmentRefs: Maybe<Edge[]>; // KEVIN-1936 this should change based on the type of resource (see switch (model.modelType))
+  // KEVIN-1936 should change based on the type of resource (see switch (model.modelType))
+  assessmentRefs: Maybe<Edge[]>;
 }
 
 /**
@@ -173,8 +174,6 @@ class ContextAwareSidebar
 
   componentDidMount() {
 
-    console.log("component mounted");
-
     this.fetchRefs();
 
   }
@@ -185,7 +184,6 @@ class ContextAwareSidebar
 //    const org = this.props.selectedOrganization;
 //    const directResources = org
 
-    console.log("fetching Refs");
 
       // KEVIN-1936 see (AAA) to see what call to replicate
       // fetch summative assessment to pool edges
@@ -194,12 +192,8 @@ class ContextAwareSidebar
       destinationType: LegacyTypes.assessment2_pool,
     }).then((edges) => {
 
-      console.log(edges);
-      console.log(resource);
       const assessments = edges.filter((edge) => edge.destinationId.indexOf(resource.id) >= 0);
 
-      console.log("setting pool edges: ");
-      console.log(assessments);
       this.setState({
         assessmentRefs: Maybe.just(assessments) // KEVIN-1936 (CCC)
       })
@@ -298,8 +292,6 @@ class ContextAwareSidebar
     } = this.props;
 
     const { assessmentRefs } = this.state;
-    console.log("assessmentRefs:");
-    console.log(assessmentRefs);
 
     const adjusted = (date: Date): Date => adjustForSkew(date, this.props.timeSkewInMs);
 
@@ -323,9 +315,6 @@ class ContextAwareSidebar
       </SidebarGroup>
     );
 
-    console.log(" --- course --- ")
-    console.log(course);
-
     const getRefGuidFromRef = (ref: Edge) => {
       console.log(ref)
       console.log(ref.sourceId);
@@ -342,7 +331,7 @@ class ContextAwareSidebar
       if (splits.length == 3) {
         return splits[2];
       }
-    }
+    };
 
     const getRefTitleFromRef = (ref: Edge) => {
 
@@ -352,13 +341,13 @@ class ContextAwareSidebar
 
       return Maybe.maybe(course.resourcesById.get(id)).caseOf({
         just: resource => resource.title,
-        nothing: () => '[Error loading page title]'
-      })
-    }
+        nothing: () => '[Error loading page title]',
+      });
+    };
 
     const orgGuid = selectedOrganization.caseOf({
       just: (organization) => organization.guid,
-      nothing: () => ""
+      nothing: () => '',
     })
 
     /* KYLE-1936 currently only works for pools, needs to be modified to work for any type
@@ -374,11 +363,30 @@ class ContextAwareSidebar
                 ? (
                   <div className="container">
 
-                    {refs.map(ref => (
+                    { // KYLE-1936 link uses  viewDocument interface, currently not supporting org
+                      refs.map(ref => (
                       <div key={ref.guid} className="ref-thing">
-                        <a href={`#${getRefGuidFromRef(ref)}-${course.guid}`
-                              + `${orgGuid ? "-" + orgGuid : ""}`}>
-                            <i className={classNames(/* KEVIN-1936 icon should change based on type*/
+                        <a href="#" onClick = {(event) => {
+                          event.preventDefault();
+                          console.log(stripId(ref.sourceId))
+                          viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
+                        }
+                        }>
+
+
+
+
+
+
+
+
+
+{ //KYLE-1936 original hardcoded implementation preserved for now, messily
+                        // ${getRefGuidFromRef(ref)}-${course.guid}`
+                        // + `${orgGuid ? "-" + orgGuid : ""}`}>
+}
+                            <i className={classNames(
+                              /* KEVIN-1936 icon should change based on type*/
                               ['fa fa-check', classes.detailsSectionIcon])} />
                             {getRefTitleFromRef(ref)}
                         </a>
@@ -387,10 +395,10 @@ class ContextAwareSidebar
                   </div>
                 ) : (
                   <div>No references found</div>
-                )
+                );
               },
               nothing: () => <div>Error loading</div>
-            }
+            },
             )
             }
           </div>
