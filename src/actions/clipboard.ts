@@ -122,7 +122,7 @@ export function paste() {
           // FIXME: actions should not have side effects. Should call "setState".
           displayModalMessasge(
             dispatch,
-            React.createElement(PasteFailModalElement, {message, removed})
+            React.createElement(PasteFailModalElement, { message, removed }),
           );
         }
 

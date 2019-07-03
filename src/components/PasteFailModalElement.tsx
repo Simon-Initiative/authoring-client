@@ -2,7 +2,7 @@ import * as React from 'react';
 
 export interface PasteFailModalElementProps {
   message: string;
-  removed?: string[];
+  removed: string[];
 }
 
 export class PasteFailModalElement extends React.PureComponent<PasteFailModalElementProps, {}> {
