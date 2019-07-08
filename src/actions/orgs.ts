@@ -9,7 +9,7 @@ import * as viewActions from 'actions/view';
 import { showMessage, dismissSpecificMessage } from 'actions/messages';
 
 import { buildConflictMessage } from 'utils/error';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, ResourceId } from 'data/types';
 import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
 
@@ -106,10 +106,10 @@ export const ORG_REQUESTED: ORG_REQUESTED = 'orgs/ORG_REQUESTED';
 
 export type OrgRequestedAction = {
   type: ORG_REQUESTED,
-  orgId: string,
+  orgId: ResourceId,
 };
 
-export const orgRequested = (orgId: string): OrgRequestedAction => ({
+export const orgRequested = (orgId: ResourceId): OrgRequestedAction => ({
   type: ORG_REQUESTED,
   orgId,
 });
@@ -136,14 +136,12 @@ export const ORG_CHANGE_FAILED: ORG_CHANGE_FAILED = 'orgs/ORG_CHANGE_FAILED';
 
 export type OrgChangeFailedAction = {
   type: ORG_CHANGE_FAILED,
-  orgId: string,
   error: string,
 };
 
-export const orgChangeFailed = (orgId: string, error: string)
+export const orgChangeFailed = (error: string)
   : OrgChangeFailedAction => ({
     type: ORG_CHANGE_FAILED,
-    orgId,
     error,
   });
 
@@ -153,13 +151,11 @@ export const ORG_CHANGE_SUCCEEDED: ORG_CHANGE_SUCCEEDED = 'orgs/ORG_CHANGE_SUCCE
 
 export type OrgChangeSucceededAction = {
   type: ORG_CHANGE_SUCCEEDED,
-  orgId: string,
 };
 
-export const orgChangeSucceeded = (orgId: string)
+export const orgChangeSucceeded = ()
   : OrgChangeSucceededAction => ({
     type: ORG_CHANGE_SUCCEEDED,
-    orgId,
   });
 
 
@@ -180,7 +176,7 @@ export const modelUpdated = (
 
 
 
-export function load(courseId: CourseIdVers, organizationId: string) {
+export function load(courseId: CourseIdVers, organizationId: ResourceId) {
   return function (dispatch): Promise<persistence.Document> {
 
     const holder = { changeMade: false };
@@ -233,7 +229,7 @@ function applyChange(
 
       persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
         .then(() => {
-          dispatch(orgChangeSucceeded(m.guid));
+          dispatch(orgChangeSucceeded());
           dispatch(dismissSpecificMessage(buildConflictMessage()));
         })
         .catch((err) => {
@@ -253,13 +249,13 @@ function applyChange(
                   // If no retry attempts remaining, we simply update the model to reflect
                   // the latest from the server's perspective.
                   // Track that this change failed
-                  dispatch(orgChangeFailed(m.guid, err));
+                  dispatch(orgChangeFailed(err));
                   dispatch(modelUpdated(latestDoc.model as models.OrganizationModel));
                   dispatch(showMessage(buildConflictMessage()));
                 }
               });
           } else {
-            dispatch(orgChangeFailed(m.guid, err));
+            dispatch(orgChangeFailed(err));
           }
         });
     },
@@ -268,7 +264,7 @@ function applyChange(
       // only after reaching a conflict and refetching the model - so it does no good
       // to continue to retry.  Just give the user notification and access to the new model.
       dispatch(modelUpdated(m));
-      dispatch(orgChangeFailed(m.guid, 'Conflict'));
+      dispatch(orgChangeFailed('Conflict'));
       dispatch(showMessage(buildConflictMessage()));
 
       // Transition the view back to the course overview page.  This avoids the most
@@ -296,7 +292,7 @@ export function change(change: org.OrgChangeRequest, changeType = ChangeType.Nor
 
 
 export function undo() {
-  return function (dispatch, getState) {
+  return function (dispatch, getState: () => State) {
 
     const undoStack: Immutable.Stack<org.OrgChangeRequest> = getState().orgs.undoStack;
     const cr = undoStack.peek();
@@ -309,7 +305,7 @@ export function undo() {
 }
 
 export function redo() {
-  return function (dispatch, getState) {
+  return function (dispatch, getState: () => State) {
 
     const redoStack: Immutable.Stack<org.OrgChangeRequest> = getState().orgs.redoStack;
     const cr = redoStack.peek();

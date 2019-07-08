@@ -3,10 +3,11 @@ import * as Immutable from 'immutable';
 import * as types from '../types';
 import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
+import { ResourceId } from 'data/types';
 
 export type PoolModelParams = {
-  guid?: string,
-  id?: string,
+  guid?: types.ResourceGuid,
+  id?: types.ResourceId,
   resource?: contentTypes.Resource,
   type?: string,
   lock?: contentTypes.Lock,
@@ -17,18 +18,18 @@ export type PoolModelParams = {
 const defaultPoolModel = {
   modelType: 'PoolModel',
   resource: new contentTypes.Resource(),
-  guid: '',
-  id: '',
+  guid: types.ResourceGuid.of(''),
+  id: types.ResourceId.of(''),
   type: types.LegacyTypes.assessment2_pool,
   icon: new contentTypes.WebContent(),
   lock: new contentTypes.Lock(),
-  pool: new contentTypes.Pool({ id: guid() }),
+  pool: new contentTypes.Pool({ id: ResourceId.of(guid()) }),
 };
 
 export class PoolModel extends Immutable.Record(defaultPoolModel) {
   modelType: 'PoolModel';
-  guid: string;
-  id: string;
+  guid: types.ResourceGuid;
+  id: types.ResourceId;
   resource: contentTypes.Resource;
   type: string;
   lock: contentTypes.Lock;
@@ -49,8 +50,7 @@ export class PoolModel extends Immutable.Record(defaultPoolModel) {
 
     const p = (json as any);
     model = model.with({
-      resource: contentTypes.
-        Resource.fromPersistence(p),
+      resource: contentTypes.Resource.fromPersistence(p),
     });
     model = model.with({ type: p.type });
     if (p.lock !== undefined && p.lock !== null) {
@@ -74,7 +74,7 @@ export class PoolModel extends Immutable.Record(defaultPoolModel) {
     const doc = [this.pool.toPersistence()];
     const values = {
       modelType: 'PoolModel',
-      id: this.pool.id,
+      id: this.pool.id.value(),
       title: this.pool.title.text,
       type: this.type,
       doc,

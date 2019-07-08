@@ -10,40 +10,41 @@ import { Title } from '../learning/title';
 
 import { Content } from './content';
 import { Question } from './question';
+import { ResourceId, ResourceGuid } from 'data/types';
 
 export type PoolParams = {
-  id?: string;
+  id?: ResourceId;
   objrefs?: Immutable.OrderedMap<string, ObjRef>,
   title?: Title,
   content?: Content,
   sections?: Immutable.OrderedMap<string, Unsupported>,
   questions?: Immutable.OrderedMap<string, Question>,
-  guid?: string;
+  guid?: ResourceGuid;
 };
 
 const defaultPoolParams = {
   contentType: 'Pool',
   elementType: 'pool',
-  id: '',
+  id: ResourceId.of(''),
   objrefs: Immutable.OrderedMap<string, ObjRef>(),
   title: new Title({ text: ContentElements.fromText('Pool Title', '', TEXT_ELEMENTS) }),
   content: new Content(),
   sections: Immutable.OrderedMap<string, Unsupported>(),
   questions: Immutable.OrderedMap<string, Question>(),
-  guid: '',
+  guid: ResourceGuid.of(''),
 };
 
 export class Pool extends Immutable.Record(defaultPoolParams) {
 
   contentType: 'Pool';
   elementType: 'pool';
-  id: string;
+  id: ResourceId;
   objrefs: Immutable.OrderedMap<string, ObjRef>;
   title: Title;
   content: Content;
   sections: Immutable.OrderedMap<string, Unsupported>;
   questions: Immutable.OrderedMap<string, Question>;
-  guid: string;
+  guid: ResourceGuid;
 
   constructor(params?: PoolParams) {
     super(augment(params));
@@ -55,7 +56,7 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
 
   static fromPersistence(json: any, guid: string, notify?: () => void) {
 
-    let model = new Pool({ guid });
+    let model = new Pool({ guid: ResourceGuid.of(guid) });
 
     const s = json.pool;
 
@@ -137,7 +138,7 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
 
     return {
       pool: {
-        '@id': this.id,
+        '@id': this.id.value(),
         '#array': children,
       },
     };

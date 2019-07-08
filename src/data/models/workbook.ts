@@ -4,7 +4,7 @@ import guid from 'utils/guid';
 import { getKey } from 'data/common';
 import { isArray } from 'util';
 import { ContentElements, TEXT_ELEMENTS, BODY_ELEMENTS } from 'data/content/common/elements';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId, ResourceGuid } from 'data/types';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
 const WB_ELEMENTS = [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS];
@@ -14,7 +14,7 @@ export const NEW_PAGE_CONTENT =
 
 export type WorkbookPageModelParams = {
   resource?: contentTypes.Resource,
-  guid?: string,
+  guid?: ResourceGuid,
   type?: string;
   head?: contentTypes.Head,
   body?: ContentElements,
@@ -25,7 +25,7 @@ export type WorkbookPageModelParams = {
 const defaultWorkbookPageModelParams = {
   modelType: 'WorkbookPageModel',
   resource: new contentTypes.Resource(),
-  guid: '',
+  guid: ResourceGuid.of(''),
   type: LegacyTypes.workbook_page,
   head: new contentTypes.Head(),
   body: new ContentElements(),
@@ -37,7 +37,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
   modelType: 'WorkbookPageModel';
   resource: contentTypes.Resource;
-  guid: string;
+  guid: ResourceGuid;
   type: string;
   head: contentTypes.Head;
   body: ContentElements;
@@ -58,8 +58,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
         title:
           new contentTypes.Title({ text: ContentElements.fromText(title, '', TEXT_ELEMENTS) }),
       }),
-      resource: new contentTypes.Resource({ id, title }),
-      guid: id,
+      resource: new contentTypes.Resource({ id: ResourceId.of(id), title }),
+      guid: ResourceGuid.of(id),
       body: ContentElements.fromText(body, '', WB_ELEMENTS),
     });
   }
@@ -69,7 +69,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
     const wb = (json as any);
     model = model.with({ resource: contentTypes.Resource.fromPersistence(wb) });
-    model = model.with({ guid: wb.guid });
+    model = model.with({ guid: ResourceGuid.of(wb.guid) });
     model = model.with({ type: wb.type });
     if (wb.lock !== undefined && wb.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(wb.lock) });
@@ -125,7 +125,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
     const doc = [{
       workbook_page: {
-        '@id': this.resource.id,
+        '@id': this.resource.id.value(),
         '#array': children,
       },
     }];

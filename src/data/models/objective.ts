@@ -3,13 +3,14 @@ import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { LegacyTypes } from '../types';
+import { ResourceGuid, ResourceId } from 'data/types';
 
 
 export type LearningObjectivesModelParams = {
   resource?: contentTypes.Resource,
-  guid?: string,
+  guid?: ResourceGuid,
   lock?: contentTypes.Lock,
-  id?: string,
+  id?: ResourceId,
   title?: string,
   objectives?: Immutable.OrderedMap<string, contentTypes.LearningObjective>,
 };
@@ -17,8 +18,8 @@ const defaultLearningObjectivesModelParams = {
   modelType: 'LearningObjectivesModel',
   type: LegacyTypes.learning_objectives,
   resource: new contentTypes.Resource(),
-  guid: '',
-  id: '',
+  guid: ResourceGuid.of(''),
+  id: ResourceId.of(''),
   lock: new contentTypes.Lock(),
   title: 'New LearningObjectives',
   objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>(),
@@ -32,9 +33,9 @@ export class LearningObjectivesModel
   modelType: 'LearningObjectivesModel';
   resource: contentTypes.Resource;
   type: string;
-  guid: string;
+  guid: ResourceGuid;
   lock: contentTypes.Lock;
-  id: string;
+  id: ResourceId;
   title: string;
   objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>;
 
@@ -53,7 +54,7 @@ export class LearningObjectivesModel
     const a = (json as any);
     model = model.with({
       resource: contentTypes.Resource.fromPersistence(a),
-      guid: a.guid,
+      guid: ResourceGuid.of(a.guid),
       title: a.title,
     });
 
@@ -68,7 +69,7 @@ export class LearningObjectivesModel
     }
 
     if (org['@id'] !== undefined) {
-      model = model.with({ id: org['@id'] });
+      model = model.with({ id: ResourceId.of(org['@id']) });
     }
 
     const objById = {};
@@ -104,7 +105,7 @@ export class LearningObjectivesModel
   }
 
   toPersistence(): Object {
-    const children : Object[] = [
+    const children: Object[] = [
       { title: { '#text': this.title } }];
 
     if (this.objectives.size === 0) {
@@ -139,7 +140,7 @@ export class LearningObjectivesModel
     const resource = this.resource.toPersistence();
     const doc = [{
       objectives: {
-        '@id': this.resource.id,
+        '@id': this.resource.id.value(),
         '#array': children,
       },
     }];

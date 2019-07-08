@@ -93,7 +93,7 @@ function buildResourceMap(params: CourseModelParams): CourseModelParams {
 
   if (params.resources !== undefined) {
     let map = Immutable.OrderedMap<string, contentTypes.Resource>();
-    params.resources.forEach((value, key) => map = map.set(value.id, value));
+    params.resources.forEach((value, key) => map = map.set(value.id.value(), value));
     params.resourcesById = map;
   }
   return params;

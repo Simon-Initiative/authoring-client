@@ -3,16 +3,16 @@ import * as contentTypes from 'data/contentTypes';
 import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
 import { getKey } from 'data/common';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceGuid, ResourceId } from 'data/types';
 import { setId } from 'data/content/common';
 import { flattenChildren } from 'data/models/utils/org';
 
 export type OrganizationModelParams = {
   resource?: contentTypes.Resource,
-  guid?: string,
+  guid?: ResourceGuid,
   type?: string;
   lock?: contentTypes.Lock,
-  id?: string;
+  id?: ResourceId;
   version?: string;
   product?: Maybe<string>;
   title?: string;
@@ -28,8 +28,8 @@ const defaultOrganizationModelParams = {
   modelType: 'OrganizationModel',
   type: LegacyTypes.organization,
   resource: new contentTypes.Resource(),
-  guid: '',
-  id: '',
+  guid: ResourceGuid.of(''),
+  id: ResourceId.of(''),
   version: '',
   product: Maybe.nothing<string>(),
   lock: new contentTypes.Lock(),
@@ -48,10 +48,10 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
   modelType: 'OrganizationModel';
   resource: contentTypes.Resource;
-  guid: string;
+  guid: ResourceGuid;
   type: string;
   lock: contentTypes.Lock;
-  id: string;
+  id: ResourceId;
   version: string;
   product: Maybe<string>;
   title: string;
@@ -82,7 +82,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     const a = (json as any);
     model = model.with({
       resource: contentTypes.Resource.fromPersistence(a),
-      guid: a.guid,
+      guid: ResourceGuid.of(a.guid),
       type: a.type,
       title: a.title,
     });
@@ -160,7 +160,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     const resource = this.resource.toPersistence();
     const doc = [{
       organization: {
-        '@id': this.resource.id,
+        '@id': this.resource.id.value(),
         '@version': this.version,
         '#array': children,
       },

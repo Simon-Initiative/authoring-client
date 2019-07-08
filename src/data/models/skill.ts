@@ -3,21 +3,22 @@ import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
 
-import { LegacyTypes } from '../types';
+import { LegacyTypes, ResourceId } from '../types';
+import { ResourceGuid } from 'data/types';
 
 export type SkillsModelParams = {
   resource?: contentTypes.Resource,
-  guid?: string,
+  guid?: ResourceGuid,
   lock?: contentTypes.Lock,
-  id?: string,
+  id?: ResourceId,
   title?: string,
   skills?: Immutable.OrderedMap<string, contentTypes.Skill>,
 };
 const defaultSkillsModelParams = {
   modelType: 'SkillsModel',
   resource: new contentTypes.Resource(),
-  guid: '',
-  id: '',
+  guid: ResourceGuid.of(''),
+  id: ResourceId.of(''),
   type: LegacyTypes.skills_model,
   lock: new contentTypes.Lock(),
   title: 'New Skills',
@@ -25,14 +26,14 @@ const defaultSkillsModelParams = {
 };
 
 
-export class SkillsModel 
+export class SkillsModel
   extends Immutable.Record(defaultSkillsModelParams) {
 
   modelType: 'SkillsModel';
   resource: contentTypes.Resource;
-  guid: string;
+  guid: ResourceGuid;
   lock: contentTypes.Lock;
-  id: string;
+  id: ResourceId;
   type: string;
   title: string;
   skills: Immutable.OrderedMap<string, contentTypes.Skill>;
@@ -50,9 +51,9 @@ export class SkillsModel
     let model = new SkillsModel();
 
     const a = (json as any);
-    model = model.with({ 
+    model = model.with({
       resource: contentTypes.Resource.fromPersistence(a),
-      guid: a.guid,
+      guid: ResourceGuid.of(a.guid),
       title: a.title,
     });
 
@@ -69,19 +70,19 @@ export class SkillsModel
     }
 
     if (org.skills_model !== undefined) {
-      
+
       if (org.skills_model['@id'] !== undefined) {
-        model = model.with({ id: org['@id'] });
+        model = model.with({ id: ResourceId.of(org['@id']) });
       }
-      const container = org.skills_model.skills === undefined 
+      const container = org.skills_model.skills === undefined
         ? org.skills_model['#array'] : org.skills_model.skills;
-        
+
       container.forEach((skill) => {
 
         const thisGuid = guid();
         const id = skill['@id'];
         const title = skill['@title'];
-        const obj = new contentTypes.Skill().with({ id, guid: thisGuid, title });
+        const obj = new contentTypes.Skill().with({ id: ResourceId.of(id), guid: thisGuid, title });
         model = model.with({ skills: model.skills.set(obj.guid, obj) });
       });
 
@@ -98,7 +99,7 @@ export class SkillsModel
             model = model.with({ skills: model.skills.set(obj.guid, obj) });
             break;
           default:
-            
+
         }
       });
     }
@@ -107,24 +108,24 @@ export class SkillsModel
   }
 
   toPersistence(): Object {
-    const children : Object[] = [
+    const children: Object[] = [
       { title: { '#text': this.title } }];
-    
+
     if (this.skills.size === 0) {
       const id = guid();
       const o = new contentTypes.Skill().with({
         title: 'Default skill',
-        id,
+        id: ResourceId.of(id),
       });
       children.push(o.toPersistence());
     } else {
       this.skills.toArray().forEach(o => children.push(o.toPersistence()));
     }
-    
+
     const resource = this.resource.toPersistence();
     const doc = [{
       skills: {
-        '@id': this.resource.id,
+        '@id': this.resource.id.value(),
         '#array': children,
       },
     }];

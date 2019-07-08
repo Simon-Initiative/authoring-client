@@ -7,7 +7,6 @@ import { ServerState } from 'reducers/server';
 import { HoverState } from 'reducers/hover';
 import { updateHover } from 'actions/hover';
 import { load, release } from 'actions/document';
-import { load as loadOrg } from 'actions/orgs';
 import * as persistence from 'data/persistence';
 import Main from './Main';
 import { RouterState } from 'reducers/router';

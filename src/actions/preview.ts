@@ -67,7 +67,7 @@ export function quickPreview(resource: Resource) {
 
   return function (dispatch, getState: () => State): Promise<any> {
     const { course, documents, user } = getState();
-    const document: EditedDocument = documents.get(resource.id);
+    const document: EditedDocument = documents.get(resource.id.value());
 
     // Flush pending changes before initiating the preview so that the user doesn't see
     // a stale preview page

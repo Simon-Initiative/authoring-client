@@ -4,7 +4,7 @@ import * as models from '../models';
 import { Resource } from '../content/resource';
 import { DeployStage } from 'data/models/course.ts';
 import { CourseModel } from 'data/models/course';
-import { CourseGuid, CourseIdVers } from 'data/types';
+import { CourseGuid, CourseIdVers, ResourceId } from 'data/types';
 
 export function createPackage(course: CourseModel): Promise<CourseModel> {
 
@@ -64,7 +64,7 @@ export function deleteCoursePackage(courseId: CourseIdVers): Promise<{}> {
 }
 
 export type CourseResource = {
-  _id: string,
+  _id: ResourceId,
   title: string,
   type: string,
 };

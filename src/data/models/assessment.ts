@@ -7,12 +7,12 @@ import { assessmentTemplate } from '../activity_templates';
 import { isArray, isNullOrUndefined } from 'util';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { splitQuestionsIntoPages } from './utils/assessment';
-import { AssessmentType, LegacyTypes } from 'data/types';
+import { AssessmentType, LegacyTypes, ResourceGuid, ResourceId } from 'data/types';
 import { Maybe } from 'tsmonad';
 
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
-  guid?: string,
+  guid?: ResourceGuid,
   type?: AssessmentType;
   recommendedAttempts?: string;
   maxAttempts?: string;
@@ -28,7 +28,7 @@ const defaultAssessmentModelParams = {
   modelType: 'AssessmentModel',
   type: LegacyTypes.inline,
   resource: new contentTypes.Resource(),
-  guid: '',
+  guid: ResourceGuid.of(''),
   recommendedAttempts: '3',
   maxAttempts: '3',
   branching: false,
@@ -77,7 +77,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
   modelType: 'AssessmentModel';
   resource: contentTypes.Resource;
-  guid: string;
+  guid: ResourceGuid;
   type: AssessmentType;
   recommendedAttempts: string;
   maxAttempts: string;
@@ -168,7 +168,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
     const a = (json as any);
     model = model.with({ resource: contentTypes.Resource.fromPersistence(a) });
-    model = model.with({ guid: a.guid });
+    model = model.with({ guid: ResourceGuid.of(a.guid) });
     model = model.with({ type: a.type });
     model = model.with({
       title: new contentTypes.Title({
@@ -258,11 +258,11 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     let resource = this.resource.toPersistence();
     let doc = null;
 
-    if (isNullOrUndefined(this.guid) || this.guid === '') {
+    if (isNullOrUndefined(this.guid) || this.guid.value() === '') {
       // Assume new assessment created if guid is null
       const assessment = assessmentTemplate(titleText);
       try {
-        const id = assessment.assessment['@id'];
+        const id = ResourceId.of(assessment.assessment['@id']);
         resource = new contentTypes.Resource({ id, title: titleText });
       } catch (err) {
         return null;
@@ -274,7 +274,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     } else {
       doc = [{
         assessment: {
-          '@id': this.resource.id,
+          '@id': this.resource.id.value(),
           '@recommended_attempts': this.recommendedAttempts,
           '@max_attempts': this.maxAttempts,
           '#array': children,

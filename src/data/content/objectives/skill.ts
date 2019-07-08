@@ -1,9 +1,10 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
+import { ResourceId } from 'data/types';
 
 export type SkillParams = {
-  id?: string,
+  id?: ResourceId,
   guid?: string,
   title?: string,
   p?: string,
@@ -15,7 +16,7 @@ export type SkillParams = {
 const defaultContent = {
   contentType: 'Skill',
   elementType: 'skill',
-  id: '',
+  id: ResourceId.of(''),
   guid: '',
   title: '',
   p: '',
@@ -28,7 +29,7 @@ export class Skill extends Immutable.Record(defaultContent) {
 
   contentType: 'Skill';
   elementType: 'skill';
-  id: string;
+  id: ResourceId;
   guid: string;
   title: string;
   p: string;
@@ -50,7 +51,7 @@ export class Skill extends Immutable.Record(defaultContent) {
     let model = new Skill({ guid });
 
     if (skill['@id'] !== undefined) {
-      model = model.with({ id: skill['@id'] });
+      model = model.with({ id: ResourceId.of(skill['@id']) });
     }
     if (skill['@p'] !== undefined) {
       model = model.with({ p: skill['@p'] });
@@ -81,10 +82,10 @@ export class Skill extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     const s = {
       skill: {
-        '@id': this.id,
+        '@id': this.id.value(),
         '#array': [{ '#text': this.title }],
       },
     };

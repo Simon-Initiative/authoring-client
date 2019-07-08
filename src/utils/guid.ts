@@ -27,7 +27,7 @@ setInterval(() => logger.debug(LogTag.DEFAULT, 'Hit rate: ' + (hits / (hits + mi
 
 
 // Request a guid
-export default function guid() {
+export default function guid(): string {
 
   // If we have a guid available, take it
   if (pool.length > 0) {

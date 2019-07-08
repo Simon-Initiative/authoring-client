@@ -6,7 +6,7 @@ import { State } from 'reducers';
 import { Document } from 'data/persistence';
 import { UserProfile } from 'types/user';
 import { load as loadOrg, releaseOrg } from 'actions/orgs';
-import { CourseIdVers, DocumentId } from 'data/types';
+import { CourseIdVers, DocumentId, ResourceId } from 'data/types';
 import { preview } from 'actions/preview';
 import { RouteCourse } from 'types/router';
 import { CourseModel } from 'data/models/course';
@@ -46,7 +46,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     {});
 
   return {
-    onLoadOrg: (courseId: CourseIdVers, resourceId: string) =>
+    onLoadOrg: (courseId: CourseIdVers, resourceId: ResourceId) =>
       dispatch(loadOrg(courseId, resourceId)),
     onReleaseOrg: () => dispatch(releaseOrg() as any),
     onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>

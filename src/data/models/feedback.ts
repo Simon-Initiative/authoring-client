@@ -15,11 +15,12 @@ import {
 } from 'data/content/common/elements';
 import guid from 'utils/guid';
 import { createLikertSeries } from 'editors/content/question/addquestion/questionFactories';
+import { ResourceGuid } from 'data/types';
 
 // oli_feedback_1_2.dtd
 export type FeedbackModelParams = {
   resource?: contentTypes.Resource,
-  guid?: string,
+  guid?: ResourceGuid,
   type?: LegacyTypes,
   lock?: contentTypes.Lock,
   title?: Title,
@@ -33,7 +34,7 @@ export type FeedbackModelParams = {
 const defaultFeedbackModelParams = {
   modelType: 'FeedbackModel',
   resource: new contentTypes.Resource(),
-  guid: '',
+  guid: ResourceGuid.of(''),
   type: LegacyTypes.feedback,
   lock: new contentTypes.Lock(),
   title: Title.fromText('New Feedback'),
@@ -46,7 +47,7 @@ const defaultFeedbackModelParams = {
 export class FeedbackModel extends Immutable.Record(defaultFeedbackModelParams) {
   modelType: 'FeedbackModel';
   resource: contentTypes.Resource;
-  guid: string;
+  guid: ResourceGuid;
   type: LegacyTypes;
   lock: contentTypes.Lock;
   title: Title;
@@ -81,8 +82,8 @@ export class FeedbackModel extends Immutable.Record(defaultFeedbackModelParams) 
       title: new contentTypes.Title({
         text: ContentElements.fromText(title, guid(), TEXT_ELEMENTS),
       }),
-      resource: new contentTypes.Resource({ id, title }),
-      guid: id,
+      resource: new contentTypes.Resource({ id: ResourceGuid.of(id), title }),
+      guid: ResourceGuid.of(id),
       description: new FeedbackDescription({
         content: ContentElements.fromText(description, '', MATERIAL_ELEMENTS),
       }),
@@ -100,7 +101,7 @@ export class FeedbackModel extends Immutable.Record(defaultFeedbackModelParams) 
 
     const o = (json as any);
     model = model.with({ resource: contentTypes.Resource.fromPersistence(o) });
-    model = model.with({ guid: o.guid });
+    model = model.with({ guid: ResourceGuid.of(o.guid) });
     model = model.with({ type: o.type });
     if (o.lock !== undefined && o.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(o.lock) });
@@ -165,7 +166,7 @@ export class FeedbackModel extends Immutable.Record(defaultFeedbackModelParams) 
 
     const doc = [{
       feedback: {
-        '@id': this.resource.id,
+        '@id': this.resource.id.value(),
         '#array': children,
       },
     }];
