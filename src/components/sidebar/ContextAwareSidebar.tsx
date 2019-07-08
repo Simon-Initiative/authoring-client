@@ -150,7 +150,7 @@ export interface ContextAwareSidebarProps {
 
 export interface ContextAwareSidebarState {
   // KEVIN-1936 should change based on the type of resource (see switch (model.modelType))
-  assessmentRefs: Maybe<Edge[]>;
+  resourceRefs: Maybe<Edge[]>;
 }
 
 /**
@@ -164,7 +164,7 @@ class ContextAwareSidebar
     super(props);
 
     this.state = {
-      assessmentRefs: Maybe.nothing() // KEVIN-1936 (BBB) initialize state as nothing
+      resourceRefs: Maybe.nothing() // KEVIN-1936 (BBB) initialize state as nothing
     };
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
@@ -186,17 +186,19 @@ class ContextAwareSidebar
 
 
       // KEVIN-1936 see (AAA) to see what call to replicate
-      // fetch summative assessment to pool edges
-    const fetchSummativeToPoolEdges = persistence.fetchEdges(course.guid, {
-      sourceType: LegacyTypes.assessment2,
-      destinationType: LegacyTypes.assessment2_pool,
+      // fetch edges for reference list
+    const fetchResouceEdges = persistence.fetchEdges(course.guid, {
+      // sourceType: LegacyTypes.assessment2,
+      // destinationType: LegacyTypes.assessment2_pool,
     }).then((edges) => {
 
-      const assessments = edges.filter((edge) => edge.destinationId.indexOf(resource.id) >= 0);
+      const sources = edges.filter((edge) => {
+        return edge.destinationId.indexOf(resource.id) >= 0;
+      });
 
       this.setState({
-        assessmentRefs: Maybe.just(assessments) // KEVIN-1936 (CCC)
-      })
+        resourceRefs: Maybe.just(sources) // KEVIN-1936 (CCC)
+      });
     });
 
 
@@ -288,10 +290,10 @@ class ContextAwareSidebar
   renderPageDetails() {
     const {
       model, resource, editMode, currentPage, onSetCurrentNodeOrPage,
-      onEditModel, classes, course, selectedOrganization
+      onEditModel, classes, course, selectedOrganization,
     } = this.props;
 
-    const { assessmentRefs } = this.state;
+    const { resourceRefs } = this.state;
 
     const adjusted = (date: Date): Date => adjustForSkew(date, this.props.timeSkewInMs);
 
@@ -316,7 +318,7 @@ class ContextAwareSidebar
     );
 
     const getRefGuidFromRef = (ref: Edge) => {
-      console.log(ref)
+      console.log(ref);
       console.log(ref.sourceId);
       const id = stripId(ref.sourceId);
 
@@ -327,8 +329,8 @@ class ContextAwareSidebar
     }
 
     const stripId = (id: string) => {
-      let splits = id.split(":");
-      if (splits.length == 3) {
+      const splits = id.split(':');
+      if (splits.length === 3) {
         return splits[2];
       }
     };
@@ -337,7 +339,7 @@ class ContextAwareSidebar
 
       console.log("id: " + ref.sourceId);
       console.log("guid: " + ref.sourceGuid);
-      let id = stripId(ref.sourceId);
+      const id = stripId(ref.sourceId);
 
       return Maybe.maybe(course.resourcesById.get(id)).caseOf({
         just: resource => resource.title,
@@ -346,9 +348,11 @@ class ContextAwareSidebar
     };
 
     const orgGuid = selectedOrganization.caseOf({
-      just: (organization) => organization.guid,
+      just: (organization) => {
+        return organization.guid;
+      },
       nothing: () => '',
-    })
+    });
 
     /* KYLE-1936 currently only works for pools, needs to be modified to work for any type
        best would be to be able to have type provided as input, rather than having multiple functions */
@@ -356,8 +360,8 @@ class ContextAwareSidebar
       <SidebarGroup label="Referenced Locations">
         <SidebarRow>
           <div className="page-list">
-            {assessmentRefs.caseOf({
-            /* KYLE-1936 finding source of assessmentRefs*/
+            {resourceRefs.caseOf({
+            /* KYLE-1936 finding source of resourceRefs*/
               just: (refs) => {
                 return refs.length > 0
                 ? (
@@ -368,23 +372,10 @@ class ContextAwareSidebar
                       <div key={ref.guid} className="ref-thing">
                         <a href="#" onClick = {(event) => {
                           event.preventDefault();
-                          console.log(stripId(ref.sourceId))
+                          console.log(stripId(ref.sourceId));
                           viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
                         }
                         }>
-
-
-
-
-
-
-
-
-
-{ //KYLE-1936 original hardcoded implementation preserved for now, messily
-                        // ${getRefGuidFromRef(ref)}-${course.guid}`
-                        // + `${orgGuid ? "-" + orgGuid : ""}`}>
-}
                             <i className={classNames(
                               /* KEVIN-1936 icon should change based on type*/
                               ['fa fa-check', classes.detailsSectionIcon])} />
@@ -425,7 +416,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
-            {/*referenceLocations*/} {/* make this special for WorkbookPageModel */}
+            {referenceLocations} {/* make this special for WorkbookPageModel */}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
@@ -469,7 +460,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
-            {/*referenceLocations*/} {/* make this special for Assessment */}
+            {referenceLocations} {/* make this special for Assessment */}
             {/* Branching assessments require a specific page structuring,
             so they cannot be modified by the user */}
             {model.branching
@@ -636,7 +627,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
-            {/*referenceLocations*/} {/* make this special for Feedback */}
+            {referenceLocations} {/* make this special for Feedback */}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
