@@ -58,9 +58,11 @@ export interface AppServices {
 
   // Fetch a content element in the current resource
   // by its id
-  fetchContentElementById: (docId: string, id: string) => Promise<Maybe<ContentElement>>;
+  fetchContentElementById: (docId: types.DocumentId, id: string) =>
+    Promise<Maybe<ContentElement>>;
 
-  fetchContentElementByGuid: (docId: string, guid: string) => Promise<Maybe<ContentElement>>;
+  fetchContentElementByGuid: (docId: types.DocumentId, guid: string) =>
+    Promise<Maybe<ContentElement>>;
 
   // Fetch a colleciton of attributes by some other attribute,
   // returns an object whose keys are the attributes requested
@@ -75,7 +77,7 @@ export interface AppServices {
 
   refreshCourse: (courseId: types.CourseIdVers) => void;
 
-  mapAndSave: (fn: MapFn, documentId: string) => void;
+  mapAndSave: (fn: MapFn, documentId: types.DocumentId) => void;
 }
 
 export interface DispatchBasedServices {
@@ -84,7 +86,7 @@ export interface DispatchBasedServices {
 }
 
 export class DispatchBasedServices implements AppServices {
-  constructor(dispatch, courseModel) {
+  constructor(dispatch, courseModel: models.CourseModel) {
     this.dispatch = dispatch;
     this.courseModel = courseModel;
   }
@@ -98,7 +100,7 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(messageActions.dismissSpecificMessage(message));
   }
 
-  viewDocument(documentId: string, courseId: types.CourseIdVers, orgId: Maybe<string>) {
+  viewDocument(documentId: types.DocumentId, courseId: types.CourseIdVers, orgId: Maybe<string>) {
     view.viewDocument(documentId, courseId, orgId);
   }
 
@@ -158,17 +160,17 @@ export class DispatchBasedServices implements AppServices {
       .then(o => o.title);
   }
 
-  fetchContentElementById(documentId: string, id: string)
+  fetchContentElementById(documentId: types.DocumentId, id: string)
     : Promise<Maybe<ContentElement>> {
     return this.dispatch(docActions.fetchContentElementById(documentId, id));
   }
 
-  fetchContentElementByGuid(documentId: string, guid: string)
+  fetchContentElementByGuid(documentId: types.DocumentId, guid: string)
     : Promise<Maybe<ContentElement>> {
     return this.dispatch(docActions.fetchContentElementByGuid(documentId, guid));
   }
 
-  mapAndSave(fn: MapFn, documentId: string) {
+  mapAndSave(fn: MapFn, documentId: types.DocumentId) {
     this.dispatch(docActions.mapAndSave(fn, documentId));
   }
 

@@ -5,11 +5,12 @@ import { Toast, Severity } from 'components/common/Toast';
 import './DocumentView.scss';
 import { CourseModel } from 'data/models';
 import { ResourceState } from 'data/content/resource';
+import { DocumentId } from 'data/types';
 
 export interface DocumentViewProps {
-  onLoad: (documentId: string) => void;
-  onRelease: (documentId: string) => void;
-  documentId: string;
+  onLoad: (documentId: DocumentId) => void;
+  onRelease: (documentId: DocumentId) => void;
+  documentId: DocumentId;
   profile: UserProfile;
   userId: string;
   userName: string;
@@ -17,8 +18,8 @@ export interface DocumentViewProps {
   orgId: string;
 }
 
-function isDeletedResource(documentId, course: CourseModel): boolean {
-  const resource = course.resources.get(documentId);
+function isDeletedResource(documentId: DocumentId, course: CourseModel): boolean {
+  const resource = course.resources.get(documentId.value());
   if (resource !== undefined) {
     return resource.resourceState === ResourceState.DELETED;
   }

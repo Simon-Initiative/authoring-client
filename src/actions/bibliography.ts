@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import { Entry } from 'data/content/bibtek/entry';
 import { WorkbookPageModel } from 'data/models';
 import { mapAndSave } from 'actions/document';
+import { DocumentId } from 'data/types';
 export type SET_ORDERED_IDS = 'SET_ORDERED_IDS';
 export const SET_ORDERED_IDS = 'SET_ORDERED_IDS';
 
@@ -21,8 +22,7 @@ export function setOrderedIds(
 }
 
 
-export function addEntry(
-  entry: Entry, documentId: string) {
+export function addEntry(entry: Entry, documentId: DocumentId) {
 
   const insertEntry = (e) => {
     if ('WorkbookPageModel' === e.modelType) {

@@ -257,6 +257,8 @@ export class MultipleChoice
 
     const choices = itemModel.choices.toArray();
 
+    console.log('choices', choices)
+
     return choices.map((choice, i) => {
       // If a corresponding response for this choice does not exist AND there is
       // a catch-all response with match '*' AND a response has not been generated,
@@ -271,6 +273,8 @@ export class MultipleChoice
       // Get the response associated with the choice by match (either real or generated)
       const response = responsesByMatch.get(choice.value)
         || this.generatedResponsesByMatch.get(choice.value);
+
+      console.log('response', response)
 
       if (response) {
         return (

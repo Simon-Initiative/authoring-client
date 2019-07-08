@@ -63,7 +63,7 @@ export function preview(
 // Invoke a preview for the current resource (ie Workbook Page) from the editor.
 // The full course is not built in OLI. Instead, we just receive an HTML page with
 // the workbook page contents.
-export function quickPreview(courseId: string, resource: Resource) {
+export function quickPreview(resource: Resource) {
 
   return function (dispatch, getState: () => State): Promise<any> {
     const { course, documents, user } = getState();

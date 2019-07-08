@@ -2,7 +2,7 @@ import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
 import { DocumentId, LegacyTypes } from '../types';
 import * as models from '../models';
-import { CourseIdVers, CourseGuid } from 'data/types';
+import { CourseIdVers, CourseGuid, ResourceId, ResourceGuid } from 'data/types';
 
 /**
  * Retrieve a document, given a course and document id.
@@ -10,11 +10,12 @@ import { CourseIdVers, CourseGuid } from 'data/types';
  * @param documentId the document guid
  */
 export function retrieveDocument(
-  course: CourseGuid | CourseIdVers, documentId: DocumentId, notify?: () => void):
+  course: CourseGuid | CourseIdVers, documentId: ResourceId | ResourceGuid | CourseGuid,
+  notify?: () => void):
   Promise<Document> {
 
   // tslint:disable-next-line:max-line-length
-  const url = `${configuration.baseUrl}/${course.value()}/resources/${documentId}`;
+  const url = `${configuration.baseUrl}/${course.value()}/resources/${documentId.value()}`;
 
   return authenticatedFetch({ url })
     .then((json: any) => {
@@ -68,10 +69,10 @@ export type PreviewResult =
  * @param documentId the document guid to preview
  */
 export function initiatePreview(
-  course: CourseGuid | CourseIdVers, documentId: DocumentId,
+  course: CourseGuid | CourseIdVers, documentId: ResourceId | ResourceGuid,
   isRefresh: boolean, server?: ServerName): Promise<PreviewResult> {
 
-  const url = `${configuration.baseUrl}/${course.value()}/resources/preview/${documentId}`
+  const url = `${configuration.baseUrl}/${course.value()}/resources/preview/${documentId.value()}`
     + '?redeploy=true'
     + (isRefresh ? '&refresh=true' : '')
     + (server ? '&server=' + server : '');
@@ -112,12 +113,12 @@ export function initiatePreview(
     });
 }
 
-export function initiateQuickPreview(course: CourseGuid, documentId: DocumentId) {
+export function initiateQuickPreview(course: CourseGuid, documentId: ResourceId | ResourceGuid) {
   const protocol = window.location.protocol + '//';
   const hostname = window.location.host;
   const prefix = 'content-service/api';
   // tslint:disable-next-line:max-line-length
-  const src = `${protocol + hostname}/${prefix}/${course.value()}/resources/quick_preview/${documentId}`;
+  const src = `${protocol + hostname}/${prefix}/${course.value()}/resources/quick_preview/${documentId.value()}`;
   window.open(src, '_blank');
 }
 

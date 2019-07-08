@@ -20,7 +20,7 @@ import { PageSelection } from 'editors/document/assessment/PageSelection';
 import { createMultipleChoiceQuestion }
   from 'editors/content/question/addquestion/questionFactories';
 import { TextInput } from 'editors/content/common/TextInput';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, DocumentId } from 'data/types';
 import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import {
   styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS,
@@ -136,7 +136,8 @@ export interface ContextAwareSidebarProps {
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
-  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
+  onSetCurrentNodeOrPage: (documentId: DocumentId, nodeOrPageId: contentTypes.Node | string) =>
+    void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   timeSkewInMs: number;

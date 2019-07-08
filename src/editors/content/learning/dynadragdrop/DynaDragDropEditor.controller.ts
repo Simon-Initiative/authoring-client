@@ -7,9 +7,10 @@ import { save } from 'actions/document';
 import { selectInitiator } from 'actions/dynadragdrop';
 import { AbstractContentEditorProps } from '../../common/AbstractContentEditor';
 import { Custom } from 'data/content/assessment/custom';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
-  documentId: string;
+  documentId: DocumentId;
   assessment: AssessmentModel;
   currentPage: Page;
   currentNode: Node | any;
@@ -17,7 +18,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onSaveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => void;
+  onSaveAssessment: (documentId: DocumentId, updatedAssessment: AssessmentModel) => void;
   onSelectInitiator: (id: string) => void;
 }
 
@@ -40,7 +41,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onSaveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => {
+    onSaveAssessment: (documentId: DocumentId, updatedAssessment: AssessmentModel) => {
       dispatch(save(documentId, updatedAssessment) as any);
     },
     onSelectInitiator: (id: string) => {

@@ -3,7 +3,7 @@ import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
 import { CourseModel } from 'data/models';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, DocumentId } from 'data/types';
 
 const getReadableResourceType = (documentResource: Resource) => {
   switch (documentResource && documentResource.type) {
@@ -23,14 +23,14 @@ export interface ActionsToolbarProps {
   course: CourseModel;
   editMode: boolean;
   documentResource: Resource;
-  documentId: string;
+  documentId: DocumentId;
   canUndo: boolean;
   canRedo: boolean;
   canPreview: boolean;
   onShowPageDetails: () => void;
-  onQuickPreview: (courseId: string, resource: Resource) => Promise<any>;
-  onUndo: (documentId: string) => void;
-  onRedo: (documentId: string) => void;
+  onQuickPreview: (resource: Resource) => Promise<any>;
+  onUndo: (documentId: DocumentId) => void;
+  onRedo: (documentId: DocumentId) => void;
 }
 
 export interface ActionsToolbarState {
@@ -65,7 +65,7 @@ export class ActionsToolbar extends React.PureComponent<ActionsToolbarProps, Act
   preview() {
     this.setState(
       { previewing: true },
-      () => this.props.onQuickPreview(this.props.course.guid.value(), this.props.documentResource)
+      () => this.props.onQuickPreview(this.props.documentResource)
         .then(_ => this.setState({ previewing: false }))
         .catch(_ => this.setState({ previewing: false })));
   }

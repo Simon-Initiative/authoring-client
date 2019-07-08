@@ -27,16 +27,16 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import './WorkbookPageEditor.scss';
 import { MessageState } from 'reducers/messages';
-import { CourseIdVers, LegacyTypes } from 'data/types';
+import { CourseIdVers, LegacyTypes, DocumentId } from 'data/types';
 import { Prerequisites } from 'editors/document/workbook/Prerequisites';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: CourseIdVers) => void;
   preview: (courseId: CourseIdVers, resource: Resource) => Promise<any>;
   activeContext: ActiveContext;
-  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContent: (documentId: DocumentId, content: Object) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: DocumentId, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   messages: MessageState;

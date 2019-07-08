@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { SelectionState } from 'draft-js';
 import { ContentElement } from 'data/content/common/interfaces';
+import { DocumentId } from 'data/types';
 
 export enum Trigger {
   KEYPRESS,
@@ -75,23 +76,23 @@ export interface ParentContainer {
 }
 
 export type ActiveContextParams = {
-  documentId?: Maybe<string>,
+  documentId?: Maybe<DocumentId>,
   container?: Maybe<ParentContainer>,
   activeChild?: Maybe<ContentElement>,
   textSelection?: Maybe<TextSelection>,
 };
 
 const defaultContent = {
-  documentId: Maybe.nothing(),
-  container: Maybe.nothing(),
-  activeChild: Maybe.nothing(),
-  textSelection: Maybe.nothing(),
+  documentId: Maybe.nothing<DocumentId>(),
+  container: Maybe.nothing<ParentContainer>(),
+  activeChild: Maybe.nothing<ContentElement>(),
+  textSelection: Maybe.nothing<TextSelection>(),
 };
 
 export class ActiveContext extends Immutable.Record(defaultContent) {
 
   // The id of the parent document
-  documentId: Maybe<string>;
+  documentId: Maybe<DocumentId>;
 
   // The parent container
   container: Maybe<ParentContainer>;

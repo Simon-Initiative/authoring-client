@@ -9,6 +9,7 @@ import { CourseModel } from 'data/models';
 import { ContentElement } from 'data/content/common/interfaces';
 import { fetchAndSetTargetNode, MissingTargetId } from 'actions/xref';
 import { Either } from 'tsmonad';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
   clipboard: Clipboard;
@@ -34,11 +35,11 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
+const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     displayModal: component => dispatch(modalActions.display(component)),
     dismissModal: () => dispatch(modalActions.dismiss()),
-    updateTarget: (targetId: string, documentId: string) =>
+    updateTarget: (targetId: string, documentId: DocumentId) =>
       dispatch(fetchAndSetTargetNode(targetId, documentId) as any),
   };
 };

@@ -17,7 +17,7 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { Resource } from 'data/contentTypes';
 import { RouteCourse } from 'types/router';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, DocumentId } from 'data/types';
 
 
 const DEFAULT_WIDTH_PX = 400;
@@ -270,7 +270,7 @@ export interface NavigationPanelProps {
   userId: string;
   userName: string;
   onCreateOrg: () => void;
-  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
+  onLoadOrg: (courseId: CourseIdVers, resourceId: string) => Promise<Document>;
   onReleaseOrg: () => void;
   onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
     Promise<any>;

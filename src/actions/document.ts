@@ -27,17 +27,18 @@ import { WritelockModal } from 'components/WritelockModal.controller';
 import { ConflictModal } from 'components/ConflictModal.controller';
 import { State } from 'reducers';
 import { IdentifiableContentElement, ContentElement } from 'data/content/common/interfaces';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, DocumentId, CourseGuid } from 'data/types';
+import { Document } from 'data/persistence/common';
 
 export type DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
 export const DOCUMENT_REQUESTED: DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
 
 export type DocumentRequestedAction = {
   type: DOCUMENT_REQUESTED,
-  documentId: string,
+  documentId: DocumentId,
 };
 
-export const documentRequested = (documentId: string): DocumentRequestedAction => ({
+export const documentRequested = (documentId: DocumentId): DocumentRequestedAction => ({
   type: DOCUMENT_REQUESTED,
   documentId,
 });
@@ -48,14 +49,14 @@ export const DOCUMENT_LOADED: DOCUMENT_LOADED = 'document/DOCUMENT_LOADED';
 
 export type DocumentLoadedAction = {
   type: DOCUMENT_LOADED,
-  documentId: string,
+  documentId: DocumentId,
   document: persistence.Document,
   persistence: PersistenceStrategy,
   editingAllowed: boolean,
 };
 
 export const documentLoaded = (
-  documentId: string, document: persistence.Document,
+  documentId: DocumentId, document: persistence.Document,
   persistence: PersistenceStrategy,
   editingAllowed: boolean)
   : DocumentLoadedAction => ({
@@ -71,11 +72,11 @@ export const DOCUMENT_EDITING_ENABLE = 'document/DOCUMENT_EDITING_ENABLE';
 
 export type DocumentEditingEnableAction = {
   type: DOCUMENT_EDITING_ENABLE,
-  documentId: string,
+  documentId: DocumentId,
   editable: boolean,
 };
 
-export function documentEditingEnable(editable: boolean, documentId: string) {
+export function documentEditingEnable(editable: boolean, documentId: DocumentId) {
   return {
     type: DOCUMENT_EDITING_ENABLE,
     editable,
@@ -88,11 +89,11 @@ export const DOCUMENT_FAILED: DOCUMENT_FAILED = 'document/DOCUMENT_FAILED';
 
 export type DocumentFailedAction = {
   type: DOCUMENT_FAILED,
-  documentId: string,
+  documentId: DocumentId,
   error: string,
 };
 
-export const documentFailed = (documentId: string, error: string)
+export const documentFailed = (documentId: DocumentId, error: string)
   : DocumentFailedAction => ({
     type: DOCUMENT_FAILED,
     documentId,
@@ -105,11 +106,11 @@ export const MODEL_UPDATED: MODEL_UPDATED = 'document/MODEL_UPDATED';
 
 export type ModelUpdatedAction = {
   type: MODEL_UPDATED,
-  documentId: string,
+  documentId: DocumentId,
   model: models.ContentModel,
 };
 
-export const modelUpdated = (documentId: string, model: models.ContentModel)
+export const modelUpdated = (documentId: DocumentId, model: models.ContentModel)
   : ModelUpdatedAction => ({
     type: MODEL_UPDATED,
     documentId,
@@ -121,11 +122,11 @@ export const IS_SAVING_UPDATED: IS_SAVING_UPDATED = 'document/IS_SAVING_UPDATED'
 
 export type IsSavingUpdatedAction = {
   type: IS_SAVING_UPDATED,
-  documentId: string,
+  documentId: DocumentId,
   isSaving: boolean,
 };
 
-export const isSavingUpdated = (documentId: string, isSaving: boolean)
+export const isSavingUpdated = (documentId: DocumentId, isSaving: boolean)
   : IsSavingUpdatedAction => ({
     type: IS_SAVING_UPDATED,
     documentId,
@@ -137,11 +138,11 @@ export const LAST_SAVE_SUCEEDED: LAST_SAVE_SUCEEDED = 'document/LAST_SAVE_SUCEED
 
 export type LastSaveSucceededAction = {
   type: LAST_SAVE_SUCEEDED,
-  documentId: string,
+  documentId: DocumentId,
   lastRequestSucceeded: Maybe<boolean>,
 };
 
-export const lastSaveSucceeded = (documentId: string, lastRequestSucceeded: Maybe<boolean>)
+export const lastSaveSucceeded = (documentId: DocumentId, lastRequestSucceeded: Maybe<boolean>)
   : LastSaveSucceededAction => ({
     type: LAST_SAVE_SUCEEDED,
     documentId,
@@ -154,10 +155,10 @@ export const DOCUMENT_RELEASED: DOCUMENT_RELEASED = 'document/DOCUMENT_RELEASED'
 
 export type DocumentReleasedAction = {
   type: DOCUMENT_RELEASED,
-  documentId: string,
+  documentId: DocumentId,
 };
 
-export const documentReleased = (documentId: string): DocumentReleasedAction => ({
+export const documentReleased = (documentId: DocumentId): DocumentReleasedAction => ({
   type: DOCUMENT_RELEASED,
   documentId,
 });
@@ -168,10 +169,10 @@ export const CHANGE_UNDONE: CHANGE_UNDONE = 'document/CHANGE_UNDONE';
 
 export type ChangeUndoneAction = {
   type: CHANGE_UNDONE,
-  documentId: string,
+  documentId: DocumentId,
 };
 
-export const changeUndone = (documentId: string): ChangeUndoneAction => ({
+export const changeUndone = (documentId: DocumentId): ChangeUndoneAction => ({
   type: CHANGE_UNDONE,
   documentId,
 });
@@ -182,15 +183,16 @@ export const CHANGE_REDONE: CHANGE_REDONE = 'document/CHANGE_REDONE';
 
 export type ChangeRedoneAction = {
   type: CHANGE_REDONE,
-  documentId: string,
+  documentId: DocumentId,
 };
 
-export const changeRedone = (documentId: string): ChangeRedoneAction => ({
+export const changeRedone = (documentId: DocumentId): ChangeRedoneAction => ({
   type: CHANGE_REDONE,
   documentId,
 });
 
-function saveCompleted(dispatch, getState: () => State, documentId, document) {
+function saveCompleted(
+  dispatch, getState: () => State, documentId: DocumentId, document: Document) {
 
   dispatch(lastSaveSucceeded(documentId, Maybe.just(true)));
 
@@ -199,7 +201,7 @@ function saveCompleted(dispatch, getState: () => State, documentId, document) {
 }
 
 function saveFailed(
-  dispatch, getState, courseId, documentId,
+  dispatch, getState, courseId: CourseGuid, documentId: DocumentId,
   error: { status: string, statusText: string, message: string }) {
 
   dispatch(lastSaveSucceeded(documentId, Maybe.just(false)));
@@ -220,7 +222,8 @@ function saveFailed(
 }
 
 function stateChangeListener(
-  dispatch, getState, courseId, documentId, currentState: PersistenceState) {
+  dispatch, getState, courseId: CourseGuid, documentId: DocumentId,
+  currentState: PersistenceState) {
 
   dispatch(isSavingUpdated(documentId, currentState.isInFlight || currentState.isPending));
 }
@@ -265,7 +268,7 @@ export function createNew(model: models.ContentModel) {
   };
 }
 
-export function load(courseId: CourseIdVers, documentId: string) {
+export function load(courseId: CourseIdVers, documentId: DocumentId) {
   return function (dispatch, getState): Promise<persistence.Document> {
 
     const userName = getState().user.profile.username;
@@ -321,15 +324,15 @@ export function load(courseId: CourseIdVers, documentId: string) {
 }
 
 export function releaseAll() {
-  return function (dispatch, getState) {
+  return function (dispatch, getState: () => State) {
     const documents: EditedDocument[] = getState().documents.toArray();
     documents.forEach(d => dispatch(release(d.documentId)));
   };
 }
 
-export function release(documentId: string) {
-  return function (dispatch, getState) {
-    const editedDocument: EditedDocument = getState().documents.get(documentId);
+export function release(documentId: DocumentId) {
+  return function (dispatch, getState: () => State) {
+    const editedDocument: EditedDocument = getState().documents.get(documentId.value());
     dispatch(documentReleased(documentId));
 
     if (editedDocument.persistence !== null) {
@@ -340,19 +343,19 @@ export function release(documentId: string) {
   };
 }
 
-export function mapAndSave(fn: MapFn, documentId: string) {
-  return function (dispatch, getState) {
-    const editedDocument: EditedDocument = getState().documents.get(documentId);
+export function mapAndSave(fn: MapFn, documentId: DocumentId) {
+  return function (dispatch, getState: () => State) {
+    const editedDocument: EditedDocument = getState().documents.get(documentId.value());
     const model = rawMap(fn, ((editedDocument.document.model as any) as ContentElement));
     return dispatch(save(documentId, (model as any) as models.ContentModel));
   };
 }
 
 
-export function save(documentId: string, model: models.ContentModel, isUndoRedo?: boolean) {
-  return function (dispatch, getState) {
+export function save(documentId: DocumentId, model: models.ContentModel, isUndoRedo?: boolean) {
+  return function (dispatch, getState: () => State) {
 
-    const editedDocument: EditedDocument = getState().documents.get(documentId);
+    const editedDocument: EditedDocument = getState().documents.get(documentId.value());
 
     if (model.modelType !== 'CourseModel' && model.modelType !== 'MediaModel') {
       const resource = model.resource.with({ dateUpdated: new Date() });
@@ -372,10 +375,10 @@ export function save(documentId: string, model: models.ContentModel, isUndoRedo?
 
 }
 
-export function undo(documentId: string) {
-  return function (dispatch, getState) {
+export function undo(documentId: DocumentId) {
+  return function (dispatch, getState: () => State) {
 
-    const editedDocument: EditedDocument = getState().documents.get(documentId);
+    const editedDocument: EditedDocument = getState().documents.get(documentId.value());
     const model = editedDocument.undoStack.peek();
 
     if (model) {
@@ -386,10 +389,10 @@ export function undo(documentId: string) {
   };
 }
 
-export function redo(documentId: string) {
-  return function (dispatch, getState) {
+export function redo(documentId: DocumentId) {
+  return function (dispatch, getState: () => State) {
 
-    const editedDocument: EditedDocument = getState().documents.get(documentId);
+    const editedDocument: EditedDocument = getState().documents.get(documentId.value());
     const model = editedDocument.redoStack.peek();
 
     if (model) {
@@ -399,24 +402,24 @@ export function redo(documentId: string) {
   };
 }
 
-export function fetchContentElementById(documentId: string, elementId: string) {
+export function fetchContentElementById(documentId: DocumentId, elementId: string) {
   return fetchContentElementByPredicate(documentId, e => elementId === e.id);
 }
 
 
-export function fetchContentElementByGuid(documentId: string, elementId: string) {
+export function fetchContentElementByGuid(documentId: DocumentId, elementId: string) {
   return fetchContentElementByPredicate(documentId, e => elementId === e.guid);
 }
 
-export function fetchContentElementByPredicate(documentId: string, pred) {
-  return function (dispatch, getState): Promise<Maybe<IdentifiableContentElement>> {
+export function fetchContentElementByPredicate(documentId: DocumentId, pred) {
+  return function (dispatch, getState: () => State): Promise<Maybe<IdentifiableContentElement>> {
 
-    const editedDoc = getState().documents.get(documentId);
+    const editedDoc = getState().documents.get(documentId.value());
     const model: models.ContentModel = editedDoc.document.model;
 
     const toMaybe = (results) => {
       if (results.length === 0) {
-        return Maybe.nothing();
+        return Maybe.nothing<ContentElement>();
       }
       return Maybe.just(results[0]);
     };
@@ -440,12 +443,12 @@ export const SET_CURRENT_PAGE_OR_NODE: SET_CURRENT_PAGE_OR_NODE =
 
 export type SetCurrentNodeOrPageAction = {
   type: SET_CURRENT_PAGE_OR_NODE,
-  documentId,
+  documentId: DocumentId,
   nodeOrPageId: contentTypes.Node | string,
 };
 
 export const setCurrentNodeOrPage
-  = (documentId: string, nodeOrPageId: contentTypes.Node | string):
+  = (documentId: DocumentId, nodeOrPageId: contentTypes.Node | string):
     SetCurrentNodeOrPageAction => ({
       type: SET_CURRENT_PAGE_OR_NODE,
       documentId,

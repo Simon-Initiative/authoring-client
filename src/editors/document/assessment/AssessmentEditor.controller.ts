@@ -16,7 +16,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { RouterState } from 'reducers/router';
 import { setSearchParam, clearSearchParam } from 'actions/router';
 import { CourseState } from 'reducers/course';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, DocumentId } from 'data/types';
 
 interface StateProps {
   activeContext: any;
@@ -29,14 +29,15 @@ interface StateProps {
 
 interface DispatchProps {
   onFetchSkills: (courseId: CourseIdVers) => any;
-  onUpdateContent: (documentId: string, content: ContentElement) => void;
+  onUpdateContent: (documentId: DocumentId, content: ContentElement) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: DocumentId, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
-  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
+  onSetCurrentNodeOrPage: (documentId: DocumentId, nodeOrPageId: contentTypes.Node | string) =>
+    void;
   onSetSearchParam: (name, value) => void;
   onClearSearchParam: (name) => void;
 }
@@ -51,11 +52,11 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     hover,
     course,
     currentPage: activeContext.documentId.caseOf({
-      just: docId => documents.get(docId).currentPage.valueOr(null),
+      just: docId => documents.get(docId.value()).currentPage.valueOr(null),
       nothing: null,
     }),
     currentNode: activeContext.documentId.caseOf({
-      just: docId => documents.get(docId).currentNode.valueOr(null),
+      just: docId => documents.get(docId.value()).currentNode.valueOr(null),
       nothing: null,
     }),
     router,
@@ -67,11 +68,11 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onFetchSkills: (courseId: CourseIdVers) => {
       return dispatch(fetchSkills(courseId));
     },
-    onUpdateContent: (documentId: string, content: ContentElement) => {
+    onUpdateContent: (documentId: DocumentId, content: ContentElement) => {
       return dispatch(activeActions.updateContent(documentId, content));
     },
     onUpdateContentSelection: (
-      documentId: string, content: ContentElement,
+      documentId: DocumentId, content: ContentElement,
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));
@@ -79,7 +80,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));
     },
-    onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => {
+    onSetCurrentNodeOrPage: (documentId: DocumentId, nodeOrPageId: contentTypes.Node | string) => {
       return dispatch(setCurrentNodeOrPage(documentId, nodeOrPageId));
     },
     showMessage: (message: Messages.Message) => {

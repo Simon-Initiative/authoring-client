@@ -6,7 +6,7 @@ import { State } from 'reducers';
 import { Document } from 'data/persistence';
 import { UserProfile } from 'types/user';
 import { load as loadOrg, releaseOrg } from 'actions/orgs';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, DocumentId } from 'data/types';
 import { preview } from 'actions/preview';
 import { RouteCourse } from 'types/router';
 import { CourseModel } from 'data/models/course';
@@ -15,7 +15,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
+  onLoadOrg: (courseId: CourseIdVers, documentId: DocumentId) => Promise<Document>;
   onReleaseOrg: () => void;
   onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
     Promise<any>;
@@ -46,8 +46,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     {});
 
   return {
-    onLoadOrg: (courseId: CourseIdVers, documentId: string) =>
-      dispatch(loadOrg(courseId, documentId)),
+    onLoadOrg: (courseId: CourseIdVers, resourceId: string) =>
+      dispatch(loadOrg(courseId, resourceId)),
     onReleaseOrg: () => dispatch(releaseOrg() as any),
     onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
       dispatch(preview(courseId, organizationId, false, redeploy)),

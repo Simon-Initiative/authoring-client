@@ -1,6 +1,6 @@
 import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
-import { CourseGuid } from 'data/types';
+import { CourseGuid, DocumentId } from 'data/types';
 
 import {
   onFailureCallback, onSaveCompletedCallback,
@@ -11,7 +11,7 @@ export interface AbstractPersistenceStrategy {
   successCallback: onSaveCompletedCallback;
   failureCallback: onFailureCallback;
   stateChangeCallback: onStateChangeCallback;
-  writeLockedDocumentId: string;
+  writeLockedDocumentId: DocumentId;
   courseId: string;
   destroyed: boolean;
   lockDetails: LockDetails;

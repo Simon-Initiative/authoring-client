@@ -14,6 +14,7 @@ import * as Messages from 'types/messages';
 import { modalActions } from 'actions/modal';
 import { Maybe } from 'tsmonad';
 import { NavigationItem } from 'types/navigation';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
   expanded: any;
@@ -35,14 +36,14 @@ interface DispatchProps {
   dismissMessage: (message: Messages.Message) => void;
   dismissModal: () => void;
   displayModal: (c) => void;
-  onUndo: (documentId: string) => void;
-  onRedo: (documentId: string) => void;
-  onEditingEnable: (editable: boolean, documentId: string) => void;
+  onUndo: (documentId: DocumentId) => void;
+  onRedo: (documentId: DocumentId) => void;
+  onEditingEnable: (editable: boolean, documentId: DocumentId) => void;
 }
 
 interface OwnProps {
   course: CourseModel;
-  documentId: string;
+  documentId: DocumentId;
   userId: string;
   userName: string;
   profile: UserProfile;
@@ -98,9 +99,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     displayModal: (c) => {
       dispatch(modalActions.display(c));
     },
-    onUndo: (documentId: string) =>
+    onUndo: (documentId: DocumentId) =>
       dispatch(undo(documentId)),
-    onRedo: (documentId: string) =>
+    onRedo: (documentId: DocumentId) =>
       dispatch(redo(documentId)),
     onEditingEnable: (editable, documentId) =>
       dispatch(documentEditingEnable(editable, documentId)),

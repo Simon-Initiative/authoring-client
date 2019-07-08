@@ -5,11 +5,11 @@ import * as persistence from 'data/persistence';
 import * as Messages from 'types/messages';
 
 import './Preview.scss';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, DocumentId } from 'data/types';
 
 export interface PreviewProps {
   email: string;
-  documentId?: string;
+  documentId?: DocumentId;
   courseIdVers?: CourseIdVers;
   previewUrl: Maybe<string>;
   shouldRefresh: boolean;

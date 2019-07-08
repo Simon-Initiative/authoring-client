@@ -10,8 +10,10 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
-import { Page, Question, Part, Choice, Response,
-  FillInTheBlank } from 'data/contentTypes';
+import {
+  Page, Question, Part, Choice, Response,
+  FillInTheBlank
+} from 'data/contentTypes';
 import { AssessmentModel } from 'data/models';
 import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
@@ -23,17 +25,18 @@ import {
 import { HTMLTableEditor } from './HTMLTableEditor';
 import { styles } from './DynaDragDropEditor.styles';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
+import { DocumentId } from 'data/types';
 import {
   TableTargetArea,
 } from 'data/content/assessment/dragdrop/htmlLayout/table/table_targetarea';
 
 export interface DynaDragDropEditorProps extends AbstractContentEditorProps<Custom> {
-  documentId: string;
+  documentId: DocumentId;
   assessment: AssessmentModel;
   currentPage: Page;
   currentNode: Question;
   selectedInitiator: string;
-  onSaveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => void;
+  onSaveAssessment: (documentId: DocumentId, updatedAssessment: AssessmentModel) => void;
   onSelectInitiator: (id: string) => void;
 }
 
@@ -43,7 +46,7 @@ export interface DynaDragDropEditorState {
 
 class DynaDragDropEditor
   extends AbstractContentEditor<Custom,
-    StyledComponentProps<DynaDragDropEditorProps, typeof styles>, DynaDragDropEditorState> {
+  StyledComponentProps<DynaDragDropEditorProps, typeof styles>, DynaDragDropEditorState> {
 
   constructor(props) {
     super(props);
@@ -255,7 +258,7 @@ class DynaDragDropEditor
     }));
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const { model, editMode, currentNode, selectedInitiator } = this.props;
     const question = currentNode;
 
@@ -265,21 +268,21 @@ class DynaDragDropEditor
       switch (targetArea.contentType) {
         case 'DndTableTargetArea':
           return <HTMLTableEditor
-                    table={targetArea as TableTargetArea}
-                    initiators={layout.initiators}
-                    question={question}
-                    model={model}
-                    selectedInitiator={selectedInitiator}
-                    editMode={editMode}
-                    onEditTable={targetArea =>
-                      this.onEditLayoutData(layout.with({ targetArea }))}
-                    onSelectInitiator={this.selectInitiator}
-                    onTargetDrop={this.onTargetDrop}
-                    onAddInitiator={this.addInitiator}
-                    onDeleteInitiator={this.deleteInitiator}
-                    onAssignInitiator={this.assignInitiator}
-                    onUnassignInitiator={this.unassignInitiator}
-                    onEditQuestion={this.onEditQuestion} />;
+            table={targetArea as TableTargetArea}
+            initiators={layout.initiators}
+            question={question}
+            model={model}
+            selectedInitiator={selectedInitiator}
+            editMode={editMode}
+            onEditTable={targetArea =>
+              this.onEditLayoutData(layout.with({ targetArea }))}
+            onSelectInitiator={this.selectInitiator}
+            onTargetDrop={this.onTargetDrop}
+            onAddInitiator={this.addInitiator}
+            onDeleteInitiator={this.deleteInitiator}
+            onAssignInitiator={this.assignInitiator}
+            onUnassignInitiator={this.unassignInitiator}
+            onEditQuestion={this.onEditQuestion} />;
         case 'UnsupportedTargetArea':
         default:
           return (
@@ -289,11 +292,11 @@ class DynaDragDropEditor
           );
       }
     })
-    .valueOr(
-      <div className="alert alert-danger" role="alert">
-        Could not load Drag and Drop layout. Please check the original XML.
+      .valueOr(
+        <div className="alert alert-danger" role="alert">
+          Could not load Drag and Drop layout. Please check the original XML.
       </div>,
-    );
+      );
   }
 }
 

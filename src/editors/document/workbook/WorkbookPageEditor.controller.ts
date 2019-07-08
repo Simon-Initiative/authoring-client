@@ -13,7 +13,7 @@ import * as Messages from 'types/messages';
 import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
 import { setOrderedIds } from 'actions/bibliography';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, DocumentId } from 'data/types';
 
 interface StateProps {
   activeContext: any;
@@ -22,9 +22,9 @@ interface StateProps {
 
 interface DispatchProps {
   fetchObjectives: (courseId: CourseIdVers) => void;
-  onUpdateContent: (documentId: string, content: ContentElement) => void;
+  onUpdateContent: (documentId: DocumentId, content: ContentElement) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: DocumentId, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
@@ -49,11 +49,11 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     fetchObjectives: (courseId: CourseIdVers) => {
       return dispatch(fetchObjectives(courseId) as any);
     },
-    onUpdateContent: (documentId: string, content: ContentElement) => {
+    onUpdateContent: (documentId: DocumentId, content: ContentElement) => {
       return dispatch(activeActions.updateContent(documentId, content));
     },
     onUpdateContentSelection: (
-      documentId: string, content: ContentElement,
+      documentId: DocumentId, content: ContentElement,
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));

@@ -5,7 +5,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { LinkTarget } from 'data/content/learning/common';
 import { Select, Button } from 'editors/content/common/controls';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, DocumentId } from 'data/types';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
@@ -29,7 +29,7 @@ export interface XrefEditorProps
   onShowSidebar: () => void;
   displayModal: (component: any) => void;
   dismissModal: () => void;
-  updateTarget: (targetId: string, documentResourceId: string) => Promise<any>;
+  updateTarget: (targetId: string, documentResourceId: DocumentId) => Promise<any>;
   clipboard: Clipboard;
   course: CourseModel;
   target: Either<MissingTargetId, ContentElement>;
@@ -78,7 +78,7 @@ export default class XrefEditor
   }
 
   thisId = this.props.context.courseModel.resources.get(
-    this.props.context.documentId).id;
+    this.props.context.documentId.value()).id;
 
   pages = this.props.context.courseModel.resources
     .toArray()

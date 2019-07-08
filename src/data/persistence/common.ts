@@ -94,7 +94,7 @@ export type DocumentParams = {
   _courseId?: string | CourseGuid | CourseIdVers,
   // A course might be the document being edited (CourseEditor.tsx)
   // documentId is generally resource.guid
-  _id?: DocumentId | CourseIdVers,
+  _id?: DocumentId,
   _rev?: RevisionId,
   model?: models.ContentModel,
 };

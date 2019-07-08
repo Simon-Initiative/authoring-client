@@ -34,6 +34,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import EntryList from 'editors/content/bibliography/EntryList';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
+import { DocumentId } from 'data/types';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -41,8 +42,9 @@ export interface ContiguousTextToolbarProps
   resource: Resource;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
-  onAddEntry: (e, documentId) => Promise<void>;
-  onFetchContentElementByPredicate: (documentId, predicate) => Promise<Maybe<ContentElement>>;
+  onAddEntry: (e, documentId: DocumentId) => Promise<void>;
+  onFetchContentElementByPredicate: (documentId: DocumentId, predicate) =>
+    Promise<Maybe<ContentElement>>;
   selection: TextSelection;
 }
 

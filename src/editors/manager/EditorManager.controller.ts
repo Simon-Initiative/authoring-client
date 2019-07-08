@@ -8,6 +8,7 @@ import { LearningObjective, Skill } from 'data/contentTypes';
 import { save } from 'actions/document';
 import { State } from 'reducers';
 import { CourseModel } from 'data/models/course';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
   expanded: any;
@@ -20,12 +21,12 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onSave: (documentId: string, model: ContentModel) => any;
+  onSave: (documentId: DocumentId, model: ContentModel) => any;
   onDispatch: (...args: any[]) => any;
 }
 
 interface OwnProps {
-  documentId: string;
+  documentId: DocumentId;
   userId: string;
   userName: string;
   profile: UserProfile;
@@ -37,7 +38,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   const { expanded, skills, objectives, documents } = state;
 
-  const ed = documents.get(ownProps.documentId);
+  const ed = documents.get(ownProps.documentId.value());
 
   let document = null;
   let undoRedoGuid = 'Loading';
@@ -64,7 +65,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onSave: (documentId: string, model: ContentModel) => {
+    onSave: (documentId: DocumentId, model: ContentModel) => {
       dispatch(save(documentId, model));
     },
     onDispatch: dispatch,

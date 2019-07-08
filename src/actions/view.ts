@@ -1,7 +1,7 @@
 import { Maybe } from 'tsmonad';
 import history from 'utils/history';
 import * as router from 'types/router';
-import { CourseIdVers, DocumentId, iLiterallyCantEven } from 'data/types';
+import { CourseIdVers, DocumentId, iLiterallyCantEven, ResourceId } from 'data/types';
 
 export type ViewActions = {
   // Application Routes
@@ -11,12 +11,12 @@ export type ViewActions = {
   viewMissingPage: () => void,
 
   // Course Routes
-  viewCourse: (course: CourseIdVers, orgId: Maybe<string>) => void,
-  viewAllResources: (course: CourseIdVers, orgId: Maybe<string>) => void,
-  viewOrganizations: (course: CourseIdVers, orgId: Maybe<string>) => void,
-  viewObjectives: (course: CourseIdVers, orgId: Maybe<string>) => void,
-  viewSkills: (course: CourseIdVers, orgId: Maybe<string>) => void,
-  viewDocument: (documentId: DocumentId, course: CourseIdVers, orgId: Maybe<string>) => void,
+  viewCourse: (course: CourseIdVers, orgId: Maybe<ResourceId>) => void,
+  viewAllResources: (course: CourseIdVers, orgId: Maybe<ResourceId>) => void,
+  viewOrganizations: (course: CourseIdVers, orgId: Maybe<ResourceId>) => void,
+  viewObjectives: (course: CourseIdVers, orgId: Maybe<ResourceId>) => void,
+  viewSkills: (course: CourseIdVers, orgId: Maybe<ResourceId>) => void,
+  viewDocument: (documentId: DocumentId, course: CourseIdVers, orgId: Maybe<ResourceId>) => void,
 };
 
 // Application Routes
@@ -26,23 +26,23 @@ export const viewImportCourse = () => pushRoute(router.toRouteImport());
 export const viewMissingPage = () => pushRoute(router.toRouteMissing());
 
 // Course Routes
-export const viewCourse = (course: CourseIdVers, orgId: Maybe<string>) =>
+export const viewCourse = (course: CourseIdVers, orgId: Maybe<ResourceId>) =>
   pushRoute(router.toRouteCourse(course, orgId, router.toRouteCourseOverview()));
 
-export const viewAllResources = (course: CourseIdVers, orgId: Maybe<string>) =>
+export const viewAllResources = (course: CourseIdVers, orgId: Maybe<ResourceId>) =>
   pushRoute(router.toRouteCourse(course, orgId, router.toRouteAllResources()));
 
-export const viewOrganizations = (course: CourseIdVers, orgId: Maybe<string>) =>
+export const viewOrganizations = (course: CourseIdVers, orgId: Maybe<ResourceId>) =>
   pushRoute(router.toRouteCourse(course, orgId, router.toRouteOrganizations()));
 
-export const viewSkills = (course: CourseIdVers, orgId: Maybe<string>) =>
+export const viewSkills = (course: CourseIdVers, orgId: Maybe<ResourceId>) =>
   pushRoute(router.toRouteCourse(course, orgId, router.toRouteSkills()));
 
-export const viewObjectives = (course: CourseIdVers, orgId: Maybe<string>) =>
+export const viewObjectives = (course: CourseIdVers, orgId: Maybe<ResourceId>) =>
   pushRoute(router.toRouteCourse(course, orgId, router.toRouteObjectives()));
 
 export const viewDocument =
-  (resourceId: string, course: CourseIdVers, orgId: Maybe<string>) =>
+  (resourceId: ResourceId, course: CourseIdVers, orgId: Maybe<ResourceId>) =>
     pushRoute(router.toRouteCourse(course, orgId, router.toRouteResource(resourceId)));
 
 function pushRoute(route: router.RouteOption) {
@@ -59,14 +59,14 @@ export function buildUrlFromRoute(route: router.RouteOption) {
       const { courseId, orgId } = route;
       const courseIdVers = courseId.value();
       const organizationId = orgId.caseOf({
-        just: o => `?organization=${o}`,
+        just: o => `?organization=${o.value()}`,
         nothing: () => '',
       });
       switch (route.route.type) {
         case 'RouteCourseOverview':
           return `/${courseIdVers}${organizationId}`;
         case 'RouteResource':
-          const resourceId = route.route.resourceId;
+          const resourceId = route.route.resourceId.value();
           return `/${courseIdVers}/${resourceId}${organizationId}`;
         case 'RoutePreview': return `/${courseIdVers}/preview/${organizationId}`;
         case 'RouteSkills': return `/${courseIdVers}/skills${organizationId}`;

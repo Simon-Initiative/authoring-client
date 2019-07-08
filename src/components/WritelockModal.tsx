@@ -3,12 +3,13 @@ import { StyledComponentProps } from 'types/component';
 import { withStyles, classNames } from 'styles/jss';
 
 import { styles } from './WritelockModal.styles';
+import { CourseGuid, DocumentId } from 'data/types';
 
 export interface WritelockModalProps {
   className?: string;
-  courseId?: string;
-  documentId?: string;
-  onLoadDocument: (courseId, documentId) => Promise<any>;
+  courseId?: CourseGuid;
+  documentId?: DocumentId;
+  onLoadDocument: (courseId: CourseGuid, documentId: DocumentId) => Promise<any>;
 }
 
 export interface WritelockModalState {

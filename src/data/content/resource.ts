@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { FileNode } from './file_node';
 import { isNullOrUndefined } from 'util';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceGuid, ResourceId } from 'data/types';
 
 const monthsToOrdinal = {
   Jan: 0,
@@ -42,8 +42,8 @@ export function parseDate(value: string): Date {
 
 export type ResourceParams = {
   rev?: number,
-  guid?: string,
-  id?: string,
+  guid?: ResourceGuid,
+  id?: ResourceId,
   type?: LegacyTypes,
   title?: string,
   lastRevisionGuid?: string;
@@ -64,7 +64,8 @@ export enum ResourceState {
 
 export class Resource extends Immutable.Record(
   {
-    contentType: 'Resource', rev: 0, guid: '', id: '', type: '', title: '',
+    contentType: 'Resource', rev: 0, guid: ResourceGuid.of(''),
+    id: ResourceId.of(''), type: '', title: '',
     dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode(),
     lastRevisionGuid: '', lastRevisionNumber: '', previousRevisionGuid: '',
     resourceState: ResourceState.ACTIVE,
@@ -72,8 +73,8 @@ export class Resource extends Immutable.Record(
 
   contentType: 'Resource';
   rev: number;
-  guid: string;
-  id: string;
+  guid: ResourceGuid;
+  id: ResourceId;
   type: string;
   title: string;
   lastRevisionGuid: string;
@@ -96,8 +97,8 @@ export class Resource extends Immutable.Record(
     const a = (root as any);
     const model = new Resource({
       rev: a.rev,
-      guid: a.guid,
-      id: a.id,
+      guid: ResourceGuid.of(a.guid),
+      id: ResourceId.of(a.id),
       type: a.type,
       title: a.title || '',
       lastRevisionGuid: a.lastRevision !== undefined && a.lastRevision !== null
@@ -122,8 +123,8 @@ export class Resource extends Immutable.Record(
   toPersistence(): Object {
     return {
       rev: this.rev,
-      guid: this.guid,
-      id: this.id,
+      guid: this.guid.value(),
+      id: this.id.value(),
       type: this.type,
       title: this.title,
       dateCreated: JSON.stringify(this.dateCreated),

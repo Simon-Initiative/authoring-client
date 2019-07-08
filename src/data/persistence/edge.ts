@@ -2,7 +2,7 @@ import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
 import { Edge } from 'types/edge';
-import { CourseIdVers, CourseGuid } from 'data/types';
+import { CourseIdVers, CourseGuid, ResourceId } from 'data/types';
 
 /**
  * Fetches all references for the course or resource, returns a Promise to resolve to
@@ -21,7 +21,7 @@ export function fetchEdges(
     status?: string,
   } = {},
   byResource = false,
-  resourceId = ''): Promise<Edge[]> {
+  resourceId = ResourceId.of('')): Promise<Edge[]> {
   const {
     relationship,
     purpose,
@@ -35,7 +35,7 @@ export function fetchEdges(
 
   const method = 'GET';
   const url = byResource
-    ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId}`
+    ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId.value()}`
     : `${configuration.baseUrl}/${packageId.value()}/edges`;
 
   const headers = getHeaders(credentials);

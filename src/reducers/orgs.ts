@@ -21,6 +21,7 @@ import { Maybe } from 'tsmonad';
 import { NavigationItem, makePackageOverview } from 'types/navigation';
 import * as org from 'data/models/utils/org';
 import { OrganizationModel } from 'data/models';
+import { DocumentId } from 'data/types';
 
 type ActionTypes =
   OrgChangeFailedAction | OrgChangeSucceededAction | ReleaseOrgAction |
@@ -32,7 +33,7 @@ export type OrgsState = {
   activeOrg: Maybe<Document>,
   placements: Immutable.OrderedMap<string, org.Placement>,
   lastChangeSucceeded: boolean,
-  documentId: Maybe<string>,
+  documentId: Maybe<DocumentId>,
   selectedItem: NavigationItem,
   undoStack: Immutable.Stack<org.OrgChangeRequest>,
   redoStack: Immutable.Stack<org.OrgChangeRequest>,
@@ -43,7 +44,7 @@ const initialState = {
   activeOrg: Maybe.nothing<Document>(),
   placements: Immutable.OrderedMap<string, org.Placement>(),
   lastChangeSucceeded: true,
-  documentId: Maybe.nothing<string>(),
+  documentId: Maybe.nothing<DocumentId>(),
   selectedItem: makePackageOverview(),
   undoStack: Immutable.Stack<org.OrgChangeRequest>(),
   redoStack: Immutable.Stack<org.OrgChangeRequest>(),

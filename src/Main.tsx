@@ -38,7 +38,7 @@ import * as viewActions from 'actions/view';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 import { FourZeroFour } from 'components/404';
 import { OrganizationModel } from 'data/models/org';
-import { LegacyTypes, CourseIdVers, CourseGuid } from 'data/types';
+import { LegacyTypes, CourseIdVers, CourseGuid, DocumentId } from 'data/types';
 
 interface MainProps {
   user: UserState;
@@ -48,9 +48,8 @@ interface MainProps {
   router: RouterState;
   server: ServerState;
   hover: HoverState;
-  onLoad: (courseId: CourseIdVers, documentId: string) => Promise<persistence.Document>;
-  onRelease: (documentId: string) => Promise<{}>;
-  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<persistence.Document>;
+  onLoad: (courseId: CourseIdVers, documentId: DocumentId) => Promise<persistence.Document>;
+  onRelease: (documentId: DocumentId) => Promise<{}>;
   onSetServerTimeSkew: () => void;
   onLoadCourse: (courseId: CourseIdVers) => Promise<models.CourseModel>;
   onDispatch: (...args: any[]) => any;
@@ -227,9 +226,9 @@ export default class Main extends React.Component<MainProps, MainState> {
                                       just: resource =>
                                         // Regular resource
                                         <DocumentView
-                                          onLoad={(docId: string) =>
+                                          onLoad={(docId: DocumentId) =>
                                             onLoad(loadedCourse.idvers, docId)}
-                                          onRelease={(docId: string) => onRelease(docId)}
+                                          onRelease={(docId: DocumentId) => onRelease(docId)}
                                           profile={user.profile}
                                           orgId={route.orgId.valueOr('')}
                                           course={loadedCourse}

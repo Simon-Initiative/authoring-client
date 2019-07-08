@@ -6,7 +6,7 @@ import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import ModalSelection from './ModalSelection';
 import guid from '../guid';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, DocumentId } from 'data/types';
 
 export enum AssessmentsToDisplay {
   Formative,
@@ -39,7 +39,7 @@ export class AssessmentSelection
 
     this.state = {
       assessments: [],
-      selected: { id: '', title: '' },
+      selected: { id: types.ResourceId.of(''), title: '' },
     };
 
     this.onInsert = this.onInsert.bind(this);
@@ -109,13 +109,13 @@ export class AssessmentSelection
 
     return this.state.assessments.map((r) => {
       const active = r.id === this.state.selected.id ? 'table-active' : '';
-      return <tr key={r.id} className={active}>
+      return <tr key={r.id.value()} className={active}>
         <td>{link(r)}</td>
       </tr>;
     });
   }
 
-  onInsert(id: string) {
+  onInsert(id: DocumentId) {
     persistence.retrieveDocument(this.props.courseIdVers, id)
       .then(result => this.props.onInsert(result.model as models.AssessmentModel));
   }

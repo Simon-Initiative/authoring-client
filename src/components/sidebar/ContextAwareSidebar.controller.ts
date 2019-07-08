@@ -12,12 +12,13 @@ import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentElement } from 'data/content/common/interfaces';
-import { ContentModel, CourseModel, Node } from 'data/models';
+import { ContentModel, Node } from 'data/models';
 import { modalActions } from 'actions/modal';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
 import { duplicate } from 'actions/duplication';
 import { CourseState } from 'reducers/course';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
   content: Maybe<ContentElement>;
@@ -35,7 +36,7 @@ interface DispatchProps {
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
-  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: Node | string) => void;
+  onSetCurrentNodeOrPage: (documentId: DocumentId, nodeOrPageId: Node | string) => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
@@ -54,7 +55,7 @@ interface OwnProps {
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const activeContext: ActiveContextState = state.activeContext;
 
-  const documentId = activeContext.documentId.caseOf({ just: d => d, nothing: () => '' });
+  const documentId = activeContext.documentId.caseOf({ just: d => d.value(), nothing: () => '' });
   const resource = (state.documents.get(documentId).document.model as any).resource;
 
   const supportedElements = activeContext.container.caseOf({
@@ -74,7 +75,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     resource,
     timeSkewInMs,
     currentPage: activeContext.documentId.caseOf({
-      just: docId => state.documents.get(docId).currentPage.valueOr(null),
+      just: docId => state.documents.get(docId.value()).currentPage.valueOr(null),
       nothing: null,
     }),
   };
@@ -85,7 +86,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onInsert: content => dispatch(insert(content) as any),
     onEdit: content => dispatch(edit(content) as any),
     onHide: () => dispatch(showSidebar(false)),
-    onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: Node | string) =>
+    onSetCurrentNodeOrPage: (documentId: DocumentId, nodeOrPageId: Node | string) =>
       dispatch(setCurrentNodeOrPage(documentId, nodeOrPageId)),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),

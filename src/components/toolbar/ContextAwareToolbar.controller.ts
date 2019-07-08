@@ -45,7 +45,7 @@ interface OwnProps {
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const activeContext: ActiveContextState = state.activeContext;
   const courseModel = state.course;
-  const documentId = activeContext.documentId.caseOf({ just: d => d, nothing: () => '' });
+  const documentId = activeContext.documentId.caseOf({ just: d => d.value(), nothing: () => '' });
   const resource = state.documents.get(documentId).document.model.resource;
   const supportedElements = activeContext.container.caseOf({
     just: c => c.supportedElements,

@@ -12,6 +12,8 @@ import { addEntry } from 'actions/bibliography';
 import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
 import { fetchContentElementByPredicate } from 'actions/document';
+import { State } from 'reducers';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
   selection: TextSelection;
@@ -22,8 +24,8 @@ interface StateProps {
 interface DispatchProps {
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
-  onAddEntry: (e, documentId) => Promise<void>;
-  onFetchContentElementByPredicate: (documentId: string, predicate)
+  onAddEntry: (e, documentId: DocumentId) => Promise<void>;
+  onFetchContentElementByPredicate: (documentId: DocumentId, predicate)
     => Promise<Maybe<ContentElement>>;
 }
 
@@ -31,12 +33,12 @@ interface OwnProps extends AbstractContentEditorProps<ContiguousText> {
 
 }
 
-const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   const { activeContext } = state;
   const courseModel = state.course;
-  const documentId = activeContext.documentId.caseOf({ just: d => d, nothing: () => '' });
-  const resource = state.documents.get(documentId).document.model.resource;
+  const documentId = activeContext.documentId.caseOf({ just: d => d.value(), nothing: () => '' });
+  const resource = (state.documents.get(documentId).document.model as any).resource;
 
   return {
     courseModel,
@@ -54,7 +56,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
     onAddEntry: (e, documentId) => dispatch(addEntry(e, documentId)),
-    onFetchContentElementByPredicate: (documentId: string, predicate) =>
+    onFetchContentElementByPredicate: (documentId: DocumentId, predicate) =>
       dispatch(fetchContentElementByPredicate(documentId, predicate)),
   };
 };

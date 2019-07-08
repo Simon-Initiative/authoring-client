@@ -13,12 +13,13 @@ import { LearningObjective, Skill } from 'data/contentTypes';
 
 import './EditorManager.scss';
 import { Toast, Severity } from 'components/common/Toast';
+import { DocumentId } from 'data/types';
 
 export interface EditorManagerProps {
   orgId: string;
   document: persistence.Document;
   hasFailed: boolean;
-  documentId: string;
+  documentId: DocumentId;
   userId: string;
   userName: string;
   profile: UserProfile;
@@ -29,7 +30,7 @@ export interface EditorManagerProps {
   skills: Immutable.Map<string, Skill>;
   objectives: Immutable.Map<string, LearningObjective>;
   onDispatch: (...args: any[]) => any;
-  onSave: (documentId: string, model: models.ContentModel) => any;
+  onSave: (documentId: DocumentId, model: models.ContentModel) => any;
 }
 
 export interface EditorManagerState {

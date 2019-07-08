@@ -7,6 +7,7 @@ import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
 import { modalActions } from 'actions/modal';
 import * as org from 'data/models/utils/org';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
   canUndo: boolean;
@@ -20,9 +21,9 @@ interface DispatchProps {
   dismissMessage: (message: Messages.Message) => void;
   dismissModal: () => void;
   displayModal: (c) => void;
-  onUndo: (documentId: string) => void;
-  onRedo: (documentId: string) => void;
-  onEditingEnable: (editable: boolean, documentId: string) => void;
+  onUndo: (documentId: DocumentId) => void;
+  onRedo: (documentId: DocumentId) => void;
+  onEditingEnable: (editable: boolean, documentId: DocumentId) => void;
 }
 
 interface OwnProps {
@@ -56,11 +57,11 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     displayModal: (c) => {
       dispatch(modalActions.display(c));
     },
-    onUndo: (documentId: string) =>
+    onUndo: (documentId: DocumentId) =>
       dispatch(undo(documentId)),
-    onRedo: (documentId: string) =>
+    onRedo: (documentId: DocumentId) =>
       dispatch(redo(documentId)),
-    onEditingEnable: (editable, documentId) =>
+    onEditingEnable: (editable: boolean, documentId: DocumentId) =>
       dispatch(documentEditingEnable(editable, documentId)),
   };
 };

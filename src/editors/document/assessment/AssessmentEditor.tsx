@@ -7,7 +7,7 @@ import {
 import { TextInput } from 'editors/content/common/TextInput';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-import { LegacyTypes, CourseIdVers } from 'data/types';
+import { LegacyTypes, CourseIdVers, DocumentId } from 'data/types';
 import guid from 'utils/guid';
 import {
   locateNextOfKin, findNodeByGuid, findQuestionById,
@@ -39,9 +39,9 @@ import { CourseState } from 'reducers/course';
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: CourseIdVers) => void;
   activeContext: ActiveContext;
-  onUpdateContent: (documentId: string, content: ContentElement) => void;
+  onUpdateContent: (documentId: DocumentId, content: ContentElement) => void;
   onUpdateContentSelection: (
-    documentId: string, content: ContentElement, container: ParentContainer,
+    documentId: DocumentId, content: ContentElement, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -49,7 +49,8 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   currentNode: contentTypes.Node;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
-  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
+  onSetCurrentNodeOrPage: (documentId: DocumentId, nodeOrPageId: contentTypes.Node | string) =>
+    void;
   onSetSearchParam: (name, value) => void;
   onClearSearchParam: (name) => void;
   course: CourseState;

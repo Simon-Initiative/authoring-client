@@ -7,6 +7,7 @@ import { quickPreview } from 'actions/preview';
 import { undo, redo } from 'actions/document';
 import { Resource } from 'data/content/resource';
 import { CourseModel } from 'data/models';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
   course: CourseModel;
@@ -16,23 +17,23 @@ interface StateProps {
 
 interface DispatchProps {
   onShowPageDetails: () => void;
-  onQuickPreview: (courseId: string, resource: Resource) => Promise<any>;
-  onUndo: (documentId: string) => void;
-  onRedo: (documentId: string) => void;
+  onQuickPreview: (resource: Resource) => Promise<any>;
+  onUndo: (documentId: DocumentId) => void;
+  onRedo: (documentId: DocumentId) => void;
 }
 
 interface OwnProps {
   editMode: boolean;
   documentResource: Resource;
-  documentId: string;
+  documentId: DocumentId;
   canPreview: boolean;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
     course: state.course,
-    canUndo: state.documents.get(ownProps.documentId).undoStack.size > 0,
-    canRedo: state.documents.get(ownProps.documentId).redoStack.size > 0,
+    canUndo: state.documents.get(ownProps.documentId.value()).undoStack.size > 0,
+    canRedo: state.documents.get(ownProps.documentId.value()).redoStack.size > 0,
   };
 };
 
@@ -45,15 +46,9 @@ const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
       dispatch(resetSidebarContent());
       dispatch(showSidebar(true));
     },
-    onQuickPreview: (courseId: string, resource: Resource) => {
-      return dispatch(quickPreview(courseId, resource));
-    },
-    onUndo: (documentId: string) => {
-      return dispatch(undo(documentId));
-    },
-    onRedo: (documentId: string) => {
-      return dispatch(redo(documentId));
-    },
+    onQuickPreview: (resource: Resource) => dispatch(quickPreview(resource)),
+    onUndo: (documentId: DocumentId) => dispatch(undo(documentId)),
+    onRedo: (documentId: DocumentId) => dispatch(redo(documentId)),
   };
 };
 

@@ -13,6 +13,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
 import { setCurrentNodeOrPage } from 'actions/document';
 import { CourseState } from 'reducers/course';
+import { DocumentId } from 'data/types';
 
 interface StateProps {
   activeContext: any;
@@ -22,14 +23,14 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContent: (documentId: DocumentId, content: Object) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: DocumentId, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
-  onSetCurrentNode: (documentId: string, node: Node) => void;
+  onSetCurrentNode: (documentId: DocumentId, node: Node) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<FeedbackModel> { }
@@ -37,7 +38,7 @@ interface OwnProps extends AbstractEditorProps<FeedbackModel> { }
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const { activeContext, hover, documents, course } = state;
   const currentNode = activeContext.documentId.caseOf({
-    just: docId => documents.get(docId).currentNode.valueOr(null),
+    just: docId => documents.get(docId.value()).currentNode.valueOr(null),
     nothing: null,
   });
 
@@ -51,11 +52,11 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
   return {
-    onUpdateContent: (documentId: string, content: ContentElement) =>
+    onUpdateContent: (documentId: DocumentId, content: ContentElement) =>
       dispatch(activeActions.updateContent(documentId, content)),
 
     onUpdateContentSelection: (
-      documentId: string, content: ContentElement,
+      documentId: DocumentId, content: ContentElement,
       parent: ParentContainer, textSelection: Maybe<TextSelection>) =>
       dispatch(activeActions.updateContext(documentId, content, parent, textSelection)),
 
@@ -68,7 +69,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
     dismissMessage: (message: Messages.Message) =>
       dispatch(dismissSpecificMessage(message)),
 
-    onSetCurrentNode: (documentId: string, node: Node) =>
+    onSetCurrentNode: (documentId: DocumentId, node: Node) =>
       dispatch(setCurrentNodeOrPage(documentId, node)),
   };
 };

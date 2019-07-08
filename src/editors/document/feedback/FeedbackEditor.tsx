@@ -6,7 +6,7 @@ import {
 } from 'editors/document/common/AbstractEditor';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, DocumentId } from 'data/types';
 import guid from 'utils/guid';
 import {
   locateNextOfKin, findNodeByGuid,
@@ -32,9 +32,9 @@ import { CourseState } from 'reducers/course';
 
 interface Props extends AbstractEditorProps<models.FeedbackModel> {
   activeContext: ActiveContext;
-  onUpdateContent: (documentId: string, content: ContentElement) => void;
+  onUpdateContent: (documentId: DocumentId, content: ContentElement) => void;
   onUpdateContentSelection: (
-    documentId: string, content: ContentElement, container: ParentContainer,
+    documentId: DocumentId, content: ContentElement, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -42,7 +42,7 @@ interface Props extends AbstractEditorProps<models.FeedbackModel> {
   dismissMessage: (message: Messages.Message) => void;
   course: CourseState;
   currentNode: models.FeedbackQuestionNode;
-  onSetCurrentNode: (documentId: string, node: Node) => void;
+  onSetCurrentNode: (documentId: DocumentId, node: Node) => void;
 }
 
 interface State extends AbstractEditorState {

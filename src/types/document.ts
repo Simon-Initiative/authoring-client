@@ -5,9 +5,10 @@ import { ContentModel } from 'data/models';
 import { PersistenceStrategy } from 'editors/manager/persistence/PersistenceStrategy';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
+import { DocumentId, ResourceId } from 'data/types';
 
 export type EditedDocumentParams = {
-  documentId? : string,
+  documentId?: DocumentId,
   document?: Document;
   hasFailed?: boolean;
   error?: string;
@@ -25,7 +26,7 @@ export type EditedDocumentParams = {
 };
 
 const defaultContent = {
-  documentId: '',
+  documentId: ResourceId.of(''),
   document: null,
   hasFailed: false,
   persistence: null,
@@ -44,7 +45,7 @@ const defaultContent = {
 
 export class EditedDocument extends Immutable.Record(defaultContent) {
 
-  documentId: string;
+  documentId: DocumentId;
   document: Document;
   hasFailed: boolean;
   error: string;

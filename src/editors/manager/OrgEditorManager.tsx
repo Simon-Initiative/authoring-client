@@ -14,12 +14,13 @@ import { NavigationItem } from 'types/navigation';
 
 import './OrgEditorManager.scss';
 import * as Messages from 'types/messages';
+import { DocumentId } from 'data/types';
 
 export interface OrgEditorManagerProps {
   document: persistence.Document;
   placements: org.Placements;
   hasFailed: boolean;
-  documentId: string;
+  documentId: DocumentId;
   userId: string;
   userName: string;
   profile: UserProfile;
@@ -37,9 +38,9 @@ export interface OrgEditorManagerProps {
   dismissMessage: (message: Messages.Message) => void;
   dismissModal: () => void;
   displayModal: (c) => void;
-  onUndo: (documentId: string) => void;
-  onRedo: (documentId: string) => void;
-  onEditingEnable: (editable: boolean, documentId: string) => void;
+  onUndo: (documentId: DocumentId) => void;
+  onRedo: (documentId: DocumentId) => void;
+  onEditingEnable: (editable: boolean, documentId: DocumentId) => void;
   selectedItem: Maybe<NavigationItem>;
 }
 

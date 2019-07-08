@@ -1,7 +1,8 @@
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, DocumentId } from 'data/types';
+
 export type AcquiredLock = {
   courseId: CourseIdVers,
-  documentId: string,
+  documentId: DocumentId,
 };
 
 export type RegisterLocks = (locks: AcquiredLock[]) => void;

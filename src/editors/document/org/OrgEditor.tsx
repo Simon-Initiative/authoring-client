@@ -16,6 +16,7 @@ import { Maybe } from 'tsmonad';
 import { NavigationItem } from 'types/navigation';
 
 import './OrgEditor.scss';
+import { DocumentId } from 'data/types';
 
 function hasMissingResource(
   model: models.OrganizationModel, course: models.CourseModel): boolean {
@@ -66,10 +67,10 @@ export interface OrgEditorProps {
   displayModal: (c) => void;
   canUndo: boolean;
   canRedo: boolean;
-  onUndo: (documentId: string) => void;
-  onRedo: (documentId: string) => void;
+  onUndo: (documentId: DocumentId) => void;
+  onRedo: (documentId: DocumentId) => void;
   course: models.CourseModel;
-  onEditingEnable: (editable: boolean, documentId: string) => void;
+  onEditingEnable: (editable: boolean, documentId: DocumentId) => void;
 }
 
 const enum TABS {

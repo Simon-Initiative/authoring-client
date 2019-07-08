@@ -24,7 +24,7 @@ import { buildMissingSkillsMessage } from 'utils/error';
 import { RouterState } from 'reducers/router';
 
 import './PoolEditor.scss';
-import { LegacyTypes, CourseIdVers } from 'data/types';
+import { LegacyTypes, CourseIdVers, DocumentId } from 'data/types';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
@@ -37,13 +37,14 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
   onFetchSkills: (courseId: CourseIdVers) => void;
   skills: Immutable.OrderedMap<string, Skill>;
   activeContext: ActiveContext;
-  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContent: (documentId: DocumentId, content: Object) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: DocumentId, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   currentNode: Maybe<contentTypes.Node>;
-  onSetCurrentNodeOrPage: (documentId: string, nodeOrPageId: contentTypes.Node | string) => void;
+  onSetCurrentNodeOrPage: (documentId: DocumentId, nodeOrPageId: contentTypes.Node | string) =>
+    void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;

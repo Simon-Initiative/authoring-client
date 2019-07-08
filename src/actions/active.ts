@@ -7,6 +7,8 @@ import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
+import { DocumentId } from 'data/types';
+import { State } from 'reducers/index';
 
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -14,12 +16,12 @@ export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 
 export type UpdateContentAction = {
   type: UPDATE_CONTENT,
-  documentId: string,
+  documentId: DocumentId,
   content: ContentElement,
 };
 
 export const updateContent = (
-  documentId: string,
+  documentId: DocumentId,
   content: ContentElement): UpdateContentAction => ({
     type: UPDATE_CONTENT,
     documentId,
@@ -32,14 +34,14 @@ export const UPDATE_CONTEXT: UPDATE_CONTEXT = 'active/UPDATE_CONTEXT';
 
 export type UpdateContextAction = {
   type: UPDATE_CONTEXT,
-  documentId: string,
+  documentId: DocumentId,
   content: ContentElement,
   container: ParentContainer,
   textSelection: Maybe<TextSelection>,
 };
 
 export const updateContext = (
-  documentId: string,
+  documentId: DocumentId,
   content: ContentElement, container: ParentContainer,
   textSelection: Maybe<TextSelection>): UpdateContextAction => ({
     type: UPDATE_CONTEXT,
@@ -80,7 +82,6 @@ export function insert(
     activeContext.container.lift((parent: ParentContainer) => {
       parent.onAddNew(content, activeContext.textSelection);
     });
-
   };
 }
 
@@ -118,7 +119,7 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
 
 
 export function edit(content: ContentElement) {
-  return function (dispatch, getState) {
+  return function (dispatch, getState: () => State) {
     const { activeContext } = getState();
     activeContext.container.lift((parent: ParentContainer) => {
       parent.onEdit(content, content);
@@ -127,7 +128,7 @@ export function edit(content: ContentElement) {
 }
 
 export function remove(item: ContentElement) {
-  return function (dispatch, getState) {
+  return function (dispatch, getState: () => State) {
     const { activeContext }: { activeContext: ActiveContextState } = getState();
     const { documents } = getState();
 
