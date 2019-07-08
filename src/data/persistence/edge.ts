@@ -37,10 +37,6 @@ export function fetchEdges(
   const url = byResource
     ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId}`
     : `${configuration.baseUrl}/${packageId.value()}/edges`;
-
-  console.log("Fetching Edges");
-  console.log(url);
-
   const headers = getHeaders(credentials);
   const query = Object.assign(
     {},

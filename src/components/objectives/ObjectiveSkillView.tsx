@@ -341,9 +341,6 @@ class ObjectiveSkillView
   ) {
     const { course } = this.props;
 
-    console.log("org: ");
-    console.log(org);
-
     const directResources = org.getFlattenedResources().toArray();
     const directLookup = Immutable.Set<string>(directResources);
 
@@ -388,7 +385,8 @@ class ObjectiveSkillView
     const fetchPoolRefs = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.assessment2_pool,
     }).then((poolToSkillEdges) => {
-      return persistence.fetchEdges(course.guid, { // FIXME: this is literally the same call as fetchSummativeToPoolEdges
+      return persistence.fetchEdges(course.guid, {
+        // FIXME: this is literally the same call as fetchSummativeToPoolEdges
         sourceType: LegacyTypes.assessment2,
         destinationType: LegacyTypes.assessment2_pool,
       })
@@ -440,8 +438,6 @@ class ObjectiveSkillView
             if (edge.sourceType === LegacyTypes.assessment2) {
               // find all edges that have a destinationId linked to this sourceId
               const linkedEdges = combinedEdges.filter(e => e.destinationId === edge.sourceId);
-              console.log("LinkedEdges: ");
-              console.log(linkedEdges);
               const isDeepLinked = linkedEdges.some(e => directLookup.has(resourceId(e.sourceId)));
 
               if (isDeepLinked) {
@@ -466,7 +462,8 @@ class ObjectiveSkillView
       };
 
       const workbookPageRefs = reduceObjectiveWorkbookPageRefs(
-        objectivesModel.objectives, workbookpageToObjectiveEdges, isValidResource); // KEVIN-1936 filter results here
+        objectivesModel.objectives, workbookpageToObjectiveEdges, isValidResource);
+        // KEVIN-1936 filter results here
       const skillFormativeQuestionRefs = reduceSkillFormativeQuestionRefs(
         skills, formativeToSkillEdges, isValidResource);
       const skillSummativeQuestionRefs = reduceSkillSummativeQuestionRefs(

@@ -165,7 +165,7 @@ class ContextAwareSidebar
     super(props);
 
     this.state = {
-      resourceRefs: Maybe.nothing() // KEVIN-1936 (BBB) initialize state as nothing
+      resourceRefs: Maybe.nothing(), // KEVIN-1936 (BBB) initialize state as nothing
     };
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
@@ -198,7 +198,7 @@ class ContextAwareSidebar
       });
 
       this.setState({
-        resourceRefs: Maybe.just(sources) // KEVIN-1936 (CCC)
+        resourceRefs: Maybe.just(sources), // KEVIN-1936 (CCC)
       });
     });
 
@@ -319,15 +319,13 @@ class ContextAwareSidebar
     );
 
     const getRefGuidFromRef = (ref: Edge) => {
-      console.log(ref);
-      console.log(ref.sourceId);
       const id = stripId(ref.sourceId);
 
       return Maybe.maybe(course.resourcesById.get(id)).caseOf({
         just: resource => resource.guid,
         nothing: () => '',
       });
-    }
+    };
 
     const stripId = (id: string) => {
       const splits = id.split(':');
@@ -337,10 +335,6 @@ class ContextAwareSidebar
     };
 
     const getRefTitleFromRef = (ref: Edge) => {
-
-      console.log("id: " + ref.sourceId);
-      console.log("guid: " + ref.sourceGuid);
-      console.log("type:  "  + ref.sourceType);
       const id = stripId(ref.sourceId);
 
       return Maybe.maybe(course.resourcesById.get(id)).caseOf({
@@ -356,8 +350,6 @@ class ContextAwareSidebar
       nothing: () => '',
     });
 
-    /* KYLE-1936 currently only works for pools, needs to be modified to work for any type
-       best would be to be able to have type provided as input, rather than having multiple functions */
     const referenceLocations = (
       <SidebarGroup label="Referenced Locations">
         <SidebarRow>
@@ -390,14 +382,14 @@ class ContextAwareSidebar
                   <div>No references found</div>
                 );
               },
-              nothing: () => <div>Error loading</div>
+              nothing: () => <div>Error loading</div>,
             },
             )
             }
           </div>
         </SidebarRow>
       </SidebarGroup>
-    )
+    );
 
     switch (model.modelType) {
       case ModelTypes.WorkbookPageModel:
@@ -629,7 +621,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
-            {referenceLocations} {/* make this special for Feedback */}
+            {referenceLocations}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
