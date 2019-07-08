@@ -37,6 +37,7 @@ import { CombinationsMap } from 'types/combinations';
 import { Edge } from 'types/edge';
 import { CourseState } from 'reducers/course';
 import { viewDocument } from 'actions/view';
+import { getNameAndIconByType } from 'components/ResourceView';
 
 interface SidebarRowProps {
   label?: string;
@@ -339,6 +340,7 @@ class ContextAwareSidebar
 
       console.log("id: " + ref.sourceId);
       console.log("guid: " + ref.sourceGuid);
+      console.log("type:  "  + ref.sourceType);
       const id = stripId(ref.sourceId);
 
       return Maybe.maybe(course.resourcesById.get(id)).caseOf({
@@ -372,13 +374,13 @@ class ContextAwareSidebar
                       <div key={ref.guid} className="ref-thing">
                         <a href="#" onClick = {(event) => {
                           event.preventDefault();
-                          console.log(stripId(ref.sourceId));
                           viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
                         }
                         }>
-                            <i className={classNames(
-                              /* KEVIN-1936 icon should change based on type*/
-                              ['fa fa-check', classes.detailsSectionIcon])} />
+                          <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
+                            {// KYLE-1936 this returns an html element, unsure how to apply style
+                              getNameAndIconByType(ref.sourceType).icon}
+                            </span>
                             {getRefTitleFromRef(ref)}
                         </a>
                       </div>
