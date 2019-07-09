@@ -47,9 +47,8 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
       node.contentType === 'Section' ||
       node.contentType === 'Module') {
 
-      console.log("####################ewhubgksbgskubgbkuybguihgihjgoihsiughugsiugbu#####");
       const predicate = (res: Resource): boolean =>
-        res.id !== (PLACEHOLDER_ITEM_ID || node.id)
+        res.id !== PLACEHOLDER_ITEM_ID
         && res.type === LegacyTypes.workbook_page
         && res.resourceState !== ResourceState.DELETED;
 
