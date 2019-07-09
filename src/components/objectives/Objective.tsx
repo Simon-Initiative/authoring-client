@@ -586,9 +586,6 @@ class Objective
     const RIGHT_QUAD_WIDTH = (orderedObjectiveAssessments.length * 35)
       + (SKILL_GRID_HEADER_HEIGHT);
 
-    console.log("workbookPageRefs");
-    console.log(workbookPageRefs);
-
     return (
       <div className={classes.detailsQuad}>
         <div className={classes.quadTop}>
