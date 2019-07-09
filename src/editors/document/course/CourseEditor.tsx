@@ -614,8 +614,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   // Either Show or Hide the Advanced options in the Details page
   toggleAdvancedDetails() {
     this.setState({
-      showAdvancedDetails: !this.state.showAdvancedDetails
-    })
+      showAdvancedDetails: !this.state.showAdvancedDetails,
+    });
   }
 
   renderDetails() {
