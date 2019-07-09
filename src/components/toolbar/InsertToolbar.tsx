@@ -45,6 +45,7 @@ const WOLFRAM_ICON = require('../../../assets/wolfram.png');
 const imgSize = 24;
 
 import SizePicker from 'editors/content/learning/table/SizePicker';
+import { controller } from 'editors/content/media/manager/MediaManager.controller';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object, context?) => void;
@@ -129,7 +130,6 @@ class InsertToolbar
     const { onInsert, parentSupportsElementType, resourcePath, context, editMode,
       courseModel, onDisplayModal, onDismissModal, requestLatestModel,
       onCreateNew } = this.props;
-
     const onTableCreate = (onInsert, numRows, numCols) => {
 
       const rows = [];
@@ -175,7 +175,7 @@ class InsertToolbar
             }
           });
       }}
-      tooltip="Insert Image"
+      tooltip={context.undoRedoGuid}
       disabled={!editMode || !parentSupportsElementType('image')}>
       {getContentIcon(insertableContentTypes.Image)}
     </ToolbarButton>;
@@ -458,7 +458,7 @@ class InsertToolbar
               {getContentIcon(insertableContentTypes.Inquiry, { width: 22 })} Inquiry
             </ToolbarButtonMenuItem>
           </ToolbarQuadMenu>
-
+          {/* Lists dropdown */}
           <ToolbarLayout.Column maxWidth="100px">
             <ToolbarWideMenu
               icon={getContentIcon(insertableContentTypes.Li)}
@@ -489,6 +489,7 @@ class InsertToolbar
                 </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
 
+            {/* learning dropdown */}
             <ToolbarWideMenu
               icon={<i className={'fa fa-graduation-cap'} />}
               label={'Learning'}
@@ -505,9 +506,10 @@ class InsertToolbar
                       return onDisplayModal(
                         <ResourceSelection
                           filterPredicate={(res: Resource): boolean =>
-                            res.type === LegacyTypes.inline
+                            (res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
-                            && !existingInlines.has(res.id)}
+                            && !existingInlines.has(res.id))
+                          }
                           courseId={context.courseId}
                           onInsert={(resource) => {
                             onDismissModal();
@@ -551,7 +553,8 @@ class InsertToolbar
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.workbook_page
                       && res.id !== PLACEHOLDER_ITEM_ID
-                      && res.resourceState !== ResourceState.DELETED}
+                      && res.resourceState !== ResourceState.DELETED
+                      && res.guid !== context.documentId}
                     courseId={context.courseId}
                     onInsert={(resource) => {
                       onDismissModal();
@@ -718,6 +721,8 @@ class InsertToolbar
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">
+
+            {/* Layout dropdown */}
             <ToolbarWideMenu
               icon={<i className={'fa fa-clone'} />}
               label={'Layout'}
@@ -751,6 +756,7 @@ class InsertToolbar
                 </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
 
+            {/* Advanced dropdown */}
             <ToolbarWideMenu
               icon={<i className={'fa fa-cogs'} />}
               label={'Advanced'}
