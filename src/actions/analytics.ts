@@ -1,12 +1,11 @@
-import { Map, List } from 'immutable';
 import { fetchDataSet, createDataSet } from 'data/persistence';
 import { Maybe } from 'tsmonad';
-import { showMessage, dismissSpecificMessage } from 'actions/messages';
+import { showMessage } from 'actions/messages';
 import { DataSet, DatasetStatus } from 'types/analytics/dataset';
 import { Dispatch } from 'redux';
 import { State } from 'reducers';
 import { dateFormatted } from 'utils/date';
-import { Message, Severity, TitledContent, Scope, MessageAction } from 'types/messages';
+import { Message, Severity, TitledContent, Scope } from 'types/messages';
 import { Priority } from 'types/messages/message';
 
 export const REQUESTED_DATASET = 'analytics/REQUESTED_DATASET';
@@ -45,8 +44,7 @@ export const dataSetReceived = (
 
 export const createNewDataSet = () =>
   async (dispatch: Dispatch<any>, getState: () => State) => {
-    const packageId = getState().course.guid;
-    const { guid } = await createDataSet(packageId);
+    const { guid } = await createDataSet(getState().course.idvers);
     dispatch(requestDataSet(guid, true));
   };
 

@@ -1,7 +1,6 @@
 
 import { State } from 'reducers';
 import * as Immutable from 'immutable';
-import { Dispatch } from 'redux';
 import * as persistence from 'data/persistence';
 import { ContentModel } from 'data/models';
 import * as viewActions from 'actions/view';
@@ -16,6 +15,7 @@ import { Title } from 'data/contentTypes';
 import { dupeOrgNode } from 'actions/models';
 import { Sequences } from 'data/content/org/sequences';
 import { orgLoaded } from 'actions/orgs';
+import { Maybe } from 'tsmonad';
 
 function buildMessage() {
   const content = new Messages.TitledContent().with({
@@ -33,7 +33,7 @@ function buildMessage() {
 }
 
 export function duplicate(model: ContentModel) {
-  return function (dispatch: Dispatch, getState: () => State) {
+  return function (dispatch, getState: () => State) {
 
     if (model.modelType === 'AssessmentModel'
       || model.modelType === 'WorkbookPageModel'
@@ -41,7 +41,7 @@ export function duplicate(model: ContentModel) {
       || model.modelType === 'FeedbackModel'
       || model.modelType === 'OrganizationModel') {
 
-      const courseId = getState().course.guid;
+      const courseId = getState().course.idvers;
 
       // Adjust the title to reflect that it is a copy
       const title = model.resource.title + ' (copy)';
@@ -77,15 +77,14 @@ export function duplicate(model: ContentModel) {
           // Use the current org from the router, if one present (which
           // it should be), otherwise just grab the first org we find
           // in the course
-          let orgId = getState().router.orgId.caseOf({
-            just: id => id,
-            nothing: () => getState().course.resources
-              .toArray()
-              .filter(r => r.type === LegacyTypes.organization)[0].guid,
-          });
+          const { router } = getState();
+          let orgId = Maybe.nothing<string>();
+          if (router.route.type === 'RouteCourse') {
+            orgId = router.route.orgId;
+          }
           // If we are duplicating an org, switch to it
-          if (model.modelType === 'OrganizationModel') {
-            orgId = doc.model.guid;
+          if (doc.model.modelType === 'OrganizationModel') {
+            orgId = Maybe.just(doc.model.resource.id);
             // This is required to keep the app in sync with the newly active org
             dispatch(orgLoaded(doc));
           }
@@ -93,7 +92,8 @@ export function duplicate(model: ContentModel) {
           const updatedResources = Immutable.OrderedMap<string, Resource>(
             [[(doc as any).model.resource.guid, (doc as any).model.resource]]);
           dispatch(courseActions.updateCourseResources(updatedResources));
-          dispatch(viewActions.viewDocument(doc._id, courseId, orgId));
+          viewActions.viewDocument(
+            typeof doc._id === 'string' ? doc._id : '', courseId, orgId);
 
           // This is unfortunate, but we must delay showing the message until
           // we suspec that the view has been completely transitioned, otherwise

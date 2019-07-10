@@ -13,7 +13,8 @@ export interface DocumentViewProps {
   profile: UserProfile;
   userId: string;
   userName: string;
-  course: any;
+  course: CourseModel;
+  orgId: string;
 }
 
 function isDeletedResource(documentId, course: CourseModel): boolean {
@@ -73,7 +74,7 @@ export default class DocumentView
   }
 
   render() {
-    const { course, documentId, profile, userId, userName } = this.props;
+    const { course, documentId, profile, userId, userName, orgId } = this.props;
 
     if (isDeletedResource(documentId, course)) {
       return this.renderDeleted();
@@ -82,6 +83,7 @@ export default class DocumentView
     return (
       <div className="document-view">
         <EditorManager
+          orgId={orgId}
           course={course}
           profile={profile}
           userId={userId}

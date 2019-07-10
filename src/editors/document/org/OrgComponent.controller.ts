@@ -14,7 +14,6 @@ import { change, undo, redo } from 'actions/orgs';
 interface StateProps {
   skills: Map<string, t.Skill>;
   objectives: Map<string, t.LearningObjective>;
-  course: models.CourseModel;
   org: Maybe<models.OrganizationModel>;
   placements: org.Placements;
   canUndo: boolean;
@@ -34,13 +33,14 @@ interface DispatchProps {
 }
 
 interface OwnProps {
+  course: models.CourseModel;
   componentId: string;
   editMode: boolean;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { skills, objectives, course, orgs } = state;
+  const { skills, objectives, orgs } = state;
   const org = orgs.activeOrg.map(v => (v.model as models.OrganizationModel));
   const { undoStack, redoStack, requestInFlight } = orgs;
 
@@ -55,7 +55,6 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     org,
     skills,
     objectives,
-    course,
     canUndo,
     canRedo,
     placements,

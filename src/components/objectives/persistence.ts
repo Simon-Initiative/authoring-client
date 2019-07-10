@@ -6,6 +6,7 @@ import { Resource } from '../../data/content/resource';
 import guid from '../../utils/guid';
 import { LegacyTypes } from '../../data/types';
 import { LockDetails } from '../../utils/lock';
+import { CourseIdVers } from 'data/types';
 
 const NEW_BUCKET_TITLE = 'Created In Editor';
 
@@ -13,17 +14,17 @@ const NEW_BUCKET_TITLE = 'Created In Editor';
 
 
 
-function retrieveObjectives(courseId: string) : Promise<persistence.Document[]> {
+function retrieveObjectives(courseId: CourseIdVers): Promise<persistence.Document[]> {
   return persistence.bulkFetchDocuments(
-      courseId, [LegacyTypes.learning_objectives], 'byTypes');
+    courseId, [LegacyTypes.learning_objectives], 'byTypes');
 }
 
-function retrieveSkills(courseId: string) : Promise<persistence.Document[]> {
+function retrieveSkills(courseId: CourseIdVers): Promise<persistence.Document[]> {
   return persistence.bulkFetchDocuments(
-      courseId, [LegacyTypes.skills_model], 'byTypes');
+    courseId, [LegacyTypes.skills_model], 'byTypes');
 }
 
-function createObjectivesModel() : models.LearningObjectivesModel {
+function createObjectivesModel(): models.LearningObjectivesModel {
   const id = guid();
   return new models.LearningObjectivesModel().with({
     id,
@@ -33,7 +34,7 @@ function createObjectivesModel() : models.LearningObjectivesModel {
   });
 }
 
-function createSkillsModel() : models.SkillsModel {
+function createSkillsModel(): models.SkillsModel {
   const id = guid();
   return new models.SkillsModel().with({
     id,
@@ -49,12 +50,12 @@ type BucketCreationResult = {
 };
 
 function createNewBucket(
-  courseId: string, docs: persistence.Document[], createFn, userName: string)
+  courseId: CourseIdVers, docs: persistence.Document[], createFn, userName: string)
   : Promise<BucketCreationResult> {
 
   return new Promise((resolve, reject) => {
     const doc = docs
-    .find(d => (d.model as any).title === NEW_BUCKET_TITLE);
+      .find(d => (d.model as any).title === NEW_BUCKET_TITLE);
 
     if (doc === undefined) {
       // Create and then lock it
@@ -69,14 +70,14 @@ function createNewBucket(
   });
 }
 
-export function retrieveAllObjectives(courseId: string)
+export function retrieveAllObjectives(courseId: CourseIdVers)
   : Promise<Immutable.List<contentTypes.LearningObjective>> {
 
   return retrieveObjectives(courseId)
     .then(docs => docs.map(doc => (doc.model as models.LearningObjectivesModel)))
-    .then((models : models.LearningObjectivesModel[]) => {
+    .then((models: models.LearningObjectivesModel[]) => {
       return models.reduce(
-        (all : Immutable.List<contentTypes.LearningObjective>, model) => {
+        (all: Immutable.List<contentTypes.LearningObjective>, model) => {
           return all.merge(model.objectives.toArray());
         },
         Immutable.List<contentTypes.LearningObjective>(),
@@ -84,13 +85,14 @@ export function retrieveAllObjectives(courseId: string)
     });
 }
 
-export function buildAggregateModel(courseId: string, userName: string) : Promise<AggregateModel> {
+export function buildAggregateModel(courseId: CourseIdVers, userName: string):
+  Promise<AggregateModel> {
   return new Promise((resolve, reject) => {
 
-    let objectives : persistence.Document[] = null;
-    let skills : persistence.Document[] = null;
-    let skillBucket : persistence.Document = null;
-    let objectiveBucket : persistence.Document = null;
+    let objectives: persistence.Document[] = null;
+    let skills: persistence.Document[] = null;
+    let skillBucket: persistence.Document = null;
+    let objectiveBucket: persistence.Document = null;
 
 
     // First fetch all the learning objectives and skills documents
@@ -126,13 +128,15 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
 
             // Lock just the new bucket objective document first.  If that succeeds, we
             // can assume that we can safely lock all others.
-            return persistence.acquireLock(courseId, results[0].doc._id);
+            const id = results[0].doc._id;
+            return persistence.acquireLock(courseId, typeof id === 'string' ? id : '');
           })
           .then((lockResult: LockDetails) => {
 
             if ((lockResult as any).lockedBy === userName) {
               return Promise.all([...objectives, ...skills]
-                .map(d => persistence.acquireLock(courseId, d._id)));
+                .map(d =>
+                  persistence.acquireLock(courseId, typeof d._id === 'string' ? d._id : '')));
             }
 
             resolve({
@@ -161,7 +165,7 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
   });
 }
 
-function objectivesToKV(doc: persistence.Document, itemFn) : any {
+function objectivesToKV(doc: persistence.Document, itemFn): any {
   return (doc.model as models.LearningObjectivesModel).objectives
     .toArray()
     .reduce(
@@ -173,7 +177,7 @@ function objectivesToKV(doc: persistence.Document, itemFn) : any {
 }
 
 
-function skillsToKV(doc: persistence.Document, itemFn) : any {
+function skillsToKV(doc: persistence.Document, itemFn): any {
   return (doc.model as models.SkillsModel).skills
     .toArray()
     .reduce(
@@ -184,7 +188,7 @@ function skillsToKV(doc: persistence.Document, itemFn) : any {
       {});
 }
 
-export function unifyObjectives(aggregate: AggregateModel) : UnifiedObjectivesModel {
+export function unifyObjectives(aggregate: AggregateModel): UnifiedObjectivesModel {
 
   const mapping = aggregate.objectives
     .reduce(
@@ -205,7 +209,7 @@ export function unifyObjectives(aggregate: AggregateModel) : UnifiedObjectivesMo
   };
 }
 
-export function unifySkills(aggregate: AggregateModel) : UnifiedSkillsModel {
+export function unifySkills(aggregate: AggregateModel): UnifiedSkillsModel {
 
   const mapping = aggregate.skills
     .reduce(

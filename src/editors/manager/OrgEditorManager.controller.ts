@@ -25,7 +25,6 @@ interface StateProps {
   hasFailed: boolean;
   canUndo: boolean;
   canRedo: boolean;
-  course: CourseModel;
   placements: org.Placements;
 }
 
@@ -42,6 +41,7 @@ interface DispatchProps {
 }
 
 interface OwnProps {
+  course: CourseModel;
   documentId: string;
   userId: string;
   userName: string;
@@ -51,11 +51,11 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { expanded, skills, objectives, course, orgs } = state;
+  const { expanded, skills, objectives, orgs } = state;
 
   let document = null;
   let undoRedoGuid = 'Loading';
-  let editingAllowed = course.editable;
+  let editingAllowed = ownProps.course.editable;
   let hasFailed = false;
 
   document = orgs.activeOrg.caseOf({
@@ -63,7 +63,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     nothing: () => null,
   });
   undoRedoGuid = '';
-  editingAllowed = course.editable;
+  editingAllowed = ownProps.course.editable;
   hasFailed = false;
 
   return {
@@ -76,7 +76,6 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     hasFailed,
     canUndo: false,
     canRedo: false,
-    course: state.course,
     placements: orgs.placements,
   };
 };

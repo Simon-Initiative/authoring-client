@@ -5,7 +5,6 @@ import { Message as Msg, Scope, MessageAction, Severity } from 'types/messages';
 import { Message } from './Message';
 import './Messages.scss';
 import { RouterState } from 'reducers/router';
-import { ROUTE } from 'actions/router';
 
 export interface MessagesProps {
   dismissMessage: (message: Msg) => void;
@@ -58,37 +57,18 @@ export class Messages
         <ReactCSSTransitionGroup transitionName="message"
           transitionEnterTimeout={250} transitionLeaveTimeout={250}>
           {messages.filter((m) => {
-            const isOrganizationRoute = router.resourceId.caseOf({
-              just: resourceId => router.orgId.caseOf({
-                just: orgId => resourceId === orgId,
-                nothing: () => false,
-              }),
-              nothing: () => false,
-            });
-
-            const isPackageDetailsRoute = router.resourceId.caseOf({
-              just: resourceId => router.courseId.caseOf({
-                just: courseId => resourceId === courseId,
-                nothing: () => false,
-              }),
-              nothing: () => false,
-            });
-
-            const isCoursePackageRoute = router.courseId.caseOf({
-              just: () => true,
-              nothing: () => false,
-            });
+            const { route } = router;
 
             switch (m.scope) {
               case Scope.Organization:
-                return isOrganizationRoute;
+                return route.type === 'RouteCourse' &&
+                  route.orgId.caseOf({ just: _ => true, nothing: () => false });
               case Scope.PackageDetails:
-                return isPackageDetailsRoute;
+                return route.type === 'RouteCourse' && route.route.type === 'RouteCourseOverview';
               case Scope.Resource:
-                return !isOrganizationRoute && !isPackageDetailsRoute
-                  && router.route === ROUTE.RESOURCE;
+                return route.type === 'RouteCourse' && route.route.type === 'RouteResource';
               case Scope.CoursePackage:
-                return isCoursePackageRoute;
+                return route.type === 'RouteCourse';
               case Scope.Application:
               default:
                 return true;

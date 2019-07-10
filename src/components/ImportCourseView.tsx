@@ -48,7 +48,7 @@ export class ImportCourseView
 
     persistence.importPackage(inputText)
       .then((_) => {
-        dispatch(viewActions.viewAllCourses());
+        viewActions.viewAllCourses();
         dispatch(showMessage(buildImportMessage()));
       })
       .catch(err => dispatch(showMessage(
