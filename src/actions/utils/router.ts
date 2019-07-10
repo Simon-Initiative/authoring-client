@@ -2,7 +2,7 @@ import { Map } from 'immutable';
 import { Maybe, maybe } from 'tsmonad';
 import { logger, LogTag } from 'utils/logger';
 import * as routerTypes from 'types/router';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, ResourceId } from 'data/types';
 
 
 export function parseUrl(url: string, search: string):
@@ -88,7 +88,7 @@ function parseRoute(
         && parsed.find(isNaN) === undefined) {
         return maybe(routerTypes.toRouteCourse(
           CourseIdVers.of(id, version),
-          maybe(params.get('organization')),
+          maybe(params.get('organization')).lift(org => ResourceId.of(org)),
           parseCoursePage(routeParts[1]),
         ));
       }
@@ -106,7 +106,7 @@ function parseCoursePage(page: string): routerTypes.RouteCourseOption {
     case 'organizations': return routerTypes.toRouteOrganizations();
     case 'objectives': return routerTypes.toRouteObjectives();
     case 'preview': return routerTypes.toRoutePreview();
-    default: return routerTypes.toRouteResource(page);
+    default: return routerTypes.toRouteResource(ResourceId.of(page));
   }
 }
 

@@ -8,7 +8,7 @@ import { LearningObjective, Skill } from 'data/contentTypes';
 import { save } from 'actions/document';
 import { State } from 'reducers';
 import { CourseModel } from 'data/models/course';
-import { DocumentId } from 'data/types';
+import { DocumentId, ResourceId } from 'data/types';
 
 interface StateProps {
   expanded: any;
@@ -31,7 +31,7 @@ interface OwnProps {
   userName: string;
   profile: UserProfile;
   course: CourseModel;
-  orgId: string;
+  orgId: ResourceId;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

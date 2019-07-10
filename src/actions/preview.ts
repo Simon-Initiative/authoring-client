@@ -9,20 +9,20 @@ import { DeferredPersistenceStrategy }
   from 'editors/manager/persistence/DeferredPersistenceStrategy';
 import { buildPersistenceFailureMessage } from 'utils/error';
 import { ServerName } from 'data/persistence/document';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, ResourceId } from 'data/types';
 import { State } from 'reducers';
 import { buildUrlFromRoute } from 'actions/view';
 import { toRoutePreview, toRouteCourse } from 'types/router';
 import { Maybe } from 'tsmonad';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(courseId: CourseIdVers, orgId: string,
+function invokePreview(courseId: CourseIdVers, orgId: ResourceId,
   isRefreshAttempt: boolean, server?: ServerName) {
   return persistence.initiatePreview(courseId, orgId, isRefreshAttempt, server);
 }
 
 export function preview(
-  courseId: CourseIdVers, organizationId: string,
+  courseId: CourseIdVers, organizationId: ResourceId,
   isRefreshAttempt: boolean, redeploy: boolean = true, server?: ServerName) {
 
   return function (dispatch): Promise<any> {

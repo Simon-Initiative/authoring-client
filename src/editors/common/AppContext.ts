@@ -1,12 +1,12 @@
 import { Map } from 'immutable';
 import * as models from 'data/models';
 import { LearningObjective, Skill } from 'data/contentTypes';
-import { DocumentId } from 'data/types';
+import { DocumentId, ResourceId } from 'data/types';
 
 export type AppContext = {
   userId: string;
   documentId: DocumentId;
-  orgId: string;
+  orgId: ResourceId;
   baseUrl: string;
   resourcePath: string;
   courseModel: models.CourseModel;

@@ -13,10 +13,10 @@ import { LearningObjective, Skill } from 'data/contentTypes';
 
 import './EditorManager.scss';
 import { Toast, Severity } from 'components/common/Toast';
-import { DocumentId } from 'data/types';
+import { DocumentId, ResourceId } from 'data/types';
 
 export interface EditorManagerProps {
-  orgId: string;
+  orgId: ResourceId;
   document: persistence.Document;
   hasFailed: boolean;
   documentId: DocumentId;

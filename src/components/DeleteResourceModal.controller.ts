@@ -8,7 +8,7 @@ import { ResourceState } from 'data/content/resource';
 import { updateCourseResources } from 'actions/course';
 import * as viewActions from 'actions/view';
 import { modalActions } from 'actions/modal';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import { CourseState } from 'reducers/course';
 import { Maybe } from 'tsmonad';
 
@@ -17,7 +17,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onDeleteResource: (resource: Resource, course: CourseModel, orgId: string) => void;
+  onDeleteResource: (resource: Resource, course: CourseModel, orgId: ResourceId) => void;
 }
 
 interface OwnProps {

@@ -66,7 +66,7 @@ export function loadCourse(courseId: CourseIdVers) {
           const courseModel: CourseModel = document.model;
 
           if (!document.model.resources.toArray().some(
-            resource => resource.id === PLACEHOLDER_ITEM_ID)) {
+            resource => resource.id.value() === PLACEHOLDER_ITEM_ID)) {
 
             const placeholder = createPlaceholderPage(courseId);
             const updatedModel = courseModel.with(

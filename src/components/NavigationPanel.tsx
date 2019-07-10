@@ -645,7 +645,7 @@ class NavigationPanel
     if (route.route.type === 'RouteObjectives') {
       selectedItem = Maybe.just(nav.makeLearningObjectives());
     } else if (route.route.type === 'RouteResource') {
-      selectedItem = Maybe.just(nav.makeOrganizationItem(route.route.resourceId));
+      selectedItem = Maybe.just(nav.makeOrganizationItem(route.route.resourceId.value()));
     }
 
     const firstOrganization = () => course.resourcesById.find(r => r.type === 'x-oli-organization');

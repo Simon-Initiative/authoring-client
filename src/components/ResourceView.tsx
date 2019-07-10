@@ -9,7 +9,7 @@ import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
-import { AssessmentType, LegacyTypes } from 'data/types';
+import { AssessmentType, LegacyTypes, ResourceId } from 'data/types';
 import * as contentTypes from 'data/contentTypes';
 import './ResourceView.scss';
 import { caseOf } from 'utils/utils';
@@ -53,7 +53,7 @@ export interface ResourceViewProps {
   course: models.CourseModel;
   dispatch: any;
   serverTimeSkewInMs: number;
-  currentOrg: string;
+  currentOrg: ResourceId;
 }
 
 interface ResourceViewState {
@@ -87,7 +87,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     const { course } = this.props;
 
     return course.resources.toArray().filter(r =>
-      r.id !== PLACEHOLDER_ITEM_ID
+      r.id.value() !== PLACEHOLDER_ITEM_ID
       && r.resourceState !== ResourceState.DELETED
       && (
         r.type === LegacyTypes.inline
@@ -104,13 +104,13 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     const text = searchText.trim().toLowerCase();
     const filterFn = (r: Resource): boolean => {
 
-      if (r.id === PLACEHOLDER_ITEM_ID) {
+      if (r.id.value() === PLACEHOLDER_ITEM_ID) {
         return false;
       }
 
       const { title, id } = r;
       const titleLower = title ? title.toLowerCase() : '';
-      const idLower = id ? id.toLowerCase() : '';
+      const idLower = id.value() ? id.value().toLowerCase() : '';
 
       return text === '' ||
         titleLower.indexOf(text) > -1 ||
@@ -156,10 +156,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
         return new models.PoolModel({
           type,
-          id: guid(),
+          id: ResourceId.of(guid()),
           pool: new contentTypes.Pool({
             questions,
-            id: guid(),
+            id: ResourceId.of(guid()),
             title: contentTypes.Title.fromText(title),
           }),
         });

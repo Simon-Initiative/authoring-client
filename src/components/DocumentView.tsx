@@ -5,7 +5,7 @@ import { Toast, Severity } from 'components/common/Toast';
 import './DocumentView.scss';
 import { CourseModel } from 'data/models';
 import { ResourceState } from 'data/content/resource';
-import { DocumentId } from 'data/types';
+import { DocumentId, ResourceId } from 'data/types';
 
 export interface DocumentViewProps {
   onLoad: (documentId: DocumentId) => void;
@@ -15,7 +15,7 @@ export interface DocumentViewProps {
   userId: string;
   userName: string;
   course: CourseModel;
-  orgId: string;
+  orgId: ResourceId;
 }
 
 function isDeletedResource(documentId: DocumentId, course: CourseModel): boolean {

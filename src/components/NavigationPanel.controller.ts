@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { NavigationPanel } from 'components/NavigationPanel';
 import * as viewActions from 'actions/view';
 import { State } from 'reducers';
@@ -17,7 +16,7 @@ interface StateProps {
 interface DispatchProps {
   onLoadOrg: (courseId: CourseIdVers, documentId: DocumentId) => Promise<Document>;
   onReleaseOrg: () => void;
-  onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
+  onPreview: (courseId: CourseIdVers, organizationId: ResourceId, redeploy: boolean) =>
     Promise<any>;
 }
 
@@ -49,7 +48,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onLoadOrg: (courseId: CourseIdVers, resourceId: ResourceId) =>
       dispatch(loadOrg(courseId, resourceId)),
     onReleaseOrg: () => dispatch(releaseOrg() as any),
-    onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
+    onPreview: (courseId: CourseIdVers, organizationId: ResourceId, redeploy: boolean) =>
       dispatch(preview(courseId, organizationId, false, redeploy)),
   };
 };

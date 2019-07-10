@@ -38,7 +38,7 @@ import * as viewActions from 'actions/view';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 import { FourZeroFour } from 'components/404';
 import { OrganizationModel } from 'data/models/org';
-import { LegacyTypes, CourseIdVers, CourseGuid, DocumentId } from 'data/types';
+import { LegacyTypes, CourseIdVers, CourseGuid, DocumentId, ResourceId, ResourceGuid } from 'data/types';
 
 interface MainProps {
   user: UserState;
@@ -162,7 +162,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                       email={this.props.user.profile.email}
                       shouldRefresh={router.params.get('refresh') === 'true'}
                       previewUrl={Maybe.maybe(router.params.get('url'))}
-                      documentId={route.orgId.valueOr('')}
+                      documentId={route.orgId.valueOr(ResourceId.of(''))}
                       courseIdVers={route.courseId} />;
                   case 'RouteAllResources':
                   case 'RouteCourseOverview':
@@ -194,7 +194,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                                   return <ResourceView
                                     serverTimeSkewInMs={server.timeSkewInMs}
                                     course={loadedCourse}
-                                    currentOrg={route.orgId.valueOr('')}
+                                    currentOrg={route.orgId.valueOr(ResourceId.of(''))}
                                     dispatch={onDispatch}
                                   />;
                                 case 'RouteOrganizations':
@@ -209,19 +209,20 @@ export default class Main extends React.Component<MainProps, MainState> {
                                   const routeResource = route.route;
                                   // Org editor
                                   // orgId should be present by this point
-                                  if (routeResource.resourceId === route.orgId.valueOr('')) {
+                                  if (routeResource.resourceId.eq(
+                                    route.orgId.valueOr(ResourceId.of('')))) {
                                     return <OrgDetailsEditor course={loadedCourse} />;
                                   }
 
                                   // If we stored a resource GUID in the route instead of an ID,
                                   // use the Id instead
                                   let resourceId = routeResource.resourceId;
-                                  if (loadedCourse.resources.get(resourceId)) {
-                                    resourceId = loadedCourse.resources.get(resourceId).id;
+                                  if (loadedCourse.resources.get(resourceId.value())) {
+                                    resourceId = loadedCourse.resources.get(resourceId.value()).id;
                                   }
 
                                   return Maybe.maybe(loadedCourse.resourcesById
-                                    .get(routeResource.resourceId))
+                                    .get(routeResource.resourceId.value()))
                                     .caseOf({
                                       just: resource =>
                                         // Regular resource
@@ -230,7 +231,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                                             onLoad(loadedCourse.idvers, docId)}
                                           onRelease={(docId: DocumentId) => onRelease(docId)}
                                           profile={user.profile}
-                                          orgId={route.orgId.valueOr('')}
+                                          orgId={route.orgId.valueOr(ResourceId.of(''))}
                                           course={loadedCourse}
                                           userId={user.userId}
                                           userName={user.user}
@@ -239,7 +240,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                                         // Org component
                                         <OrgComponentEditor
                                           course={loadedCourse}
-                                          componentId={resourceId}
+                                          componentId={resourceId.value()}
                                           editMode={loadedCourse.editable}
                                         />,
                                     });
@@ -292,10 +293,12 @@ const createOrg = (courseGuid: CourseGuid, title, courseTitle: string, wbId: str
 
   return new models.OrganizationModel().with({
     type: LegacyTypes.organization,
-    id,
+    id: ResourceId.of(id),
     title,
     resource: new contentTypes.Resource().with({
-      title, id, guid: id,
+      title,
+      id: ResourceId.of(id),
+      guid: ResourceGuid.of(id),
     }),
     sequences,
     version: '1.0',
