@@ -81,7 +81,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
       nothing: null,
     }),
     selectedOrganization: orgs.activeOrg.lift(doc =>
-      (doc.model as OrganizationModel))
+      (doc.model as OrganizationModel)),
   };
 };
 
