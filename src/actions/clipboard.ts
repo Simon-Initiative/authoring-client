@@ -9,7 +9,9 @@ import { State } from 'reducers';
 import { Dispatch } from 'redux';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-import { filter } from 'data/utils/map';
+import { filter, map } from 'data/utils/map';
+import { PasteFailModalElement } from 'components/PasteFailModalElement';
+import * as React from 'react';
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
 
@@ -37,7 +39,7 @@ export function cut(item: ContentElement, page: string) {
       dispatch(copy(item, page) as any);
       activeContext.container.lift(parent => parent.onRemove(item));
     } else {
-      displayModalMessasge(
+      displayModalMessasge( // FIXME: actions should not have side effects. Should call "setState".
         dispatch,
         'Cutting this element would leave one or more command elements untargetted.');
     }
@@ -87,6 +89,7 @@ export function paste() {
         elementToPaste = factoryFn(savedData, guid());
       }
 
+      // Not all Element types can be copy/pasted
       const isSupported = activeContext.container.caseOf({
         just: parent => parent.supportedElements.contains(elementType),
         nothing: () => false,
@@ -97,6 +100,32 @@ export function paste() {
         // a duplicate inline - which breaks validation
         const filtered = filter(
           e => e.contentType !== 'WbInline' && e.contentType !== 'Multipanel', elementToPaste);
+
+        const removed = [];
+
+        map(
+          (e) => {
+            // Track which Content Types have been removed from the tree
+            if (e.contentType === 'WbInline' || e.contentType === 'Multipanel') {
+              if (!removed.includes(e.contentType)) {
+                removed.push(e.contentType);
+              }
+            }
+            return e;
+          },
+          elementToPaste);
+
+        if (removed.length > 0) {
+          const message = 'WARNING: the following content types can not be copied and pasted. '
+                      + 'Please adjust your course accordingly.';
+
+          // FIXME: actions should not have side effects. Should call "setState".
+          displayModalMessasge(
+            dispatch,
+            React.createElement(PasteFailModalElement, { message, removed }),
+          );
+        }
+
         parent.onPaste(filtered, textSelection);
       }
     }
