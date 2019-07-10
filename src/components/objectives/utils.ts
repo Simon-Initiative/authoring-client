@@ -1,20 +1,21 @@
 import { Map } from 'immutable';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import { QuestionRef } from 'types/questionRef';
 
 export const addPluralS = (string: string, itemCount: number) =>
-itemCount === 1 ? string : `${string}s`;
+  itemCount === 1 ? string : `${string}s`;
 
-const numPoolQuestionsWithSkill = (skillQuestionRefs: QuestionRef[], poolAssessmentId: string) =>
-  skillQuestionRefs.filter(r =>
-    r.assessmentType === LegacyTypes.assessment2_pool
-    && r.assessmentId === poolAssessmentId,
-  ).length;
+const numPoolQuestionsWithSkill =
+  (skillQuestionRefs: QuestionRef[], poolAssessmentId: ResourceId) =>
+    skillQuestionRefs.filter(r =>
+      r.assessmentType === LegacyTypes.assessment2_pool
+      && r.assessmentId.eq(poolAssessmentId),
+    ).length;
 
 const numPoolQuestionsWithoutSkill = (
   skillQuestionRefs: QuestionRef[],
   questionCount: number,
-  poolAssessmentId: string,
+  poolAssessmentId: ResourceId,
 ) => questionCount - numPoolQuestionsWithSkill(skillQuestionRefs, poolAssessmentId);
 
 // Guaranteed pool question count = SUM g(x) for all x e {...pools} where
@@ -26,13 +27,13 @@ const guaranteedPoolQuestionCountMap = (skillQuestionRefs: QuestionRef[]): Map<s
     // reduce a map of guaranteed pool question counts, memoize results to improve performance
     .reduce(
       (acc, poolRef) => poolRef.poolInfo.caseOf({
-        just: poolInfo => acc.has(poolRef.assessmentId)
+        just: poolInfo => acc.has(poolRef.assessmentId.value())
           // if we already calculated the guaranteed number for this pool,
           // just return the map. A repeat calculation will result in the same value
           ? acc
           // if we havent, perform the calculation and store in the map
           : acc.set(
-            poolRef.assessmentId,
+            poolRef.assessmentId.value(),
             poolInfo.count === '*'
               ? numPoolQuestionsWithSkill(skillQuestionRefs, poolRef.assessmentId)
               : Math.min(

@@ -3,6 +3,7 @@ import { Maybe } from 'tsmonad';
 import { augment, getChildren } from 'data/content/common';
 import { getKey } from 'data/common';
 import { KnowledgeCategory, LearningProcess } from 'data/content/objectives/types';
+import { ResourceId } from 'data/types';
 
 export function extractFullText(obj: Object[]): string {
   const str = '';
@@ -33,38 +34,38 @@ function extractFullTextHelper(obj: Object[], str: string): string {
 }
 
 export type LearningObjectiveParams = {
-  id?: string,
+  id?: ResourceId,
   guid?: string,
   title?: string,
   rawContent?: Maybe<Object[]>,
   category?: Maybe<KnowledgeCategory>,
   process?: Maybe<LearningProcess>,
-  skills?: Immutable.List<string>,
+  skills?: Immutable.List<ResourceId>,
 };
 
 const defaultContent = {
   contentType: 'LearningObjective',
   elementType: 'objective',
-  id: '',
+  id: ResourceId.of(''),
   guid: '',
   title: '',
   rawContent: Maybe.nothing<Object[]>(),
   category: Maybe.nothing<KnowledgeCategory>(),
   process: Maybe.nothing<LearningProcess>(),
-  skills: Immutable.List<string>(),
+  skills: Immutable.List<ResourceId>(),
 };
 
 export class LearningObjective extends Immutable.Record(defaultContent) {
 
   contentType: 'LearningObjective';
   elementType: 'objective';
-  id: string;
+  id: ResourceId;
   guid: string;
   title: string;
   rawContent: Maybe<Object[]>;
   category: Maybe<KnowledgeCategory>;
   process: Maybe<LearningProcess>;
-  skills: Immutable.List<string>;
+  skills: Immutable.List<ResourceId>;
 
   constructor(params?: LearningObjectiveParams) {
     super(augment(params));
@@ -80,7 +81,7 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
     const lo = { guid } as any;
 
     if (o['@id'] !== undefined) {
-      lo.id = o['@id'];
+      lo.id = ResourceId.of(o['@id']);
     }
     if (o['@process'] !== undefined) {
       lo.process = Maybe.just<LearningProcess>(o['@process']);
@@ -118,7 +119,7 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
 
     const o = {
       objective: {
-        '@id': this.id,
+        '@id': this.id.value(),
         '#array': this.rawContent.caseOf({
           just: raw => raw,
           nothing: () => [{ '#text': this.title }],

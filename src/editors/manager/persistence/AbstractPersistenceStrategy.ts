@@ -66,15 +66,11 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
         typeof doc._courseId === 'string'
           ? CourseGuid.of(doc._courseId)
           : doc._courseId,
-        typeof doc._id === 'string'
-          ? doc._id
-          : '')
+        doc._id)
         .then((result) => {
           if ((result as any).lockedBy === userName) {
             this.lockDetails = (result as any);
-            this.writeLockedDocumentId = typeof doc._id === 'string'
-              ? doc._id
-              : '';
+            this.writeLockedDocumentId = doc._id;
             this.courseId = typeof doc._courseId === 'string'
               ? doc._courseId
               : '';

@@ -50,7 +50,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   return {
     activeContext,
-    skills,
+    skills: skills.map(skill => ({ id: skill.id, title: skill.title })).toOrderedMap(),
     hover,
     course,
     currentNode: activeContext.documentId.caseOf({

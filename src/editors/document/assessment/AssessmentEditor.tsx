@@ -437,14 +437,13 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
       return;
     }
 
-    this.props.services.fetchIdByGuid(resource.guid)
-      .then((idref) => {
-        const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
-        this.addNode(pool);
-        this.setState({
-          collapseInsertPopup: true,
-        });
-      });
+    const pool = new contentTypes.Selection({
+      source: new contentTypes.PoolRef({ idref: resource.id }),
+    });
+    this.addNode(pool);
+    this.setState({
+      collapseInsertPopup: true,
+    });
   }
 
   renderSettings() {

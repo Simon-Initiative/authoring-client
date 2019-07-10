@@ -98,7 +98,7 @@ export class Section extends Immutable.Record(defaultContent) {
           break;
         case 'item':
           const candidateItem = Item.fromPersistence(item, id);
-          if (candidateItem.resourceref.idref !== PLACEHOLDER_ITEM_ID) {
+          if (candidateItem.resourceref.idref.value() !== PLACEHOLDER_ITEM_ID) {
             children.push([id, candidateItem]);
           }
           break;

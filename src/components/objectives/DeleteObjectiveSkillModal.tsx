@@ -28,12 +28,6 @@ export default class DeleteObjectiveSkillModal extends
     super(props);
   }
 
-  // Edge sourceId looks like 'javascript-evz4jsnu:1.0:welcome',
-  // in the form '{courseId}:{version}:{resourceId}'.
-  edgeResourceId(edge: Edge): ResourceId {
-    return edge.sourceId.slice(edge.sourceId.lastIndexOf(':') + 1);
-  }
-
   edgeResource(resourceId: ResourceId): Resource {
     return this.props.course.resourcesById.get(resourceId.value());
   }
@@ -76,8 +70,8 @@ export default class DeleteObjectiveSkillModal extends
 
     const safeCompare =
       (key: string, direction: SortDirection, a: Edge, b: Edge): number => {
-        const aValue = key === 'title' ? this.edgeResourceTitle(this.edgeResourceId(a)) : a[key];
-        const bValue = key === 'title' ? this.edgeResourceTitle(this.edgeResourceId(b)) : b[key];
+        const aValue = key === 'title' ? this.edgeResourceTitle(a.sourceId) : a[key];
+        const bValue = key === 'title' ? this.edgeResourceTitle(b.sourceId) : b[key];
 
         if (aValue === null && bValue === null) {
           return 0;
@@ -106,7 +100,7 @@ export default class DeleteObjectiveSkillModal extends
       <a onClick={(e) => {
         e.preventDefault();
         this.props.services.dismissModal();
-        viewActions.viewDocument(this.edgeResourceId(edge), course.idvers, Maybe.nothing());
+        viewActions.viewDocument(edge.sourceId, course.idvers, Maybe.nothing());
       }}
         href="#"
         className="btn btn-link">
@@ -114,7 +108,7 @@ export default class DeleteObjectiveSkillModal extends
       </a>;
 
     const columnRenderers = [
-      (edge: Edge) => link(edge)(this.edgeResourceTitle(this.edgeResourceId(edge))),
+      (edge: Edge) => link(edge)(this.edgeResourceTitle(edge.sourceId)),
       (edge: Edge) => <span>{this.edgeType(edge.sourceType)}</span>,
     ];
 

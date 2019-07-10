@@ -48,7 +48,7 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
       node.contentType === 'Module') {
 
       const predicate = (res: Resource): boolean =>
-        res.id !== PLACEHOLDER_ITEM_ID
+        res.id.value() !== PLACEHOLDER_ITEM_ID
         && res.type === LegacyTypes.workbook_page
         && res.resourceState !== ResourceState.DELETED;
 

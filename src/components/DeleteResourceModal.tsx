@@ -51,7 +51,7 @@ export default class DeleteResourceModal extends
           edges: OrderedMap<string, Edge>(
             edges
               // filter out deleted resources
-              .filter(edge => this.edgeResource(this.edgeResourceId(edge)).resourceState
+              .filter(edge => this.edgeResource(edge.sourceId).resourceState
                 !== ResourceState.DELETED)
               .map(e => [e.guid, e]),
           ),
@@ -61,17 +61,11 @@ export default class DeleteResourceModal extends
       .catch(err => this.setState({ edgeLoadFailure: true }));
   }
 
-  // Edge sourceId looks like 'javascript-evz4jsnu:1.0:welcome',
-  // in the form '{courseId}:{version}:{resourceId}'.
-  edgeResourceId(edge: Edge): string {
-    return edge.sourceId.slice(edge.sourceId.lastIndexOf(':') + 1);
+  edgeResource(resourceId: ResourceId): Resource {
+    return this.props.course.resourcesById.get(resourceId.value());
   }
 
-  edgeResource(resourceId: string): Resource {
-    return this.props.course.resourcesById.get(resourceId);
-  }
-
-  edgeResourceTitle(id: string): string {
+  edgeResourceTitle(id: ResourceId): string {
     return this.edgeResource(id).title;
   }
 
@@ -114,8 +108,8 @@ export default class DeleteResourceModal extends
 
     const safeCompare =
       (key: string, direction: SortDirection, a: Edge, b: Edge): number => {
-        const aValue = key === 'title' ? this.edgeResourceTitle(this.edgeResourceId(a)) : a[key];
-        const bValue = key === 'title' ? this.edgeResourceTitle(this.edgeResourceId(b)) : b[key];
+        const aValue = key === 'title' ? this.edgeResourceTitle(a.sourceId) : a[key];
+        const bValue = key === 'title' ? this.edgeResourceTitle(b.sourceId) : b[key];
 
         if (aValue === null && bValue === null) {
           return 0;
@@ -140,7 +134,7 @@ export default class DeleteResourceModal extends
     ];
 
     const link = (edge: Edge) => {
-      const edgeResource = this.edgeResource(this.edgeResourceId(edge));
+      const edgeResource = this.edgeResource(edge.sourceId);
 
       // All routes must have an organization as context. If the link is to an organization,
       // use the target as the organization in the route. Otherwise, just use the current
@@ -162,7 +156,7 @@ export default class DeleteResourceModal extends
     };
 
     const columnRenderers = [
-      (edge: Edge) => link(edge)(this.edgeResourceTitle(this.edgeResourceId(edge))),
+      (edge: Edge) => link(edge)(this.edgeResourceTitle(edge.sourceId)),
       (edge: Edge) => <span>{this.prettyPrintResourceType(edge.sourceType)}</span>,
     ];
 

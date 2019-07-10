@@ -1,6 +1,6 @@
 import { List } from 'immutable';
 import { Maybe } from 'tsmonad';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import { PathElement } from 'types/edge';
 import { Part } from 'data/contentTypes';
 import guid from 'utils/guid';
@@ -30,7 +30,7 @@ export interface QuestionRef {
   title: Maybe<string>;
   type: string;
   assessmentType: LegacyTypes;
-  assessmentId: string;
+  assessmentId: ResourceId;
   poolInfo: Maybe<PoolInfo>;
   parts: () => List<Part>;
   body: () => ContentElements;
@@ -64,12 +64,12 @@ const getBody = (pathItem: SkillPathElement) => pathItem['body'] && ContentEleme
 
 export const getQuestionRefFromPathInfo = (
   pathItem: SkillPathElement, assessmentType: LegacyTypes,
-  assessmentId: string): Maybe<QuestionRef> => {
+  assessmentId: ResourceId): Maybe<QuestionRef> => {
   // base case: if this pathItem is a question, return the QuestionRef
   switch (pathItem.name) {
     case 'essay':
       return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
+        key: `${assessmentId.value()}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
@@ -83,7 +83,7 @@ export const getQuestionRefFromPathInfo = (
       });
     case 'short_answer':
       return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
+        key: `${assessmentId.value()}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
@@ -97,7 +97,7 @@ export const getQuestionRefFromPathInfo = (
       });
     case 'fill_in_the_blank':
       return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
+        key: `${assessmentId.value()}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
@@ -111,7 +111,7 @@ export const getQuestionRefFromPathInfo = (
       });
     case 'image_hotspot':
       return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
+        key: `${assessmentId.value()}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
@@ -125,7 +125,7 @@ export const getQuestionRefFromPathInfo = (
       });
     case 'multiple_choice':
       return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
+        key: `${assessmentId.value()}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
@@ -139,7 +139,7 @@ export const getQuestionRefFromPathInfo = (
       });
     case 'numeric':
       return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
+        key: `${assessmentId.value()}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
@@ -153,7 +153,7 @@ export const getQuestionRefFromPathInfo = (
       });
     case 'ordering':
       return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
+        key: `${assessmentId.value()}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),
@@ -167,7 +167,7 @@ export const getQuestionRefFromPathInfo = (
       });
     case 'question':
       return Maybe.just({
-        key: `${assessmentId}:${pathItem['@id']}`,
+        key: `${assessmentId.value()}:${pathItem['@id']}`,
         id: pathItem['@id'],
         title: pathItem.title
           ? Maybe.just(pathItem.title) : Maybe.nothing<string>(),

@@ -101,11 +101,11 @@ export const fetchMediaReferences = (courseId: CourseIdVers) => (
       .then((edges) => {
         const webcontentPathToSourceMap = edges.reduce(
           (acc, edge) => {
-            const edgePathTo = edge.destinationId.replace(/^.*content\//, 'webcontent/');
+            const edgePathTo = edge.destinationId.value().replace(/^.*content\//, 'webcontent/');
             return acc.set(
               edgePathTo,
               (acc.get(edgePathTo) || List<MediaRef>()).concat({
-                resourceId: edge.sourceId.replace(/^.*:/, ''),
+                resourceId: edge.sourceId.value(),
                 guid: edge.metadata.jsonObject.sourceGuid,
               }) as List<MediaRef>,
             );

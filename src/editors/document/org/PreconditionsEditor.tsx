@@ -82,7 +82,7 @@ export class PreconditionsEditor
     const options = this.props.placements.toArray().map((p) => {
       let title;
       if (p.node.contentType === 'Item') {
-        title = this.props.course.resourcesById.get(p.node.resourceref.idref).title;
+        title = this.props.course.resourcesById.get(p.node.resourceref.idref.value()).title;
       } else if (p.node.contentType === 'Include') {
         title = 'Include';
       } else {

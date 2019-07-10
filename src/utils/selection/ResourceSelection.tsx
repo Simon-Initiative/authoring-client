@@ -120,7 +120,7 @@ export default class ResourceSelection
 
     const rowRenderer = (item: DataRow, index: number, children: any) => {
       const resource = item.data as Resource;
-      const active = resource.id === (this.state.selected && this.state.selected.id)
+      const active = resource.id.eq(this.state.selected && this.state.selected.id)
         ? 'table-active'
         : '';
 
@@ -134,7 +134,7 @@ export default class ResourceSelection
       );
     };
 
-    const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
+    const rows = this.state.resources.map(r => ({ key: r.guid.value(), data: r }));
 
     return (
       <div className="resourceSelection">

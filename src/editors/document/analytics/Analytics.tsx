@@ -5,10 +5,9 @@ import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from 'data/persistence';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import * as models from 'data/models';
 import { flattenChildren } from 'data/models/utils/org';
-import { resourceId } from 'types/edge';
 import {
   QuestionRef, getQuestionRefFromPathInfo, getReadableTitleFromType,
 } from 'types/questionRef';
@@ -51,13 +50,13 @@ export type OrgItem = contentTypes.Sequence
   | contentTypes.Section;
 
 type SkillRef = {
-  id: string,
+  id: ResourceId,
   title: string,
   questions: List<QuestionRef>,
 };
 
 type ObjectiveRef = {
-  id: string,
+  id: ResourceId,
   title: string,
   rawContent: Maybe<Object[]>,
   skills: List<SkillRef>,
@@ -244,7 +243,7 @@ class Analytics
           || e.destinationType === LegacyTypes.assessment2_pool
           || e.destinationType === LegacyTypes.workbook_page,
         )
-        .map(e => resourceId(e.destinationId)));
+        .map(e => e.destinationId.value()));
 
     const skillEdges = await persistence.fetchEdgesByIds(
       course.guid, { destinationType: LegacyTypes.skill }, { sourceIds: allIds });
@@ -254,11 +253,11 @@ class Analytics
       (acc, edge) => getQuestionRefFromPathInfo(
         edge.metadata.jsonObject.pathInfo,
         edge.sourceType,
-        resourceId(edge.sourceId),
+        edge.sourceId,
       ).caseOf({
         just: ref => acc.set(
-          resourceId(edge.destinationId),
-          (acc.get(resourceId(edge.destinationId)) || OrderedMap<string, QuestionRef>())
+          edge.destinationId.value(),
+          (acc.get(edge.destinationId.value()) || OrderedMap<string, QuestionRef>())
             .set(ref.key, ref),
         ),
         nothing: () => acc,
@@ -271,19 +270,19 @@ class Analytics
       course.guid, { destinationType: LegacyTypes.learning_objective }, { sourceIds: allIds });
 
     const objectiveRefs: List<ObjectiveRef> =
-      dedupeArray(objectiveEdges, e => resourceId(e.destinationId)).reduce(
-        (acc, objEdge) => Maybe.maybe(objectives.get(resourceId(objEdge.destinationId)))
+      dedupeArray(objectiveEdges, e => e.destinationId.value()).reduce(
+        (acc, objEdge) => Maybe.maybe(objectives.get(objEdge.destinationId.value()))
           .caseOf({
-            just: objective => acc.push({
+            just: (objective: contentTypes.LearningObjective) => acc.push({
               id: objective.id,
               title: objective.title,
               rawContent: objective.rawContent,
               skills: objective.skills.reduce(
-                (acc, skillId) => Maybe.maybe(skillQuestionRefMap.get(skillId))
+                (acc, skillId) => Maybe.maybe(skillQuestionRefMap.get(skillId.value()))
                   .caseOf({
                     just: questionRefs => acc.push({
                       id: skillId,
-                      title: Maybe.maybe(skills.get(skillId))
+                      title: Maybe.maybe(skills.get(skillId.value()))
                         .caseOf({
                           just: skill => skill.title,
                           nothing: () => '[skill not found]',
@@ -308,20 +307,20 @@ class Analytics
     });
   }
 
-  onEnterObjective = (id: string) => {
+  onEnterObjective = (id: ResourceId) => {
     const { hoveredObjectives } = this.state;
-    this.setState({ hoveredObjectives: hoveredObjectives.set(id, true) });
+    this.setState({ hoveredObjectives: hoveredObjectives.set(id.value(), true) });
   }
 
-  onLeaveObjective = (id: string) => {
+  onLeaveObjective = (id: ResourceId) => {
     const { hoveredObjectives } = this.state;
-    this.setState({ hoveredObjectives: hoveredObjectives.set(id, false) });
+    this.setState({ hoveredObjectives: hoveredObjectives.set(id.value(), false) });
   }
 
-  onToggleObjectiveDetails = (id: string) => {
+  onToggleObjectiveDetails = (id: ResourceId) => {
     const { expandedObjectives } = this.state;
     this.setState({
-      expandedObjectives: expandedObjectives.set(id, !expandedObjectives.get(id)),
+      expandedObjectives: expandedObjectives.set(id.value(), !expandedObjectives.get(id.value())),
     });
   }
 
@@ -348,7 +347,7 @@ class Analytics
         skills: part.skills,
       }))
       // only include parts that pertain to this skill
-      .filter(part => part.skills.contains(skill.id));
+      .filter(part => part.skills.contains(skill.id.value()));
 
     return parts.map(part => (
       <div key={part.guid} className={classes.partTitle}>
@@ -421,7 +420,7 @@ class Analytics
     return (
       <div className={classes.objectiveDetails}>
         {objectiveRef.skills.map(skill => (
-          <div key={skill.id} className={classes.skill}>
+          <div key={skill.id.value()} className={classes.skill}>
             <i className="fa fa-cube" /> <b>Skill:</b> {skill.title}
             <div className={classes.skillQuestions}>
               {skill.questions.map(question => this.renderQuestion(question, skill, organization))}
@@ -445,11 +444,11 @@ class Analytics
     const displayedTitle = objectiveRef
       .rawContent.caseOf({ just: c => extractFullText(c), nothing: () => objectiveRef.title });
 
-    const isExpanded = expandedObjectives.get(objectiveRef.id);
+    const isExpanded = expandedObjectives.get(objectiveRef.id.value());
 
     return (
       <div
-        key={objectiveRef.id}
+        key={objectiveRef.id.value()}
         className={classes.objectiveRef}
         onMouseEnter={() => this.onEnterObjective(objectiveRef.id)}
         onMouseLeave={() => this.onLeaveObjective(objectiveRef.id)}>

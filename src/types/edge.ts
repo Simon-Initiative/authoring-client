@@ -1,38 +1,40 @@
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceGuid, CourseIdVers, ResourceId } from 'data/types';
 
 export type PathElement = {
   name: string;
   parent: PathElement;
 };
 
+export type EdgeRelationship = 'UTILIZES' | 'LINKS' | 'INLINES' | 'CONTAINS' | 'SUPPORTS'
+  | 'REFERENCES';
+export type EdgeStatus = 'NOT_VALIDATED' | 'DESTINATION_PRESENT' | 'DESTINATION_MISSING';
+export type EdgeReferenceType = 'unknown' | 'inline' | 'image' | 'resourceref' | 'video' |
+  'activity_link' | 'objref' | 'activity' | 'image_hotspot' | 'flash' | 'custom' | 'param' |
+  'xref' | 'alternate' | 'skillref' | 'iframe' | 'concept' | 'objective' | 'audio' | 'asset' |
+  'source' | 'pool_ref' | 'image_input' | 'interface' | 'dataset' | 'pronunciation' | 'unity' |
+  'track' | 'conjugate' | 'director' | 'mathematica';
+
 export type Edge = {
   rev: number;
   guid: string;
-  relationship: string;
-  sourceGuid: string;
-  sourceId: string;
+  relationship: EdgeRelationship;
+
+  sourceCourseIdVers: CourseIdVers;
+  sourceGuid: ResourceGuid;
+  sourceId: ResourceId;
   sourceType: LegacyTypes;
-  destinationGuid: string;
-  destinationId: string;
+
+  destinationCourseIdVers: CourseIdVers;
+  destinationGuid: ResourceGuid;
+  destinationId: ResourceId;
   destinationType: LegacyTypes;
-  referenceType: string;
-  status: string;
+
+  referenceType: EdgeReferenceType;
+  status: EdgeStatus;
   metadata: {
     jsonObject: {
       pathInfo: PathElement;
       sourceGuid: string;
     };
   };
-};
-
-
-/**
- * Edge sourceIds and destinationIds are guaranteed to have 3 parts e.g.
- * package:version:resourceid. This returns the last part, which is
- * the actual resource id
- * @param fullId sourceId or destinationId
- */
-export const resourceId = (fullId: string) => {
-  const index = fullId.lastIndexOf(':');
-  return fullId.substr(index + 1);
 };

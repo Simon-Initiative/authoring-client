@@ -1,8 +1,9 @@
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
-import { Edge } from 'types/edge';
-import { CourseIdVers, CourseGuid } from 'data/types';
+import { Edge, EdgeRelationship, EdgeReferenceType, EdgeStatus } from 'types/edge';
+import { CourseIdVers, CourseGuid, ResourceGuid, ResourceId, LegacyTypes } from 'data/types';
+import { Maybe } from 'tsmonad';
 
 /**
  * Fetches all references for the course or resource, returns a Promise to resolve to
@@ -51,7 +52,8 @@ export function fetchEdges(
     status ? { relationship } : {},
   );
 
-  return authenticatedFetch({ method, url, headers, query }).then(res => (res as Edge[]));
+  return authenticatedFetch({ method, url, headers, query })
+    .then((res: any[]) => res.map(parseEdge));
 }
 
 /**
@@ -97,5 +99,49 @@ export function fetchEdgesByIds(
 
   return authenticatedFetch({
     method, url, headers, query, body: JSON.stringify(body),
-  }).then(res => (res as Edge[]));
+  }).then((res: any[]) => res.map(parseEdge));
+}
+
+export function parseEdge(o: any): Edge {
+  const [sourceCourseIdVers, sourceId] = parseIds(o.sourceId);
+  const [destinationCourseIdVers, destinationId] = parseIds(o.destinationId);
+
+  return {
+    rev: o.rev,
+    guid: o.guid,
+    relationship: o.relationship as EdgeRelationship,
+
+    sourceGuid: ResourceGuid.of(o.sourceGuid),
+    sourceCourseIdVers,
+    sourceId,
+    sourceType: o.sourceType as LegacyTypes,
+
+    destinationGuid: ResourceGuid.of(o.destinationGuid),
+    destinationCourseIdVers,
+    destinationId,
+    destinationType: o.destinationType as LegacyTypes,
+
+    referenceType: o.referenceType as EdgeReferenceType,
+    status: o.status as EdgeStatus,
+    metadata: o.metadata,
+  };
+
+  function parseIds(input: string): [CourseIdVers, ResourceId] {
+    return splitIds(':', input).valueOr(
+      splitIds('_', input).valueOr([
+        CourseIdVers.of('', ''),
+        ResourceId.of(''),
+      ]));
+  }
+
+  function splitIds(delimiter: string, input: string): Maybe<[CourseIdVers, ResourceId]> {
+    const parts = input.split(delimiter);
+    if (parts.length === 3) {
+      return Maybe.just([
+        CourseIdVers.of(parts[0], parts[1]),
+        ResourceId.of(parts[2]),
+      ]);
+    }
+    return Maybe.nothing<[CourseIdVers, ResourceId]>();
+  }
 }

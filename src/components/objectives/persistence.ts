@@ -6,7 +6,7 @@ import { Resource } from '../../data/content/resource';
 import guid from '../../utils/guid';
 import { LegacyTypes } from '../../data/types';
 import { LockDetails } from '../../utils/lock';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, ResourceId, ResourceGuid } from 'data/types';
 
 const NEW_BUCKET_TITLE = 'Created In Editor';
 
@@ -27,20 +27,20 @@ function retrieveSkills(courseId: CourseIdVers): Promise<persistence.Document[]>
 function createObjectivesModel(): models.LearningObjectivesModel {
   const id = guid();
   return new models.LearningObjectivesModel().with({
-    id,
-    guid: id,
+    id: ResourceId.of(id),
+    guid: ResourceGuid.of(id),
     title: NEW_BUCKET_TITLE,
-    resource: new Resource().with({ title: NEW_BUCKET_TITLE, id }),
+    resource: new Resource().with({ title: NEW_BUCKET_TITLE, id: ResourceId.of(id) }),
   });
 }
 
 function createSkillsModel(): models.SkillsModel {
   const id = guid();
   return new models.SkillsModel().with({
-    id,
-    guid: id,
+    id: ResourceId.of(id),
+    guid: ResourceGuid.of(id),
     title: NEW_BUCKET_TITLE,
-    resource: new Resource().with({ title: NEW_BUCKET_TITLE, id }),
+    resource: new Resource().with({ title: NEW_BUCKET_TITLE, id: ResourceId.of(id) }),
   });
 }
 
@@ -129,14 +129,13 @@ export function buildAggregateModel(courseId: CourseIdVers, userName: string):
             // Lock just the new bucket objective document first.  If that succeeds, we
             // can assume that we can safely lock all others.
             const id = results[0].doc._id;
-            return persistence.acquireLock(courseId, typeof id === 'string' ? id : '');
+            return persistence.acquireLock(courseId, id);
           })
           .then((lockResult: LockDetails) => {
 
             if ((lockResult as any).lockedBy === userName) {
               return Promise.all([...objectives, ...skills]
-                .map(d =>
-                  persistence.acquireLock(courseId, typeof d._id === 'string' ? d._id : '')));
+                .map(d => persistence.acquireLock(courseId, d._id)));
             }
 
             resolve({
@@ -170,7 +169,7 @@ function objectivesToKV(doc: persistence.Document, itemFn): any {
     .toArray()
     .reduce(
       (o, obj) => {
-        o[obj.id] = itemFn(doc, obj);
+        o[obj.id.value()] = itemFn(doc, obj);
         return o;
       },
       {});
@@ -182,7 +181,7 @@ function skillsToKV(doc: persistence.Document, itemFn): any {
     .toArray()
     .reduce(
       (o, obj) => {
-        o[obj.id] = itemFn(doc, obj);
+        o[obj.id.value()] = itemFn(doc, obj);
         return o;
       },
       {});

@@ -4,6 +4,7 @@ import { credentials, getFormHeaders } from '../../actions/utils/credentials';
 import { PaginatedResponse, CourseIdVers, CourseGuid, ResourceId } from 'data/types';
 import { Edge } from 'types/edge';
 import { WebContent } from 'data/content/webcontent';
+import { parseEdge } from 'data/persistence/edge';
 
 /**
  * Uploads a file, receives a promise to deliver path on server
@@ -70,9 +71,9 @@ export function fetchWebContentReferences(
   queryParams: {
     relationship?: string,
     purpose?: string,
-    sourceId?: string,
+    sourceId?: ResourceId,
     sourceType?: string,
-    destinationId?: string,
+    destinationId?: ResourceId,
     destinationType?: string,
     referenceType?: string,
     status?: string,
@@ -100,13 +101,14 @@ export function fetchWebContentReferences(
     {},
     relationship ? { relationship } : {},
     purpose ? { purpose } : {},
-    sourceId ? { sourceId } : {},
+    sourceId ? { sourceId: sourceId.value() } : {},
     sourceType ? { sourceType } : {},
-    destinationId ? { destinationId } : {},
+    destinationId ? { destinationId: destinationId.value() } : {},
     destinationType ? { destinationType } : {},
     referenceType ? { referenceType } : {},
     status ? { relationship } : {},
   );
 
-  return authenticatedFetch({ method, url, headers, query }).then(res => (res as Edge[]));
+  return authenticatedFetch({ method, url, headers, query })
+    .then((res: any[]) => res.map(parseEdge));
 }

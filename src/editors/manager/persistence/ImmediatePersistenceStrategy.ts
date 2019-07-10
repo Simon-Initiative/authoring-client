@@ -59,9 +59,7 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
               typeof initialDoc._courseId === 'string'
                 ? CourseGuid.of(initialDoc._courseId)
                 : initialDoc._courseId,
-              typeof initialDoc._id === 'string'
-                ? initialDoc._id
-                : '')
+                initialDoc._id)
               .then((doc) => {
                 const updated = toSave.with({ _rev: doc._rev });
                 this.saveDocument(updated, (remainingRetries - 1),

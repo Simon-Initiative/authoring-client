@@ -530,7 +530,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                           }}
                           target="_blank">
                           {stringFormat.ellipsize(
-                            courseModel.resourcesById.get(ref.resourceId).title, 20, 5)}
+                            courseModel.resourcesById.get(ref.resourceId.value()).title, 20, 5)}
                         </a>
                         {i < mediaItemRefs.get(selectedItem.guid).size - 1 ? ', ' : ''}
                       </span>

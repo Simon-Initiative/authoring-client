@@ -35,7 +35,7 @@ import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
 import SearchBar from 'components/common/SearchBar';
-import { Edge, resourceId } from 'types/edge';
+import { Edge } from 'types/edge';
 import { ConfirmModal } from 'components/ConfirmModal';
 
 import './ObjectiveSkillView.scss';
@@ -44,7 +44,7 @@ import { WritelockModal } from 'components/WritelockModal';
 import { ConflictModal } from 'components/ConflictModal.controller';
 
 const getQuestionRefFromSkillEdge = (
-  edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
+  edge: Edge, assessmentType: LegacyTypes, assessmentId: ResourceId): Maybe<QuestionRef> => {
   return getQuestionRefFromPathInfo(
     edge.metadata.jsonObject.pathInfo, assessmentType, assessmentId);
 };
@@ -70,10 +70,10 @@ export const reduceObjectiveWorkbookPageRefs = (
   objectives.toArray().forEach((objective) => {
     const items = workbookpageToObjectiveEdges
       // filter out edges that dont point to this objective
-      .filter(edge => isValidResource(resourceId(edge.sourceId))
-        && resourceId(edge.destinationId).eq(objective.id))
+      .filter(edge => isValidResource(edge.sourceId)
+        && edge.destinationId.eq(objective.id))
       // map to workbook page ids
-      .map(edge => resourceId(edge.sourceId));
+      .map(edge => edge.sourceId);
     entries.push([objective.id, Immutable.List<string>(items)]);
   });
 
@@ -91,11 +91,11 @@ function skillToAssessmentMap(skillEdges: Edge[], isInOrg: (string) => boolean) 
   const skills = {};
   skillEdges.forEach((e) => {
 
-    const id = resourceId(e.destinationId).value();
+    const id = e.destinationId.value();
     if (skills[id] === undefined) {
       skills[id] = [];
     }
-    if (isInOrg(resourceId(e.sourceId))) {
+    if (isInOrg(e.sourceId)) {
       skills[id].push(e);
     }
   });
@@ -119,7 +119,7 @@ function reduceSkillToQuestionRefs(
     .map((skill) => {
 
       // Now for each skill, get the assessment edges
-      const edges: Edge[] = skillMap[resourceId(skill.id.value())];
+      const edges: Edge[] = skillMap[skill.id.value()];
       const refs = [];
 
       // edges will be undefined if a skill simply has no assessments in
@@ -129,7 +129,7 @@ function reduceSkillToQuestionRefs(
         // Collect all of the question refs for this skill and assessment
         edges.forEach((edge) => {
           getQuestionRefFromSkillEdge(
-            edge, resourceType, resourceId(edge.sourceId)).lift(ref => refs.push(ref));
+            edge, resourceType, edge.sourceId).lift(ref => refs.push(ref));
         });
       }
 
@@ -171,11 +171,11 @@ export const reduceSkillPoolQuestionRefs = (
     (acc.get(skill.id.value()) || Immutable.List<QuestionRef>())
       .concat(
         // ensure that all pool to skill edges are valid and belong to this skill
-        poolToSkillEdges.filter(edge => isValidResource(resourceId(edge.sourceId))
-          && resourceId(edge.destinationId) === skill.id.value())
+        poolToSkillEdges.filter(edge => isValidResource(edge.sourceId)
+          && edge.destinationId.eq(skill.id))
           // map skill edge to a more usable QuestionRef
           .map(edge => getQuestionRefFromSkillEdge(
-            edge, LegacyTypes.assessment2_pool, resourceId(edge.sourceId)))
+            edge, LegacyTypes.assessment2_pool, edge.sourceId))
           // filter out any QuestionRefs that didnt have sufficient edge information
           // (a.k.a. any items that are Maybe<QuestionRef>.nothing)
           .filter(maybeQuestionRef => maybeQuestionRef.caseOf({
@@ -186,8 +186,7 @@ export const reduceSkillPoolQuestionRefs = (
           .map(maybeQuestionRef => maybeQuestionRef.bind(questionRef => Maybe.just({
             ...questionRef,
             poolInfo: getPoolInfoFromPoolRefEdge(
-              assessmentToPoolEdges.find(
-                e => resourceId(e.destinationId) === questionRef.assessmentId),
+              assessmentToPoolEdges.find(e => e.destinationId.eq(questionRef.assessmentId)),
               questionRef.poolInfo.valueOr({ questionCount: 0 }).questionCount,
             ),
           })))
@@ -432,17 +431,17 @@ class ObjectiveSkillView
             if (edge.sourceType === LegacyTypes.assessment2) {
               // find all edges that have a destinationId linked to this sourceId
               const linkedEdges = combinedEdges.filter(e => e.destinationId === edge.sourceId);
-              const isDeepLinked = linkedEdges.some(e => directLookup.has(resourceId(e.sourceId)));
+              const isDeepLinked = linkedEdges.some(e => directLookup.has(e.sourceId.value()));
 
               if (isDeepLinked) {
                 return true;
               }
             }
 
-            return !directLookup.has(resourceId(edge.destinationId))
-              && directLookup.has(resourceId(edge.sourceId));
+            return !directLookup.has(edge.destinationId.value())
+              && directLookup.has(edge.sourceId.value());
           })
-          .map(edge => resourceId(edge.destinationId)),
+          .map(edge => edge.destinationId),
       ];
 
       const organizationResourceMap = Immutable.OrderedMap<string, string>(
@@ -557,7 +556,7 @@ class ObjectiveSkillView
       return;
     }
     const objectiveIds = this.state.objectives.objectives.toArray().map(o => o.id);
-    this.props.dispatch(expandNodes('objectives', objectiveIds));
+    this.props.dispatch(expandNodes(ResourceId.of('objectives'), objectiveIds));
   }
 
   logObjectivesAndSkills(aggregateModel: AggregateModel) {
@@ -635,7 +634,7 @@ class ObjectiveSkillView
 
   onObjectiveEdit(obj: contentTypes.LearningObjective) {
 
-    const originalDocument = this.state.objectives.mapping.get(obj.id);
+    const originalDocument = this.state.objectives.mapping.get(obj.id.value());
 
     const objectives = (originalDocument.model as models.LearningObjectivesModel)
       .objectives.set(obj.guid, obj);
@@ -650,7 +649,7 @@ class ObjectiveSkillView
     const index = unified.documents.indexOf(originalDocument);
 
     unified.documents[index] = updatedDocument;
-    unified.objectives = unified.objectives.set(obj.id, obj);
+    unified.objectives = unified.objectives.set(obj.id.value(), obj);
 
     const idsToDocument = unified.mapping
       .filter((doc, id) => doc._id.eq(originalDocument._id))
@@ -979,7 +978,7 @@ class ObjectiveSkillView
       loading: true,
     });
 
-    return persistence.fetchWebContentReferences(course.idvers, { destinationId: skill.id.value() })
+    return persistence.fetchWebContentReferences(course.idvers, { destinationId: skill.id })
       .then((edges) => {
 
         this.setState({
@@ -1020,7 +1019,7 @@ class ObjectiveSkillView
       .then((canDelete) => {
         if (canDelete) {
           const confirmDelete = () => {
-            const originalDocument = this.state.objectives.mapping.get(obj.id);
+            const originalDocument = this.state.objectives.mapping.get(obj.id.value());
 
             const objectives = (originalDocument.model as models.LearningObjectivesModel)
               .objectives.delete(obj.guid);
@@ -1035,7 +1034,7 @@ class ObjectiveSkillView
             const index = unified.documents.indexOf(originalDocument);
 
             unified.documents[index] = updatedDocument;
-            unified.objectives = unified.objectives.delete(obj.id);
+            unified.objectives = unified.objectives.delete(obj.id.value());
 
             // We need to remap the existing objective ids to the
             // new version of the newBucket document
@@ -1180,14 +1179,14 @@ class ObjectiveSkillView
 
             const wbs = Maybe.just(
               workbookPageRefs.caseOf({
-                just: w => w.get(objective.id),
+                just: w => w.get(objective.id.value()),
                 nothing: () => Immutable.List<string>(),
               }),
             );
 
             rows.push(
               <Objective
-                key={objective.id}
+                key={objective.id.value()}
                 course={this.props.course}
                 onAddExistingSkill={this.onAddExistingSkill}
                 onRemove={obj => this.removeObjective(obj)}
@@ -1220,12 +1219,12 @@ class ObjectiveSkillView
   createNew(title: string) {
     const id = guid();
     const obj = new contentTypes.LearningObjective().with({
-      id,
+      id: ResourceId.of(id),
       title,
       guid: id,
     });
     const objectives = (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
-      .objectives.set(obj.id, obj);
+      .objectives.set(obj.id.value(), obj);
 
     const model =
       (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
@@ -1238,7 +1237,7 @@ class ObjectiveSkillView
     const index = unified.documents.indexOf(unified.newBucket);
 
     unified.documents[index] = document;
-    unified.objectives = unified.objectives.set(obj.id, obj);
+    unified.objectives = unified.objectives.set(obj.id.value(), obj);
 
     // The key step is to remap all newly created objective ids
     // to the updated newBucket document
@@ -1253,7 +1252,7 @@ class ObjectiveSkillView
     unified.newBucket = document;
 
     const workbookPageRefs = this.state.workbookPageRefs.caseOf({
-      just: m => Maybe.just(m.set(obj.id, Immutable.List<string>())),
+      just: m => Maybe.just(m.set(obj.id.value(), Immutable.List<string>())),
       nothing: () => Maybe.nothing<Immutable.Map<string, Immutable.List<string>>>(),
     });
 

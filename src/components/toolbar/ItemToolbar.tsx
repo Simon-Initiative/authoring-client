@@ -17,8 +17,8 @@ export interface ItemToolbarProps {
   context: AppContext;
   editMode: boolean;
   activeContext: ActiveContextState;
-  onCut: (item: ContentElement, page: ResourceId) => void;
-  onCopy: (item: ContentElement, page: ResourceId) => void;
+  onCut: (item: ContentElement, page: string) => void;
+  onCopy: (item: ContentElement, page: string) => void;
   onPaste: () => void;
   onRemove: (item: ContentElement) => void;
   parentSupportsElementType: (type: string) => boolean;
@@ -66,10 +66,10 @@ class ItemToolbar
     });
   }
 
-  getPage(): ResourceId | undefined {
+  getPage(): string | undefined {
     const { modelId } = this.props;
 
-    return modelId === null ? undefined : modelId;
+    return modelId ? undefined : modelId.value();
   }
 
   getContainer() {

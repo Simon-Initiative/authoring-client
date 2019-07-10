@@ -45,12 +45,12 @@ export class ExistingSkillSelection
 
   renderRows() {
     const link = (r: contentTypes.Skill) =>
-      <button value={r.id} onClick={this.clickResource}
+      <button value={r.id.value()} onClick={this.clickResource}
         className="btn btn-link">{r.title}</button>;
 
     return this.props.skills.map((r) => {
-      const active = this.state.selected === r.id ? 'table-active' : '';
-      return <tr key={r.id} className={active}>
+      const active = this.state.selected === r.id.value() ? 'table-active' : '';
+      return <tr key={r.id.value()} className={active}>
         <td>{link(r)}</td>
       </tr>;
     });

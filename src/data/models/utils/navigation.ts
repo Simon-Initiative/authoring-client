@@ -19,8 +19,8 @@ function combine(...maps: Immutable.OrderedMap<string, any>[])
 
 // Defines how we navigate through workbook page content elements
 export function getChildren<NodeType extends HasGuid>(
-  node: HasGuid): Maybe<Nodes<NodeType>> {
-  switch ((node as any).contentType) {
+  node: any): Maybe<Nodes<NodeType>> {
+  switch (node.contentType) {
 
     case 'Page':
       return Maybe.just((node as contentTypes.Page).nodes as any);

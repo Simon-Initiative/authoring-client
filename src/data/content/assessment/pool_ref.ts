@@ -1,15 +1,16 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
+import { ResourceId } from 'data/types';
 
 export type PoolRefParams = {
-  idref?: string;
+  idref?: ResourceId;
   guid?: string;
 };
 
 const defaultPoolRefParams = {
   contentType: 'PoolRef',
   elementType: 'pool_ref',
-  idref: '',
+  idref: ResourceId.of(''),
   guid: '',
 };
 
@@ -17,7 +18,7 @@ export class PoolRef extends Immutable.Record(defaultPoolRefParams) {
 
   contentType: 'PoolRef';
   elementType: 'pool_ref';
-  idref: string;
+  idref: ResourceId;
   guid: string;
 
   constructor(params?: PoolRefParams) {
@@ -35,17 +36,17 @@ export class PoolRef extends Immutable.Record(defaultPoolRefParams) {
     const s = json.pool_ref;
 
     if (s['@idref'] !== undefined) {
-      model = model.with({ idref: s['@idref'] });
+      model = model.with({ idref: ResourceId.of(s['@idref']) });
     }
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     return {
       pool_ref: {
-        '@idref': this.idref,
+        '@idref': this.idref.value(),
       },
     };
   }

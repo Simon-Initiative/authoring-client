@@ -82,14 +82,14 @@ export class LearningObjectivesModel
       switch (key) {
         case 'objective':
           const obj = contentTypes.LearningObjective.fromPersistence(item, id);
-          objById[obj.id] = obj;
+          objById[obj.id.value()] = obj;
           model = model.with({ objectives: model.objectives.set(obj.guid, obj) });
           break;
         case 'objective_skills':
           const objskills = contentTypes.ObjectiveSkills.fromPersistence(item, id);
 
           // Find the objective and update it's skills
-          const o = objById[objskills.idref];
+          const o = objById[objskills.idref.value()];
           if (o !== undefined) {
             const updated = o.with({ skills: objskills.skills.toList() });
             model = model.with({ objectives: model.objectives.set(updated.guid, updated) });
@@ -112,7 +112,7 @@ export class LearningObjectivesModel
       const id = guid();
       const o = new contentTypes.LearningObjective().with({
         title: DEFAULT_OBJECTIVE_TITLE,
-        id,
+        id: ResourceId.of(id),
       });
       children.push(o.toPersistence());
     } else {
@@ -126,8 +126,10 @@ export class LearningObjectivesModel
 
         if (o.skills.size > 0) {
           objectiveSkills.push(
-            (new contentTypes.ObjectiveSkills().with({ idref: o.id, skills: o.skills.toSet() }))
-              .toPersistence());
+            (new contentTypes.ObjectiveSkills().with({
+              idref: o.id,
+              skills: o.skills.map(s => s.value()).toSet(),
+            })).toPersistence());
         }
       });
 
