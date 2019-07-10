@@ -36,7 +36,7 @@ import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 import { CombinationsMap } from 'types/combinations';
 import { Edge } from 'types/edge';
 import { CourseState } from 'reducers/course';
-import { viewDocument } from 'actions/view';
+import { viewDocument, viewOrganizations } from 'actions/view';
 import { getNameAndIconByType } from 'components/ResourceView';
 
 interface SidebarRowProps {
@@ -174,7 +174,6 @@ class ContextAwareSidebar
   }
 
   componentDidMount() {
-
     this.fetchRefs();
 
   }
@@ -350,6 +349,9 @@ class ContextAwareSidebar
       nothing: () => '',
     });
 
+    /* This const is responsible for constructing and displaying a list of clickable
+     * reference links
+     */
     const referenceLocations = (
       <SidebarGroup label="Referenced Locations">
         <SidebarRow>
@@ -361,16 +363,22 @@ class ContextAwareSidebar
                 ? (
                   <div className="container">
 
-                    { // KYLE-1936 link uses  viewDocument interface, currently not supporting org
+                    {
                       refs.map(ref => (
                       <div key={ref.guid} className="ref-thing">
                         <a href="#" onClick = {(event) => {
                           event.preventDefault();
-                          viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
+                          // if link is to org, just switch org and stay on current page
+                          if (ref.sourceType === 'x-oli-organization') {
+                            viewDocument(resource.id, course.idvers,
+                                         Maybe.maybe(stripId(ref.sourceId)));
+                          } else {
+                            viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
+                          }
                         }
                         }>
                           <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
-                            {// KYLE-1936 this returns an html element, unsure how to apply style
+                            {
                               getNameAndIconByType(ref.sourceType).icon}
                             </span>
                             {getRefTitleFromRef(ref)}
