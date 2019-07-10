@@ -69,7 +69,6 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
           guid: CourseGuid.of(g), id, title, version: '1.0',
           idvers: CourseIdVers.of(id, '1.0'),
         });
-        console.log('model', model)
         return persistence.createPackage(model)
           .then((course) => {
             viewActions.viewCourse(course.idvers, Maybe.nothing());

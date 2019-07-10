@@ -39,7 +39,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
   return {
-    onDeleteResource: (resource: Resource, course: CourseModel, orgId: string) => {
+    onDeleteResource: (resource: Resource, course: CourseModel, orgId: ResourceId) => {
       const updatedResource = resource.with({ resourceState: ResourceState.DELETED });
       const resources = Immutable.OrderedMap<string, Resource>([[
         updatedResource.guid, updatedResource,
@@ -47,10 +47,10 @@ const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
       dispatch(updateCourseResources(resources));
 
       let orgToView = orgId;
-      if (orgToView === updatedResource.id) {
+      if (orgToView.eq(updatedResource.id)) {
         orgToView = ownProps.course.resources.toArray().filter(
           r => r.type === LegacyTypes.organization
-            && r.id !== orgId && r.resourceState !== 'DELETED',
+            && !r.id.eq(orgId) && r.resourceState !== 'DELETED',
         )[0].id;
       }
 

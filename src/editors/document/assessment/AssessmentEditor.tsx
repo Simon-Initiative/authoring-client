@@ -433,7 +433,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     this.props.services.dismissModal();
 
     // Handle case where Insert is clicked after no pool selection is made
-    if (!resource || resource.id === '') {
+    if (!resource || resource.id.value() === '') {
       return;
     }
 

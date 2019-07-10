@@ -1,7 +1,7 @@
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
-import { PaginatedResponse, CourseIdVers, CourseGuid } from 'data/types';
+import { PaginatedResponse, CourseIdVers, CourseGuid, ResourceId } from 'data/types';
 import { Edge } from 'types/edge';
 import { WebContent } from 'data/content/webcontent';
 
@@ -78,7 +78,7 @@ export function fetchWebContentReferences(
     status?: string,
   } = {},
   byResource = false,
-  resourceId = ''): Promise<Edge[]> {
+  resourceId = ResourceId.of('')): Promise<Edge[]> {
   const {
     relationship,
     purpose,
@@ -92,7 +92,7 @@ export function fetchWebContentReferences(
 
   const method = 'GET';
   const url = byResource
-    ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId}`
+    ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId.value()}`
     : `${configuration.baseUrl}/${packageId.value()}/edges`;
 
   const headers = getFormHeaders(credentials);

@@ -270,7 +270,7 @@ const createOrg = (courseGuid: CourseGuid, title, courseTitle: string, wbId: str
   const prefix = courseTitle.toLowerCase().startsWith('Welcome')
     ? '' : 'Welcome to ';
   const resourceref = new contentTypes.ResourceRef().with({
-    idref: wbId,
+    idref: ResourceId.of(wbId),
   });
   const item = new contentTypes.Item().with({
     resourceref,

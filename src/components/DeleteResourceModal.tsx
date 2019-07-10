@@ -7,7 +7,7 @@ import * as persistence from 'data/persistence';
 import { SortDirection, SortableTable } from 'components/common/SortableTable';
 import { CourseModel } from 'data/models';
 import './DeleteResourceModal.scss';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import { Severity, Toast } from 'components/common/Toast';
 import * as viewActions from 'actions/view';
@@ -16,9 +16,9 @@ import { Maybe } from 'tsmonad';
 export interface DeleteResourceModalProps {
   resource: Resource;
   course: CourseModel;
-  onDeleteResource: (resource: Resource, course: CourseModel, orgId: string) => void;
+  onDeleteResource: (resource: Resource, course: CourseModel, orgId: ResourceId) => void;
   onDismissModal: () => void;
-  orgId: string;
+  orgId: ResourceId;
 }
 
 interface DeleteResourceModalState {
