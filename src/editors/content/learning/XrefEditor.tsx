@@ -5,7 +5,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { LinkTarget } from 'data/content/learning/common';
 import { Select, Button } from 'editors/content/common/controls';
-import { LegacyTypes, DocumentId } from 'data/types';
+import { LegacyTypes, DocumentId, ResourceGuid, ResourceId } from 'data/types';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
@@ -29,7 +29,7 @@ export interface XrefEditorProps
   onShowSidebar: () => void;
   displayModal: (component: any) => void;
   dismissModal: () => void;
-  updateTarget: (targetId: string, documentResourceId: DocumentId) => Promise<any>;
+  updateTarget: (targetId: string, documentResourceId: ResourceId) => Promise<any>;
   clipboard: Clipboard;
   course: CourseModel;
   target: Either<MissingTargetId, ContentElement>;
@@ -83,8 +83,8 @@ export default class XrefEditor
   pages = this.props.context.courseModel.resources
     .toArray()
     .filter(r => r.type === LegacyTypes.workbook_page &&
-      r.id !== this.thisId &&
-      r.id !== PLACEHOLDER_ITEM_ID &&
+      r.id.eq(this.thisId) &&
+      r.id.value() !== PLACEHOLDER_ITEM_ID &&
       r.resourceState !== ResourceState.DELETED);
 
   onChangeTarget() {
@@ -112,7 +112,7 @@ export default class XrefEditor
   onChangePage(page: string) {
     const { onEdit, model, updateTarget } = this.props;
 
-    onEdit(model.with({ page }));
+    onEdit(model.with({ page: ResourceGuid.of(page) }));
 
     // Search for the target element in the new page
     if (model.idref) {
@@ -123,7 +123,8 @@ export default class XrefEditor
   renderSidebar() {
     const { editMode, model, onEdit, target } = this.props;
 
-    const pageOptions = this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>);
+    const pageOptions = this.pages.map(r =>
+      <option key={r.guid.value()} value={r.id.value()}>{r.title}</option>);
 
     return (
       <SidebarContent title="Cross Reference">
@@ -131,7 +132,7 @@ export default class XrefEditor
           <Select
             editMode={this.props.editMode}
             label=""
-            value={model.page}
+            value={model.page.value()}
             onChange={this.onChangePage}>
             {pageOptions}
           </Select>

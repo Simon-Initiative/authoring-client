@@ -26,14 +26,14 @@ const initialState = Immutable.Map<string, EditedDocument>();
 function processUndo(
   state: DocumentsState, action: documentActions.ChangeUndoneAction): DocumentsState {
 
-  const ed = state.get(action.documentId);
+  const ed = state.get(action.documentId.value());
   const model = ed.undoStack.peek();
   const document = ed.document.with({ model });
 
   const undoStack = ed.undoStack.pop();
   const redoStack = ed.redoStack.push(ed.document.model);
 
-  return state.set(action.documentId, ed.with({
+  return state.set(action.documentId.value(), ed.with({
     undoRedoGuid: createGuid(),
     redoStack,
     undoStack,
@@ -44,7 +44,7 @@ function processUndo(
 function processRedo(
   state: DocumentsState, action: documentActions.ChangeRedoneAction): DocumentsState {
 
-  const ed = state.get(action.documentId);
+  const ed = state.get(action.documentId.value());
 
   const model = ed.redoStack.peek();
   const undoStack = ed.undoStack.push(ed.document.model);
@@ -52,7 +52,7 @@ function processRedo(
 
   const document = ed.document.with({ model });
 
-  return state.set(action.documentId, ed.with({
+  return state.set(action.documentId.value(), ed.with({
     undoRedoGuid: createGuid(),
     redoStack,
     undoStack,
@@ -64,33 +64,33 @@ export const documents = (
   state: DocumentsState = initialState,
   action: ActionTypes,
 ): DocumentsState => {
-  const ed = state.get(action.documentId);
+  const ed = state.get(action.documentId.value());
 
   switch (action.type) {
 
     case documentActions.IS_SAVING_UPDATED:
-      if (state.get(action.documentId) !== undefined) {
-        return state.set(action.documentId, state.get(action.documentId).with({
+      if (state.get(action.documentId.value()) !== undefined) {
+        return state.set(action.documentId.value(), state.get(action.documentId.value()).with({
           isSaving: action.isSaving,
         }));
       }
       return state;
 
     case documentActions.LAST_SAVE_SUCEEDED:
-      return state.set(action.documentId, state.get(action.documentId).with({
+      return state.set(action.documentId.value(), state.get(action.documentId.value()).with({
         lastRequestSucceeded: action.lastRequestSucceeded,
-        saveCount: state.get(action.documentId).saveCount + 1,
+        saveCount: state.get(action.documentId.value()).saveCount + 1,
       }));
 
     case documentActions.DOCUMENT_REQUESTED:
       // Newly requested documents simply get a new record in the map
-      return state.set(action.documentId, new EditedDocument()
+      return state.set(action.documentId.value(), new EditedDocument()
         .with({ documentId: action.documentId }));
 
     case documentActions.DOCUMENT_LOADED:
       // Successfully loaded documents have to have their doc set and
       // their persistence strategies initialized
-      return state.set(action.documentId, state.get(action.documentId).with({
+      return state.set(action.documentId.value(), state.get(action.documentId.value()).with({
         document: action.document,
         persistence: action.persistence,
         editingAllowed: action.editingAllowed,
@@ -106,17 +106,17 @@ export const documents = (
 
     case documentActions.DOCUMENT_FAILED:
 
-      return state.set(action.documentId, state.get(action.documentId).with({
+      return state.set(action.documentId.value(), state.get(action.documentId.value()).with({
         error: action.error,
         hasFailed: true,
       }));
     case documentActions.DOCUMENT_EDITING_ENABLE:
-      return state.set(action.documentId, state.get(action.documentId).with({
+      return state.set(action.documentId.value(), state.get(action.documentId.value()).with({
         editingAllowed: action.editable,
       }));
 
     case documentActions.DOCUMENT_RELEASED:
-      return state.delete(action.documentId);
+      return state.delete(action.documentId.value());
 
     case documentActions.CHANGE_REDONE:
       return processRedo(state, action);
@@ -126,7 +126,7 @@ export const documents = (
 
     case documentActions.MODEL_UPDATED:
       const document = ed.document.with({ model: action.model });
-      return state.set(action.documentId, ed.with({
+      return state.set(action.documentId.value(), ed.with({
         document,
         undoRedoGuid: createGuid(),
         undoStack: ed.undoStack.push(ed.document.model),
@@ -138,7 +138,7 @@ export const documents = (
       // For pools, there are no pages, so just set the node
       if (ed.document.model instanceof PoolModel
         && (!(typeof action.nodeOrPageId === 'string'))) {
-        return state.set(action.documentId, ed.with({
+        return state.set(action.documentId.value(), ed.with({
           currentNode: Maybe.just(action.nodeOrPageId),
         }));
       }
@@ -154,7 +154,7 @@ export const documents = (
           : assessment.modelType === 'AssessmentModel'
             ? Maybe.just(assessment.pages.get(selectedPage).nodes.first())
             : Maybe.nothing<contentTypes.Node>();
-        return state.set(action.documentId, ed.with({
+        return state.set(action.documentId.value(), ed.with({
           currentNode: selectedNode,
           currentPage: Maybe.just(selectedPage),
         }));
@@ -162,7 +162,7 @@ export const documents = (
 
       // Else we are setting the node, so also set the corresponding page
       const node = action.nodeOrPageId;
-      return state.set(action.documentId, ed.with({
+      return state.set(action.documentId.value(), ed.with({
         currentNode: Maybe.just(action.nodeOrPageId),
         currentPage: assessment.modelType === 'AssessmentModel'
           ? assessment.pages.reduce(

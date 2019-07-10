@@ -30,7 +30,7 @@ import { SkillsModel } from 'data/models/skill';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
-import { LegacyTypes, CourseIdVers } from 'data/types';
+import { LegacyTypes, CourseIdVers, ResourceId } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
@@ -71,7 +71,7 @@ export const reduceObjectiveWorkbookPageRefs = (
     const items = workbookpageToObjectiveEdges
       // filter out edges that dont point to this objective
       .filter(edge => isValidResource(resourceId(edge.sourceId))
-        && resourceId(edge.destinationId) === objective.id)
+        && resourceId(edge.destinationId).eq(objective.id))
       // map to workbook page ids
       .map(edge => resourceId(edge.sourceId));
     entries.push([objective.id, Immutable.List<string>(items)]);
@@ -91,7 +91,7 @@ function skillToAssessmentMap(skillEdges: Edge[], isInOrg: (string) => boolean) 
   const skills = {};
   skillEdges.forEach((e) => {
 
-    const id = resourceId(e.destinationId);
+    const id = resourceId(e.destinationId).value();
     if (skills[id] === undefined) {
       skills[id] = [];
     }
@@ -119,7 +119,7 @@ function reduceSkillToQuestionRefs(
     .map((skill) => {
 
       // Now for each skill, get the assessment edges
-      const edges: Edge[] = skillMap[resourceId(skill.id)];
+      const edges: Edge[] = skillMap[resourceId(skill.id.value())];
       const refs = [];
 
       // edges will be undefined if a skill simply has no assessments in
@@ -167,12 +167,12 @@ export const reduceSkillPoolQuestionRefs = (
   isValidResource = resourceId => true,
 ) => skills.reduce(
   (acc, skill) => acc.set(
-    skill.id,
-    (acc.get(skill.id) || Immutable.List<QuestionRef>())
+    skill.id.value(),
+    (acc.get(skill.id.value()) || Immutable.List<QuestionRef>())
       .concat(
         // ensure that all pool to skill edges are valid and belong to this skill
         poolToSkillEdges.filter(edge => isValidResource(resourceId(edge.sourceId))
-          && resourceId(edge.destinationId) === skill.id)
+          && resourceId(edge.destinationId) === skill.id.value())
           // map skill edge to a more usable QuestionRef
           .map(edge => getQuestionRefFromSkillEdge(
             edge, LegacyTypes.assessment2_pool, resourceId(edge.sourceId)))
@@ -474,11 +474,11 @@ class ObjectiveSkillView
         skillQuestionRefs: Maybe.just(
           skills.reduce(
             (acc, skill) => acc.set(
-              skill.id,
+              skill.id.value(),
               Immutable.List<QuestionRef>()
-                .concat(skillFormativeQuestionRefs.get(skill.id))
-                .concat(skillSummativeQuestionRefs.get(skill.id))
-                .concat(skillPoolQuestionRefs.get(skill.id))
+                .concat(skillFormativeQuestionRefs.get(skill.id.value()))
+                .concat(skillSummativeQuestionRefs.get(skill.id.value()))
+                .concat(skillPoolQuestionRefs.get(skill.id.value()))
                 .toList(),
             ),
             Immutable.Map<string, Immutable.List<QuestionRef>>(),
@@ -527,7 +527,7 @@ class ObjectiveSkillView
             const locks = [...aggregateModel.objectives, ...aggregateModel.skills]
               .map(d => ({
                 courseId: this.props.course.idvers,
-                documentId: typeof d._id === 'string' ? d._id : d._id.value(),
+                documentId: d._id,
               }));
             this.props.registerLocks(locks);
 
@@ -653,12 +653,12 @@ class ObjectiveSkillView
     unified.objectives = unified.objectives.set(obj.id, obj);
 
     const idsToDocument = unified.mapping
-      .filter((doc, id) => doc._id === originalDocument._id)
+      .filter((doc, id) => doc._id.eq(originalDocument._id))
       .map((doc, id) => updatedDocument)
       .toOrderedMap();
     unified.mapping = unified.mapping.merge(idsToDocument);
 
-    if (originalDocument._id === unified.newBucket._id) {
+    if (originalDocument._id.eq(unified.newBucket._id)) {
       unified.newBucket = updatedDocument;
     }
 
@@ -678,7 +678,7 @@ class ObjectiveSkillView
     const { onUpdateSkills } = this.props;
 
     // Based on the skill id, find the document that this skill lives in
-    const originalDocument = this.state.skills.mapping.get(model.id);
+    const originalDocument = this.state.skills.mapping.get(model.id.value());
 
     // Now update the skills model contained within that document, yielding
     // ultimately an updated document
@@ -691,21 +691,21 @@ class ObjectiveSkillView
 
     // Determine if we are making an edit to our special document that
     // handles all additions
-    const isEditingNewBucket = originalDocument._id === this.state.skills.newBucket._id;
+    const isEditingNewBucket = originalDocument._id.eq(this.state.skills.newBucket._id);
 
     // Create a copy of our current unified skills model
     const unified = Object.assign({}, this.state.skills);
     unified.documents = [...this.state.skills.documents];
 
     // Now update that copy
-    const index = unified.documents.findIndex(d => originalDocument._id === d._id);
+    const index = unified.documents.findIndex(d => originalDocument._id.eq(d._id));
     unified.documents[index] = updatedDocument;
-    unified.skills = unified.skills.set(model.id, model);
+    unified.skills = unified.skills.set(model.id.value(), model);
 
     // We need to update the mapping of EVERY skill that exists in this
     // original document to point to the updated document
     const idsToDocument = unified.mapping
-      .filter((doc, id) => doc._id === originalDocument._id)
+      .filter((doc, id) => doc._id.eq(originalDocument._id))
       .map((doc, id) => updatedDocument)
       .toOrderedMap();
     unified.mapping = unified.mapping.merge(idsToDocument);
@@ -725,13 +725,13 @@ class ObjectiveSkillView
     onUpdateSkills(Immutable.OrderedMap([[model.id, model]]));
   }
 
-  createNewSkill(): Promise<string> {
+  createNewSkill(): Promise<ResourceId> {
     const { onUpdateSkills } = this.props;
 
     // Create the new skill and persist it
     const id = guid();
     const skill = new contentTypes.Skill().with({
-      id,
+      id: ResourceId.of(id),
       guid: id,
       title: 'New skill',
     });
@@ -746,7 +746,7 @@ class ObjectiveSkillView
 
     unified.documents[index] = updatedDocument;
     unified.mapping = unified.mapping.set(id, updatedDocument);
-    unified.skills = unified.skills.set(skill.id, skill);
+    unified.skills = unified.skills.set(skill.id.value(), skill);
     unified.newBucket = updatedDocument;
 
     return new Promise((resolve, reject) => {
@@ -781,7 +781,7 @@ class ObjectiveSkillView
 
     this.createNewSkill()
       .then((id) => {
-        const updated = model.with({ skills: model.skills.push(id) });
+        const updated = model.with({ skills: model.skills.push(id.value()) });
         this.onObjectiveEdit(updated);
       });
   }
@@ -804,7 +804,7 @@ class ObjectiveSkillView
       skills
         .reduce(
           (map, skill) => {
-            map[skill.id] = skill;
+            map[skill.id.value()] = skill;
             return map;
           },
           {});
@@ -844,7 +844,7 @@ class ObjectiveSkillView
 
   detachSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
     // Update the parent objective
-    const index = objective.skills.indexOf(model.id);
+    const index = objective.skills.indexOf(model.id.value());
     const skills = objective.skills.remove(index);
     const updated = objective.with({ skills });
 
@@ -852,7 +852,7 @@ class ObjectiveSkillView
   }
 
   deleteSkill(skill: contentTypes.Skill) {
-    const originalDocument = this.state.skills.mapping.get(skill.id);
+    const originalDocument = this.state.skills.mapping.get(skill.id.value());
 
     const skills = (originalDocument.model as models.SkillsModel)
       .skills.delete(skill.guid);
@@ -867,12 +867,12 @@ class ObjectiveSkillView
     const index = unified.documents.indexOf(originalDocument);
 
     unified.documents[index] = updatedDocument;
-    unified.skills = unified.skills.delete(skill.id);
+    unified.skills = unified.skills.delete(skill.id.value());
 
     // We need to remap the existing skill ids to the
     // new version of the edited document
     const idsToDocument = unified.mapping
-      .filter((doc, id) => doc._id === originalDocument._id)
+      .filter((doc, id) => doc._id.eq(originalDocument._id))
       .map((doc, id) => updatedDocument)
       .toOrderedMap();
     unified.mapping = unified.mapping.merge(idsToDocument);
@@ -899,7 +899,7 @@ class ObjectiveSkillView
   countSkillRefs(model: contentTypes.Skill): number {
     return this.state.objectives.objectives
       .toArray()
-      .map(o => o.skills.contains(model.id) ? 1 : 0)
+      .map(o => o.skills.contains(model.id.value()) ? 1 : 0)
       .reduce((acc, count) => acc + count, 0);
   }
 
@@ -979,7 +979,7 @@ class ObjectiveSkillView
       loading: true,
     });
 
-    return persistence.fetchWebContentReferences(course.idvers, { destinationId: skill.id })
+    return persistence.fetchWebContentReferences(course.idvers, { destinationId: skill.id.value() })
       .then((edges) => {
 
         this.setState({
@@ -1040,7 +1040,7 @@ class ObjectiveSkillView
             // We need to remap the existing objective ids to the
             // new version of the newBucket document
             const idsToDocument = unified.mapping
-              .filter((doc, id) => doc._id === originalDocument._id)
+              .filter((doc, id) => doc._id.eq(originalDocument._id))
               .map((doc, id) => updatedDocument)
               .toOrderedMap();
             unified.mapping = unified.mapping.merge(idsToDocument);
@@ -1243,7 +1243,7 @@ class ObjectiveSkillView
     // The key step is to remap all newly created objective ids
     // to the updated newBucket document
     const idsToDocument = unified.mapping
-      .filter((doc, id) => doc._id === this.state.objectives.newBucket._id)
+      .filter((doc, id) => doc._id.eq(this.state.objectives.newBucket._id))
       .map((doc, id) => document)
       .toOrderedMap()
       .set(id, document);

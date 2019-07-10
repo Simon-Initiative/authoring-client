@@ -24,7 +24,7 @@ export interface EssayState extends QuestionState {
 export class Essay
   extends Question<EssayProps, EssayState> {
 
-  constructor(props) {
+  constructor(props: EssayProps) {
     super(props);
 
     this.onPartEdit = this.onPartEdit.bind(this);

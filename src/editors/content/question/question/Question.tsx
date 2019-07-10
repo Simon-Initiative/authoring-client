@@ -35,6 +35,7 @@ import { DatasetStatus } from 'types/analytics/dataset';
 import { convert } from 'utils/format';
 import * as chroma from 'chroma-js';
 import colors from 'styles/colors';
+import { ResourceId } from 'data/types';
 
 export const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question or pool. '
@@ -65,7 +66,7 @@ export interface OwnQuestionProps<ModelType>
 export interface QuestionProps<ModelType>
   extends OwnQuestionProps<ModelType> {
   analytics: AnalyticsState;
-  assessmentId: string;
+  assessmentId: ResourceId;
 }
 
 export interface QuestionState {
@@ -475,7 +476,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           just: partAnalytics => (
             <Tab className="analytics-tab">
               <TabSection key="analytics" className="analytics">
-                <TabSectionHeader title="Analytics"/>
+                <TabSectionHeader title="Analytics" />
                 <TabSectionContent>
                   <PartAnalytics partAnalytics={partAnalytics} expandedView />
                   <div className="instruction-label" style={{ marginTop: 10 }}>

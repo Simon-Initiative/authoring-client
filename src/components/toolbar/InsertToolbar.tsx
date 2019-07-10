@@ -507,7 +507,7 @@ class InsertToolbar
                           filterPredicate={(res: Resource): boolean =>
                             res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
-                            && !existingInlines.has(res.id)}
+                            && !existingInlines.has(res.id.value())}
                           courseId={context.courseModel.guid}
                           onInsert={(resource) => {
                             onDismissModal();
@@ -550,7 +550,7 @@ class InsertToolbar
                   <ResourceSelection
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.workbook_page
-                      && res.id !== PLACEHOLDER_ITEM_ID
+                      && res.id.value() !== PLACEHOLDER_ITEM_ID
                       && res.resourceState !== ResourceState.DELETED}
                     courseId={context.courseModel.guid}
                     onInsert={(resource) => {
@@ -688,7 +688,7 @@ class InsertToolbar
                           filterPredicate={(res: Resource): boolean =>
                             res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
-                            && !existingInlines.has(res.id)}
+                            && !existingInlines.has(res.id.value())}
                           courseId={context.courseModel.guid}
                           noResourcesMessage={
                             <React.Fragment>

@@ -230,7 +230,7 @@ class MultipanelEditor
       activityPageCount: Maybe.nothing<number>(),
     });
 
-    Maybe.maybe(context.courseModel.resourcesById.get(model.inline.idref))
+    Maybe.maybe(context.courseModel.resourcesById.get(model.inline.idref.value()))
       .lift((inline) => {
         retrieveDocument(context.courseModel.idvers, inline.id)
           .then((inline) => {
@@ -360,7 +360,7 @@ class MultipanelEditor
         filterPredicate={(res: contentTypes.Resource): boolean =>
           res.type === LegacyTypes.inline
           && res.resourceState !== ResourceState.DELETED
-          && !existingInlines.has(res.id)}
+          && !existingInlines.has(res.id.value())}
         courseId={context.courseModel.guid}
         noResourcesMessage={
           <React.Fragment>
@@ -496,7 +496,7 @@ class MultipanelEditor
     const { classes, className, context, services, editMode, model, onEdit } = this.props;
     const { selectedPanel, activityPageCount, isLoadingActivity } = this.state;
 
-    const resource = this.props.context.courseModel.resourcesById.get(model.inline.idref);
+    const resource = this.props.context.courseModel.resourcesById.get(model.inline.idref.value());
     const title = resource === undefined ? 'Loading...' : resource.title;
 
     const currentPanel = model.panels.find(p => p.guid === selectedPanel);

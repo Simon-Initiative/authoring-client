@@ -43,7 +43,7 @@ export default class ActivityLinkEditor
     const highStakesOptions = context.courseModel.resources
       .toArray()
       .filter(r => r.type === LegacyTypes.assessment2 && r.resourceState !== ResourceState.DELETED)
-      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+      .map(r => <option key={r.id.value()} value={r.id.value()}>{r.title}</option>);
 
     return (
       <SidebarContent title="Activity Link">

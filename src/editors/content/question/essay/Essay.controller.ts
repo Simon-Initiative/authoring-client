@@ -5,10 +5,11 @@ import { State } from 'reducers';
 import { OwnQuestionProps } from '../question/Question';
 import { AnalyticsState } from 'reducers/analytics';
 import { AssessmentModel } from 'data/models';
+import { ResourceId } from 'data/types';
 
 interface StateProps {
   analytics: AnalyticsState;
-  assessmentId: string;
+  assessmentId: ResourceId;
 }
 
 interface DispatchProps {

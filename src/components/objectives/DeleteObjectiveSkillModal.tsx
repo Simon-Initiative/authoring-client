@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Edge } from 'types/edge';
 import { SortDirection, SortableTable } from 'components/common/SortableTable';
 import { CourseModel } from 'data/models';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import * as contentTypes from 'data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { ModalMessage } from 'utils/ModalMessage';
@@ -30,15 +30,15 @@ export default class DeleteObjectiveSkillModal extends
 
   // Edge sourceId looks like 'javascript-evz4jsnu:1.0:welcome',
   // in the form '{courseId}:{version}:{resourceId}'.
-  edgeResourceId(edge: Edge): string {
+  edgeResourceId(edge: Edge): ResourceId {
     return edge.sourceId.slice(edge.sourceId.lastIndexOf(':') + 1);
   }
 
-  edgeResource(resourceId: string): Resource {
-    return this.props.course.resourcesById.get(resourceId);
+  edgeResource(resourceId: ResourceId): Resource {
+    return this.props.course.resourcesById.get(resourceId.value());
   }
 
-  edgeResourceTitle(id: string): string {
+  edgeResourceTitle(id: ResourceId): string {
     return this.edgeResource(id).title;
   }
 

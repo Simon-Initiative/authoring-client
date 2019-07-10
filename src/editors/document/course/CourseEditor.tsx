@@ -164,24 +164,24 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     });
   }
 
-  onTitleEdit = (title) => {
+  onTitleEdit = (title: string) => {
     const model = this.props.model.with({ title });
     this.props.courseChanged(model);
     const doc = new Document().with({
       _courseId: model.guid,
-      _id: model.id,
+      _id: model.guid,
       _rev: model.rev.toString(),
       model,
     });
     persistence.persistDocument(doc);
   }
 
-  onDescriptionEdit = (description) => {
+  onDescriptionEdit = (description: string) => {
     const model = this.props.model.with({ description });
     this.props.courseChanged(model);
     const doc = new Document().with({
       _courseId: model.guid,
-      _id: model.id,
+      _id: model.guid,
       _rev: model.rev.toString(),
       model,
     });
@@ -332,7 +332,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  onRenderMenuItemChildren = (dev: UserInfo, props, index) => {
+  onRenderMenuItemChildren = (dev: UserInfo, props: any, index: number) => {
     const name = dev.firstName + ' ' + dev.lastName;
     return [
       <strong key="name">{name}</strong>,
@@ -533,7 +533,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.props.courseChanged(model);
     const doc = new Document().with({
       _courseId: model.guid,
-      _id: model.id,
+      _id: model.guid,
       _rev: model.rev.toString(),
       model,
     });
@@ -614,8 +614,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   // Either Show or Hide the Advanced options in the Details page
   toggleAdvancedDetails() {
     this.setState({
-      showAdvancedDetails: !this.state.showAdvancedDetails
-    })
+      showAdvancedDetails: !this.state.showAdvancedDetails,
+    });
   }
 
   renderDetails() {
@@ -670,46 +670,46 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         }
         <div className="row">
           <div className="col-3">
-              <button
-                type="button"
-                className="btn btn-link"
-                onClick={() => this.toggleAdvancedDetails()}>
-                Advanced Details {collapseIndicator}
-              </button>
+            <button
+              type="button"
+              className="btn btn-link"
+              onClick={() => this.toggleAdvancedDetails()}>
+              Advanced Details {collapseIndicator}
+            </button>
           </div>
           <div className="col-9"></div>
         </div>
         {this.state.showAdvancedDetails &&
           <div className="advanced">
-          <div className="row">
-            <div className="col-3">Theme</div>
-            <div className="col-9">{this.renderThemes()}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Version</div>
-            <div className="col-9">{model.version}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">License <HelpPopover activateOnClick>
-              <div><img src={CC_LICENSES} />
-                <br /><br />
-                <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
-                  target="_blank">
-                  More information
-                </a>
-              </div>
-            </HelpPopover>
+            <div className="row">
+              <div className="col-3">Theme</div>
+              <div className="col-9">{this.renderThemes()}</div>
             </div>
-            <div className="col-9">{this.renderLicenseSelect()}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Unique ID</div>
-            <div className="col-9">{model.id}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Package Location</div>
-            <div className="col-9">{model.svnLocation}</div>
-          </div>
+            <div className="row">
+              <div className="col-3">Version</div>
+              <div className="col-9">{model.version}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">License <HelpPopover activateOnClick>
+                <div><img src={CC_LICENSES} />
+                  <br /><br />
+                  <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                    target="_blank">
+                    More information
+                </a>
+                </div>
+              </HelpPopover>
+              </div>
+              <div className="col-9">{this.renderLicenseSelect()}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Unique ID</div>
+              <div className="col-9">{model.id}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Package Location</div>
+              <div className="col-9">{model.svnLocation}</div>
+            </div>
           </div>
         }
 
@@ -798,7 +798,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                            To get the most recent data for analytics, create a new dataset.
+                                        To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size

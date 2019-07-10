@@ -11,18 +11,19 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { CourseModel } from 'data/models';
 import { nonMoveableTypes } from 'data/content/restrictions';
 import { StyledComponentProps } from 'types/component';
+import { ResourceId } from 'data/types';
 
 export interface ItemToolbarProps {
   context: AppContext;
   editMode: boolean;
   activeContext: ActiveContextState;
-  onCut: (item: ContentElement, page: string) => void;
-  onCopy: (item: ContentElement, page: string) => void;
+  onCut: (item: ContentElement, page: ResourceId) => void;
+  onCopy: (item: ContentElement, page: ResourceId) => void;
   onPaste: () => void;
   onRemove: (item: ContentElement) => void;
   parentSupportsElementType: (type: string) => boolean;
   course: CourseModel;
-  modelId: string;
+  modelId: ResourceId | null;
 }
 
 type StyledItemToolbarProps = StyledComponentProps<ItemToolbarProps, typeof styles>;
@@ -57,7 +58,7 @@ class ItemToolbar
     });
   }
 
-  getItem() {
+  getItem(): ContentElement | undefined {
     const { activeContext } = this.props;
     return activeContext.activeChild.caseOf({
       just: activeChild => activeChild,
@@ -65,7 +66,7 @@ class ItemToolbar
     });
   }
 
-  getPage() {
+  getPage(): ResourceId | undefined {
     const { modelId } = this.props;
 
     return modelId === null ? undefined : modelId;

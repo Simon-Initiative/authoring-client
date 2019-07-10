@@ -19,6 +19,7 @@ import './OrgComponent.scss';
 import { Analytics } from '../analytics/Analytics.controller';
 import { Remove } from 'components/common/Remove';
 import { Resource } from 'data/content/resource';
+import { ResourceGuid, ResourceId } from 'data/types';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -117,10 +118,15 @@ export class OrgComponentEditor
     this.props.onEdit(org.makeUpdateNode(model.id, n => (n as any).with({ title }), undo));
   }
 
-  onView(componentOrResourceId: string) { // guid
-    let resourceId = this.props.course.resources.get(componentOrResourceId, {} as Resource).id;
-    if (!resourceId) {
-      resourceId = componentOrResourceId;
+  onView(componentOrResourceGuid: ResourceGuid | ResourceId | string) { // guid
+    let resourceId;
+    if (typeof componentOrResourceGuid === 'string') {
+      resourceId = componentOrResourceGuid;
+    } else if (componentOrResourceGuid instanceof ResourceId) {
+      resourceId = componentOrResourceGuid;
+    } else {
+      resourceId = this.props.course.resources
+        .get(componentOrResourceGuid.value(), {} as Resource).id;
     }
     this.props.org.lift((o) => {
       viewActions.viewDocument(

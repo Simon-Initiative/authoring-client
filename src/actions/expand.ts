@@ -1,3 +1,4 @@
+import { ResourceId } from 'data/types';
 
 export type EXPAND_NODES = 'EXPAND_NODES';
 export const EXPAND_NODES = 'EXPAND_NODES';
@@ -7,11 +8,11 @@ export const COLLAPSE_NODES = 'COLLAPSE_NODES';
 
 export type expandNodesAction = {
   type: EXPAND_NODES,
-  resourceId: string,
+  resourceId: ResourceId,
   nodeIds: string[],
 };
 
-export function expandNodes(resourceId: string, nodeIds: string[]): expandNodesAction {
+export function expandNodes(resourceId: ResourceId, nodeIds: string[]): expandNodesAction {
   return {
     type: EXPAND_NODES,
     resourceId,
@@ -21,11 +22,11 @@ export function expandNodes(resourceId: string, nodeIds: string[]): expandNodesA
 
 export type collapseNodesAction = {
   type: COLLAPSE_NODES,
-  resourceId: string,
+  resourceId: ResourceId,
   nodeIds: string[],
 };
 
-export function collapseNodes(resourceId: string, nodeIds: string[]): collapseNodesAction {
+export function collapseNodes(resourceId: ResourceId, nodeIds: string[]): collapseNodesAction {
   return {
     type: COLLAPSE_NODES,
     resourceId,

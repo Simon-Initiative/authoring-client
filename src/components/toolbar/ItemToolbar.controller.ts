@@ -1,4 +1,4 @@
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { State } from 'reducers';
 import { ActiveContextState } from 'reducers/active';
 import { ItemToolbar } from './ItemToolbar';
@@ -6,10 +6,11 @@ import { AppContext } from 'editors/common/AppContext';
 import { remove } from 'actions/active';
 import { cut, copy, paste } from 'actions/clipboard';
 import { ContentElement } from 'data/content/common/interfaces';
+import { ResourceId } from 'data/types';
 
 interface StateProps {
   activeContext: ActiveContextState;
-  modelId: string;
+  modelId: ResourceId | null;
 }
 
 interface DispatchProps {
@@ -37,12 +38,12 @@ const mapStateToProps = (state: State): StateProps => {
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
   return {
-    onCut: (item, page) => dispatch(cut(item, page) as any),
-    onCopy: (item, page) => dispatch(copy(item, page) as any),
-    onPaste: () => dispatch(paste() as any),
-    onRemove: item => dispatch(remove(item) as any),
+    onCut: (item, page) => dispatch(cut(item, page)),
+    onCopy: (item, page) => dispatch(copy(item, page)),
+    onPaste: () => dispatch(paste()),
+    onRemove: item => dispatch(remove(item)),
   };
 };
 

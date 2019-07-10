@@ -29,7 +29,7 @@ export interface AppServices {
 
   // Request to view a document with the specified document id.
   viewDocument: (documentId: types.DocumentId, courseId: types.CourseIdVers,
-    orgId: Maybe<string>) => void;
+    orgId: Maybe<types.ResourceId>) => void;
 
   displayMessage: (message: Messages.Message) => void;
 
@@ -42,19 +42,19 @@ export interface AppServices {
     Promise<persistence.Document>;
 
   // Display the given component in a modal dialog.
-  displayModal: (component: any) => void;
+  displayModal: (component: JSX.Element) => void;
 
   // Dismiss the modal dialog.
   dismissModal: () => void;
 
   // Fetch a title by id
-  fetchTitleById: (internalId: string) => Promise<string>;
+  fetchTitleById: (internalId: types.ResourceId) => Promise<string>;
 
   // Fetch an id by guid
-  fetchIdByGuid: (guid: string) => Promise<string>;
+  fetchIdByGuid: (guid: types.ResourceGuid) => Promise<types.ResourceId>;
 
   // Fetch guid by an id
-  fetchGuidById: (id: string) => Promise<string>;
+  fetchGuidById: (id: types.ResourceId) => Promise<types.ResourceGuid>;
 
   // Fetch a content element in the current resource
   // by its id
@@ -100,7 +100,8 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(messageActions.dismissSpecificMessage(message));
   }
 
-  viewDocument(documentId: types.DocumentId, courseId: types.CourseIdVers, orgId: Maybe<string>) {
+  viewDocument(documentId: types.DocumentId,
+    courseId: types.CourseIdVers, orgId: Maybe<types.ResourceId>) {
     view.viewDocument(documentId, courseId, orgId);
   }
 
@@ -120,7 +121,7 @@ export class DispatchBasedServices implements AppServices {
     return this.createResource(courseId, resource);
   }
 
-  displayModal(component: any) {
+  displayModal(component: JSX.Element) {
     this.dispatch(modalActions.display(component));
   }
 
@@ -145,17 +146,17 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(courseActions.loadCourse(courseId));
   }
 
-  fetchIdByGuid(guid: string): Promise<string> {
+  fetchIdByGuid(guid: types.ResourceGuid): Promise<types.ResourceId> {
     return this.fetchAttributesBy(['id'], 'guid', guid)
       .then(o => o.id);
   }
 
-  fetchGuidById(id: string): Promise<string> {
+  fetchGuidById(id: types.ResourceId): Promise<types.ResourceGuid> {
     return this.fetchAttributesBy(['guid'], 'id', id)
       .then(o => o.guid);
   }
 
-  fetchTitleById(internalId: string): Promise<string> {
+  fetchTitleById(internalId: types.ResourceId): Promise<string> {
     return this.fetchAttributesBy(['title'], 'id', internalId)
       .then(o => o.title);
   }

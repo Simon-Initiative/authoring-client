@@ -19,7 +19,7 @@ export abstract class ExplanationEditor
   extends AbstractContentEditor<ContentElements,
   ExplanationEditorProps, ExplanationEditorState> {
 
-  constructor(props) {
+  constructor(props: ExplanationEditorProps) {
     super(props);
   }
 

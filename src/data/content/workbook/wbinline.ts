@@ -4,9 +4,10 @@ import { getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { Param } from '../learning/param';
 import { Maybe } from 'tsmonad';
+import { ResourceId } from 'data/types';
 
 export type WbInlineParams = {
-  idref?: string,
+  idref?: ResourceId,
   src?: string,
   width?: string,
   height?: string,
@@ -19,7 +20,7 @@ const defaults = (params: Partial<WbInlineParams> = {}) => ({
   contentType: 'WbInline',
   elementType: 'wb:inline',
   guid: params.guid || createGuid(),
-  idref: params.idref || '',
+  idref: params.idref || ResourceId.of(''),
   src: params.src || '',
   width: params.width || '',
   height: params.height || '',
@@ -31,7 +32,7 @@ export class WbInline extends Immutable.Record(defaults()) {
 
   contentType: 'WbInline';
   elementType: 'wb:inline';
-  idref: string;
+  idref: ResourceId;
   src: string;
   width: string;
   height: string;
@@ -63,7 +64,7 @@ export class WbInline extends Immutable.Record(defaults()) {
     let model = new WbInline({ guid });
 
     if (wb['@idref'] !== undefined) {
-      model = model.with({ idref: wb['@idref'] });
+      model = model.with({ idref: ResourceId.of(wb['@idref']) });
     }
     if (wb['@src'] !== undefined) {
       model = model.with({ src: wb['@src'] });
@@ -100,7 +101,7 @@ export class WbInline extends Immutable.Record(defaults()) {
   toPersistence(): Object {
     const wbinline = {
       'wb:inline': {
-        '@idref': this.idref,
+        '@idref': this.idref.value(),
         '@src': this.src,
         '@height': this.height,
         '@width': this.width,

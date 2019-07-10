@@ -2,8 +2,8 @@ import * as Immutable from 'immutable';
 import { augment, setId, ensureIdGuidPresent } from '../common';
 
 export type EssayParams = {
-  id? : string,
-  name? : string,
+  id?: string,
+  name?: string,
   guid?: string,
 };
 
@@ -19,15 +19,15 @@ export class Essay extends Immutable.Record(defaultContent) {
 
   contentType: 'Essay';
   elementType: 'essay';
-  id : string;
-  name : string;
+  id: string;
+  name: string;
   guid: string;
 
   constructor(params?: EssayParams) {
     super(augment(params));
   }
 
-  clone() : Essay {
+  clone(): Essay {
     return ensureIdGuidPresent(this);
   }
 
@@ -35,7 +35,7 @@ export class Essay extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string, notify: () => void) : Essay {
+  static fromPersistence(json: Object, guid: string, notify: () => void): Essay {
 
     const n = (json as any).essay;
     let model = new Essay({ guid });
@@ -50,7 +50,7 @@ export class Essay extends Immutable.Record(defaultContent) {
 
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     return {
       essay: {

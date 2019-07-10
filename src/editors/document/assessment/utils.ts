@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
+import { ResourceId } from 'data/types';
 
 /**
  * Handles question reordering in a branch mode assessment.
@@ -11,7 +12,7 @@ import * as contentTypes from 'data/contentTypes';
  * @param editDetails the details about the reordering
  */
 export function handleBranchingReordering(
-  assessmentId: string,
+  assessmentId: ResourceId,
   originalPages: Immutable.OrderedMap<string, contentTypes.Page>,
   updatedNodes: Immutable.OrderedMap<string, contentTypes.Node>)
   : Immutable.OrderedMap<string, contentTypes.Page> {
@@ -45,7 +46,7 @@ export function handleBranchingReordering(
   let pages = Immutable.OrderedMap<string, contentTypes.Page>(
     updatedNodes.toArray().map((node, index) => {
       const p = new contentTypes.Page().with({
-        id: 'p' + (index + 1).toString() + '_' + assessmentId,
+        id: 'p' + (index + 1).toString() + '_' + assessmentId.value(),
         guid: originalPageArr[newToOldIndices[index]].guid,
         nodes: Immutable.OrderedMap<string, contentTypes.Node>([[node.guid, node]]),
       });
@@ -77,7 +78,7 @@ export function handleBranchingReordering(
  * @param guid the guid of the deleted question
  */
 export function handleBranchingDeletion(
-  assessmentId: string,
+  assessmentId: ResourceId,
   originalPages: Immutable.OrderedMap<string, contentTypes.Page>,
   guid: string)
   : Immutable.OrderedMap<string, contentTypes.Page> {
@@ -108,7 +109,7 @@ export function handleBranchingDeletion(
 
       const p = page.with({
         nodes: page.nodes.set(q.guid, q),
-        id: 'p' + (index + 1).toString() + '_' + assessmentId,
+        id: 'p' + (index + 1).toString() + '_' + assessmentId.value(),
       });
       return [p.guid, p];
     }));

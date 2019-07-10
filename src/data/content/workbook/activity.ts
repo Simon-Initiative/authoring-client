@@ -4,9 +4,10 @@ import { augment, getChildren, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import { Image } from 'data/content/learning/image';
 import { Maybe } from 'tsmonad';
+import { ResourceId } from 'data/types';
 
 export type ActivityParams = {
-  idref?: string,
+  idref?: ResourceId,
   purpose?: Maybe<string>,
   image?: Maybe<Image>,
   guid?: string,
@@ -15,7 +16,7 @@ export type ActivityParams = {
 const defaultContent = {
   contentType: 'Activity',
   elementType: 'activity',
-  idref: '',
+  idref: ResourceId.of(''),
   purpose: Maybe.just('quiz'),
   image: Maybe.nothing<Image>(),
   guid: '',
@@ -24,7 +25,7 @@ const defaultContent = {
 export class Activity extends Immutable.Record(defaultContent) {
   contentType: 'Activity';
   elementType: 'activity';
-  idref: string;
+  idref: ResourceId;
   purpose: Maybe<string>;
   image: Maybe<Image>;
   guid: string;
@@ -37,19 +38,19 @@ export class Activity extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Activity {
+  clone(): Activity {
     return ensureIdGuidPresent(this.with({
       image: this.image.lift(i => i.clone()),
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void) : Activity {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Activity {
     const t = (root as any).activity;
 
     let model = new Activity({ guid });
 
     if (t['@idref'] !== undefined) {
-      model = model.with({ idref: t['@idref'] });
+      model = model.with({ idref: ResourceId.of(t['@idref']) });
     }
     if (t['@purpose'] !== undefined) {
       model = model.with({ purpose: Maybe.just(t['@purpose']) });
@@ -71,10 +72,10 @@ export class Activity extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     const activity = {
       activity: {
-        '@idref': this.idref,
+        '@idref': this.idref.value(),
         '#array': this.image.caseOf({
           just: i => [i.toPersistence],
           nothing: () => [],

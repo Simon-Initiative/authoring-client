@@ -7,12 +7,13 @@ import { computePermutations } from 'actions/choices';
 import { toggleAdvancedScoring } from 'actions/questionEditor';
 import { AnalyticsState } from 'reducers/analytics';
 import { AssessmentModel } from 'data/models';
+import { ResourceId } from 'data/types';
 
 interface StateProps {
   advancedScoringInitialized: boolean;
   advancedScoring: boolean;
   analytics: AnalyticsState;
-  assessmentId: string;
+  assessmentId: ResourceId;
 }
 
 interface DispatchProps {

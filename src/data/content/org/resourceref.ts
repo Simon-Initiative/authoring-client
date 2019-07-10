@@ -2,11 +2,12 @@ import * as Immutable from 'immutable';
 import { augment } from 'data/content/common';
 import { Maybe } from 'tsmonad';
 import * as types from 'data/content/org/types';
+import { ResourceId } from 'data/types';
 
 export type ResourceRefParams = {
   package?: Maybe<string>,
   version?: Maybe<string>,
-  idref?: string,
+  idref?: ResourceId,
   guid?: string,
 };
 
@@ -15,7 +16,7 @@ const defaultContent = {
   elementType: 'resourceref',
   package: Maybe.nothing<string>(),
   version: Maybe.nothing<string>(),
-  idref: '',
+  idref: ResourceId.of(''),
   guid: '',
 };
 
@@ -25,7 +26,7 @@ export class ResourceRef extends Immutable.Record(defaultContent) {
   elementType: 'resourceref';
   package: Maybe<string>;
   version: Maybe<string>;
-  idref: string;
+  idref: ResourceId;
   guid: string;
 
   constructor(params?: ResourceRefParams) {
@@ -48,7 +49,7 @@ export class ResourceRef extends Immutable.Record(defaultContent) {
       params.version = Maybe.just(r['@version']);
     }
     if (r['@idref'] !== undefined) {
-      params.idref = r['@idref'];
+      params.idref = ResourceId.of(r['@idref']);
     }
 
     return new ResourceRef(params);
@@ -58,7 +59,7 @@ export class ResourceRef extends Immutable.Record(defaultContent) {
 
     const r = {
       resourceref: {
-        '@idref': this.idref,
+        '@idref': this.idref.value(),
       },
     };
 

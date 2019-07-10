@@ -6,7 +6,7 @@ import * as t from 'data/contentTypes';
 import './tabs.scss';
 import * as org from 'data/models/utils/org';
 import { CourseModel, OrganizationModel } from 'data/models';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import { RemoveCommand } from '../commands/remove';
 import { PreconditionsEditor } from '../PreconditionsEditor';
 import { DragHandle } from 'components/common/DragHandle';
@@ -21,14 +21,14 @@ export interface TabProps {
   nodeState: Tree.NodeState<OutlineNode>;
   handlers: Tree.Handlers;
   connectDragSource?: any;
-  onView: (id) => void;
+  onView: (id: string | ResourceId) => void;
   onEdit: (cr: org.OrgChangeRequest) => void;
   commandProcessor: (model, command) => void;
 }
 
 export function renderTab(
   course: CourseModel,
-  onView: (id) => void,
+  onView: (id: string) => void,
   onEdit: (cr) => void,
   commandProcessor: (model, command) => void,
   placements: org.Placements,
@@ -76,7 +76,7 @@ const Label = (props) => {
 const ItemTab = (props: TabProps) => {
   const item = props.node as t.Item;
 
-  const resource = props.course.resourcesById.get(item.resourceref.idref);
+  const resource = props.course.resourcesById.get(item.resourceref.idref.value());
   const label = resource.type === LegacyTypes.workbook_page
     ? 'Workbook Page' : 'Assessment';
   const title = resource.title;
@@ -122,7 +122,7 @@ const ContainerTab = (props: TabProps) => {
   const title = (props.node as any).title;
 
   const previewLink = (
-    <button className="btn btn-link" onClick={() => props.onView((props.node as any).id)}>
+    <button className="btn btn-link" onClick={() => props.onView(props.node.id)}>
       {title}
     </button>
   );

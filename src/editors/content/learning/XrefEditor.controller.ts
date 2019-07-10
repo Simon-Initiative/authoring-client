@@ -9,7 +9,7 @@ import { CourseModel } from 'data/models';
 import { ContentElement } from 'data/content/common/interfaces';
 import { fetchAndSetTargetNode, MissingTargetId } from 'actions/xref';
 import { Either } from 'tsmonad';
-import { DocumentId } from 'data/types';
+import { ResourceId } from 'data/types';
 
 interface StateProps {
   clipboard: Clipboard;
@@ -20,7 +20,7 @@ interface StateProps {
 interface DispatchProps {
   displayModal: (component: any) => void;
   dismissModal: () => void;
-  updateTarget: (targetId: string, documentResourceId: string) => Promise<any>;
+  updateTarget: (targetId: string, documentResourceId: ResourceId) => Promise<any>;
 }
 
 interface OwnProps extends AbstractContentEditorProps<contentTypes.Xref> {
@@ -39,8 +39,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     displayModal: component => dispatch(modalActions.display(component)),
     dismissModal: () => dispatch(modalActions.dismiss()),
-    updateTarget: (targetId: string, documentId: DocumentId) =>
-      dispatch(fetchAndSetTargetNode(targetId, documentId) as any),
+    updateTarget: (targetId: string, resourceId: ResourceId) =>
+      dispatch(fetchAndSetTargetNode(targetId, resourceId)),
   };
 };
 

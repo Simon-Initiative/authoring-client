@@ -1,12 +1,13 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { ContentElements, LINK_ELEMENTS } from 'data/content/common/elements';
+import { ResourceGuid } from 'data/types';
 
 
 export type XrefParams = {
   target?: string,
   idref?: string,
-  page?: string,
+  page?: ResourceGuid,
   title?: string,
   content?: ContentElements,
   guid?: string,
@@ -17,7 +18,7 @@ const defaultContent = {
   elementType: 'xref',
   target: 'self',
   idref: '',
-  page: '',
+  page: ResourceGuid.of(''),
   title: '',
   content: new ContentElements().with({ supportedElements: Immutable.List(LINK_ELEMENTS) }),
   guid: '',
@@ -30,7 +31,7 @@ export class Xref extends Immutable.Record(defaultContent) {
   content: ContentElements;
   target: string;
   idref: string;
-  page: string;
+  page: ResourceGuid;
   title: string;
   guid: string;
 
@@ -42,13 +43,13 @@ export class Xref extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Xref {
+  clone(): Xref {
     return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void) : Xref {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Xref {
 
     const t = (root as any).xref;
 
@@ -64,22 +65,24 @@ export class Xref extends Immutable.Record(defaultContent) {
       model = model.with({ target: t['@target'] });
     }
     if (t['@page'] !== undefined) {
-      model = model.with({ page: t['@page'] });
+      model = model.with({ page: ResourceGuid.of(t['@page']) });
     }
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(getChildren(t), '', LINK_ELEMENTS, null, notify) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(getChildren(t), '', LINK_ELEMENTS, null, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       xref: {
         '@title': this.title,
         '@idref': this.idref,
         '@target': this.target,
-        '@page': this.page,
+        '@page': this.page.value(),
       },
     };
   }

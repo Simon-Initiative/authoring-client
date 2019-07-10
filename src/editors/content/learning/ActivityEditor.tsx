@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import { Select } from 'editors/content/common/Select';
 import { PurposeTypes } from 'data/content/learning/common';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -36,7 +36,7 @@ export interface ActivityEditorProps {
 class ActivityEditor
   extends AbstractContentEditor<contentTypes.Activity,
   StyledComponentProps<ActivityEditorProps, typeof styles>, ActivityEditorState> {
-  constructor(props) {
+  constructor(props: StyledComponentProps<ActivityEditorProps, typeof styles>) {
     super(props);
 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
@@ -56,7 +56,7 @@ class ActivityEditor
   }
 
   isPage() {
-    return this.props.context.courseModel.resourcesById.get(this.props.model.idref).type
+    return this.props.context.courseModel.resourcesById.get(this.props.model.idref.value()).type
       === LegacyTypes.workbook_page;
   }
 
@@ -67,8 +67,8 @@ class ActivityEditor
     this.props.onEdit(model, model);
   }
 
-  onAssessmentChange(idref): void {
-    const model = this.props.model.with({ idref });
+  onAssessmentChange(idref: string): void {
+    const model = this.props.model.with({ idref: ResourceId.of(idref) });
     this.props.onEdit(model, model);
   }
 
@@ -82,7 +82,7 @@ class ActivityEditor
     const resources = (type: LegacyTypes) => this.props.context.courseModel.resources
       .toArray()
       .filter(r => r.type === type && r.resourceState !== ResourceState.DELETED)
-      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+      .map(r => <option key={r.id.value()} value={r.id.value()}>{r.title}</option>);
 
     const summatives = resources(LegacyTypes.assessment2);
     const feedbacks = resources(LegacyTypes.feedback);
@@ -98,7 +98,7 @@ class ActivityEditor
     const activitySelect = options => <SidebarGroup label={this.isPage() ? 'Page' : 'Assessment'}>
       <Select
         editMode={this.props.editMode}
-        value={this.props.model.idref}
+        value={this.props.model.idref.value()}
         onChange={this.onAssessmentChange}>
         {options}
       </Select>
@@ -149,7 +149,8 @@ class ActivityEditor
   renderMain() {
     const { classes } = this.props;
 
-    const resource = this.props.context.courseModel.resourcesById.get(this.props.model.idref);
+    const resource = this.props.context.courseModel.resourcesById
+      .get(this.props.model.idref.value());
 
     const titleOrPlaceholder = resource !== undefined
       ? resource.title

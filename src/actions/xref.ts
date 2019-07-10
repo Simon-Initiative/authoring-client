@@ -6,6 +6,8 @@ import { WorkbookPageModel } from 'data/models';
 import { findNodes } from 'data/models/utils/workbook';
 import { Either } from 'tsmonad';
 import { ContiguousText } from 'data/contentTypes';
+import { ResourceId, ResourceGuid } from 'data/types';
+import { resourceId } from 'types/edge';
 
 export type SET_TARGET = 'SET_TARGET';
 export const SET_TARGET = 'SET_TARGET';
@@ -26,12 +28,12 @@ function setTargetNode(node): SetXrefTargetAction {
 
 // targetId is an id
 // documentId is a guid
-export function fetchAndSetTargetNode(targetId: string, resourceId: string) {
+export function fetchAndSetTargetNode(targetId: string, resourceId: ResourceId) {
   return (dispatch: Dispatch, getState: () => State): Promise<any> => {
     const { course } = getState();
-    const documentId = course.resourcesById.get(resourceId).guid;
+    const resourceGuid = course.resourcesById.get(resourceId.value()).guid;
 
-    return persistence.retrieveDocument(course.idvers, documentId).then((doc) => {
+    return persistence.retrieveDocument(course.idvers, resourceGuid).then((doc) => {
       const wbpage = doc.model as WorkbookPageModel;
       // Find the target node in the workbook page's content tree
       const node = findNodes(

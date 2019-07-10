@@ -6,7 +6,7 @@ import { ModalMessage } from 'utils/ModalMessage';
 import { modalActions } from 'actions/modal';
 import { viewObjectives } from 'actions/view';
 import * as React from 'react';
-import { CourseIdVers } from 'data/types';
+import { CourseIdVers, ResourceId } from 'data/types';
 import { Maybe } from 'tsmonad';
 
 export function buildReportProblemAction(
@@ -103,7 +103,7 @@ function buildModalMessageAction(label, text): Messages.MessageAction {
 }
 
 function goToObjectivesPage(
-  label: string, courseId: CourseIdVers, orgId: string): Messages.MessageAction {
+  label: string, courseId: CourseIdVers, orgId: ResourceId): Messages.MessageAction {
   return {
     label,
     enabled: true,
@@ -126,7 +126,7 @@ const missingObjectivesDetails =
   </React.Fragment>;
 // tslint:enable:max-line-length
 
-export function buildMissingObjectivesMessage(courseId: CourseIdVers, orgId: string) {
+export function buildMissingObjectivesMessage(courseId: CourseIdVers, orgId: ResourceId) {
 
   const actions = [
     buildModalMessageAction('Learn', missingObjectivesDetails),
@@ -161,7 +161,7 @@ const missingSkillsDetails =
   </React.Fragment>;
 // tslint:enable:max-line-length
 
-export function buildMissingSkillsMessage(courseId: CourseIdVers, orgId: string) {
+export function buildMissingSkillsMessage(courseId: CourseIdVers, orgId: ResourceId) {
 
   const actions = [
     buildModalMessageAction('Learn', missingSkillsDetails),

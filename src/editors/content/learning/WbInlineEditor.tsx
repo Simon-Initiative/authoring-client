@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import { Select } from 'editors/content/common/Select';
 import { PurposeTypes } from 'data/content/learning/common';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -51,7 +51,7 @@ export default class WbInlineEditor
   }
 
   onAssessmentChange(idref: string): void {
-    const model = this.props.model.with({ idref });
+    const model = this.props.model.with({ idref: ResourceId.of(idref) });
     this.props.onEdit(model, model);
   }
 
@@ -65,7 +65,7 @@ export default class WbInlineEditor
     const inlineAssessmentOptions = this.props.context.courseModel.resources
       .toArray()
       .filter(r => r.type === LegacyTypes.inline && r.resourceState !== ResourceState.DELETED)
-      .map(r => <option key={r.guid} value={r.id}>{r.title}</option>);
+      .map(r => <option key={r.guid.value()} value={r.id.value()}>{r.title}</option>);
 
     // A purpose is not required, so we need to add an option for an empty type
     const purposeTypesWithEmpty = PurposeTypes.slice();
@@ -76,7 +76,7 @@ export default class WbInlineEditor
         <SidebarGroup label="Assessment">
           <Select
             editMode={this.props.editMode}
-            value={this.props.model.idref}
+            value={this.props.model.idref.value()}
             onChange={this.onAssessmentChange}>
             {inlineAssessmentOptions}
           </Select>
@@ -114,7 +114,8 @@ export default class WbInlineEditor
   }
 
   renderMain() {
-    const resource = this.props.context.courseModel.resourcesById.get(this.props.model.idref);
+    const resource = this.props.context.courseModel.resourcesById
+      .get(this.props.model.idref.value());
     const title = resource === undefined ? 'Loading...' : resource.title;
 
     const iconStyle = { color: CONTENT_COLORS.WbInline };

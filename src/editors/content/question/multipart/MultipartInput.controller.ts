@@ -10,13 +10,14 @@ import { RouterState } from 'reducers/router';
 import { clearSearchParam } from 'actions/router';
 import { AnalyticsState } from 'reducers/analytics';
 import { AssessmentModel } from 'data/models';
+import { ResourceId } from 'data/types';
 
 interface StateProps {
   activeContext: ActiveContext;
   selectedInput: Maybe<string>;
   router: RouterState;
   analytics: AnalyticsState;
-  assessmentId: string;
+  assessmentId: ResourceId;
 }
 
 interface DispatchProps {

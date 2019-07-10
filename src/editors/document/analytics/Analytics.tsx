@@ -217,7 +217,7 @@ class Analytics
   }
 
   async fetchResources(nextProps: AnalyticsProps) {
-    const { model, course, objectives, skills, organization } = nextProps;
+    const { model, course, objectives, skills } = nextProps;
 
     // get all page and assesment items in org item
     const ids = flattenChildren(model.children)
@@ -226,7 +226,7 @@ class Analytics
         switch (resource.type) {
           case LegacyTypes.workbook_page:
           case LegacyTypes.assessment2:
-            return acc.push(resource.id);
+            return acc.push(resource.id.value());
           default:
             return acc;
         }

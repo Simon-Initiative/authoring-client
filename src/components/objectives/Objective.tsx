@@ -97,7 +97,7 @@ const getOrderedObjectiveQuestions = (
     skill
       ? skillQuestionRefs
         .valueOr(Map<string, List<QuestionRef>>())
-        .get(skill.id) || List<QuestionRef>()
+        .get(skill.id.value()) || List<QuestionRef>()
       : skills.reduce(
         (acc, skill) => acc
           .concat(skillQuestionRefs
@@ -458,8 +458,8 @@ class Objective
     const skillContainsFormativeQuestion = (
       skill: contentTypes.Skill, question: QuestionRef) =>
       skillQuestionRefs.caseOf({
-        just: questionRefs => questionRefs.has(skill.id)
-          && !!questionRefs.get(skill.id)
+        just: questionRefs => questionRefs.has(skill.id.value())
+          && !!questionRefs.get(skill.id.value())
             .find(r => r.id === question.id && r.assessmentType === LegacyTypes.inline),
         nothing: () => false,
       });
@@ -467,8 +467,8 @@ class Objective
     const skillContainsSummativeQuestion = (
       skill: contentTypes.Skill, question: QuestionRef) =>
       skillQuestionRefs.caseOf({
-        just: questionRefs => questionRefs.has(skill.id)
-          && !!questionRefs.get(skill.id)
+        just: questionRefs => questionRefs.has(skill.id.value())
+          && !!questionRefs.get(skill.id.value())
             .find(r => r.id === question.id && r.assessmentType === LegacyTypes.assessment2),
         nothing: () => false,
       });
@@ -476,8 +476,8 @@ class Objective
     const skillContainsPoolQuestion = (
       skill: contentTypes.Skill, question: QuestionRef) =>
       skillQuestionRefs.caseOf({
-        just: questionRefs => questionRefs.has(skill.id)
-          && !!questionRefs.get(skill.id)
+        just: questionRefs => questionRefs.has(skill.id.value())
+          && !!questionRefs.get(skill.id.value())
             .find(r => r.id === question.id && r.assessmentType === LegacyTypes.assessment2_pool),
         nothing: () => false,
       });

@@ -107,8 +107,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     this.coursePostreqs = this.createPostreqs(this.coursePrereqs);
 
-    this.prereqRefs = this.coursePrereqs && this.coursePrereqs[this.props.model.resource.id]
-      ? Immutable.List<string>(this.coursePrereqs[this.props.model.resource.id])
+    this.prereqRefs = this.coursePrereqs && this.coursePrereqs[this.props.model.resource.id.value()]
+      ? Immutable.List<string>(this.coursePrereqs[this.props.model.resource.id.value()])
       : Immutable.List<string>();
 
     this.workbookPages = this.props.context.courseModel.resourcesById
@@ -281,11 +281,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       && JSON.parse(localStorage.getItem(courseKey));
 
     if (anyExistingPrereqs) {
-      anyExistingPrereqs[model.resource.id] = prereqRefs.toArray();
+      anyExistingPrereqs[model.resource.id.value()] = prereqRefs.toArray();
       localStorage.setItem(courseKey, JSON.stringify(anyExistingPrereqs));
     } else {
       localStorage.setItem(courseKey, JSON.stringify(
-        { [model.resource.id]: prereqRefs.toArray() },
+        { [model.resource.id.value()]: prereqRefs.toArray() },
       ));
     }
   }
