@@ -24,7 +24,7 @@ export interface TreeNodeProps {
   editMode: boolean;
   onClick: (model: NodeTypes) => void;
   onReposition: (
-  sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
+    sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
 
 export interface TreeNodeState {
@@ -62,19 +62,19 @@ export class TreeNode
 
   renderTitle() {
 
-    const { isExpanded, model } = this.props;
+    const { isExpanded, model, context } = this.props;
 
-    if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
+    if (model.contentType === contentTypes.OrganizationContentTypes.Item) {
 
-      const resource = this.props.context.courseModel.resourcesById.get(
-        this.props.model.resourceref.idref);
+      const resource = context.courseModel.resourcesById.get(
+        model.resourceref.idref.value());
       return resource !== undefined
         ? <React.Fragment>
           <span style={{ marginRight: 8 }}>{this.getResourceIcon(resource)}</span>{resource.title}
         </React.Fragment>
         : 'Loading...';
     }
-    if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
+    if (model.contentType === contentTypes.OrganizationContentTypes.Include) {
       return 'Include';
     }
 
@@ -82,12 +82,12 @@ export class TreeNode
     const hasShownChildren = <i className="toggle fa fa-caret-down"></i>;
 
     const toggle = isExpanded ? hasShownChildren : hasHiddenChildren;
-    const contentType = this.getLabel(this.props.model.contentType);
+    const contentType = this.getLabel(model.contentType);
     const number = this.getAdaptiveNumber();
 
     return (
       <React.Fragment>
-        {toggle}{contentType} {number}: {this.props.model.title}
+        {toggle}{contentType} {number}: {model.title}
       </React.Fragment>
     );
   }

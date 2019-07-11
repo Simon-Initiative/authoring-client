@@ -186,7 +186,7 @@ const PoolRefTab = (props: TabProps) => {
   const pool = p.source as PoolRef;
 
   const previewText = pool
-    ? props.course.resourcesById.get(pool.idref).title
+    ? props.course.resourcesById.get(pool.idref.value()).title
     : '(No Title)';
 
   return (

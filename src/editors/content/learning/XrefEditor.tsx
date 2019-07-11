@@ -29,7 +29,7 @@ export interface XrefEditorProps
   onShowSidebar: () => void;
   displayModal: (component: any) => void;
   dismissModal: () => void;
-  updateTarget: (targetId: string, documentResourceId: ResourceId) => Promise<any>;
+  updateTarget: (targetId: string, documentResourceId: string) => Promise<any>;
   clipboard: Clipboard;
   course: CourseModel;
   target: Either<MissingTargetId, ContentElement>;
@@ -68,7 +68,7 @@ export default class XrefEditor
     // page to be the first workbook page so that an error is not thrown in case the user chooses
     // a target element without changing the page using the 'page to link to' dropdown
     if (!this.props.model.page) {
-      this.props.onEdit(this.props.model.with({ page: this.pages[0].guid }));
+      this.props.onEdit(this.props.model.with({ page: this.pages[0].guid.value() }));
     }
 
     // Check if we need to fetch the target element from its workbook page
@@ -112,7 +112,7 @@ export default class XrefEditor
   onChangePage(page: string) {
     const { onEdit, model, updateTarget } = this.props;
 
-    onEdit(model.with({ page: ResourceGuid.of(page) }));
+    onEdit(model.with({ page }));
 
     // Search for the target element in the new page
     if (model.idref) {
@@ -132,7 +132,7 @@ export default class XrefEditor
           <Select
             editMode={this.props.editMode}
             label=""
-            value={model.page.value()}
+            value={model.page}
             onChange={this.onChangePage}>
             {pageOptions}
           </Select>

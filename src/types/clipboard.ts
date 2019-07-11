@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
-import { ResourceGuid } from 'data/types';
 
 export type ClipboardParams = {
   item?: Maybe<ContentElement>;
@@ -16,7 +15,7 @@ const defaultContent = {
 export class Clipboard extends Immutable.Record(defaultContent) {
 
   item: Maybe<ContentElement>;
-  page: Maybe<ResourceGuid>;
+  page: Maybe<string>;
 
   constructor(params?: ClipboardParams) {
     super(params);

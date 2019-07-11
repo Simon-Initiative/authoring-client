@@ -373,7 +373,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                 just: node =>
                   <AssessmentNodeRenderer
                     {...this.props}
-                    allSkills={this.props.context.skills}
+                    allSkills={this.props.context.skills
+                      .map(s => ({ id: s.id.value(), title: s.title })).toOrderedMap()}
                     activeContentGuid={activeContentGuid}
                     model={node}
                     onEdit={(c: Node, src: ContentElement) => this.onEdit(node.guid, c, src)}

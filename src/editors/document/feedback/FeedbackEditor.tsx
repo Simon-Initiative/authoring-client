@@ -336,7 +336,8 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
               </Outline>
               <AssessmentNodeRenderer
                 {...this.props}
-                allSkills={this.props.context.skills}
+                allSkills={this.props.context.skills
+                  .map(s => ({ id: s.id.value(), title: s.title })).toOrderedMap()}
                 activeContentGuid={activeContentGuid}
                 model={currentNode}
                 onEdit={(c: FeedbackQuestion, src: ContentElement) => this.onEditNode(

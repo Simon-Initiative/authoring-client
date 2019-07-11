@@ -555,7 +555,7 @@ class ObjectiveSkillView
     if (!this.state.objectives) {
       return;
     }
-    const objectiveIds = this.state.objectives.objectives.toArray().map(o => o.id);
+    const objectiveIds = this.state.objectives.objectives.toArray().map(o => o.id.value());
     this.props.dispatch(expandNodes(ResourceId.of('objectives'), objectiveIds));
   }
 
@@ -770,25 +770,21 @@ class ObjectiveSkillView
 
   }
 
-
-  attachSkills(model: contentTypes.LearningObjective, strings: string[]) {
-    const skills = Immutable.List<string>(model.skills.toArray().concat(strings));
-    this.onObjectiveEdit(model.with({ skills }));
-  }
-
   onAddNewSkill(model: contentTypes.LearningObjective) {
 
     this.createNewSkill()
       .then((id) => {
-        const updated = model.with({ skills: model.skills.push(id.value()) });
+        const updated = model.with({ skills: model.skills.push(id) });
         this.onObjectiveEdit(updated);
       });
   }
 
-  onExistingSkillInsert(model: contentTypes.LearningObjective, string: string) {
+  onExistingSkillInsert(model: contentTypes.LearningObjective, skillId: ResourceId) {
     this.services.dismissModal();
 
-    const updated = model.with({ skills: model.skills.concat(string) as Immutable.List<string> });
+    const updated = model.with({
+      skills: model.skills.concat(skillId).toList(),
+    });
     this.onObjectiveEdit(updated);
   }
 
@@ -812,7 +808,7 @@ class ObjectiveSkillView
       toSkillsMap(this.state.skills.skills.toArray());
 
     const attachedSkills =
-      toSkillsMap(model.skills.map(id => allSkills[id]).toArray());
+      toSkillsMap(model.skills.map(id => allSkills[id.value()]).toArray());
 
     // Not all skills fetched from server are attached to any objectives.
     // We filter out the completely unattached skills and the skills already attached
@@ -821,8 +817,8 @@ class ObjectiveSkillView
       .toArray()
       .forEach((objective: contentTypes.LearningObjective) => {
         objective.skills.forEach((id) => {
-          const skill = allSkills[id];
-          if (skill !== undefined && !attachedSkills[id]) {
+          const skill = allSkills[id.value()];
+          if (skill !== undefined && !attachedSkills[id.value()]) {
             availableSkills.push(skill);
           }
         });
@@ -843,7 +839,7 @@ class ObjectiveSkillView
 
   detachSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
     // Update the parent objective
-    const index = objective.skills.indexOf(model.id.value());
+    const index = objective.skills.indexOf(model.id);
     const skills = objective.skills.remove(index);
     const updated = objective.with({ skills });
 
@@ -898,7 +894,7 @@ class ObjectiveSkillView
   countSkillRefs(model: contentTypes.Skill): number {
     return this.state.objectives.objectives
       .toArray()
-      .map(o => o.skills.contains(model.id.value()) ? 1 : 0)
+      .map(o => o.skills.contains(model.id) ? 1 : 0)
       .reduce((acc, count) => acc + count, 0);
   }
 
@@ -1131,7 +1127,8 @@ class ObjectiveSkillView
       });
       return objTitle.toLowerCase().includes(text)
         || o.skills.toArray().reduce(
-          (acc, s) => acc || (skills.has(s) && skills.get(s).title.toLowerCase().includes(text)),
+          (acc, s) => acc || (skills.has(s.value()) &&
+            skills.get(s.value()).title.toLowerCase().includes(text)),
           false,
         );
     };
@@ -1199,8 +1196,8 @@ class ObjectiveSkillView
                 objective={objective}
                 organization={organization}
                 highlightText={searchText}
-                skills={objective.skills.filter(string => this.props.skills.has(string))
-                  .map(string => this.props.skills.get(string)).toList()}
+                skills={objective.skills.filter(skillId => this.props.skills.has(skillId.value()))
+                  .map(skillId => this.props.skills.get(skillId.value())).toList()}
                 isExpanded={isExpanded(objective.id)}
                 onToggleExpanded={this.onToggleExpanded}
                 editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}

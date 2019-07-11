@@ -7,7 +7,7 @@ import { ResourceGuid } from 'data/types';
 export type XrefParams = {
   target?: string,
   idref?: string,
-  page?: ResourceGuid,
+  page?: string,
   title?: string,
   content?: ContentElements,
   guid?: string,
@@ -18,7 +18,7 @@ const defaultContent = {
   elementType: 'xref',
   target: 'self',
   idref: '',
-  page: ResourceGuid.of(''),
+  page: '',
   title: '',
   content: new ContentElements().with({ supportedElements: Immutable.List(LINK_ELEMENTS) }),
   guid: '',
@@ -31,7 +31,7 @@ export class Xref extends Immutable.Record(defaultContent) {
   content: ContentElements;
   target: string;
   idref: string;
-  page: ResourceGuid;
+  page: string;
   title: string;
   guid: string;
 
@@ -65,7 +65,7 @@ export class Xref extends Immutable.Record(defaultContent) {
       model = model.with({ target: t['@target'] });
     }
     if (t['@page'] !== undefined) {
-      model = model.with({ page: ResourceGuid.of(t['@page']) });
+      model = model.with({ page: t['@page'] });
     }
 
     model = model.with({
@@ -82,7 +82,7 @@ export class Xref extends Immutable.Record(defaultContent) {
         '@title': this.title,
         '@idref': this.idref,
         '@target': this.target,
-        '@page': this.page.value(),
+        '@page': this.page,
       },
     };
   }

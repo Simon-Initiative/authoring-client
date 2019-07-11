@@ -3,44 +3,37 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../data/contentTypes';
 
 import ModalSelection from '../../utils/selection/ModalSelection';
+import { ResourceId } from 'data/types';
+import { Maybe } from 'tsmonad';
 
 
 export interface ExistingSkillSelection {
 
 }
 
-type SkillId = string;
-
 export interface ExistingSkillSelectionProps {
   skills: Immutable.List<contentTypes.Skill>;
   objective: contentTypes.LearningObjective;
-  onInsert: (objective: contentTypes.LearningObjective, selected: SkillId) => void;
+  onInsert: (objective: contentTypes.LearningObjective, selectedSkill: ResourceId) => void;
   onCancel: () => void;
   disableInsert: boolean;
 }
 
 export interface ExistingSkillSelectionState {
-  selected: SkillId;
+  selectedSkill: Maybe<ResourceId>;
 }
 
 export class ExistingSkillSelection
   extends React.PureComponent<ExistingSkillSelectionProps, ExistingSkillSelectionState> {
 
-  constructor(props) {
-    super(props);
+  state = {
+    ...this.state,
+    selectedSkill: Maybe.nothing<ResourceId>(),
+  };
 
-    this.state = {
-      selected: undefined,
-    };
-
-    this.clickResource = this.clickResource.bind(this);
-  }
-
-  onInsert = () => this.props.onInsert(this.props.objective, this.state.selected);
-
-  clickResource(e) {
-    const selected = e.target.value;
-    this.setState({ selected });
+  clickResource = (e: any) => {
+    const selectedSkill = e.target.value;
+    this.setState({ selectedSkill });
   }
 
   renderRows() {
@@ -49,7 +42,10 @@ export class ExistingSkillSelection
         className="btn btn-link">{r.title}</button>;
 
     return this.props.skills.map((r) => {
-      const active = this.state.selected === r.id.value() ? 'table-active' : '';
+      const active = this.state.selectedSkill.caseOf({
+        just: skillId => skillId.eq(r.id) && 'table-active',
+        nothing: () => '',
+      });
       return <tr key={r.id.value()} className={active}>
         <td>{link(r)}</td>
       </tr>;
@@ -60,9 +56,15 @@ export class ExistingSkillSelection
   render() {
     return (
       <ModalSelection title="Select Existing Skill"
-        disableInsert={this.state.selected === undefined && this.props.disableInsert}
+        disableInsert={this.state.selectedSkill.caseOf({
+          just: skillId => this.props.disableInsert,
+          nothing: () => true,
+        })}
         onCancel={this.props.onCancel}
-        onInsert={this.onInsert}>
+        onInsert={() => this.state.selectedSkill.caseOf({
+          just: skillId => this.props.onInsert(this.props.objective, skillId),
+          nothing: () => undefined,
+        })}>
         <table className="table table-sm">
           <thead>
             <tr>

@@ -12,7 +12,7 @@ import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
 import { buildGeneralErrorMessage } from 'utils/error';
-import { CourseIdVers, CourseGuid } from 'data/types';
+import { CourseIdVers, CourseGuid, CourseId } from 'data/types';
 
 function reportProblemAction(): Messages.MessageAction {
 
@@ -42,8 +42,9 @@ function errorMessageAction(): Messages.Message {
 
 export type CourseDescription = {
   guid: CourseGuid,
-  idvers: CourseIdVers,
+  id: string,
   version: string,
+  idvers: CourseIdVers,
   title: string,
   description: string,
   buildStatus: string,
@@ -86,9 +87,9 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
     const searchText = this.state.searchText;
     const text = searchText.trim().toLowerCase();
     const filterFn = (r: CourseDescription): boolean => {
-      const { title, idvers, version } = r;
+      const { title, id, version } = r;
       const titleLower = title ? title.toLowerCase() : '';
-      const idLower = idvers.value() ? idvers.value().toLowerCase() : '';
+      const idLower = id ? id.toLowerCase() : '';
       const versionLower = version ? version.toLowerCase() : '';
 
       return text === '' ||
@@ -107,8 +108,9 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
       .then((docs) => {
         const courses: CourseDescription[] = docs.map(d => ({
           guid: d.guid,
-          idvers: d.idvers,
+          id: d.id,
           version: d.version,
+          idvers: d.idvers,
           title: d.title,
           dateCreated: d.dateCreated,
           description: d.description,

@@ -203,7 +203,9 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
   }
 
   fetchSkillsIfMissing = (props: AssessmentEditorProps) => {
+    console.log('fetch skills if missing')
     if (hasUnknownSkill(props.model, props.context.skills)) {
+      console.log('has unknown skill')
       props.onFetchSkills(props.context.courseModel.idvers);
     }
   }
@@ -607,7 +609,8 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
               </Outline>
               <AssessmentNodeRenderer
                 {...this.props}
-                allSkills={this.props.context.skills}
+                allSkills={this.props.context.skills
+                  .map(s => ({ id: s.id.value(), title: s.title })).toOrderedMap()}
                 activeContentGuid={activeContentGuid}
                 model={currentNode}
                 onEdit={(c: Node, src: ContentElement) => this.onEditNode(currentNode.guid, c, src)}

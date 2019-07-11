@@ -3,7 +3,6 @@ import {
   COLLAPSE_NODES, collapseNodesAction, EXPAND_NODES, expandNodesAction,
 } from '../actions/expand';
 import { OtherAction } from './utils';
-import { ResourceId } from 'data/types';
 
 type ExpandCollapseAction =
   expandNodesAction |

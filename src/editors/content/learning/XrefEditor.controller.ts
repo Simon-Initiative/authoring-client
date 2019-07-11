@@ -20,7 +20,7 @@ interface StateProps {
 interface DispatchProps {
   displayModal: (component: any) => void;
   dismissModal: () => void;
-  updateTarget: (targetId: string, documentResourceId: ResourceId) => Promise<any>;
+  updateTarget: (targetId: string, documentResourceId: string) => Promise<any>;
 }
 
 interface OwnProps extends AbstractContentEditorProps<contentTypes.Xref> {
@@ -39,7 +39,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     displayModal: component => dispatch(modalActions.display(component)),
     dismissModal: () => dispatch(modalActions.dismiss()),
-    updateTarget: (targetId: string, resourceId: ResourceId) =>
+    updateTarget: (targetId: string, resourceId: string) =>
       dispatch(fetchAndSetTargetNode(targetId, resourceId)),
   };
 };

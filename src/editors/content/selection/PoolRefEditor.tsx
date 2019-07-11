@@ -123,7 +123,7 @@ export class PoolRefEditor
   renderMain(): JSX.Element {
 
     let details;
-    if (this.props.model.idref === '') {
+    if (this.props.model.idref.value() === '') {
       details = 'No external pool selected';
     } else if (this.state.title === null) {
       details = '';

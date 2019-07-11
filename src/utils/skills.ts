@@ -1,13 +1,12 @@
 import * as Immutable from 'immutable';
 import { AssessmentModel, PoolModel } from 'data/models';
-import { Part, Question } from 'data/contentTypes';
-import { Skill } from 'types/course';
+import { Part, Question, Skill } from 'data/contentTypes';
 
 // Does an assessment or standalone pool contain at least one
 // question that has a skill that we do no know about?
 export function hasUnknownSkill(
   model: AssessmentModel | PoolModel,
-  knownSkills: Immutable.OrderedMap<string, Skill>): boolean {
+  knownSkills: Immutable.Map<string, Skill>): boolean {
 
   const questions = model.modelType === 'AssessmentModel'
     ? collectAssessmentQuestions(model)

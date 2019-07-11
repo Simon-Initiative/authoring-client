@@ -64,8 +64,7 @@ export const documents = (
   state: DocumentsState = initialState,
   action: ActionTypes,
 ): DocumentsState => {
-  const ed = state.get(action.documentId.value());
-
+  let ed;
   switch (action.type) {
 
     case documentActions.IS_SAVING_UPDATED:
@@ -125,6 +124,7 @@ export const documents = (
       return processUndo(state, action);
 
     case documentActions.MODEL_UPDATED:
+      ed = state.get(action.documentId.value());
       const document = ed.document.with({ model: action.model });
       return state.set(action.documentId.value(), ed.with({
         document,
@@ -134,7 +134,7 @@ export const documents = (
       }));
 
     case documentActions.SET_CURRENT_PAGE_OR_NODE:
-
+      ed = state.get(action.documentId.value());
       // For pools, there are no pages, so just set the node
       if (ed.document.model instanceof PoolModel
         && (!(typeof action.nodeOrPageId === 'string'))) {
