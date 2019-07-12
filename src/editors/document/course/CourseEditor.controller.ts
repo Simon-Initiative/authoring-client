@@ -13,6 +13,7 @@ import { showMessage } from 'actions/messages';
 interface StateProps {
   user: UserState;
   analytics: AnalyticsState;
+  currentOrg: string;
 }
 
 interface DispatchProps {
@@ -22,6 +23,7 @@ interface DispatchProps {
   onDismissModal: () => void;
   onCreateDataset: () => void;
   onShowMessage: (message: Messages.Message) => void;
+  dispatch: any;
 }
 
 interface OwnProps {
@@ -33,18 +35,21 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   return {
     user: state.user,
     analytics: state.analytics,
+    currentOrg: state.orgs.activeOrg.caseOf(
+      { just: doc => (doc as any).model.id, nothing: () => null }),
   };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (d): DispatchProps => {
   return {
     courseChanged: (model: CourseModel) =>
-      dispatch(courseChanged(model)),
+      d(courseChanged(model)),
     viewAllCourses: () => viewActions.viewAllCourses(),
-    onDisplayModal: component => dispatch(modalActions.display(component)),
-    onDismissModal: () => dispatch(modalActions.dismiss()),
-    onShowMessage: (message: Messages.Message) => dispatch(showMessage(message)),
-    onCreateDataset: () => dispatch(createNewDataSet()),
+    onDisplayModal: component => d(modalActions.display(component)),
+    onDismissModal: () => d(modalActions.dismiss()),
+    onShowMessage: (message: Messages.Message) => d(showMessage(message)),
+    onCreateDataset: () => d(createNewDataSet()),
+    dispatch: d,
   };
 };
 

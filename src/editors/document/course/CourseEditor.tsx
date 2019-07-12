@@ -30,6 +30,7 @@ import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { buildGeneralErrorMessage } from 'utils/error';
 import { configuration } from 'actions/utils/config';
+import ResourceView from 'components/ResourceView';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -39,6 +40,8 @@ export interface CourseEditorProps {
   model: models.CourseModel;
   editMode: boolean;
   analytics: AnalyticsState;
+  currentOrg: string;
+  dispatch: any;
   courseChanged: (m: models.CourseModel) => any;
   viewAllCourses: () => any;
   onDisplayModal: (component: any) => void;
@@ -670,46 +673,46 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         }
         <div className="row">
           <div className="col-3">
-              <button
-                type="button"
-                className="btn btn-link"
-                onClick={() => this.toggleAdvancedDetails()}>
-                Advanced Details {collapseIndicator}
-              </button>
+            <button
+              type="button"
+              className="btn btn-link"
+              onClick={() => this.toggleAdvancedDetails()}>
+              Advanced Details {collapseIndicator}
+            </button>
           </div>
           <div className="col-9"></div>
         </div>
         {this.state.showAdvancedDetails &&
           <div className="advanced">
-          <div className="row">
-            <div className="col-3">Theme</div>
-            <div className="col-9">{this.renderThemes()}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Version</div>
-            <div className="col-9">{model.version}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">License <HelpPopover activateOnClick>
-              <div><img src={CC_LICENSES} />
-                <br /><br />
-                <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
-                  target="_blank">
-                  More information
-                </a>
-              </div>
-            </HelpPopover>
+            <div className="row">
+              <div className="col-3">Theme</div>
+              <div className="col-9">{this.renderThemes()}</div>
             </div>
-            <div className="col-9">{this.renderLicenseSelect()}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Unique ID</div>
-            <div className="col-9">{model.id}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Package Location</div>
-            <div className="col-9">{model.svnLocation}</div>
-          </div>
+            <div className="row">
+              <div className="col-3">Version</div>
+              <div className="col-9">{model.version}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">License <HelpPopover activateOnClick>
+                <div><img src={CC_LICENSES} />
+                  <br /><br />
+                  <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                    target="_blank">
+                    More information
+                </a>
+                </div>
+              </HelpPopover>
+              </div>
+              <div className="col-9">{this.renderLicenseSelect()}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Unique ID</div>
+              <div className="col-9">{model.id}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Package Location</div>
+              <div className="col-9">{model.svnLocation}</div>
+            </div>
           </div>
         }
 
@@ -758,6 +761,19 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  renderResources() {
+    const { model, currentOrg, dispatch } = this.props;
+
+    return (
+      <ResourceView
+        course={model}
+        dispatch={dispatch}
+        currentOrg={currentOrg}
+        serverTimeSkewInMs={0}
+      />
+    );
+  }
+
   renderAnalytics() {
     const { user, analytics, onCreateDataset, editMode, model } = this.props;
 
@@ -798,7 +814,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                            To get the most recent data for analytics, create a new dataset.
+                              To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
@@ -855,7 +871,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         <div className="row info">
           <div className="col-md-12">
             <h2>Course Package</h2>
-            <TabContainer labels={['Details', 'Workflow', 'Analytics']}>
+            <TabContainer labels={['Details', 'Workflow', 'Analytics', 'Resources']}>
               <Tab>
                 {this.renderDetails()}
               </Tab>
@@ -864,6 +880,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               </Tab>
               <Tab>
                 {this.renderAnalytics()}
+              </Tab>
+              <Tab>
+                {this.renderResources()}
               </Tab>
             </TabContainer>
           </div>

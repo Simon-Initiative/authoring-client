@@ -24,7 +24,7 @@ export interface TreeNodeProps {
   editMode: boolean;
   onClick: (model: NodeTypes) => void;
   onReposition: (
-  sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
+    sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
 
 export interface TreeNodeState {

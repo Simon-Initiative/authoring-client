@@ -191,13 +191,6 @@ export default class Main extends React.Component<MainProps, MainState> {
                                     dispatch={onDispatch}
                                     expanded={expanded}
                                     userName={user.user} />;
-                                case 'RouteAllResources':
-                                  return <ResourceView
-                                    serverTimeSkewInMs={server.timeSkewInMs}
-                                    course={loadedCourse}
-                                    currentOrg={route.orgId.valueOr('')}
-                                    dispatch={onDispatch}
-                                  />;
                                 case 'RouteOrganizations':
                                 // Consider creating a page for the organizations
                                 case 'RouteSkills':
