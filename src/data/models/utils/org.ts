@@ -10,7 +10,6 @@ import { LegacyTypes } from 'data/types';
 
 
 export type OrgNode =
-  ct.Sequences |
   ct.Sequence |
   ct.Unit |
   ct.Module |
@@ -89,10 +88,12 @@ export function modelToPlacements(
   const positions = {};
   const positionAtLevels = {};
   const placements = [];
-  const arr = model.sequences.children.toArray();
 
-  modelToPlacementsHelper(
-    model.sequences, 0, positions, positionAtLevels, placements, Maybe.nothing());
+  const arr = model.sequences.children.toArray();
+  arr.forEach((n) => {
+    modelToPlacementsHelper(
+      n, 0, positions, positionAtLevels, placements, Maybe.nothing());
+  });
 
   return Immutable.OrderedMap<string, Placement>(
     placements.map(p => [p.node.id, p]));
