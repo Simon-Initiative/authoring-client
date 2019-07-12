@@ -62,21 +62,16 @@ export default class XrefEditor
   }
 
   componentDidMount() {
-    console.log('PAGEEEEEEEEEE');
     const { target, model, updateTarget } = this.props;
 
     // Xref must have a page set in order to allow linking to a target element. We set the default
     // page to be the first workbook page so that an error is not thrown in case the user chooses
     // a target element without changing the page using the 'page to link to' dropdown
-    console.log("BEFORE##############%%%%%%%%%%!!!!!");
     if (!this.props.model.page) {
       //KYLE-1997 With only one WBP in course, pages array is empty, and pages[0] is undefined
       this.props.onEdit(this.props.model.with(
-        { page: this.pages[0] ? this.pages[0].guid :  'NO PAGES AVAILABLE' }));
-      console.log('PAGEEEEEEEEEE');
-      console.log(this.props.model.page);
+        { page: this.pages[0] ? this.pages[0].guid :  'No pages to reference' }));
     }
-    console.log("Past buggy part");
 
     // Check if we need to fetch the target element from its workbook page
     if (!target && model.idref) {
@@ -128,20 +123,27 @@ export default class XrefEditor
   }
 
   renderSidebar() {
+    console.log("################################SIDEBAR");
     const { editMode, model, onEdit, target } = this.props;
     // KYLE-1997 The items displayed in the drop are HTML option elements in the array below
-    const pageOptions = this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>);
+    const pageOptions = (this.pages ?
+    this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>) :
+    <option key={this.context.guid} value={this.context.id}>{'No pages to reference'}</option>);
+
+    console.log(model.page);
+    console.log(this.pages === false);
+    console.table(this.pages);
     console.table(pageOptions);
 
     return (
-      <SidebarContent title={model.page}>
+      <SidebarContent title="Cross Reference">
         <SidebarGroup label="Page to link to">
           <Select
             editMode={this.props.editMode}
             label=""
-            value="Cross Reference"
+            value={model.page}
             onChange={this.onChangePage}>
-            {<option key={r.guid} value={r.id}>{r.title}</option>/*pageOptions*/}
+            {/*pageOptions*/}
           </Select>
         </SidebarGroup>
         <SidebarGroup label="Element to link to">
