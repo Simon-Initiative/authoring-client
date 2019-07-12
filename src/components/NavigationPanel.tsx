@@ -269,7 +269,6 @@ export interface NavigationPanelProps {
   profile: UserProfile;
   userId: string;
   userName: string;
-  onCreateOrg: () => void;
   onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
   onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>

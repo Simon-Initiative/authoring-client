@@ -90,10 +90,9 @@ export default class Main extends React.Component<MainProps, MainState> {
     onSetServerTimeSkew();
   }
 
-  onCreateOrg = () => {
+  onCreateOrg = (title: string) => {
     const { course, onUpdateCourseResources } = this.props;
 
-    const title = 'New Organization';
     const wbId = guid();
     const body = NEW_PAGE_CONTENT;
     const wb = models.WorkbookPageModel.createNew(wbId, 'Welcome', body);
@@ -105,7 +104,6 @@ export default class Main extends React.Component<MainProps, MainState> {
             const r = (result.model as OrganizationModel).resource;
             const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
             onUpdateCourseResources(updated);
-            viewActions.viewDocument(r.id, course.idvers, Maybe.just(r.id));
           });
       });
   }
@@ -179,7 +177,6 @@ export default class Main extends React.Component<MainProps, MainState> {
                             course={loadedCourse}
                             route={route}
                             profile={user.profile}
-                            onCreateOrg={this.onCreateOrg}
                             userId={user.userId}
                             userName={user.user} />
                           <div className="main-splitview-content">
@@ -198,6 +195,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                                 case 'RouteCourseOverview':
                                   return <CourseEditor
                                     model={loadedCourse}
+                                    onCreateOrg={this.onCreateOrg}
                                     editMode={loadedCourse.editable} />;
                                 case 'RouteResource': {
                                   const routeResource = route.route;

@@ -243,8 +243,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     ];
 
     return (
-      <div className="">
-        <h2>All Resources</h2>
+      <div>
 
         {this.renderCreation()}
 
