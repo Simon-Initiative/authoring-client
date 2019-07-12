@@ -464,11 +464,9 @@ class NavigationPanel
     );
   }
 
-  renderOrgDropdown(currentOrg: Resource) {
+  renderOrgRootNode(currentOrg: Resource) {
     const { classes, route, course } = this.props;
     const { collapsed } = this.state;
-
-
 
     const availableOrgs = r => r.type === 'x-oli-organization' && r.resourceState !== 'DELETED';
 
@@ -602,7 +600,7 @@ class NavigationPanel
 
         {this.renderOverview(currentOrg)}
         {this.renderObjectives(currentOrg)}
-        {this.renderOrgDropdown(currentOrg)}
+        {this.renderOrgRootNode(currentOrg)}
         {this.renderOrgTree(currentOrg, selectedItem)}
 
       </div>
