@@ -42,7 +42,7 @@ import { getNameAndIconByType } from 'components/ResourceView';
 interface SidebarRowProps {
   label?: string;
 }
-// KYLE-1936 this is a model usable for the functional component for refs, esp if styles are needed
+
 export const SidebarRow = withStyles<SidebarRowProps>(styles)(({
   classes, label, children }) => {
   return (
@@ -150,7 +150,6 @@ export interface ContextAwareSidebarProps {
 }
 
 export interface ContextAwareSidebarState {
-  // KEVIN-1936 should change based on the type of resource (see switch (model.modelType))
   resourceRefs: Maybe<Edge[]>;
 }
 
@@ -165,7 +164,7 @@ class ContextAwareSidebar
     super(props);
 
     this.state = {
-      resourceRefs: Maybe.nothing(), // KEVIN-1936 (BBB) initialize state as nothing
+      resourceRefs: Maybe.nothing(),
     };
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
@@ -180,28 +179,23 @@ class ContextAwareSidebar
 
   fetchRefs() {
     const { course, resource } = this.props;
-
-//    const org = this.props.selectedOrganization;
-//    const directResources = org
-
-
-      // KEVIN-1936 see (AAA) to see what call to replicate
-      // fetch edges for reference list
-    const fetchResouceEdges = persistence.fetchEdges(course.guid, {
-      // sourceType: LegacyTypes.assessment2,
-      // destinationType: LegacyTypes.assessment2_pool,
-    }).then((edges) => {
+    persistence.fetchEdges(course.guid).then((edges) => {
 
       const sources = edges.filter((edge) => {
-        return edge.destinationId.indexOf(resource.id) >= 0;
+        return (this.stripId(edge.destinationId) === resource.id);
       });
 
       this.setState({
-        resourceRefs: Maybe.just(sources), // KEVIN-1936 (CCC)
+        resourceRefs: Maybe.just(sources),
       });
     });
+  }
 
-
+  stripId(id: string) {
+    const splits = id.split(':');
+    if (splits.length === 3) {
+      return splits[2];
+    }
   }
 
   onRemovePage(page: contentTypes.Page) {
@@ -349,15 +343,11 @@ class ContextAwareSidebar
       nothing: () => '',
     });
 
-    /* This const is responsible for constructing and displaying a list of clickable
-     * reference links
-     */
     const referenceLocations = (
       <SidebarGroup label="Referenced Locations">
         <SidebarRow>
           <div className="page-list">
             {resourceRefs.caseOf({
-            /* KYLE-1936 finding source of resourceRefs*/
               just: (refs) => {
                 return refs.length > 0
                 ? (
@@ -390,7 +380,7 @@ class ContextAwareSidebar
                   <div>No references found</div>
                 );
               },
-              nothing: () => <div>Error loading</div>,
+              nothing: () => <div>Loading...</div>,
             },
             )
             }
@@ -418,7 +408,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
-            {referenceLocations} {/* make this special for WorkbookPageModel */}
+            {referenceLocations}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
@@ -462,7 +452,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
-            {referenceLocations} {/* make this special for Assessment */}
+            {referenceLocations}
             {/* Branching assessments require a specific page structuring,
             so they cannot be modified by the user */}
             {model.branching

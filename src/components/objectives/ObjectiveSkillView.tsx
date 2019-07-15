@@ -61,7 +61,6 @@ const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<Po
   });
 };
 
-// KEVIN-1936 may be needed to filter Edges by type?...
 export const reduceObjectiveWorkbookPageRefs = (
   objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>,
   workbookpageToObjectiveEdges: Edge[],
@@ -266,7 +265,7 @@ class ObjectiveSkillView
       loading: false,
       organizationResourceMap: Maybe.nothing(),
       skillQuestionRefs: Maybe.nothing(),
-      workbookPageRefs: Maybe.nothing(), // KEVIN-1936 (BBB) workbookPageRefs initialized as nothing
+      workbookPageRefs: Maybe.nothing(),
       searchText: '',
     };
     this.unmounted = false;
@@ -333,7 +332,6 @@ class ObjectiveSkillView
     onFetchSkills(course.idvers);
   }
 
-  // KEVIN-1936 this may be better off in a shared util class or something..
   fetchAllRefs(
     skills: Immutable.OrderedMap<string, contentTypes.Skill>,
     objectivesModel: UnifiedObjectivesModel,
@@ -345,8 +343,6 @@ class ObjectiveSkillView
     const directLookup = Immutable.Set<string>(directResources);
 
 
-    // KEVIN-1936 replicate this call to get references to QuestionPool
-    // KEVIN-1936 (AAA) replicate the rest of these calls
     // fetch workbook page to inline assessment edges
     const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.workbook_page,
@@ -463,7 +459,6 @@ class ObjectiveSkillView
 
       const workbookPageRefs = reduceObjectiveWorkbookPageRefs(
         objectivesModel.objectives, workbookpageToObjectiveEdges, isValidResource);
-        // KEVIN-1936 filter results here
       const skillFormativeQuestionRefs = reduceSkillFormativeQuestionRefs(
         skills, formativeToSkillEdges, isValidResource);
       const skillSummativeQuestionRefs = reduceSkillSummativeQuestionRefs(
@@ -477,7 +472,6 @@ class ObjectiveSkillView
       // of bundling things up and calling setState to re-render the UI
       this.setState({
         organizationResourceMap: Maybe.just(organizationResourceMap),
-        workbookPageRefs: Maybe.just(workbookPageRefs), // KEVIN-1936 (CCC) set state here
         skillQuestionRefs: Maybe.just(
           skills.reduce(
             (acc, skill) => acc.set(
@@ -1157,7 +1151,6 @@ class ObjectiveSkillView
 
   renderObjectives() {
     const { onPushRoute, selectedOrganization } = this.props;
-    // KEVIN-1936 workbookPageRefs are stored in state
     const {
       overrideExpanded, searchText, skillQuestionRefs, workbookPageRefs,
     } = this.state;
