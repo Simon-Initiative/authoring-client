@@ -13,6 +13,9 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
+import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
+import { ContiguousText } from 'data/content/learning/contiguous';
 import {
   Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
@@ -48,8 +51,40 @@ class AlternativeEditor
     this.props.onEdit(model, model);
   }
 
+  /**
+   * Note that for this soution, we must use a Title Editor
+   * This is called when the user edits the Title via the Title Editor
+   */
+  onTitleEdit(ct: ContiguousText, sourceObject) {
+    const content = this.props.model.title.text.content.set(ct.guid, ct);
+    const text = this.props.model.title.text.with({ content });
+    const title = this.props.model.title.with({ text });
+    const model = this.props.model.with({ title });
+    this.props.onEdit(model, sourceObject);
+  }
+
+  /**
+   * This is called when the user edits the Title via the sidebar (for design consistency)
+   * @param titleText
+   */
+  onSideTitleEdit(titleText: string) {
+    const title = new contentTypes.Title({
+      text: ContentElements.fromText(titleText, '', TEXT_ELEMENTS),
+    });
+
+    const model = this.props.model.with({ title });
+    this.props.onEdit(model, model);
+
+  }
+
   renderSidebar() {
     const { model, editMode } = this.props;
+
+    // must be stripped out of the Title object
+    const titleText = model.title.text.extractPlainText().caseOf({
+      just: t => t,
+      nothing: () => '',
+    });
 
     return (
       <SidebarContent title={model.value}>
@@ -62,6 +97,18 @@ class AlternativeEditor
               width="100%"
               label=""
               onEdit={this.onValueEdit.bind(this)}
+            />
+          </Discoverable>
+        </SidebarGroup>
+        <SidebarGroup label="Title">
+          <Discoverable id={DiscoverableId.AlternativeEditorKey} focusChild>
+            <TextInput
+              editMode={editMode}
+              value={titleText}
+              type="text"
+              width="100%"
+              label=""
+              onEdit={this.onSideTitleEdit.bind(this)}
             />
           </Discoverable>
         </SidebarGroup>
@@ -92,6 +139,16 @@ class AlternativeEditor
     return (
       <div className={classNames([classes.alternative, className])}
         onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>
+
+        <TitleTextEditor
+          context={this.props.context}
+          services={this.props.services}
+          onFocus={this.props.onFocus}
+          model={(this.props.model.title.text.content.first() as ContiguousText)}
+          editMode={this.props.editMode}
+          onEdit={this.onTitleEdit.bind(this)}
+        editorStyles={{ fontSize: 20, fontWeight: 600 }} />
+
         <ContentContainer
           {...this.props}
           model={this.props.model.content}
