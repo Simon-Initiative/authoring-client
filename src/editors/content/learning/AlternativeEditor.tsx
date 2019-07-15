@@ -139,8 +139,7 @@ class AlternativeEditor
     return (
       <div className={classNames([classes.alternative, className])}
         onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>
-        {/* FIXME: for some reason, this Title value changes
-        when the "model.value" is edited via the Sidebar */}
+
         <TitleTextEditor
           context={this.props.context}
           services={this.props.services}
