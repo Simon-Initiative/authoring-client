@@ -472,6 +472,7 @@ class ObjectiveSkillView
       // of bundling things up and calling setState to re-render the UI
       this.setState({
         organizationResourceMap: Maybe.just(organizationResourceMap),
+        workbookPageRefs: Maybe.just(workbookPageRefs),
         skillQuestionRefs: Maybe.just(
           skills.reduce(
             (acc, skill) => acc.set(

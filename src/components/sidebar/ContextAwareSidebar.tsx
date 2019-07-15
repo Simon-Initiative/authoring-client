@@ -151,6 +151,7 @@ export interface ContextAwareSidebarProps {
 
 export interface ContextAwareSidebarState {
   resourceRefs: Maybe<Edge[]>;
+  failedLoading: boolean;
 }
 
 /**
@@ -165,20 +166,27 @@ class ContextAwareSidebar
 
     this.state = {
       resourceRefs: Maybe.nothing(),
+      failedLoading: false,
     };
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
     this.onToggleBranching = this.onToggleBranching.bind(this);
   }
-
   componentDidMount() {
-    this.fetchRefs();
-
+    this.fetchRefs(this.props);
+  }
+  componentWillReceiveProps(nextProps: ContextAwareSidebarProps) {
+    if ((this.props.course !== nextProps.course) || (this.props.resource !== nextProps.resource)) {
+      this.fetchRefs(nextProps);
+    }
   }
 
-  fetchRefs() {
-    const { course, resource } = this.props;
+  fetchRefs(props: ContextAwareSidebarProps) {
+    const { course, resource } = props;
+    this.setState({
+      resourceRefs: Maybe.nothing(),
+    });
     persistence.fetchEdges(course.guid).then((edges) => {
 
       const sources = edges.filter((edge) => {
@@ -187,6 +195,11 @@ class ContextAwareSidebar
 
       this.setState({
         resourceRefs: Maybe.just(sources),
+        failedLoading: false,
+      });
+    }).catch(() => {
+      this.setState({
+        failedLoading: true,
       });
     });
   }
@@ -380,7 +393,8 @@ class ContextAwareSidebar
                   <div>No references found</div>
                 );
               },
-              nothing: () => <div>Loading...</div>,
+              nothing: () => <div>{this.state.failedLoading ? 'Error loading'
+                                   : 'Loading references' }</div>,
             },
             )
             }
