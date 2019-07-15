@@ -9,29 +9,30 @@ import { DeferredPersistenceStrategy }
   from 'editors/manager/persistence/DeferredPersistenceStrategy';
 import { buildPersistenceFailureMessage } from 'utils/error';
 import { ServerName } from 'data/persistence/document';
+import { CourseIdVers } from 'data/types';
+import { State } from 'reducers';
+import { buildUrlFromRoute } from 'actions/view';
+import { toRoutePreview, toRouteCourse } from 'types/router';
+import { Maybe } from 'tsmonad';
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(orgId: string, isRefreshAttempt: boolean, server?: ServerName) {
-  return function (dispatch, getState): Promise<persistence.PreviewResult> {
-
-    const { course } = getState();
-
-    return persistence.initiatePreview(course.guid, orgId, isRefreshAttempt, server);
-  };
+function invokePreview(courseId: CourseIdVers, orgId: string,
+  isRefreshAttempt: boolean, server?: ServerName) {
+  return persistence.initiatePreview(courseId, orgId, isRefreshAttempt, server);
 }
 
 export function preview(
-  courseId: string, organizationId: string, isRefreshAttempt: boolean, redeploy: boolean = true,
-  server?: ServerName) {
+  courseId: CourseIdVers, organizationId: string,
+  isRefreshAttempt: boolean, redeploy: boolean = true, server?: ServerName) {
 
   return function (dispatch): Promise<any> {
 
     const OPEN_IN_NEW_WINDOW_ALWAYS = '';
 
-    return dispatch(invokePreview(organizationId, isRefreshAttempt, server))
+    return invokePreview(courseId, organizationId, isRefreshAttempt, server)
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
-          const message = buildMissingFromOrgMessage(courseId);
+          const message = buildMissingFromOrgMessage();
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewNotSetUp') {
           const message = buildNotSetUpMessage();
@@ -40,14 +41,17 @@ export function preview(
           const refresh = result.message === 'pending';
 
           window.open(
-            '/#preview' + organizationId + '-' + courseId
+            '#' + buildUrlFromRoute(toRouteCourse(
+              courseId, Maybe.just(organizationId), toRoutePreview()))
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
             + (refresh ? '&refresh=true' : '')
             + (redeploy ? '&redeploy=true' : ''),
             OPEN_IN_NEW_WINDOW_ALWAYS);
 
         } else if (result.type === 'PreviewPending') {
-          window.open('/#preview' + organizationId + '-' + courseId, OPEN_IN_NEW_WINDOW_ALWAYS);
+          window.open('#' + buildUrlFromRoute(toRouteCourse(
+            courseId, Maybe.just(organizationId), toRoutePreview())),
+            OPEN_IN_NEW_WINDOW_ALWAYS);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);
@@ -61,9 +65,9 @@ export function preview(
 // the workbook page contents.
 export function quickPreview(courseId: string, resource: Resource) {
 
-  return function (dispatch, getState): Promise<any> {
+  return function (dispatch, getState: () => State): Promise<any> {
     const { course, documents, user } = getState();
-    const document: EditedDocument = documents.get(resource.guid);
+    const document: EditedDocument = documents.get(resource.id);
 
     // Flush pending changes before initiating the preview so that the user doesn't see
     // a stale preview page
@@ -78,7 +82,7 @@ export function quickPreview(courseId: string, resource: Resource) {
   };
 }
 
-function buildMissingFromOrgMessage(courseId) {
+function buildMissingFromOrgMessage() {
 
   const actions = [];
 

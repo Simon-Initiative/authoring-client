@@ -1,7 +1,7 @@
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
-import { PaginatedResponse } from 'data/types';
+import { PaginatedResponse, CourseIdVers, CourseGuid } from 'data/types';
 import { Edge } from 'types/edge';
 import { WebContent } from 'data/content/webcontent';
 
@@ -10,10 +10,10 @@ import { WebContent } from 'data/content/webcontent';
  * that the file is being stored as. Rejects if the file name conflicts
  * with another file.
  */
-export function createWebContent(courseId: string, file: File): Promise<string> {
+export function createWebContent(course: CourseGuid | CourseIdVers, file: File): Promise<string> {
 
   const method = 'POST';
-  const url = `${configuration.baseUrl}/${courseId}/webcontents/upload`;
+  const url = `${configuration.baseUrl}/${course.value()}/webcontents/upload`;
   const headers = getFormHeaders(credentials);
   const body = new FormData();
 
@@ -39,12 +39,12 @@ export function createWebContent(courseId: string, file: File): Promise<string> 
  * a list of webcontents
  */
 export function fetchWebContent(
-  courseId: string, offset?: number, limit?: number,
+  course: CourseGuid | CourseIdVers, offset?: number, limit?: number,
   mimeFilter?: string, pathFilter?: string, searchText?: string, orderBy?: string,
   order?: string): Promise<PaginatedResponse<WebContent>> {
 
   const method = 'GET';
-  const url = `${configuration.baseUrl}/${courseId}/webcontents`;
+  const url = `${configuration.baseUrl}/${course.value()}/webcontents`;
   const headers = getFormHeaders(credentials);
   const query = Object.assign(
     {},
@@ -66,7 +66,7 @@ export function fetchWebContent(
  * a list of edges
  */
 export function fetchWebContentReferences(
-  packageId: string,
+  packageId: CourseGuid | CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,
@@ -92,8 +92,8 @@ export function fetchWebContentReferences(
 
   const method = 'GET';
   const url = byResource
-    ? `${configuration.baseUrl}/${packageId}/resources/edges/${resourceId}`
-    : `${configuration.baseUrl}/${packageId}/edges`;
+    ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId}`
+    : `${configuration.baseUrl}/${packageId.value()}/edges`;
 
   const headers = getFormHeaders(credentials);
   const query = Object.assign(

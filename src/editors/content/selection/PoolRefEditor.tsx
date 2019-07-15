@@ -6,6 +6,7 @@ import {
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
 import { Resource, ResourceState } from 'data/content/resource';
+import { Maybe } from 'tsmonad';
 
 export interface PoolRefEditor {
   guid: string;
@@ -90,11 +91,11 @@ export class PoolRefEditor
   }
 
   onViewPool() {
-    if (this.guid !== null) {
+    if (this.props.model.idref !== null) {
       this.props.services.viewDocument(
-        this.guid,
-        this.props.context.courseId,
-        this.props.context.orgId);
+        this.props.model.idref,
+        this.props.context.courseModel.idvers,
+        Maybe.just(this.props.context.orgId));
     }
   }
 
@@ -107,7 +108,7 @@ export class PoolRefEditor
     this.props.services.displayModal(
       <ResourceSelection
         filterPredicate={predicate}
-        courseId={this.props.context.courseId}
+        courseId={this.props.context.courseModel.guid}
         onInsert={this.onInsert}
         onCancel={this.onCancel} />);
   }
