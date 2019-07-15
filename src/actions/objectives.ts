@@ -47,7 +47,7 @@ export const fetchObjectives = (courseId: CourseIdVers) =>
         const arr = objectives
           .map(doc => (doc.model as any).objectives.toArray())
           .reduce((p, c) => [...p, ...c], [])
-          .map(s => [s.id, s]);
+          .map(s => [s.id.value(), s]);
 
         const map = Immutable.OrderedMap<string, LearningObjective>(arr);
         dispatch(setObjectives(map));

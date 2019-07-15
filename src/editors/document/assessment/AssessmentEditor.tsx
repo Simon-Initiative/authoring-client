@@ -203,9 +203,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
   }
 
   fetchSkillsIfMissing = (props: AssessmentEditorProps) => {
-    console.log('fetch skills if missing')
     if (hasUnknownSkill(props.model, props.context.skills)) {
-      console.log('has unknown skill')
       props.onFetchSkills(props.context.courseModel.idvers);
     }
   }
@@ -412,7 +410,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
   }
 
   onSelectPool = () => {
-    const { editMode, services, context } = this.props;
+    const { editMode, services } = this.props;
     if (!editMode) return;
 
     const predicate = (res: Resource): boolean =>
@@ -422,7 +420,6 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     services.displayModal(
       <ResourceSelection
         filterPredicate={predicate}
-        courseId={context.courseModel.guid}
         onInsert={this.onInsertPool}
         onCancel={this.onCancelSelectPool} />);
   }

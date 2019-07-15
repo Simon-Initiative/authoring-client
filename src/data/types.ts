@@ -3,7 +3,7 @@ export function iLiterallyCantEven(...args: any[]):
 
 const identity = <T>(t: T) => t;
 
-class Id {
+export class Id {
   private type: string;
   private val: string;
 
@@ -19,11 +19,11 @@ class Id {
     s: string) =>
     new Id(type, canonicalize(s))
 
-  apply = f => f(this.val);
+  apply = (f: (s: string) => any) => f(this.val);
   value: () => string = () => this.apply(identity);
+  toString = this.value;
   eq = (x: Id) => this.type === x.type && this.val === x.val;
 }
-
 
 // In OLI, a course is technically different from a package. A course is a set of packages.
 // For example the course "computing at carnegie mellon" has a package for each course version.
@@ -34,32 +34,32 @@ class Id {
 // and the legacy OLI database.
 
 export class CourseId extends Id {
-  static of = (id: string) => Id.create(identity, 'CourseId', id);
+  static of = (id: string) => new CourseId('CourseId', id);
 }
 export class CourseGuid extends Id {
-  static of = (guid: string) => Id.create(identity, 'CourseGuid', guid);
+  static of = (guid: string) => new CourseGuid('CourseGuid', guid);
 }
 export class CourseIdVers extends Id {
   static of = (id: string, v: string) => {
     const courseIdentifier = id + '-' + v;
-    return Id.create(identity, 'CourseIdentifier', courseIdentifier);
+    return new CourseIdVers('CourseIdentifier', courseIdentifier);
   }
 }
 
 // Resources are saved directly in the authoring database with a unique GUID and
 // unique-per-course ID
 export class ResourceGuid extends Id {
-  static of = (guid: string) => Id.create(identity, 'ResourceGuid', guid);
+  static of = (guid: string) => new ResourceGuid('ResourceGuid', guid);
 }
 
 export class ResourceId extends Id {
-  static of = (guid: string) => Id.create(identity, 'ResourceId', guid);
+  static of = (guid: string) => new ResourceId('ResourceId', guid);
 }
 
 // A resource is built from many content items, which are generally identified by their
 // ID in the xml, but not all content items have IDs.
 export class ContentId extends Id {
-  static of = (guid: string) => Id.create(identity, 'ContentId', guid);
+  static of = (guid: string) => new ContentId('ContentId', guid);
 }
 
 export type CourseTitle = string;

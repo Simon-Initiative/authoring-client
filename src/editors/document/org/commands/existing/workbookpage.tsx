@@ -56,7 +56,6 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
         displayModal(
           <ResourceSelection
             filterPredicate={predicate}
-            courseId={courseModel.guid}
             onInsert={page => this.onInsert(org, node, dismissModal, courseModel, resolve, page)}
             onCancel={() => this.onCancel(dismissModal, reject)} />);
       });

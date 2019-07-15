@@ -108,7 +108,6 @@ export class PoolRefEditor
     this.props.services.displayModal(
       <ResourceSelection
         filterPredicate={predicate}
-        courseId={this.props.context.courseModel.guid}
         onInsert={this.onInsert}
         onCancel={this.onCancel} />);
   }

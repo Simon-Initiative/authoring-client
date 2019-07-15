@@ -479,7 +479,7 @@ export const flattenChildren = (children: OrgItemChildren): Immutable.List<strin
         case types.ContentTypes.Section:
           return acc.concat(flattenChildren(child.children)).toList();
         case types.ContentTypes.Item:
-          return acc.concat(child.resourceref.idref).toList();
+          return acc.concat(child.resourceref.idref.value()).toList();
         default:
           return acc;
       }

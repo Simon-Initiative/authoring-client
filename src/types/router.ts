@@ -10,7 +10,7 @@ export type RouteApplicationOption =
   | RouteCreate
   | RouteImport
   | RouteMissing
-  | RouteKeycloakGarbage;
+  | RouteLoading;
 
 export type RouteCourse = {
   type: 'RouteCourse',
@@ -22,6 +22,7 @@ export type RouteCourse = {
 export type RouteCourseOption =
   | RouteCourseOverview
   | RouteResource
+  | RouteOrgComponent
   | RoutePreview
   | RouteSkills
   | RouteAllResources
@@ -65,6 +66,15 @@ export function toRouteImport(): RouteImport {
   };
 }
 
+export type RouteLoading = {
+  type: 'RouteLoading',
+};
+export function toRouteLoading(): RouteLoading {
+  return {
+    type: 'RouteLoading',
+  };
+}
+
 export type RouteCourseOverview = {
   type: 'RouteCourseOverview',
 };
@@ -76,12 +86,23 @@ export function toRouteCourseOverview(): RouteCourseOverview {
 
 export type RouteResource = {
   type: 'RouteResource',
-  resourceId: ResourceId,
+  id: ResourceId,
 };
-export function toRouteResource(resourceId: ResourceId): RouteResource {
+export function toRouteResource(id: ResourceId): RouteResource {
   return {
     type: 'RouteResource',
-    resourceId,
+    id,
+  };
+}
+
+export type RouteOrgComponent = {
+  type: 'RouteOrgComponent',
+  id: string,
+};
+export function toRouteOrgComponent(id: string): RouteOrgComponent {
+  return {
+    type: 'RouteOrgComponent',
+    id,
   };
 }
 
@@ -136,14 +157,5 @@ export type RouteMissing = {
 export function toRouteMissing(): RouteMissing {
   return {
     type: 'RouteMissing',
-  };
-}
-
-export type RouteKeycloakGarbage = {
-  type: 'RouteKeycloakGarbage',
-};
-export function toRouteKeycloakGarbage(): RouteKeycloakGarbage {
-  return {
-    type: 'RouteKeycloakGarbage',
   };
 }

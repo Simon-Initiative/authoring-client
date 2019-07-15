@@ -38,7 +38,9 @@ import * as viewActions from 'actions/view';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 import { FourZeroFour } from 'components/404';
 import { OrganizationModel } from 'data/models/org';
-import { LegacyTypes, CourseIdVers, CourseGuid, DocumentId, ResourceId, ResourceGuid } from 'data/types';
+import {
+  LegacyTypes, CourseIdVers, CourseGuid, DocumentId, ResourceId, ResourceGuid,
+} from 'data/types';
 
 interface MainProps {
   user: UserState;
@@ -151,6 +153,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                 return <CreateCourseView userName={user.user} dispatch={onDispatch} />;
               case 'RouteImport': return <ImportCourseView dispatch={onDispatch} />;
               case 'RouteMissing': return <FourZeroFour />;
+              case 'RouteLoading': return <ResourceLoading />;
               case 'RouteCourse': {
                 switch (route.route.type) {
                   case 'RoutePreview':
@@ -164,12 +167,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                       previewUrl={Maybe.maybe(router.params.get('url'))}
                       documentId={route.orgId.valueOr(ResourceId.of(''))}
                       courseIdVers={route.courseId} />;
-                  case 'RouteAllResources':
-                  case 'RouteCourseOverview':
-                  case 'RouteObjectives':
-                  case 'RouteOrganizations':
-                  case 'RouteResource':
-                  case 'RouteSkills':
+                  default: {
                     return Maybe.maybe(course).caseOf({
                       nothing: () => <ResourceLoading />,
                       just: loadedCourse => (
@@ -205,45 +203,46 @@ export default class Main extends React.Component<MainProps, MainState> {
                                   return <CourseEditor
                                     model={loadedCourse}
                                     editMode={loadedCourse.editable} />;
+                                case 'RouteOrgComponent':
+                                  return <OrgComponentEditor
+                                    course={loadedCourse}
+                                    componentId={route.route.id}
+                                    editMode={loadedCourse.editable}
+                                  />;
                                 case 'RouteResource': {
                                   const routeResource = route.route;
-                                  // Org editor
-                                  // orgId should be present by this point
-                                  if (routeResource.resourceId.eq(
-                                    route.orgId.valueOr(ResourceId.of('')))) {
+
+                                  // RouteResource can be one of two views:
+                                  // 1. Organization editor
+                                  // 2. Document/resource editor
+
+                                  const isOrgEditorView = route.orgId.caseOf({
+                                    just: orgId => orgId.eq(routeResource.id),
+                                    nothing: () => false,
+                                  });
+
+                                  if (isOrgEditorView) {
                                     return <OrgDetailsEditor course={loadedCourse} />;
                                   }
 
-                                  // If we stored a resource GUID in the route instead of an ID,
-                                  // use the Id instead
-                                  let resourceId = routeResource.resourceId;
-                                  if (loadedCourse.resources.get(resourceId.value())) {
-                                    resourceId = loadedCourse.resources.get(resourceId.value()).id;
-                                  }
+                                  // If we accidentally stored a resource GUID in the route
+                                  // instead of an ID, use the Id instead
+                                  const resourceId = loadedCourse.resourcesById
+                                    .get(routeResource.id.value())
+                                    ? routeResource.id
+                                    : loadedCourse.resources
+                                      .get(routeResource.id.value(), {} as any).id;
 
-                                  return Maybe.maybe(loadedCourse.resourcesById
-                                    .get(routeResource.resourceId.value()))
-                                    .caseOf({
-                                      just: resource =>
-                                        // Regular resource
-                                        <DocumentView
-                                          onLoad={(docId: DocumentId) =>
-                                            onLoad(loadedCourse.idvers, docId)}
-                                          onRelease={(docId: DocumentId) => onRelease(docId)}
-                                          profile={user.profile}
-                                          orgId={route.orgId.valueOr(ResourceId.of(''))}
-                                          course={loadedCourse}
-                                          userId={user.userId}
-                                          userName={user.user}
-                                          documentId={resourceId} />,
-                                      nothing: () =>
-                                        // Org component
-                                        <OrgComponentEditor
-                                          course={loadedCourse}
-                                          componentId={resourceId.value()}
-                                          editMode={loadedCourse.editable}
-                                        />,
-                                    });
+                                  return <DocumentView
+                                    onLoad={(docId: DocumentId) =>
+                                      onLoad(loadedCourse.idvers, docId)}
+                                    onRelease={(docId: DocumentId) => onRelease(docId)}
+                                    profile={user.profile}
+                                    orgId={route.orgId.valueOr(ResourceId.of(''))}
+                                    course={loadedCourse}
+                                    userId={user.userId}
+                                    userName={user.user}
+                                    documentId={resourceId} />;
                                 }
                               }
                             })()}
@@ -251,6 +250,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                         </div>
                       ),
                     });
+                  }
                 }
               }
             }

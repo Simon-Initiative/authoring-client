@@ -8,11 +8,11 @@ import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import './CoursesViewSearchable.scss';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
-import { highlightMatchesStr } from 'components/common/SearchBarLogic';
+import { highlightMatches } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
 import { buildGeneralErrorMessage } from 'utils/error';
-import { CourseIdVers, CourseGuid, CourseId } from 'data/types';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 function reportProblemAction(): Messages.MessageAction {
 
@@ -67,14 +67,11 @@ export type CoursesViewState = {
 
 class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, CoursesViewState> {
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      courses: Maybe.nothing<CourseDescription[]>(),
-      searchText: '',
-    };
-  }
+  state: CoursesViewState = {
+    ...this.state,
+    courses: Maybe.nothing<CourseDescription[]>(),
+    searchText: '',
+  };
 
   // called to update state when search text changes
   textChange = (searchText: string) => this.setState({
@@ -235,26 +232,24 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
     'Created',
   ];
 
-  const link = course => span =>
+  const link = (course: CourseDescription) => (span: JSX.Element) =>
     <button disabled={course.buildStatus !== 'READY'}
       onClick={() => onSelect(course.idvers)}
       className="btn btn-link">{span}</button>;
 
   const columnRenderers = [
-    r => link(r)(highlightedColumnRenderer(
-      'title', r, r.buildStatus === 'READY' ? '' : ' (processing)')),
-    r => highlightedColumnRenderer('version', r),
-    r => highlightedColumnRenderer('id', r),
-    r => <span>{relativeToNow(
-      adjustForSkew(r.dateCreated, serverTimeSkewInMs))}</span>,
+    course => link(course)(highlightedColumnRenderer(course.title +
+      (course.buildStatus === 'READY' ? '' : ' (processing)'))),
+    course => highlightedColumnRenderer(course.version),
+    course => highlightedColumnRenderer(course.id),
+    course => <span>{relativeToNow(
+      adjustForSkew(course.dateCreated, serverTimeSkewInMs))}</span>,
   ];
 
-  const highlightedColumnRenderer = (
-    prop: string,
-    r: CourseDescription, appendText: string = '') =>
+  const highlightedColumnRenderer = (text: string) =>
     searchText.length < 3
-      ? <span>{r[prop] + appendText}</span>
-      : highlightMatchesStr(r[prop] + appendText, searchText);
+      ? <span>{text}</span>
+      : highlightMatches(text, searchText);
 
   const comparators = [
     (direction, a, b) => safeCompare('title', 'id', direction, a, b),

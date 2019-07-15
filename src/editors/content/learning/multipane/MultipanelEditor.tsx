@@ -361,7 +361,6 @@ class MultipanelEditor
           res.type === LegacyTypes.inline
           && res.resourceState !== ResourceState.DELETED
           && !existingInlines.has(res.id.value())}
-        courseId={context.courseModel.guid}
         noResourcesMessage={
           <React.Fragment>
             No assessments are available for this activity.

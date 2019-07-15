@@ -15,7 +15,7 @@ export interface SkillsEditorProps extends AbstractContentEditorProps<Immutable.
 }
 
 export interface SkillsEditorState {
-  selected: any;
+  selected: Skill[];
 }
 
 function toSkillArray(
@@ -49,7 +49,7 @@ export default class SkillsEditor
 
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: SkillsEditorProps, nextState: SkillsEditorState) {
     if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
       return true;
     }
@@ -79,7 +79,7 @@ export default class SkillsEditor
   renderMain(): JSX.Element {
     const options = this.props.context.skills
       .toArray()
-      .map(s => ({ id: s.id, title: s.title }));
+      .map(s => ({ id: s.id.value(), title: s.title }));
 
     return (
       <div className="skills-editor">

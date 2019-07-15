@@ -28,7 +28,7 @@ export interface TabProps {
 
 export function renderTab(
   course: CourseModel,
-  onView: (id: string) => void,
+  onView: (id: string | ResourceId) => void,
   onEdit: (cr) => void,
   commandProcessor: (model, command) => void,
   placements: org.Placements,

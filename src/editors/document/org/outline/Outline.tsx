@@ -9,6 +9,7 @@ import './Outline.scss';
 import * as org from 'data/models/utils/org';
 
 import { OutlineNode } from './types';
+import { ResourceId } from 'data/types';
 
 export interface EditDetails {
   sourceModel: OutlineNode;
@@ -23,7 +24,7 @@ export interface OutlineProps {
   parentNodeId: string;
   nodes: Immutable.OrderedMap<string, OutlineNode>;
   onEdit: (change: org.OrgChangeRequest) => void;
-  onView: (componentOrResourceId: string) => void;
+  onView: (componentOrResourceId: string | ResourceId) => void;
   commandProcessor: (model, command) => void;
   course: CourseModel;
   placements: org.Placements;

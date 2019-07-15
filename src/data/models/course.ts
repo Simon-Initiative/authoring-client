@@ -4,7 +4,7 @@ import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
 import { parseDate } from 'utils/date';
 import { DatasetStatus } from 'types/analytics/dataset';
-import { CourseIdVers, CourseGuid } from 'data/types';
+import { CourseIdVers, CourseGuid, Id } from 'data/types';
 
 // Must match DeployStage enum values in ContentService
 export enum DeployStage {
@@ -81,7 +81,7 @@ function toKV(arr, deserialize) {
   return arr.reduce(
     (p, c) => {
       const obj = deserialize(c);
-      const id = obj.guid;
+      const id = obj.guid instanceof Id ? obj.guid.value() : obj.guid;
       p[id] = obj;
       return p;
     },

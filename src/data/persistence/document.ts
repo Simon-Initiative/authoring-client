@@ -21,7 +21,7 @@ export function retrieveDocument(
     .then((json: any) => {
       return new Document({
         _courseId: course,
-        _id: json.id,
+        _id: ResourceId.of(json.id),
         _rev: json.rev,
         model: models.createModel(json, notify),
       });
@@ -137,14 +137,14 @@ export function bulkFetchDocuments(
       if (json instanceof Array) {
         json.forEach(item => documents.push(new Document({
           _courseId: course,
-          _id: item.guid,
+          _id: ResourceId.of(item.id),
           _rev: item.rev,
           model: models.createModel(item),
         })));
       } else {
         documents.push(new Document({
           _courseId: course,
-          _id: json.guid,
+          _id: ResourceId.of(json.id),
           _rev: json.rev,
           model: models.createModel(json),
         }));
@@ -167,7 +167,7 @@ export function listenToDocument(doc: Document): Promise<Document> {
       if (json.payload !== undefined && json.payload) {
         return new Document({
           _courseId: doc._courseId,
-          _id: json.payload.guid,
+          _id: ResourceId.of(json.payload.id),
           _rev: json.payload.rev,
           model: models.createModel(json.payload.doc),
         });
@@ -188,7 +188,7 @@ export function createDocument(course: CourseGuid | CourseIdVers, content: model
     .then((json) => {
       return new Document({
         _courseId: course,
-        _id: json.id ? json.id : json.guid,
+        _id: json.id ? ResourceId.of(json.id) : ResourceGuid.of(json.guid),
         _rev: json.rev,
         model: models.createModel(json),
       });
@@ -219,7 +219,7 @@ export function persistDocument(doc: Document): Promise<Document> {
       .then((json) => {
         const newDocument = new Document({
           _courseId: doc._courseId,
-          _id: json.guid,
+          _id: ResourceId.of(json.id),
           _rev: json.rev,
           model: doc.model,
         });
@@ -255,7 +255,7 @@ export function persistRevisionBasedDocument(
       .then((json) => {
         const newDocument = new Document({
           _courseId: doc._courseId,
-          _id: json.guid,
+          _id: ResourceId.of(json.id),
           _rev: json.rev,
           model: doc.model,
         });

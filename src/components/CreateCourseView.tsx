@@ -24,7 +24,7 @@ export interface CreateCourseViewState {
 
 class CreateCourseView extends React.PureComponent<CreateCourseViewProps, CreateCourseViewState> {
 
-  constructor(props) {
+  constructor(props: CreateCourseViewProps) {
     super(props);
 
     this.state = {
@@ -37,43 +37,15 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
 
   startCreation(title: string) {
     const g = guid();
-    // Real courses have titles that are generally between 1 and 6 words, usually around 2-4.
-    // We create a human-readable unique ID that matches the course title as closely as possible.
-    // The OLI database has a hard-cap of 50 characters for a package ID, but we try to use
-    // a shorter one.
-    // This is 50 characters:
-    // Far far away, behind the word mountains, far away.
+    const id = title.toLowerCase().split(' ')[0] + '-' + g.substring(g.lastIndexOf('-') + 1);
+    const model = new models.CourseModel({
+      guid: CourseGuid.of(g), id, title, version: '1.0', idvers: CourseIdVers.of(id, '1.0'),
+    });
 
-    // We take the title and remove "stop words" (https://en.wikipedia.org/wiki/Stop_words)
-    // and create an id with what's left.
-
-    const id = title.toLowerCase().split(/[ -/_]+/)
-      .filter(s => s && !stopwords.includes(s))
-      .reduce((acc, curr, i, all) => {
-        // Add 1 to count for '-' when joined after
-        if (acc.count + curr.length + 1 < 20) {
-          return { count: acc.count + curr.length + 1, words: acc.words.concat(curr) };
-        }
-        // If the id is too short and the last word is too long, take 10 chars of it
-        if (acc.count < 10 && i === all.length - 1) {
-          return { count: acc.count + 11, words: acc.words.concat(curr.slice(10)) };
-        }
-        return acc;
-      }, { count: 0, words: [] })
-      .words
-      .join('-');
-
-    return persistence.getValidPackageId(id)
-      .then((id) => {
-        const model = new models.CourseModel({
-          guid: CourseGuid.of(g), id, title, version: '1.0',
-          idvers: CourseIdVers.of(id, '1.0'),
-        });
-        return persistence.createPackage(model)
-          .then((course) => {
-            viewActions.viewCourse(course.idvers, Maybe.nothing());
-            return buildAggregateModel(course.idvers, this.props.userName);
-          });
+    persistence.createPackage(model)
+      .then((course) => {
+        viewActions.viewCourse(course.idvers, Maybe.nothing());
+        return buildAggregateModel(course.idvers, this.props.userName);
       })
       .catch((err) => {
         this.setState({ waiting: false, error: true });

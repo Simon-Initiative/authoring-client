@@ -12,6 +12,7 @@ import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpi
 import { Severity, Toast } from 'components/common/Toast';
 import * as viewActions from 'actions/view';
 import { Maybe } from 'tsmonad';
+import { safeCompare } from './ResourceView';
 
 export interface DeleteResourceModalProps {
   resource: Resource;

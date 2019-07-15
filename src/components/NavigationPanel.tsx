@@ -496,12 +496,12 @@ class NavigationPanel
         <div className={classNames([
           classes.navItemDropdown,
           route.route.type === 'RouteResource'
-          && route.route.resourceId === currentOrg.id
+          && route.route.id.eq(currentOrg.id)
           && classes.selectedNavItem,
         ])}>
           <Tooltip
             disabled={!collapsed}
-            title={`${currentOrg.title} (${currentOrg.id})`}
+            title={`${currentOrg.title} (${currentOrg.id.value()})`}
             position="right"
             distance={32}
             style={{ overflow: 'hidden', flex: 1, display: 'flex' }}>
@@ -539,17 +539,17 @@ class NavigationPanel
               <a key={org.guid.value()}
                 className={classNames([
                   'dropdown-item',
-                  currentOrg.id === org.id && classes.selectedNavItem,
+                  currentOrg.id.eq(org.id) && classes.selectedNavItem,
                 ])}
                 onClick={() => {
-                  if (org.id !== currentOrg.id) {
+                  if (!org.id.eq(currentOrg.id)) {
                     this.props.onReleaseOrg();
                     updateActiveOrgPref(course.idvers, profile.username, org.id);
-                    this.props.onLoadOrg(course.idvers, org.guid);
+                    this.props.onLoadOrg(course.idvers, org.id);
                     viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
                   }
                 }}>
-                {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
+                {org.title} <span style={{ color: colors.gray }}>{org.id.value()}</span>
               </a>
             ))}
           <div className="dropdown-divider" />
@@ -644,14 +644,16 @@ class NavigationPanel
     let selectedItem: Maybe<nav.NavigationItem> = Maybe.just(nav.makePackageOverview());
     if (route.route.type === 'RouteObjectives') {
       selectedItem = Maybe.just(nav.makeLearningObjectives());
+    } else if (route.route.type === 'RouteOrgComponent') {
+      selectedItem = Maybe.just(nav.makeOrganizationItem(route.route.id));
     } else if (route.route.type === 'RouteResource') {
-      selectedItem = Maybe.just(nav.makeOrganizationItem(route.route.resourceId.value()));
+      selectedItem = Maybe.just(nav.makeOrganizationItem(route.route.id.value()));
     }
 
     const firstOrganization = () => course.resourcesById.find(r => r.type === 'x-oli-organization');
 
     const currentOrg = route.orgId.caseOf({
-      just: id => Maybe.maybe(course.resourcesById.find(r => r.id === id))
+      just: id => Maybe.maybe(course.resourcesById.find(r => r.id.eq(id)))
         .caseOf({
           just: resource => resource,
           nothing: () => firstOrganization(),

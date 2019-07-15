@@ -1,6 +1,6 @@
 import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
-import { CourseGuid, DocumentId } from 'data/types';
+import { CourseGuid, DocumentId, CourseIdVers } from 'data/types';
 
 import {
   onFailureCallback, onSaveCompletedCallback,
@@ -12,7 +12,7 @@ export interface AbstractPersistenceStrategy {
   failureCallback: onFailureCallback;
   stateChangeCallback: onStateChangeCallback;
   writeLockedDocumentId: DocumentId;
-  courseId: string;
+  courseId: string | CourseGuid | CourseIdVers;
   destroyed: boolean;
   lockDetails: LockDetails;
 }
@@ -39,8 +39,9 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     // the document first to get the most up to date version
 
     if (this.writeLockedDocumentId !== null) {
-      return persistence.releaseLock(CourseGuid.of(this.courseId),
-        this.writeLockedDocumentId);
+      const courseId = typeof this.courseId === 'string'
+        ? CourseGuid.of(this.courseId) : this.courseId;
+      return persistence.releaseLock(courseId, this.writeLockedDocumentId);
     }
     return Promise.resolve({});
   }
@@ -71,9 +72,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
           if ((result as any).lockedBy === userName) {
             this.lockDetails = (result as any);
             this.writeLockedDocumentId = doc._id;
-            this.courseId = typeof doc._courseId === 'string'
-              ? doc._courseId
-              : '';
+            this.courseId = doc._courseId;
 
             resolve(true);
 

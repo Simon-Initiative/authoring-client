@@ -15,9 +15,10 @@ import { modalActions } from 'actions/modal';
 import { Maybe } from 'tsmonad';
 import { NavigationItem } from 'types/navigation';
 import { DocumentId } from 'data/types';
+import { ExpandedState } from 'reducers/expanded';
 
 interface StateProps {
-  expanded: any;
+  expanded: ExpandedState;
   skills: Map<string, Skill>;
   objectives: Map<string, LearningObjective>;
   document: Document;

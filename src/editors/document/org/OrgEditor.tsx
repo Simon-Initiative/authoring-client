@@ -87,8 +87,7 @@ interface OrgEditorState {
   redoStackSize: number;
 }
 
-class OrgEditor extends React.Component<OrgEditorProps,
-  OrgEditorState>  {
+class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
 
   pendingHighlightedNodes: Immutable.Set<string>;
 
@@ -139,8 +138,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
           }
         }
       });
-    this.props.dispatch(
-      expandNodes(this.props.context.documentId, ids));
+    this.props.dispatch(expandNodes(this.props.context.documentId, ids));
   }
 
   onReposition(sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) {
@@ -171,14 +169,15 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.pendingHighlightedNodes = Immutable.Set<string>().add(node.guid);
   }
 
-  toggleExpanded(id) {
+  toggleExpanded(id: string) {
+    const { dispatch, context, expanded } = this.props;
 
-    const action = this.props.expanded.caseOf({
+    const action: typeof expandNodes | typeof collapseNodes = expanded.caseOf({
       just: set => set.has(id) ? collapseNodes : expandNodes,
       nothing: () => expandNodes,
     });
 
-    this.props.dispatch(action(this.props.context.documentId, [id]));
+    dispatch(action(context.documentId, [id]));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -227,29 +226,28 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
   }
 
-  onClickComponent(model: NodeTypes) {
-    if (model.contentType === 'Item') {
-      viewDocument(model.resourceref.idref,
-        this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
+  onClickComponent(clicked: NodeTypes) {
+    const { context, model, selectedItem } = this.props;
+
+    if (clicked.contentType === 'Item') {
+      viewDocument(clicked.resourceref.idref, context.courseModel.idvers, Maybe.nothing());
     } else {
-      const id = this.props.selectedItem.caseOf({
+      const id: string | undefined = selectedItem.caseOf({
         just: (item) => {
           if (item.type === 'OrganizationItem') {
             return item.id;
           }
-          return null;
+          return undefined;
         },
-        nothing: () => null,
+        nothing: () => undefined,
       });
 
-      const componentId = (model as any).id;
+      const componentId = clicked.id;
       if (componentId === id) {
         this.toggleExpanded(componentId);
       } else {
-        viewDocument(componentId,
-          this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
+        viewDocument(componentId, context.courseModel.idvers, Maybe.just(model.resource.id));
       }
-
     }
   }
 

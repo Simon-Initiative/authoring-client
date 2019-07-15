@@ -1,9 +1,8 @@
 import { Map } from 'immutable';
 import { Dispatch } from 'react-redux';
 import { State } from 'reducers';
-import { parseUrl, stringifyUrlParams } from 'actions/utils/router';
+import { parseUrl, stringifyUrlParams, RouteInfo } from 'actions/utils/router';
 import history from 'utils/history';
-import * as models from 'data/models';
 import { dismissScopedMessages } from './messages';
 import { Scope } from 'types/messages';
 import * as courseActions from 'actions/course';
@@ -16,9 +15,12 @@ import { ResourceState } from 'data/content/resource';
 import { UserState } from 'reducers/user';
 import { buildUrlFromRoute } from 'actions/view';
 import { LegacyTypes, CourseIdVers, ResourceId } from 'data/types';
+import { CourseModel } from 'data/models/course';
 
 export type UPDATE_ROUTE_ACTION = 'route/UPDATE_ROUTE_ACTION';
 export const UPDATE_ROUTE_ACTION: UPDATE_ROUTE_ACTION = 'route/UPDATE_ROUTE_ACTION';
+
+type Transition = 'Application' | 'Course' | 'Organization' | 'Resource' | 'Other';
 
 export type UpdateRouteAction = {
   type: UPDATE_ROUTE_ACTION,
@@ -29,140 +31,159 @@ export type UpdateRouteAction = {
 
 /** This function should only be called by history.listen */
 export function updateRoute(path: string, search: string) {
-  return (dispatch, getState: () => State) => {
-    return parseUrl(path, search)
-      .caseOf({
-        just: (route) => {
-          dispatch({
-            type: UPDATE_ROUTE_ACTION,
-            ...route,
+  return async (dispatch, getState: () => State) => {
+    const { course: courseInRedux, orgs: orgsInRedux, user, router: oldRoute } = getState();
+
+    const newRoute = await parseUrl(path, search);
+
+    const requestedCourse = newRoute.route.type === 'RouteCourse' && newRoute.route.courseId;
+    const isSameCourse = courseInRedux && courseInRedux.idvers.eq(requestedCourse);
+
+    determineTransition(newRoute)
+      .then(dismissMessages);
+
+    loadResources(newRoute)
+      .then(route => updateUrlIfNecessary(route, newRoute))
+      .then(route => dispatch({
+        type: UPDATE_ROUTE_ACTION,
+        ...route,
+      }));
+
+    async function determineTransition(route: RouteInfo): Promise<Transition> {
+      switch (route.route.type) {
+        case 'RouteRoot':
+        case 'RouteCreate':
+        case 'RouteImport':
+        case 'RouteMissing':
+          return 'Application';
+        case 'RouteCourse':
+          const routeOption = route.route;
+          const { orgId: requestedOrg } = routeOption;
+
+          if (!isSameCourse) {
+            return 'Course';
+          }
+
+          return requestedOrg.caseOf({
+            just: org => orgsInRedux.activeOrg.caseOf({
+              just: activeOrg => org.eq(activeOrg._id) ? 'Resource' : 'Organization',
+              nothing: () => 'Organization',
+            }),
+            nothing: () => orgsInRedux.activeOrg.caseOf({
+              just: _ => 'Resource',
+              nothing: () => 'Organization',
+            }),
+          }) as Transition;
+      }
+    }
+
+    async function dismissMessages(transition: Transition) {
+      return dispatch(dismissScopedMessages((() => {
+        switch (transition) {
+          case 'Application': return Scope.Application;
+          case 'Course': return Scope.CoursePackage;
+          case 'Organization': return Scope.Organization;
+          case 'Resource': return Scope.Resource;
+        }
+      })()));
+    }
+
+    async function loadResources(route: RouteInfo): Promise<RouteInfo> {
+      switch (route.route.type) {
+
+        // "Application" routes
+        case 'RouteRoot':
+        case 'RouteCreate':
+        case 'RouteImport':
+        case 'RouteMissing':
+          dispatch(enterApplicationView());
+          dispatch(orgActions.releaseOrg());
+          return Promise.resolve(route);
+
+        case 'RouteCourse':
+          const routeOption = route.route;
+          const { courseId: requestedCourse, orgId: requestedOrg } = routeOption;
+
+          // Course priorities:
+          // 1. Use the current course
+          // 2. Load a new course
+          const course = isSameCourse
+            ? courseInRedux
+            : await dispatch(courseActions.loadCourse(requestedCourse));
+          // Org priorities:
+          // 1. Use the org requested in the route
+          // 2. Use the org saved in local storage
+          // 3. Use the loaded course's first org
+          const getFirstOrg = (course: CourseModel) => course.resourcesById.filter(
+            r => r.type === LegacyTypes.organization
+              && r.resourceState !== ResourceState.DELETED)
+            .first().id as ResourceId;
+
+          const getOrgFromLocalStorage = (user: UserState, courseId: CourseIdVers) =>
+            Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
+              .lift(savedOrgs => savedOrgs[activeOrgUserKey(user.profile.username, courseId)])
+              .lift((activeOrg: string) => ResourceId.of(activeOrg) as ResourceId);
+
+          const organization = requestedOrg
+            .valueOr(getOrgFromLocalStorage(user, requestedCourse)
+              .valueOr(getFirstOrg(course)));
+
+          const isSameOrg = orgsInRedux.activeOrg.caseOf({
+            just: org => {
+              return org._id.eq(organization)
+            },
+            nothing: () => false,
           });
 
-          switch (route.route.type) {
-            case 'RouteRoot':
-            case 'RouteCreate':
-            case 'RouteImport':
-            case 'RouteMissing':
-              dispatch(dismissScopedMessages(Scope.Application));
-              dispatch(enterApplicationView());
-              dispatch(orgActions.releaseOrg());
-              break;
-            case 'RouteCourse':
-              const { course: loadedCourse, router: loadedRoute, user } = getState();
-              const routeOption = route.route;
-              const { courseId: requestedCourseId, orgId } = route.route;
-
-              const isDifferentCourse = (id1, id2) => id1.eq(id2);
-
-              const requestedOrg: Maybe<ResourceId> = orgId.caseOf({
-                just: _ => orgId,
-                nothing: () => getActiveOrgFromLocalStorage(user, requestedCourseId),
-              });
-
-              return Maybe.maybe(loadedCourse).caseOf({
-                nothing: () =>
-                  routeDifferentCourse(dispatch, requestedCourseId, requestedOrg, routeOption),
-                just: (course) => {
-                  if (isDifferentCourse(course.idvers, requestedCourseId)) {
-                    return routeDifferentCourse(
-                      dispatch, requestedCourseId, requestedOrg, routeOption);
-                  }
-
-                  if (isDifferentOrg(loadedRoute.route, requestedOrg)) {
-                    return routeDifferentOrg(
-                      dispatch, course, requestedCourseId, requestedOrg, routeOption);
-                  }
-                  return dispatch(dismissScopedMessages(Scope.Resource));
-                },
-              });
-            case 'RouteKeycloakGarbage':
+          if (!isSameOrg) {
+            dispatch(orgActions.releaseOrg());
+            dispatch(orgActions.load(course.idvers, organization));
           }
-        },
-        // If we get a "keycloak garbage" route, we shouldn't trigger a route update
-        nothing: () => undefined,
-      });
+
+          // If the route is coming from the URL (via history.listen) and not a route transition,
+          // a request to view an org component may be incorrectly parsed as a 'RouteResource'
+          // because it shares the same path as a 'RouteOrgComponent'.
+          // Now that we have the course loaded, we can check if the resource belongs to
+          // the course. If it doesn't, that indicates that we want to view an org component.
+          if (routeOption.route.type === 'RouteResource') {
+            const resourceId = routeOption.route.id;
+            if (!course.resourcesById.get(resourceId.value())) {
+              return Promise.resolve({
+                ...route,
+                route: router.toRouteCourse(
+                  course.idvers,
+                  Maybe.just(organization),
+                  router.toRouteOrgComponent(resourceId.value())),
+              });
+            }
+          }
+          return Promise.resolve({
+            ...route,
+            route: router.toRouteCourse(course.idvers, Maybe.just(organization), routeOption.route),
+          });
+      }
+    }
+
+    async function updateUrlIfNecessary(
+      updatedRoute: RouteInfo, urlRoute: RouteInfo): Promise<RouteInfo> {
+      // At the moment, the only time we need to update the URL is if an organization
+      // is missing from the URL.
+
+      const isOrgMissingFromRoute = updatedRoute.route.type === 'RouteCourse'
+        && urlRoute.route.type === 'RouteCourse'
+        && !updatedRoute.route.orgId.equals(urlRoute.route.orgId);
+
+      if (isOrgMissingFromRoute) {
+        history.replace(buildUrlFromRoute(updatedRoute.route));
+      }
+
+      return {
+        params: urlRoute.params,
+        ...updatedRoute,
+      };
+    }
   };
 }
-
-const redirectToFirstOrg = (route: router.RouteCourse, course: models.CourseModel) =>
-  history.replace(buildUrlFromRoute({
-    ...route,
-    orgId: Maybe.just(firstOrg(course)),
-  }));
-
-function routeDifferentOrg(dispatch, course: models.CourseModel, courseId: CourseIdVers,
-  org: Maybe<ResourceId>, route: router.RouteCourse) {
-
-  org.caseOf({
-    just: (org) => {
-      if (course.resourcesById.get(org.value())) {
-        dispatch(dismissScopedMessages(Scope.Organization));
-        dispatch(orgActions.load(courseId, org));
-      } else {
-        redirectToFirstOrg(route, course);
-      }
-    },
-    nothing: () => redirectToFirstOrg(route, course),
-  });
-}
-
-function routeDifferentCourse(dispatch, courseId: CourseIdVers, requestedOrg: Maybe<ResourceId>,
-  route: router.RouteCourse) {
-
-  dispatch(dismissScopedMessages(Scope.PackageDetails));
-  dispatch(courseActions.loadCourse(courseId))
-    .then((course: models.CourseModel) => {
-      requestedOrg.caseOf({
-        just: (org) => {
-          if (course.resourcesById.get(org.value())) {
-            dispatch(orgActions.load(courseId, org));
-            route.orgId.caseOf({
-              just: _ => undefined,
-              nothing: () => history.push(buildUrlFromRoute({
-                ...route,
-                orgId: Maybe.just(org),
-              })),
-            });
-          } else {
-            redirectToFirstOrg(route, course);
-          }
-        },
-        // If we have a url without an org, push a new url with the first org
-        nothing: () => redirectToFirstOrg(route, course),
-      });
-    });
-}
-
-function getActiveOrgFromLocalStorage(user: UserState, courseId: CourseIdVers): Maybe<ResourceId> {
-  const { maybe } = Maybe;
-
-  return maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
-    .bind((savedOrgs: Object) =>
-      maybe(savedOrgs[activeOrgUserKey(user.profile.username, courseId)])
-        .lift((activeOrg: string) => ResourceId.of(activeOrg)));
-}
-
-function isDifferentOrg(route: router.RouteOption, requestedOrgId: Maybe<ResourceId>): boolean {
-  return requestedOrgId.caseOf({
-    just: (requestedOrgId) => {
-      // Only course routes store an organization
-      if (route.type !== 'RouteCourse') {
-        return true;
-      }
-      return route.orgId.caseOf({
-        just: loadedOrg => loadedOrg !== requestedOrgId,
-        nothing: () => true,
-      });
-    },
-    nothing: () => true,
-  });
-}
-
-const firstOrg = (course: models.CourseModel) =>
-  course.resourcesById.filter(
-    r => r.type === LegacyTypes.organization
-      && r.resourceState !== ResourceState.DELETED)
-    .first().id;
 
 export type ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
 export const ENTER_APPLICATION_VIEW: ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';

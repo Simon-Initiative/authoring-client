@@ -45,7 +45,7 @@ export const fetchSkills = (courseId: CourseIdVers) =>
         const skillArray = skills
           .map(doc => (doc.model as any).skills.toArray())
           .reduce((p, c) => [...p, ...c], [])
-          .map(s => [s.id, s]);
+          .map(s => [s.id.value(), s]);
 
         const map = Immutable.OrderedMap<string, Skill>(skillArray);
         dispatch(setSkills(map));

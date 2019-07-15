@@ -41,9 +41,11 @@ export const viewSkills = (course: CourseIdVers, orgId: Maybe<ResourceId>) =>
 export const viewObjectives = (course: CourseIdVers, orgId: Maybe<ResourceId>) =>
   pushRoute(router.toRouteCourse(course, orgId, router.toRouteObjectives()));
 
-export const viewDocument =
-  (resourceId: ResourceId, course: CourseIdVers, orgId: Maybe<ResourceId>) =>
-    pushRoute(router.toRouteCourse(course, orgId, router.toRouteResource(resourceId)));
+export const viewDocument = (id: ResourceId | string, course: CourseIdVers,
+  orgId: Maybe<ResourceId>) => {
+  pushRoute(router.toRouteCourse(course, orgId,
+    typeof id === 'string' ? router.toRouteOrgComponent(id) : router.toRouteResource(id)));
+};
 
 function pushRoute(route: router.RouteOption) {
   history.push(buildUrlFromRoute(route));
@@ -65,9 +67,8 @@ export function buildUrlFromRoute(route: router.RouteOption) {
       switch (route.route.type) {
         case 'RouteCourseOverview':
           return `/${courseIdVers}${organizationId}`;
-        case 'RouteResource':
-          const resourceId = route.route.resourceId.value();
-          return `/${courseIdVers}/${resourceId}${organizationId}`;
+        case 'RouteResource': return `/${courseIdVers}/${route.route.id.value()}${organizationId}`;
+        case 'RouteOrgComponent': return `/${courseIdVers}/${route.route.id}${organizationId}`;
         case 'RoutePreview': return `/${courseIdVers}/preview/${organizationId}`;
         case 'RouteSkills': return `/${courseIdVers}/skills${organizationId}`;
         case 'RouteObjectives': return `/${courseIdVers}/objectives${organizationId}`;

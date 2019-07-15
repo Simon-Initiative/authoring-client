@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button } from 'components/common/Button';
 import { classNames } from 'styles/jss';
-import { highlightMatchesStr } from 'components/common/SearchBarLogic.tsx';
+import { highlightMatches } from 'components/common/SearchBarLogic.tsx';
 
 export interface InlineEditProps {
   value: string;
@@ -65,7 +65,7 @@ export class InlineEdit
   }
 
 
-  render() : JSX.Element {
+  render(): JSX.Element {
     const { inputStyle, isEditing, value, editMode, highlightText } = this.props;
 
     if (isEditing) {
@@ -81,7 +81,7 @@ export class InlineEdit
             onKeyUp={this.onKeyUp}
             onChange={this.onTextChange}
             onClick={e => e.stopPropagation()}
-            value={this.state.value}/>
+            value={this.state.value} />
           <Button
             className={classNames(['btn btn-sm'])}
             editMode={editMode}
@@ -102,7 +102,7 @@ export class InlineEdit
 
     return (
       <React.Fragment>
-        {highlightText ? highlightMatchesStr(value, highlightText) : value}
+        {highlightText ? highlightMatches(value, highlightText) : value}
       </React.Fragment>
     );
   }

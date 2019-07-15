@@ -88,7 +88,7 @@ export class LearningObjectivesModel
         case 'objective_skills':
           const objskills = contentTypes.ObjectiveSkills.fromPersistence(item, id);
 
-          // Find the objective and update it's skills
+          // Find the objective and update its skills
           const o = objById[objskills.idref.value()];
           if (o !== undefined) {
             const updated = o.with({ skills: objskills.skills.toList() });
@@ -128,7 +128,7 @@ export class LearningObjectivesModel
           objectiveSkills.push(
             (new contentTypes.ObjectiveSkills().with({
               idref: o.id,
-              skills: o.skills.map(s => s.value()).toSet(),
+              skills: o.skills.toSet(),
             })).toPersistence());
         }
       });

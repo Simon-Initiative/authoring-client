@@ -23,7 +23,7 @@ export interface SortableTable {
 
 }
 
-const defaultRowRenderer: RowRenderer = (item: DataRow, index: number, children: any) => {
+const defaultRowRenderer: RowRenderer = (item: DataRow, index: number, children: JSX.Element) => {
   return (
     <tr key={item.key}>{children}</tr>
   );
@@ -46,7 +46,7 @@ export interface SortableTableState {
 export class SortableTable
   extends React.Component<SortableTableProps, SortableTableState> {
 
-  constructor(props) {
+  constructor(props: SortableTableProps) {
     super(props);
 
     this.state = {
@@ -61,8 +61,7 @@ export class SortableTable
   }
 
 
-  sort(model: DataRow[], columnIndex: number, sortDirection: SortDirection) : DataRow[] {
-
+  sort(model: DataRow[], columnIndex: number, sortDirection: SortDirection): DataRow[] {
     const i = columnIndex;
     return model.sort((a: DataRow, b: DataRow) => {
       return this.props.columnComparators[i](
@@ -70,7 +69,7 @@ export class SortableTable
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: SortableTableProps) {
     if (this.props.model !== nextProps.model) {
       this.setState({
         sortedModel: this.sort(
@@ -84,7 +83,7 @@ export class SortableTable
     if (sortColumnIndex === this.state.sortColumnIndex) {
 
       const sortDirection = this.state.sortDirection === SortDirection.Ascending
-          ? SortDirection.Descending : SortDirection.Ascending;
+        ? SortDirection.Descending : SortDirection.Ascending;
 
       this.setState({
         sortDirection,
@@ -110,7 +109,7 @@ export class SortableTable
       <span>&nbsp;&nbsp;
         <a onClick={_ => this.onSortChange(this.state.sortColumnIndex)}>
           <span>
-          <i className={classes}></i>
+            <i className={classes}></i>
           </span>
         </a>
       </span>
@@ -125,7 +124,7 @@ export class SortableTable
             <a>{label}</a>
             {index === this.state.sortColumnIndex
               ? this.renderSortIndicator(true)
-              : this.renderSortIndicator(false) }
+              : this.renderSortIndicator(false)}
           </th>
         );
       });

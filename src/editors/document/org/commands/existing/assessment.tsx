@@ -46,7 +46,6 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
       displayModal(
         <ResourceSelection
           filterPredicate={predicate}
-          courseId={courseModel.guid}
           onInsert={assessment => this.onInsert(org, parent, dismissModal, resolve, assessment)}
           onCancel={() => this.onCancel(dismissModal, reject)} />);
     });

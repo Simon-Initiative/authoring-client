@@ -8,12 +8,12 @@ import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import * as models from 'data/models';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
-import { CourseGuid } from 'data/types';
+import { Id } from 'data/types';
+import { safeCompare } from 'components/ResourceView';
 
 export interface ResourceSelectionProps {
   timeSkewInMs: number;
   course: models.CourseModel;
-  courseId: CourseGuid;
   title?: string;
   noResourcesMessage?: string | JSX.Element;
   filterPredicate: (res: Resource) => boolean;
@@ -30,7 +30,7 @@ export interface ResourceSelectionState {
 export default class ResourceSelection
   extends React.Component<ResourceSelectionProps, ResourceSelectionState> {
 
-  constructor(props) {
+  constructor(props: ResourceSelectionProps) {
     super(props);
 
     this.state = {
@@ -52,10 +52,10 @@ export default class ResourceSelection
     this.setState({ searchText });
 
     const text = searchText.trim().toLowerCase();
-    const filterFn = (r) => {
+    const filterFn = (r: Resource) => {
       const { title, id } = r;
       const titleLower = title.toLowerCase();
-      const idLower = id.toLowerCase();
+      const idLower = id.value().toLowerCase();
 
       return text === '' ||
         titleLower.indexOf(text) > -1 ||
@@ -75,28 +75,6 @@ export default class ResourceSelection
       'Last Updated',
     ];
 
-    const safeCompare =
-      (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
-        if (a[primaryKey] === null && b[primaryKey] === null) {
-          return 0;
-        }
-        if (a[primaryKey] === null) {
-          return direction === SortDirection.Ascending ? 1 : -1;
-        }
-        if (b[primaryKey] === null) {
-          return direction === SortDirection.Ascending ? -1 : 1;
-        }
-        if (a[primaryKey] === b[primaryKey]) {
-          if (a[secondaryKey] === b[secondaryKey]) {
-            return 0;
-          }
-          return safeCompare(secondaryKey, primaryKey, direction, a, b);
-        }
-        return direction === SortDirection.Ascending
-          ? a[primaryKey].localeCompare(b[primaryKey])
-          : b[primaryKey].localeCompare(a[primaryKey]);
-      };
-
     const comparators = [
       (direction, a, b) => safeCompare('title', 'id', direction, a, b),
       (direction, a, b) => safeCompare('id', 'title', direction, a, b),
@@ -107,10 +85,9 @@ export default class ResourceSelection
 
     const highlightedColumnRenderer = (prop: string, r: Resource) =>
       this.state.searchText.length < 3
-        ? <span>{r[prop]}</span>
-        : highlightMatches(prop, r, this.state.searchText);
+        ? <span>{r[prop] instanceof Id ? r[prop].value() : r[prop]}</span>
+        : highlightMatches(r[prop], this.state.searchText);
 
-    // r : Resource
     const columnRenderers = [
       r => highlightedColumnRenderer('title', r),
       r => highlightedColumnRenderer('id', r),
@@ -120,7 +97,7 @@ export default class ResourceSelection
 
     const rowRenderer = (item: DataRow, index: number, children: any) => {
       const resource = item.data as Resource;
-      const active = resource.id.eq(this.state.selected && this.state.selected.id)
+      const active = this.state.selected && resource.id.eq(this.state.selected.id)
         ? 'table-active'
         : '';
 
@@ -134,7 +111,10 @@ export default class ResourceSelection
       );
     };
 
-    const rows = this.state.resources.map(r => ({ key: r.guid.value(), data: r }));
+    const rows = this.state.resources.map(r => ({
+      key: r.guid.value(),
+      data: r,
+    }));
 
     return (
       <div className="resourceSelection">

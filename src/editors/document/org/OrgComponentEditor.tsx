@@ -128,11 +128,7 @@ export class OrgComponentEditor
       resourceId = this.props.course.resources
         .get(componentOrResourceGuid.value(), {} as Resource).id;
     }
-    this.props.org.lift((o) => {
-      viewActions.viewDocument(
-        resourceId, this.props.course.idvers, Maybe.just(o.resource.id));
-    });
-
+    viewActions.viewDocument(resourceId, this.props.course.idvers, Maybe.nothing());
   }
 
   getLabel(model: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section) {

@@ -48,7 +48,7 @@ export default class DocumentView
   }
 
   componentWillReceiveProps(nextProps: DocumentViewProps) {
-    if (nextProps.documentId !== this.props.documentId) {
+    if (!nextProps.documentId.eq(this.props.documentId)) {
       const { onLoad, onRelease, documentId } = nextProps;
 
       onRelease(this.props.documentId);

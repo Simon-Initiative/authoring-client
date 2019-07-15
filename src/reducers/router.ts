@@ -4,13 +4,19 @@ import {
   UPDATE_ROUTE_ACTION,
   ResetRouteAction,
   RESET_ROUTE_ACTION,
+  SetSearchParamAction,
+  SET_SEARCH_PARAM_ACTION,
+  ClearSearchParamAction,
+  CLEAR_SEARCH_PARAM_ACTION,
 } from 'actions/router';
 import { OtherAction } from './utils';
-import { toRouteRoot, RouteOption } from 'types/router';
+import { RouteOption, toRouteLoading } from 'types/router';
 
 export type ActionTypes = UpdateRouteAction
   | ResetRouteAction
-  | OtherAction;
+  | OtherAction
+  | SetSearchParamAction
+  | ClearSearchParamAction;
 
 interface RouterStateParams {
   path: string;
@@ -21,7 +27,7 @@ interface RouterStateParams {
 const defaults = (params: Partial<RouterStateParams> = {}): RouterStateParams => ({
   path: params.path || '',
   params: params.params || Map<string, string>(),
-  route: params.route || toRouteRoot(),
+  route: params.route || toRouteLoading(),
 });
 
 export class RouterState extends Record(defaults()) implements RouterStateParams {
@@ -52,6 +58,11 @@ export const router = (
         params: action.params,
         route: action.route,
       });
+    case SET_SEARCH_PARAM_ACTION:
+    case CLEAR_SEARCH_PARAM_ACTION:
+      return state.with({
+        params: action.newUrlParams,
+      })
     case RESET_ROUTE_ACTION:
       return initialState;
     default:

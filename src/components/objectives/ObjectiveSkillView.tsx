@@ -42,6 +42,7 @@ import './ObjectiveSkillView.scss';
 import { extractFullText } from 'data/content/objectives/objective';
 import { WritelockModal } from 'components/WritelockModal';
 import { ConflictModal } from 'components/ConflictModal.controller';
+import { Document } from 'data/persistence/common';
 
 const getQuestionRefFromSkillEdge = (
   edge: Edge, assessmentType: LegacyTypes, assessmentId: ResourceId): Maybe<QuestionRef> => {
@@ -66,7 +67,7 @@ export const reduceObjectiveWorkbookPageRefs = (
   workbookpageToObjectiveEdges: Edge[],
   isValidResource = resourceId => true,
 ) => {
-  const entries = [];
+  const entries: [string, Immutable.List<ResourceId>][] = [];
   objectives.toArray().forEach((objective) => {
     const items = workbookpageToObjectiveEdges
       // filter out edges that dont point to this objective
@@ -74,10 +75,10 @@ export const reduceObjectiveWorkbookPageRefs = (
         && edge.destinationId.eq(objective.id))
       // map to workbook page ids
       .map(edge => edge.sourceId);
-    entries.push([objective.id, Immutable.List<string>(items)]);
+    entries.push([objective.id.value(), Immutable.List<ResourceId>(items)]);
   });
 
-  return Immutable.Map<string, Immutable.List<string>>(entries);
+  return Immutable.Map<string, Immutable.List<ResourceId>>(entries);
 };
 
 
@@ -86,7 +87,7 @@ export const reduceObjectiveWorkbookPageRefs = (
 // that do not exist in this organization. We strive
 // for ultra efficiency here - so we advoid Immutable collections
 // and go raw JS objects as maps.
-function skillToAssessmentMap(skillEdges: Edge[], isInOrg: (string) => boolean) {
+function skillToAssessmentMap(skillEdges: Edge[], isInOrg: (resourceId: ResourceId) => boolean) {
 
   const skills = {};
   skillEdges.forEach((e) => {
@@ -107,13 +108,13 @@ function reduceSkillToQuestionRefs(
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
   assessmentToSkillEdges: Edge[],
   resourceType: LegacyTypes,
-  isInOrg = resourceId => true,
+  isInOrg = (resourceId: ResourceId) => true,
 ) {
 
   // Create a map of the skills to the assessments in this org that
   // target the skill
   const skillMap = skillToAssessmentMap(assessmentToSkillEdges, isInOrg);
-
+  console.log('skillMap', skillMap)
 
   const results = skills.toArray()
     .map((skill) => {
@@ -133,7 +134,7 @@ function reduceSkillToQuestionRefs(
         });
       }
 
-      return [skill.id, Immutable.List<QuestionRef>(refs)];
+      return [skill.id.value(), Immutable.List<QuestionRef>(refs)];
     });
 
   return Immutable.Map<string, Immutable.List<QuestionRef>>(results);
@@ -143,7 +144,7 @@ function reduceSkillToQuestionRefs(
 function reduceSkillFormativeQuestionRefs(
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
   formativeToSkillEdges: Edge[],
-  isInOrg = resourceId => true) {
+  isInOrg = (resourceId: ResourceId) => true) {
 
   return reduceSkillToQuestionRefs(skills, formativeToSkillEdges, LegacyTypes.inline, isInOrg);
 }
@@ -152,7 +153,7 @@ function reduceSkillFormativeQuestionRefs(
 function reduceSkillSummativeQuestionRefs(
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
   formativeToSkillEdges: Edge[],
-  isInOrg = resourceId => true) {
+  isInOrg = (resourceId: ResourceId) => true) {
 
   return reduceSkillToQuestionRefs(skills, formativeToSkillEdges, LegacyTypes.assessment2, isInOrg);
 }
@@ -164,7 +165,7 @@ export const reduceSkillPoolQuestionRefs = (
   skills: Immutable.OrderedMap<string, contentTypes.Skill>,
   poolToSkillEdges: Edge[],
   assessmentToPoolEdges: Edge[],
-  isValidResource = resourceId => true,
+  isValidResource = (resourceId: ResourceId) => true,
 ) => skills.reduce(
   (acc, skill) => acc.set(
     skill.id.value(),
@@ -232,7 +233,7 @@ interface ObjectiveSkillViewState {
   loading: boolean;
   organizationResourceMap: Maybe<Immutable.OrderedMap<string, string>>;
   skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
-  workbookPageRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
+  workbookPageRefs: Maybe<Immutable.Map<string, Immutable.List<ResourceId>>>;
   searchText: string;
 }
 
@@ -251,7 +252,7 @@ class ObjectiveSkillView
   unmounted: boolean;
   failureMessage: Maybe<Messages.Message>;
 
-  constructor(props) {
+  constructor(props: ObjectiveSkillViewProps) {
     super(props);
 
     this.state = {
@@ -430,7 +431,7 @@ class ObjectiveSkillView
             // the summative is deep linked from a workbook page activity
             if (edge.sourceType === LegacyTypes.assessment2) {
               // find all edges that have a destinationId linked to this sourceId
-              const linkedEdges = combinedEdges.filter(e => e.destinationId === edge.sourceId);
+              const linkedEdges = combinedEdges.filter(e => e.destinationId.eq(edge.sourceId));
               const isDeepLinked = linkedEdges.some(e => directLookup.has(e.sourceId.value()));
 
               if (isDeepLinked) {
@@ -441,7 +442,7 @@ class ObjectiveSkillView
             return !directLookup.has(edge.destinationId.value())
               && directLookup.has(edge.sourceId.value());
           })
-          .map(edge => edge.destinationId),
+          .map(edge => edge.destinationId.value()),
       ];
 
       const organizationResourceMap = Immutable.OrderedMap<string, string>(
@@ -450,8 +451,8 @@ class ObjectiveSkillView
       // Now that we have the full transitive set of this organization's
       // resources, we can use that to filter down the pages and questions
       // to those that are included in this selected organization
-      const isValidResource = (resourceId) => {
-        return organizationResourceMap.has(resourceId);
+      const isValidResource = (resourceId: ResourceId) => {
+        return organizationResourceMap.has(resourceId.value());
       };
 
       const workbookPageRefs = reduceObjectiveWorkbookPageRefs(
@@ -464,6 +465,9 @@ class ObjectiveSkillView
       const { poolToSkillEdges, assessmentToPoolEdges } = poolEdges;
       const skillPoolQuestionRefs = reduceSkillPoolQuestionRefs(
         skills, poolToSkillEdges, assessmentToPoolEdges, isValidResource);
+
+      console.log('skillFormativeQuestionRefs', skillFormativeQuestionRefs)
+      console.log('skillSummativeQuestionRefs', skillSummativeQuestionRefs)
 
       // At this point we have everything that we need, so now it is just a matter
       // of bundling things up and calling setState to re-render the UI
@@ -488,7 +492,7 @@ class ObjectiveSkillView
 
   }
 
-  releaseAllLocks(documents) {
+  releaseAllLocks(documents: Document[]) {
 
     const courseId = this.props.course.guid;
     const locks = documents.map(d => ({ courseId, documentId: d._id }));
@@ -587,7 +591,7 @@ class ObjectiveSkillView
           logger
             .setVisibility(LogAttribute.TAG, false)
             .setVisibility(LogAttribute.DATE, false)
-            .info(LogTag.DEFAULT, `${objective.title} (id: ${objective.id})`);
+            .info(LogTag.DEFAULT, `${objective.title} (id: ${objective.id.value()})`);
         });
       },
       LogStyle.HEADER + LogStyle.BLUE,
@@ -602,7 +606,7 @@ class ObjectiveSkillView
           logger
             .setVisibility(LogAttribute.TAG, false)
             .setVisibility(LogAttribute.DATE, false)
-            .info(LogTag.DEFAULT, `${skill.title} (${skill.id})`);
+            .info(LogTag.DEFAULT, `${skill.title} (${skill.id.value()})`);
         });
       },
       LogStyle.HEADER + LogStyle.BLUE,
@@ -721,7 +725,7 @@ class ObjectiveSkillView
         .catch(error => this.failureEncountered(error)),
     );
 
-    onUpdateSkills(Immutable.OrderedMap([[model.id, model]]));
+    onUpdateSkills(Immutable.OrderedMap([[model.id.value(), model]]));
   }
 
   createNewSkill(): Promise<ResourceId> {
@@ -764,7 +768,7 @@ class ObjectiveSkillView
           }),
       );
 
-      onUpdateSkills(Immutable.OrderedMap([[skill.id, skill]]));
+      onUpdateSkills(Immutable.OrderedMap([[skill.id.value(), skill]]));
 
     });
 
@@ -1074,22 +1078,22 @@ class ObjectiveSkillView
 
   }
 
-  onToggleExpanded(guid) {
+  onToggleExpanded(id: ResourceId) {
     const { overrideExpanded } = this.state;
 
     // if overrideExpanded is enabled, disable toggle expanded
     if (overrideExpanded) return;
 
-    let action = null;
+    let action: typeof expandNodes | typeof collapseNodes = null;
     if (this.props.expanded.has('objectives')) {
-      action = this.props.expanded.get('objectives').has(guid)
+      action = this.props.expanded.get('objectives').has(id.value())
         ? collapseNodes
         : expandNodes;
     } else {
       action = expandNodes;
     }
 
-    this.props.dispatch(action('objectives', [guid]));
+    this.props.dispatch(action(ResourceId.of('objectives'), [id.value()]));
   }
 
   onBeginExternalEdit(model: contentTypes.LearningObjective) {
@@ -1154,12 +1158,12 @@ class ObjectiveSkillView
       just: (organization) => {
         const rows = [];
 
-        const isExpanded = (guid) => {
+        const isExpanded = (id: ResourceId) => {
           if (overrideExpanded) return true;
 
           if (this.props.expanded.has('objectives')) {
             const set = this.props.expanded.get('objectives');
-            return set.includes(guid);
+            return set.includes(id.value());
           }
 
           return false;
@@ -1177,7 +1181,7 @@ class ObjectiveSkillView
             const wbs = Maybe.just(
               workbookPageRefs.caseOf({
                 just: w => w.get(objective.id.value()),
-                nothing: () => Immutable.List<string>(),
+                nothing: () => Immutable.List<ResourceId>(),
               }),
             );
 
@@ -1196,7 +1200,8 @@ class ObjectiveSkillView
                 objective={objective}
                 organization={organization}
                 highlightText={searchText}
-                skills={objective.skills.filter(skillId => this.props.skills.has(skillId.value()))
+                skills={objective.skills
+                  .filter(skillId => this.props.skills.has(skillId.value()))
                   .map(skillId => this.props.skills.get(skillId.value())).toList()}
                 isExpanded={isExpanded(objective.id)}
                 onToggleExpanded={this.onToggleExpanded}
@@ -1249,8 +1254,8 @@ class ObjectiveSkillView
     unified.newBucket = document;
 
     const workbookPageRefs = this.state.workbookPageRefs.caseOf({
-      just: m => Maybe.just(m.set(obj.id.value(), Immutable.List<string>())),
-      nothing: () => Maybe.nothing<Immutable.Map<string, Immutable.List<string>>>(),
+      just: m => Maybe.just(m.set(obj.id.value(), Immutable.List<ResourceId>())),
+      nothing: () => Maybe.nothing<Immutable.Map<string, Immutable.List<ResourceId>>>(),
     });
 
     this.setState({ objectives: unified, workbookPageRefs });

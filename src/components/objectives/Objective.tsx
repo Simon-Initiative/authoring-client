@@ -8,7 +8,7 @@ import { Button } from 'components/common/Button';
 import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import { InlineEdit } from './InlineEdit';
 import { CourseModel, OrganizationModel } from 'data/models';
 import { stringFormat } from 'utils/format';
@@ -21,6 +21,7 @@ import {
 } from 'components/objectives/utils';
 import { QuestionRef, getReadableTitleFromType } from 'types/questionRef';
 import { checkModel, ModelCheckerRule, RequirementType } from 'data/linter/modelChecker';
+import * as viewActions from 'actions/view';
 
 export interface RuleData {
   pageCount: number;
@@ -86,7 +87,7 @@ export const SKILLS_HELP_LINK = '//olihelp.freshdesk.com/support/solutions/artic
   + '-what-are-learning-objectives-and-skills-';
 
 const getOrderedObjectiveQuestions = (
-  skills,
+  skills: List<contentTypes.Skill>,
   skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>,
   skill?: contentTypes.Skill,
 ) => {
@@ -102,7 +103,7 @@ const getOrderedObjectiveQuestions = (
         (acc, skill) => acc
           .concat(skillQuestionRefs
             .valueOr(Map<string, List<QuestionRef>>())
-            .get(skill.id))
+            .get(skill.id.value()))
           .toList(),
         List<QuestionRef>(),
       )
@@ -322,10 +323,10 @@ export interface ObjectiveProps {
   skills: List<contentTypes.Skill>;
   loading: boolean;
   skillQuestionRefs: Maybe<Map<string, List<QuestionRef>>>;
-  workbookPageRefs: Maybe<List<string>>;
+  workbookPageRefs: Maybe<List<ResourceId>>;
   highlightText?: string;
   organization: OrganizationModel;
-  onToggleExpanded: (id) => void;
+  onToggleExpanded: (id: ResourceId) => void;
   onEdit: (model: contentTypes.LearningObjective) => void;
   onEditSkill: (model: contentTypes.Skill) => void;
   onAddNewSkill: (model: contentTypes.LearningObjective) => void;
@@ -348,7 +349,7 @@ export interface ObjectiveState {
 class Objective
   extends React.PureComponent<StyledComponentProps<ObjectiveProps, typeof styles>, ObjectiveState> {
 
-  constructor(props) {
+  constructor(props: StyledComponentProps<ObjectiveProps, typeof styles>) {
     super(props);
 
     this.onEnter = this.onEnter.bind(this);
@@ -427,7 +428,7 @@ class Objective
                       className={classes.assessmentLink}
                       transform="translate(10, 2)"
                       onClick={() => onPushRoute(
-                        `/${course.idvers.value()}/${question.assessmentId}`
+                        `/${course.idvers}/${question.assessmentId}`
                         + `?organization=${organization.resource.id}`
                         + `&questionId=${question.id}`)}>
                       {stringFormat.ellipsizePx(
@@ -575,8 +576,8 @@ class Objective
       { disabled: skillQuestionRefs.caseOf({ just: () => false, nothing: () => true }) },
     );
 
-    const getWBPTitleFromRefId = (id: string) =>
-      Maybe.maybe(course.resourcesById.get(id)).caseOf({
+    const getWBPTitleFromRefId = (id: ResourceId) =>
+      Maybe.maybe(course.resourcesById.get(id.value())).caseOf({
         just: resource => resource.title,
         nothing: () => '[Error loading page title]',
       });
@@ -618,14 +619,17 @@ class Objective
                   return refs.size > 0
                     ? (
                       <div className={classes.pageList}>
-                        {refs.toArray().map(refGuid => (
-                          <div key={refGuid} className={classes.pageTitle}>
-                            <a href={
-                              `#${course.idvers.value()}/${refGuid}`
-                              + `?organization=${organization.resource.id}`}>
+                        {refs.toArray().map(refId => (
+                          <div key={refId.value()} className={classes.pageTitle}>
+                            <a href="#"
+                              onClick={(e: any) => {
+                                e.preventDefault();
+                                viewActions.viewDocument(refId, course.idvers,
+                                  Maybe.just(organization.resource.id));
+                              }}>
                               <i className={classNames(
                                 ['far fa-file', classes.detailsSectionIcon])} />
-                              {getWBPTitleFromRefId(refGuid)}
+                              {getWBPTitleFromRefId(refId)}
                             </a>
                           </div>
                         ))}

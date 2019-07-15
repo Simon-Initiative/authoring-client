@@ -15,6 +15,7 @@ import { NavigationItem } from 'types/navigation';
 import './OrgEditorManager.scss';
 import * as Messages from 'types/messages';
 import { DocumentId } from 'data/types';
+import { ExpandedState } from 'reducers/expanded';
 
 export interface OrgEditorManagerProps {
   document: persistence.Document;
@@ -25,7 +26,7 @@ export interface OrgEditorManagerProps {
   userName: string;
   profile: UserProfile;
   course: models.CourseModel;
-  expanded: any;
+  expanded: ExpandedState;
   editingAllowed: boolean;
   undoRedoGuid: string;
   skills: Immutable.Map<string, Skill>;
@@ -53,7 +54,7 @@ export default class OrgEditorManager
 
   waitBufferTimer: any;
 
-  constructor(props) {
+  constructor(props: OrgEditorManagerProps) {
     super(props);
     this.onEdit = this.onEdit.bind(this);
 
@@ -98,8 +99,8 @@ export default class OrgEditorManager
         {...this.props}
         selectedItem={this.props.selectedItem}
         model={document.model as models.OrganizationModel}
-        expanded={expanded.has(documentId)
-          ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
+        expanded={expanded.has(documentId.value())
+          ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId.value()))
           : Maybe.nothing<Immutable.Set<string>>()}
         context={{
           orgId: documentId,

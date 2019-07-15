@@ -9,7 +9,7 @@ import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
-import { AssessmentType, LegacyTypes, ResourceId } from 'data/types';
+import { AssessmentType, LegacyTypes, ResourceId, Id } from 'data/types';
 import * as contentTypes from 'data/contentTypes';
 import './ResourceView.scss';
 import { caseOf } from 'utils/utils';
@@ -65,7 +65,7 @@ interface ResourceViewState {
 
 export default class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
 
-  state = {
+  state: ResourceViewState = {
     ...this.state,
     selected: undefined,
     searchText: '',
@@ -126,7 +126,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     });
   }
 
-  onClickResource(id) {
+  onClickResource(id: ResourceId) {
     const { course, currentOrg } = this.props;
 
     viewActions.viewDocument(id, course.idvers, Maybe.just(currentOrg));
@@ -195,7 +195,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderResources() {
-    const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
+    const rows = this.state.resources.map(r => ({
+      key: r.guid.value(),
+      data: r,
+    }));
 
     const labels = [
       'Title',
@@ -218,18 +221,18 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     ];
 
     const highlightedColumnRenderer = (prop: string, r: Resource) => {
+      const text = r[prop] instanceof Id ? r[prop].value() : r[prop];
       const maybeHighlighted = this.state.searchText.length < 3
-        ? r[prop]
-        : highlightMatches(prop, r, this.state.searchText);
+        ? text
+        : highlightMatches(text, this.state.searchText);
 
       return prop === 'title'
         ? <span>{getNameAndIconByType(r.type).icon} {maybeHighlighted}</span>
         : <span>{maybeHighlighted}</span>;
-
     };
 
-    const link = resource => span =>
-      <button onClick={this.onClickResource.bind(this, resource.id)}
+    const link = (resource: Resource) => (span: JSX.Element) =>
+      <button onClick={() => this.onClickResource(resource.id)}
         className="btn btn-link title-btn">{span}</button>;
 
     const columnRenderers = [
@@ -336,9 +339,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     );
   }
 }
-
 export function safeCompare(primaryK: string, secondaryK: string, direction: SortDirection, a, b) {
-
   if (a[primaryK] === null && b[primaryK] === null) {
     return 0;
   }
@@ -348,13 +349,18 @@ export function safeCompare(primaryK: string, secondaryK: string, direction: Sor
   if (b[primaryK] === null) {
     return direction === SortDirection.Ascending ? -1 : 1;
   }
-  if (a[primaryK] === b[primaryK]) {
-    if (a[secondaryK] === b[secondaryK]) {
+
+  const propOrId = (x, k) => x[k] instanceof Id ? x[k].value() : x[k];
+  const aProps = [propOrId(a, primaryK), propOrId(a, secondaryK)];
+  const bProps = [propOrId(b, primaryK), propOrId(b, secondaryK)];
+
+  if (aProps[0] === bProps[0]) {
+    if (aProps[1] === bProps[1]) {
       return 0;
     }
     return safeCompare(secondaryK, primaryK, direction, a, b);
   }
   return direction === SortDirection.Ascending
-    ? a[primaryK].localeCompare(b[primaryK])
-    : b[primaryK].localeCompare(a[primaryK]);
+    ? aProps[0].localeCompare(bProps[0])
+    : bProps[0].localeCompare(aProps[0]);
 }

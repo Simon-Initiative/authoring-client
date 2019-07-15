@@ -270,7 +270,7 @@ class ContextAwareSidebar
         <SidebarRow>
           <Tooltip title={resource.id.value()}
             delay={150} distance={5} size="small" arrowSize="small">
-            {resource.id}
+            {resource.id.value()}
           </Tooltip>
         </SidebarRow>
       </SidebarGroup>

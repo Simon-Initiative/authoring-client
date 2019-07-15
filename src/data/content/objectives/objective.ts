@@ -111,7 +111,6 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
         lo.rawContent = Maybe.just(children);
       }
     }
-
     return new LearningObjective(lo);
   }
 

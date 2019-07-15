@@ -6,7 +6,7 @@ import { ResourceId } from 'data/types';
 export type ObjectiveSkillsParams = {
   idref?: ResourceId,
   guid?: string,
-  skills?: Immutable.Set<string>,
+  skills?: Immutable.Set<ResourceId>,
 };
 
 const defaultContent = {
@@ -14,7 +14,7 @@ const defaultContent = {
   elementType: 'objective_skills',
   idref: ResourceId.of(''),
   guid: '',
-  skills: Immutable.Set<string>(),
+  skills: Immutable.Set<ResourceId>(),
 };
 
 export class ObjectiveSkills extends Immutable.Record(defaultContent) {
@@ -24,7 +24,7 @@ export class ObjectiveSkills extends Immutable.Record(defaultContent) {
   idref: ResourceId;
   guid: string;
   title: string;
-  skills: Immutable.Set<string>;
+  skills: Immutable.Set<ResourceId>;
 
   constructor(params?: ObjectiveSkillsParams) {
     super(augment(params));
@@ -49,7 +49,9 @@ export class ObjectiveSkills extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'skillref':
-          model = model.with({ skills: model.skills.add((item as any).skillref['@idref']) });
+          model = model.with({
+            skills: model.skills.add(ResourceId.of((item as any).skillref['@idref'])),
+          });
           break;
         default:
 
@@ -63,7 +65,7 @@ export class ObjectiveSkills extends Immutable.Record(defaultContent) {
     const o = {
       objective_skills: {
         '@idref': this.idref.value(),
-        '#array': this.skills.toArray().map(s => ({ skillref: { '@idref': s } })),
+        '#array': this.skills.toArray().map(s => ({ skillref: { '@idref': s.value() } })),
       },
     };
 
