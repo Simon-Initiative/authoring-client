@@ -73,11 +73,11 @@ export function quickPreview(resource: Resource) {
     // a stale preview page
     if (document.persistence instanceof DeferredPersistenceStrategy) {
       return (document.persistence as DeferredPersistenceStrategy).flushPendingChanges()
-        .then(_ => persistence.initiateQuickPreview(course.guid, resource.guid))
+        .then(_ => persistence.initiateQuickPreview(course.idvers, resource.guid))
         .catch(err => dispatch(showMessage(buildPersistenceFailureMessage(err, user.profile))));
     }
 
-    persistence.initiateQuickPreview(course.guid, resource.guid);
+    persistence.initiateQuickPreview(course.idvers, resource.guid);
     return Promise.resolve();
   };
 }

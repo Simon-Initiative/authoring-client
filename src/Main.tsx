@@ -39,7 +39,7 @@ import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 import { FourZeroFour } from 'components/404';
 import { OrganizationModel } from 'data/models/org';
 import {
-  LegacyTypes, CourseIdVers, CourseGuid, DocumentId, ResourceId, ResourceGuid,
+  LegacyTypes, CourseIdVers, DocumentId, ResourceId, ResourceGuid,
 } from 'data/types';
 
 interface MainProps {
@@ -100,7 +100,7 @@ export default class Main extends React.Component<MainProps, MainState> {
     const wb = models.WorkbookPageModel.createNew(wbId, 'Welcome', body);
     persistence.createDocument(course.idvers, wb)
       .then((result) => {
-        const resource = createOrg(course.guid, title, course.title, wbId);
+        const resource = createOrg(course.idvers, title, course.title, wbId);
         persistence.createDocument(course.idvers, resource)
           .then((result) => {
             const r = (result.model as OrganizationModel).resource;
@@ -261,9 +261,9 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 }
 
-const createOrg = (courseGuid: CourseGuid, title, courseTitle: string, wbId: string) => {
+const createOrg = (courseId: CourseIdVers, title, courseTitle: string, wbId: string) => {
   const g = guid();
-  const id = courseGuid.value() + '_' +
+  const id = courseId.value() + '_' +
     title.toLowerCase().split(' ')[0] + '_'
     + g.substring(g.lastIndexOf('-') + 1);
 

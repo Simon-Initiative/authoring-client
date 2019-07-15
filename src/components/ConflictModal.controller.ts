@@ -2,18 +2,18 @@ import { connect } from 'react-redux';
 import { State } from 'reducers';
 import { load } from 'actions/document';
 import { ConflictModal } from './ConflictModal';
-import { CourseGuid, DocumentId } from 'data/types';
+import { DocumentId, CourseIdVers } from 'data/types';
 
 interface StateProps {
 
 }
 
 interface DispatchProps {
-  onLoadDocument: (courseId: CourseGuid, documentId: DocumentId) => Promise<any>;
+  onLoadDocument: (courseId: CourseIdVers, documentId: DocumentId) => Promise<any>;
 }
 
 interface OwnProps {
-  courseId: CourseGuid;
+  courseId: CourseIdVers;
   documentId: DocumentId;
 }
 
@@ -25,7 +25,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
   return {
-    onLoadDocument: (courseId, documentId) =>
+    onLoadDocument: (courseId: CourseIdVers, documentId: DocumentId) =>
       dispatch(load(courseId, documentId)),
   };
 };

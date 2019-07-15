@@ -27,7 +27,7 @@ import { WritelockModal } from 'components/WritelockModal.controller';
 import { ConflictModal } from 'components/ConflictModal.controller';
 import { State } from 'reducers';
 import { IdentifiableContentElement, ContentElement } from 'data/content/common/interfaces';
-import { CourseIdVers, DocumentId, CourseGuid } from 'data/types';
+import { CourseIdVers, DocumentId } from 'data/types';
 import { Document } from 'data/persistence/common';
 
 export type DOCUMENT_REQUESTED = 'document/DOCUMENT_REQUESTED';
@@ -201,7 +201,7 @@ function saveCompleted(
 }
 
 function saveFailed(
-  dispatch, getState, courseId: CourseGuid, documentId: DocumentId,
+  dispatch, getState, courseId: CourseIdVers, documentId: DocumentId,
   error: { status: string, statusText: string, message: string }) {
 
   dispatch(lastSaveSucceeded(documentId, Maybe.just(false)));
@@ -222,7 +222,7 @@ function saveFailed(
 }
 
 function stateChangeListener(
-  dispatch, getState, courseId: CourseGuid, documentId: DocumentId,
+  dispatch, getState, courseId: CourseIdVers, documentId: DocumentId,
   currentState: PersistenceState) {
 
   dispatch(isSavingUpdated(documentId, currentState.isInFlight || currentState.isPending));
@@ -294,9 +294,10 @@ export function load(courseId: CourseIdVers, documentId: DocumentId) {
 
         strategy.initialize(
           document, userName,
-          saveCompleted.bind(undefined, dispatch, getState, documentId),
-          saveFailed.bind(undefined, dispatch, getState, courseId, documentId),
-          stateChangeListener.bind(undefined, dispatch, getState, courseId, documentId),
+          (document: Document) => saveCompleted(dispatch, getState, documentId, document),
+          error => saveFailed(dispatch, getState, courseId, documentId, error),
+          (currentState: PersistenceState) =>
+            stateChangeListener(dispatch, getState, courseId, documentId, currentState),
         ).then((editingAllowed) => {
 
           if (!editingAllowed) {

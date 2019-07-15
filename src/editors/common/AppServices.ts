@@ -35,10 +35,10 @@ export interface AppServices {
 
   dismissMessage: (message: Messages.Message) => void;
 
-  createWorkbookPage: (title: string, courseId: types.CourseGuid | types.CourseIdVers) =>
+  createWorkbookPage: (title: string, courseId: types.CourseIdVers) =>
     Promise<persistence.Document>;
 
-  createAssessment: (title: string, courseId: types.CourseGuid | types.CourseIdVers) =>
+  createAssessment: (title: string, courseId: types.CourseIdVers) =>
     Promise<persistence.Document>;
 
   // Display the given component in a modal dialog.
@@ -105,14 +105,14 @@ export class DispatchBasedServices implements AppServices {
     view.viewDocument(documentId, courseId, orgId);
   }
 
-  createWorkbookPage(title: string, courseId: types.CourseGuid | types.CourseIdVers):
+  createWorkbookPage(title: string, courseId: types.CourseIdVers):
     Promise<persistence.Document> {
     const resource = models.WorkbookPageModel.createNew(
       guid(), 'New Page', NEW_PAGE_CONTENT);
     return this.createResource(courseId, resource);
   }
 
-  createAssessment(title: string, courseId: types.CourseGuid | types.CourseIdVers):
+  createAssessment(title: string, courseId: types.CourseIdVers):
     Promise<persistence.Document> {
     const resource = new models.AssessmentModel({
       type: types.LegacyTypes.assessment2,
@@ -175,7 +175,7 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(docActions.mapAndSave(fn, documentId));
   }
 
-  createResource(courseId: types.CourseGuid | types.CourseIdVers, resource):
+  createResource(courseId: types.CourseIdVers, resource):
     Promise<persistence.Document> {
     return new Promise((resolve, reject) => {
 

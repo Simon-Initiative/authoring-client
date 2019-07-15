@@ -343,44 +343,44 @@ class ObjectiveSkillView
 
 
     // fetch workbook page to inline assessment edges
-    const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.guid, {
+    const fetchWorkbookPageToInlineEdges = persistence.fetchEdges(course.idvers, {
       sourceType: LegacyTypes.workbook_page,
       destinationType: LegacyTypes.inline,
     });
 
     // fetch workbook page to inline assessment edges
-    const fetchWorkbookPageToSummativeEdges = persistence.fetchEdges(course.guid, {
+    const fetchWorkbookPageToSummativeEdges = persistence.fetchEdges(course.idvers, {
       sourceType: LegacyTypes.workbook_page,
       destinationType: LegacyTypes.assessment2,
     });
 
     // fetch summative assessment to pool edges
-    const fetchSummativeToPoolEdges = persistence.fetchEdges(course.guid, {
+    const fetchSummativeToPoolEdges = persistence.fetchEdges(course.idvers, {
       sourceType: LegacyTypes.assessment2,
       destinationType: LegacyTypes.assessment2_pool,
     });
 
     // fetch workbook page to objective refs
-    const fetchWorkbookPageToObjectiveEdges = persistence.fetchEdges(course.guid, {
+    const fetchWorkbookPageToObjectiveEdges = persistence.fetchEdges(course.idvers, {
       sourceType: LegacyTypes.workbook_page,
       destinationType: LegacyTypes.learning_objective,
     });
 
     // fetch all formative assessment edges and build skill-formative refs map
-    const fetchFormativeRefs = persistence.fetchEdges(course.guid, {
+    const fetchFormativeRefs = persistence.fetchEdges(course.idvers, {
       sourceType: LegacyTypes.inline,
     });
 
     // fetch all summative assessment edges and build skill-summative refs map
-    const fetchSummativeRefs = persistence.fetchEdges(course.guid, {
+    const fetchSummativeRefs = persistence.fetchEdges(course.idvers, {
       sourceType: LegacyTypes.assessment2,
     });
 
     // fetch all question pool assessment edges and build skill-pool refs map
-    const fetchPoolRefs = persistence.fetchEdges(course.guid, {
+    const fetchPoolRefs = persistence.fetchEdges(course.idvers, {
       sourceType: LegacyTypes.assessment2_pool,
     }).then((poolToSkillEdges) => {
-      return persistence.fetchEdges(course.guid, {
+      return persistence.fetchEdges(course.idvers, {
         sourceType: LegacyTypes.assessment2,
         destinationType: LegacyTypes.assessment2_pool,
       })
@@ -490,7 +490,7 @@ class ObjectiveSkillView
 
   releaseAllLocks(documents: Document[]) {
 
-    const courseId = this.props.course.guid;
+    const courseId = this.props.course.idvers;
     const locks = documents.map(d => ({ courseId, documentId: d._id }));
 
     locks.forEach((lock) => {

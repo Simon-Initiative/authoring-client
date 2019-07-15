@@ -1,10 +1,9 @@
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { DocumentId } from '../types';
-import { CourseIdVers, CourseGuid } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
-function lock(
-  course: CourseGuid | CourseIdVers, id: DocumentId,
+function lock(course: CourseIdVers, id: DocumentId,
   action: string, hasTextResult: boolean): Promise<Object> {
 
   // tslint:disable-next-line:max-line-length
@@ -12,15 +11,15 @@ function lock(
   return authenticatedFetch({ url, hasTextResult });
 }
 
-export function releaseLock(course: CourseGuid | CourseIdVers, id: DocumentId): Promise<Object> {
+export function releaseLock(course: CourseIdVers, id: DocumentId): Promise<Object> {
   return lock(course, id, 'RELEASE', true);
 }
 
-export function statusLock(course: CourseGuid | CourseIdVers, id: DocumentId): Promise<Object> {
+export function statusLock(course: CourseIdVers, id: DocumentId): Promise<Object> {
   return lock(course, id, 'STATUS', true);
 }
 
-export function acquireLock(course: CourseGuid | CourseIdVers, id: DocumentId): Promise<Object> {
+export function acquireLock(course: CourseIdVers, id: DocumentId): Promise<Object> {
   return lock(course, id, 'AQUIRE', false);
 }
 

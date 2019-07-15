@@ -67,7 +67,7 @@ export type CourseTitle = string;
 // Documents are a wrapper that link a single resource (or course, if it's under active edit
 // in the CourseEditor) to the course it belongs to. Resources do not contain any information
 // about the course they belong to when fetched from the server.
-export type DocumentId = ResourceId | ResourceGuid | CourseGuid | CourseIdVers;
+export type DocumentId = ResourceId | ResourceGuid | CourseIdVers;
 
 export type DataSetGuid = { type: 'DataSetGuid', value: string };
 

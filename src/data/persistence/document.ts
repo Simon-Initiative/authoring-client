@@ -1,16 +1,15 @@
 import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
-import { DocumentId, LegacyTypes } from '../types';
+import { LegacyTypes } from '../types';
 import * as models from '../models';
-import { CourseIdVers, CourseGuid, ResourceId, ResourceGuid } from 'data/types';
+import { CourseIdVers, ResourceId, ResourceGuid, DocumentId } from 'data/types';
 
 /**
  * Retrieve a document, given a course and document id.
  * @param courseId the course guid
  * @param documentId the document guid
  */
-export function retrieveDocument(
-  course: CourseGuid | CourseIdVers, documentId: ResourceId | ResourceGuid | CourseGuid,
+export function retrieveDocument(course: CourseIdVers, documentId: DocumentId,
   notify?: () => void):
   Promise<Document> {
 
@@ -68,8 +67,7 @@ export type PreviewResult =
  * @param courseId the course guid
  * @param documentId the document guid to preview
  */
-export function initiatePreview(
-  course: CourseGuid | CourseIdVers, documentId: ResourceId | ResourceGuid,
+export function initiatePreview(course: CourseIdVers, documentId: DocumentId,
   isRefresh: boolean, server?: ServerName): Promise<PreviewResult> {
 
   const url = `${configuration.baseUrl}/${course}/resources/preview/${documentId}`
@@ -113,7 +111,7 @@ export function initiatePreview(
     });
 }
 
-export function initiateQuickPreview(course: CourseGuid, documentId: ResourceId | ResourceGuid) {
+export function initiateQuickPreview(course: CourseIdVers, documentId: ResourceId | ResourceGuid) {
   const protocol = window.location.protocol + '//';
   const hostname = window.location.host;
   const prefix = 'content-service/api';
@@ -123,7 +121,7 @@ export function initiateQuickPreview(course: CourseGuid, documentId: ResourceId 
 }
 
 export function bulkFetchDocuments(
-  course: CourseGuid | CourseIdVers, filters: string[], action: string): Promise<Document[]> {
+  course: CourseIdVers, filters: string[], action: string): Promise<Document[]> {
 
   // Valid values for 'action' is limited to 'byIds' or 'byTypes'
   // tslint:disable-next-line:max-line-length
@@ -176,7 +174,7 @@ export function listenToDocument(doc: Document): Promise<Document> {
     });
 }
 
-export function createDocument(course: CourseGuid | CourseIdVers, content: models.ContentModel):
+export function createDocument(course: CourseIdVers, content: models.ContentModel):
   Promise<Document> {
 
   // tslint:disable-next-line:max-line-length

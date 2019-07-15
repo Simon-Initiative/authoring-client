@@ -232,8 +232,7 @@ class Analytics
       }, List<string>()).toArray();
 
     // get all edges from org item refs
-    const sourceEdges = await persistence.fetchEdgesByIds(
-      course.guid, {}, { sourceIds: ids });
+    const sourceEdges = await persistence.fetchEdgesByIds(course.idvers, {}, { sourceIds: ids });
 
     // fetch skill edges for all items, then dedupe ids
     const allIds = ids.concat(
@@ -246,7 +245,7 @@ class Analytics
         .map(e => e.destinationId.value()));
 
     const skillEdges = await persistence.fetchEdgesByIds(
-      course.guid, { destinationType: LegacyTypes.skill }, { sourceIds: allIds });
+      course.idvers, { destinationType: LegacyTypes.skill }, { sourceIds: allIds });
 
     // using skill edges, create a Map<SkillId, List<QuestionRef>>
     const skillQuestionRefMap = skillEdges.reduce(
@@ -267,7 +266,7 @@ class Analytics
     // create objectives List<ObjectiveRef>. We must re-fetch edges using all ids because
     // workbook pages linked by other workbook pages might have learning objectives as well
     const objectiveEdges = await persistence.fetchEdgesByIds(
-      course.guid, { destinationType: LegacyTypes.learning_objective }, { sourceIds: allIds });
+      course.idvers, { destinationType: LegacyTypes.learning_objective }, { sourceIds: allIds });
 
     const objectiveRefs: List<ObjectiveRef> =
       dedupeArray(objectiveEdges, e => e.destinationId.value()).reduce(

@@ -143,7 +143,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   fetchGlobalThemes() {
     const { model } = this.props;
 
-    persistence.fetchCourseThemes(model.guid)
+    persistence.fetchCourseThemes(model.idvers)
       .then(themes => this.setState({
         themes: themes
           .sort((a, b) => a.id.localeCompare(b.id))
@@ -168,8 +168,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const model = this.props.model.with({ title });
     this.props.courseChanged(model);
     const doc = new Document().with({
-      _courseId: model.guid,
-      _id: model.guid,
+      _courseId: model.idvers,
+      _id: model.idvers,
       _rev: model.rev.toString(),
       model,
     });
@@ -180,8 +180,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const model = this.props.model.with({ description });
     this.props.courseChanged(model);
     const doc = new Document().with({
-      _courseId: model.guid,
-      _id: model.guid,
+      _courseId: model.idvers,
+      _id: model.idvers,
       _rev: model.rev.toString(),
       model,
     });
@@ -239,7 +239,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   onEditTheme = (themeId: string) => {
     const { model, courseChanged } = this.props;
 
-    persistence.setCourseTheme(model.guid, themeId)
+    persistence.setCourseTheme(model.idvers, themeId)
       // Update the dropdown and course model with the newly selected theme
       .then((_) => {
         this.setState({
@@ -263,7 +263,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     if (isNewVersionValid) {
       // Reparse version number to remove spaces/other formatting issues in the raw input string
       return persistence.createNewVersion(
-        model.guid, this.parseVersionNumber(newVersionNumber).join('.'))
+        model.idvers, this.parseVersionNumber(newVersionNumber).join('.'))
         .then(viewAllCourses)
         .catch((err) => {
           this.setState({ newVersionErrorMessage: err.message });
@@ -495,7 +495,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   onRequestDeployment = (stage: DeployStage, redeploy: boolean) => {
     const { model, courseChanged, onShowMessage } = this.props;
 
-    return persistence.requestDeployment(model.guid, stage, redeploy)
+    return persistence.requestDeployment(model.idvers, stage, redeploy)
       .then((deployStatusObj) => {
         const deploymentStatus = (deployStatusObj as any).deployStatus;
         courseChanged(model.with({ deploymentStatus }));
@@ -532,8 +532,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const model = this.props.model.with({ metadata: this.props.model.metadata.with({ license }) });
     this.props.courseChanged(model);
     const doc = new Document().with({
-      _courseId: model.guid,
-      _id: model.guid,
+      _courseId: model.idvers,
+      _id: model.idvers,
       _rev: model.rev.toString(),
       model,
     });
@@ -798,7 +798,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                              To get the most recent data for analytics, create a new dataset.
+                                        To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size

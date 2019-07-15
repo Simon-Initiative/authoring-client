@@ -1,7 +1,7 @@
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
-import { PaginatedResponse, CourseIdVers, CourseGuid, ResourceId } from 'data/types';
+import { PaginatedResponse, CourseIdVers, ResourceId } from 'data/types';
 import { Edge } from 'types/edge';
 import { WebContent } from 'data/content/webcontent';
 import { parseEdge } from 'data/persistence/edge';
@@ -11,7 +11,7 @@ import { parseEdge } from 'data/persistence/edge';
  * that the file is being stored as. Rejects if the file name conflicts
  * with another file.
  */
-export function createWebContent(course: CourseGuid | CourseIdVers, file: File): Promise<string> {
+export function createWebContent(course: CourseIdVers, file: File): Promise<string> {
 
   const method = 'POST';
   const url = `${configuration.baseUrl}/${course}/webcontents/upload`;
@@ -40,7 +40,7 @@ export function createWebContent(course: CourseGuid | CourseIdVers, file: File):
  * a list of webcontents
  */
 export function fetchWebContent(
-  course: CourseGuid | CourseIdVers, offset?: number, limit?: number,
+  course: CourseIdVers, offset?: number, limit?: number,
   mimeFilter?: string, pathFilter?: string, searchText?: string, orderBy?: string,
   order?: string): Promise<PaginatedResponse<WebContent>> {
 
@@ -67,7 +67,7 @@ export function fetchWebContent(
  * a list of edges
  */
 export function fetchWebContentReferences(
-  course: CourseGuid | CourseIdVers,
+  course: CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,

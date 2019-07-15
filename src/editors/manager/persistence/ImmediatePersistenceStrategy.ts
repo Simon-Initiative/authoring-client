@@ -1,7 +1,6 @@
 import * as persistence from 'data/persistence';
 import { AbstractPersistenceStrategy } from
   'editors/manager/persistence/AbstractPersistenceStrategy';
-import { CourseGuid } from 'data/types';
 
 /**
  * A persistence strategy that applies changes immediately, and will auto
@@ -55,11 +54,7 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
           if (remainingRetries === 0) {
             initialReject !== undefined ? initialReject(err) : reject(err);
           } else {
-            persistence.retrieveDocument(
-              typeof initialDoc._courseId === 'string'
-                ? CourseGuid.of(initialDoc._courseId)
-                : initialDoc._courseId,
-                initialDoc._id)
+            persistence.retrieveDocument(initialDoc._courseId, initialDoc._id)
               .then((doc) => {
                 const updated = toSave.with({ _rev: doc._rev });
                 this.saveDocument(updated, (remainingRetries - 1),

@@ -2,7 +2,7 @@ import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
 import { Edge, EdgeRelationship, EdgeReferenceType, EdgeStatus } from 'types/edge';
-import { CourseIdVers, CourseGuid, ResourceGuid, ResourceId, LegacyTypes } from 'data/types';
+import { CourseIdVers, ResourceGuid, ResourceId, LegacyTypes } from 'data/types';
 import { Maybe } from 'tsmonad';
 
 /**
@@ -10,7 +10,7 @@ import { Maybe } from 'tsmonad';
  * a list of edges
  */
 export function fetchEdges(
-  course: CourseGuid | CourseIdVers,
+  course: CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,
@@ -61,7 +61,7 @@ export function fetchEdges(
  * returns a Promise to resolve to a list of edges
  */
 export function fetchEdgesByIds(
-  course: CourseGuid | CourseIdVers,
+  course: CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,

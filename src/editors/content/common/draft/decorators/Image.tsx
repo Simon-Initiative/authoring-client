@@ -28,7 +28,7 @@ class Image extends React.PureComponent<ImageProps, any> {
 
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
     const src = data.src;
@@ -54,13 +54,13 @@ class Image extends React.PureComponent<ImageProps, any> {
           src={fullSrc}
           height={data.height}
           width={data.width}
-          />
+        />
       </span>
     );
   }
 }
 
-export default function (props: Object) : Decorator {
+export default function (props: Object): Decorator {
   return {
     strategy: byType.bind(undefined, EntityTypes.image),
     component: Image,

@@ -9,14 +9,14 @@ function onInsert(context, services, resolve, reject, type, file) {
 
   services.dismissModal();
 
-  persistence.createWebContent(context.courseModel.guid, file)
-  .then(src => resolve(src))
-  .catch(err => reject(err));
+  persistence.createWebContent(context.courseModel.idvers, file)
+    .then(src => resolve(src))
+    .catch(err => reject(err));
 }
 
 export function uploadFile(
   mediaType: string, accept: string,
-  context: AppContext, services: AppServices) : Promise<string> {
+  context: AppContext, services: AppServices): Promise<string> {
 
   return new Promise((resolve, reject) => {
     services.displayModal(
@@ -24,7 +24,7 @@ export function uploadFile(
         accept={accept}
         type={mediaType}
         onInsert={onInsert.bind(undefined, context, services, resolve, reject)}
-        onCancel={() => services.dismissModal()}/>);
+        onCancel={() => services.dismissModal()} />);
   });
 }
 

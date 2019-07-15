@@ -30,9 +30,9 @@ export const Speaker: React.StatelessComponent<SpeakerProps>
       just: content =>
         content instanceof contentTypes.Image
           ? buildUrl(context.baseUrl,
-                     context.courseModel.guid,
-                     context.resourcePath,
-                     content.src)
+            context.courseModel.guid,
+            context.resourcePath,
+            content.src)
           : 'https://via.placeholder.com/100x100',
       nothing: () => 'https://via.placeholder.com/100x100',
     });

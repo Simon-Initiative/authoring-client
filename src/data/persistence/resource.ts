@@ -1,9 +1,9 @@
 import { credentials, getFormHeaders } from 'actions/utils/credentials';
 import { configuration } from 'actions/utils/config';
 import { authenticatedFetch } from 'data/persistence/common';
-import { CourseGuid, CourseIdVers, ResourceId } from 'data/types';
+import { CourseIdVers, ResourceId } from 'data/types';
 
-export function deleteResource(course: CourseGuid | CourseIdVers, resourceId: ResourceId):
+export function deleteResource(course: CourseIdVers, resourceId: ResourceId):
   Promise<{}> {
   const method = 'DELETE';
   // tslint:disable-next-line:max-line-length

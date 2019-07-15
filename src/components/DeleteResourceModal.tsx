@@ -46,7 +46,7 @@ export default class DeleteResourceModal extends
   componentDidMount() {
     const { course, resource } = this.props;
 
-    persistence.fetchWebContentReferences(course.guid, {}, true, resource.id)
+    persistence.fetchWebContentReferences(course.idvers, {}, true, resource.id)
       .then((edges) => {
         this.setState({
           edges: OrderedMap<string, Edge>(

@@ -238,7 +238,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
         });
 
     // sequentially upload files one at a time, then reload the media page
-    createWebContentPromiseFactory(courseModel.guid, fileList.pop())
+    createWebContentPromiseFactory(courseModel.idvers, fileList.pop())
       .then((result) => {
         onResetMedia();
         onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order)

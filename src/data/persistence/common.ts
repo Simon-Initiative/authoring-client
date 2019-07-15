@@ -1,9 +1,9 @@
 import * as Immutable from 'immutable';
-import { DocumentId } from '../types';
+import { DocumentId, ResourceId } from '../types';
 import * as models from '../models';
 import { credentials, getHeaders } from '../../actions/utils/credentials';
 import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak';
-import { CourseIdVers, CourseGuid } from 'data/types';
+import { CourseIdVers } from 'data/types';
 
 const fetch = (window as any).fetch;
 
@@ -90,8 +90,7 @@ export function authenticatedFetch(params: HttpRequestParams): Promise<Object> {
 export type RevisionId = string;
 
 export type DocumentParams = {
-  // string is course.guid, db guid
-  _courseId?: string | CourseGuid | CourseIdVers,
+  _courseId?: CourseIdVers,
   // A course might be the document being edited (CourseEditor.tsx)
   // documentId is generally resource.guid
   _id?: DocumentId,
@@ -100,8 +99,8 @@ export type DocumentParams = {
 };
 
 const defaultDocumentParams = {
-  _courseId: '',
-  _id: '',
+  _courseId: CourseIdVers.of('', '1.0'),
+  _id: ResourceId.of(''),
   _rev: '',
   model: Immutable.Record({ modelType: models.EmptyModel }),
 };
@@ -109,8 +108,8 @@ const defaultDocumentParams = {
 export class Document extends Immutable.Record(defaultDocumentParams) {
 
   /* tslint:disable */
-  _courseId?: string | CourseGuid | CourseIdVers;
-  _id: DocumentId | CourseIdVers;
+  _courseId?: CourseIdVers;
+  _id: DocumentId;
   _rev: RevisionId;
   /* tslint:enable */
 
