@@ -45,7 +45,6 @@ const WOLFRAM_ICON = require('../../../assets/wolfram.png');
 const imgSize = 24;
 
 import SizePicker from 'editors/content/learning/table/SizePicker';
-import { controller } from 'editors/content/media/manager/MediaManager.controller';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object, context?) => void;
@@ -175,7 +174,7 @@ class InsertToolbar
             }
           });
       }}
-      tooltip={context.undoRedoGuid}
+      tooltip="Insert Image"
       disabled={!editMode || !parentSupportsElementType('image')}>
       {getContentIcon(insertableContentTypes.Image)}
     </ToolbarButton>;
@@ -458,7 +457,7 @@ class InsertToolbar
               {getContentIcon(insertableContentTypes.Inquiry, { width: 22 })} Inquiry
             </ToolbarButtonMenuItem>
           </ToolbarQuadMenu>
-          {/* Lists dropdown */}
+
           <ToolbarLayout.Column maxWidth="100px">
             <ToolbarWideMenu
               icon={getContentIcon(insertableContentTypes.Li)}
@@ -489,7 +488,6 @@ class InsertToolbar
                 </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
 
-            {/* learning dropdown */}
             <ToolbarWideMenu
               icon={<i className={'fa fa-graduation-cap'} />}
               label={'Learning'}
@@ -722,7 +720,6 @@ class InsertToolbar
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">
 
-            {/* Layout dropdown */}
             <ToolbarWideMenu
               icon={<i className={'fa fa-clone'} />}
               label={'Layout'}
@@ -756,7 +753,6 @@ class InsertToolbar
                 </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
 
-            {/* Advanced dropdown */}
             <ToolbarWideMenu
               icon={<i className={'fa fa-cogs'} />}
               label={'Advanced'}
