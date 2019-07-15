@@ -8,7 +8,7 @@ function lock(
   action: string, hasTextResult: boolean): Promise<Object> {
 
   // tslint:disable-next-line:max-line-length
-  const url = `${configuration.baseUrl}/${course.value()}/locks?action=${action}&resourceId=${id}`;
+  const url = `${configuration.baseUrl}/${course}/locks?action=${action}&resourceId=${id}`;
   return authenticatedFetch({ url, hasTextResult });
 }
 

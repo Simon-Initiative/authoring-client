@@ -101,14 +101,14 @@ export type Theme = {
 };
 
 export function fetchCourseThemes(courseGuid: CourseGuid): Promise<Theme[]> {
-  const url = `${configuration.baseUrl}/${courseGuid.value()}/themes/available`;
+  const url = `${configuration.baseUrl}/${courseGuid}/themes/available`;
   const method = 'GET';
 
   return authenticatedFetch({ url, method }) as Promise<Theme[]>;
 }
 
 export function setCourseTheme(courseGuid: CourseGuid, theme: string): Promise<{}> {
-  const url = `${configuration.baseUrl}/packages/${courseGuid.value()}/theme`;
+  const url = `${configuration.baseUrl}/packages/${courseGuid}/theme`;
   const method = 'PUT';
   const body = JSON.stringify({ theme });
 
@@ -117,7 +117,7 @@ export function setCourseTheme(courseGuid: CourseGuid, theme: string): Promise<{
 
 export function requestDeployment(courseGuid: CourseGuid, stage: DeployStage, redeploy: boolean):
   Promise<{}> {
-  const url = `${configuration.baseUrl}/packages/${courseGuid.value()}/deploy`;
+  const url = `${configuration.baseUrl}/packages/${courseGuid}/deploy`;
   const method = 'POST';
   const body = JSON.stringify({ stage, redeploy });
 
@@ -125,7 +125,7 @@ export function requestDeployment(courseGuid: CourseGuid, stage: DeployStage, re
 }
 
 export function createNewVersion(courseGuid: CourseGuid, version: string): Promise<{}> {
-  const url = `${configuration.baseUrl}/packages/${courseGuid.value()}/new/version`;
+  const url = `${configuration.baseUrl}/packages/${courseGuid}/new/version`;
   const method = 'POST';
 
   const body = JSON.stringify({ version });

@@ -14,7 +14,7 @@ import { parseEdge } from 'data/persistence/edge';
 export function createWebContent(course: CourseGuid | CourseIdVers, file: File): Promise<string> {
 
   const method = 'POST';
-  const url = `${configuration.baseUrl}/${course.value()}/webcontents/upload`;
+  const url = `${configuration.baseUrl}/${course}/webcontents/upload`;
   const headers = getFormHeaders(credentials);
   const body = new FormData();
 
@@ -45,7 +45,7 @@ export function fetchWebContent(
   order?: string): Promise<PaginatedResponse<WebContent>> {
 
   const method = 'GET';
-  const url = `${configuration.baseUrl}/${course.value()}/webcontents`;
+  const url = `${configuration.baseUrl}/${course}/webcontents`;
   const headers = getFormHeaders(credentials);
   const query = Object.assign(
     {},
@@ -67,7 +67,7 @@ export function fetchWebContent(
  * a list of edges
  */
 export function fetchWebContentReferences(
-  packageId: CourseGuid | CourseIdVers,
+  course: CourseGuid | CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,
@@ -93,8 +93,8 @@ export function fetchWebContentReferences(
 
   const method = 'GET';
   const url = byResource
-    ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId.value()}`
-    : `${configuration.baseUrl}/${packageId.value()}/edges`;
+    ? `${configuration.baseUrl}/${course}/resources/edges/${resourceId}`
+    : `${configuration.baseUrl}/${course}/edges`;
 
   const headers = getFormHeaders(credentials);
   const query = Object.assign(

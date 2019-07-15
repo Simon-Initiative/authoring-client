@@ -58,7 +58,7 @@ type GetAllDataSetsResponse = DataSet[];
 
 export function getAllDataSets(course: CourseGuid | CourseIdVers): Promise<GetAllDataSetsResponse> {
 
-  const url = `${configuration.baseUrl}/analytics/${course.value()}`;
+  const url = `${configuration.baseUrl}/analytics/${course}`;
   const method = 'GET';
 
   return (authenticatedFetch({ url, method }) as any)
@@ -74,7 +74,7 @@ type CreateDatasetResponse = {
 
 export function createDataSet(course: CourseGuid | CourseIdVers): Promise<CreateDatasetResponse> {
 
-  const url = `${configuration.baseUrl}/analytics/dataset/${course.value()}`;
+  const url = `${configuration.baseUrl}/analytics/dataset/${course}`;
   const method = 'POST';
 
   return (authenticatedFetch({ url, method }) as any)

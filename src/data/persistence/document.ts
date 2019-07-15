@@ -15,7 +15,7 @@ export function retrieveDocument(
   Promise<Document> {
 
   // tslint:disable-next-line:max-line-length
-  const url = `${configuration.baseUrl}/${course.value()}/resources/${documentId.value()}`;
+  const url = `${configuration.baseUrl}/${course}/resources/${documentId}`;
 
   return authenticatedFetch({ url })
     .then((json: any) => {
@@ -72,7 +72,7 @@ export function initiatePreview(
   course: CourseGuid | CourseIdVers, documentId: ResourceId | ResourceGuid,
   isRefresh: boolean, server?: ServerName): Promise<PreviewResult> {
 
-  const url = `${configuration.baseUrl}/${course.value()}/resources/preview/${documentId.value()}`
+  const url = `${configuration.baseUrl}/${course}/resources/preview/${documentId}`
     + '?redeploy=true'
     + (isRefresh ? '&refresh=true' : '')
     + (server ? '&server=' + server : '');
@@ -118,7 +118,7 @@ export function initiateQuickPreview(course: CourseGuid, documentId: ResourceId 
   const hostname = window.location.host;
   const prefix = 'content-service/api';
   // tslint:disable-next-line:max-line-length
-  const src = `${protocol + hostname}/${prefix}/${course.value()}/resources/quick_preview/${documentId.value()}`;
+  const src = `${protocol + hostname}/${prefix}/${course}/resources/quick_preview/${documentId}`;
   window.open(src, '_blank');
 }
 
@@ -180,7 +180,7 @@ export function createDocument(course: CourseGuid | CourseIdVers, content: model
   Promise<Document> {
 
   // tslint:disable-next-line:max-line-length
-  const url = `${configuration.baseUrl}/${course.value()}/resources?resourceType=${content.type}`;
+  const url = `${configuration.baseUrl}/${course}/resources?resourceType=${content.type}`;
   const body = JSON.stringify(content.toPersistence());
   const method = 'POST';
 
@@ -196,18 +196,11 @@ export function createDocument(course: CourseGuid | CourseIdVers, content: model
 }
 
 export function persistDocument(doc: Document): Promise<Document> {
-  const course = typeof doc._courseId === 'string'
-    ? doc._courseId
-    : doc._courseId.value();
-  const resource = typeof doc._id === 'string'
-    ? doc._id
-    : doc._id.value();
-
   let url = null;
   if (doc.model.type === LegacyTypes.package) {
-    url = `${configuration.baseUrl}/packages/${course}`;
+    url = `${configuration.baseUrl}/packages/${doc._courseId}`;
   } else {
-    url = `${configuration.baseUrl}/${course}/resources/${resource}`;
+    url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
   }
 
   try {
@@ -234,17 +227,10 @@ export function persistDocument(doc: Document): Promise<Document> {
 
 export function persistRevisionBasedDocument(
   doc: Document, nextRevision: string): Promise<Document> {
-  const course = typeof doc._courseId === 'string'
-    ? doc._courseId
-    : doc._courseId.value();
-  const resource = typeof doc._id === 'string'
-    ? doc._id
-    : doc._id.value();
-
   const br = (doc.model as any).resource.lastRevisionGuid;
   const url
     // tslint:disable-next-line:max-line-length
-    = `${configuration.baseUrl}/${course}/resources/${resource}/${br}/${nextRevision}`;
+    = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}/${br}/${nextRevision}`;
 
   try {
     const toPersist = doc.model.toPersistence();

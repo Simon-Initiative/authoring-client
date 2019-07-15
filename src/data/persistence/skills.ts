@@ -4,7 +4,7 @@ import { CourseGuid, CourseIdVers } from 'data/types';
 
 export function skillsDownload(course: CourseGuid | CourseIdVers): Promise<void> {
   const method = 'GET';
-  const url = `${configuration.baseUrl}/${course.value()}/ldmodel/export`;
+  const url = `${configuration.baseUrl}/${course}/ldmodel/export`;
   const headers = getFormHeaders(credentials);
 
   // tslint:disable-next-line:max-line-length

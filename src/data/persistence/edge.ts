@@ -10,7 +10,7 @@ import { Maybe } from 'tsmonad';
  * a list of edges
  */
 export function fetchEdges(
-  packageId: CourseGuid | CourseIdVers,
+  course: CourseGuid | CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,
@@ -36,8 +36,8 @@ export function fetchEdges(
 
   const method = 'GET';
   const url = byResource
-    ? `${configuration.baseUrl}/${packageId.value()}/resources/edges/${resourceId}`
-    : `${configuration.baseUrl}/${packageId.value()}/edges`;
+    ? `${configuration.baseUrl}/${course}/resources/edges/${resourceId}`
+    : `${configuration.baseUrl}/${course}/edges`;
 
   const headers = getHeaders(credentials);
   const query = Object.assign(
@@ -61,7 +61,7 @@ export function fetchEdges(
  * returns a Promise to resolve to a list of edges
  */
 export function fetchEdgesByIds(
-  packageId: CourseGuid | CourseIdVers,
+  course: CourseGuid | CourseIdVers,
   queryParams: {
     relationship?: string,
     purpose?: string,
@@ -84,7 +84,7 @@ export function fetchEdgesByIds(
   } = queryParams;
 
   const method = 'POST';
-  const url = `${configuration.baseUrl}/${packageId.value()}/edges/by-ids`;
+  const url = `${configuration.baseUrl}/${course}/edges/by-ids`;
 
   const headers = getHeaders(credentials);
   const query = Object.assign(

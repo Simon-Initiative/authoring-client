@@ -7,7 +7,7 @@ export function deleteResource(course: CourseGuid | CourseIdVers, resourceId: Re
   Promise<{}> {
   const method = 'DELETE';
   // tslint:disable-next-line:max-line-length
-  const url = `${configuration.baseUrl}/${course.value()}/resources/${resourceId.value()}`;
+  const url = `${configuration.baseUrl}/${course}/resources/${resourceId}`;
   const headers = getFormHeaders(credentials);
 
   return authenticatedFetch({ method, url, headers });

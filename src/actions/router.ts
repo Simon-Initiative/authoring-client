@@ -107,7 +107,7 @@ export function updateRoute(path: string, search: string) {
           // Course priorities:
           // 1. Use the current course
           // 2. Load a new course
-          const course = isSameCourse
+          const course: CourseModel = isSameCourse
             ? courseInRedux
             : await dispatch(courseActions.loadCourse(requestedCourse));
           // Org priorities:
@@ -122,6 +122,9 @@ export function updateRoute(path: string, search: string) {
           const getOrgFromLocalStorage = (user: UserState, courseId: CourseIdVers) =>
             Maybe.maybe(loadFromLocalStorage(ACTIVE_ORG_STORAGE_KEY))
               .lift(savedOrgs => savedOrgs[activeOrgUserKey(user.profile.username, courseId)])
+              .lift((activeOrg: string) => course.resourcesById.get(activeOrg)
+                ? activeOrg
+                : undefined)
               .lift((activeOrg: string) => ResourceId.of(activeOrg) as ResourceId);
 
           const organization = requestedOrg
@@ -129,9 +132,7 @@ export function updateRoute(path: string, search: string) {
               .valueOr(getFirstOrg(course)));
 
           const isSameOrg = orgsInRedux.activeOrg.caseOf({
-            just: org => {
-              return org._id.eq(organization)
-            },
+            just: org => org._id.eq(organization),
             nothing: () => false,
           });
 
