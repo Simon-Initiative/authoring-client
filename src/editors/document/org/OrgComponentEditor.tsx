@@ -20,6 +20,7 @@ import { Analytics } from '../analytics/Analytics.controller';
 import { Remove } from 'components/common/Remove';
 import { Resource } from 'data/content/resource';
 import { ResourceGuid, ResourceId } from 'data/types';
+import { FourZeroFour } from 'components/404';
 
 export interface OrgComponentEditorProps {
   skills: Map<string, t.Skill>;
@@ -43,6 +44,7 @@ export interface OrgComponentEditorProps {
 
 export interface OrgComponentEditorState {
   model: Maybe<t.Sequence | t.Unit | t.Module | t.Section>;
+  notFound: boolean;
 }
 
 function buildCommandButtons(
@@ -71,12 +73,12 @@ function buildCommandButtons(
 export class OrgComponentEditor
   extends React.PureComponent<OrgComponentEditorProps, OrgComponentEditorState> {
 
-  constructor(props) {
+  constructor(props: OrgComponentEditorProps) {
     super(props);
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onView = this.onView.bind(this);
-    this.state = { model: Maybe.nothing() };
+    this.state = { model: Maybe.nothing(), notFound: false };
   }
 
   componentDidMount() {
@@ -98,7 +100,7 @@ export class OrgComponentEditor
         map(
           (e) => {
             if (e.id === props.componentId) {
-              this.setState({ model: Maybe.just(e as any) });
+              this.setState({ model: Maybe.just(e as any), notFound: false });
             }
             return e;
           },
@@ -106,7 +108,9 @@ export class OrgComponentEditor
         );
       },
       nothing: () => {
-        // Do nothing
+        this.setState({
+          notFound: true,
+        });
       },
     });
   }
@@ -341,10 +345,12 @@ export class OrgComponentEditor
 
 
   render(): JSX.Element {
-    const { model } = this.state;
+    const { model, notFound } = this.state;
     return model.caseOf({
       just: m => this.renderContent(m),
-      nothing: () => this.renderWaiting(),
+      nothing: () => notFound
+        ? <FourZeroFour />
+        : this.renderWaiting(),
     });
   }
 

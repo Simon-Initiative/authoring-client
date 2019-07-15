@@ -264,7 +264,7 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
     });
 
     // This id will either be a resource guid or the id of a unit, module, section
-    const id = selectedItem && selectedItem.caseOf({
+    const id: string = selectedItem && selectedItem.caseOf({
       just: (item) => {
         if (item.type === 'OrganizationItem') {
           return item.id;
@@ -279,8 +279,8 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
       let isSelected = false;
       if (node.contentType === 'Item') {
         const res = this.props.context.courseModel
-          .resourcesById.get(node.resourceref.idref);
-        isSelected = res !== undefined ? res.id === id : false;
+          .resourcesById.get(node.resourceref.idref.value());
+        isSelected = res !== undefined ? res.id.value() === id : false;
       } else {
         isSelected = node.id === id;
       }

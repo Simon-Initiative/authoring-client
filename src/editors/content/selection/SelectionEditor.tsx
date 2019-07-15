@@ -6,7 +6,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { Select, TextInput } from 'editors/content/common/controls';
 import { AddQuestion } from 'editors/content/question/addquestion/AddQuestion.controller';
-import { PoolRefEditor } from 'editors/content/selection/PoolRefEditor';
+import PoolRefEditor from 'editors/content/selection/PoolRefEditor.controller';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
@@ -207,7 +207,7 @@ export class SelectionEditor
                   }
                 }} />
             </div>
-            </div>
+          </div>
         </div>
       </div>);
 

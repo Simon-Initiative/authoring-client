@@ -4,31 +4,27 @@ import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, ResourceId } from 'data/types';
 import { Resource, ResourceState } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
-
-export interface PoolRefEditor {
-  guid: string;
-}
+import { CourseModel } from 'data/models/course';
+import { PoolRef } from 'data/content/assessment/pool_ref';
 
 export interface PoolRefProps extends AbstractContentEditorProps<contentTypes.PoolRef> {
   onRemove: (guid: string) => void;
-
+  course: CourseModel;
+  model: PoolRef;
+  onEdit: (source: any) => void;
 }
 
 export interface PoolRefState {
   title: string;
 }
 
-
-/**
- * The content editor for HtmlContent.
- */
-export class PoolRefEditor
+export default class PoolRefEditor
   extends AbstractContentEditor<contentTypes.PoolRef, PoolRefProps, PoolRefState> {
 
-  constructor(props) {
+  constructor(props: PoolRefProps) {
     super(props);
 
     this.onInsert = this.onInsert.bind(this);
@@ -41,14 +37,10 @@ export class PoolRefEditor
     };
   }
 
-  fetchTitlePoolById(id) {
-
-    this.props.services.fetchAttributesBy(['title', 'guid'], 'id', id)
-      .then((o) => {
-        const { title, guid } = o;
-        this.guid = guid;
-        this.setState({ title });
-      });
+  fetchTitlePoolById(id: ResourceId) {
+    const o = this.props.course.resourcesById.get(id.value());
+    const { title } = o;
+    this.setState({ title });
   }
 
   componentDidMount() {
@@ -131,7 +123,9 @@ export class PoolRefEditor
         <span>
           <button onClick={this.onViewPool}
             className="btn btn-link" type="button">{this.state.title}</button>
-          <small style={{ paddingLeft: 15 }} className="tab-label">{this.props.model.idref}</small>
+          <small style={{ paddingLeft: 15 }} className="tab-label">
+            {this.props.model.idref.value()}
+          </small>
         </span>;
     }
 

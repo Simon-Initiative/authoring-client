@@ -114,7 +114,6 @@ function reduceSkillToQuestionRefs(
   // Create a map of the skills to the assessments in this org that
   // target the skill
   const skillMap = skillToAssessmentMap(assessmentToSkillEdges, isInOrg);
-  console.log('skillMap', skillMap)
 
   const results = skills.toArray()
     .map((skill) => {
@@ -465,9 +464,6 @@ class ObjectiveSkillView
       const { poolToSkillEdges, assessmentToPoolEdges } = poolEdges;
       const skillPoolQuestionRefs = reduceSkillPoolQuestionRefs(
         skills, poolToSkillEdges, assessmentToPoolEdges, isValidResource);
-
-      console.log('skillFormativeQuestionRefs', skillFormativeQuestionRefs)
-      console.log('skillSummativeQuestionRefs', skillSummativeQuestionRefs)
 
       // At this point we have everything that we need, so now it is just a matter
       // of bundling things up and calling setState to re-render the UI

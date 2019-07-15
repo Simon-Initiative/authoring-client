@@ -1,5 +1,6 @@
 import createGuid from '../../utils/guid';
 import { getKey } from 'data/common.ts';
+import { ResourceId } from 'data/types';
 
 export function getChildren(item): Object[] {
 
@@ -20,7 +21,10 @@ export function augment(params, hasId = false) {
   const guid = createGuid();
 
   if (params === undefined) {
-    return { guid, id: guid };
+    return {
+      guid,
+      id: guid,
+    };
   }
   if (!params.guid) {
     Object.assign(params, { guid });
@@ -34,12 +38,17 @@ export function augment(params, hasId = false) {
 
 export function setId(model, json, notify?: () => void) {
   if (json['@id']) {
-    return model.with({ id: json['@id'] });
+    const id = json['@id'];
+    return model.with({
+      id: model.id instanceof ResourceId ? ResourceId.of(id) : id,
+    });
   }
   if (notify) {
     notify();
   }
-  return model.with({ id: createGuid() });
+  return model.with({
+    id: model.id instanceof ResourceId ? ResourceId.of(createGuid()) : createGuid(),
+  });
 }
 
 export function ensureIdGuidPresent<T>(record: Record<string, any>): T {
