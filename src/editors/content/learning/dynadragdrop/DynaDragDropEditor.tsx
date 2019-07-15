@@ -12,7 +12,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import {
   Page, Question, Part, Choice, Response,
-  FillInTheBlank
+  FillInTheBlank,
 } from 'data/contentTypes';
 import { AssessmentModel } from 'data/models';
 import guid from 'utils/guid';

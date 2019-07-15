@@ -62,7 +62,7 @@ export const router = (
     case CLEAR_SEARCH_PARAM_ACTION:
       return state.with({
         params: action.newUrlParams,
-      })
+      });
     case RESET_ROUTE_ACTION:
       return initialState;
     default:
