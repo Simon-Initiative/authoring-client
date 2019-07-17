@@ -37,7 +37,6 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
 
     // Release the write lock if it was acquired, but fetch
     // the document first to get the most up to date version
-    console.log('this.courseId', this.courseId)
     if (this.writeLockedDocumentId !== null) {
       return persistence.releaseLock(CourseGuid.of(this.courseId),
         this.writeLockedDocumentId);
