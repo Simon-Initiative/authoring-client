@@ -251,12 +251,9 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   const highlightedColumnRenderer = (
     prop: string,
-    r: CourseDescription, appendText: string = '') => {
-    console.log('r[prop]', r[prop])
-    return searchText.length < 3
+    r: CourseDescription, appendText: string = '') => searchText.length < 3
       ? <span>{r[prop] + appendText}</span>
-      : highlightMatchesStr(r[prop] + appendText, searchText)
-  };
+      : highlightMatchesStr(r[prop] + appendText, searchText);
 
   const comparators = [
     (direction, a, b) => safeCompare('title', 'id', direction, a, b),
