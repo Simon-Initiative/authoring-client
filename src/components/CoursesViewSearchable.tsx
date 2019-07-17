@@ -12,7 +12,7 @@ import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
 import { buildGeneralErrorMessage } from 'utils/error';
-import { CourseIdVers, CourseGuid, CourseId } from 'data/types';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 function reportProblemAction(): Messages.MessageAction {
 
