@@ -663,6 +663,32 @@ class InsertToolbar
                 Create survey
                 </ToolbarButtonMenuItem>
 
+              <ToolbarButtonMenuItem
+                onClick={() => onDisplayModal(
+                  <ResourceSelection
+                    filterPredicate={(res: Resource): boolean =>
+                      res.type === LegacyTypes.feedback
+                      && res.resourceState !== ResourceState.DELETED}
+                    courseId={context.courseModel.guid}
+                    onInsert={(resource) => {
+                      onDismissModal();
+                      const resources = context.courseModel.resources.toArray();
+                      const found = resources.find(r => r.id === resource.id);
+                      if (found !== undefined) {
+                        onInsert(new contentTypes.ActivityReport().with({
+                          idref: resource.id,
+                          type: Maybe.just(contentTypes.ActivityReportTypes.LikertBar),
+                        }));
+                      }
+
+                    }}
+                    onCancel={onDismissModal}
+                  />)
+                  }
+                disabled={false}>
+                <i style={{ width: 22 }} className={'fas fa-clipboard-check'} />
+                Insert Survey{/* Future: Activity */} Report
+                </ToolbarButtonMenuItem>
               <ToolbarButtonMenuDivider />
 
               <ToolbarButtonMenuItem
