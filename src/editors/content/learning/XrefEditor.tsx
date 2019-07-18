@@ -11,7 +11,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ResourceState } from 'data/content/resource';
 import { Clipboard } from 'types/clipboard';
 import { ContentElement } from 'data/content/common/interfaces';
@@ -23,6 +23,8 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 import './XrefEditor.scss';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
+import { targetAssessmentIdSort } from './dynadragdrop/utils';
+import { modelToPlacements } from 'data/models/utils/org';
 
 export interface XrefEditorProps
   extends AbstractContentEditorProps<contentTypes.Xref> {
@@ -36,7 +38,7 @@ export interface XrefEditorProps
 }
 
 export interface XrefEditorState {
-
+  targetIsPage: boolean;
 }
 
 /* Cross Reference is essentially an internal link. It allows you to link to another
@@ -53,6 +55,7 @@ export default class XrefEditor
 
     this.onChangeTarget = this.onChangeTarget.bind(this);
     this.onChangePage = this.onChangePage.bind(this);
+    this.state = { targetIsPage: props.model.idref === props.model.page };
   }
 
   shouldComponentUpdate(nextProps: XrefEditorProps, nextState: XrefEditorState) {
@@ -68,9 +71,8 @@ export default class XrefEditor
     // page to be the first workbook page so that an error is not thrown in case the user chooses
     // a target element without changing the page using the 'page to link to' dropdown
     if (!this.props.model.page) {
-      //KYLE-1997 With only one WBP in course, pages array is empty, and pages[0] is undefined
       this.props.onEdit(this.props.model.with(
-        { page: this.pages[0] ? this.pages[0].guid :  'No pages to reference' }));
+        { page: this.noPages ? this.pages[0].guid :  this.thisId }));
     }
 
     // Check if we need to fetch the target element from its workbook page
@@ -89,26 +91,31 @@ export default class XrefEditor
       r.id !== PLACEHOLDER_ITEM_ID &&
       r.resourceState !== ResourceState.DELETED);
 
+  noPages = this.pages.length === 0;
+
   onChangeTarget() {
     const { onEdit, model, clipboard, updateTarget } = this.props;
 
-    clipboard.item.lift((item) => {
-      let id: string;
-      // Handle contiguous text as a special case, retrieving the ID of the first paragraph
-      if (item.contentType === 'ContiguousText') {
-        id = (item as contentTypes.ContiguousText).getFirstReferenceId();
-        // Else, if it's a valid xref target, it must have an ID
-      } else if (isValidXrefTarget(item)) {
-        id = (item as any).id;
-      }
+    if (this.state.targetIsPage) {
+    } else {
+      clipboard.item.lift((item) => {
+        let id: string;
+        // Handle contiguous text as a special case, retrieving the ID of the first paragraph
+        if (item.contentType === 'ContiguousText') {
+          id = (item as contentTypes.ContiguousText).getFirstReferenceId();
+          // Else, if it's a valid xref target, it must have an ID
+        } else if (isValidXrefTarget(item)) {
+          id = (item as any).id;
+        }
 
-      if (id) {
-        clipboard.page.lift((pageId) => {
-          onEdit(model.with({ idref: id, page: pageId }));
-          updateTarget(id, pageId);
-        });
-      }
-    });
+        if (id) {
+          clipboard.page.lift((pageId) => {
+            onEdit(model.with({ idref: id, page: pageId }));
+            updateTarget(id, pageId);
+          });
+        }
+      });
+    }
   }
 
   onChangePage(page: string) {
@@ -122,34 +129,60 @@ export default class XrefEditor
     }
   }
 
+  onToggleTargetPage(targetIsPage) {
+    const { onEdit, model, updateTarget } = this.props;
+    this.setState({ targetIsPage });
+    onEdit(model.with({ idref: model.page, page: model.page }));
+    updateTarget(model.page, model.page);
+  }
+
   renderSidebar() {
-    console.log("################################SIDEBAR");
     const { editMode, model, onEdit, target } = this.props;
     // KYLE-1997 The items displayed in the drop are HTML option elements in the array below
-    const pageOptions = (this.pages ?
-    this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>) :
-    <option key={this.context.guid} value={this.context.id}>{'No pages to reference'}</option>);
-
-    console.log(model.page);
-    console.log(this.pages === false);
-    console.table(this.pages);
-    console.table(pageOptions);
+    const pageOptions = (this.pages.length === 0 ?
+      <option key={this.context.guid} value={this.context.id}>{'No pages to reference'}</option> :
+      this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>));
 
     return (
       <SidebarContent title="Cross Reference">
         <SidebarGroup label="Page to link to">
           <Select
-            editMode={this.props.editMode}
+            editMode={this.props.editMode && !this.noPages}
             label=""
             value={model.page}
             onChange={this.onChangePage}>
-            {/*pageOptions*/}
+            {pageOptions}
           </Select>
         </SidebarGroup>
-        <SidebarGroup label="Element to link to">
-          <Target {...this.props} target={target} onChangeTarget={this.onChangeTarget} />
+        <SidebarGroup label="Link Target">
+          <SidebarRow>
+            <div className="form-check">
+              <label className="form-check-label">
+                <input className="form-check-input"
+                  name="targetOption"
+                  value="page"
+                  checked={this.state.targetIsPage}
+                  onChange={() => this.onToggleTargetPage(true)}
+                  disabled = {this.noPages}
+                  type="radio" />&nbsp; Selected Page
+            </label>
+            </div>
+            <div className="form-check">
+              <label className="form-check-label">
+                <input className="form-check-input"
+                  name="targetOption"
+                  onChange={() => this.onToggleTargetPage(false)}
+                  value="element"
+                  checked={!this.state.targetIsPage}
+                  disabled = {this.noPages}
+                  type="radio" />&nbsp; Specific Element
+            </label>
+            </div>
+          </SidebarRow>
+          <Target {...this.props} targetIsPage = {this.state.targetIsPage} target={target}
+            onChangeTarget={this.onChangeTarget} />
         </SidebarGroup>
-        <SidebarGroup label="Target">
+        <SidebarGroup label="On Click">
           <Select
             editMode={editMode}
             value={model.target}
@@ -183,8 +216,9 @@ export default class XrefEditor
 
 interface TargetProps extends XrefEditorProps {
   onChangeTarget: () => void;
+  targetIsPage : boolean;
 }
-const Target = ({ target, editMode, clipboard, onChangeTarget }: TargetProps) => {
+const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: TargetProps) => {
 
   const validItemCopied = clipboard.item.caseOf({
     just: item => isValidXrefTarget(item),
@@ -225,9 +259,16 @@ const Target = ({ target, editMode, clipboard, onChangeTarget }: TargetProps) =>
                 </span> {validXrefTargets[element.elementType]}
               </Label>
             ),
-            left: () => <span className="italic">
-              {getContentIcon(insertableContentTypes[''])} Target not found in selected page
-            </span>,
+            left: () => (
+               targetIsPage ? (
+                <span>
+                  <i className={'far fa-file'}/> Workbook Page
+                </span>
+                ) : (
+                <span className="italic">
+                  {getContentIcon(insertableContentTypes[''])} Target not found in selected page
+                </span>)
+             ),
           })
           : <span className="italic">No target element</span>}
       </div>
