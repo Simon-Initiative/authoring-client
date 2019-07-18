@@ -3,10 +3,9 @@ import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
 import { OrganizationModel } from 'data/models/org';
 import { Maybe } from 'tsmonad';
-import { map } from 'data/utils/map';
+import { map, filter } from 'data/utils/map';
 import { ContentElement } from 'data/content/common/interfaces';
 import * as types from 'data/content/org/types';
-import { LegacyTypes } from 'data/types';
 
 
 export type OrgNode =
@@ -33,6 +32,224 @@ export type OrgChangeRequest =
   SetAnonymousAttribute |
   AddAnonymousNode |
   RemoveAnonymousNode;
+
+/**
+ * Utility function to add a 'container' to a position within
+ * an organization.
+ *
+ * @param org The organization model to add a container to
+ * @param selectedId The id of the currently selected node.
+ *  Nothing if no node or the root sequences is selected.
+ * @returns The updated organization model, possibly with swapped units and modules
+ */
+export function addContainer(
+  org: OrganizationModel,
+  selectedNodeId: Maybe<string>): OrganizationModel {
+
+  // Find the selected node based on the selectedNodeId
+  const node = findContainerOrParent(org, selectedNodeId);
+
+  // From the selected node's type, determine the type of the
+  // container that we are inserting and create it
+  const container = createContainer(node);
+
+  // Now insert the container
+  const inserted = insertAsChild(org, node, container);
+
+  // Finally, determine based on the depth of the org tree whether
+  // we need to translate modules to units
+  return translateModulesToUnits(inserted);
+
+}
+
+export function translateModulesToUnits(org: OrganizationModel): OrganizationModel {
+
+  let updatedOrg = org;
+
+  org.sequences.children.toArray().forEach((seq) => {
+
+    if (seq.contentType === 'Sequence') {
+
+      if (calcDepth(seq) === 3 && hasNone(seq, 'Unit')) {
+
+        // We have confirmed that this sequence contains modules - and
+        // at least one of them contains a section.  This is the condition
+        // that triggers the auto-conversion of the modules to units and
+        // the top-level sections to modules
+
+        let children = Immutable.OrderedMap<string, ct.Unit | ct.Module | ct.Include>();
+        seq.children.toArray().forEach((c) => {
+          if (c.contentType === 'Module') {
+            let unit = new ct.Unit().with({
+              id: c.id,
+              title: c.title,
+              description: c.description,
+              metadata: c.metadata,
+              dependencies: c.dependencies,
+              preconditions: c.preconditions,
+              supplements: c.supplements,
+              unordered: c.unordered,
+              progressConstraintIdref: c.progressConstraintIdref,
+              duration: c.duration,
+            });
+
+            let unitChildren = Immutable.OrderedMap<string, ct.Module | ct.Include | ct.Item>();
+            c.children.toArray().forEach((m) => {
+              if (m.contentType === 'Section') {
+                const module = new ct.Module().with({
+                  id: m.id,
+                  title: m.title,
+                  description: m.description,
+                  metadata: m.metadata,
+                  preconditions: m.preconditions,
+                  supplements: m.supplements,
+                  unordered: m.unordered,
+                  progressConstraintIdref: m.progressConstraintIdref,
+                  children: m.children,
+                });
+                unitChildren = unitChildren.set(module.guid, module);
+              } else {
+                unitChildren = unitChildren.set(m.guid, (m as any));
+              }
+
+            });
+
+            unit = unit.with({ children: unitChildren });
+
+            children = children.set(unit.guid, unit);
+
+          } else {
+            children = children.set(c.guid, c);
+          }
+        });
+
+        const s = seq.with({ children });
+        const c = updatedOrg.sequences.children.set(s.guid, s);
+        const ss = updatedOrg.sequences.with({ children: c });
+        updatedOrg = updatedOrg.with({ sequences: ss });
+      }
+    }
+
+  });
+
+  return updatedOrg;
+}
+
+// Does this sequence contain any of the given content types?
+function hasNone(seq: ct.Sequence, contentType: string): boolean {
+  return seq.children.toArray().filter(n => n.contentType === contentType).length === 0;
+}
+
+// Calculate the maximum depth of this organization, assigning a sequence
+// a depth of 1.
+export function calcDepth(sequence: ct.Sequence): number {
+
+  let maxDepth = 1;
+  sequence.children.toArray().forEach((node) => {
+    const depth = calcDepthHelper(node, 1);
+    if (depth > maxDepth) {
+      maxDepth = depth;
+    }
+  });
+  return maxDepth;
+}
+
+function calcDepthHelper(node: OrgNode, depth: number): number {
+
+  if ((node as any).children !== undefined) {
+    let maxDepth = 0;
+    (node as any).children.toArray().forEach((seq) => {
+      const thisMaxDepth = calcDepthHelper(seq, depth + 1);
+      if (thisMaxDepth > maxDepth) {
+        maxDepth = thisMaxDepth;
+      }
+    });
+    return maxDepth;
+  }
+  return depth;
+
+}
+
+export function insertAsChild(
+  org: OrganizationModel,
+  node: OrgNode | ct.Sequences,
+  container: OrgNode): OrganizationModel {
+
+  return (map(
+    (e) => {
+      if (e.id === node.id) {
+        return e.with({ children: e.children.set(container.guid, container) });
+      }
+      return e;
+    }, (org as any) as ContentElement) as any) as OrganizationModel;
+}
+
+function createContainer(node: OrgNode | ct.Sequences): OrgNode {
+  if (node.contentType === 'Sequences') {
+    return new ct.Sequence().with({ title: 'New Container' });
+  }
+  if (node.contentType === 'Sequence') {
+
+    // We need to look at what is currently contained in the sequence -
+    // it may contain modules or units - which we cannot mix. If it is
+    // empty, we insert a module.
+    if (node.children.size === 0 || node.children.first().contentType === 'Module') {
+      return new ct.Module().with({ title: 'New Container' });
+    }
+
+    return new ct.Unit().with({ title: 'New Container' });
+  }
+  if (node.contentType === 'Unit') {
+    return new ct.Module().with({ title: 'New Container' });
+  }
+  if (node.contentType === 'Module') {
+    return new ct.Section().with({ title: 'New Container' });
+  }
+  if (node.contentType === 'Section') {
+    return new ct.Section().with({ title: 'New Container' });
+  }
+}
+
+// Finds the container node corresponding to the selected id.
+// If the id is for a container, that container node is returned.
+// If the id is for an item, the parent container of the item is
+// returned.
+export function findContainerOrParent(
+  org: OrganizationModel,
+  selectedNodeId: Maybe<string>): OrgNode | ct.Sequences {
+
+  return selectedNodeId.caseOf({
+    just: (id) => {
+      let found = false;
+      let node = org.sequences as any;
+      filter((e) => {
+
+        if (!found && e.id === id) {
+          found = true;
+          node = e;
+        }
+
+        if (!found && e.children !== undefined) {
+
+          const nodes = e.children.toArray().filter(c => c.id === id);
+
+          if (nodes.length === 1
+            && (nodes[0].contentType === 'Include' || nodes[0].contentType === 'Item')) {
+            found = true;
+            node = e;
+          }
+
+        }
+        return true;
+
+      }, (org.sequences as any) as ContentElement);
+
+      return node;
+
+    },
+    nothing: () => org.sequences,
+  });
+}
 
 function isNumberedNodeType(node: any) {
   return (node.contentType === ct.OrganizationContentTypes.Unit
