@@ -381,17 +381,12 @@ class ObjectiveSkillView
     const fetchPoolRefs = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.assessment2_pool,
     }).then((poolToSkillEdges) => {
-      return persistence.fetchEdges(course.guid, {
-        // FIXME: this is literally the same call as fetchSummativeToPoolEdges
-        sourceType: LegacyTypes.assessment2,
-        destinationType: LegacyTypes.assessment2_pool,
-      })
-        .then((assessmentToPoolEdges) => {
-          return {
-            poolToSkillEdges,
-            assessmentToPoolEdges,
-          };
-        });
+      return fetchSummativeToPoolEdges.then((assessmentToPoolEdges) => {
+        return {
+          poolToSkillEdges,
+          assessmentToPoolEdges,
+        };
+      });
     });
 
     Promise.all([
