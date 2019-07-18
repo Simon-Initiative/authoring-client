@@ -269,7 +269,6 @@ export interface NavigationPanelProps {
   profile: UserProfile;
   userId: string;
   userName: string;
-  onCreateOrg: () => void;
   onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
   onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
@@ -434,14 +433,14 @@ class NavigationPanel
     const { collapsed } = this.state;
 
     return (
-      <Tooltip disabled={!collapsed} title="Overview" position="right">
+      <Tooltip disabled={!collapsed} title="Course Details" position="right">
         <div
           className={classNames([
             classes.navItem,
             route.route.type === 'RouteCourseOverview' && classes.selectedNavItem,
           ])}
           onClick={() => viewActions.viewCourse(course.idvers, Maybe.just(currentOrg.id))}>
-          <i className="fa fa-book" />{!collapsed && ' Overview'}
+          <i className="fa fa-book" />{!collapsed && ' Course Details'}
         </div>
       </Tooltip>
     );
@@ -452,115 +451,43 @@ class NavigationPanel
     const { collapsed } = this.state;
 
     return (
-      <Tooltip disabled={!collapsed} title="Objectives" position="right">
+      <Tooltip disabled={!collapsed} title="Learning Objectives" position="right">
         <div className={classNames([
           classes.navItem,
           route.route.type === 'RouteObjectives' && classes.selectedNavItem,
         ])}
           onClick={() =>
             viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id))}>
-          <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
+          <i className="fa fa-graduation-cap" />{!collapsed && ' Learning Objectives'}
         </div>
       </Tooltip>
     );
   }
 
-  renderAllResources(currentOrg: Resource) {
-    const { classes, course, route } = this.props;
+  renderOrgRootNode(currentOrg: Resource) {
+    const { classes, route, course } = this.props;
     const { collapsed } = this.state;
-
-    return (
-      <Tooltip disabled={!collapsed} title="All Resources" position="right">
-        <div
-          className={classNames([
-            classes.navItem,
-            route.route.type === 'RouteAllResources' && classes.selectedNavItem,
-          ])}
-          onClick={() =>
-            viewActions.viewAllResources(course.idvers, Maybe.just(currentOrg.id))}>
-          <i className="fas fa-folder-open" />{!collapsed && ' All Resources'}
-        </div>
-      </Tooltip>
-
-    );
-  }
-
-  renderOrgDropdown(currentOrg: Resource) {
-    const { classes, route, profile, course, onCreateOrg } = this.props;
-    const { showOrgDropdown, collapsed } = this.state;
 
     const availableOrgs = r => r.type === 'x-oli-organization' && r.resourceState !== 'DELETED';
 
+    const orgCount = course.resources.toArray().filter(availableOrgs).length;
+    const title = orgCount === 1
+      ? 'Course Outline'
+      : currentOrg.title;
+
     return (
-      <div className="dropdown">
+      <Tooltip disabled={!collapsed} title={title} position="right">
         <div className={classNames([
-          classes.navItemDropdown,
-          route.route.type === 'RouteResource'
-          && route.route.resourceId === currentOrg.id
-          && classes.selectedNavItem,
-        ])}>
-          <Tooltip
-            disabled={!collapsed}
-            title={`${currentOrg.title} (${currentOrg.id})`}
-            position="right"
-            distance={32}
-            style={{ overflow: 'hidden', flex: 1, display: 'flex' }}>
-            <div className={classNames([
-              classes.dropdownText,
-              collapsed && classes.dropdownTextCollapsed,
-            ])}
-              onClick={() => viewActions.viewDocument(
-                currentOrg.id, course.idvers, Maybe.just(currentOrg.id))}>
-              <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
-            </div>
-          </Tooltip>
-          <div className={classNames([
-            classes.dropdownToggle,
-            collapsed && classes.dropdownToggleCollapsed,
-          ])}
-            onClick={(e) => {
-              (e.nativeEvent as any).originator = 'OrgDropdownToggle';
-              this.setState({ showOrgDropdown: !showOrgDropdown });
-            }}>
-            <i className={'fas fa-sort-down'} />
-          </div>
+          classes.navItem,
+          (route.route as any).resourceId === currentOrg.id && classes.selectedNavItem,
+        ])}
+          onClick={() => viewActions.viewDocument(
+            currentOrg.id, course.idvers, Maybe.just(currentOrg.id))}>
+          <i className="fa fa-list-alt" />{!collapsed && (' ' + title)}
         </div>
-        <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
-          {course.resources.valueSeq()
-            .filter(availableOrgs)
-            .sort((r1, r2) => {
-              return r1.title.toLowerCase() < r2.title.toLowerCase()
-                ? -1
-                : r1.title.toLowerCase() > r2.title.toLowerCase()
-                  ? 1
-                  : 0;
-            })
-            .map(org => (
-              <a key={org.guid}
-                className={classNames([
-                  'dropdown-item',
-                  currentOrg.id === org.id && classes.selectedNavItem,
-                ])}
-                onClick={() => {
-                  if (org.id !== currentOrg.id) {
-                    this.props.onReleaseOrg();
-                    updateActiveOrgPref(course.idvers, profile.username, org.id);
-                    this.props.onLoadOrg(course.idvers, org.guid);
-                    viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
-                  }
-                }}>
-                {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
-              </a>
-            ))}
-          <div className="dropdown-divider" />
-          <a key="create-org"
-            className={classNames(['dropdown-item'])}
-            onClick={() => onCreateOrg()}>
-            <i className={'fa fa-plus-circle'} /> Create New Organization
-          </a>
-        </div>
-      </div>
+      </Tooltip>
     );
+
   }
 
   renderOrgTree(currentOrg: Resource, selectedItem: Maybe<nav.NavigationItem>) {
@@ -673,8 +600,7 @@ class NavigationPanel
 
         {this.renderOverview(currentOrg)}
         {this.renderObjectives(currentOrg)}
-        {this.renderAllResources(currentOrg)}
-        {this.renderOrgDropdown(currentOrg)}
+        {this.renderOrgRootNode(currentOrg)}
         {this.renderOrgTree(currentOrg, selectedItem)}
 
       </div>

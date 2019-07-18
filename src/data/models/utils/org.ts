@@ -88,8 +88,8 @@ export function modelToPlacements(
   const positions = {};
   const positionAtLevels = {};
   const placements = [];
-  const arr = model.sequences.children.toArray();
 
+  const arr = model.sequences.children.toArray();
   arr.forEach((n) => {
     modelToPlacementsHelper(
       n, 0, positions, positionAtLevels, placements, Maybe.nothing());
