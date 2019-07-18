@@ -508,7 +508,7 @@ class InsertToolbar
                             && res.resourceState !== ResourceState.DELETED
                             && !existingInlines.has(res.id))
                           }
-                          courseId={context.courseId}
+                          courseId={context.courseModel.guid}
                           onInsert={(resource) => {
                             onDismissModal();
                             const resources = context.courseModel.resources.toArray();
@@ -553,7 +553,7 @@ class InsertToolbar
                       && res.id !== PLACEHOLDER_ITEM_ID
                       && res.resourceState !== ResourceState.DELETED
                       && res.guid !== context.documentId}
-                    courseId={context.courseId}
+                    courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
                       const resources = context.courseModel.resources.toArray();
