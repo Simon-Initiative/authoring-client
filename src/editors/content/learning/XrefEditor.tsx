@@ -23,7 +23,7 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 import './XrefEditor.scss';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
-import { targetAssessmentIdSort } from './dynadragdrop/utils';
+import { targetAssessmentIdSort, updateHTMLLayoutTargetRefs } from './dynadragdrop/utils';
 import { modelToPlacements } from 'data/models/utils/org';
 
 export interface XrefEditorProps
@@ -66,18 +66,27 @@ export default class XrefEditor
 
   componentDidMount() {
     const { target, model, updateTarget } = this.props;
-
+    //KYLE-1984 This block, responsible for the initial crashing bug, may have been totally unnecessary!
+    //KYLE-1984 If anything beyond default behavior is needed, change ContiguousTextToolbar line 380
     // Xref must have a page set in order to allow linking to a target element. We set the default
     // page to be the first workbook page so that an error is not thrown in case the user chooses
     // a target element without changing the page using the 'page to link to' dropdown
-    if (!this.props.model.page) {
+    // KYLE-1
+   /* if (!this.props.model.page) {
       this.props.onEdit(this.props.model.with(
         { page: !this.noPages ? this.pages[0].guid :  this.thisId }));
-    }
+    } */
 
     // Check if we need to fetch the target element from its workbook page
     if (!target && model.idref) {
       updateTarget(model.idref, model.page);
+    }
+  }
+
+  componentWillReceiveProps(nextProps: XrefEditorProps) {
+    const { target, updateTarget } = this.props;
+    if (target !== nextProps.target) {
+      updateTarget(nextProps.model.idref, nextProps.model.page);
     }
   }
 
