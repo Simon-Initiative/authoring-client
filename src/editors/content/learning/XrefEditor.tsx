@@ -72,7 +72,7 @@ export default class XrefEditor
     // a target element without changing the page using the 'page to link to' dropdown
     if (!this.props.model.page) {
       this.props.onEdit(this.props.model.with(
-        { page: this.noPages ? this.pages[0].guid :  this.thisId }));
+        { page: !this.noPages ? this.pages[0].guid :  this.thisId }));
     }
 
     // Check if we need to fetch the target element from its workbook page
@@ -93,36 +93,38 @@ export default class XrefEditor
 
   noPages = this.pages.length === 0;
 
+  // this should only be called if !isTargetPage
   onChangeTarget() {
     const { onEdit, model, clipboard, updateTarget } = this.props;
 
-    if (this.state.targetIsPage) {
-    } else {
-      clipboard.item.lift((item) => {
-        let id: string;
-        // Handle contiguous text as a special case, retrieving the ID of the first paragraph
-        if (item.contentType === 'ContiguousText') {
-          id = (item as contentTypes.ContiguousText).getFirstReferenceId();
-          // Else, if it's a valid xref target, it must have an ID
-        } else if (isValidXrefTarget(item)) {
-          id = (item as any).id;
-        }
 
-        if (id) {
-          clipboard.page.lift((pageId) => {
-            onEdit(model.with({ idref: id, page: pageId }));
-            updateTarget(id, pageId);
-          });
-        }
-      });
-    }
+    clipboard.item.lift((item) => {
+      let id: string;
+        // Handle contiguous text as a special case, retrieving the ID of the first paragraph
+      if (item.contentType === 'ContiguousText') {
+        id = (item as contentTypes.ContiguousText).getFirstReferenceId();
+          // Else, if it's a valid xref target, it must have an ID
+      } else if (isValidXrefTarget(item)) {
+        id = (item as any).id;
+      }
+
+      if (id) {
+        clipboard.page.lift((pageId) => {
+          onEdit(model.with({ idref: id, page: pageId }));
+          updateTarget(id, pageId);
+        });
+      }
+    });
+
   }
 
   onChangePage(page: string) {
     const { onEdit, model, updateTarget } = this.props;
-
-    onEdit(model.with({ page }));
-
+    if (this.state.targetIsPage) {
+      onEdit(model.with({ page, idref: page }));
+    } else {
+      onEdit(model.with({ page }));
+    }
     // Search for the target element in the new page
     if (model.idref) {
       updateTarget(model.idref, page);
@@ -132,8 +134,10 @@ export default class XrefEditor
   onToggleTargetPage(targetIsPage) {
     const { onEdit, model, updateTarget } = this.props;
     this.setState({ targetIsPage });
-    onEdit(model.with({ idref: model.page, page: model.page }));
-    updateTarget(model.page, model.page);
+    if (targetIsPage) {
+      onEdit(model.with({ idref: model.page }));
+      updateTarget(model.page, model.page);
+    }
   }
 
   renderSidebar() {
