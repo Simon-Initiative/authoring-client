@@ -106,7 +106,6 @@ class ActivityReportEditor
     const { classes } = this.props;
 
     const resource = this.props.context.courseModel.resourcesById.get(this.props.model.idref);
-    // KEVIN-1951 OOO should say "Report of: "
 
     const refTitleOrPlaceholder = resource !== undefined
       ? resource.title // Future: handle many activity types.
@@ -116,7 +115,6 @@ class ActivityReportEditor
 
     const activityIcon = 'fas fa-clipboard-check';
 
-    // KEVIN-1951 OOO should make new class*/}
     return (
       <div className={classNames(['ActivityReportEditor', classes.activityReport])}>
         <h5>
