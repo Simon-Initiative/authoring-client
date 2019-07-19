@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { ViewActions } from 'actions/view';
 import { CourseModel } from 'data/models';
 import { UserState } from 'reducers/user';
 import { Maybe } from 'tsmonad';
@@ -11,7 +10,7 @@ import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import * as chroma from 'chroma-js';
 import { RouterState } from 'reducers/router';
-import { ROUTE } from 'actions/router';
+import * as viewActions from 'actions/view';
 
 const OLI_ICON = require('../../assets/oli-icon.png');
 
@@ -89,7 +88,6 @@ const styles: JSSStyles = {
 export interface HeaderProps {
   course: CourseModel;
   user: UserState;
-  viewActions: ViewActions;
   isSaveInProcess: boolean;
   lastRequestSucceeded: Maybe<boolean>;
   saveCount: number;
@@ -244,11 +242,14 @@ class Header
   }
 
   renderPackageTitle() {
-    const { classes, course, viewActions } = this.props;
+    const { classes, course } = this.props;
     return (
       <span>
         <a className={classes.headerLink}
-          onClick={(e) => { e.preventDefault(); viewActions.viewCourse(course.guid); }}>
+          onClick={(e) => {
+            e.preventDefault();
+            viewActions.viewCourse(course.idvers, Maybe.nothing());
+          }}>
           {course.title}
         </a> <span className={classes.version}>v{course.version}</span>
       </span>
@@ -265,8 +266,8 @@ class Header
     return (
       <div className={classNames(['Header', classes.Header])}>
         <div className={classes.headerLogo}>
-          <Link className={classes.headerLogoLink} action={this.props.viewActions.viewAllCourses}>
-            {router.route !== ROUTE.ROOT
+          <Link className={classes.headerLogoLink} action={viewActions.viewAllCourses}>
+            {router.route.type !== 'RouteRoot'
               ? <i className="fa fa-chevron-left" style={{ marginRight: 10 }} />
               : undefined
             }

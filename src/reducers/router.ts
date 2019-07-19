@@ -1,47 +1,33 @@
 import { Map, Record } from 'immutable';
-import { Maybe } from 'tsmonad';
 import {
-  ROUTE,
   UpdateRouteAction,
   UPDATE_ROUTE_ACTION,
   ResetRouteAction,
   RESET_ROUTE_ACTION,
 } from 'actions/router';
 import { OtherAction } from './utils';
+import { toRouteRoot, RouteOption } from 'types/router';
 
 export type ActionTypes = UpdateRouteAction
   | ResetRouteAction
   | OtherAction;
 
-// model
 interface RouterStateParams {
-  route: ROUTE;
   path: string;
-  search: string;
-  courseId: Maybe<string>;
-  resourceId: Maybe<string>;
-  orgId: Maybe<string>;
-  urlParams: Map<string, string>;
+  params: Map<string, string>;
+  route: RouteOption;
 }
 
 const defaults = (params: Partial<RouterStateParams> = {}): RouterStateParams => ({
-  route: params.route || ROUTE.ROOT,
   path: params.path || '',
-  search: params.search || '?',
-  courseId: params.courseId || Maybe.nothing(),
-  resourceId: params.resourceId || Maybe.nothing(),
-  orgId: params.orgId || Maybe.nothing(),
-  urlParams: params.urlParams || Map<string, string>(),
+  params: params.params || Map<string, string>(),
+  route: params.route || toRouteRoot(),
 });
 
 export class RouterState extends Record(defaults()) implements RouterStateParams {
-  route: ROUTE;
   path: string;
-  search: string;
-  courseId: Maybe<string>;
-  resourceId: Maybe<string>;
-  orgId: Maybe<string>;
-  urlParams: Map<string, string>;
+  params: Map<string, string>;
+  route: RouteOption;
 
   constructor(params?: Partial<RouterStateParams>) {
     super(defaults(params));
@@ -61,14 +47,10 @@ export const router = (
 ): RouterState => {
   switch (action.type) {
     case UPDATE_ROUTE_ACTION:
-      return state.with({
-        route: action.route,
+      return new RouterState({
         path: action.path,
-        search: action.search,
-        courseId: action.courseId,
-        resourceId: action.resourceId,
-        orgId: action.orgId,
-        urlParams: action.urlParams || Map<string, string>(),
+        params: action.params,
+        route: action.route,
       });
     case RESET_ROUTE_ACTION:
       return initialState;

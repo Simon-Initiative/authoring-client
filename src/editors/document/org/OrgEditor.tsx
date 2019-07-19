@@ -100,7 +100,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.pendingHighlightedNodes = null;
 
     if (hasMissingResource(props.model, props.context.courseModel)) {
-      props.services.refreshCourse(props.context.courseId);
+      props.services.refreshCourse(props.context.courseModel.guid);
     }
 
     this.state = {
@@ -170,14 +170,14 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.pendingHighlightedNodes = Immutable.Set<string>().add(node.guid);
   }
 
-  toggleExpanded(guid) {
+  toggleExpanded(id) {
 
     const action = this.props.expanded.caseOf({
-      just: set => set.has(guid) ? collapseNodes : expandNodes,
+      just: set => set.has(id) ? collapseNodes : expandNodes,
       nothing: () => expandNodes,
     });
 
-    this.props.dispatch(action(this.props.context.documentId, [guid]));
+    this.props.dispatch(action(this.props.context.documentId, [id]));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -195,10 +195,10 @@ class OrgEditor extends React.Component<OrgEditorProps,
         if (newNodes.length > 0) {
           if (this.pendingHighlightedNodes === null) {
             this.pendingHighlightedNodes
-              = Immutable.Set.of(...newNodes.map(p => p.node.guid));
+              = Immutable.Set.of(...newNodes.map(p => p.node.id));
           } else {
             this.pendingHighlightedNodes = this.pendingHighlightedNodes
-              .union(Immutable.Set.of(...newNodes.map(p => p.node.guid)));
+              .union(Immutable.Set.of(...newNodes.map(p => p.node.id)));
           }
 
           // As long as the new nodes were not the result of an undo or redo,
@@ -227,11 +227,9 @@ class OrgEditor extends React.Component<OrgEditorProps,
   }
 
   onClickComponent(model: NodeTypes) {
-
     if (model.contentType === 'Item') {
-      this.props.services.fetchGuidById(model.resourceref.idref)
-        .then(guid => this.props.dispatch(
-          viewDocument(guid, this.props.context.courseId, this.props.model.guid)));
+      viewDocument(model.resourceref.idref,
+        this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
     } else {
       const id = this.props.selectedItem.caseOf({
         just: (item) => {
@@ -247,8 +245,8 @@ class OrgEditor extends React.Component<OrgEditorProps,
       if (componentId === id) {
         this.toggleExpanded(componentId);
       } else {
-        this.props.dispatch(
-          viewDocument(componentId, this.props.context.courseId, this.props.model.guid));
+        viewDocument(componentId,
+          this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
       }
 
     }
@@ -283,7 +281,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
       if (node.contentType === 'Item') {
         const res = this.props.context.courseModel
           .resourcesById.get(node.resourceref.idref);
-        isSelected = res !== undefined ? res.guid === id : false;
+        isSelected = res !== undefined ? res.id === id : false;
       } else {
         isSelected = node.id === id;
       }

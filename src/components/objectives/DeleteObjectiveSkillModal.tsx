@@ -7,6 +7,8 @@ import { LegacyTypes } from 'data/types';
 import * as contentTypes from 'data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { ModalMessage } from 'utils/ModalMessage';
+import * as viewActions from 'actions/view';
+import { Maybe } from 'tsmonad';
 
 export interface DeleteObjectiveSkillModalProps {
   model: contentTypes.Skill | contentTypes.LearningObjective;
@@ -101,9 +103,13 @@ export default class DeleteObjectiveSkillModal extends
 
     // Dismiss the modal and link to the resource that references this skill/LO
     const link = (edge: Edge) => (text: string) =>
-      <a onClick={() => this.props.services.dismissModal()}
-         href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
-         className="btn btn-link">
+      <a onClick={(e) => {
+        e.preventDefault();
+        this.props.services.dismissModal();
+        viewActions.viewDocument(this.edgeResourceId(edge), course.idvers, Maybe.nothing());
+      }}
+        href="#"
+        className="btn btn-link">
         {text}
       </a>;
 

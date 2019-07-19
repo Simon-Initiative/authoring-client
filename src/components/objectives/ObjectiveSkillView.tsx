@@ -30,7 +30,7 @@ import { SkillsModel } from 'data/models/skill';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
 import { ExpandedState } from 'reducers/expanded';
 import { RawContentEditor } from './RawContentEditor';
@@ -172,7 +172,7 @@ export const reduceSkillPoolQuestionRefs = (
       .concat(
         // ensure that all pool to skill edges are valid and belong to this skill
         poolToSkillEdges.filter(edge => isValidResource(resourceId(edge.sourceId))
-            && resourceId(edge.destinationId) === skill.id)
+          && resourceId(edge.destinationId) === skill.id)
           // map skill edge to a more usable QuestionRef
           .map(edge => getQuestionRefFromSkillEdge(
             edge, LegacyTypes.assessment2_pool, resourceId(edge.sourceId)))
@@ -206,7 +206,7 @@ export interface ObjectiveSkillViewProps {
   dispatch: any;
   expanded: ExpandedState;
   skills: Immutable.OrderedMap<string, contentTypes.Skill>;
-  onFetchSkills: (courseId: string) => any;
+  onFetchSkills: (courseId: CourseIdVers) => any;
   onSetSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
   onUpdateSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
   onSetObjectives: (objectives: Immutable.OrderedMap<string,
@@ -248,7 +248,6 @@ interface ObjectiveSkillViewState {
 class ObjectiveSkillView
   extends React.Component<ObjectiveSkillViewProps, ObjectiveSkillViewState> {
 
-  viewActions: Object;
   services: AppServices;
   unmounted: boolean;
   failureMessage: Maybe<Messages.Message>;
@@ -271,7 +270,6 @@ class ObjectiveSkillView
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
-    this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
     this.createNew = this.createNew.bind(this);
     this.onObjectiveEdit = this.onObjectiveEdit.bind(this);
     this.onSkillEdit = this.onSkillEdit.bind(this);
@@ -331,7 +329,7 @@ class ObjectiveSkillView
 
   fetchSkills() {
     const { course, onFetchSkills } = this.props;
-    onFetchSkills(course.id);
+    onFetchSkills(course.idvers);
   }
 
   fetchAllRefs(
@@ -506,7 +504,7 @@ class ObjectiveSkillView
 
   buildModels() {
 
-    const courseId = this.props.course.guid;
+    const courseId = this.props.course.idvers;
     const userName = this.props.userName;
 
     return buildAggregateModel(courseId, userName)
@@ -527,7 +525,10 @@ class ObjectiveSkillView
           if (aggregateModel.isLocked) {
 
             const locks = [...aggregateModel.objectives, ...aggregateModel.skills]
-              .map(d => ({ courseId: this.props.course.guid, documentId: d._id }));
+              .map(d => ({
+                courseId: this.props.course.idvers,
+                documentId: typeof d._id === 'string' ? d._id : d._id.value(),
+              }));
             this.props.registerLocks(locks);
 
           } else {
@@ -942,7 +943,7 @@ class ObjectiveSkillView
       loading: true,
     });
 
-    return persistence.fetchWebContentReferences(course.guid, { destinationId: obj.id })
+    return persistence.fetchWebContentReferences(course.idvers, { destinationId: obj.id })
       .then((edges) => {
         this.setState({
           loading: false,
@@ -978,7 +979,7 @@ class ObjectiveSkillView
       loading: true,
     });
 
-    return persistence.fetchWebContentReferences(course.guid, { destinationId: skill.id })
+    return persistence.fetchWebContentReferences(course.idvers, { destinationId: skill.id })
       .then((edges) => {
 
         this.setState({
@@ -1315,8 +1316,10 @@ class ObjectiveSkillView
       just: org => (
         <div className="filter-bar table-toolbar">
           <div className="selected-org-info">
-            Metrics shown are based on the selected organization: <a href={
-              `#${org.guid}-${course.guid}-${org.guid}`}>
+            Metrics shown are based on the selected organization: <a href="#" onClick={(e) => {
+              e.preventDefault();
+              viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.resource.id));
+            }}>
               {org.title}
             </a>
             <div className="flex-spacer" />

@@ -35,7 +35,7 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
-    media: Maybe.maybe(state.media.get(ownProps.courseModel.guid)),
+    media: Maybe.maybe(state.media.get(ownProps.courseModel.guid.value())),
   };
 };
 

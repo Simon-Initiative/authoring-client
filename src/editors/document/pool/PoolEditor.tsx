@@ -24,7 +24,7 @@ import { buildMissingSkillsMessage } from 'utils/error';
 import { RouterState } from 'reducers/router';
 
 import './PoolEditor.scss';
-import { LegacyTypes } from 'data/types';
+import { LegacyTypes, CourseIdVers } from 'data/types';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
@@ -34,7 +34,7 @@ interface PoolEditor {
 }
 
 export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
-  onFetchSkills: (courseId: string) => void;
+  onFetchSkills: (courseId: CourseIdVers) => void;
   skills: Immutable.OrderedMap<string, Skill>;
   activeContext: ActiveContext;
   onUpdateContent: (documentId: string, content: Object) => void;
@@ -80,7 +80,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
     if (hasUnknownSkill(props.model, props.skills)) {
-      props.onFetchSkills(props.context.courseId);
+      props.onFetchSkills(props.context.courseModel.guid);
     }
   }
 
@@ -96,7 +96,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     if (hasNoskills) {
       this.noSkillsMessage = buildMissingSkillsMessage(
-        this.props.context.courseId,
+        this.props.context.courseModel.idvers,
         this.props.context.orgId);
       this.props.showMessage(this.noSkillsMessage);
     }
@@ -145,17 +145,17 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   selectRoutedOrDefaultQuestion = (router: RouterState) => {
     const { activeContext, onSetCurrentNodeOrPage, model } = this.props;
 
-    if (router.urlParams.get('questionId')) {
+    if (router.params.get('questionId')) {
       const urlSelectedQuestion =
-        findQuestionById(model.pool.questions, router.urlParams.get('questionId'));
+        findQuestionById(model.pool.questions, router.params.get('questionId'));
 
       urlSelectedQuestion.caseOf({
         just: question => onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), question),
         nothing: () => this.selectFirstQuestion(),
       });
-    } else if (router.urlParams.get('nodeGuid')) {
+    } else if (router.params.get('nodeGuid')) {
       const urlSelectedNode =
-        findNodeByGuid(model.pool.questions, router.urlParams.get('nodeGuid'));
+        findNodeByGuid(model.pool.questions, router.params.get('nodeGuid'));
 
       urlSelectedNode.caseOf({
         just: node => onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node),

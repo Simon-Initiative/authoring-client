@@ -23,7 +23,7 @@ class Link extends React.PureComponent<any, any> {
       let fullSrc;
       if (src.startsWith('..')) {
         fullSrc = this.props.context.baseUrl
-          + '/' + this.props.context.courseId
+          + '/' + this.props.context.courseModel.guid
           + '/'
           + this.props.context.resourcePath
           + '/' + src;
