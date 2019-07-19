@@ -21,6 +21,7 @@ class Id {
 
   apply = f => f(this.val);
   value: () => string = () => this.apply(identity);
+  toString = this.value;
   eq = (x: Id) => this.type === x.type && this.val === x.val;
 }
 
