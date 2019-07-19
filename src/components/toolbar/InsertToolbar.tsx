@@ -129,7 +129,6 @@ class InsertToolbar
     const { onInsert, parentSupportsElementType, resourcePath, context, editMode,
       courseModel, onDisplayModal, onDismissModal, requestLatestModel,
       onCreateNew } = this.props;
-
     const onTableCreate = (onInsert, numRows, numCols) => {
 
       const rows = [];
@@ -505,9 +504,10 @@ class InsertToolbar
                       return onDisplayModal(
                         <ResourceSelection
                           filterPredicate={(res: Resource): boolean =>
-                            res.type === LegacyTypes.inline
+                            (res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
-                            && !existingInlines.has(res.id)}
+                            && !existingInlines.has(res.id))
+                          }
                           courseId={context.courseModel.guid}
                           onInsert={(resource) => {
                             onDismissModal();
@@ -551,7 +551,8 @@ class InsertToolbar
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.workbook_page
                       && res.id !== PLACEHOLDER_ITEM_ID
-                      && res.resourceState !== ResourceState.DELETED}
+                      && res.resourceState !== ResourceState.DELETED
+                      && res.guid !== context.documentId}
                     courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
@@ -718,6 +719,7 @@ class InsertToolbar
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">
+
             <ToolbarWideMenu
               icon={<i className={'fa fa-clone'} />}
               label={'Layout'}

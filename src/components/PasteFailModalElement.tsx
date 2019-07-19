@@ -19,7 +19,7 @@ export class PasteFailModalElement extends React.PureComponent<PasteFailModalEle
           {removed.map(r => (
             <li key={r}>{r === 'WbInline' ? 'Inline Assessment' : r}</li>
           ))}
-        </ul>
+        </ul> 
       </div>
     );
   }
