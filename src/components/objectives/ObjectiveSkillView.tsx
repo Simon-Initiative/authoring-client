@@ -381,16 +381,12 @@ class ObjectiveSkillView
     const fetchPoolRefs = persistence.fetchEdges(course.guid, {
       sourceType: LegacyTypes.assessment2_pool,
     }).then((poolToSkillEdges) => {
-      return persistence.fetchEdges(course.guid, {
-        sourceType: LegacyTypes.assessment2,
-        destinationType: LegacyTypes.assessment2_pool,
-      })
-        .then((assessmentToPoolEdges) => {
-          return {
-            poolToSkillEdges,
-            assessmentToPoolEdges,
-          };
-        });
+      return fetchSummativeToPoolEdges.then((assessmentToPoolEdges) => {
+        return {
+          poolToSkillEdges,
+          assessmentToPoolEdges,
+        };
+      });
     });
 
     Promise.all([
@@ -410,6 +406,7 @@ class ObjectiveSkillView
       summativeToSkillEdges,
       poolEdges,
     ]) => {
+
 
       // Combine all of the edges into one array
       const combinedEdges = [
@@ -1177,7 +1174,6 @@ class ObjectiveSkillView
         objectives
           .toArray()
           .forEach((objective: contentTypes.LearningObjective) => {
-
             const wbs = Maybe.just(
               workbookPageRefs.caseOf({
                 just: w => w.get(objective.id),
@@ -1212,6 +1208,7 @@ class ObjectiveSkillView
           });
 
         return rows;
+
       },
       nothing: () => undefined,
     });
