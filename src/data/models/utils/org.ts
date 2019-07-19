@@ -26,6 +26,7 @@ export type AnonymousNode =
 export type OrgChangeRequest =
   UpdateRootModel |
   UpdateNode |
+  AddContainer |
   AddNode |
   RemoveNode |
   MoveNode |
@@ -38,44 +39,83 @@ export type OrgChangeRequest =
  * an organization.
  *
  * @param org The organization model to add a container to
- * @param selectedId The id of the currently selected node.
- *  Nothing if no node or the root sequences is selected.
+ * @param parentId The id of the node to add the container to
  * @returns The updated organization model, possibly with swapped units and modules
  */
 export function addContainer(
-  org: OrganizationModel,
-  selectedNodeId: Maybe<string>): OrganizationModel {
+  org: OrganizationModel, parentId: string): Maybe<AppliedChange> {
 
-  // Find the selected node based on the selectedNodeId
-  const node = findContainerOrParent(org, selectedNodeId);
+  // Assume that the operation will fail
+  let succeeded = false;
+  let container = null;
+  let parent = null;
 
-  // From the selected node's type, determine the type of the
-  // container that we are inserting and create it
-  const container = createContainer(node);
+  const add = (e) => {
+    const c = e as any;
 
-  // Now insert the container
-  const inserted = insertAsChild(org, node, container);
+    // Locate the parent id.
+    if (c.id !== undefined && c.id === parentId) {
 
-  // Finally, determine based on the depth of the org tree whether
-  // we need to translate modules to units
-  return translateModulesToUnits(inserted);
+      // We found the parent node, so we now know that this operation
+      // will succeed
+      succeeded = true;
+      parent = c;
+      container = createContainer(c);
+
+      const children = c.children;
+      return c.with({ children: children.set(container.guid, container) });
+    }
+    return e;
+  };
+
+  const updated = (map(add, (org as any) as ContentElement) as any) as OrganizationModel;
+
+
+  if (succeeded) {
+
+    let updatedModel = updated;
+    // If we have just added a section to a module, we may possibly want
+    // to translate all the modules to units
+    if (container.contentType === 'Section' && parent.contentType === 'Module') {
+      translateModulesToUnits(updated).lift(u => updatedModel = u);
+    }
+
+    const ac = {
+      updatedModel,
+      undo: makeRemoveNode(container.id),
+    };
+    return Maybe.just(ac);
+  }
+  return Maybe.nothing();
 
 }
 
-export function translateModulesToUnits(org: OrganizationModel): OrganizationModel {
+function countIn(node: OrgNode, contentType: string): number {
+  let count = 0;
+
+  map((e) => {
+    if (e.contentType === contentType) {
+      count += 1;
+    }
+    return e;
+  }, node as any);
+  return count;
+}
+
+export function translateModulesToUnits(org: OrganizationModel): Maybe<OrganizationModel> {
 
   let updatedOrg = org;
+  let translated = false;
 
   org.sequences.children.toArray().forEach((seq) => {
 
     if (seq.contentType === 'Sequence') {
 
-      if (calcDepth(seq) === 3 && hasNone(seq, 'Unit')) {
+      // The conditions for triggering module to unit translation are that we
+      // have no units and exactly one section (the one that was just added)
+      if (countIn(seq, 'Unit') === 0 && countIn(seq, 'Section') === 1) {
 
-        // We have confirmed that this sequence contains modules - and
-        // at least one of them contains a section.  This is the condition
-        // that triggers the auto-conversion of the modules to units and
-        // the top-level sections to modules
+        translated = true;
 
         let children = Immutable.OrderedMap<string, ct.Unit | ct.Module | ct.Include>();
         seq.children.toArray().forEach((c) => {
@@ -132,57 +172,12 @@ export function translateModulesToUnits(org: OrganizationModel): OrganizationMod
 
   });
 
-  return updatedOrg;
-}
-
-// Does this sequence contain any of the given content types?
-function hasNone(seq: ct.Sequence, contentType: string): boolean {
-  return seq.children.toArray().filter(n => n.contentType === contentType).length === 0;
-}
-
-// Calculate the maximum depth of this organization, assigning a sequence
-// a depth of 1.
-export function calcDepth(sequence: ct.Sequence): number {
-
-  let maxDepth = 1;
-  sequence.children.toArray().forEach((node) => {
-    const depth = calcDepthHelper(node, 1);
-    if (depth > maxDepth) {
-      maxDepth = depth;
-    }
-  });
-  return maxDepth;
-}
-
-function calcDepthHelper(node: OrgNode, depth: number): number {
-
-  if ((node as any).children !== undefined) {
-    let maxDepth = 0;
-    (node as any).children.toArray().forEach((seq) => {
-      const thisMaxDepth = calcDepthHelper(seq, depth + 1);
-      if (thisMaxDepth > maxDepth) {
-        maxDepth = thisMaxDepth;
-      }
-    });
-    return maxDepth;
+  if (translated) {
+    return Maybe.just(updatedOrg);
   }
-  return depth;
-
+  return Maybe.nothing();
 }
 
-export function insertAsChild(
-  org: OrganizationModel,
-  node: OrgNode | ct.Sequences,
-  container: OrgNode): OrganizationModel {
-
-  return (map(
-    (e) => {
-      if (e.id === node.id) {
-        return e.with({ children: e.children.set(container.guid, container) });
-      }
-      return e;
-    }, (org as any) as ContentElement) as any) as OrganizationModel;
-}
 
 function createContainer(node: OrgNode | ct.Sequences): OrgNode {
   if (node.contentType === 'Sequences') {
@@ -386,6 +381,11 @@ export interface AddNode {
   index: Maybe<number>;
 }
 
+export interface AddContainer {
+  type: 'AddContainer';
+  parentId: string;
+}
+
 export interface RemoveNode {
   type: 'RemoveNode';
   nodeId: string;
@@ -415,6 +415,14 @@ export function makeAddNode(parentId: string, node: OrgNode, index: Maybe<number
     parentId,
     node,
     index,
+  };
+}
+
+
+export function makeAddContainer(parentId: string): AddContainer {
+  return {
+    type: 'AddContainer',
+    parentId,
   };
 }
 
@@ -504,6 +512,9 @@ export function applyChange(
   }
   if (change.type === 'UpdateNode') {
     return updateNode(model, change);
+  }
+  if (change.type === 'AddContainer') {
+    return addContainer(model, change.parentId);
   }
   if (change.type === 'AddAnonymousNode') {
 
