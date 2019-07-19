@@ -1209,7 +1209,6 @@ class ObjectiveSkillView
 
         return rows;
 
-        // TODO
       },
       nothing: () => undefined,
     });
