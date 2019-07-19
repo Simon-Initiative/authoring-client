@@ -464,7 +464,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           stripPastedStyles={false}
           handleReturn={this.handleReturn.bind(this)}
           handlePastedText={this.handlePastedText.bind(this)}
-          customStyleMap={styleMap}
+          customStyleMap={styleMap as any}
           blockRenderMap={blockRenderMap as any}
           blockStyleFn={this.blockStyleFn.bind(this)}
           editorState={this.state.editorState}
