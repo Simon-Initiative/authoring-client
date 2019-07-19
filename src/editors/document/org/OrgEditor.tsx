@@ -16,6 +16,7 @@ import { Maybe } from 'tsmonad';
 import { NavigationItem } from 'types/navigation';
 
 import './OrgEditor.scss';
+import { Outline } from 'editors/document/org/outline/Outline';
 
 function hasMissingResource(
   model: models.OrganizationModel, course: models.CourseModel): boolean {
@@ -95,7 +96,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
     super(props);
 
     this.onNodeEdit = this.onNodeEdit.bind(this);
-    this.onClickComponent = this.onClickComponent.bind(this);
+    this.onSelectComponent = this.onSelectComponent.bind(this);
 
     this.pendingHighlightedNodes = null;
 
@@ -113,33 +114,34 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
   componentDidMount() {
     // If the page has not been viewed yet or custom expand/collapse state has not been set by the
-    // user, expand the top-level nodes
+    // user, expand all the nodes
     this.props.expanded.caseOf({
       just: expandedNodes => null,
-      nothing: () => this.expandFirstTwoLevels(),
+      nothing: () => this.expandAll(),
     });
   }
 
-  expandFirstTwoLevels() {
-    const ids = [];
-    this.props.model.sequences.children.toArray().forEach(
-      (c) => {
-        const id = (c as any).id;
-        if (id !== undefined) {
-          ids.push(id);
-          const children = (c as any).children;
-          if (children !== undefined) {
-            children.toArray().forEach((s) => {
-              const id = (s as any).id;
-              if (id !== undefined) {
-                ids.push(id);
-              }
-            });
+  expandAll() {
+    const { model, dispatch, context } = this.props;
+
+    const dfsExpand = (c) => {
+      const isExpandable = c => c.id !== undefined && c.contentType !== 'Item';
+
+      if (isExpandable(c)) {
+        ids.push(c.id);
+      }
+      if (c.children !== undefined) {
+        c.children.toArray().forEach((c) => {
+          if (isExpandable(c)) {
+            dfsExpand(c);
           }
-        }
-      });
-    this.props.dispatch(
-      expandNodes(this.props.context.documentId, ids));
+        });
+      }
+    };
+
+    const ids = [];
+    model.sequences.children.toArray().forEach(dfsExpand);
+    dispatch(expandNodes(context.documentId, ids));
   }
 
   onReposition(sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) {
@@ -170,14 +172,15 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.pendingHighlightedNodes = Immutable.Set<string>().add(node.guid);
   }
 
-  toggleExpanded(id) {
+  toggleExpanded = (id: string) => {
+    const { expanded, dispatch, context } = this.props;
 
-    const action = this.props.expanded.caseOf({
+    const action = expanded.caseOf({
       just: set => set.has(id) ? collapseNodes : expandNodes,
       nothing: () => expandNodes,
     });
 
-    this.props.dispatch(action(this.props.context.documentId, [id]));
+    dispatch(action(context.documentId, [id]));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -226,12 +229,14 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
   }
 
-  onClickComponent(model: NodeTypes) {
-    if (model.contentType === 'Item') {
-      viewDocument(model.resourceref.idref,
-        this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
+  onSelectComponent(node: NodeTypes) {
+    const { context, model, selectedItem } = this.props;
+
+    if (node.contentType === 'Item') {
+      viewDocument(node.resourceref.idref,
+        context.courseModel.idvers, Maybe.just(model.resource.id));
     } else {
-      const id = this.props.selectedItem.caseOf({
+      const id = selectedItem.caseOf({
         just: (item) => {
           if (item.type === 'OrganizationItem') {
             return item.id;
@@ -241,14 +246,10 @@ class OrgEditor extends React.Component<OrgEditorProps,
         nothing: () => null,
       });
 
-      const componentId = (model as any).id;
-      if (componentId === id) {
-        this.toggleExpanded(componentId);
-      } else {
-        viewDocument(componentId,
-          this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
+      const componentId = (node as any).id;
+      if (componentId !== id) {
+        viewDocument(componentId, context.courseModel.idvers, Maybe.just(model.resource.id));
       }
-
     }
   }
 
@@ -289,7 +290,8 @@ class OrgEditor extends React.Component<OrgEditorProps,
       return <TreeNode
         isSelected={isSelected}
         key={node.guid}
-        onClick={this.onClickComponent}
+        onClick={this.onSelectComponent}
+        onExpand={this.toggleExpanded}
         numberAtLevel={numberAtLevel}
         highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}

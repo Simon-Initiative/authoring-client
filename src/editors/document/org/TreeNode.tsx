@@ -7,6 +7,8 @@ import * as org from 'data/models/utils/org';
 
 import './TreeNode.scss';
 import { getNameAndIconByType } from 'components/ResourceView';
+import { prettyPrintResourceType } from 'components/DeleteResourceModal';
+import { LegacyTypes } from 'data/types';
 
 export interface TreeNodeProps {
   isSelected: boolean;
@@ -23,6 +25,7 @@ export interface TreeNodeProps {
   onEdit: (request: org.OrgChangeRequest) => void;
   editMode: boolean;
   onClick: (model: NodeTypes) => void;
+  onExpand: (id: string) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
@@ -34,10 +37,6 @@ export interface TreeNodeState {
 
 export class TreeNode
   extends React.PureComponent<TreeNodeProps, TreeNodeState> {
-
-  constructor(props) {
-    super(props);
-  }
 
   getLabel(contentType: string) {
 
@@ -62,33 +61,81 @@ export class TreeNode
 
   renderTitle() {
 
-    const { isExpanded, model } = this.props;
+    const { isExpanded, model, context, onExpand, isSelected } = this.props;
 
-    if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
+    if (model.contentType === contentTypes.OrganizationContentTypes.Item) {
 
-      const resource = this.props.context.courseModel.resourcesById.get(
-        this.props.model.resourceref.idref);
-      return resource !== undefined
-        ? <React.Fragment>
-          <span style={{ marginRight: 8 }}>{this.getResourceIcon(resource)}</span>{resource.title}
-        </React.Fragment>
-        : 'Loading...';
+      const resource = context.courseModel.resourcesById.get(model.resourceref.idref);
+
+      if (resource === undefined) {
+        return 'Loading...';
+      }
+
+      return (
+        <div style={{
+          // borderRadius: '.28571429rem',
+          // boxShadow: '0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5',
+        }}>
+          <div style={{
+            color: 'rgba(0,0,0,.4)',
+          }}
+            className={isSelected ? 'selected' : ''}
+          >
+            <span>{this.getResourceIcon(resource)}</span>
+            {' '}
+            <span style={{ fontStyle: 'italic' }}>
+              {prettyPrintResourceType(resource.type as LegacyTypes)}
+            </span>
+          </div>
+          <div>
+            <a href="#" onClick={(e) => {
+              e.preventDefault();
+              this.props.onClick(model);
+            }}
+            >
+              {resource.title}
+            </a>
+          </div>
+        </div>
+      );
     }
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
       return 'Include';
     }
 
-    const hasHiddenChildren = <i className="toggle fa fa-caret-right"></i>;
-    const hasShownChildren = <i className="toggle fa fa-caret-down"></i>;
-
-    const toggle = isExpanded ? hasShownChildren : hasHiddenChildren;
+    const toggle = <a href="#" onClick={(e) => {
+      e.preventDefault();
+      onExpand(model.id);
+    }}>
+      {isExpanded ? '[-]' : '[+]'}
+    </a>;
     const contentType = this.getLabel(this.props.model.contentType);
     const number = this.getAdaptiveNumber();
 
     return (
-      <React.Fragment>
-        {toggle}{contentType} {number}: {this.props.model.title}
-      </React.Fragment>
+      <div style={{
+        color: 'rgba(0,0,0,.4)',
+        // borderRadius: '.28571429rem',
+        // boxShadow: '0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5',
+      }}>
+        <div>
+          <span>{toggle}</span>
+          {' '}
+          <span
+            className={`${isSelected ? 'selected' : ''}`}
+            style={{ fontStyle: 'italic' }}>
+            {contentType} {number}
+          </span>
+        </div>
+        <div>
+          <a href="#" onClick={(e) => {
+            e.preventDefault();
+            this.props.onClick(model);
+          }} className={isSelected ? 'selected' : ''}>
+            {model.title}
+          </a>
+        </div>
+      </div>
     );
   }
 
@@ -99,7 +146,7 @@ export class TreeNode
       <tr
         className={`${highlighted ? 'table-info' : ''}`}
         key={model.guid}>
-        <td onClick={() => this.props.onClick(model)}>
+        <td>
           <div className={`treenode-content ${isSelected ? 'selected' : ''}`}>
             <div className="treenode-title" style={{ marginLeft: (depth * 20) }}>
               {this.renderTitle()}
@@ -112,3 +159,63 @@ export class TreeNode
 
 }
 
+
+class Card extends React.PureComponent<{}, {}> {
+  /*
+const toggle = <a href="#" onClick={(e) => {
+      e.preventDefault();
+      onExpand(model.id);
+    }}>
+      {isExpanded ? '[-]' : '[+]'}
+    </a>;
+    const contentType = this.getLabel(this.props.model.contentType);
+    const number = this.getAdaptiveNumber();
+
+    return (
+      <div style={{
+        color: 'rgba(0,0,0,.4)',
+        // borderRadius: '.28571429rem',
+        // boxShadow: '0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5',
+      }}>
+        <div>
+          <span>{toggle}</span>
+          {' '}
+          <span
+            className={`${isSelected ? 'selected' : ''}`}
+            style={{ fontStyle: 'italic' }}>
+            {contentType} {number}
+          </span>
+        </div>
+        <div>
+          <a href="#" onClick={(e) => {
+            e.preventDefault();
+            this.props.onClick(model);
+          }} className={isSelected ? 'selected' : ''}>
+            {model.title}
+          </a>
+        </div>
+      </div>
+  */
+  // render() {
+  //   const { isSelected } = this.props;
+  //   return (
+  //     <React.Fragment>
+  //       <div className={`treenode-info ${isSelected ? 'selected' : ''}`}>
+  //         <span>{this.getResourceIcon(resource)}</span>
+  //         {' '}
+  //         <span style={{ fontStyle: 'italic' }}>
+  //           {prettyPrintResourceType(resource.type as LegacyTypes)}
+  //         </span>
+  //       </div>
+  //       <div>
+  //         <a href="#" onClick={(e) => {
+  //           e.preventDefault();
+  //           this.props.onClick(model);
+  //         }}>
+  //           {resource.title}
+  //         </a>
+  //       </div>
+  //     </React.Fragment>
+  //   );
+  // }
+}

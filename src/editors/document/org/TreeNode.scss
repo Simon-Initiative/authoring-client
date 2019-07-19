@@ -2,40 +2,42 @@
 
 
 .treenode-content {
-  height: 36px;
+  height: 45px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   padding: 0 10px;
   vertical-align: middle;
-  font-size: 1.0em;
+  font-size: 14px;
   font-weight: 500;
   border-radius: 6px;
   border: 1px solid transparent;
-  cursor: pointer;
 
   .treenode-title {
     vertical-align: middle;
-    margin: 4px 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+
+    .selected {
+      font-weight: bold;
+    }
+
+    .treenode-info {
+      color: 'rgba(0,0,0,.4)';
+    }
   }
 
-  &.selected {
-    background-color: $selection;
-    border-color: $selection;
-    color: $white;
-  }
+  a, .text-link {
+    color: $primary;
 
-  &:hover {
-    background-color: $gray-lightest;
-    border-color: $gray-lightest;
+    &:hover {
+      color: $primary;
+    }
 
     &.selected {
-      background-color: $selection;
-      border-color: $selection;
-      color: $white;
+      font-weight: bold;
+      color: $selection;
     }
   }
 

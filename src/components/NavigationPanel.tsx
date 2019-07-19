@@ -14,7 +14,6 @@ import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
 import { RequestButton } from 'editors/document/course/CourseEditor';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
-import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { Resource } from 'data/contentTypes';
 import { RouteCourse } from 'types/router';
 import { CourseIdVers } from 'data/types';
@@ -26,6 +25,7 @@ const COLLAPSE_SETPOINT_PX = 150;
 
 export const styles: JSSStyles = {
   NavigationPanel: {
+    fontSize: '14px',
     extend: [disableSelect],
     display: 'flex',
     flexDirection: 'column',
@@ -49,11 +49,17 @@ export const styles: JSSStyles = {
       width: '100%',
     },
   },
+  navItemContainer: {
+    margin: [2, 5],
+    padding: [5, 10],
+  },
+  navItemDescription: {
+    color: 'rgba(0,0,0,.4)',
+    fontStyle: 'italic',
+  },
   navItem: {
     fontSize: '1.0em',
     fontWeight: 500,
-    margin: [2, 5],
-    padding: [5, 10],
     borderRadius: 6,
     border: [1, 'solid', 'transparent'],
     cursor: 'pointer',
@@ -67,8 +73,8 @@ export const styles: JSSStyles = {
     },
 
     '&:hover': {
-      backgroundColor: colors.grayLighter,
-      borderColor: colors.grayLighter,
+      color: colors.primary,
+      textDecoration: 'underline',
     },
   },
   navItemDropdown: {
@@ -183,18 +189,16 @@ export const styles: JSSStyles = {
     fontSize: 14,
   },
   selectedNavItem: {
-    color: colors.white,
-    backgroundColor: colors.selection,
-    borderColor: colors.selection,
+    color: colors.primary,
+    fontWeight: 'bold',
 
     '&:hover': {
-      backgroundColor: colors.selection,
-      borderColor: colors.selection,
+      textDecoration: 'underline',
     },
   },
   orgTree: {
     flex: 1,
-    overflowY: 'scroll',
+    overflowY: 'auto',
     borderTop: [1, 'solid', colors.grayLighter],
     borderBottom: [1, 'solid', colors.grayLighter],
     margin: [5, 0],
@@ -409,22 +413,9 @@ class NavigationPanel
 
   renderResizeHandle() {
     const { classes } = this.props;
-    const { collapsed } = this.state;
 
     return (
-      <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown}>
-        {!collapsed && (
-          <div className={classes.collapseButtonContainer}>
-            <Tooltip title="Collapse Outline" position="right" size="small" delay={750}>
-              <div className={classes.collapseButton}
-                onClick={this.onCollapse}
-                onMouseDown={e => e.stopPropagation()}>
-                <i className="fa fa-angle-double-left" />
-              </div>
-            </Tooltip>
-          </div>
-        )}
-      </div>
+      <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown} />
     );
   }
 
@@ -433,16 +424,19 @@ class NavigationPanel
     const { collapsed } = this.state;
 
     return (
-      <Tooltip disabled={!collapsed} title="Course Details" position="right">
-        <div
+      <div className={classes.navItemContainer}>
+        <a href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            viewActions.viewCourse(course.idvers, Maybe.just(currentOrg.id));
+          }}
           className={classNames([
             classes.navItem,
             route.route.type === 'RouteCourseOverview' && classes.selectedNavItem,
-          ])}
-          onClick={() => viewActions.viewCourse(course.idvers, Maybe.just(currentOrg.id))}>
-          <i className="fa fa-book" />{!collapsed && ' Course Details'}
-        </div>
-      </Tooltip>
+          ])}>
+          {!collapsed && 'Course Details'}
+        </a>
+      </div>
     );
   }
 
@@ -451,16 +445,19 @@ class NavigationPanel
     const { collapsed } = this.state;
 
     return (
-      <Tooltip disabled={!collapsed} title="Learning Objectives" position="right">
-        <div className={classNames([
-          classes.navItem,
-          route.route.type === 'RouteObjectives' && classes.selectedNavItem,
-        ])}
-          onClick={() =>
-            viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id))}>
-          <i className="fa fa-graduation-cap" />{!collapsed && ' Learning Objectives'}
-        </div>
-      </Tooltip>
+      <div className={classes.navItemContainer}>
+        <a href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id));
+          }}
+          className={classNames([
+            classes.navItem,
+            route.route.type === 'RouteObjectives' && classes.selectedNavItem,
+          ])}>
+          {!collapsed && 'Learning Objectives'}
+        </a>
+      </div>
     );
   }
 
@@ -476,18 +473,21 @@ class NavigationPanel
       : currentOrg.title;
 
     return (
-      <Tooltip disabled={!collapsed} title={title} position="right">
-        <div className={classNames([
-          classes.navItem,
-          (route.route as any).resourceId === currentOrg.id && classes.selectedNavItem,
-        ])}
-          onClick={() => viewActions.viewDocument(
-            currentOrg.id, course.idvers, Maybe.just(currentOrg.id))}>
-          <i className="fa fa-list-alt" />{!collapsed && (' ' + title)}
-        </div>
-      </Tooltip>
+      <div className={classes.navItemContainer}>
+        <div className={classes.navItemDescription}>Active Organization</div>
+        <a href="#"
+          className={classNames([
+            classes.navItem,
+            (route.route as any).resourceId === currentOrg.id && classes.selectedNavItem,
+          ])}
+          onClick={(e) => {
+            e.preventDefault();
+            viewActions.viewDocument(currentOrg.id, course.idvers, Maybe.just(currentOrg.id));
+          }}>
+          {!collapsed && (' ' + title)}
+        </a>
+      </div>
     );
-
   }
 
   renderOrgTree(currentOrg: Resource, selectedItem: Maybe<nav.NavigationItem>) {
