@@ -377,8 +377,9 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
+                //const xrefDefault
                 onEdit(model.addEntity(
-                  EntityTypes.xref, true, new contentTypes.Xref(), selection));
+                  EntityTypes.xref, true, new contentTypes.Xref({}), selection));
               }
             }
             disabled={!supports('xref') || !rangeEntitiesEnabled}

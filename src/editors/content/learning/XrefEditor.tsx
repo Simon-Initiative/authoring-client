@@ -55,6 +55,7 @@ export default class XrefEditor
 
     this.onChangeTarget = this.onChangeTarget.bind(this);
     this.onChangePage = this.onChangePage.bind(this);
+    this.onToggleTargetPage = this.onToggleTargetPage.bind(this);
     this.state = { targetIsPage: props.model.idref === props.model.page };
   }
 
@@ -85,7 +86,8 @@ export default class XrefEditor
 
   componentWillReceiveProps(nextProps: XrefEditorProps) {
     const { target, updateTarget } = this.props;
-    if (target !== nextProps.target) {
+    // short circuit to avoid crash - first update should be handled by didMount
+    if (target && !target.equals(nextProps.target)) {
       updateTarget(nextProps.model.idref, nextProps.model.page);
     }
   }
