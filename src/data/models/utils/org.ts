@@ -90,6 +90,8 @@ export function addContainer(
 
 }
 
+// Counts all intances of nodes of a particular content type
+// within an arbitrary hierarchy
 function countIn(node: OrgNode, contentType: string): number {
   let count = 0;
 
@@ -102,6 +104,9 @@ function countIn(node: OrgNode, contentType: string): number {
   return count;
 }
 
+// Possibly translates modules to units and sections to modules
+// in one or more sequences of an organization.  This is designed
+// to be used after a section has just been added to an org.
 export function translateModulesToUnits(org: OrganizationModel): Maybe<OrganizationModel> {
 
   let updatedOrg = org;
@@ -155,7 +160,6 @@ export function translateModulesToUnits(org: OrganizationModel): Maybe<Organizat
             });
 
             unit = unit.with({ children: unitChildren });
-
             children = children.set(unit.guid, unit);
 
           } else {
@@ -178,7 +182,8 @@ export function translateModulesToUnits(org: OrganizationModel): Maybe<Organizat
   return Maybe.nothing();
 }
 
-
+// Create a container with a type that makes sense give the
+// supplied parent node.
 function createContainer(node: OrgNode | ct.Sequences): OrgNode {
   if (node.contentType === 'Sequences') {
     return new ct.Sequence().with({ title: 'New Container' });
