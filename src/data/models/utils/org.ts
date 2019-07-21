@@ -3,10 +3,9 @@ import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
 import { OrganizationModel } from 'data/models/org';
 import { Maybe } from 'tsmonad';
-import { map } from 'data/utils/map';
+import { map, filter } from 'data/utils/map';
 import { ContentElement } from 'data/content/common/interfaces';
 import * as types from 'data/content/org/types';
-import { LegacyTypes } from 'data/types';
 
 
 export type OrgNode =
@@ -27,12 +26,230 @@ export type AnonymousNode =
 export type OrgChangeRequest =
   UpdateRootModel |
   UpdateNode |
+  AddContainer |
   AddNode |
   RemoveNode |
   MoveNode |
   SetAnonymousAttribute |
   AddAnonymousNode |
   RemoveAnonymousNode;
+
+/**
+ * Utility function to add a 'container' to a position within
+ * an organization.
+ *
+ * @param org The organization model to add a container to
+ * @param parentId The id of the node to add the container to
+ * @returns The updated organization model, possibly with swapped units and modules
+ */
+export function addContainer(
+  org: OrganizationModel, parentId: string): Maybe<AppliedChange> {
+
+  // Assume that the operation will fail
+  let succeeded = false;
+  let container = null;
+  let parent = null;
+
+  const add = (e) => {
+    const c = e as any;
+
+    // Locate the parent id.
+    if (c.id !== undefined && c.id === parentId) {
+
+      // We found the parent node, so we now know that this operation
+      // will succeed
+      succeeded = true;
+      parent = c;
+      container = createContainer(c);
+
+      const children = c.children;
+      return c.with({ children: children.set(container.guid, container) });
+    }
+    return e;
+  };
+
+  const updated = (map(add, (org as any) as ContentElement) as any) as OrganizationModel;
+
+
+  if (succeeded) {
+
+    let updatedModel = updated;
+    // If we have just added a section to a module, we may possibly want
+    // to translate all the modules to units
+    if (container.contentType === 'Section' && parent.contentType === 'Module') {
+      translateModulesToUnits(updated).lift(u => updatedModel = u);
+    }
+
+    const ac = {
+      updatedModel,
+      undo: makeRemoveNode(container.id),
+    };
+    return Maybe.just(ac);
+  }
+  return Maybe.nothing();
+
+}
+
+// Counts all intances of nodes of a particular content type
+// within an arbitrary hierarchy
+function countIn(node: OrgNode, contentType: string): number {
+  let count = 0;
+
+  map((e) => {
+    if (e.contentType === contentType) {
+      count += 1;
+    }
+    return e;
+  }, node as any);
+  return count;
+}
+
+// Possibly translates modules to units and sections to modules
+// in one or more sequences of an organization.  This is designed
+// to be used after a section has just been added to an org.
+export function translateModulesToUnits(org: OrganizationModel): Maybe<OrganizationModel> {
+
+  let updatedOrg = org;
+  let translated = false;
+
+  org.sequences.children.toArray().forEach((seq) => {
+
+    if (seq.contentType === 'Sequence') {
+
+      // The conditions for triggering module to unit translation are that we
+      // have no units and exactly one section (the one that was just added)
+      if (countIn(seq, 'Unit') === 0 && countIn(seq, 'Section') === 1) {
+
+        translated = true;
+
+        let children = Immutable.OrderedMap<string, ct.Unit | ct.Module | ct.Include>();
+        seq.children.toArray().forEach((c) => {
+          if (c.contentType === 'Module') {
+            let unit = new ct.Unit().with({
+              id: c.id,
+              title: c.title,
+              description: c.description,
+              metadata: c.metadata,
+              dependencies: c.dependencies,
+              preconditions: c.preconditions,
+              supplements: c.supplements,
+              unordered: c.unordered,
+              progressConstraintIdref: c.progressConstraintIdref,
+              duration: c.duration,
+            });
+
+            let unitChildren = Immutable.OrderedMap<string, ct.Module | ct.Include | ct.Item>();
+            c.children.toArray().forEach((m) => {
+              if (m.contentType === 'Section') {
+                const module = new ct.Module().with({
+                  id: m.id,
+                  title: m.title,
+                  description: m.description,
+                  metadata: m.metadata,
+                  preconditions: m.preconditions,
+                  supplements: m.supplements,
+                  unordered: m.unordered,
+                  progressConstraintIdref: m.progressConstraintIdref,
+                  children: m.children,
+                });
+                unitChildren = unitChildren.set(module.guid, module);
+              } else {
+                unitChildren = unitChildren.set(m.guid, (m as any));
+              }
+
+            });
+
+            unit = unit.with({ children: unitChildren });
+            children = children.set(unit.guid, unit);
+
+          } else {
+            children = children.set(c.guid, c);
+          }
+        });
+
+        const s = seq.with({ children });
+        const c = updatedOrg.sequences.children.set(s.guid, s);
+        const ss = updatedOrg.sequences.with({ children: c });
+        updatedOrg = updatedOrg.with({ sequences: ss });
+      }
+    }
+
+  });
+
+  if (translated) {
+    return Maybe.just(updatedOrg);
+  }
+  return Maybe.nothing();
+}
+
+// Create a container with a type that makes sense give the
+// supplied parent node.
+function createContainer(node: OrgNode | ct.Sequences): OrgNode {
+  if (node.contentType === 'Sequences') {
+    return new ct.Sequence().with({ title: 'New Container' });
+  }
+  if (node.contentType === 'Sequence') {
+
+    // We need to look at what is currently contained in the sequence -
+    // it may contain modules or units - which we cannot mix. If it is
+    // empty, we insert a module.
+    if (node.children.size === 0 || node.children.first().contentType === 'Module') {
+      return new ct.Module().with({ title: 'New Container' });
+    }
+
+    return new ct.Unit().with({ title: 'New Container' });
+  }
+  if (node.contentType === 'Unit') {
+    return new ct.Module().with({ title: 'New Container' });
+  }
+  if (node.contentType === 'Module') {
+    return new ct.Section().with({ title: 'New Container' });
+  }
+  if (node.contentType === 'Section') {
+    return new ct.Section().with({ title: 'New Container' });
+  }
+}
+
+// Finds the container node corresponding to the selected id.
+// If the id is for a container, that container node is returned.
+// If the id is for an item, the parent container of the item is
+// returned.
+export function findContainerOrParent(
+  org: OrganizationModel,
+  selectedNodeId: Maybe<string>): OrgNode | ct.Sequences {
+
+  return selectedNodeId.caseOf({
+    just: (id) => {
+      let found = false;
+      let node = org.sequences as any;
+      filter((e) => {
+
+        if (!found && e.id === id) {
+          found = true;
+          node = e;
+        }
+
+        if (!found && e.children !== undefined) {
+
+          const nodes = e.children.toArray().filter(c => c.id === id);
+
+          if (nodes.length === 1
+            && (nodes[0].contentType === 'Include' || nodes[0].contentType === 'Item')) {
+            found = true;
+            node = e;
+          }
+
+        }
+        return true;
+
+      }, (org.sequences as any) as ContentElement);
+
+      return node;
+
+    },
+    nothing: () => org.sequences,
+  });
+}
 
 function isNumberedNodeType(node: any) {
   return (node.contentType === ct.OrganizationContentTypes.Unit
@@ -169,6 +386,11 @@ export interface AddNode {
   index: Maybe<number>;
 }
 
+export interface AddContainer {
+  type: 'AddContainer';
+  parentId: string;
+}
+
 export interface RemoveNode {
   type: 'RemoveNode';
   nodeId: string;
@@ -198,6 +420,14 @@ export function makeAddNode(parentId: string, node: OrgNode, index: Maybe<number
     parentId,
     node,
     index,
+  };
+}
+
+
+export function makeAddContainer(parentId: string): AddContainer {
+  return {
+    type: 'AddContainer',
+    parentId,
   };
 }
 
@@ -287,6 +517,9 @@ export function applyChange(
   }
   if (change.type === 'UpdateNode') {
     return updateNode(model, change);
+  }
+  if (change.type === 'AddContainer') {
+    return addContainer(model, change.parentId);
   }
   if (change.type === 'AddAnonymousNode') {
 
