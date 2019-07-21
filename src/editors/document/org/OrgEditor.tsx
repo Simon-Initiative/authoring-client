@@ -9,14 +9,19 @@ import { SourceNodeType } from 'editors/content/org/drag/utils';
 import { TreeNode } from 'editors/document/org/TreeNode';
 import * as Messages from 'types/messages';
 import * as org from 'data/models/utils/org';
+import * as commands from './commands/map';
+import * as t from '../../../data/contentTypes';
 
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { Maybe } from 'tsmonad';
 import { NavigationItem } from 'types/navigation';
+import { Command } from './commands/command';
 
 import './OrgEditor.scss';
-import { Outline } from 'editors/document/org/outline/Outline';
+import { OrganizationModel } from 'data/models/org';
+import { map } from 'data/utils/map';
+import { Tooltip } from 'utils/tooltip';
 
 function hasMissingResource(
   model: models.OrganizationModel, course: models.CourseModel): boolean {
@@ -71,6 +76,7 @@ export interface OrgEditorProps {
   onRedo: (documentId: string) => void;
   course: models.CourseModel;
   onEditingEnable: (editable: boolean, documentId: string) => void;
+  onDispatch: () => void;
 }
 
 const enum TABS {
@@ -85,10 +91,10 @@ interface OrgEditorState {
   highlightedNodes: Immutable.Set<string>;
   undoStackSize: number;
   redoStackSize: number;
+  selectedNode: Maybe<NodeTypes>;
 }
 
-class OrgEditor extends React.Component<OrgEditorProps,
-  OrgEditorState>  {
+class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
 
   pendingHighlightedNodes: Immutable.Set<string>;
 
@@ -109,6 +115,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
       highlightedNodes: Immutable.Set<string>(),
       undoStackSize: 0,
       redoStackSize: 0,
+      selectedNode: Maybe.nothing(),
     };
   }
 
@@ -183,7 +190,13 @@ class OrgEditor extends React.Component<OrgEditorProps,
     dispatch(action(context.documentId, [id]));
   }
 
-  componentWillReceiveProps(nextProps) {
+
+  componentWillReceiveProps(nextProps: OrgEditorProps) {
+
+    // if (this.props.selectedItem !== nextProps.selectedItem
+    //   || this.props.model !== nextProps.model) {
+    //   this.findComponentModel(nextProps);
+    // }
 
     if (this.props.placements !== nextProps.placements) {
 
@@ -276,53 +289,91 @@ class OrgEditor extends React.Component<OrgEditorProps,
       nothing: () => null,
     });
 
+
     const renderNode = (node, parent, index, depth, numberAtLevel) => {
 
       let isSelected = false;
       if (node.contentType === 'Item') {
-        const res = this.props.context.courseModel
-          .resourcesById.get(node.resourceref.idref);
+        const res = this.props.context.courseModel.resourcesById.get(node.resourceref.idref);
         isSelected = res !== undefined ? res.id === id : false;
       } else {
         isSelected = node.id === id;
       }
 
-      return <TreeNode
-        isSelected={isSelected}
-        key={node.guid}
-        onClick={this.onSelectComponent}
-        onExpand={this.toggleExpanded}
-        numberAtLevel={numberAtLevel}
-        highlighted={this.state.highlightedNodes.has(node.guid)}
-        labels={this.props.model.labels}
-        model={node}
-        org={this.props.model}
-        context={this.props.context}
-        parentModel={parent}
-        onEdit={this.onNodeEdit}
-        editMode={this.props.editMode}
-        isExpanded={isExpanded(getExpandId(node))}
-        onReposition={this.onReposition.bind(this)}
-        indexWithinParent={index}
-        depth={depth} />;
+      return (
+        <TreeNode
+          isSelected={isSelected}
+          key={node.guid}
+          onClick={this.onSelectComponent}
+          onExpand={this.toggleExpanded}
+          numberAtLevel={numberAtLevel}
+          highlighted={this.state.highlightedNodes.has(node.guid)}
+          labels={this.props.model.labels}
+          model={node}
+          org={this.props.model}
+          context={this.props.context}
+          parentModel={parent}
+          onEdit={this.onNodeEdit}
+          editMode={this.props.editMode}
+          isExpanded={isExpanded(getExpandId(node))}
+          onReposition={this.onReposition.bind(this)}
+          indexWithinParent={index}
+          depth={depth}
+          onDispatch={this.props.dispatch}
+          displayModal={this.props.displayModal}
+          dismissModal={this.props.dismissModal}
+        />
+      );
     };
 
     return (
-      <table className="table table-sm">
-        <tbody>
-          {render(
-            this.props.model.sequences,
-            isExpanded, renderNode, this.props.placements)}
-        </tbody>
-      </table>
+      <React.Fragment>
+        <table className="table table-sm">
+          <tbody>
+            {render(
+              this.props.model.sequences,
+              isExpanded, renderNode, this.props.placements)}
+          </tbody>
+        </table>
+      </React.Fragment>
     );
   }
 
+  renderAddButton() {
+    const { selectedItem } = this.props;
+
+    const enabled = selectedItem.caseOf({
+      just: i => i.type === 'OrganizationItem',
+      nothing: () => false,
+    });
+
+    if (enabled) {
+      return (
+        <div className="add-button"
+          onClick={() => {
+
+          }}>
+          +
+        </div>
+      );
+    }
+
+    return (
+      <div className="add-button disabled">
+        <Tooltip
+          title="Select something to add an item" position="top"
+          distance={5}>
+          +
+        </Tooltip>
+      </div>
+    );
+  }
 
   render() {
     return (
       <div className="org-editor">
         {this.renderContent()}
+        {this.renderAddButton()}
       </div>
     );
   }

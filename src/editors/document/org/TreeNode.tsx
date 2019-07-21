@@ -9,6 +9,8 @@ import './TreeNode.scss';
 import { getNameAndIconByType } from 'components/ResourceView';
 import { prettyPrintResourceType } from 'components/DeleteResourceModal';
 import { LegacyTypes } from 'data/types';
+import { Command } from './commands/command';
+import * as commands from './commands/map';
 
 export interface TreeNodeProps {
   isSelected: boolean;
@@ -28,6 +30,9 @@ export interface TreeNodeProps {
   onExpand: (id: string) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
+  onDispatch: () => void;
+  displayModal: (c: any) => void;
+  dismissModal: () => void;
 }
 
 export interface TreeNodeState {
@@ -55,6 +60,69 @@ export class TreeNode
     return '';
   }
 
+  buildCommandButtons(
+    prefix, commands, org, model,
+    labels, processCommand, editMode): Object[] {
+
+    const slash: any = {
+      fontFamily: 'sans-serif',
+      position: 'relative',
+      color: '#606060',
+    };
+
+    const buttons = commands[model.contentType].map(commandClass => new commandClass())
+      .map(command => [<button
+        className="btn btn-link btn-sm" key={prefix + command.description(labels)}
+        disabled={!command.precondition(org, model) || !editMode}
+        onClick={() => processCommand(command)}>{command.description(labels)}</button>,
+      <span key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
+      .reduce((p, c) => p.concat(c), []);
+
+    buttons.pop();
+
+    return buttons;
+  }
+
+  renderInsertExisting(org, model, processor) {
+    if (commands.ADD_EXISTING_COMMANDS[model.contentType].length > 0) {
+      const buttons = this.buildCommandButtons(
+        'addexisting',
+        commands.ADD_EXISTING_COMMANDS,
+        org, model, org.labels,
+        processor, this.props.editMode);
+
+      return [
+        <span key="add-existing" className="label">Add existing:</span>,
+        ...buttons,
+      ];
+    }
+
+    return [];
+  }
+
+  renderInsertNew(org, model, processor) {
+    if (commands.ADD_NEW_COMMANDS[model.contentType].length > 0) {
+      return [
+        <span key="add-new" className="label">Add new:</span>,
+        ...this.buildCommandButtons(
+          'addnew',
+          commands.ADD_NEW_COMMANDS,
+          org, model, org.labels,
+          processor, this.props.editMode)];
+    }
+
+    return [];
+  }
+
+  processCommand(org, model, command: Command) {
+    command.execute(
+      org, model, this.props.context.courseModel,
+      this.props.displayModal, this.props.dismissModal, this.props.onDispatch)
+      .then((cr) => {
+        this.props.onEdit(cr);
+      });
+  }
+
   getResourceIcon(resource: contentTypes.Resource) {
     return getNameAndIconByType(resource.type).icon;
   }
@@ -72,27 +140,12 @@ export class TreeNode
       }
 
       return (
-        <div style={{
-          // borderRadius: '.28571429rem',
-          // boxShadow: '0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5',
-        }}>
-          <div style={{
-            color: 'rgba(0,0,0,.4)',
-          }}
-            className={isSelected ? 'selected' : ''}
-          >
-            <span>{this.getResourceIcon(resource)}</span>
-            {' '}
-            <span style={{ fontStyle: 'italic' }}>
-              {prettyPrintResourceType(resource.type as LegacyTypes)}
-            </span>
-          </div>
-          <div>
+        <div>
+          <div className={`treenode-item ${isSelected ? 'selected' : ''}`}>
             <a href="#" onClick={(e) => {
               e.preventDefault();
               this.props.onClick(model);
-            }}
-            >
+            }}>
               {resource.title}
             </a>
           </div>
@@ -112,28 +165,47 @@ export class TreeNode
     const contentType = this.getLabel(this.props.model.contentType);
     const number = this.getAdaptiveNumber();
 
+    const processor = this.processCommand.bind(this, this.props.model, this.props.model);
+    // this.renderInsertNew(this.props.model, node, processor);
+
+    const addButton = this.props.model.contentType === 'Item'
+      ? undefined
+      : (
+        <div className="dropdown" style={{ overflow: 'visible' }}>
+          <a
+            className="add-button"
+            data-toggle="dropdown">
+            <i className="fas fa-ellipsis-v"></i>
+          </a>
+          <div className="dropdown-menu dropdown-menu-right">
+            <button
+              className="dropdown-item"
+              onClick={() => { }}>
+              New Workbook Page
+            </button>
+          </div>
+        </div>
+      );
+
     return (
       <div style={{
         color: 'rgba(0,0,0,.4)',
-        // borderRadius: '.28571429rem',
-        // boxShadow: '0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5',
       }}>
-        <div>
-          <span>{toggle}</span>
-          {' '}
-          <span
-            className={`${isSelected ? 'selected' : ''}`}
-            style={{ fontStyle: 'italic' }}>
-            {contentType} {number}
-          </span>
+        {/* {addButton} */}
+        <div className={`info ${isSelected ? 'selected' : ''}`}>
+          {contentType} {number}
         </div>
-        <div>
-          <a href="#" onClick={(e) => {
-            e.preventDefault();
-            this.props.onClick(model);
-          }} className={isSelected ? 'selected' : ''}>
-            {model.title}
-          </a>
+        <div style={{ display: 'flex' }}>
+          <span style={{ marginRight: '5px' }}>{toggle}</span>
+          {' '}
+          <div className={`treenode-item group ${isSelected ? 'selected' : ''}`}>
+            <a href="#" onClick={(e) => {
+              e.preventDefault();
+              this.props.onClick(model);
+            }}>
+              {model.title}
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -147,7 +219,7 @@ export class TreeNode
         className={`${highlighted ? 'table-info' : ''}`}
         key={model.guid}>
         <td>
-          <div className={`treenode-content ${isSelected ? 'selected' : ''}`}>
+          <div className="treenode-content">
             <div className="treenode-title" style={{ marginLeft: (depth * 20) }}>
               {this.renderTitle()}
             </div>

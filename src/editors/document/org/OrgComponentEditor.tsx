@@ -7,7 +7,6 @@ import { Title, Size } from 'components/objectives/Title';
 import * as Messages from 'types/messages';
 import { Maybe } from 'tsmonad';
 import { map } from 'data/utils/map';
-import * as commands from './commands/map';
 import { Command } from './commands/command';
 import { RemoveCommand } from './commands/remove';
 import { Outline } from './outline/Outline';
@@ -42,29 +41,6 @@ export interface OrgComponentEditorProps {
 
 export interface OrgComponentEditorState {
   model: Maybe<t.Sequence | t.Unit | t.Module | t.Section>;
-}
-
-function buildCommandButtons(
-  prefix, commands, org, model,
-  labels, processCommand, editMode): Object[] {
-
-  const slash: any = {
-    fontFamily: 'sans-serif',
-    position: 'relative',
-    color: '#606060',
-  };
-
-  const buttons = commands[model.contentType].map(commandClass => new commandClass())
-    .map(command => [<button
-      className="btn btn-link btn-sm" key={prefix + command.description(labels)}
-      disabled={!command.precondition(org, model) || !editMode}
-      onClick={() => processCommand(command)}>{command.description(labels)}</button>,
-    <span key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
-    .reduce((p, c) => p.concat(c), []);
-
-  buttons.pop();
-
-  return buttons;
 }
 
 export class OrgComponentEditor
@@ -168,21 +144,25 @@ export class OrgComponentEditor
 
     const titleEditor = model.title !== undefined
       ? (
-        <Title
-          title={model.title}
-          editMode={editMode}
-          onBeginExternallEdit={() => true}
-          requiresExternalEdit={false}
-          isHoveredOver={true}
-          onEdit={this.onTitleEdit.bind(this, model)}
-          loading={false}
-          disableRemoval={true}
-          editWording="Edit"
-          onRemove={() => false}
-          size={Size.Large}
-        >
-          <span style={{ fontSize: '25pt' }}>{this.getLabel(model) + ': ' + model.title}</span>
-        </Title>
+        <div style={{ flexDirection: 'column' }}>
+          <div className="info">{this.getLabel(model)}</div>
+          <div>
+            <Title
+              title={model.title}
+              editMode={editMode}
+              onBeginExternallEdit={() => true}
+              requiresExternalEdit={false}
+              isHoveredOver={true}
+              onEdit={this.onTitleEdit.bind(this, model)}
+              loading={false}
+              disableRemoval={true}
+              editWording="Edit"
+              onRemove={() => false}
+              size={Size.Large}>
+              <span style={{ fontSize: '16pt' }}>{model.title}</span>
+            </Title>
+          </div>
+        </div>
       )
       : null;
 
@@ -263,39 +243,6 @@ export class OrgComponentEditor
 
   }
 
-  renderInsertExisting(org, model, processor) {
-    if (commands.ADD_EXISTING_COMMANDS[model.contentType].length > 0) {
-      const buttons = buildCommandButtons(
-        'addexisting',
-        commands.ADD_EXISTING_COMMANDS,
-        org, model, org.labels,
-        processor, this.props.editMode);
-
-      return [
-        <span key="add-existing" className="label">Add existing:</span>,
-        ...buttons,
-      ];
-    }
-
-    return [];
-  }
-
-  renderInsertNew(org, model, processor) {
-
-    if (commands.ADD_NEW_COMMANDS[model.contentType].length > 0) {
-      return [
-        <span key="add-new" className="label">Add new:</span>,
-        ...buildCommandButtons(
-          'addnew',
-          commands.ADD_NEW_COMMANDS,
-          org, model, org.labels,
-          processor, this.props.editMode)];
-
-    }
-
-    return [];
-  }
-
   renderActionBar(model: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section) {
     return this.props.org.caseOf({
       just: (org) => {
@@ -305,7 +252,6 @@ export class OrgComponentEditor
         const removeCommand = new RemoveCommand();
         const remove = model.contentType !== 'Sequences' ? (
           <Remove
-            style={{ float: 'right' }}
             editMode={this.props.editMode && removeCommand.precondition(org, model)}
             onRemove={() => processor(removeCommand)}>
             Remove {this.getLabel(model)}
@@ -313,10 +259,7 @@ export class OrgComponentEditor
         ) : null;
         return (
           <div>
-            {[
-              ...this.renderInsertNew(org, model, processor),
-              ...this.renderInsertExisting(org, model, processor),
-              remove]}
+            {remove}
           </div>
         );
       },

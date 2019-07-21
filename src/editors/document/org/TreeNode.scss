@@ -2,11 +2,9 @@
 
 
 .treenode-content {
-  height: 45px;
   text-overflow: ellipsis;
-  overflow: hidden;
   white-space: nowrap;
-  padding: 0 10px;
+  padding: 0 0 0 10px;
   vertical-align: middle;
   font-size: 14px;
   font-weight: 500;
@@ -19,26 +17,41 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 
-    .selected {
-      font-weight: bold;
-    }
-
     .treenode-info {
       color: 'rgba(0,0,0,.4)';
     }
   }
 
-  a, .text-link {
-    color: $primary;
+  .treenode-item {
+    display: flex;
+    border: 3px solid transparent;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
 
-    &:hover {
-      color: $primary;
+    &.group {
+      font-weight: bold;
     }
 
     &.selected {
+      display: block;
+      background: $primary;
+      color: white;
       font-weight: bold;
-      color: $selection;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+      a, a:hover {
+        background: $primary;
+        color: white;
+      }
     }
+  }
+  .info {
+    margin-left: 18px;
+    font-style: italic;
+    font-size: 12px;
+    line-height: 12px;
   }
 
   .toggle {
