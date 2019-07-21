@@ -44,6 +44,10 @@ export const getNameAndIconByType = (type: string) => caseOf<TitleIcon>(type)({
     name: 'Workbook Page',
     icon: <i className="title-icon far fa-file" />,
   },
+  [LegacyTypes.organization]: {
+    name: 'Organization',
+    icon: <i className="title-icon fa fa-th-list" />,
+  },
 })({
   name: 'Unknown',
   icon: <i className="title-icon fa fa-question" />,

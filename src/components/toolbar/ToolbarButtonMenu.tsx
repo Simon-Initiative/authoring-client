@@ -69,7 +69,7 @@ export class ToolbarButtonMenuItem extends React.PureComponent<ToolbarButtonMenu
 
     const button = (
       <button
-        type ="button"
+        type="button"
         className="dropdown-item btn-sm"
         onClick={onClick}
         disabled={disabled}>

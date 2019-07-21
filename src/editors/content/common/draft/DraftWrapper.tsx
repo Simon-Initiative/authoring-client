@@ -58,14 +58,14 @@ const styleMap = {
     verticalAlign: 'baseline',
     fontSize: '75%',
     bottom: '-0.25em',
-  },
+  } as any,
   SUPERSCRIPT: {
     lineHeight: '0',
     position: 'relative',
     verticalAlign: 'baseline',
     fontSize: '75%',
     top: '-0.5em',
-  },
+  } as any,
   CITE: {
     fontStyle: 'italic',
     textDecoration: 'underline',
