@@ -58,14 +58,14 @@ const styleMap = {
     verticalAlign: 'baseline',
     fontSize: '75%',
     bottom: '-0.25em',
-  },
+  } as any,
   SUPERSCRIPT: {
     lineHeight: '0',
     position: 'relative',
     verticalAlign: 'baseline',
     fontSize: '75%',
     top: '-0.5em',
-  },
+  } as any,
   CITE: {
     fontStyle: 'italic',
     textDecoration: 'underline',
@@ -464,7 +464,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           stripPastedStyles={false}
           handleReturn={this.handleReturn.bind(this)}
           handlePastedText={this.handlePastedText.bind(this)}
-          customStyleMap={styleMap}
+          customStyleMap={styleMap as any}
           blockRenderMap={blockRenderMap as any}
           blockStyleFn={this.blockStyleFn.bind(this)}
           editorState={this.state.editorState}
