@@ -238,9 +238,6 @@ export class OrgComponentEditor
       },
       nothing: () => null,
     });
-
-
-
   }
 
   renderActionBar(model: t.Sequences | t.Sequence | t.Unit | t.Module | t.Section) {
@@ -271,7 +268,7 @@ export class OrgComponentEditor
     return null;
   }
 
-  processCommand(org, model, command: Command) {
+  processCommand(org: models.OrganizationModel, model, command: Command) {
     command.execute(
       org, model, this.props.course,
       this.props.displayModal, this.props.dismissModal, this.props.onDispatch)
@@ -288,5 +285,4 @@ export class OrgComponentEditor
       nothing: () => this.renderWaiting(),
     });
   }
-
 }

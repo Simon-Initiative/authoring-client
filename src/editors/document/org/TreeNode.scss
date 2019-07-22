@@ -16,10 +16,6 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-
-    .treenode-info {
-      color: 'rgba(0,0,0,.4)';
-    }
   }
 
   .treenode-item {
@@ -35,7 +31,6 @@
     }
 
     &.selected {
-      display: block;
       background: $primary;
       color: white;
       font-weight: bold;
@@ -52,6 +47,7 @@
     font-style: italic;
     font-size: 12px;
     line-height: 12px;
+    color: rgba(0,0,0,.4);
   }
 
   .toggle {

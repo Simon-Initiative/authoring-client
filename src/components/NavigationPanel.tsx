@@ -47,11 +47,14 @@ export const styles: JSSStyles = {
 
     '& $navItem i': {
       width: '100%',
+      color: colors.grayDarker,
     },
   },
   navItemContainer: {
     margin: [2, 5],
     padding: [5, 10],
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
   },
   navItemDescription: {
     color: 'rgba(0,0,0,.4)',
@@ -434,6 +437,7 @@ class NavigationPanel
             classes.navItem,
             route.route.type === 'RouteCourseOverview' && classes.selectedNavItem,
           ])}>
+          {collapsed && <i className="fa fa-book" />}
           {!collapsed && 'Course Details'}
         </a>
       </div>
@@ -455,6 +459,7 @@ class NavigationPanel
             classes.navItem,
             route.route.type === 'RouteObjectives' && classes.selectedNavItem,
           ])}>
+          {collapsed && <i className="fa fa-graduation-cap" />}
           {!collapsed && 'Learning Objectives'}
         </a>
       </div>
@@ -474,7 +479,11 @@ class NavigationPanel
 
     return (
       <div className={classes.navItemContainer}>
-        <div className={classes.navItemDescription}>Active Organization</div>
+        {orgCount === 1
+          ? null
+          : <div className={classes.navItemDescription}>
+            {!collapsed && 'Active Organization'}
+          </div>}
         <a href="#"
           className={classNames([
             classes.navItem,
@@ -484,6 +493,7 @@ class NavigationPanel
             e.preventDefault();
             viewActions.viewDocument(currentOrg.id, course.idvers, Maybe.just(currentOrg.id));
           }}>
+          {collapsed && <i className="fa fa-th-list" />}
           {!collapsed && (' ' + title)}
         </a>
       </div>

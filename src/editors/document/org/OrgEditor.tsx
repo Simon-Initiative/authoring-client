@@ -15,7 +15,7 @@ import * as t from '../../../data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { Maybe } from 'tsmonad';
-import { NavigationItem } from 'types/navigation';
+import { NavigationItem, OrganizationItem } from 'types/navigation';
 import { Command } from './commands/command';
 
 import './OrgEditor.scss';
@@ -270,6 +270,70 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
     this.props.onEdit(request);
   }
 
+
+  buildCommandButtons(
+    prefix, commands, org, model,
+    labels, processCommand, editMode): Object[] {
+
+    const slash: any = {
+      fontFamily: 'sans-serif',
+      position: 'relative',
+      color: '#606060',
+    };
+
+    const buttons = commands[model.contentType].map(commandClass => new commandClass())
+      .map(command => [<button
+        className="btn btn-link btn-sm" key={prefix + command.description(labels)}
+        disabled={!command.precondition(org, model) || !editMode}
+        onClick={() => processCommand(command)}>{command.description(labels)}</button>,
+      <span key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
+      .reduce((p, c) => p.concat(c), []);
+
+    buttons.pop();
+
+    return buttons;
+  }
+
+  renderInsertExisting(org, model, processor) {
+    if (commands.ADD_EXISTING_COMMANDS[model.contentType].length > 0) {
+      const buttons = this.buildCommandButtons(
+        'addexisting',
+        commands.ADD_EXISTING_COMMANDS,
+        org, model, org.labels,
+        processor, this.props.editMode);
+
+      return [
+        <span key="add-existing" className="label">Add existing:</span>,
+        ...buttons,
+      ];
+    }
+
+    return [];
+  }
+
+  renderInsertNew(org: OrganizationModel, model, processor) {
+    if (commands.ADD_NEW_COMMANDS[model.contentType].length > 0) {
+      return [
+        <span key="add-new" className="label">Add new:</span>,
+        ...this.buildCommandButtons(
+          'addnew',
+          commands.ADD_NEW_COMMANDS,
+          org, model, org.labels,
+          processor, this.props.editMode)];
+    }
+
+    return [];
+  }
+
+  processCommand(org, model, command: Command) {
+    command.execute(
+      org, model, this.props.context.courseModel,
+      this.props.displayModal, this.props.dismissModal, this.props.onDispatch)
+      .then((cr) => {
+        this.props.onEdit(cr);
+      });
+  }
+
   renderContent() {
 
     const { selectedItem } = this.props;
@@ -339,34 +403,56 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
     );
   }
 
-  renderAddButton() {
-    const { selectedItem } = this.props;
-
-    const enabled = selectedItem.caseOf({
-      just: i => i.type === 'OrganizationItem',
-      nothing: () => false,
-    });
-
-    if (enabled) {
-      return (
-        <div className="add-button"
-          onClick={() => {
-
-          }}>
-          +
-        </div>
-      );
-    }
-
+  renderAddButtonDisabled() {
     return (
-      <div className="add-button disabled">
+      <div className="add-button-container disabled">
         <Tooltip
-          title="Select something to add an item" position="top"
+          title="Select an outline item to add course content" position="top"
           distance={5}>
-          +
+          <div className="add-button disabled">+</div>
         </Tooltip>
       </div>
     );
+  }
+
+  renderAddButtonWithActions(item: OrganizationItem) {
+    // If selected item is a group, call add new item with selected item as parent
+    // If selected item is not a group, it's a resource. call action with item's parent
+
+    const { model } = this.props;
+
+    const parent = org.findContainerOrParent(model, Maybe.just(item.id));
+    const processor = this.processCommand.bind(this, model, parent);
+    this.renderInsertNew(model, parent, processor);
+
+    return (
+      <div className="add-button-container">
+        <div className="dropdown show">
+          <div data-toggle="dropdown" data-boundary="window" className="add-button">+</div>
+          <div className="dropdown-menu dropdown-menu-right">
+            <h6 className="dropdown-header">Add new</h6>
+            <button className="dropdown-item">Group</button>
+            <button className="dropdown-item">Page</button>
+            <button className="dropdown-item">Assessment</button>
+            <div className="dropdown-divider" />
+            <h6 className="dropdown-header">Add existing</h6>
+            <button className="dropdown-item">Page</button>
+            <button className="dropdown-item">Assessment</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderAddButton() {
+    const { selectedItem } = this.props;
+
+    return selectedItem.caseOf({
+      just: item => item.type === 'OrganizationItem'
+        ? this.renderAddButtonWithActions(item)
+        : this.renderAddButtonDisabled(),
+      nothing: () => this.renderAddButtonDisabled(),
+    });
   }
 
   render() {
