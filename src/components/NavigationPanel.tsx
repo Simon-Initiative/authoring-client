@@ -110,25 +110,18 @@ export const styles: JSSStyles = {
   },
   collapseButtonContainer: {
     position: 'absolute',
-    top: 182,
-    right: -2,
+    top: 127,
+    right: 25,
   },
   collapseButton: {
     width: 30,
     height: 30,
-    borderRadius: '50%',
     color: colors.grayDark,
-    border: [1, 'solid', colors.grayDark],
-    background: colors.white,
     paddingRight: 2,
     paddingTop: 2,
     textAlign: 'center',
     cursor: 'pointer',
-    boxShadow: [2, 3, 10, -2, 'rgba(148,148,148,1)'],
     fontSize: 16,
-    opacity: 0,
-
-    transition: 'opacity .2s ease-out',
 
     '& i': {
       fontWeight: 600,
@@ -136,7 +129,6 @@ export const styles: JSSStyles = {
 
     '&:hover': {
       color: colors.selection,
-      border: [1, 'solid', colors.selection],
     },
   },
   publishActions: {
@@ -309,9 +301,20 @@ class NavigationPanel
 
   renderResizeHandle() {
     const { classes } = this.props;
+    const { collapsed } = this.state;
 
     return (
-      <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown} />
+      <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown}>
+        {!collapsed && (
+          <div className={classes.collapseButtonContainer}>
+            <div className={classes.collapseButton}
+              onClick={this.onCollapse}
+              onMouseDown={e => e.stopPropagation()}>
+              <i className="fa fa-angle-double-left" />
+            </div>
+          </div>
+        )}
+      </div>
     );
   }
 
@@ -404,29 +407,31 @@ class NavigationPanel
     const { width, collapsed } = this.state;
 
     return (
-      <React.Fragment>
+      <React.Fragment >
         <div className={classes.orgTree}>
           {collapsed
             ? (
-              <div
-                className={classNames([
-                  classes.navItem,
-                ])}
-                onClick={() => {
-                  const newWidth = width.lift(w =>
-                    w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
+              <div className={classes.navItemContainer}>
+                <div
+                  className={classNames([
+                    classes.navItem,
+                  ])}
+                  onClick={() => {
+                    const newWidth = width.lift(w =>
+                      w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
 
-                  this.setState({
-                    width: newWidth,
-                    collapsed: false,
-                  });
-                  this.updatePersistentPrefs(
-                    profile.username,
-                    newWidth.valueOr(DEFAULT_WIDTH_PX),
-                    false,
-                  );
-                }}>
-                <i className="fa fa-angle-double-right" />
+                    this.setState({
+                      width: newWidth,
+                      collapsed: false,
+                    });
+                    this.updatePersistentPrefs(
+                      profile.username,
+                      newWidth.valueOr(DEFAULT_WIDTH_PX),
+                      false,
+                    );
+                  }}>
+                  <i className="fa fa-angle-double-right" />
+                </div>
               </div>
             )
             : (
@@ -464,7 +469,7 @@ class NavigationPanel
             )
           }
         </div>
-      </React.Fragment>
+      </React.Fragment >
     );
   }
 
