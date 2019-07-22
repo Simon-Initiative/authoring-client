@@ -5,6 +5,7 @@ import flatui from 'styles/palettes/flatui';
 
 export const CONTENT_COLORS = {
   Activity: flatui.amethyst,
+  ActivityReport: flatui.pumpkin,
   Alternative: flatui.pumpkin,
   Alternatives: flatui.sunflower,
   Applet: flatui.greenSea,
@@ -87,7 +88,8 @@ export const CONTENT_COLORS = {
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
 
 export enum insertableContentTypes {
-  Activity, Alternative, Alternatives, Answer, Applet, Audio, BlockCode, BlockFormula,
+  Activity, ActivityReport, Alternative, Alternatives, Answer, Applet, Audio, BlockCode,
+  BlockFormula,
   BlockQuote, CellData, CellHeader, CodeBlock, Command, Composite, Conjugate, Conjugation,
   ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, Feedback,
   FeedbackChoice, Figure, Flash, Hint, IFrame, Image, Inquiry, InquiryQuestion, Instructions,
@@ -105,6 +107,7 @@ const i = insertableContentTypes;
 export const getContentIcon = (type: insertableContentTypes, style?: React.CSSProperties) => {
   switch (type) {
     case i.Activity: return <i style={style} className={'fa fa-check'} />;
+    case i.ActivityReport: return <i style={style} className={'fas fa-clipboard-check'} />;
     case i.Alternative: return <i style={style} className={'far fa-plus-square'} />;
     case i.Alternatives: return <i style={style} className={'fa fa-plus-square'} />;
     case i.Answer: return <i style={style} className={'fa fa-exclamation'} />;

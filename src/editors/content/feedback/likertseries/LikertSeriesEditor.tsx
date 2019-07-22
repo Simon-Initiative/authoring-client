@@ -19,6 +19,8 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import '../common.scss';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { Maybe, MaybeType } from 'tsmonad';
 
 export interface Props extends AbstractContentEditorProps<LikertSeries> {
   canRemove: boolean;
@@ -30,10 +32,44 @@ export interface Props extends AbstractContentEditorProps<LikertSeries> {
 }
 
 export interface State extends AbstractContentEditorState {
-
+  showGrouping: boolean; // toggle to show item grouping
 }
 
 export class LikertSeriesEditor extends AbstractContentEditor<LikertSeries, Props, State> {
+
+  constructor(props) {
+    super(props);
+
+    // If there are any groups entered, show them by default
+    const validGroups = this.props.model.items.filter(i =>  i.group.caseOf({
+      just: g => /\S/.test(g), // only groups that have non-whitespace
+      nothing: () => false,
+    }));
+
+    this.state = {
+      showGrouping: !validGroups.isEmpty(),
+    };
+
+    this.onToggleItemGrouping = this.onToggleItemGrouping.bind(this);
+  }
+
+  // Override the shouldComponentUpdate of AbstractContentEditor.
+  // This allows the component to be re-rendered after "onToggleItemGrouping".
+  // This solution allows us to re-render without changing the model or using redux.
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (super.shouldComponentUpdate(nextProps, nextState)) {
+      return true;
+    }
+
+    return this.state.showGrouping !== nextState.showGrouping;
+  }
+
+  onToggleItemGrouping() {
+    // Simple state change will trigger re-render.
+    this.setState({
+      showGrouping: !this.state.showGrouping,
+    });
+  }
 
   onEditPrompt = (content: ContentElements, src: ContentElement) => {
     const { onEdit, model } = this.props;
@@ -62,6 +98,7 @@ export class LikertSeriesEditor extends AbstractContentEditor<LikertSeries, Prop
 
   renderMain() {
     const { editMode, model, onDuplicate, canRemove, onRemove } = this.props;
+    const { showGrouping } = this.state;
 
     return (
       <div className="feedback-question-editor">
@@ -79,12 +116,18 @@ export class LikertSeriesEditor extends AbstractContentEditor<LikertSeries, Prop
             model={model.prompt.content}
             onEdit={this.onEditPrompt} />
           <br />
+          <ToggleSwitch
+                editMode={editMode}
+                checked={this.state.showGrouping}
+                label="Show advanced grouping option"
+                onClick={this.onToggleItemGrouping} />
           <QuestionTable
             {...this.props}
             // scale={model.scale}
             // items={model.items}
             onEditItems={this.onEditItems}
             onEditScale={this.onEditScale}
+            allowGroup={showGrouping}
           />
         </div>
       </div>

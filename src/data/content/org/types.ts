@@ -65,6 +65,10 @@ export enum PurposeTypes {
   Walkthrough = 'walkthrough',
 }
 
+export enum ActivityReportTypes {
+  LikertBar = 'likert_bar',
+}
+
 export enum ScoringModes {
   Default = 'default',
   SuggestScored = 'suggest_scored',

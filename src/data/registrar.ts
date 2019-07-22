@@ -5,6 +5,7 @@ import { registerType } from './content/common/parse';
 export function registerContentTypes() {
   registerType('activity', ct.Activity.fromPersistence);
   registerType('activity_link', ct.ActivityLink.fromPersistence);
+  registerType('activity_report', ct.ActivityReport.fromPersistence);
   registerType('alternate', ct.Alternate.fromPersistence);
   registerType('alternative', ct.Alternative.fromPersistence);
   registerType('alternatives', ct.Alternatives.fromPersistence);
