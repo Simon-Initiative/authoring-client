@@ -110,7 +110,7 @@ export const styles: JSSStyles = {
   },
   collapseButtonContainer: {
     position: 'absolute',
-    top: 127,
+    top: 14,
     right: 25,
   },
   collapseButton: {
@@ -407,7 +407,8 @@ class NavigationPanel
     const { width, collapsed } = this.state;
 
     return (
-      <React.Fragment >
+      <React.Fragment>
+        {this.renderResizeHandle()}
         <div className={classes.orgTree}>
           {collapsed
             ? (
@@ -509,8 +510,6 @@ class NavigationPanel
           className,
         ])}
         style={{ width: this.getWidth() }}>
-
-        {this.renderResizeHandle()}
 
         {this.renderOverview(currentOrg)}
         {this.renderObjectives(currentOrg)}
