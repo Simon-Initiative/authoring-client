@@ -188,15 +188,7 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
 
 
   componentWillReceiveProps(nextProps: OrgEditorProps) {
-
-    // if (this.props.selectedItem !== nextProps.selectedItem
-    //   || this.props.model !== nextProps.model) {
-    //   this.findComponentModel(nextProps);
-    // }
-
     if (this.props.placements !== nextProps.placements) {
-
-
       // As long as we are still using the same actual document, indentify
       // newly added nodes so that we can highlight them:
 
@@ -278,6 +270,7 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
   renderInsertExisting(org, model, processor) {
     if (commands.ADD_EXISTING_COMMANDS[model.contentType].length > 0) {
       return [
+        <div className="dropdown-divider" />,
         <h6 className="dropdown-header" key="add-existing">Add existing</h6>,
         ...this.buildCommandButtons(
           'addexisting',
@@ -395,8 +388,8 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
   }
 
   renderAddButtonWithActions(item: OrganizationItem) {
-    // If selected item is a group, call add new item with selected item as parent
-    // If selected item is not a group, it's a resource. call action with item's parent
+    // If selected item is a container, call action with selected item as parent
+    // Else it's a resource. call action with item's parent
 
     const { model } = this.props;
 
@@ -409,7 +402,6 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
           <div data-toggle="dropdown" data-boundary="window" className="add-button">+</div>
           <div className="dropdown-menu dropdown-menu-right">
             {this.renderInsertNew(model, parent, processor)}
-            <div className="dropdown-divider" />
             {this.renderInsertExisting(model, parent, processor)}
           </div>
         </div>
@@ -436,7 +428,6 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
       </div>
     );
   }
-
 }
 
 export default OrgEditor;

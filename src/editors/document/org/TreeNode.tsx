@@ -4,11 +4,9 @@ import { AppContext } from '../../common/AppContext';
 import * as models from '../../../data/models';
 import { NodeTypes } from './traversal';
 import * as org from 'data/models/utils/org';
+import { getNameAndIconByType } from 'components/ResourceView';
 
 import './TreeNode.scss';
-import { getNameAndIconByType } from 'components/ResourceView';
-import { Command } from './commands/command';
-import * as commands from './commands/map';
 
 export interface TreeNodeProps {
   isSelected: boolean;
@@ -88,11 +86,12 @@ export class TreeNode
       return 'Include';
     }
 
-    const toggle = <a href="#" style={{ verticalAlign: 'middle' }}
+    const toggle = <a href="#" className="toggle-link"
       onClick={(e) => {
         e.preventDefault();
         onExpand(model.id);
       }}>{isExpanded ? '[-]' : '[+]'}</a>;
+
     const contentType = this.getLabel(this.props.model.contentType);
     const number = this.getAdaptiveNumber();
 
@@ -102,7 +101,7 @@ export class TreeNode
           {contentType} {number}
         </div>
         <div style={{ display: 'flex' }}>
-          <span style={{ marginRight: '5px' }}>{toggle}</span>
+          <span>{toggle}</span>
           {' '}
           <div className={`treenode-item group ${isSelected ? 'selected' : ''}`}>
             <a href="#" onClick={(e) => {
@@ -121,8 +120,7 @@ export class TreeNode
 
     const { highlighted, depth, model } = this.props;
     return (
-      <tr
-        className={`${highlighted ? 'table-info' : ''}`}
+      <tr className={`${highlighted ? 'table-info' : ''}`}
         key={model.guid}>
         <td>
           <div className="treenode-content">

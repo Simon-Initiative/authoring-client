@@ -11,6 +11,13 @@
   border-radius: 6px;
   border: 1px solid transparent;
 
+  .toggle-link {
+    vertical-align: middle;
+    display: inline-block;
+    width: 16px;
+    margin-right: 5px;
+  }
+
   .treenode-title {
     vertical-align: middle;
     overflow: hidden;
@@ -25,6 +32,7 @@
     white-space: nowrap;
     overflow: hidden;
     display: block;
+    width: 100%;
 
     &.group {
       font-weight: bold;
