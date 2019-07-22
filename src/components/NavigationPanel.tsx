@@ -49,6 +49,9 @@ export const styles: JSSStyles = {
       width: '100%',
       color: colors.grayDarker,
     },
+    '& $navItem$selectedNavItem i': {
+      color: colors.white,
+    },
   },
   navItemContainer: {
     margin: [2, 5],
