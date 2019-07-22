@@ -247,7 +247,7 @@ export class OrgDetailsEditor
           <div className="doc-head">
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               <div className="org-details-title">
-                <div className="info">Organization</div>
+                <div className="info">Course Outline</div>
                 <h3>{m.title}</h3>
               </div>
               <div className="flex-spacer"></div>
