@@ -824,8 +824,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                                        To get the most recent
-                                        data for analytics, create a new dataset.
+                                          To get the most recent
+                                          data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
@@ -905,7 +905,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       <div className="course-editor" >
         <div className="row info">
           <div className="col-md-12">
-            <h2>Course Package</h2>
+            <h2>Course Details</h2>
             <TabContainer labels={
               ['Details', 'Workflow', 'Analytics', 'Resources', 'Organizations']}>
               <Tab>

@@ -27,6 +27,22 @@ interface DeleteResourceModalState {
   edgeLoadFailure: boolean;
 }
 
+export function prettyPrintResourceType(type: LegacyTypes): string {
+  switch (type) {
+    case 'x-oli-workbook_page':
+      return 'Workbook Page';
+    case 'x-oli-inline-assessment':
+    case 'x-oli-assessment2':
+      return 'Assessment';
+    case 'x-oli-assessment2-pool':
+      return 'Assessment Pool';
+    case 'x-oli-organization':
+      return 'Organization';
+    default:
+      return type;
+  }
+}
+
 export default class DeleteResourceModal extends
   React.Component<DeleteResourceModalProps, DeleteResourceModalState> {
 
@@ -82,27 +98,11 @@ export default class DeleteResourceModal extends
       .then(_ => onDeleteResource(resource, course, orgId));
   }
 
-  prettyPrintResourceType(type: LegacyTypes): string {
-    switch (type) {
-      case 'x-oli-workbook_page':
-        return 'Workbook Page';
-      case 'x-oli-inline-assessment':
-      case 'x-oli-assessment2':
-        return 'Assessment';
-      case 'x-oli-assessment2-pool':
-        return 'Assessment Pool';
-      case 'x-oli-organization':
-        return 'Organization';
-      default:
-        return type;
-    }
-  }
-
   render() {
     const { course, resource, onDismissModal } = this.props;
     const { edges, edgesAreLoaded, edgeLoadFailure } = this.state;
 
-    const resourceTypeUppercase = this.prettyPrintResourceType(resource.type as LegacyTypes);
+    const resourceTypeUppercase = prettyPrintResourceType(resource.type as LegacyTypes);
     const resourceTypeLowercase = resourceTypeUppercase.toLowerCase();
 
     const rows = this.state.edges.toArray().map(e => ({ key: e.guid, data: e }));
@@ -163,7 +163,7 @@ export default class DeleteResourceModal extends
 
     const columnRenderers = [
       (edge: Edge) => link(edge)(this.edgeResourceTitle(this.edgeResourceId(edge))),
-      (edge: Edge) => <span>{this.prettyPrintResourceType(edge.sourceType)}</span>,
+      (edge: Edge) => <span>{prettyPrintResourceType(edge.sourceType)}</span>,
     ];
 
     const failureIcon =
