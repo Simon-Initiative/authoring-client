@@ -12,7 +12,7 @@ it('finds the parent container', () => {
   let node = org.findContainerOrParent(model, Maybe.just('section'));
   expect(node.id).toBe('section');
 
-  node = org.findContainerOrParent(model, Maybe.just('page'));
+  node = org.findContainerOrParent(model, Maybe.just('pageref'));
   expect(node.id).toBe('section');
 
 });
