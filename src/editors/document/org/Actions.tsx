@@ -33,10 +33,11 @@ export class Actions
 
         <dl className="row">
 
-          <dd className="col-sm-10">Create a <strong>copy</strong> of this organization.
+          <dd className="col-sm-10">Create a <strong>copy
+            </strong> of this course outline (a.k.a. "organization").
           Changes you make to the structure
             of the copy (e.g. adding units, removing modules,
-          renaming sections) will not be reflected in this original organization.</dd>
+          renaming sections) will not be reflected in this original course outline.</dd>
           <dt className="col-sm-2 justify-content-right">
             <button
               onClick={onDuplicate}
@@ -45,7 +46,7 @@ export class Actions
             </button>
           </dt>
           <dd className="col-sm-10">
-            <p>Permanently <strong>delete</strong> this organization from the course package. This
+            <p>Permanently <strong>delete</strong> this course outline from the course package. This
           operation cannot be undone.</p>
           </dd>
           <dt className="col-sm-2">

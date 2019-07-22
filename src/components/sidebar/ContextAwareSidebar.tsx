@@ -2,6 +2,7 @@ import * as React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
+import * as persistence from 'data/persistence';
 import { Maybe } from 'tsmonad';
 import { StyledComponentProps } from 'types/component';
 import { withStyles, classNames } from 'styles/jss';
@@ -12,7 +13,7 @@ import { ParentContainer } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { Resource } from 'data/content/resource';
 import {
-  ModelTypes, ContentModel, AssessmentModel, CourseModel,
+  ModelTypes, ContentModel, AssessmentModel, CourseModel, OrganizationModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
@@ -33,7 +34,10 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 import { CombinationsMap } from 'types/combinations';
+import { Edge } from 'types/edge';
 import { CourseState } from 'reducers/course';
+import { viewDocument, viewOrganizations } from 'actions/view';
+import { getNameAndIconByType } from 'components/ResourceView';
 
 interface SidebarRowProps {
   label?: string;
@@ -129,6 +133,7 @@ export interface ContextAwareSidebarProps {
   resource: Resource;
   model: ContentModel;
   currentPage: string;
+  selectedOrganization: Maybe<OrganizationModel>;
   onEditModel: (model: ContentModel) => void;
   supportedElements: Immutable.List<string>;
   show: boolean;
@@ -145,7 +150,8 @@ export interface ContextAwareSidebarProps {
 }
 
 export interface ContextAwareSidebarState {
-
+  resourceRefs: Maybe<Edge[]>;
+  failedLoading: boolean;
 }
 
 /**
@@ -158,10 +164,51 @@ class ContextAwareSidebar
   constructor(props) {
     super(props);
 
+    this.state = {
+      resourceRefs: Maybe.nothing(),
+      failedLoading: false,
+    };
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
     this.onToggleBranching = this.onToggleBranching.bind(this);
+  }
+  componentDidMount() {
+    this.fetchRefs(this.props);
+  }
+  componentWillReceiveProps(nextProps: ContextAwareSidebarProps) {
+    if ((this.props.course !== nextProps.course) || (this.props.resource !== nextProps.resource)) {
+      this.fetchRefs(nextProps);
+    }
+  }
+
+  fetchRefs(props: ContextAwareSidebarProps) {
+    const { course, resource } = props;
+    this.setState({
+      resourceRefs: Maybe.nothing(),
+    });
+    persistence.fetchEdges(course.guid).then((edges) => {
+
+      const sources = edges.filter((edge) => {
+        return (this.stripId(edge.destinationId) === resource.id);
+      });
+
+      this.setState({
+        resourceRefs: Maybe.just(sources),
+        failedLoading: false,
+      });
+    }).catch(() => {
+      this.setState({
+        failedLoading: true,
+      });
+    });
+  }
+
+  stripId(id: string) {
+    const splits = id.split(':');
+    if (splits.length === 3) {
+      return splits[2];
+    }
   }
 
   onRemovePage(page: contentTypes.Page) {
@@ -250,8 +297,10 @@ class ContextAwareSidebar
   renderPageDetails() {
     const {
       model, resource, editMode, currentPage, onSetCurrentNodeOrPage,
-      onEditModel, classes,
+      onEditModel, classes, course, selectedOrganization,
     } = this.props;
+
+    const { resourceRefs } = this.state;
 
     const adjusted = (date: Date): Date => adjustForSkew(date, this.props.timeSkewInMs);
 
@@ -275,6 +324,85 @@ class ContextAwareSidebar
       </SidebarGroup>
     );
 
+    const getRefGuidFromRef = (ref: Edge) => {
+      const id = stripId(ref.sourceId);
+
+      return Maybe.maybe(course.resourcesById.get(id)).caseOf({
+        just: resource => resource.guid,
+        nothing: () => '',
+      });
+    };
+
+    const stripId = (id: string) => {
+      const splits = id.split(':');
+      if (splits.length === 3) {
+        return splits[2];
+      }
+    };
+
+    const getRefTitleFromRef = (ref: Edge) => {
+      const id = stripId(ref.sourceId);
+
+      return Maybe.maybe(course.resourcesById.get(id)).caseOf({
+        just: resource => resource.title,
+        nothing: () => '[Error loading page title]',
+      });
+    };
+
+    const orgGuid = selectedOrganization.caseOf({
+      just: (organization) => {
+        return organization.guid;
+      },
+      nothing: () => '',
+    });
+
+    const referenceLocations = (
+      <SidebarGroup label="Referenced Locations">
+        <SidebarRow>
+          <div className="page-list">
+            {resourceRefs.caseOf({
+              just: (refs) => {
+                return refs.length > 0
+                ? (
+                  <div className="container">
+
+                    {
+                      refs.map(ref => (
+                      <div key={ref.guid} className="ref-thing">
+                        <a href="#" onClick = {(event) => {
+                          event.preventDefault();
+                          // if link is to org, just switch org and stay on current page
+                          if (ref.sourceType === 'x-oli-organization') {
+                            viewDocument(resource.id, course.idvers,
+                                         Maybe.maybe(stripId(ref.sourceId)));
+                          } else {
+                            viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
+                          }
+                        }
+                        }>
+                          <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
+                            {
+                              getNameAndIconByType(ref.sourceType).icon}
+                            </span>
+                            {getRefTitleFromRef(ref)}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div>No references found</div>
+                );
+              },
+              nothing: () => <div>{this.state.failedLoading ? 'Error loading'
+                                   : 'Loading references' }</div>,
+            },
+            )
+            }
+          </div>
+        </SidebarRow>
+      </SidebarGroup>
+    );
+
     switch (model.modelType) {
       case ModelTypes.WorkbookPageModel:
         return (
@@ -294,6 +422,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {referenceLocations}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
@@ -337,6 +466,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {referenceLocations}
             {/* Branching assessments require a specific page structuring,
             so they cannot be modified by the user */}
             {model.branching
@@ -463,6 +593,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {referenceLocations} {/* take src type as an argument?*/}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button
@@ -502,6 +633,7 @@ class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             {idDisplay}
+            {referenceLocations}
             <SidebarGroup label="Advanced">
               <SidebarRow>
                 <Button

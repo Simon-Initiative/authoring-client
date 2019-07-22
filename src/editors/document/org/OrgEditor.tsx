@@ -9,13 +9,17 @@ import { SourceNodeType } from 'editors/content/org/drag/utils';
 import { TreeNode } from 'editors/document/org/TreeNode';
 import * as Messages from 'types/messages';
 import * as org from 'data/models/utils/org';
+import * as commands from './commands/map';
 
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { Maybe } from 'tsmonad';
-import { NavigationItem } from 'types/navigation';
+import { NavigationItem, OrganizationItem } from 'types/navigation';
+import { Command } from './commands/command';
 
 import './OrgEditor.scss';
+import { OrganizationModel } from 'data/models/org';
+import { Tooltip } from 'utils/tooltip';
 
 function hasMissingResource(
   model: models.OrganizationModel, course: models.CourseModel): boolean {
@@ -70,6 +74,7 @@ export interface OrgEditorProps {
   onRedo: (documentId: string) => void;
   course: models.CourseModel;
   onEditingEnable: (editable: boolean, documentId: string) => void;
+  onDispatch: () => void;
 }
 
 const enum TABS {
@@ -86,8 +91,7 @@ interface OrgEditorState {
   redoStackSize: number;
 }
 
-class OrgEditor extends React.Component<OrgEditorProps,
-  OrgEditorState>  {
+class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
 
   pendingHighlightedNodes: Immutable.Set<string>;
 
@@ -95,7 +99,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
     super(props);
 
     this.onNodeEdit = this.onNodeEdit.bind(this);
-    this.onClickComponent = this.onClickComponent.bind(this);
+    this.onSelectComponent = this.onSelectComponent.bind(this);
 
     this.pendingHighlightedNodes = null;
 
@@ -113,33 +117,34 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
   componentDidMount() {
     // If the page has not been viewed yet or custom expand/collapse state has not been set by the
-    // user, expand the top-level nodes
+    // user, expand all the nodes
     this.props.expanded.caseOf({
       just: expandedNodes => null,
-      nothing: () => this.expandFirstTwoLevels(),
+      nothing: () => this.expandAll(),
     });
   }
 
-  expandFirstTwoLevels() {
-    const ids = [];
-    this.props.model.sequences.children.toArray().forEach(
-      (c) => {
-        const id = (c as any).id;
-        if (id !== undefined) {
-          ids.push(id);
-          const children = (c as any).children;
-          if (children !== undefined) {
-            children.toArray().forEach((s) => {
-              const id = (s as any).id;
-              if (id !== undefined) {
-                ids.push(id);
-              }
-            });
+  expandAll() {
+    const { model, dispatch, context } = this.props;
+
+    const dfsExpand = (c) => {
+      const isExpandable = c => c.id !== undefined && c.contentType !== 'Item';
+
+      if (isExpandable(c)) {
+        ids.push(c.id);
+      }
+      if (c.children !== undefined) {
+        c.children.toArray().forEach((c) => {
+          if (isExpandable(c)) {
+            dfsExpand(c);
           }
-        }
-      });
-    this.props.dispatch(
-      expandNodes(this.props.context.documentId, ids));
+        });
+      }
+    };
+
+    const ids = [];
+    model.sequences.children.toArray().forEach(dfsExpand);
+    dispatch(expandNodes(context.documentId, ids));
   }
 
   onReposition(sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) {
@@ -170,21 +175,20 @@ class OrgEditor extends React.Component<OrgEditorProps,
     this.pendingHighlightedNodes = Immutable.Set<string>().add(node.guid);
   }
 
-  toggleExpanded(id) {
+  toggleExpanded = (id: string) => {
+    const { expanded, dispatch, context } = this.props;
 
-    const action = this.props.expanded.caseOf({
+    const action = expanded.caseOf({
       just: set => set.has(id) ? collapseNodes : expandNodes,
       nothing: () => expandNodes,
     });
 
-    this.props.dispatch(action(this.props.context.documentId, [id]));
+    dispatch(action(context.documentId, [id]));
   }
 
-  componentWillReceiveProps(nextProps) {
 
+  componentWillReceiveProps(nextProps: OrgEditorProps) {
     if (this.props.placements !== nextProps.placements) {
-
-
       // As long as we are still using the same actual document, indentify
       // newly added nodes so that we can highlight them:
 
@@ -226,12 +230,14 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
   }
 
-  onClickComponent(model: NodeTypes) {
-    if (model.contentType === 'Item') {
-      viewDocument(model.resourceref.idref,
-        this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
+  onSelectComponent(node: NodeTypes) {
+    const { context, model, selectedItem } = this.props;
+
+    if (node.contentType === 'Item') {
+      viewDocument(node.resourceref.idref,
+        context.courseModel.idvers, Maybe.just(model.resource.id));
     } else {
-      const id = this.props.selectedItem.caseOf({
+      const id = selectedItem.caseOf({
         just: (item) => {
           if (item.type === 'OrganizationItem') {
             return item.id;
@@ -241,19 +247,63 @@ class OrgEditor extends React.Component<OrgEditorProps,
         nothing: () => null,
       });
 
-      const componentId = (model as any).id;
-      if (componentId === id) {
-        this.toggleExpanded(componentId);
-      } else {
-        viewDocument(componentId,
-          this.props.context.courseModel.idvers, Maybe.just(this.props.model.resource.id));
+      const componentId = (node as any).id;
+      if (componentId !== id) {
+        viewDocument(componentId, context.courseModel.idvers, Maybe.just(model.resource.id));
       }
-
     }
   }
 
   onNodeEdit(request: org.OrgChangeRequest) {
     this.props.onEdit(request);
+  }
+
+  buildCommandButtons(prefix, commands, org, model, labels, processCommand, editMode): Object[] {
+    return commands[model.contentType].map(commandClass => new commandClass())
+      .map(command => [<button
+        className="dropdown-item" key={prefix + command.description(labels)}
+        disabled={!command.precondition(org, model) || !editMode}
+        onClick={() => processCommand(command)}>{command.description(labels)}</button>])
+      .reduce((p, c) => p.concat(c), []);
+  }
+
+  renderInsertExisting(org, model, processor) {
+    if (commands.ADD_EXISTING_COMMANDS[model.contentType].length > 0) {
+      return [
+        <div className="dropdown-divider" />,
+        <h6 className="dropdown-header" key="add-existing">Add existing</h6>,
+        ...this.buildCommandButtons(
+          'addexisting',
+          commands.ADD_EXISTING_COMMANDS,
+          org, model, org.labels,
+          processor, this.props.editMode),
+      ];
+    }
+
+    return [];
+  }
+
+  renderInsertNew(org: OrganizationModel, model, processor) {
+    if (commands.ADD_NEW_COMMANDS[model.contentType].length > 0) {
+      return [
+        <h6 className="dropdown-header" key="add-new">Add new</h6>,
+        ...this.buildCommandButtons(
+          'addnew',
+          commands.ADD_NEW_COMMANDS,
+          org, model, org.labels,
+          processor, this.props.editMode)];
+    }
+
+    return [];
+  }
+
+  processCommand(org, model, command: Command) {
+    command.execute(
+      org, model, this.props.context.courseModel,
+      this.props.displayModal, this.props.dismissModal, this.props.onDispatch)
+      .then((cr) => {
+        this.props.onEdit(cr);
+      });
   }
 
   renderContent() {
@@ -275,56 +325,109 @@ class OrgEditor extends React.Component<OrgEditorProps,
       nothing: () => null,
     });
 
+
     const renderNode = (node, parent, index, depth, numberAtLevel) => {
 
       let isSelected = false;
       if (node.contentType === 'Item') {
-        const res = this.props.context.courseModel
-          .resourcesById.get(node.resourceref.idref);
+        const res = this.props.context.courseModel.resourcesById.get(node.resourceref.idref);
         isSelected = res !== undefined ? res.id === id : false;
       } else {
         isSelected = node.id === id;
       }
 
-      return <TreeNode
-        isSelected={isSelected}
-        key={node.guid}
-        onClick={this.onClickComponent}
-        numberAtLevel={numberAtLevel}
-        highlighted={this.state.highlightedNodes.has(node.guid)}
-        labels={this.props.model.labels}
-        model={node}
-        org={this.props.model}
-        context={this.props.context}
-        parentModel={parent}
-        onEdit={this.onNodeEdit}
-        editMode={this.props.editMode}
-        isExpanded={isExpanded(getExpandId(node))}
-        onReposition={this.onReposition.bind(this)}
-        indexWithinParent={index}
-        depth={depth} />;
+      return (
+        <TreeNode
+          isSelected={isSelected}
+          key={node.guid}
+          onClick={this.onSelectComponent}
+          onExpand={this.toggleExpanded}
+          numberAtLevel={numberAtLevel}
+          highlighted={this.state.highlightedNodes.has(node.guid)}
+          labels={this.props.model.labels}
+          model={node}
+          org={this.props.model}
+          context={this.props.context}
+          parentModel={parent}
+          onEdit={this.onNodeEdit}
+          editMode={this.props.editMode}
+          isExpanded={isExpanded(getExpandId(node))}
+          onReposition={this.onReposition.bind(this)}
+          indexWithinParent={index}
+          depth={depth}
+          onDispatch={this.props.dispatch}
+          displayModal={this.props.displayModal}
+          dismissModal={this.props.dismissModal}
+        />
+      );
     };
 
     return (
-      <table className="table table-sm">
-        <tbody>
-          {render(
-            this.props.model.sequences,
-            isExpanded, renderNode, this.props.placements)}
-        </tbody>
-      </table>
+      <React.Fragment>
+        <table className="table table-sm">
+          <tbody>
+            {render(
+              this.props.model.sequences,
+              isExpanded, renderNode, this.props.placements)}
+          </tbody>
+        </table>
+      </React.Fragment>
     );
   }
 
+  renderAddButtonDisabled() {
+    return (
+      <div className="add-button-container disabled">
+        <Tooltip
+          html={<span>Select an outline item<br />to add course content</span>} position="top"
+          distance={5}>
+          <div className="add-button disabled">+</div>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  renderAddButtonWithActions(item: OrganizationItem) {
+    // If selected item is a container, call action with selected item as parent
+    // Else it's a resource. call action with item's parent
+
+    const { model } = this.props;
+
+    const parent = org.findContainerOrParent(model, Maybe.just(item.id));
+    const processor = this.processCommand.bind(this, model, parent);
+
+    return (
+      <div className="add-button-container">
+        <div className="dropdown show">
+          <div data-toggle="dropdown" data-boundary="window" className="add-button">+</div>
+          <div className="dropdown-menu dropdown-menu-right">
+            {this.renderInsertNew(model, parent, processor)}
+            {this.renderInsertExisting(model, parent, processor)}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderAddButton() {
+    const { selectedItem } = this.props;
+
+    return selectedItem.caseOf({
+      just: item => item.type === 'OrganizationItem'
+        ? this.renderAddButtonWithActions(item)
+        : this.renderAddButtonDisabled(),
+      nothing: () => this.renderAddButtonDisabled(),
+    });
+  }
 
   render() {
     return (
       <div className="org-editor">
         {this.renderContent()}
+        {this.renderAddButton()}
       </div>
     );
   }
-
 }
 
 export default OrgEditor;

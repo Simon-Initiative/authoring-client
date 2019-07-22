@@ -65,23 +65,35 @@ let getInequalityOperator = (matchPattern: string) => {
     switch (matchPattern.[index]) {
     | '=' => EQ
     | '!' =>
-      switch (matchPattern.[index + 1]) {
-      | '=' => NE
-      | exception Not_found => Unknown
-      | _ => Unknown
+      if (String.length(matchPattern) > 1) {
+        switch (matchPattern.[index + 1]) {
+        | '=' => NE
+        | exception Not_found => Unknown
+        | _ => Unknown
+        }
       }
+      else
+        Unknown
     | '>' =>
-      switch (matchPattern.[index + 1]) {
-      | '=' => GTE
-      | exception Not_found => GT
-      | _ => GT
+      if (String.length(matchPattern) > 1) {
+        switch (matchPattern.[index + 1]) {
+        | '=' => GTE
+        | exception Not_found => GT
+        | _ => GT
+        }
       }
+      else
+        GT
     | '<' =>
-      switch (matchPattern.[index + 1]) {
-      | '=' => LTE
-      | exception Not_found => LT
-      | _ => LT
+      if (String.length(matchPattern) > 1) {
+        switch (matchPattern.[index + 1]) {
+        | '=' => LTE
+        | exception Not_found => LT
+        | _ => LT
+        }
       }
+      else
+        LT
     | _ => Unknown
     }
   | None => EQ
