@@ -11,6 +11,18 @@
     .org-details-title {
         display: flex;
         justify-content: space-between;
+        flex-direction: column;
+    }
+
+    .info {
+        font-size: 14px;
+        font-style: italic;
+        color: $gray-light;
+    }
+
+    .org-undo-redo {
+        display: flex;
+        flex-direction: row;
     }
 
     .btn {

@@ -8,6 +8,47 @@
   padding: 0 0px;
   height: 100%;
 
+  .add-button-container {
+    height: 48px;
+    width: 48px;
+    color: white;
+    background-color: $primary;
+    font-size: 32px;
+    line-height: 48px;
+    border-radius: 50%;
+    text-align: center;
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+
+    .add-button {
+      cursor: pointer;
+      &.disabled {
+        cursor: default;
+      }
+    }
+
+    &.disabled {
+      background-color: $gray-lighter;
+    }
+
+    .dropdown {
+      cursor: default;
+      .dropdown-menu {
+        padding: 0;
+      }
+      .dropdown-header {
+        line-height: 24px;
+      }
+      .dropdown-item {
+        cursor: pointer;
+        line-height: 24px;
+        font-size: 14px;
+      }
+    }
+  }
+
   .table {
     table-layout: fixed;
     margin-bottom: 0;
