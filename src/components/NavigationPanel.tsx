@@ -115,7 +115,7 @@ export const styles: JSSStyles = {
     backgroundColor: '#fdfdfd',
     borderRadius: '50%',
     position: 'absolute',
-    top: 14,
+    top: 13,
     right: 25,
   },
   collapseButton: {
