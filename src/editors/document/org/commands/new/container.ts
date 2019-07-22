@@ -3,7 +3,6 @@ import * as models from '../../../../../data/models';
 import * as t from '../../../../../data/contentTypes';
 
 import * as o from 'data/models/utils/org';
-import { Maybe } from 'tsmonad';
 
 
 export class AddContainerCommand extends AbstractCommand {
