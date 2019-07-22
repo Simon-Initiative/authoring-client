@@ -231,7 +231,13 @@ export function findContainerOrParent(
 
         if (!found && e.children !== undefined) {
 
-          const nodes = e.children.toArray().filter(c => c.id === id);
+          const nodes = e.children.toArray().filter((c) => {
+            if ((c.contentType === 'Include' && c.id === id)
+              || (c.contentType === 'Item' && (c as ct.Item).resourceref.idref === id)) {
+              return true;
+            }
+            return false;
+          });
 
           if (nodes.length === 1
             && (nodes[0].contentType === 'Include' || nodes[0].contentType === 'Item')) {
