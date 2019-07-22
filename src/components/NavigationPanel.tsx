@@ -109,6 +109,8 @@ export const styles: JSSStyles = {
     zIndex: 1000,
   },
   collapseButtonContainer: {
+    backgroundColor: '#fdfdfd',
+    borderRadius: '50%',
     position: 'absolute',
     top: 14,
     right: 25,
