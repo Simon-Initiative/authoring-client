@@ -56,6 +56,11 @@ export const styles: JSSStyles = {
     textOverflow: 'ellipsis',
     overflow: 'hidden',
   },
+  selectedNavContainer: {
+    borderRadius: 6,
+    boxShadow: '0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5',
+    backgroundColor: colors.primary,
+  },
   navItemDescription: {
     color: 'rgba(0,0,0,.4)',
     fontStyle: 'italic',
@@ -80,123 +85,11 @@ export const styles: JSSStyles = {
       textDecoration: 'underline',
     },
   },
-  navItemDropdown: {
-    background: 'transparent',
-    display: 'flex',
-    flexDirection: 'row',
-    border: 'none',
-    width: '100%',
-    fontSize: '1.0em',
-    fontWeight: 500,
-    borderRadius: 6,
-
-    '&:hover': {
-      '& $dropdownText': {
-        border: [1, 'solid', colors.grayLighter],
-      },
-      '& $dropdownToggle': {
-        border: [1, 'solid', colors.grayLighter],
-        borderLeft: [1, 'solid', 'transparent'],
-      },
-
-      '&$selectedNavItem': {
-        '& $dropdownText': {
-          border: [1, 'solid', colors.selection],
-        },
-        '& $dropdownToggle': {
-          border: [1, 'solid', colors.selection],
-        },
-      },
-    },
-
-    '&:focus': {
-      outline: 'none',
-    },
-
-    '&$selectedNavItem': {
-      color: 'inherit',
-      backgroundColor: 'inherit',
-      borderColor: 'inherit',
-
-      '&:hover': {
-        backgroundColor: 'inherit',
-        borderColor: 'inherit',
-      },
-
-      '& $dropdownText': {
-        color: colors.white,
-        backgroundColor: colors.selection,
-        borderColor: colors.selection,
-
-        '&:hover': {
-          backgroundColor: colors.selection,
-          borderColor: colors.selection,
-        },
-      },
-
-      '& $dropdownToggle': {
-        borderColor: colors.selection,
-        color: colors.selection,
-
-        '&:hover': {
-          backgroundColor: colors.selection,
-          color: colors.white,
-          borderLeft: [[1, 'solid', colors.white], '!important'],
-        },
-      },
-    },
-  },
-  dropdownText: {
-    flex: 1,
-    margin: [2, 0, 2, 5],
-    padding: [5, 0, 5, 10],
-    paddingRight: 10,
-    borderTopLeftRadius: 6,
-    borderBottomLeftRadius: 6,
-    border: [1, 'solid', 'transparent'],
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-
-    '& i': {
-      width: 40,
-      textAlign: 'center',
-    },
-
-    '&:hover': {
-      backgroundColor: colors.grayLighter,
-    },
-  },
-  dropdownTextCollapsed: {
-    paddingRight: 0,
-  },
-  dropdownToggle: {
-    margin: [2, 5, 2, 0],
-    padding: [5, 15, 5, 15],
-    borderTopRightRadius: 6,
-    borderBottomRightRadius: 6,
-    border: [1, 'solid', 'transparent'],
-    cursor: 'pointer',
-
-    '& i': {
-      verticalAlign: 'top',
-    },
-
-    '&:hover': {
-      backgroundColor: colors.grayLighter,
-    },
-  },
-  dropdownToggleCollapsed: {
-    padding: [8, 2],
-    fontSize: 14,
-  },
   selectedNavItem: {
-    color: colors.primary,
+    color: colors.white,
     fontWeight: 'bold',
-
     '&:hover': {
-      textDecoration: 'underline',
+      color: colors.white,
     },
   },
   orgTree: {
@@ -426,17 +319,17 @@ class NavigationPanel
     const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
+    const selected = route.route.type === 'RouteCourseOverview';
+
     return (
-      <div className={classes.navItemContainer}>
+      <div className={classNames([
+        classes.navItemContainer, selected && classes.selectedNavContainer])}>
         <a href="#"
           onClick={(e) => {
             e.preventDefault();
             viewActions.viewCourse(course.idvers, Maybe.just(currentOrg.id));
           }}
-          className={classNames([
-            classes.navItem,
-            route.route.type === 'RouteCourseOverview' && classes.selectedNavItem,
-          ])}>
+          className={classNames([classes.navItem, selected && classes.selectedNavItem])}>
           {collapsed && <i className="fa fa-book" />}
           {!collapsed && 'Course Details'}
         </a>
@@ -448,8 +341,11 @@ class NavigationPanel
     const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
+    const selected = route.route.type === 'RouteObjectives';
+
     return (
-      <div className={classes.navItemContainer}>
+      <div className={classNames([
+        classes.navItemContainer, selected && classes.selectedNavContainer])}>
         <a href="#"
           onClick={(e) => {
             e.preventDefault();
@@ -457,7 +353,7 @@ class NavigationPanel
           }}
           className={classNames([
             classes.navItem,
-            route.route.type === 'RouteObjectives' && classes.selectedNavItem,
+            selected && classes.selectedNavItem,
           ])}>
           {collapsed && <i className="fa fa-graduation-cap" />}
           {!collapsed && 'Learning Objectives'}
@@ -477,17 +373,20 @@ class NavigationPanel
       ? 'Course Outline'
       : currentOrg.title;
 
+    const selected = (route.route as any).resourceId === currentOrg.id;
+
     return (
-      <div className={classes.navItemContainer}>
+      <div className={classNames([
+        classes.navItemContainer, selected && classes.selectedNavContainer])}>
         {orgCount === 1
           ? null
           : <div className={classes.navItemDescription}>
-            {!collapsed && 'Active Organization'}
+            {!collapsed && 'Active Course Outline'}
           </div>}
         <a href="#"
           className={classNames([
             classes.navItem,
-            (route.route as any).resourceId === currentOrg.id && classes.selectedNavItem,
+            selected && classes.selectedNavItem,
           ])}
           onClick={(e) => {
             e.preventDefault();

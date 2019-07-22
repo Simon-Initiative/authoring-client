@@ -15,7 +15,6 @@
     vertical-align: middle;
     display: inline-block;
     width: 16px;
-    margin-right: 5px;
   }
 
   .treenode-title {
@@ -28,6 +27,7 @@
   .treenode-item {
     display: flex;
     border: 3px solid transparent;
+    padding-left: 3px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -51,7 +51,7 @@
     }
   }
   .info {
-    margin-left: 18px;
+    margin-left: 22px;
     font-style: italic;
     font-size: 12px;
     line-height: 12px;
