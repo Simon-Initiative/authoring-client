@@ -89,7 +89,6 @@ interface OrgEditorState {
   highlightedNodes: Immutable.Set<string>;
   undoStackSize: number;
   redoStackSize: number;
-  selectedNode: Maybe<NodeTypes>;
 }
 
 class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
@@ -113,7 +112,6 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
       highlightedNodes: Immutable.Set<string>(),
       undoStackSize: 0,
       redoStackSize: 0,
-      selectedNode: Maybe.nothing(),
     };
   }
 
@@ -242,16 +240,6 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
 
   onSelectComponent(node: NodeTypes) {
     const { context, model, selectedItem } = this.props;
-
-    const x = selectedItem.valueOr({} as any).type === 'OrganizationItem'
-      && selectedItem.valueOr({} as any).id;
-
-    console.log('selectedItem', x)
-    console.log('selected node', node)
-
-    this.setState({
-      selectedNode: Maybe.just(node),
-    });
 
     if (node.contentType === 'Item') {
       viewDocument(node.resourceref.idref,
@@ -406,13 +394,13 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
     );
   }
 
-  renderAddButtonWithActions(node: NodeTypes) {
+  renderAddButtonWithActions(item: OrganizationItem) {
     // If selected item is a group, call add new item with selected item as parent
     // If selected item is not a group, it's a resource. call action with item's parent
 
     const { model } = this.props;
 
-    const parent = org.findContainerOrParent(model, Maybe.just(node.id));
+    const parent = org.findContainerOrParent(model, Maybe.just(item.id));
     const processor = this.processCommand.bind(this, model, parent);
 
     return (
@@ -421,15 +409,8 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
           <div data-toggle="dropdown" data-boundary="window" className="add-button">+</div>
           <div className="dropdown-menu dropdown-menu-right">
             {this.renderInsertNew(model, parent, processor)}
-            {/* <h6 className="dropdown-header">Add new</h6>
-            <button className="dropdown-item">Group</button>
-            <button className="dropdown-item">Page</button>
-            <button className="dropdown-item">Assessment</button> */}
             <div className="dropdown-divider" />
             {this.renderInsertExisting(model, parent, processor)}
-            {/* <h6 className="dropdown-header">Add existing</h6>
-            <button className="dropdown-item">Page</button>
-            <button className="dropdown-item">Assessment</button> */}
           </div>
         </div>
       </div>
@@ -437,10 +418,12 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
   }
 
   renderAddButton() {
-    const { selectedNode } = this.state;
+    const { selectedItem } = this.props;
 
-    return selectedNode.caseOf({
-      just: node => this.renderAddButtonWithActions(node),
+    return selectedItem.caseOf({
+      just: item => item.type === 'OrganizationItem'
+        ? this.renderAddButtonWithActions(item)
+        : this.renderAddButtonDisabled(),
       nothing: () => this.renderAddButtonDisabled(),
     });
   }

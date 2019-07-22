@@ -35,11 +35,11 @@ export class AddContainerCommand extends AbstractCommand {
     courseModel: models.CourseModel,
     displayModal: (c) => void,
     dismissModal: () => void, dispatch) {
-
-    return o.addContainer(org, parent.id).caseOf({
-      just: cr => Promise.resolve(cr),
-      nothing: () => Promise.reject(),
-    });
+    return Promise.reject();
+    // return o.addContainer(org, parent.id).caseOf({
+    //   just: cr => Promise.resolve(cr),
+    //   nothing: () => Promise.reject(),
+    // });
   }
 
 
