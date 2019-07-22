@@ -13,7 +13,7 @@ export type ActivityReportParams = {
 
 const defaultContent = {
   contentType: 'ActivityReport',
-  elementType: 'activityreport',
+  elementType: 'activity_report',
   id: '',
   guid: '',
   idref: '',
@@ -22,7 +22,7 @@ const defaultContent = {
 
 export class ActivityReport extends Immutable.Record(defaultContent) {
   contentType: 'ActivityReport';
-  elementType: 'activity';
+  elementType: 'activity_report';
   id: string;
   guid: string;
   idref: string;

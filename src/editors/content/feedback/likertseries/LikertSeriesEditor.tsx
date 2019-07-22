@@ -20,6 +20,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import '../common.scss';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { Maybe, MaybeType } from 'tsmonad';
 
 export interface Props extends AbstractContentEditorProps<LikertSeries> {
   canRemove: boolean;
@@ -39,8 +40,14 @@ export class LikertSeriesEditor extends AbstractContentEditor<LikertSeries, Prop
   constructor(props) {
     super(props);
 
+    // If there are any groups entered, show them by default
+    const validGroups = this.props.model.items.filter(i =>  i.group.caseOf({
+      just: g => /\S/.test(g), // only groups that have non-whitespace
+      nothing: () => false,
+    }));
+
     this.state = {
-      showGrouping: false,
+      showGrouping: !validGroups.isEmpty(),
     };
 
     this.onToggleItemGrouping = this.onToggleItemGrouping.bind(this);
