@@ -92,7 +92,7 @@ export default class XrefEditor
     }
   }
 
-  thisId = this.props.context.courseModel.resources.get(
+  thisId = this.props.context.courseModel.resourcesById.get(
     this.props.context.documentId).id;
 
   pages = this.props.context.courseModel.resources
