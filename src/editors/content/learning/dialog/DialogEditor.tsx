@@ -166,6 +166,7 @@ export default class DialogEditor
           onEdit={this.onTitleEdit}
           editorStyles={{ fontSize: 20 }} />
 
+        <div>Speakers</div>
         <div className="speakerContainer">
           <ContentContainer
             {...this.props}
@@ -175,12 +176,13 @@ export default class DialogEditor
             overrideRemove={this.overrideSpeakerRemove}
           />
           <div className="addButton addSpeaker">
-            <a onClick={this.onAddSpeaker}>
-              <i className="fa fa-plus"></i>
-            </a>
+            <button className="btn btn-primary" onClick={this.onAddSpeaker}>
+              Add Speaker
+            </button>
           </div>
         </div>
 
+        <div>Lines</div>
         <div className="lineContainer">
           <ContentContainer
             {...this.props}
@@ -192,9 +194,9 @@ export default class DialogEditor
         </div>
         {model.speakers.size > 0
           ? <div className="addButton addLine">
-            <a onClick={this.onAddLine}>
-              <i className="fa fa-plus"></i>
-            </a>
+            <button className="btn btn-primary" onClick={this.onAddLine}>
+              Add Line
+            </button>
           </div>
           : null}
       </div>

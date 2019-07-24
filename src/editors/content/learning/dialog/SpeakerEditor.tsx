@@ -31,7 +31,7 @@ export interface SpeakerEditorState {
 
 export default class SpeakerEditor
   extends AbstractContentEditor<contentTypes.Speaker, SpeakerEditorProps, SpeakerEditorState> {
-  constructor(props) {
+  constructor(props: SpeakerEditorProps) {
     super(props);
 
     this.state = {
@@ -53,12 +53,17 @@ export default class SpeakerEditor
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: SpeakerEditorProps) {
     if (nextProps.model !== this.props.model) {
       this.setState({
         isDisplayedAsImage: this.isDisplayedAsImage(nextProps.model),
       });
     }
+  }
+
+  shouldComponentUpdate(nextProps: SpeakerEditorProps, nextState: SpeakerEditorState) {
+    return super.shouldComponentUpdate(nextProps, nextState)
+      || this.state !== nextState;
   }
 
   onToggleDisplayAsImage(isDisplayedAsImage) {
@@ -88,7 +93,7 @@ export default class SpeakerEditor
     const { model, onEdit } = this.props;
 
     const newModel = model.with({
-      title: title !== ''
+      content: title !== ''
         ? Maybe.just(title)
         : Maybe.nothing(),
     });
@@ -98,7 +103,7 @@ export default class SpeakerEditor
 
   renderSidebar(): JSX.Element {
     const { model, editMode } = this.props;
-    const { title } = model;
+    const { content } = model;
 
     return (
       <SidebarContent title="Speaker">
@@ -110,8 +115,7 @@ export default class SpeakerEditor
                 value="image"
                 checked={this.state.isDisplayedAsImage}
                 onChange={() => this.onToggleDisplayAsImage(true)}
-                type="radio" />&nbsp;
-  as Image
+                type="radio" />{' '}as Image
             </label>
           </div>
 
@@ -133,18 +137,20 @@ export default class SpeakerEditor
                 onChange={() => this.onToggleDisplayAsImage(false)}
                 value="text"
                 checked={!this.state.isDisplayedAsImage}
-                type="radio" />&nbsp;
-  as Text
+                type="radio" />{' '}as Text
             </label>
           </div>
 
           <SidebarRow label="">
             <TextInput width="100%" label=""
               editMode={editMode && !this.state.isDisplayedAsImage}
-              value={title.caseOf({
-                just: title => title,
-                nothing: () => '',
-              })}
+              value={this.state.isDisplayedAsImage
+                ? ''
+                : content.caseOf({
+                  just: c => c as string,
+                  nothing: () => '',
+                })
+              }
               type="text"
               onEdit={this.onTitleEdit} />
           </SidebarRow>
@@ -169,6 +175,7 @@ export default class SpeakerEditor
 
   renderMain(): JSX.Element {
     const { model, context } = this.props;
+
     return (
       <Speaker
         context={context}
