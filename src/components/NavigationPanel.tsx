@@ -14,6 +14,7 @@ import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
 import { RequestButton } from 'editors/document/course/CourseEditor';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
+import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { Resource } from 'data/contentTypes';
 import { RouteCourse } from 'types/router';
 import { CourseIdVers } from 'data/types';
@@ -25,7 +26,6 @@ const COLLAPSE_SETPOINT_PX = 150;
 
 export const styles: JSSStyles = {
   NavigationPanel: {
-    fontSize: '14px',
     extend: [disableSelect],
     display: 'flex',
     flexDirection: 'column',
@@ -47,30 +47,13 @@ export const styles: JSSStyles = {
 
     '& $navItem i': {
       width: '100%',
-      color: colors.grayDarker,
     },
-    '& $navItem$selectedNavItem i': {
-      color: colors.white,
-    },
-  },
-  navItemContainer: {
-    margin: [2, 5],
-    padding: [5, 10],
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-  },
-  selectedNavContainer: {
-    borderRadius: 6,
-    boxShadow: '0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5',
-    backgroundColor: colors.primary,
-  },
-  navItemDescription: {
-    color: 'rgba(0,0,0,.4)',
-    fontStyle: 'italic',
   },
   navItem: {
     fontSize: '1.0em',
     fontWeight: 500,
+    margin: [2, 5],
+    padding: [5, 10],
     borderRadius: 6,
     border: [1, 'solid', 'transparent'],
     cursor: 'pointer',
@@ -84,20 +67,134 @@ export const styles: JSSStyles = {
     },
 
     '&:hover': {
-      color: colors.primary,
-      textDecoration: 'underline',
+      backgroundColor: colors.grayLighter,
+      borderColor: colors.grayLighter,
     },
+  },
+  navItemDropdown: {
+    background: 'transparent',
+    display: 'flex',
+    flexDirection: 'row',
+    border: 'none',
+    width: '100%',
+    fontSize: '1.0em',
+    fontWeight: 500,
+    borderRadius: 6,
+
+    '&:hover': {
+      '& $dropdownText': {
+        border: [1, 'solid', colors.grayLighter],
+      },
+      '& $dropdownToggle': {
+        border: [1, 'solid', colors.grayLighter],
+        borderLeft: [1, 'solid', 'transparent'],
+      },
+
+      '&$selectedNavItem': {
+        '& $dropdownText': {
+          border: [1, 'solid', colors.selection],
+        },
+        '& $dropdownToggle': {
+          border: [1, 'solid', colors.selection],
+        },
+      },
+    },
+
+    '&:focus': {
+      outline: 'none',
+    },
+
+    '&$selectedNavItem': {
+      color: 'inherit',
+      backgroundColor: 'inherit',
+      borderColor: 'inherit',
+
+      '&:hover': {
+        backgroundColor: 'inherit',
+        borderColor: 'inherit',
+      },
+
+      '& $dropdownText': {
+        color: colors.white,
+        backgroundColor: colors.selection,
+        borderColor: colors.selection,
+
+        '&:hover': {
+          backgroundColor: colors.selection,
+          borderColor: colors.selection,
+        },
+      },
+
+      '& $dropdownToggle': {
+        borderColor: colors.selection,
+        color: colors.selection,
+
+        '&:hover': {
+          backgroundColor: colors.selection,
+          color: colors.white,
+          borderLeft: [[1, 'solid', colors.white], '!important'],
+        },
+      },
+    },
+  },
+  dropdownText: {
+    flex: 1,
+    margin: [2, 0, 2, 5],
+    padding: [5, 0, 5, 10],
+    paddingRight: 10,
+    borderTopLeftRadius: 6,
+    borderBottomLeftRadius: 6,
+    border: [1, 'solid', 'transparent'],
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+
+    '& i': {
+      width: 40,
+      textAlign: 'center',
+    },
+
+    '&:hover': {
+      backgroundColor: colors.grayLighter,
+    },
+  },
+  dropdownTextCollapsed: {
+    paddingRight: 0,
+  },
+  dropdownToggle: {
+    margin: [2, 5, 2, 0],
+    padding: [5, 15, 5, 15],
+    borderTopRightRadius: 6,
+    borderBottomRightRadius: 6,
+    border: [1, 'solid', 'transparent'],
+    cursor: 'pointer',
+
+    '& i': {
+      verticalAlign: 'top',
+    },
+
+    '&:hover': {
+      backgroundColor: colors.grayLighter,
+    },
+  },
+  dropdownToggleCollapsed: {
+    padding: [8, 2],
+    fontSize: 14,
   },
   selectedNavItem: {
     color: colors.white,
-    fontWeight: 'bold',
+    backgroundColor: colors.selection,
+    borderColor: colors.selection,
+
     '&:hover': {
-      color: colors.white,
+      backgroundColor: colors.selection,
+      borderColor: colors.selection,
     },
   },
   orgTree: {
     flex: 1,
-    overflowY: 'auto',
+    overflowY: 'scroll',
     borderTop: [1, 'solid', colors.grayLighter],
     borderBottom: [1, 'solid', colors.grayLighter],
     margin: [5, 0],
@@ -112,21 +209,26 @@ export const styles: JSSStyles = {
     zIndex: 1000,
   },
   collapseButtonContainer: {
-    backgroundColor: '#fdfdfd',
-    borderRadius: '50%',
     position: 'absolute',
-    top: 13,
-    right: 25,
+    top: 182,
+    right: -2,
   },
   collapseButton: {
     width: 30,
     height: 30,
+    borderRadius: '50%',
     color: colors.grayDark,
+    border: [1, 'solid', colors.grayDark],
+    background: colors.white,
     paddingRight: 2,
     paddingTop: 2,
     textAlign: 'center',
     cursor: 'pointer',
+    boxShadow: [2, 3, 10, -2, 'rgba(148,148,148,1)'],
     fontSize: 16,
+    opacity: 0,
+
+    transition: 'opacity .2s ease-out',
 
     '& i': {
       fontWeight: 600,
@@ -134,6 +236,7 @@ export const styles: JSSStyles = {
 
     '&:hover': {
       color: colors.selection,
+      border: [1, 'solid', colors.selection],
     },
   },
   publishActions: {
@@ -166,6 +269,7 @@ export interface NavigationPanelProps {
   profile: UserProfile;
   userId: string;
   userName: string;
+  onCreateOrg: () => void;
   onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
   onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
@@ -312,11 +416,13 @@ class NavigationPanel
       <div className={classes.resizeHandle} onMouseDown={this.onResizeHandleMousedown}>
         {!collapsed && (
           <div className={classes.collapseButtonContainer}>
-            <div className={classes.collapseButton}
-              onClick={this.onCollapse}
-              onMouseDown={e => e.stopPropagation()}>
-              <i className="fa fa-angle-double-left" />
-            </div>
+            <Tooltip title="Collapse Outline" position="right" size="small" delay={750}>
+              <div className={classes.collapseButton}
+                onClick={this.onCollapse}
+                onMouseDown={e => e.stopPropagation()}>
+                <i className="fa fa-angle-double-left" />
+              </div>
+            </Tooltip>
           </div>
         )}
       </div>
@@ -327,21 +433,17 @@ class NavigationPanel
     const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
-    const selected = route.route.type === 'RouteCourseOverview';
-
     return (
-      <div className={classNames([
-        classes.navItemContainer, selected && classes.selectedNavContainer])}>
-        <a href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            viewActions.viewCourse(course.idvers, Maybe.just(currentOrg.id));
-          }}
-          className={classNames([classes.navItem, selected && classes.selectedNavItem])}>
-          {collapsed && <i className="fa fa-book" />}
-          {!collapsed && 'Course Details'}
-        </a>
-      </div>
+      <Tooltip disabled={!collapsed} title="Overview" position="right">
+        <div
+          className={classNames([
+            classes.navItem,
+            route.route.type === 'RouteCourseOverview' && classes.selectedNavItem,
+          ])}
+          onClick={() => viewActions.viewCourse(course.idvers, Maybe.just(currentOrg.id))}>
+          <i className="fa fa-book" />{!collapsed && ' Overview'}
+        </div>
+      </Tooltip>
     );
   }
 
@@ -349,60 +451,114 @@ class NavigationPanel
     const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
-    const selected = route.route.type === 'RouteObjectives';
-
     return (
-      <div className={classNames([
-        classes.navItemContainer, selected && classes.selectedNavContainer])}>
-        <a href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id));
-          }}
-          className={classNames([
-            classes.navItem,
-            selected && classes.selectedNavItem,
-          ])}>
-          {collapsed && <i className="fa fa-graduation-cap" />}
-          {!collapsed && 'Learning Objectives'}
-        </a>
-      </div>
+      <Tooltip disabled={!collapsed} title="Objectives" position="right">
+        <div className={classNames([
+          classes.navItem,
+          route.route.type === 'RouteObjectives' && classes.selectedNavItem,
+        ])}
+          onClick={() =>
+            viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id))}>
+          <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
+        </div>
+      </Tooltip>
     );
   }
 
-  renderOrgRootNode(currentOrg: Resource) {
-    const { classes, route, course } = this.props;
+  renderAllResources(currentOrg: Resource) {
+    const { classes, course, route } = this.props;
     const { collapsed } = this.state;
+
+    return (
+      <Tooltip disabled={!collapsed} title="All Resources" position="right">
+        <div
+          className={classNames([
+            classes.navItem,
+            route.route.type === 'RouteAllResources' && classes.selectedNavItem,
+          ])}
+          onClick={() =>
+            viewActions.viewAllResources(course.idvers, Maybe.just(currentOrg.id))}>
+          <i className="fas fa-folder-open" />{!collapsed && ' All Resources'}
+        </div>
+      </Tooltip>
+
+    );
+  }
+
+  renderOrgDropdown(currentOrg: Resource) {
+    const { classes, route, profile, course, onCreateOrg } = this.props;
+    const { showOrgDropdown, collapsed } = this.state;
 
     const availableOrgs = r => r.type === 'x-oli-organization' && r.resourceState !== 'DELETED';
 
-    const orgCount = course.resources.toArray().filter(availableOrgs).length;
-    const title = orgCount === 1
-      ? 'Course Outline'
-      : currentOrg.title;
-
-    const selected = (route.route as any).resourceId === currentOrg.id;
-
     return (
-      <div className={classNames([
-        classes.navItemContainer, selected && classes.selectedNavContainer])}>
-        {orgCount === 1
-          ? null
-          : <div className={classes.navItemDescription}>
-            {!collapsed && 'Active Course Outline'}
-          </div>}
-        <a href="#"
-          className={classNames([
-            classes.navItem,
-            selected && classes.selectedNavItem,
+      <div className="dropdown">
+        <div className={classNames([
+          classes.navItemDropdown,
+          route.route.type === 'RouteResource'
+          && route.route.resourceId === currentOrg.id
+          && classes.selectedNavItem,
+        ])}>
+          <Tooltip
+            disabled={!collapsed}
+            title={`${currentOrg.title} (${currentOrg.id})`}
+            position="right"
+            distance={32}
+            style={{ overflow: 'hidden', flex: 1, display: 'flex' }}>
+            <div className={classNames([
+              classes.dropdownText,
+              collapsed && classes.dropdownTextCollapsed,
+            ])}
+              onClick={() => viewActions.viewDocument(
+                currentOrg.id, course.idvers, Maybe.just(currentOrg.id))}>
+              <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
+            </div>
+          </Tooltip>
+          <div className={classNames([
+            classes.dropdownToggle,
+            collapsed && classes.dropdownToggleCollapsed,
           ])}
-          onClick={(e) => {
-            e.preventDefault();
-            viewActions.viewDocument(currentOrg.id, course.idvers, Maybe.just(currentOrg.id));
-          }}>
-          {collapsed && <i className="fa fa-th-list" />}
-          {!collapsed && (' ' + title)}
-        </a>
+            onClick={(e) => {
+              (e.nativeEvent as any).originator = 'OrgDropdownToggle';
+              this.setState({ showOrgDropdown: !showOrgDropdown });
+            }}>
+            <i className={'fas fa-sort-down'} />
+          </div>
+        </div>
+        <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
+          {course.resources.valueSeq()
+            .filter(availableOrgs)
+            .sort((r1, r2) => {
+              return r1.title.toLowerCase() < r2.title.toLowerCase()
+                ? -1
+                : r1.title.toLowerCase() > r2.title.toLowerCase()
+                  ? 1
+                  : 0;
+            })
+            .map(org => (
+              <a key={org.guid}
+                className={classNames([
+                  'dropdown-item',
+                  currentOrg.id === org.id && classes.selectedNavItem,
+                ])}
+                onClick={() => {
+                  if (org.id !== currentOrg.id) {
+                    this.props.onReleaseOrg();
+                    updateActiveOrgPref(course.idvers, profile.username, org.id);
+                    this.props.onLoadOrg(course.idvers, org.guid);
+                    viewActions.viewDocument(org.id, course.idvers, Maybe.just(org.id));
+                  }
+                }}>
+                {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
+              </a>
+            ))}
+          <div className="dropdown-divider" />
+          <a key="create-org"
+            className={classNames(['dropdown-item'])}
+            onClick={() => onCreateOrg()}>
+            <i className={'fa fa-plus-circle'} /> Create New Organization
+          </a>
+        </div>
       </div>
     );
   }
@@ -413,31 +569,28 @@ class NavigationPanel
 
     return (
       <React.Fragment>
-        {this.renderResizeHandle()}
         <div className={classes.orgTree}>
           {collapsed
             ? (
-              <div className={classes.navItemContainer}>
-                <div
-                  className={classNames([
-                    classes.navItem,
-                  ])}
-                  onClick={() => {
-                    const newWidth = width.lift(w =>
-                      w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
+              <div
+                className={classNames([
+                  classes.navItem,
+                ])}
+                onClick={() => {
+                  const newWidth = width.lift(w =>
+                    w < COLLAPSE_SETPOINT_PX ? DEFAULT_WIDTH_PX : w);
 
-                    this.setState({
-                      width: newWidth,
-                      collapsed: false,
-                    });
-                    this.updatePersistentPrefs(
-                      profile.username,
-                      newWidth.valueOr(DEFAULT_WIDTH_PX),
-                      false,
-                    );
-                  }}>
-                  <i className="fa fa-angle-double-right" />
-                </div>
+                  this.setState({
+                    width: newWidth,
+                    collapsed: false,
+                  });
+                  this.updatePersistentPrefs(
+                    profile.username,
+                    newWidth.valueOr(DEFAULT_WIDTH_PX),
+                    false,
+                  );
+                }}>
+                <i className="fa fa-angle-double-right" />
               </div>
             )
             : (
@@ -475,7 +628,7 @@ class NavigationPanel
             )
           }
         </div>
-      </React.Fragment >
+      </React.Fragment>
     );
   }
 
@@ -516,9 +669,12 @@ class NavigationPanel
         ])}
         style={{ width: this.getWidth() }}>
 
+        {this.renderResizeHandle()}
+
         {this.renderOverview(currentOrg)}
         {this.renderObjectives(currentOrg)}
-        {this.renderOrgRootNode(currentOrg)}
+        {/* {this.renderAllResources(currentOrg)} */}
+        {this.renderOrgDropdown(currentOrg)}
         {this.renderOrgTree(currentOrg, selectedItem)}
 
       </div>
