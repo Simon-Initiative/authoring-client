@@ -1,4 +1,5 @@
 import ActivityEditor from 'editors/content/learning/ActivityEditor';
+import ActivityReportEditor from 'editors/content/learning/ActivityReportEditor';
 import ActivityLinkEditor from 'editors/content/learning/ActivityLinkEditor';
 import AlternativeEditor from 'editors/content/learning/AlternativeEditor';
 import AlternativesEditor from 'editors/content/learning/AlternativesEditor';
@@ -91,6 +92,7 @@ function init() {
   registry = {};
   registry['Activity'] = connectEditor(ActivityEditor);
   registry['ActivityLink'] = connectEditor(ActivityLinkEditor);
+  registry['ActivityReport'] = connectEditor(ActivityReportEditor);
   registry['Alternative'] = connectEditor(AlternativeEditor);
   registry['Alternatives'] = connectEditor(AlternativesEditor);
   registry['Answer'] = connectEditor(AnswerEditor);

@@ -46,6 +46,10 @@ const styles: JSSStyles = {
     },
   },
 
+  activeLink: {
+    textDecoration: 'underline',
+  },
+
   saveNotification: {
     fontWeight: 300,
     paddingRight: 30,
@@ -242,13 +246,21 @@ class Header
   }
 
   renderPackageTitle() {
-    const { classes, course } = this.props;
+    const { classes, course, router } = this.props;
+
+    const active = router.route.type === 'RouteCourse'
+      && router.route.route.type === 'RouteCourseOverview';
+
+    const orgId = router.route.type === 'RouteCourse'
+      ? router.route.orgId
+      : Maybe.nothing<string>();
+
     return (
       <span>
-        <a className={classes.headerLink}
+        <a className={classNames([classes.headerLink, active ? classes.activeLink : ''])}
           onClick={(e) => {
             e.preventDefault();
-            viewActions.viewCourse(course.idvers, Maybe.nothing());
+            viewActions.viewCourse(course.idvers, orgId);
           }}>
           {course.title}
         </a> <span className={classes.version}>v{course.version}</span>
