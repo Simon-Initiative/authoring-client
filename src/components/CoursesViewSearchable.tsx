@@ -43,6 +43,7 @@ function errorMessageAction(): Messages.Message {
 export type CourseDescription = {
   guid: CourseGuid,
   idvers: CourseIdVers,
+  id: string,
   version: string,
   title: string,
   description: string,
@@ -86,9 +87,9 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
     const searchText = this.state.searchText;
     const text = searchText.trim().toLowerCase();
     const filterFn = (r: CourseDescription): boolean => {
-      const { title, idvers, version } = r;
+      const { title, id, version } = r;
       const titleLower = title ? title.toLowerCase() : '';
-      const idLower = idvers.value() ? idvers.value().toLowerCase() : '';
+      const idLower = id ? id.toLowerCase() : '';
       const versionLower = version ? version.toLowerCase() : '';
 
       return text === '' ||
@@ -108,6 +109,7 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
         const courses: CourseDescription[] = docs.map(d => ({
           guid: d.guid,
           idvers: d.idvers,
+          id: d.id,
           version: d.version,
           title: d.title,
           dateCreated: d.dateCreated,
@@ -249,8 +251,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   const highlightedColumnRenderer = (
     prop: string,
-    r: CourseDescription, appendText: string = '') =>
-    searchText.length < 3
+    r: CourseDescription, appendText: string = '') => searchText.length < 3
       ? <span>{r[prop] + appendText}</span>
       : highlightMatchesStr(r[prop] + appendText, searchText);
 

@@ -9,6 +9,7 @@ $active-tab: $blue;
   border-color: #CCCCCC;
   color: black;
   background-color: transparent;
+  font-size: 14px;
 
   padding: 6px 6px 2px 8px;
   margin-bottom: 6px;
@@ -16,6 +17,18 @@ $active-tab: $blue;
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   border-radius: 3px;
+
+  a {
+    color: $primary;
+    :hover {
+      text-decoration: underline;
+    }
+  }
+
+  .info {
+    // font-size: 12px;
+    font-style: italic;
+  }
 
   &:hover {
     background-color: lighten(#edeff0, 5%);
@@ -42,12 +55,9 @@ $active-tab: $blue;
     }
 
     small {
+      font-size: 12px;
       display: inline-block;
     }
-  }
-
-  .remove-btn {
-    padding-top: 10px;
   }
 }
 

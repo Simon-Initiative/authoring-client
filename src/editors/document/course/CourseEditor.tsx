@@ -9,9 +9,10 @@ import { Button } from 'editors/content/common/Button';
 import { Select } from 'editors/content/common/Select';
 import { Document } from 'data/persistence/common';
 import './CourseEditor.scss';
+import * as viewActions from 'actions/view';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { DeploymentStatus, DeployStage } from 'data/models/course';
-import { LegacyTypes, CourseId } from 'data/types';
+import { LegacyTypes, CourseId, CourseIdVers } from 'data/types';
 import { ResourceState, Resource } from 'data/content/resource';
 import { Title } from 'components/objectives/Title';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
@@ -30,6 +31,9 @@ import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { buildGeneralErrorMessage } from 'utils/error';
 import { configuration } from 'actions/utils/config';
+import ResourceView from 'components/ResourceView';
+import OrgLibrary from 'components/OrgLibrary';
+import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -39,13 +43,17 @@ export interface CourseEditorProps {
   model: models.CourseModel;
   editMode: boolean;
   analytics: AnalyticsState;
+  currentOrgDoc: persistence.Document;
+  dispatch: any;
   courseChanged: (m: models.CourseModel) => any;
   viewAllCourses: () => any;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   onShowMessage: (message: Messages.Message) => void;
-  onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
   onCreateDataset: () => void;
+  onCreateOrg: (title: string) => void;
+  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
+  onReleaseOrg: () => void;
 }
 
 type ThemeSelection = {
@@ -670,46 +678,46 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         }
         <div className="row">
           <div className="col-3">
-              <button
-                type="button"
-                className="btn btn-link"
-                onClick={() => this.toggleAdvancedDetails()}>
-                Advanced Details {collapseIndicator}
-              </button>
+            <button
+              type="button"
+              className="btn btn-link"
+              onClick={() => this.toggleAdvancedDetails()}>
+              Advanced Details {collapseIndicator}
+            </button>
           </div>
           <div className="col-9"></div>
         </div>
         {this.state.showAdvancedDetails &&
           <div className="advanced">
-          <div className="row">
-            <div className="col-3">Theme</div>
-            <div className="col-9">{this.renderThemes()}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Version</div>
-            <div className="col-9">{model.version}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">License <HelpPopover activateOnClick>
-              <div><img src={CC_LICENSES} />
-                <br /><br />
-                <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
-                  target="_blank">
-                  More information
-                </a>
-              </div>
-            </HelpPopover>
+            <div className="row">
+              <div className="col-3">Theme</div>
+              <div className="col-9">{this.renderThemes()}</div>
             </div>
-            <div className="col-9">{this.renderLicenseSelect()}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Unique ID</div>
-            <div className="col-9">{model.id}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Package Location</div>
-            <div className="col-9">{model.svnLocation}</div>
-          </div>
+            <div className="row">
+              <div className="col-3">Version</div>
+              <div className="col-9">{model.version}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">License <HelpPopover activateOnClick>
+                <div><img src={CC_LICENSES} />
+                  <br /><br />
+                  <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                    target="_blank">
+                    More information
+                </a>
+                </div>
+              </HelpPopover>
+              </div>
+              <div className="col-9">{this.renderLicenseSelect()}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Unique ID</div>
+              <div className="col-9">{model.id}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Package Location</div>
+              <div className="col-9">{model.svnLocation}</div>
+            </div>
           </div>
         }
 
@@ -758,6 +766,24 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  renderResources() {
+    const { model, currentOrgDoc, dispatch } = this.props;
+
+    const org =
+      currentOrgDoc !== null
+        ? (currentOrgDoc.model as models.OrganizationModel).id
+        : null;
+
+    return (
+      <ResourceView
+        course={model}
+        dispatch={dispatch}
+        currentOrg={org}
+        serverTimeSkewInMs={0}
+      />
+    );
+  }
+
   renderAnalytics() {
     const { user, analytics, onCreateDataset, editMode, model } = this.props;
 
@@ -798,7 +824,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                            To get the most recent data for analytics, create a new dataset.
+                                          To get the most recent
+                                          data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
@@ -849,13 +876,38 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  onSelectOrg = (orgId: string) => {
+    const course = this.props.model;
+    const profile = this.props.user.profile;
+
+    this.props.onReleaseOrg();
+    updateActiveOrgPref(course.idvers, profile.username, orgId);
+    this.props.onLoadOrg(course.guid, orgId);
+    viewActions.viewCourse(course.idvers, Maybe.just(orgId));
+  }
+
+  renderOrgs() {
+    const org = this.props.currentOrgDoc !== null
+      ? (this.props.currentOrgDoc.model as models.OrganizationModel).resource
+      : null;
+    return (
+      <OrgLibrary
+        course={this.props.model}
+        currentOrg={org}
+        onCreateOrg={this.props.onCreateOrg}
+        onSelectOrg={this.onSelectOrg}
+      />
+    );
+  }
+
   render() {
     return (
       <div className="course-editor" >
         <div className="row info">
           <div className="col-md-12">
-            <h2>Course Package</h2>
-            <TabContainer labels={['Details', 'Workflow', 'Analytics']}>
+            <h2>Course Details</h2>
+            <TabContainer labels={
+              ['Details', 'Workflow', 'Analytics', 'Resources', 'Organizations']}>
               <Tab>
                 {this.renderDetails()}
               </Tab>
@@ -864,6 +916,12 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               </Tab>
               <Tab>
                 {this.renderAnalytics()}
+              </Tab>
+              <Tab>
+                {this.renderResources()}
+              </Tab>
+              <Tab>
+                {this.renderOrgs()}
               </Tab>
             </TabContainer>
           </div>

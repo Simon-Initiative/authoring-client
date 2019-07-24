@@ -12,7 +12,8 @@ it('parseDate test', () => {
 
 // just subtracts two dates as ms numbers
 it('compareDates test', () => {
-  expect(compareDates(new Date(), new Date())).toBe(0);
+  const date = new Date();
+  expect(compareDates(date, date)).toBe(0);
   expect(compareDates(new Date(500000001999), new Date(500000000000))).toBe(1999);
   expect(compareDates(new Date(500000000000), new Date(500000001999))).toBe(-1999);
   expect(compareDates(

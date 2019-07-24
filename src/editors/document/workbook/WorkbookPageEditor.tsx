@@ -28,7 +28,6 @@ import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import './WorkbookPageEditor.scss';
 import { MessageState } from 'reducers/messages';
 import { CourseIdVers, LegacyTypes } from 'data/types';
-// import { Prerequisites } from 'editors/document/workbook/Prerequisites';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: CourseIdVers) => void;

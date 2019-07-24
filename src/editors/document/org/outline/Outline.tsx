@@ -42,7 +42,6 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
     nodes: Immutable.OrderedMap<string, OutlineNode>,
     editDetails: Tree.TreeEditDetails<OutlineNode>) {
 
-
     const { sourceModel, newIndex } = editDetails;
 
     // we cannot handle reordering Includes yet

@@ -129,7 +129,6 @@ class InsertToolbar
     const { onInsert, parentSupportsElementType, resourcePath, context, editMode,
       courseModel, onDisplayModal, onDismissModal, requestLatestModel,
       onCreateNew } = this.props;
-
     const onTableCreate = (onInsert, numRows, numCols) => {
 
       const rows = [];
@@ -505,9 +504,10 @@ class InsertToolbar
                       return onDisplayModal(
                         <ResourceSelection
                           filterPredicate={(res: Resource): boolean =>
-                            res.type === LegacyTypes.inline
+                            (res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
-                            && !existingInlines.has(res.id)}
+                            && !existingInlines.has(res.id))
+                          }
                           courseId={context.courseModel.guid}
                           onInsert={(resource) => {
                             onDismissModal();
@@ -551,7 +551,8 @@ class InsertToolbar
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.workbook_page
                       && res.id !== PLACEHOLDER_ITEM_ID
-                      && res.resourceState !== ResourceState.DELETED}
+                      && res.resourceState !== ResourceState.DELETED
+                      && res.guid !== context.documentId}
                     courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
@@ -663,6 +664,32 @@ class InsertToolbar
                 Create survey
                 </ToolbarButtonMenuItem>
 
+              <ToolbarButtonMenuItem
+                onClick={() => onDisplayModal(
+                  <ResourceSelection
+                    filterPredicate={(res: Resource): boolean =>
+                      res.type === LegacyTypes.feedback
+                      && res.resourceState !== ResourceState.DELETED}
+                    courseId={context.courseModel.guid}
+                    onInsert={(resource) => {
+                      onDismissModal();
+                      const resources = context.courseModel.resources.toArray();
+                      const found = resources.find(r => r.id === resource.id);
+                      if (found !== undefined) {
+                        onInsert(new contentTypes.ActivityReport().with({
+                          idref: resource.id,
+                          type: Maybe.just(contentTypes.ActivityReportTypes.LikertBar),
+                        }));
+                      }
+
+                    }}
+                    onCancel={onDismissModal}
+                  />)
+                  }
+                disabled={false}>
+                <i style={{ width: 22 }} className={'fas fa-clipboard-check'} />
+                Insert Survey{/* Future: Activity */} Report
+                </ToolbarButtonMenuItem>
               <ToolbarButtonMenuDivider />
 
               <ToolbarButtonMenuItem
@@ -718,6 +745,7 @@ class InsertToolbar
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">
+
             <ToolbarWideMenu
               icon={<i className={'fa fa-clone'} />}
               label={'Layout'}

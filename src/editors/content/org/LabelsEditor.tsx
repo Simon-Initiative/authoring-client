@@ -102,7 +102,7 @@ export class LabelsEditor
 
     return (
       <div className="labels-editor">
-        <p>Enter custom labels to use in place of the following organization components:</p>
+        <p>Enter custom labels to use in place of the following course outline components:</p>
         {rows}
       </div>
     );

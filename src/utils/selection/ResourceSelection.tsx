@@ -135,7 +135,6 @@ export default class ResourceSelection
     };
 
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
-
     return (
       <div className="resourceSelection">
         <ModalSelection

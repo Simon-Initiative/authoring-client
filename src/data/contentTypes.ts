@@ -109,6 +109,7 @@ export { Variable } from './content/assessment/variable';
 
 // Workbook page
 export { Activity } from 'data/content/workbook/activity';
+export { ActivityReport } from 'data/content/workbook/activity_report';
 export { Head } from 'data/content/workbook/head';
 export { Section as WorkbookSection } from 'data/content/workbook/section';
 export { WbInline } from 'data/content/workbook/wbinline';
@@ -126,7 +127,7 @@ export { WebContent } from 'data/content/webcontent';
 // Organization
 export {
   AudienceTypes, DependencyTypes, GrainSizes, ConditionTypes,
-  PurposeTypes, ScoringModes, CategoryTypes,
+  PurposeTypes, ScoringModes, CategoryTypes, ActivityReportTypes,
 } from 'data/content/org/types';
 export { Before } from 'data/content/org/before';
 export { Dependencies } from 'data/content/org/dependencies';

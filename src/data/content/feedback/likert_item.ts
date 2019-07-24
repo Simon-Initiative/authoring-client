@@ -3,6 +3,7 @@ import { getChildren, augment, ensureIdGuidPresent } from 'data/content/common';
 import { getKey } from 'data/common';
 import createGuid from 'utils/guid';
 import { FeedbackPrompt } from './feedback_prompt';
+import { Maybe } from 'tsmonad';
 
 type LikertItemParams = {
   guid?: string;
@@ -10,6 +11,7 @@ type LikertItemParams = {
   prompt?: FeedbackPrompt;
   // required = does this question require a response?
   required?: boolean;
+  group?: Maybe<string>; // for use with the "Survey Report" function
 };
 
 const defaultLikertItemParams = {
@@ -19,6 +21,7 @@ const defaultLikertItemParams = {
   id: '',
   prompt: new FeedbackPrompt(),
   required: false,
+  group: Maybe.nothing<string>(),
 };
 
 export class LikertItem extends Immutable.Record(defaultLikertItemParams) {
@@ -28,6 +31,7 @@ export class LikertItem extends Immutable.Record(defaultLikertItemParams) {
   id: string;
   prompt: FeedbackPrompt;
   required: boolean;
+  group: Maybe<string>;
 
   constructor(params?: LikertItemParams) {
     super(augment(params, true));
@@ -54,6 +58,11 @@ export class LikertItem extends Immutable.Record(defaultLikertItemParams) {
     // '@required' required, defaults to false
     model = model.with({ required: JSON.parse((o['@required'] as string).toLowerCase()) });
 
+    if (o['@group'] !== undefined) {
+      const group = Maybe.just(o['@group']);
+      model = model.with({ group });
+    }
+
     getChildren(o).forEach((item) => {
       const key = getKey(item);
       const id = createGuid();
@@ -76,12 +85,14 @@ export class LikertItem extends Immutable.Record(defaultLikertItemParams) {
       this.prompt.toPersistence(),
     ];
 
-    return {
+    const item = {
       item: {
         '@id': this.id,
         '@required': this.required.toString(),
         '#array': children,
       },
     };
+    this.group.lift(g => item.item['@group'] = g);
+    return item;
   }
 }
