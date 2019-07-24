@@ -210,7 +210,7 @@ export const styles: JSSStyles = {
   },
   collapseButtonContainer: {
     position: 'absolute',
-    top: 182,
+    top: 142,
     right: -2,
   },
   collapseButton: {
