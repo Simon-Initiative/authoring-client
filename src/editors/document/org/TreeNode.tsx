@@ -4,9 +4,9 @@ import { AppContext } from '../../common/AppContext';
 import * as models from '../../../data/models';
 import { NodeTypes } from './traversal';
 import * as org from 'data/models/utils/org';
-import { getNameAndIconByType } from 'components/ResourceView';
 
 import './TreeNode.scss';
+import { getNameAndIconByType } from 'components/ResourceView';
 
 export interface TreeNodeProps {
   isSelected: boolean;
@@ -23,12 +23,8 @@ export interface TreeNodeProps {
   onEdit: (request: org.OrgChangeRequest) => void;
   editMode: boolean;
   onClick: (model: NodeTypes) => void;
-  onExpand: (id: string) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
-  onDispatch: () => void;
-  displayModal: (c: any) => void;
-  dismissModal: () => void;
 }
 
 export interface TreeNodeState {
@@ -38,6 +34,10 @@ export interface TreeNodeState {
 
 export class TreeNode
   extends React.PureComponent<TreeNodeProps, TreeNodeState> {
+
+  constructor(props) {
+    super(props);
+  }
 
   getLabel(contentType: string) {
 
@@ -62,74 +62,53 @@ export class TreeNode
 
   renderTitle() {
 
-    const { isExpanded, model, context, onExpand, isSelected } = this.props;
+    const { isExpanded, model } = this.props;
 
-    if (model.contentType === contentTypes.OrganizationContentTypes.Item) {
+    if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
 
-      const resource = context.courseModel.resourcesById.get(model.resourceref.idref);
-
-      return (
-        <div>
-          <div className={`treenode-item ${isSelected ? 'selected' : ''}`}>
-            <a href="#" onClick={(e) => {
-              e.preventDefault();
-              this.props.onClick(model);
-            }}>
-              {resource ? resource.title : 'Loading...'}
-            </a>
-          </div>
-        </div>
-      );
+      const resource = this.props.context.courseModel.resourcesById.get(
+        this.props.model.resourceref.idref);
+      return resource !== undefined
+        ? <React.Fragment>
+          <span style={{ marginRight: 8 }}>{this.getResourceIcon(resource)}</span>{resource.title}
+        </React.Fragment>
+        : 'Loading...';
     }
-
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
       return 'Include';
     }
 
-    const toggle = <a href="#" className="toggle-link"
-      onClick={(e) => {
-        e.preventDefault();
-        onExpand(model.id);
-      }}>{isExpanded ? '[-]' : '[+]'}</a>;
+    const hasHiddenChildren = <i className="toggle fa fa-caret-right"></i>;
+    const hasShownChildren = <i className="toggle fa fa-caret-down"></i>;
 
+    const toggle = isExpanded ? hasShownChildren : hasHiddenChildren;
     const contentType = this.getLabel(this.props.model.contentType);
     const number = this.getAdaptiveNumber();
 
     return (
       <React.Fragment>
-        <div className="info">
-          {contentType} {number}
-        </div>
-        <div style={{ display: 'flex' }}>
-          <span>{toggle}</span>
-          {' '}
-          <div className={`treenode-item group ${isSelected ? 'selected' : ''}`}>
-            <a href="#" onClick={(e) => {
-              e.preventDefault();
-              this.props.onClick(model);
-            }}>
-              {model.title}
-            </a>
-          </div>
-        </div>
+        {toggle}{contentType} {number}: {this.props.model.title}
       </React.Fragment>
     );
   }
 
   render(): JSX.Element {
 
-    const { highlighted, depth, model } = this.props;
+    const { highlighted, isSelected, depth, model } = this.props;
     return (
-      <tr className={`${highlighted ? 'table-info' : ''}`}
+      <tr
+        className={`${highlighted ? 'table-info' : ''}`}
         key={model.guid}>
-        <td>
-          <div className="treenode-content">
+        <td onClick={() => this.props.onClick(model)}>
+          <div className={`treenode-content ${isSelected ? 'selected' : ''}`}>
             <div className="treenode-title" style={{ marginLeft: (depth * 20) }}>
               {this.renderTitle()}
             </div>
           </div>
         </td>
-      </tr>
+      </tr >
     );
   }
+
 }
+

@@ -1,66 +1,44 @@
-@import 'oli/colors';
-
+@import "oli/colors";
 
 .treenode-content {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 0 0 0 10px;
-  vertical-align: middle;
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: 6px;
-  border: 1px solid transparent;
-
-  .toggle-link {
-    vertical-align: middle;
-    display: inline-block;
-    width: 16px;
-    margin-right: 2px;
-    margin-left: 4px;
-  }
-
-  .treenode-title {
-    vertical-align: middle;
+    height: 36px;
+    text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
-  }
+    padding: 0 10px;
+    vertical-align: middle;
+    font-size: 1.0em;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
 
-  .treenode-item {
-    display: flex;
-    border: 3px solid transparent;
-    padding-left: 3px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    display: block;
-    width: 100%;
-
-    &.group {
-      font-weight: bold;
+    .treenode-title {
+        vertical-align: middle;
+        margin: 4px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     &.selected {
-      background: $primary;
-      color: white;
-      font-weight: bold;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
-      a, a:hover {
-        background: $primary;
-        color: white;
-      }
+        background-color: $selection;
+        border-color: $selection;
+        color: $white;
     }
-  }
-  .info {
-    margin-left: 28px;
-    font-style: italic;
-    font-size: 12px;
-    line-height: 12px;
-    color: rgba(0,0,0,.4);
-  }
 
-  .toggle {
-    margin-right: 5px;
-  }
+    &:hover {
+        background-color: $gray-lightest;
+        border-color: $gray-lightest;
+
+        &.selected {
+            background-color: $selection;
+            border-color: $selection;
+            color: $white;
+        }
+    }
+
+    .toggle {
+        margin-right: 5px;
+    }
 }
