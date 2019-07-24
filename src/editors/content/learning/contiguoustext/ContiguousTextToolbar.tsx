@@ -379,23 +379,24 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
-                // This segment of code sets an initial target for the xref as a wb page
-                // NOTE: this will fail if a link is created on the first page!
+
                 const thisId = this.props.context.courseModel.resourcesById.get(
-                this.props.context.documentId).id;
+                  this.props.context.documentId).id;
 
                 const pages = this.props.context.courseModel.resources
-                .toArray()
-                .filter(r => r.type === LegacyTypes.workbook_page &&
-                  r.id !== thisId &&
-                  r.id !== PLACEHOLDER_ITEM_ID &&
-                  r.resourceState !== ResourceState.DELETED);
+                  .toArray()
+                  .filter(r => r.type === LegacyTypes.workbook_page &&
+                    r.id !== thisId &&
+                    r.id !== PLACEHOLDER_ITEM_ID &&
+                    r.resourceState !== ResourceState.DELETED);
 
-                const xrefDefault  = (pages.length !== 0 ? pages[0].guid : '');
+                const xrefDefault = pages[0].id;
 
-                onEdit(model.addEntity(
-                  EntityTypes.xref, true,
-                  new contentTypes.Xref({ page: xrefDefault, idref: xrefDefault }), selection));
+                if (pages.length > 0) {
+                  onEdit(model.addEntity(
+                    EntityTypes.xref, true,
+                    new contentTypes.Xref({ page: xrefDefault, idref: xrefDefault }), selection));
+                }
               }
             }
             disabled={!supports('xref') || !rangeEntitiesEnabled}

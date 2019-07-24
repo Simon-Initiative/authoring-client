@@ -67,16 +67,18 @@ export default class XrefEditor
 
   componentDidMount() {
     const { target, model, updateTarget } = this.props;
-    //KYLE-1984 This block, responsible for the initial crashing bug, may have been totally unnecessary!
-    //KYLE-1984 If anything beyond default behavior is needed, change ContiguousTextToolbar line 380
+    // KYLE-1984 This block, responsible for the initial
+    // crashing bug, may have been totally unnecessary!
+    // KYLE-1984 If anything beyond default behavior is needed,
+    // change ContiguousTextToolbar line 380
     // Xref must have a page set in order to allow linking to a target element. We set the default
     // page to be the first workbook page so that an error is not thrown in case the user chooses
     // a target element without changing the page using the 'page to link to' dropdown
     // KYLE-1
-   /* if (!this.props.model.page) {
-      this.props.onEdit(this.props.model.with(
-        { page: !this.noPages ? this.pages[0].guid :  this.thisId }));
-    } */
+    /* if (!this.props.model.page) {
+       this.props.onEdit(this.props.model.with(
+         { page: !this.noPages ? this.pages[0].guid :  this.thisId }));
+     } */
 
     // Check if we need to fetch the target element from its workbook page
     if (!target && model.idref) {
@@ -85,10 +87,13 @@ export default class XrefEditor
   }
 
   componentWillReceiveProps(nextProps: XrefEditorProps) {
-    const { target, updateTarget } = this.props;
+    const { target, updateTarget, model } = this.props;
     // short circuit to avoid crash - first update should be handled by didMount
     if (target && !target.equals(nextProps.target)) {
       updateTarget(nextProps.model.idref, nextProps.model.page);
+    }
+    if (model !== nextProps.model) {
+      this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page });
     }
   }
 
@@ -111,10 +116,10 @@ export default class XrefEditor
 
     clipboard.item.lift((item) => {
       let id: string;
-        // Handle contiguous text as a special case, retrieving the ID of the first paragraph
+      // Handle contiguous text as a special case, retrieving the ID of the first paragraph
       if (item.contentType === 'ContiguousText') {
         id = (item as contentTypes.ContiguousText).getFirstReferenceId();
-          // Else, if it's a valid xref target, it must have an ID
+        // Else, if it's a valid xref target, it must have an ID
       } else if (isValidXrefTarget(item)) {
         id = (item as any).id;
       }
@@ -178,7 +183,7 @@ export default class XrefEditor
                   value="page"
                   checked={this.state.targetIsPage}
                   onChange={() => this.onToggleTargetPage(true)}
-                  disabled = {this.noPages}
+                  disabled={this.noPages}
                   type="radio" />&nbsp; Selected Page
             </label>
             </div>
@@ -189,12 +194,12 @@ export default class XrefEditor
                   onChange={() => this.onToggleTargetPage(false)}
                   value="element"
                   checked={!this.state.targetIsPage}
-                  disabled = {this.noPages}
+                  disabled={this.noPages}
                   type="radio" />&nbsp; Specific Element
             </label>
             </div>
           </SidebarRow>
-          <Target {...this.props} targetIsPage = {this.state.targetIsPage} target={target}
+          <Target {...this.props} targetIsPage={this.state.targetIsPage} target={target}
             onChangeTarget={this.onChangeTarget} />
         </SidebarGroup>
         <SidebarGroup label="On Click">
@@ -231,7 +236,7 @@ export default class XrefEditor
 
 interface TargetProps extends XrefEditorProps {
   onChangeTarget: () => void;
-  targetIsPage : boolean;
+  targetIsPage: boolean;
 }
 const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: TargetProps) => {
 
@@ -275,15 +280,15 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
               </Label>
             ),
             left: () => (
-               targetIsPage ? (
+              targetIsPage ? (
                 <span>
-                  <i className={'far fa-file'}/> Workbook Page
+                  <i className={'far fa-file'} /> Workbook Page
                 </span>
-                ) : (
-                <span className="italic">
-                  {getContentIcon(insertableContentTypes[''])} Target not found in selected page
+              ) : (
+                  <span className="italic">
+                    {getContentIcon(insertableContentTypes[''])} Target not found in selected page
                 </span>)
-             ),
+            ),
           })
           : <span className="italic">No target element</span>}
       </div>
