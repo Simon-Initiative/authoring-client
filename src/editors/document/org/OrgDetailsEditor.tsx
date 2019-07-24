@@ -242,26 +242,28 @@ export class OrgDetailsEditor
   render() {
 
     return this.props.model.caseOf({
-      just: m => (
-        <div className="org-details-editor">
-          <div className="doc-head">
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
+      just: (m) => {
+        return (
+          <div className="org-details-editor">
+            <div className="doc-head">
+
               <div className="org-details-title">
-                <div className="info">Course Outline</div>
-                <h3>{m.title}</h3>
+                <h3>Organization: {m.title}</h3>
+                <UndoRedoToolbar
+                  undoEnabled={this.props.canUndo}
+                  redoEnabled={this.props.canRedo}
+                  onUndo={this.props.onUndo.bind(this)}
+                  onRedo={this.props.onRedo.bind(this)} />
               </div>
-              <div className="flex-spacer"></div>
-              <UndoRedoToolbar
-                undoEnabled={this.props.canUndo}
-                redoEnabled={this.props.canRedo}
-                onUndo={this.props.onUndo.bind(this)}
-                onRedo={this.props.onRedo.bind(this)} />
+
+              {this.renderTabs(m)}
             </div>
-            {this.renderTabs(m)}
-          </div>
-        </div>),
+          </div>);
+      },
       nothing: () => null,
     });
+
+
   }
 
 }
