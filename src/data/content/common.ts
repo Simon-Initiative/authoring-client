@@ -1,6 +1,5 @@
 import createGuid from '../../utils/guid';
 import { getKey } from 'data/common.ts';
-import { Record } from 'immutable';
 
 export function getChildren(item): Object[] {
 

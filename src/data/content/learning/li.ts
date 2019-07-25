@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Li',
   elementType: 'li',
   title: Maybe.nothing(),
-  content: new ContentElements().with({ supportedElements: Immutable.List(FLOW_ELEMENTS) }),
+  content: new ContentElements().with({ supportedElements: Immutable.List(['#text', 'image']) }),
   guid: '',
 };
 
@@ -34,13 +34,13 @@ export class Li extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Li {
+  clone(): Li {
     return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void) : Li {
+  static fromPersistence(root: Object, guid: string, notify: () => void): Li {
 
     const t = (root as any).li;
 
@@ -50,13 +50,15 @@ export class Li extends Immutable.Record(defaultContent) {
       model = model.with({ title: Maybe.just(t['@title']) });
     }
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(t, createGuid(), FLOW_ELEMENTS, null, notify) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(t, createGuid(), FLOW_ELEMENTS, null, notify)
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     const li = {
       li: {
         '#array': this.content.toPersistence(),

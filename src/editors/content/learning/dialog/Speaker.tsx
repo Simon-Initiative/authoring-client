@@ -4,6 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import { AppContext } from 'editors/common/AppContext';
 import { buildUrl } from 'utils/path';
 import './Speaker.scss';
+import { Maybe } from 'tsmonad';
 
 export interface SpeakerProps {
   className?: string;
@@ -22,34 +23,23 @@ export enum SpeakerSize {
  */
 export const Speaker: React.StatelessComponent<SpeakerProps>
   = (({
-    className, context, children, model, size = SpeakerSize.Large,
+    className, context, model, size = SpeakerSize.Large,
   }) => {
-    const { content } = model;
 
-    const src = content.caseOf({
-      just: content =>
-        content instanceof contentTypes.Image
-          ? buildUrl(context.baseUrl,
-            context.courseModel.guid,
-            context.resourcePath,
-            content.src)
-          : 'https://via.placeholder.com/100x100',
+    const src = (model.content.get('image') as Maybe<contentTypes.Image>).caseOf({
+      just: image => buildUrl(context.baseUrl,
+        context.courseModel.guid,
+        context.resourcePath,
+        image.src),
       nothing: () => 'https://via.placeholder.com/100x100',
-    });
-
-    const displayTitle = content.caseOf({
-      just: c => c instanceof contentTypes.Image
-        ? 'Speaker'
-        : c,
-      nothing: () => 'Speaker',
     });
 
     return (
       <div className={classNames(['speaker', size, className])}>
         <div className="imageContainer">
-          <img src={src} alt={displayTitle} />
+          <img src={src} alt={model.content.get('name') as string} />
         </div>
-        <p>{displayTitle}</p>
+        <p>{model.content.get('name') as string}</p>
       </div>
     );
   });

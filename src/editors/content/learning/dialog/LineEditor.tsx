@@ -83,12 +83,12 @@ export default class LineEditor
           context={context}
           model={speaker}
           size={SpeakerSize.Small} />
-        <button className="btn btn-primary" onClick={this.cycleSpeaker}>
-          <Tooltip title="Change speaker">
-            <i className="fas fa-sync-alt" />
-          </Tooltip>
-        </button>
-        <div className="lineText">
+        <div className="line">
+          <button className="btn btn-primary" onClick={this.cycleSpeaker}>
+            <Tooltip delay={200} title="Change speaker">
+              <i className="fas fa-sync-alt" />
+            </Tooltip>
+          </button>
           <MaterialEditor
             {...this.props}
             model={material}

@@ -12,9 +12,9 @@ import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { modalActions } from 'actions/modal';
 import { selectImage } from 'editors/content/learning/ImageEditor';
-import { Maybe } from 'tsmonad';
 import { Speaker, SpeakerSize } from 'editors/content/learning/dialog/Speaker';
 import { TextInput } from 'editors/content/common/controls';
+import { Maybe } from 'tsmonad';
 
 export interface SpeakerEditorProps extends
   AbstractContentEditorProps<contentTypes.Speaker> {
@@ -23,52 +23,12 @@ export interface SpeakerEditorProps extends
   context: AppContext;
 }
 
-export interface SpeakerEditorState {
-  isDisplayedAsImage: boolean;
-}
+export interface SpeakerEditorState { }
 
 export default class SpeakerEditor
   extends AbstractContentEditor<contentTypes.Speaker, SpeakerEditorProps, SpeakerEditorState> {
-  constructor(props: SpeakerEditorProps) {
-    super(props);
 
-    this.state = {
-      isDisplayedAsImage: this.isDisplayedAsImage(props.model),
-    };
-
-    this.onToggleDisplayAsImage = this.onToggleDisplayAsImage.bind(this);
-    this.onSelectImage = this.onSelectImage.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
-  }
-
-  isDisplayedAsImage(speaker: contentTypes.Speaker): boolean {
-    return speaker.content.caseOf({
-      just: content =>
-        content instanceof contentTypes.Image
-          ? true
-          : false,
-      nothing: () => false,
-    });
-  }
-
-  componentWillReceiveProps(nextProps: SpeakerEditorProps) {
-    if (nextProps.model !== this.props.model) {
-      this.setState({
-        isDisplayedAsImage: this.isDisplayedAsImage(nextProps.model),
-      });
-    }
-  }
-
-  shouldComponentUpdate(nextProps: SpeakerEditorProps, nextState: SpeakerEditorState) {
-    return super.shouldComponentUpdate(nextProps, nextState)
-      || this.state !== nextState;
-  }
-
-  onToggleDisplayAsImage(isDisplayedAsImage) {
-    this.setState({ isDisplayedAsImage });
-  }
-
-  onSelectImage() {
+  onSelectImage = () => {
     const { context, services, onEdit, model } = this.props;
 
     const dispatch = (services as any).dispatch;
@@ -81,76 +41,48 @@ export default class SpeakerEditor
       display, dismiss)
       .then((image) => {
         if (image !== null) {
-          const updated = model.with({ content: Maybe.just(image) });
+          const updated = model.with({
+            content: model.content.set('image', Maybe.just(image)),
+          });
           onEdit(updated, updated);
         }
       });
   }
 
-  onTitleEdit(title: string) {
+  onNameEdit = (name: string) => {
     const { model, onEdit } = this.props;
 
     const newModel = model.with({
-      content: title !== ''
-        ? Maybe.just(title)
-        : Maybe.nothing(),
+      content: model.content.set('name', name),
     });
 
     onEdit(newModel, newModel);
   }
 
   renderSidebar(): JSX.Element {
-    const { model, editMode } = this.props;
-    const { content } = model;
+    const { editMode, model } = this.props;
 
     return (
       <SidebarContent title="Speaker">
+        Each speaker has a name with an optional image.
         <SidebarGroup label="Display">
-          <div className="form-check">
-            <label className="form-check-label">
-              <input className="form-check-input"
-              name="sizingOptions"
-                value="image"
-                checked={this.state.isDisplayedAsImage}
-                onChange={() => this.onToggleDisplayAsImage(true)}
-                type="radio" />{' '}as Image
-            </label>
-          </div>
+          <SidebarRow label="">
+            Name
+            <TextInput width="100%" label=""
+              editMode={editMode}
+              value={model.content.get('name') as string}
+              type="text"
+              onEdit={this.onNameEdit} />
+          </SidebarRow>
 
           <SidebarRow label="">
             <ToolbarButton
-              disabled={!this.state.isDisplayedAsImage}
+              disabled={!editMode}
               onClick={this.onSelectImage}
               size={ToolbarButtonSize.Large}>
               <div>{getContentIcon(insertableContentTypes.Image)}</div>
-              <div>Change Image</div>
+              <div>Add / Change Image</div>
             </ToolbarButton>
-          </SidebarRow>
-
-
-          <div className="form-check" style={{ marginBottom: '30px' }}>
-            <label className="form-check-label">
-              <input className="form-check-input"
-                name="sizingOptions"
-              onChange={() => this.onToggleDisplayAsImage(false)}
-                value="text"
-                checked={!this.state.isDisplayedAsImage}
-                type="radio" />{' '}as Text
-            </label>
-          </div>
-
-          <SidebarRow label="">
-            <TextInput width="100%" label=""
-              editMode={editMode && !this.state.isDisplayedAsImage}
-              value={this.state.isDisplayedAsImage
-                ? ''
-                : content.caseOf({
-                  just: c => c as string,
-                  nothing: () => '',
-                })
-              }
-              type="text"
-              onEdit={this.onTitleEdit} />
           </SidebarRow>
 
         </SidebarGroup>

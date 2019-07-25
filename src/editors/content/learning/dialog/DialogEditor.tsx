@@ -109,7 +109,7 @@ export default class DialogEditor
       speaker: lines.size > 1
         ? lines.toArray()[lines.size - 2].speaker
         : speakers.last().id,
-      material: contentTypes.Material.fromText('Empty text block', ''),
+      material: contentTypes.Material.fromText('So then I said....', ''),
     });
 
     onEdit(model.with({ lines: lines.set(line.guid, line) }), line);
@@ -182,7 +182,14 @@ export default class DialogEditor
           </div>
         </div>
 
-        <div style={{ marginLeft: 20 }}>Lines</div>
+        <div style={{ marginLeft: 20 }}>
+          Lines
+          <div style={{ fontStyle: 'italic' }}>
+            Add line translations by highlighting a word and adding a "Rollover Definition"
+            from the text block toolbar.
+          </div>
+        </div>
+
         <div className="lineContainer">
           <ContentContainer
             {...this.props}
