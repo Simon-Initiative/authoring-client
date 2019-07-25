@@ -86,10 +86,39 @@ export default class XrefEditor
     }
   }
 
+  hasTargetChanged(nextProps: XrefEditorProps) {
+    const { target } = this.props;
+
+    if (target === undefined && nextProps.target !== undefined) {
+      return true;
+    }
+    if (target !== undefined && nextProps.target === undefined) {
+      return true;
+    }
+
+    const changed = target.caseOf({
+      left: (s) => {
+        return nextProps.target.caseOf({
+          left: s1 => s !== s1,
+          right: e1 => true,
+        });
+      },
+      right: (e) => {
+        return nextProps.target.caseOf({
+          left: s1 => true,
+          right: e1 => e !== e1,
+        });
+      },
+    });
+
+    return changed;
+  }
+
   componentWillReceiveProps(nextProps: XrefEditorProps) {
     const { target, updateTarget, model } = this.props;
     // short circuit to avoid crash - first update should be handled by didMount
-    if (target && !target.equals(nextProps.target)) {
+
+    if (this.hasTargetChanged(nextProps)) {
       updateTarget(nextProps.model.idref, nextProps.model.page);
     }
     if (model !== nextProps.model) {
@@ -113,7 +142,6 @@ export default class XrefEditor
   onChangeTarget() {
     const { onEdit, model, clipboard, updateTarget } = this.props;
 
-
     clipboard.item.lift((item) => {
       let id: string;
       // Handle contiguous text as a special case, retrieving the ID of the first paragraph
@@ -127,7 +155,7 @@ export default class XrefEditor
       if (id) {
         clipboard.page.lift((pageId) => {
           onEdit(model.with({ idref: id, page: pageId }));
-          updateTarget(id, pageId);
+          setTimeout(() => updateTarget(id, pageId), 0);
         });
       }
     });
@@ -135,6 +163,7 @@ export default class XrefEditor
   }
 
   onChangePage(page: string) {
+
     const { onEdit, model, updateTarget, context } = this.props;
     if (this.state.targetIsPage) {
       onEdit(model.with({ page, idref: context.courseModel.resourcesById.get(page).id }));
@@ -143,16 +172,17 @@ export default class XrefEditor
     }
     // Search for the target element in the new page
     if (model.idref) {
-      updateTarget(model.idref, page);
+      setTimeout(() => updateTarget(model.idref, page), 0);
     }
   }
 
-  onToggleTargetPage(targetIsPage : boolean) {
+  onToggleTargetPage(targetIsPage: boolean) {
+
     const { onEdit, model, updateTarget, context } = this.props;
     this.setState({ targetIsPage });
     if (targetIsPage) {
       onEdit(model.with({ idref: context.courseModel.resourcesById.get(model.page).id }));
-      updateTarget(model.idref, model.page);
+      setTimeout(() => updateTarget(model.idref, model.page), 0);
     }
   }
 
@@ -239,11 +269,32 @@ interface TargetProps extends XrefEditorProps {
   targetIsPage: boolean;
 }
 const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: TargetProps) => {
-
   const validItemCopied = clipboard.item.caseOf({
     just: item => isValidXrefTarget(item),
     nothing: () => false,
   });
+
+  const renderedTarget = target
+    ? target.caseOf({
+      right: element => (
+        <Label>
+          <span style={{ color: CONTENT_COLORS[element.contentType] }}>
+            {getContentIcon(insertableContentTypes[element.contentType])}
+          </span> {validXrefTargets[element.elementType]}
+        </Label>
+      ),
+      left: () => (
+        targetIsPage ? (
+          <span>
+            <i className={'far fa-file'} /> Workbook Page
+        </span>
+        ) : (
+            <span className="italic">
+              {getContentIcon(insertableContentTypes[''])} Target not found in selected page
+        </span>)
+      ),
+    })
+    : <span className="italic">No target element</span>;
 
   return (
     <div className="target__container">
@@ -270,27 +321,7 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
         {/* Target can be undefined (no target set),
         Either.right with the linked element, or
         Either.left indicating the linked element was not found (maybe deleted from the page) */}
-        {target
-          ? target.caseOf({
-            right: element => (
-              <Label>
-                <span style={{ color: CONTENT_COLORS[element.contentType] }}>
-                  {getContentIcon(insertableContentTypes[element.contentType])}
-                </span> {validXrefTargets[element.elementType]}
-              </Label>
-            ),
-            left: () => (
-              targetIsPage ? (
-                <span>
-                  <i className={'far fa-file'} /> Workbook Page
-                </span>
-              ) : (
-                  <span className="italic">
-                    {getContentIcon(insertableContentTypes[''])} Target not found in selected page
-                </span>)
-            ),
-          })
-          : <span className="italic">No target element</span>}
+        {renderedTarget}
       </div>
     </div>
   );
