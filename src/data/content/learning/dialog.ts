@@ -31,34 +31,6 @@ const defaultContent = {
   lines: Immutable.OrderedMap<string, Line>(),
 };
 
-// function withTitles(model: Dialog): Dialog {
-
-//   let count = 0;
-//   const next = () => {
-//     count += 1;
-//     return count;
-//   };
-
-//   return model.with({
-//     speakers: model.speakers.map((speaker) => {
-//       const defaultTitle = 'Speaker ' + next();
-//       const title = speaker.title.caseOf({
-//         just: title => title,
-//         nothing: () =>
-//           speaker.content.caseOf({
-//             just: content =>
-//               content instanceof String
-//                 ? content as string
-//                 : defaultTitle,
-//             nothing: () => defaultTitle,
-//           }),
-//       });
-
-//       return speaker.with({ title: Maybe.just(title) });
-//     }).toOrderedMap(),
-//   });
-// }
-
 export class Dialog extends Immutable.Record(defaultContent) {
 
   contentType: 'Dialog';
