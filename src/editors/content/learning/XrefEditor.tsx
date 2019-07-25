@@ -23,8 +23,6 @@ import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 import './XrefEditor.scss';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
-import { targetAssessmentIdSort, updateHTMLLayoutTargetRefs } from './dynadragdrop/utils';
-import { modelToPlacements } from 'data/models/utils/org';
 
 export interface XrefEditorProps
   extends AbstractContentEditorProps<contentTypes.Xref> {
@@ -66,31 +64,16 @@ export default class XrefEditor
   }
 
   componentDidMount() {
-    const { target, model, updateTarget } = this.props;
-    // KYLE-1984 This block, responsible for the initial
-    // crashing bug, may have been totally unnecessary!
-    // KYLE-1984 If anything beyond default behavior is needed,
-    // change ContiguousTextToolbar line 380
-    // Xref must have a page set in order to allow linking to a target element. We set the default
-    // page to be the first workbook page so that an error is not thrown in case the user chooses
-    // a target element without changing the page using the 'page to link to' dropdown
-    // KYLE-1
-    /* if (!this.props.model.page) {
-       this.props.onEdit(this.props.model.with(
-         { page: !this.noPages ? this.pages[0].guid :  this.thisId }));
-     } */
+    const { model, updateTarget } = this.props;
 
-    // Check if we need to fetch the target element from its workbook page
-    if (!target && model.idref) {
-      updateTarget(model.idref, model.page);
-    }
+    updateTarget(model.idref, model.page);
   }
 
   hasTargetChanged(nextProps: XrefEditorProps) {
     const { target } = this.props;
 
-    if (target === undefined && nextProps.target !== undefined) {
-      return true;
+    if (target === undefined) {
+      return  nextProps.target !== undefined;
     }
     if (target !== undefined && nextProps.target === undefined) {
       return true;
@@ -115,8 +98,7 @@ export default class XrefEditor
   }
 
   componentWillReceiveProps(nextProps: XrefEditorProps) {
-    const { target, updateTarget, model } = this.props;
-    // short circuit to avoid crash - first update should be handled by didMount
+    const { updateTarget, model } = this.props;
 
     if (this.hasTargetChanged(nextProps)) {
       updateTarget(nextProps.model.idref, nextProps.model.page);
@@ -138,7 +120,6 @@ export default class XrefEditor
 
   noPages = this.pages.length === 0;
 
-  // this should only be called if !isTargetPage
   onChangeTarget() {
     const { onEdit, model, clipboard, updateTarget } = this.props;
 
@@ -166,7 +147,7 @@ export default class XrefEditor
 
     const { onEdit, model, updateTarget, context } = this.props;
     if (this.state.targetIsPage) {
-      onEdit(model.with({ page, idref: context.courseModel.resourcesById.get(page).id }));
+      onEdit(model.with({ page, idref: page }));
     } else {
       onEdit(model.with({ page }));
     }
@@ -181,14 +162,13 @@ export default class XrefEditor
     const { onEdit, model, updateTarget, context } = this.props;
     this.setState({ targetIsPage });
     if (targetIsPage) {
-      onEdit(model.with({ idref: context.courseModel.resourcesById.get(model.page).id }));
+      onEdit(model.with({ idref: model.page }));
       setTimeout(() => updateTarget(model.idref, model.page), 0);
     }
   }
 
   renderSidebar() {
     const { editMode, model, onEdit, target } = this.props;
-    // KYLE-1997 The items displayed in the drop are HTML option elements in the array below
     const pageOptions = (this.pages.length === 0 ?
       <option key={this.context.guid} value={this.context.id}>{'No pages to reference'}</option> :
       this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>));
@@ -320,7 +300,7 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
 
         {/* Target can be undefined (no target set),
         Either.right with the linked element, or
-        Either.left indicating the linked element was not found (maybe deleted from the page) */}
+        Either.left indicating the linked element was not found or is a page */}
         {renderedTarget}
       </div>
     </div>

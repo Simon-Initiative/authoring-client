@@ -29,14 +29,7 @@ function setTargetNode(node): SetXrefTargetAction {
 export function fetchAndSetTargetNode(targetId: string, resourceId: string) {
   return (dispatch: Dispatch, getState: () => State): Promise<any> => {
     const { course } = getState();
-    console.table(course);
-    console.table(course.resources);
-    console.table(course.resourcesById);
-    console.log('target id: ' + targetId);
-    console.log('resource id: ' + resourceId);
-    console.log(course.resourcesById.get(resourceId));
     const documentId = course.resourcesById.get(resourceId).guid;
-    console.log("#$%@ DOCUMENT ID: " + documentId);
     return persistence.retrieveDocument(course.idvers, documentId).then((doc) => {
       const wbpage = doc.model as WorkbookPageModel;
       // Find the target node in the workbook page's content tree

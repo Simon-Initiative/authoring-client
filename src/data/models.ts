@@ -26,7 +26,7 @@ export { WorkbookPageModel } from './models/workbook';
 export type EmptyModel = 'EmptyModel';
 // tslint:disable-next-line
 export const EmptyModel: EmptyModel = 'EmptyModel';
-//KYLE-1997 the WorkbookPageModel here is the source for model in XrefEditor
+
 export enum ModelTypes {
   CourseModel = 'CourseModel',
   WorkbookPageModel = 'WorkbookPageModel',
