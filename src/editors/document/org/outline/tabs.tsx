@@ -11,7 +11,6 @@ import { RemoveCommand } from '../commands/remove';
 import { PreconditionsEditor } from '../PreconditionsEditor';
 import { DragHandle } from 'components/common/DragHandle';
 import { Remove } from 'components/common/Remove';
-import { getNameAndIconByType } from 'components/ResourceView';
 
 export interface TabProps {
   course?: CourseModel;
@@ -78,10 +77,8 @@ const ItemTab = (props: TabProps) => {
   const item = props.node as t.Item;
 
   const resource = props.course.resourcesById.get(item.resourceref.idref);
-  const icon = getNameAndIconByType(resource.type).icon;
-  const label = <span className="info">{icon} {resource.type === LegacyTypes.workbook_page
-    ? ' Workbook Page' : ' Assessment'}</span>;
-
+  const label = resource.type === LegacyTypes.workbook_page
+    ? 'Workbook Page' : 'Assessment';
   const title = resource.title;
 
   const onEdit = (preconditions) => {
@@ -94,12 +91,9 @@ const ItemTab = (props: TabProps) => {
 
   const previewLink = (
     <div>
-      <a href="#" onClick={(e) => {
-        e.preventDefault();
-        props.onView(resource.id);
-      }}>
+      <button className="btn btn-link" onClick={() => props.onView(resource.id)}>
         {title}
-      </a>
+      </button>
       <PreconditionsEditor
         parentId={props.node.id}
         editMode={props.editMode}
@@ -128,13 +122,9 @@ const ContainerTab = (props: TabProps) => {
   const title = (props.node as any).title;
 
   const previewLink = (
-    <a href="#"
-      onClick={(e) => {
-        e.preventDefault();
-        props.onView((props.node as any).id);
-      }}>
+    <button className="btn btn-link" onClick={() => props.onView((props.node as any).id)}>
       {title}
-    </a>
+    </button>
   );
   return (
     <Tab
@@ -166,7 +156,7 @@ interface TabProperties {
   nodeState: Tree.NodeState<OutlineNode>;
   handlers: Tree.Handlers;
   previewText: any;
-  label: string | JSX.Element;
+  label: string;
   tooltip?: string;
   connectDragSource?: any;
   commandProcessor: (model, command) => void;

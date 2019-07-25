@@ -177,6 +177,7 @@ export default class Main extends React.Component<MainProps, MainState> {
                             course={loadedCourse}
                             route={route}
                             profile={user.profile}
+                            onCreateOrg={this.onCreateOrg}
                             userId={user.userId}
                             userName={user.user} />
                           <div className="main-splitview-content">

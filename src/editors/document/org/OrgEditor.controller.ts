@@ -23,7 +23,6 @@ interface DispatchProps {
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
   onEditingEnable: (editable: boolean, documentId: string) => void;
-  onDispatch: () => void;
 }
 
 interface OwnProps {
@@ -63,7 +62,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(redo(documentId)),
     onEditingEnable: (editable, documentId) =>
       dispatch(documentEditingEnable(editable, documentId)),
-    onDispatch: dispatch,
   };
 };
 
