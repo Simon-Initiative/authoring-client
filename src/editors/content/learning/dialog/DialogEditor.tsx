@@ -186,7 +186,7 @@ export default class DialogEditor
           Lines
           <div style={{ fontStyle: 'italic' }}>
             Add line translations by highlighting a word and adding a "Rollover Definition"
-            from the text block toolbar.
+            from the toolbar.
           </div>
         </div>
 
