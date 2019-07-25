@@ -24,21 +24,23 @@ export const Speaker: React.StatelessComponent<SpeakerProps>
   = (({
     className, context, children, model, size = SpeakerSize.Large,
   }) => {
-    const { title, content } = model;
+    const { content } = model;
 
     const src = content.caseOf({
       just: content =>
         content instanceof contentTypes.Image
           ? buildUrl(context.baseUrl,
-                     context.courseModel.guid,
-                     context.resourcePath,
-                     content.src)
+            context.courseModel.guid,
+            context.resourcePath,
+            content.src)
           : 'https://via.placeholder.com/100x100',
       nothing: () => 'https://via.placeholder.com/100x100',
     });
 
-    const displayTitle = title.caseOf({
-      just: title => title,
+    const displayTitle = content.caseOf({
+      just: c => c instanceof contentTypes.Image
+        ? 'Speaker'
+        : c,
       nothing: () => 'Speaker',
     });
 

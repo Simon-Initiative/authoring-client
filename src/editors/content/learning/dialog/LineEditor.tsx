@@ -2,16 +2,16 @@ import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps }
   from 'editors/content/common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
-import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Speaker, SpeakerSize } from 'editors/content/learning/dialog/Speaker';
-import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
 import './LineEditor.scss';
-import MaterialEditor from 'editors/content/learning/MaterialEditor';
 import { AppContext } from 'editors/common/AppContext';
 import * as Immutable from 'immutable';
 import { ContentElements } from 'data/content/common/elements';
+import { Speaker, SpeakerSize } from 'editors/content/learning/dialog/Speaker';
+import MaterialEditor from 'editors/content/learning/MaterialEditor';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { Tooltip } from 'utils/tooltip';
 
 export interface LineEditorProps extends AbstractContentEditorProps<contentTypes.Line> {
   onShowSidebar: () => void;
@@ -25,16 +25,20 @@ export interface LineEditorState {
 
 export default class LineEditor
   extends AbstractContentEditor<contentTypes.Line, LineEditorProps, LineEditorState> {
-  constructor(props) {
-    super(props);
 
-    this.selectSpeaker = this.selectSpeaker.bind(this);
-    this.onMaterialEdit = this.onMaterialEdit.bind(this);
+  cycleSpeaker = () => {
+    const { speakers, model } = this.props;
+    const { speaker } = model;
+
+    const speakersArray = speakers.toArray();
+    const speakerIndex = speakersArray.findIndex(s => s.id === speaker);
+    const nextIndex = speakerIndex === speakers.size - 1 ? 0 : speakerIndex + 1;
+    const nextSpeaker = speakersArray[nextIndex];
+
+    this.selectSpeaker(nextSpeaker);
   }
 
-  selectSpeaker(e, selectedSpeaker) {
-    e.preventDefault();
-
+  selectSpeaker = (selectedSpeaker: contentTypes.Speaker) => {
     const { model, onEdit, speakers } = this.props;
 
     const newModel = model.with({
@@ -44,7 +48,7 @@ export default class LineEditor
     onEdit(newModel, newModel);
   }
 
-  onMaterialEdit(material: contentTypes.Material, src) {
+  onMaterialEdit = (material: contentTypes.Material, src) => {
     const { model, onEdit } = this.props;
     const newModel = model.with({
       material,
@@ -79,16 +83,11 @@ export default class LineEditor
           context={context}
           model={speaker}
           size={SpeakerSize.Small} />
-        <Dropdown label="">
-          {speakers.toArray().map(speaker =>
-            <DropdownItem
-              key={speaker.id}
-              onClick={e => this.selectSpeaker(e, speaker)}
-              label={speaker.title.caseOf({
-                just: title => title,
-                nothing: () => 'Unnamed speaker',
-              })} />)}
-        </Dropdown>
+        <button className="btn btn-primary" onClick={this.cycleSpeaker}>
+          <Tooltip title="Change speaker">
+            <i className="fas fa-sync-alt" />
+          </Tooltip>
+        </button>
         <div className="lineText">
           <MaterialEditor
             {...this.props}

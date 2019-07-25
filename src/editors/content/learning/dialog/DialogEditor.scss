@@ -35,7 +35,8 @@
     }
 
     &.addLine {
+        justify-content: flex-start;
         margin-left: 30px;
-        height: 90px;
+        height: 45px;
     }
 }

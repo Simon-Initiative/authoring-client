@@ -1,17 +1,17 @@
 .lineEditor {
-  display: flex;
-  align-items: center;
-  margin: 5px 0 5px 0px;
+    display: flex;
+    align-items: center;
+    margin: 5px 0 5px 0px;
 
-  .dropdown {
-    margin-left: 10px;
-  }
+    .dropdown {
+        margin-left: 10px;
+    }
+}
+
+button {
+    padding-left: 30px;
 }
 
 .lineText {
-  min-height: 36px;
-
-  button {
-    padding-left: 30px;
-  }
+    min-height: 36px;
 }

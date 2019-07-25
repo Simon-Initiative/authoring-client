@@ -6,8 +6,6 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
-
-// import './SpeakerEditor.scss';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { AppServices } from 'editors/common/AppServices';
@@ -111,7 +109,7 @@ export default class SpeakerEditor
           <div className="form-check">
             <label className="form-check-label">
               <input className="form-check-input"
-                name="sizingOptions"
+              name="sizingOptions"
                 value="image"
                 checked={this.state.isDisplayedAsImage}
                 onChange={() => this.onToggleDisplayAsImage(true)}
@@ -134,7 +132,7 @@ export default class SpeakerEditor
             <label className="form-check-label">
               <input className="form-check-input"
                 name="sizingOptions"
-                onChange={() => this.onToggleDisplayAsImage(false)}
+              onChange={() => this.onToggleDisplayAsImage(false)}
                 value="text"
                 checked={!this.state.isDisplayedAsImage}
                 type="radio" />{' '}as Text

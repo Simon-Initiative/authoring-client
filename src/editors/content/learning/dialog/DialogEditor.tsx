@@ -166,7 +166,7 @@ export default class DialogEditor
           onEdit={this.onTitleEdit}
           editorStyles={{ fontSize: 20 }} />
 
-        <div>Speakers</div>
+        <div style={{ marginLeft: 20 }}>Speakers</div>
         <div className="speakerContainer">
           <ContentContainer
             {...this.props}
@@ -182,7 +182,7 @@ export default class DialogEditor
           </div>
         </div>
 
-        <div>Lines</div>
+        <div style={{ marginLeft: 20 }}>Lines</div>
         <div className="lineContainer">
           <ContentContainer
             {...this.props}
