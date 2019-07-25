@@ -86,9 +86,7 @@ export default class OrgLibrary extends React.Component<OrgLibraryProps, OrgLibr
         = 'list-group-item list-group-item-action align-items-start flex-column';
       const since = relativeToNow(org.dateUpdated);
 
-      const onClick = thisId === currentOrgId
-        ? undefined
-        : (e) => { e.preventDefault(); this.props.onSelectOrg(thisId); };
+      const onClick = (e) => { e.preventDefault(); this.props.onSelectOrg(thisId); };
 
       return (
         <li
