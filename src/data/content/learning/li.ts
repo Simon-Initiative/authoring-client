@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Li',
   elementType: 'li',
   title: Maybe.nothing(),
-  content: new ContentElements().with({ supportedElements: Immutable.List(['#text', 'image']) }),
+  content: new ContentElements().with({ supportedElements: Immutable.List(FLOW_ELEMENTS) }),
   guid: '',
 };
 
@@ -52,7 +52,7 @@ export class Li extends Immutable.Record(defaultContent) {
 
     model = model.with({
       content: ContentElements
-        .fromPersistence(t, createGuid(), FLOW_ELEMENTS, null, notify)
+        .fromPersistence(t, createGuid(), FLOW_ELEMENTS, null, notify),
     });
 
     return model;
