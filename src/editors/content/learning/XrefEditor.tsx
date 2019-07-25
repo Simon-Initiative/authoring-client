@@ -135,9 +135,9 @@ export default class XrefEditor
   }
 
   onChangePage(page: string) {
-    const { onEdit, model, updateTarget } = this.props;
+    const { onEdit, model, updateTarget, context } = this.props;
     if (this.state.targetIsPage) {
-      onEdit(model.with({ page, idref: page }));
+      onEdit(model.with({ page, idref: context.courseModel.resourcesById.get(page).id }));
     } else {
       onEdit(model.with({ page }));
     }
@@ -147,12 +147,12 @@ export default class XrefEditor
     }
   }
 
-  onToggleTargetPage(targetIsPage) {
-    const { onEdit, model, updateTarget } = this.props;
+  onToggleTargetPage(targetIsPage : boolean) {
+    const { onEdit, model, updateTarget, context } = this.props;
     this.setState({ targetIsPage });
     if (targetIsPage) {
-      onEdit(model.with({ idref: model.page }));
-      updateTarget(model.page, model.page);
+      onEdit(model.with({ idref: context.courseModel.resourcesById.get(model.page).id }));
+      updateTarget(model.idref, model.page);
     }
   }
 

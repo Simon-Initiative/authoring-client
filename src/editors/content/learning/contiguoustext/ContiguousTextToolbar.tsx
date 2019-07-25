@@ -390,7 +390,7 @@ class ContiguousTextToolbar
                     r.id !== PLACEHOLDER_ITEM_ID &&
                     r.resourceState !== ResourceState.DELETED);
 
-                const xrefDefault = pages[0].id;
+                const xrefDefault = pages[0] ? pages[0].id : thisId;
 
                 if (pages.length > 0) {
                   onEdit(model.addEntity(
