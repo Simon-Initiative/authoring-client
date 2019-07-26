@@ -11,7 +11,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ResourceState } from 'data/content/resource';
 import { Clipboard } from 'types/clipboard';
 import { ContentElement } from 'data/content/common/interfaces';
@@ -36,13 +36,13 @@ export interface XrefEditorProps
 }
 
 export interface XrefEditorState {
-
+  targetIsPage: boolean;
 }
 
 /* Cross Reference is essentially an internal link. It allows you to link to another
- workbook page (identified by the 'page' attribute, which is saved as a resource guid)
- and also, optionally, a specific element known as a 'target' within the page.
- The target is identified by the 'idref' attribute which points to a Content Element's id)
+workbook page (identified by the 'page' attribute, which is saved as a resource guid)
+and also, optionally, a specific element known as a 'target' within the page.
+The target is identified by the 'idref' attribute which points to a Content Element's id)
 */
 export default class XrefEditor
   extends AbstractContentEditor
@@ -53,6 +53,8 @@ export default class XrefEditor
 
     this.onChangeTarget = this.onChangeTarget.bind(this);
     this.onChangePage = this.onChangePage.bind(this);
+    this.onToggleTargetPage = this.onToggleTargetPage.bind(this);
+    this.state = { targetIsPage: props.model.idref === props.model.page };
   }
 
   shouldComponentUpdate(nextProps: XrefEditorProps, nextState: XrefEditorState) {
@@ -62,22 +64,51 @@ export default class XrefEditor
   }
 
   componentDidMount() {
-    const { target, model, updateTarget } = this.props;
+    const { model, updateTarget } = this.props;
 
-    // Xref must have a page set in order to allow linking to a target element. We set the default
-    // page to be the first workbook page so that an error is not thrown in case the user chooses
-    // a target element without changing the page using the 'page to link to' dropdown
-    if (!this.props.model.page) {
-      this.props.onEdit(this.props.model.with({ page: this.pages[0].guid }));
+    updateTarget(model.idref, model.page);
+  }
+
+  hasTargetChanged(nextProps: XrefEditorProps) {
+    const { target } = this.props;
+
+    if (target === undefined) {
+      return nextProps.target !== undefined;
+    }
+    if (target !== undefined && nextProps.target === undefined) {
+      return true;
     }
 
-    // Check if we need to fetch the target element from its workbook page
-    if (!target && model.idref) {
-      updateTarget(model.idref, model.page);
+    const changed = target.caseOf({
+      left: (s) => {
+        return nextProps.target.caseOf({
+          left: s1 => s !== s1,
+          right: e1 => true,
+        });
+      },
+      right: (e) => {
+        return nextProps.target.caseOf({
+          left: s1 => true,
+          right: e1 => e !== e1,
+        });
+      },
+    });
+
+    return changed;
+  }
+
+  componentWillReceiveProps(nextProps: XrefEditorProps) {
+    const { updateTarget, model } = this.props;
+
+    if (this.hasTargetChanged(nextProps)) {
+      updateTarget(nextProps.model.idref, nextProps.model.page);
+    }
+    if (model !== nextProps.model) {
+      this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page });
     }
   }
 
-  thisId = this.props.context.courseModel.resources.get(
+  thisId = this.props.context.courseModel.resourcesById.get(
     this.props.context.documentId).id;
 
   pages = this.props.context.courseModel.resources
@@ -86,6 +117,8 @@ export default class XrefEditor
       r.id !== this.thisId &&
       r.id !== PLACEHOLDER_ITEM_ID &&
       r.resourceState !== ResourceState.DELETED);
+
+  noPages = this.pages.length === 0;
 
   onChangeTarget() {
     const { onEdit, model, clipboard, updateTarget } = this.props;
@@ -103,43 +136,83 @@ export default class XrefEditor
       if (id) {
         clipboard.page.lift((pageId) => {
           onEdit(model.with({ idref: id, page: pageId }));
-          updateTarget(id, pageId);
+          setTimeout(() => updateTarget(id, pageId), 0);
         });
       }
     });
+
   }
 
   onChangePage(page: string) {
-    const { onEdit, model, updateTarget } = this.props;
 
-    onEdit(model.with({ page }));
-
+    const { onEdit, model, updateTarget, context } = this.props;
+    if (this.state.targetIsPage) {
+      onEdit(model.with({ page, idref: page }));
+    } else {
+      onEdit(model.with({ page }));
+    }
     // Search for the target element in the new page
     if (model.idref) {
-      updateTarget(model.idref, page);
+      setTimeout(() => updateTarget(model.idref, page), 0);
+    }
+  }
+
+  onToggleTargetPage(targetIsPage: boolean) {
+
+    const { onEdit, model, updateTarget, context } = this.props;
+    this.setState({ targetIsPage });
+    if (targetIsPage) {
+      onEdit(model.with({ idref: model.page }));
+      setTimeout(() => updateTarget(model.idref, model.page), 0);
     }
   }
 
   renderSidebar() {
     const { editMode, model, onEdit, target } = this.props;
-
-    const pageOptions = this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>);
+    const pageOptions = (this.pages.length === 0 ?
+      <option key={this.context.guid} value={this.context.id}>{'No pages to reference'}</option> :
+      this.pages.map(r => <option key={r.guid} value={r.id}>{r.title}</option>));
 
     return (
       <SidebarContent title="Cross Reference">
         <SidebarGroup label="Page to link to">
           <Select
-            editMode={this.props.editMode}
+            editMode={this.props.editMode && !this.noPages}
             label=""
             value={model.page}
             onChange={this.onChangePage}>
             {pageOptions}
           </Select>
         </SidebarGroup>
-        <SidebarGroup label="Element to link to">
-          <Target {...this.props} target={target} onChangeTarget={this.onChangeTarget} />
+        <SidebarGroup label="Link Target">
+          <SidebarRow>
+            <div className="form-check">
+              <label className="form-check-label">
+                <input className="form-check-input"
+                  name="targetOption"
+                  value="page"
+                  checked={this.state.targetIsPage}
+                  onChange={() => this.onToggleTargetPage(true)}
+                  disabled={this.noPages}
+                  type="radio" />&nbsp; Selected Page
+</label>
+            </div>
+            <div className="form-check">
+              <label className="form-check-label">
+                <input className="form-check-input"
+                  name="targetOption"
+                  onChange={() => this.onToggleTargetPage(false)}
+                  value="element"
+                  checked={!this.state.targetIsPage}
+                  disabled={this.noPages}
+                  type="radio" />&nbsp; Specific Element
+</label>
+            </div>
+          </SidebarRow>
+          <Target {...this.props} targetIsPage={this.state.targetIsPage} target={target}
+            onChangeTarget={this.onChangeTarget} />
         </SidebarGroup>
-        <SidebarGroup label="Target">
+        <SidebarGroup label="On Click">
           <Select
             editMode={editMode}
             value={model.target}
@@ -173,53 +246,62 @@ export default class XrefEditor
 
 interface TargetProps extends XrefEditorProps {
   onChangeTarget: () => void;
+  targetIsPage: boolean;
 }
-const Target = ({ target, editMode, clipboard, onChangeTarget }: TargetProps) => {
-
+const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: TargetProps) => {
   const validItemCopied = clipboard.item.caseOf({
     just: item => isValidXrefTarget(item),
     nothing: () => false,
   });
+
+  const renderedTarget = target
+    ? target.caseOf({
+      right: element => (
+        <Label>
+          <span style={{ color: CONTENT_COLORS[element.contentType] }}>
+            {getContentIcon(insertableContentTypes[element.contentType])}
+          </span> {validXrefTargets[element.elementType]}
+        </Label>
+      ),
+      left: () => (
+        targetIsPage ? (
+          <span>
+            <i className={'far fa-file'} /> Workbook Page
+</span>
+        ) : (
+            <span className="italic">
+              {getContentIcon(insertableContentTypes[''])} Target not found in selected page
+</span>)
+      ),
+    })
+    : <span className="italic">No target element</span>;
 
   return (
     <div className="target__container">
       <div className="target__instructions">
         <small>
           1. Open the target page in a new tab.
-        </small>
+</small>
         <br />
         <small>
           2. Select a valid target element and then copy it using the Copy
           button in the toolbar.
-        <HelpPopover activateOnClick><ValidElementsHelp /></HelpPopover>
+<HelpPopover activateOnClick><ValidElementsHelp /></HelpPopover>
         </small>
         <br />
         <small>
           3. Use the button to link to the copied element.
-        </small>
+</small>
       </div>
       <Button editMode={editMode && validItemCopied} onClick={onChangeTarget}>
         Link Element
-      </Button>
+</Button>
       <div className="target__description">
 
         {/* Target can be undefined (no target set),
-        Either.right with the linked element, or
-        Either.left indicating the linked element was not found (maybe deleted from the page) */}
-        {target
-          ? target.caseOf({
-            right: element => (
-              <Label>
-                <span style={{ color: CONTENT_COLORS[element.contentType] }}>
-                  {getContentIcon(insertableContentTypes[element.contentType])}
-                </span> {validXrefTargets[element.elementType]}
-              </Label>
-            ),
-            left: () => <span className="italic">
-              {getContentIcon(insertableContentTypes[''])} Target not found in selected page
-            </span>,
-          })
-          : <span className="italic">No target element</span>}
+Either.right with the linked element, or
+Either.left indicating the linked element was not found or is a page */}
+        {renderedTarget}
       </div>
     </div>
   );
@@ -266,7 +348,7 @@ const validXrefTargets = {
 const ValidElementsHelp = () =>
   <React.Fragment>
     You can make cross-references to any of these element types:
-    <br /><br />
+<br /><br />
     <ul>
       {Object.getOwnPropertyNames(validXrefTargets)
         .map(key => validXrefTargets[key])
