@@ -25,6 +25,7 @@ import {
 } from 'components/common/Discoverable.controller';
 
 import { styles } from 'editors/content/learning/conjugation/Conjugation.styles';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 export interface ConjugationEditorProps
   extends AbstractContentEditorProps<contentTypes.Conjugation> {
@@ -211,8 +212,10 @@ class ConjugationEditor
     const columnsToAdd = this.props.model.rows.last().cells.size;
 
     const kvPairs = [];
-    for (let i = 0; i < columnsToAdd; i += 1) {
-      const cell = new contentTypes.CellHeader();
+    const ch = new contentTypes.CellHeader();
+    kvPairs.push([ch.guid, ch]);
+    for (let i = 1; i < columnsToAdd; i += 1) {
+      const cell = new contentTypes.Conjugate();
       kvPairs.push([cell.guid, cell]);
     }
 
@@ -492,7 +495,9 @@ class ConjugationEditor
         <button type="button"
           disabled={!editMode || !canAddPronunciation}
           onClick={this.onAddPronunciation.bind(this)}
-          className="btn btn-link">+ Add pronunciation</button>
+          className="btn btn-link">+ Add pronunciation</button> <HelpPopover>
+          You can add an audio file as a pronunciation if you have one available.
+        </HelpPopover>
         <table className={classNames([classes.conjugation, className])}>
           <tbody>
             {headerRow}
