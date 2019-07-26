@@ -400,12 +400,13 @@ class InsertToolbar
                 const lineId = guid();
 
                 const speaker = new contentTypes.Speaker({
-                  guid: speakerId, id: speakerId, title: Maybe.just('Speaker 1'),
+                  guid: speakerId, id: speakerId,
                 });
                 const speakers =
                   Immutable.OrderedMap<string, contentTypes.Speaker>([[speakerId, speaker]]);
 
-                const material = contentTypes.Material.fromText('Empty text block', '');
+                const material = contentTypes.Material.fromText(
+                  'This is where you can edit each speaker\'s lines', '');
                 const line = new contentTypes.Line({
                   guid: lineId, id: lineId, speaker: speakerId, material,
                 });
