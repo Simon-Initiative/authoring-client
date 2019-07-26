@@ -76,9 +76,6 @@ export default class DialogEditor
   }
 
   onAddSpeaker(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
     const { model, onEdit } = this.props;
 
     const id = guid();
@@ -92,10 +89,7 @@ export default class DialogEditor
     onEdit(newModel, speaker);
   }
 
-  onAddLine(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
+  onAddLine() {
     const { model, onEdit } = this.props;
     const { lines, speakers } = model;
 

@@ -56,7 +56,7 @@ export default class SpeakerEditor
       content: model.content.set('name', name),
     });
 
-    onEdit(newModel, newModel);
+    onEdit(newModel, model);
   }
 
   renderSidebar(): JSX.Element {
@@ -84,7 +84,6 @@ export default class SpeakerEditor
               <div>Add / Change Image</div>
             </ToolbarButton>
           </SidebarRow>
-
         </SidebarGroup>
       </SidebarContent>
     );
