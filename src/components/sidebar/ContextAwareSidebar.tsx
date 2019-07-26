@@ -176,18 +176,10 @@ class ContextAwareSidebar
   componentDidMount() {
     this.fetchRefs(this.props);
   }
-  componentWillReceiveProps(nextProps: ContextAwareSidebarProps) {
-    if ((this.props.course.guid !== nextProps.course.guid)
-      || (this.props.resource.id !== nextProps.resource.id)) {
-      this.fetchRefs(nextProps);
-    }
-  }
 
   fetchRefs(props: ContextAwareSidebarProps) {
     const { course, resource } = props;
-    this.setState({
-      resourceRefs: Maybe.nothing(),
-    });
+
     persistence.fetchEdges(course.guid).then((edges) => {
 
       const sources = edges.filter((edge) => {
