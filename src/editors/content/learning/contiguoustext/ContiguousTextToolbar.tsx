@@ -379,17 +379,6 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.addEntity(
-                  EntityTypes.xref, true, new contentTypes.Xref(), selection));
-              }
-            }
-            disabled={!supports('xref') || !rangeEntitiesEnabled}
-            tooltip="Cross Reference Link">
-            <i className={'fa fa-map-signs'} />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={
-              () => {
 
                 const thisId = this.props.context.courseModel.resourcesById.get(
                   this.props.context.documentId).id;
