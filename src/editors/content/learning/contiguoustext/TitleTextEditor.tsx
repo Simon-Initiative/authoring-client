@@ -47,6 +47,7 @@ export const TitleTextEditor
           editMode={editMode}
           model={(model as ContiguousText).with({ mode: ContiguousTextMode.SimpleText })}
           editorStyles={editorStyles}
+          orderedIds={null}
           hideBorder={true}
           onEdit={onEdit} />
         <div className={classes.editIcon}>

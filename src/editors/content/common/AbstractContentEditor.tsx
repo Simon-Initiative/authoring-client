@@ -38,6 +38,7 @@ export interface AbstractContentEditorProps<ModelType> {
   // through non CTE elements (like a Table) to child CTEs.
   onEntitySelected?: (key: string, data: Object) => void;
   selectedEntity?: Maybe<string>;
+
 }
 
 export interface AbstractContentEditorState { }
