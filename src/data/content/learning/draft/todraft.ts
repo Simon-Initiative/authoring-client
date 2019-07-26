@@ -409,8 +409,8 @@ function processInline(
     // This special case below checks for the latter case and appends
     // two spaces that will be necessary to display up to two-digit long
     // bibliography entry when rendered
-    if (key === 'cite' && text.length === 0) {
-      blockContext.fullText += '  ';
+    if (key === 'cite' && (text.length === 0 || text === ' ')) {
+      blockContext.fullText += (text.length === 0) ? '  ' : ' ';
       text = blockContext.fullText.substring(offset);
     }
 

@@ -18,23 +18,24 @@ export interface ContiguousTextViewerProps {
  */
 export const ContiguousTextViewer:
   React.StatelessComponent<ComponentProps<ContiguousTextViewerProps>> = (({
-  className, children, context, services, model, editorStyles,
-}) => {
+    className, context, services, model, editorStyles,
+  }) => {
     return (
       <div className={classNames([className])}>
         <ContiguousTextEditor
-          onInsertParsedContent={() => {}}
+          onInsertParsedContent={() => { }}
           activeContentGuid={null}
           hover={null}
-          onUpdateHover={() => {}}
-          onFocus={() => {}}
+          onUpdateHover={() => { }}
+          onFocus={() => { }}
           context={context}
+          orderedIds={null}
           services={services}
           editMode={false}
           model={model}
           editorStyles={editorStyles}
           viewOnly
-          onEdit={() => {}} />
+          onEdit={() => { }} />
       </div>
     );
   });

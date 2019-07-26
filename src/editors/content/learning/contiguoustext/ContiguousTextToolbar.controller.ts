@@ -17,6 +17,7 @@ interface StateProps {
   selection: TextSelection;
   resource: Resource;
   courseModel: CourseModel;
+  orderedIds?: any;
 }
 
 interface DispatchProps {

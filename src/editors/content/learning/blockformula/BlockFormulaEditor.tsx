@@ -19,9 +19,9 @@ export interface BlockFormulaEditorState {
 }
 
 class BlockFormulaEditor
-    extends AbstractContentEditor
-    <contentTypes.BlockFormula, StyledComponentProps<BlockFormulaEditorProps, typeof styles>,
-    BlockFormulaEditorState> {
+  extends AbstractContentEditor
+  <contentTypes.BlockFormula, StyledComponentProps<BlockFormulaEditorProps, typeof styles>,
+  BlockFormulaEditorState> {
 
   constructor(props) {
     super(props);
@@ -55,7 +55,8 @@ class BlockFormulaEditor
         <div className={classes.formulaWrapper}>
           <ContiguousTextEditor
             {...this.props}
-            onInsertParsedContent={() => {}}
+            onInsertParsedContent={() => { }}
+            orderedIds={null}
             onFocus={this.onFocusOverride}
             model={this.props.model.text}
             onEdit={this.onEditText}>
