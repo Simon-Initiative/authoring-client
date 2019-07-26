@@ -6,8 +6,6 @@ export interface ContentElement extends HasGuid, Persistable, Record<any, any> {
   clone: () => ContentElement;
   contentType: string;
   elementType: string;
-
-
 }
 
 export interface IdentifiableContentElement extends ContentElement {

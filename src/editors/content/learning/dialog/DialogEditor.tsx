@@ -76,9 +76,6 @@ export default class DialogEditor
   }
 
   onAddSpeaker(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
     const { model, onEdit } = this.props;
 
     const id = guid();
@@ -92,10 +89,7 @@ export default class DialogEditor
     onEdit(newModel, speaker);
   }
 
-  onAddLine(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
+  onAddLine() {
     const { model, onEdit } = this.props;
     const { lines, speakers } = model;
 
@@ -109,7 +103,7 @@ export default class DialogEditor
       speaker: lines.size > 1
         ? lines.toArray()[lines.size - 2].speaker
         : speakers.last().id,
-      material: contentTypes.Material.fromText('Empty text block', ''),
+      material: contentTypes.Material.fromText('So then I said....', ''),
     });
 
     onEdit(model.with({ lines: lines.set(line.guid, line) }), line);
@@ -166,6 +160,7 @@ export default class DialogEditor
           onEdit={this.onTitleEdit}
           editorStyles={{ fontSize: 20 }} />
 
+        <div style={{ marginLeft: 20 }}>Speakers</div>
         <div className="speakerContainer">
           <ContentContainer
             {...this.props}
@@ -175,9 +170,17 @@ export default class DialogEditor
             overrideRemove={this.overrideSpeakerRemove}
           />
           <div className="addButton addSpeaker">
-            <a onClick={this.onAddSpeaker}>
-              <i className="fa fa-plus"></i>
-            </a>
+            <button className="btn btn-primary" onClick={this.onAddSpeaker}>
+              Add Speaker
+            </button>
+          </div>
+        </div>
+
+        <div style={{ marginLeft: 20 }}>
+          Lines
+          <div style={{ fontStyle: 'italic' }}>
+            Add line translations by highlighting a word and adding a "Rollover Definition"
+            from the toolbar.
           </div>
         </div>
 
@@ -192,9 +195,9 @@ export default class DialogEditor
         </div>
         {model.speakers.size > 0
           ? <div className="addButton addLine">
-            <a onClick={this.onAddLine}>
-              <i className="fa fa-plus"></i>
-            </a>
+            <button className="btn btn-primary" onClick={this.onAddLine}>
+              Add Line
+            </button>
           </div>
           : null}
       </div>

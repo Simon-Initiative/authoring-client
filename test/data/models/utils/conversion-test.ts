@@ -24,7 +24,10 @@ it('does not translates modules to units', () => {
   const model = OrganizationModel.fromPersistence(orgData, () => null);
 
   org.translateModulesToUnits(model).caseOf({
-    just: m => fail('should have been nothing'),
+    just: (m) => {
+      fail('should have been nothing');
+      return false;
+    },
     nothing: () => expect(1).toBe(1),
   });
 

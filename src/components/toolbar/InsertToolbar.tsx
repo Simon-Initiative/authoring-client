@@ -399,12 +399,13 @@ class InsertToolbar
                 const lineId = guid();
 
                 const speaker = new contentTypes.Speaker({
-                  guid: speakerId, id: speakerId, title: Maybe.just('Speaker 1'),
+                  guid: speakerId, id: speakerId,
                 });
                 const speakers =
                   Immutable.OrderedMap<string, contentTypes.Speaker>([[speakerId, speaker]]);
 
-                const material = contentTypes.Material.fromText('Empty text block', '');
+                const material = contentTypes.Material.fromText(
+                  'This is where you can edit each speaker\'s lines', '');
                 const line = new contentTypes.Line({
                   guid: lineId, id: lineId, speaker: speakerId, material,
                 });
@@ -505,8 +506,8 @@ class InsertToolbar
                         <ResourceSelection
                           filterPredicate={(res: Resource): boolean =>
                             (res.type === LegacyTypes.inline
-                            && res.resourceState !== ResourceState.DELETED
-                            && !existingInlines.has(res.id))
+                              && res.resourceState !== ResourceState.DELETED
+                              && !existingInlines.has(res.id))
                           }
                           courseId={context.courseModel.guid}
                           onInsert={(resource) => {
@@ -685,7 +686,7 @@ class InsertToolbar
                     }}
                     onCancel={onDismissModal}
                   />)
-                  }
+                }
                 disabled={false}>
                 <i style={{ width: 22 }} className={'fas fa-clipboard-check'} />
                 Insert Survey{/* Future: Activity */} Report
