@@ -355,9 +355,6 @@ class OrgEditor extends React.Component<OrgEditorProps, OrgEditorState>  {
           onReposition={this.onReposition.bind(this)}
           indexWithinParent={index}
           depth={depth}
-          onDispatch={this.props.dispatch}
-          displayModal={this.props.displayModal}
-          dismissModal={this.props.dismissModal}
         />
       );
     };

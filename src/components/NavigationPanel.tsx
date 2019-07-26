@@ -376,13 +376,6 @@ class NavigationPanel
 
     const selected = (route.route as any).resourceId === currentOrg.id;
 
-    const orgCount = course.resources.toArray().filter(availableOrgs).length;
-    const title = orgCount === 1
-      ? 'Course Outline'
-      : currentOrg.title;
-
-    const selected = (route.route as any).resourceId === currentOrg.id;
-
     return (
       <div className={classNames([
         classes.navItem, selected && classes.selectedNavItem])}
