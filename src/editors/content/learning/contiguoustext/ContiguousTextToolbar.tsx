@@ -34,8 +34,6 @@ import { ContentElement } from 'data/content/common/interfaces';
 import EntryList from 'editors/content/bibliography/EntryList';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
-import { LegacyTypes } from 'data/types';
-import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
