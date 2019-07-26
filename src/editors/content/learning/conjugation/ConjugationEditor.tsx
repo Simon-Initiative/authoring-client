@@ -379,16 +379,6 @@ class ConjugationEditor
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsertHeader(index)}>
-            {'Insert header row before'}
-          </button>
-          <button className="dropdown-item"
-            disabled={!editMode}
-            onClick={() => onInsertHeader(index + 1)}>
-            {'Insert header row after'}
-          </button>
-          <button className="dropdown-item"
-            disabled={!editMode}
             onClick={() => onRemove(index)}>
             {'Remove row'}
           </button>
