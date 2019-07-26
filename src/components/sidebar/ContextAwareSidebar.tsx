@@ -177,7 +177,8 @@ class ContextAwareSidebar
     this.fetchRefs(this.props);
   }
   componentWillReceiveProps(nextProps: ContextAwareSidebarProps) {
-    if ((this.props.course !== nextProps.course) || (this.props.resource !== nextProps.resource)) {
+    if ((this.props.course.guid !== nextProps.course.guid)
+      || (this.props.resource.id !== nextProps.resource.id)) {
       this.fetchRefs(nextProps);
     }
   }
@@ -363,38 +364,38 @@ class ContextAwareSidebar
             {resourceRefs.caseOf({
               just: (refs) => {
                 return refs.length > 0
-                ? (
-                  <div className="container">
+                  ? (
+                    <div className="container">
 
-                    {
-                      refs.map(ref => (
-                      <div key={ref.guid} className="ref-thing">
-                        <a href="#" onClick = {(event) => {
-                          event.preventDefault();
-                          // if link is to org, just switch org and stay on current page
-                          if (ref.sourceType === 'x-oli-organization') {
-                            viewDocument(resource.id, course.idvers,
-                                         Maybe.maybe(stripId(ref.sourceId)));
-                          } else {
-                            viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
-                          }
-                        }
-                        }>
-                          <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
-                            {
-                              getNameAndIconByType(ref.sourceType).icon}
-                            </span>
-                            {getRefTitleFromRef(ref)}
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div>No references found</div>
-                );
+                      {
+                        refs.map(ref => (
+                          <div key={ref.guid} className="ref-thing">
+                            <a href="#" onClick={(event) => {
+                              event.preventDefault();
+                              // if link is to org, just switch org and stay on current page
+                              if (ref.sourceType === 'x-oli-organization') {
+                                viewDocument(resource.id, course.idvers,
+                                  Maybe.maybe(stripId(ref.sourceId)));
+                              } else {
+                                viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
+                              }
+                            }
+                            }>
+                              <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
+                                {
+                                  getNameAndIconByType(ref.sourceType).icon}
+                              </span>
+                              {getRefTitleFromRef(ref)}
+                            </a>
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <div>No references found</div>
+                  );
               },
               nothing: () => <div>{this.state.failedLoading ? 'Error loading'
-                                   : 'Loading references' }</div>,
+                : 'Loading references'}</div>,
             },
             )
             }

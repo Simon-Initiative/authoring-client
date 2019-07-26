@@ -115,8 +115,8 @@ export const styles: JSSStyles = {
     backgroundColor: '#fdfdfd',
     borderRadius: '50%',
     position: 'absolute',
-    top: 13,
-    right: 25,
+    top: 142,
+    right: -2,
   },
   collapseButton: {
     width: 30,
@@ -349,24 +349,17 @@ class NavigationPanel
     const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
-    const selected = route.route.type === 'RouteObjectives';
-
     return (
-      <div className={classNames([
-        classes.navItemContainer, selected && classes.selectedNavContainer])}>
-        <a href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id));
-          }}
-          className={classNames([
-            classes.navItem,
-            selected && classes.selectedNavItem,
-          ])}>
-          {collapsed && <i className="fa fa-graduation-cap" />}
-          {!collapsed && 'Learning Objectives'}
-        </a>
-      </div>
+      <Tooltip disabled={!collapsed} title="Objectives" position="right">
+        <div className={classNames([
+          classes.navItem,
+          route.route.type === 'RouteObjectives' && classes.selectedNavItem,
+        ])}
+          onClick={() =>
+            viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id))}>
+          <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
+        </div>
+      </Tooltip>
     );
   }
 
@@ -383,26 +376,22 @@ class NavigationPanel
 
     const selected = (route.route as any).resourceId === currentOrg.id;
 
+    const orgCount = course.resources.toArray().filter(availableOrgs).length;
+    const title = orgCount === 1
+      ? 'Course Outline'
+      : currentOrg.title;
+
+    const selected = (route.route as any).resourceId === currentOrg.id;
+
     return (
       <div className={classNames([
-        classes.navItemContainer, selected && classes.selectedNavContainer])}>
-        {orgCount === 1
-          ? null
-          : <div className={classes.navItemDescription}>
-            {!collapsed && 'Active Course Outline'}
-          </div>}
-        <a href="#"
-          className={classNames([
-            classes.navItem,
-            selected && classes.selectedNavItem,
-          ])}
-          onClick={(e) => {
-            e.preventDefault();
-            viewActions.viewDocument(currentOrg.id, course.idvers, Maybe.just(currentOrg.id));
-          }}>
-          {collapsed && <i className="fa fa-th-list" />}
-          {!collapsed && (' ' + title)}
-        </a>
+        classes.navItem, selected && classes.selectedNavItem])}
+        onClick={(e) => {
+          e.preventDefault();
+          viewActions.viewDocument(currentOrg.id, course.idvers, Maybe.just(currentOrg.id));
+        }}>
+        <i className="fa fa-th-list" />
+        {!collapsed && (' ' + title)}
       </div>
     );
   }
@@ -412,8 +401,7 @@ class NavigationPanel
     const { width, collapsed } = this.state;
 
     return (
-      <React.Fragment>
-        {this.renderResizeHandle()}
+      <React.Fragment >
         <div className={classes.orgTree}>
           {collapsed
             ? (

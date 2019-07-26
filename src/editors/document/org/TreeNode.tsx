@@ -26,9 +26,6 @@ export interface TreeNodeProps {
   onExpand: (id: string) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
-  onDispatch: () => void;
-  displayModal: (c: any) => void;
-  dismissModal: () => void;
 }
 
 export interface TreeNodeState {
