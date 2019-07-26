@@ -410,6 +410,17 @@ class ContiguousTextToolbar
                 }
               }
             }
+            disabled={!supports('xref') || !rangeEntitiesEnabled}
+            tooltip="Cross Reference Link">
+            <i className={'fa fa-map-signs'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => {
+                onEdit(model.addEntity(
+                  EntityTypes.math, true, new contentTypes.Math(), selection));
+              }
+            }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
             tooltip="MathML or Latex formula">
             {getContentIcon(insertableContentTypes.Math)}
