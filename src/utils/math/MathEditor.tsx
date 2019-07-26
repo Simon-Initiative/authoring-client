@@ -72,11 +72,13 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
         theme="github"
         readOnly={!editMode}
         width="initial"
-        height="350px"
+        minLines={35}
+        maxLines={45}
+        wrapEnabled={true}
         value={this.state.beautified}
         onChange={this.onChange}
         setOptions={{
-          showLineNumbers: false,
+          showLineNumbers: true,
           tabSize: 2,
         }}
       />
