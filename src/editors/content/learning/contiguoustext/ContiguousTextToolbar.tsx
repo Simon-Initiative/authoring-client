@@ -21,7 +21,7 @@ import { entryInstances } from 'editors/content/learning/bibliography/utils';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 import { selectImage } from 'editors/content/learning/ImageEditor';
-import { Resource, ResourceState } from 'data/content/resource';
+import { Resource } from 'data/content/resource';
 import { CourseModel } from 'data/models/course';
 import {
   selectTargetElement,
@@ -377,24 +377,8 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
-
-                const thisId = this.props.context.courseModel.resourcesById.get(
-                  this.props.context.documentId).id;
-
-                const pages = this.props.context.courseModel.resources
-                  .toArray()
-                  .filter(r => r.type === LegacyTypes.workbook_page &&
-                    r.id !== thisId &&
-                    r.id !== PLACEHOLDER_ITEM_ID &&
-                    r.resourceState !== ResourceState.DELETED);
-
-                const xrefDefault = pages[0] ? pages[0].id : thisId;
-
-                if (pages.length > 0) {
-                  onEdit(model.addEntity(
-                    EntityTypes.xref, true,
-                    new contentTypes.Xref({ page: xrefDefault, idref: xrefDefault }), selection));
-                }
+                onEdit(model.addEntity(
+                  EntityTypes.xref, true, new contentTypes.Xref(), selection));
               }
             }
             disabled={!supports('xref') || !rangeEntitiesEnabled}
@@ -467,7 +451,7 @@ class ContiguousTextToolbar
           <ToolbarNarrowMenu
             icon={<i className={'fa fa-asterisk'} />}
             label={''}
-            tooltip='Insert Citation'
+            tooltip="Insert Citation"
             disabled={!supports('cite') || !pointEntitiesEnabled}>
 
             {this.renderEntryOptions(selection)}
