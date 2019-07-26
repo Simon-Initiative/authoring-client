@@ -195,7 +195,7 @@ export default class XrefEditor
                   onChange={() => this.onToggleTargetPage(true)}
                   disabled={this.noPages}
                   type="radio" />&nbsp; Selected Page
-</label>
+              </label>
             </div>
             <div className="form-check">
               <label className="form-check-label">
@@ -206,7 +206,7 @@ export default class XrefEditor
                   checked={!this.state.targetIsPage}
                   disabled={this.noPages}
                   type="radio" />&nbsp; Specific Element
-</label>
+              </label>
             </div>
           </SidebarRow>
           <Target {...this.props} targetIsPage={this.state.targetIsPage} target={target}
@@ -267,11 +267,11 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
         targetIsPage ? (
           <span>
             <i className={'far fa-file'} /> Workbook Page
-</span>
+          </span>
         ) : (
             <span className="italic">
               {getContentIcon(insertableContentTypes[''])} Target not found in selected page
-</span>)
+            </span>)
       ),
     })
     : <span className="italic">No target element</span>;
@@ -281,26 +281,26 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
       <div className="target__instructions">
         <small>
           1. Open the target page in a new tab.
-</small>
+        </small>
         <br />
         <small>
           2. Select a valid target element and then copy it using the Copy
           button in the toolbar.
-<HelpPopover activateOnClick><ValidElementsHelp /></HelpPopover>
+          <HelpPopover activateOnClick><ValidElementsHelp /></HelpPopover>
         </small>
         <br />
         <small>
           3. Use the button to link to the copied element.
-</small>
+        </small>
       </div>
       <Button editMode={editMode && validItemCopied} onClick={onChangeTarget}>
         Link Element
-</Button>
+      </Button>
       <div className="target__description">
 
         {/* Target can be undefined (no target set),
-Either.right with the linked element, or
-Either.left indicating the linked element was not found or is a page */}
+          Either.right with the linked element, or
+          Either.left indicating the linked element was not found or is a page */}
         {renderedTarget}
       </div>
     </div>
@@ -348,7 +348,7 @@ const validXrefTargets = {
 const ValidElementsHelp = () =>
   <React.Fragment>
     You can make cross-references to any of these element types:
-<br /><br />
+    <br /><br />
     <ul>
       {Object.getOwnPropertyNames(validXrefTargets)
         .map(key => validXrefTargets[key])
