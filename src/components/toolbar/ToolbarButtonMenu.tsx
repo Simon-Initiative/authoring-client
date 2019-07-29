@@ -3,12 +3,14 @@ import { withStyles, classNames } from 'styles/jss';
 import guid from 'utils/guid';
 import { styles } from './ToolbarButtonMenu.styles';
 import { StyledComponentProps } from 'types/component';
+import { Tooltip } from 'utils/tooltip';
 
 export interface ToolbarWideMenuProps {
   className?: string;
   disabled: boolean;
   label: string;
   icon: any;
+  tooltip?: string;
 }
 
 export type ToolbarNarrowMenuProps = ToolbarWideMenuProps;
@@ -93,7 +95,7 @@ class ToolbarNarrowMenu
 
   render() {
     const {
-      className, classes, disabled, icon, label,
+      className, classes, disabled, icon, label, tooltip,
     } = this.props;
 
     const style: any = { position: 'relative', width: '32px', maxWidth: '32px' };
@@ -130,7 +132,14 @@ class ToolbarNarrowMenu
       </div>
     );
 
-    return dropdown;
+    return tooltip ?
+    (
+      <Tooltip title={tooltip} delay={1000} distance={5} style={{ display: 'inline-block' }}
+        size="small" arrowSize="small">
+        {dropdown}
+      </Tooltip>
+    )
+    : dropdown;
 
   }
 }

@@ -43,20 +43,21 @@ export class RichTextEditor
     return null;
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const editor = <ContiguousTextEditor
-            onInsertParsedContent={() => {}}
-            activeContentGuid={null}
-            hover={null}
-            onUpdateHover={() => {}}
-            onFocus={this.props.onFocus}
-            context={this.props.context}
-            services={this.props.services}
-            editMode={this.props.editMode}
-            model={this.props.model}
-            onEdit={this.onEdit}
-            />;
+      onInsertParsedContent={() => { }}
+      activeContentGuid={null}
+      hover={null}
+      orderedIds={null}
+      onUpdateHover={() => { }}
+      onFocus={this.props.onFocus}
+      context={this.props.context}
+      services={this.props.services}
+      editMode={this.props.editMode}
+      model={this.props.model}
+      onEdit={this.onEdit}
+    />;
 
     const display = this.props.showLabel === undefined || this.props.showLabel
       ? <InputLabel label={this.props.label} style="default">

@@ -20,9 +20,9 @@ export interface BlockQuoteEditorState {
 }
 
 class BlockQuoteEditor
-    extends AbstractContentEditor
-    <contentTypes.BlockQuote, StyledComponentProps<BlockQuoteEditorProps, typeof styles>,
-    BlockQuoteEditorState> {
+  extends AbstractContentEditor
+  <contentTypes.BlockQuote, StyledComponentProps<BlockQuoteEditorProps, typeof styles>,
+  BlockQuoteEditorState> {
 
   constructor(props) {
     super(props);
@@ -56,7 +56,8 @@ class BlockQuoteEditor
         <div className={classes.quoteWrapper}>
           <ContiguousTextEditor
             {...this.props}
-            onInsertParsedContent={() => {}}
+            onInsertParsedContent={() => { }}
+            orderedIds={null}
             onFocus={this.onFocusOverride}
             model={this.props.model.text}
             onEdit={this.onEditText}>

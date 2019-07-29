@@ -37,6 +37,7 @@ export interface DraftWrapperProps {
   onInsertParsedContent: (content: ParsedContent) => void;
   onEntitySelected?: (key: string, data: Object) => void;
   selectedEntity?: Maybe<string>;
+  orderedIds: Immutable.Map<string, number>;
 }
 
 interface DraftWrapperState {
@@ -290,12 +291,16 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     if (this.props.selectedEntity !== nextProps.selectedEntity) {
       return true;
     }
+    if (this.props.orderedIds !== nextProps.orderedIds) {
+      return true;
+    }
     return false;
   }
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
-    if (this.props.selectedEntity !== nextProps.selectedEntity) {
+    if (this.props.selectedEntity !== nextProps.selectedEntity
+      || this.props.orderedIds !== nextProps.orderedIds) {
       this.lastContent = nextProps.content.content;
       const es = EditorState.createWithContent(
         nextProps.content.content,
@@ -359,6 +364,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       props.onSelectionChange(ss, true);
     };
     const compositeDecorator = buildCompositeDecorator({
+      orderedIds: props.orderedIds,
       selectedEntity: props.selectedEntity,
       services: props.services,
       context: props.context, onEdit: onDecoratorEdit,

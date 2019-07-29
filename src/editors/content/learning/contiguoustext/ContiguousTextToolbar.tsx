@@ -469,6 +469,7 @@ class ContiguousTextToolbar
           <ToolbarNarrowMenu
             icon={<i className={'fa fa-asterisk'} />}
             label={''}
+            tooltip="Insert Citation"
             disabled={!supports('cite') || !pointEntitiesEnabled}>
 
             {this.renderEntryOptions(selection)}
