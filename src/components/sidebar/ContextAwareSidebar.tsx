@@ -11,7 +11,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 import {
   ModelTypes, ContentModel, AssessmentModel, CourseModel, OrganizationModel,
 } from 'data/models';
@@ -316,7 +316,7 @@ class ContextAwareSidebar
         </SidebarRow>
       </SidebarGroup>
     );
-
+/*
     const getRefGuidFromRef = (ref: Edge) => {
       const id = stripId(ref.sourceId);
 
@@ -325,7 +325,7 @@ class ContextAwareSidebar
         nothing: () => '',
       });
     };
-
+*/
     const stripId = (id: string) => {
       const splits = id.split(':');
       if (splits.length === 3) {
@@ -333,14 +333,19 @@ class ContextAwareSidebar
       }
     };
 
-    const getRefTitleFromRef = (ref: Edge) => {
+    const getRefResourceFromRef = (ref: Edge) => {
       const id = stripId(ref.sourceId);
-
-      return Maybe.maybe(course.resourcesById.get(id)).caseOf({
-        just: resource => resource.title,
-        nothing: () => '[Error loading page title]',
-      });
+      return course.resourcesById.get(id);
     };
+ /*
+      return Maybe.maybe(course.resourcesById.get(id));
+    };
+     .caseOf({
+        just: resource => resource,
+        //just: resource => resource.title,
+        nothing: () => '[Error loading page title]',
+      }); */
+    //};
 
     const orgGuid = selectedOrganization.caseOf({
       just: (organization) => {
@@ -360,24 +365,25 @@ class ContextAwareSidebar
                     <div className="container">
 
                       {
-                        refs.map(ref => (
-                          <div key={ref.guid} className="ref-thing">
+                        refs.map(ref => getRefResourceFromRef(ref)).filter(res => (
+                          res.resourceState !== ResourceState.DELETED)).map(res => (
+                          <div key={res.guid} className="ref-thing">
                             <a href="#" onClick={(event) => {
                               event.preventDefault();
                               // if link is to org, just switch org and stay on current page
-                              if (ref.sourceType === 'x-oli-organization') {
+                              if (res.type === 'x-oli-organization') {
                                 viewDocument(resource.id, course.idvers,
-                                  Maybe.maybe(stripId(ref.sourceId)));
+                                  Maybe.maybe(res.id));
                               } else {
-                                viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
+                                viewDocument(res.id, course.idvers, Maybe.nothing());
                               }
                             }
                             }>
                               <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
                                 {
-                                  getNameAndIconByType(ref.sourceType).icon}
+                                  getNameAndIconByType(res.type).icon}
                               </span>
-                              {getRefTitleFromRef(ref)}
+                              {res.title}
                             </a>
                           </div>
                         ))}
