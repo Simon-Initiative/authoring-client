@@ -65,7 +65,7 @@ export class LikertEditor extends AbstractContentEditor<Likert, Props, State> {
   renderMain() {
     const { editMode, canRemove, onRemove, onDuplicate, model } = this.props;
 
-    const scaleOptions = [1, 3, 5, 7]
+    const scaleOptions = [1, 2, 3, 4, 5, 6, 7, 8]
       .map(n => <option key={n} value={n}>{n}</option>);
 
     return (
