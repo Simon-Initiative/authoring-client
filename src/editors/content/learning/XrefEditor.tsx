@@ -68,15 +68,18 @@ export default class XrefEditor
 
     updateTarget(model.idref, model.page);
   }
-
+// FIXME: this returns false postives
   hasTargetChanged(nextProps: XrefEditorProps) {
+    const { model } = this.props;
+    return model.idref !== nextProps.model.idref;
+    /*
     const { target } = this.props;
-
+    console.table(nextProps.target);
+    if (nextProps.target === undefined) {
+      return target !== undefined;
+    }
     if (target === undefined) {
       return nextProps.target !== undefined;
-    }
-    if (target !== undefined && nextProps.target === undefined) {
-      return true;
     }
 
     const changed = target.caseOf({
@@ -93,17 +96,21 @@ export default class XrefEditor
         });
       },
     });
-
-    return changed;
+*/
+   // return changed;
   }
 
+  // FIXME: THIS AINT GOOD model is a reference type!!!
   componentWillReceiveProps(nextProps: XrefEditorProps) {
     const { updateTarget, model } = this.props;
 
     if (this.hasTargetChanged(nextProps)) {
+      console.log(nextProps.model.idref, nextProps.model.page);
       updateTarget(nextProps.model.idref, nextProps.model.page);
     }
-    if (model !== nextProps.model) {
+    console.log('Has changed: ' + this.hasTargetChanged(nextProps));
+    if (model.idref !== nextProps.model.idref) {
+      //console.log(model !== nextProps.model);
       this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page });
     }
   }
