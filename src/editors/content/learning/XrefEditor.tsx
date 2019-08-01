@@ -60,21 +60,21 @@ export default class XrefEditor
   shouldComponentUpdate(nextProps: XrefEditorProps, nextState: XrefEditorState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || nextState !== this.state
-      || nextProps.target !== this.props.target;
+      || this.hasTargetChanged(nextProps);
   }
 
   componentDidMount() {
     const { model, updateTarget } = this.props;
-
     updateTarget(model.idref, model.page);
+    console.log('COMPONENT DID MOUNT');
+    console.log('++++++++++++++++++++');
+
   }
 // FIXME: this returns false postives
   hasTargetChanged(nextProps: XrefEditorProps) {
-    const { model } = this.props;
-    return model.idref !== nextProps.model.idref;
-    /*
+
     const { target } = this.props;
-    console.table(nextProps.target);
+    //console.table(nextProps.target);
     if (nextProps.target === undefined) {
       return target !== undefined;
     }
@@ -96,22 +96,21 @@ export default class XrefEditor
         });
       },
     });
-*/
-   // return changed;
+    return changed;
   }
 
   // FIXME: THIS AINT GOOD model is a reference type!!!
   componentWillReceiveProps(nextProps: XrefEditorProps) {
     const { updateTarget, model } = this.props;
-
+/*
     if (this.hasTargetChanged(nextProps)) {
-      console.log(nextProps.model.idref, nextProps.model.page);
-      updateTarget(nextProps.model.idref, nextProps.model.page);
-    }
-    console.log('Has changed: ' + this.hasTargetChanged(nextProps));
+    } */
     if (model.idref !== nextProps.model.idref) {
-      //console.log(model !== nextProps.model);
-      this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page });
+      this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page },
+         () => { updateTarget(nextProps.model.idref, nextProps.model.page); });
+
+      console.log('COMPONENT RECEIVED PROPS');
+      console.log('==========================');
     }
   }
 
@@ -152,7 +151,7 @@ export default class XrefEditor
 
   onChangePage(page: string) {
 
-    const { onEdit, model, updateTarget, context } = this.props;
+    const { onEdit, model, updateTarget} = this.props;
     if (this.state.targetIsPage) {
       onEdit(model.with({ page, idref: page }));
     } else {
@@ -166,7 +165,7 @@ export default class XrefEditor
 
   onToggleTargetPage(targetIsPage: boolean) {
 
-    const { onEdit, model, updateTarget, context } = this.props;
+    const { onEdit, model, updateTarget } = this.props;
     this.setState({ targetIsPage });
     if (targetIsPage) {
       onEdit(model.with({ idref: model.page }));
