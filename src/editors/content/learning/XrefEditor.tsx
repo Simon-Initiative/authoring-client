@@ -37,6 +37,7 @@ export interface XrefEditorProps
 
 export interface XrefEditorState {
   targetIsPage: boolean;
+  loadingTarget: boolean;
 }
 
 /* Cross Reference is essentially an internal link. It allows you to link to another
@@ -54,7 +55,10 @@ export default class XrefEditor
     this.onChangeTarget = this.onChangeTarget.bind(this);
     this.onChangePage = this.onChangePage.bind(this);
     this.onToggleTargetPage = this.onToggleTargetPage.bind(this);
-    this.state = { targetIsPage: props.model.idref === props.model.page };
+    this.state = {
+      targetIsPage: props.model.idref === props.model.page,
+      loadingTarget: true,
+    };
   }
 
   shouldComponentUpdate(nextProps: XrefEditorProps, nextState: XrefEditorState) {
@@ -66,15 +70,12 @@ export default class XrefEditor
   componentDidMount() {
     const { model, updateTarget } = this.props;
     updateTarget(model.idref, model.page);
-    console.log('COMPONENT DID MOUNT');
-    console.log('++++++++++++++++++++');
 
   }
-// FIXME: this returns false postives
+
   hasTargetChanged(nextProps: XrefEditorProps) {
 
     const { target } = this.props;
-    //console.table(nextProps.target);
     if (nextProps.target === undefined) {
       return target !== undefined;
     }
@@ -99,7 +100,7 @@ export default class XrefEditor
     return changed;
   }
 
-  // FIXME: THIS AINT GOOD model is a reference type!!!
+
   componentWillReceiveProps(nextProps: XrefEditorProps) {
     const { updateTarget, model } = this.props;
 /*
@@ -108,9 +109,6 @@ export default class XrefEditor
     if (model.idref !== nextProps.model.idref) {
       this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page },
          () => { updateTarget(nextProps.model.idref, nextProps.model.page); });
-
-      console.log('COMPONENT RECEIVED PROPS');
-      console.log('==========================');
     }
   }
 
@@ -151,7 +149,7 @@ export default class XrefEditor
 
   onChangePage(page: string) {
 
-    const { onEdit, model, updateTarget} = this.props;
+    const { onEdit, model, updateTarget } = this.props;
     if (this.state.targetIsPage) {
       onEdit(model.with({ page, idref: page }));
     } else {
