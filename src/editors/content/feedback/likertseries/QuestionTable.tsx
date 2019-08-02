@@ -27,7 +27,7 @@ export interface Props extends AbstractContentEditorProps<LikertSeries> {
   editMode: boolean;
   onEditScale: (scale: LikertScale, src: ContentElement) => void;
   onEditItems: (items: Immutable.OrderedMap<string, LikertItem>, src: ContentElement) => void;
-  allowGroup? : boolean; // controller by Toggle switch
+  allowGroup?: boolean; // controller by Toggle switch
 }
 
 export interface State { }
@@ -197,7 +197,7 @@ export class QuestionTable extends React.PureComponent<Props, State> {
       );
     };
 
-    const scaleOptions = [1, 3, 5, 7]
+    const scaleOptions = [1, 2, 3, 4, 5, 6, 7, 8]
       .map(n => <option key={n} value={n}>{n}</option>);
 
     return (
@@ -225,8 +225,8 @@ export class QuestionTable extends React.PureComponent<Props, State> {
                 </td>
               ))}
               {allowGroup ?
-              (<td>Group</td>) :
-              (null)}
+                (<td>Group</td>) :
+                (null)}
             </tr>
           </thead>
           <tbody>
