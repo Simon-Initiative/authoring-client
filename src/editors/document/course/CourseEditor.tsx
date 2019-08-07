@@ -328,15 +328,25 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const developers = this.props.model.developers.toArray();
 
     return (
-      <Typeahead
-        disabled={!this.props.editMode}
-        multiple
-        renderMenuItemChildren={this.onRenderMenuItemChildren}
-        onChange={this.onEditDevelopers}
-        options={developers}
-        labelKey={(d: UserInfo) => `${d.firstName} ${d.lastName} (${d.email})`}
-        selected={this.state.selectedDevelopers}
-      />
+      <React.Fragment>
+        <div style={{ marginBottom: 10 }}>
+          You can add your team members here to grant them access to this course.
+        </div>
+        <label htmlFor="team"
+          style={{ color: '#aaa', fontWeight: 600, fontSize: '0.9rem', marginBottom: 0 }}>
+          Enter a user's name or email...
+        </label>
+        <Typeahead
+          inputProps={{ id: 'team' }}
+          disabled={!this.props.editMode}
+          multiple
+          renderMenuItemChildren={this.onRenderMenuItemChildren}
+          onChange={this.onEditDevelopers}
+          options={developers}
+          labelKey={(d: UserInfo) => `${d.firstName} ${d.lastName} (${d.email})`}
+          selected={this.state.selectedDevelopers}
+        />
+      </React.Fragment>
     );
   }
 
@@ -824,8 +834,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                                          To get the most recent
-                                          data for analytics, create a new dataset.
+                                                                            To get the most recent
+                                                                            data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
