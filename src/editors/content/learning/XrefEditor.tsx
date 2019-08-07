@@ -37,7 +37,6 @@ export interface XrefEditorProps
 
 export interface XrefEditorState {
   targetIsPage: boolean;
-  loadingTarget: boolean;
 }
 
 /* Cross Reference is essentially an internal link. It allows you to link to another
@@ -57,7 +56,6 @@ export default class XrefEditor
     this.onToggleTargetPage = this.onToggleTargetPage.bind(this);
     this.state = {
       targetIsPage: props.model.idref === props.model.page,
-      loadingTarget: true,
     };
   }
 
@@ -103,9 +101,6 @@ export default class XrefEditor
 
   componentWillReceiveProps(nextProps: XrefEditorProps) {
     const { updateTarget, model } = this.props;
-/*
-    if (this.hasTargetChanged(nextProps)) {
-    } */
     if (model.idref !== nextProps.model.idref) {
       this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page },
          () => { updateTarget(nextProps.model.idref, nextProps.model.page); });
