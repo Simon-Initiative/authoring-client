@@ -2,11 +2,6 @@ import * as contentTypes from 'data/contentTypes';
 import * as React from 'react';
 import AceEditor from 'react-ace';
 import './SourcePanel.scss';
-import Measure from 'react-measure';
-// KEVIN-2012  next replace <Measure> with my own custom component
-// https://stackoverflow.com/questions/25371926/...
-// (url continued): how-can-i-respond-to-the-width-of-an-auto-sized-dom-element-in-react
-// requires lodash.throttle (0 dependencies) and shallowEqual (0 dependencies)
 
 import 'brace/theme/tomorrow_night_bright';
 
@@ -19,21 +14,10 @@ interface SourcePanelProps {
 }
 
 interface SourcePanelState {
-  componentWidth: number; // needed to automatically resize
-  innerComponentPct: string; // toggle b/t 99% and 100%
 }
 
 // AceEditor is inside here!
 export class SourcePanel extends React.Component<SourcePanelProps, SourcePanelState> {
-  constructor(props: SourcePanelProps) {
-    super(props);
-
-    this.state = {
-      componentWidth: 0, // who cares, just init at zero
-      innerComponentPct: '100%',
-    };
-  }
-
   reactAceComponent: any;
 
   componentDidMount() {
@@ -44,29 +28,18 @@ export class SourcePanel extends React.Component<SourcePanelProps, SourcePanelSt
   }
 
   render() {
+
     const { editMode, model, onExpressionEdit, evaluate, onSwitchToOldVariableEditor }
       = this.props;
 
-      // div class="ace_content" has a style attribute "width" that changes.
-      // we can force this change by changing the innerComponentPct state
     return (
-      <Measure
-        bounds
-        onResize={(contentRect) => {
-          this.setState({
-            componentWidth: contentRect.bounds.width,
-            innerComponentPct: this.state.innerComponentPct === '99%' ? '100%' : '99%',
-          });
-        }}
-      >
-        {({ measureRef }) => (
-      <div className="sourcePanel" ref={measureRef}>
+      <div className="sourcePanel">
         <span className="panelTitle">JavaScript</span>
         <AceEditor
           ref={ref => this.reactAceComponent = ref}
           className="source"
           name="source"
-          width={this.state.innerComponentPct}
+          width="100%"
           height="100%"
           mode="javascript"
           theme="tomorrow_night_bright"
@@ -108,8 +81,6 @@ export class SourcePanel extends React.Component<SourcePanelProps, SourcePanelSt
           }}
         />
       </div>
-      )}
-      </Measure>
     );
   }
 }
