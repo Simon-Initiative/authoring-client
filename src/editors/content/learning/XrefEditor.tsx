@@ -54,29 +54,31 @@ export default class XrefEditor
     this.onChangeTarget = this.onChangeTarget.bind(this);
     this.onChangePage = this.onChangePage.bind(this);
     this.onToggleTargetPage = this.onToggleTargetPage.bind(this);
-    this.state = { targetIsPage: props.model.idref === props.model.page };
+    this.state = {
+      targetIsPage: props.model.idref === props.model.page,
+    };
   }
 
   shouldComponentUpdate(nextProps: XrefEditorProps, nextState: XrefEditorState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || nextState !== this.state
-      || nextProps.target !== this.props.target;
+      || this.hasTargetChanged(nextProps);
   }
 
   componentDidMount() {
     const { model, updateTarget } = this.props;
-
     updateTarget(model.idref, model.page);
+
   }
 
   hasTargetChanged(nextProps: XrefEditorProps) {
-    const { target } = this.props;
 
+    const { target } = this.props;
+    if (nextProps.target === undefined) {
+      return target !== undefined;
+    }
     if (target === undefined) {
       return nextProps.target !== undefined;
-    }
-    if (target !== undefined && nextProps.target === undefined) {
-      return true;
     }
 
     const changed = target.caseOf({
@@ -93,18 +95,15 @@ export default class XrefEditor
         });
       },
     });
-
     return changed;
   }
 
+
   componentWillReceiveProps(nextProps: XrefEditorProps) {
     const { updateTarget, model } = this.props;
-
-    if (this.hasTargetChanged(nextProps)) {
-      updateTarget(nextProps.model.idref, nextProps.model.page);
-    }
-    if (model !== nextProps.model) {
-      this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page });
+    if (model.idref !== nextProps.model.idref) {
+      this.setState({ targetIsPage: nextProps.model.idref === nextProps.model.page },
+         () => { updateTarget(nextProps.model.idref, nextProps.model.page); });
     }
   }
 
@@ -145,7 +144,7 @@ export default class XrefEditor
 
   onChangePage(page: string) {
 
-    const { onEdit, model, updateTarget, context } = this.props;
+    const { onEdit, model, updateTarget } = this.props;
     if (this.state.targetIsPage) {
       onEdit(model.with({ page, idref: page }));
     } else {
@@ -159,7 +158,7 @@ export default class XrefEditor
 
   onToggleTargetPage(targetIsPage: boolean) {
 
-    const { onEdit, model, updateTarget, context } = this.props;
+    const { onEdit, model, updateTarget } = this.props;
     this.setState({ targetIsPage });
     if (targetIsPage) {
       onEdit(model.with({ idref: model.page }));

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
@@ -22,7 +23,7 @@ export interface ContiguousTextEditorProps
   hideBorder?: boolean;
   onTextSelectionChange?: (selection: any) => void;
   onInsertParsedContent: (resourcePath: string, o) => void;
-
+  orderedIds: Immutable.Map<string, number>;
 }
 
 export interface ContiguousTextEditorState {
@@ -49,7 +50,8 @@ class ContiguousTextEditor
 
   shouldComponentUpdate(nextProps: StyledContiguousTextEditorProps) {
     return nextProps.model !== this.props.model
-      || nextProps.selectedEntity !== this.props.selectedEntity;
+      || nextProps.selectedEntity !== this.props.selectedEntity
+      || nextProps.orderedIds !== this.props.orderedIds;
   }
 
   renderActiveEntity(entity) {
@@ -115,6 +117,7 @@ class ContiguousTextEditor
           viewOnly && classes.viewOnly, className])}>
 
         <DraftWrapper
+          orderedIds={this.props.orderedIds}
           selectedEntity={this.props.selectedEntity}
           onEntitySelected={this.props.onEntitySelected}
           onInsertParsedContent={o =>

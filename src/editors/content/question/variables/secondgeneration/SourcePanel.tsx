@@ -13,10 +13,11 @@ interface SourcePanelProps {
   onSwitchToOldVariableEditor: () => void;
 }
 
-export class SourcePanel extends React.Component<SourcePanelProps, {}> {
-  constructor(props: SourcePanelProps) {
-    super(props);
-  }
+interface SourcePanelState {
+}
+
+// AceEditor is inside here!
+export class SourcePanel extends React.Component<SourcePanelProps, SourcePanelState> {
   reactAceComponent: any;
 
   componentDidMount() {
@@ -27,6 +28,7 @@ export class SourcePanel extends React.Component<SourcePanelProps, {}> {
   }
 
   render() {
+
     const { editMode, model, onExpressionEdit, evaluate, onSwitchToOldVariableEditor }
       = this.props;
 

@@ -14,7 +14,6 @@ import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
 import { RequestButton } from 'editors/document/course/CourseEditor';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
-import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { Resource } from 'data/contentTypes';
 import { RouteCourse } from 'types/router';
 import { CourseIdVers } from 'data/types';

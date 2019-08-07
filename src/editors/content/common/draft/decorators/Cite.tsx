@@ -33,7 +33,7 @@ class Cite extends React.Component<{ orderedIds, entityKey, offsetKey, contentSt
 
     if (entry !== '') {
 
-      let position = this.props.orderedIds.has(entry)
+      let position = this.props.orderedIds !== undefined && this.props.orderedIds.has(entry)
         ? this.props.orderedIds.get(entry) + 1
         : '  ';
       if ((position + '').length === 1) {
@@ -49,36 +49,10 @@ class Cite extends React.Component<{ orderedIds, entityKey, offsetKey, contentSt
 }
 
 
-interface StateProps {
-  orderedIds: Immutable.Map<string, number>;
-}
-
-interface DispatchProps {
-
-}
-
-interface OwnProps { }
-
-const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
-
-  const { orderedIds } = state;
-
-  return {
-    orderedIds,
-  };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
-  return {};
-};
-
-const CiteController = connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(Cite);
-
 export default function (props: Object): Decorator {
   return {
     strategy: byType.bind(undefined, EntityTypes.cite),
-    component: CiteController,
+    component: Cite,
     props,
   };
 }
