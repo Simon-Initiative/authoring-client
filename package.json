@@ -33,7 +33,6 @@
     "react-dom": "^16.8.4",
     "react-hot-loader": "^4.8.4",
     "react-jss": "^8.6.1",
-    "react-measure": "^2.3.0",
     "react-redux": "^6.0.1",
     "react-tippy": "^1.2.2",
     "reason-react": "^0.4.2",
