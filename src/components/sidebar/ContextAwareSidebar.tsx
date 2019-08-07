@@ -181,16 +181,16 @@ class ContextAwareSidebar
     const { course, resource } = props;
 
     persistence.fetchEdges(course.guid).then((edges) => {
-
-      // returns a list of edges pointing to the current page, with no edges sharing the same source
+ // returns a list of edges pointing to the current page, with no edges sharing the same source
       const sources: Edge[] = edges.filter(edge => this.stripId(edge.destinationId) === resource.id)
-                                                       .reduce((prev: [any, Edge[]], edge) => {
-                                                         if (prev[0][edge.sourceId]) {
-                                                           return prev;
-                                                         }
-                                                         prev[0][edge.sourceId] = edge;
-                                                         return [prev[0], prev[1].concat(edge)];
-                                                       }, [{}, []])[1];
+      .reduce((prev : {usedResources: any, edges: Edge[]}, edge) => {
+        if (prev.usedResources[edge.sourceId]) {
+          return prev;
+        }
+        prev.usedResources[edge.sourceId] = edge;
+        prev.edges.push(edge);
+        return prev;
+      }, { usedResources: {}, edges: [] }).edges;
 
       this.setState({
         resourceRefs: Maybe.just(sources),
@@ -354,7 +354,8 @@ class ContextAwareSidebar
 
                       {
                         refs.map(ref => getRefResourceFromRef(ref))
-                        .filter(res => res.resourceState !== ResourceState.DELETED)
+                        .filter(res => res !== undefined ||
+                                       res.resourceState !== ResourceState.DELETED)
                         .sort((a, b) => {
                           if (a.type === b.type) {
                             return (a.title < b.title ? -1 : 1);
