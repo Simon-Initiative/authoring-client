@@ -354,7 +354,7 @@ class ContextAwareSidebar
 
                       {
                         refs.map(ref => getRefResourceFromRef(ref))
-                        .filter(res => res !== undefined ||
+                        .filter(res => res !== undefined &&
                                        res.resourceState !== ResourceState.DELETED)
                         .sort((a, b) => {
                           if (a.type === b.type) {
