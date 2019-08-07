@@ -72,8 +72,7 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
         theme="github"
         readOnly={!editMode}
         width="initial"
-        minLines={35}
-        maxLines={45}
+        maxLines={Infinity}
         wrapEnabled={true}
         value={this.state.beautified}
         onChange={this.onChange}
