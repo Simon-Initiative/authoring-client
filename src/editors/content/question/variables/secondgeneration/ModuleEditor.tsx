@@ -21,6 +21,7 @@ export interface ModuleEditorProps extends AbstractContentEditorProps<Variables>
   resetSidebarContent: () => void;
   activeChild: Maybe<ContentElement>;
   onSwitchToOldVariableEditor: () => void;
+  sidebarShown: boolean;
 }
 
 export interface ModuleEditorState {
@@ -65,6 +66,8 @@ export class ModuleEditor extends AbstractContentEditor<Variables,
         resetSidebarContent();
       }
     });
+
+    this.source.reactAceComponent.editor.resize();
   }
 
   componentDidMount() {
