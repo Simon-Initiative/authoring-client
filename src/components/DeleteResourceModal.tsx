@@ -10,6 +10,8 @@ import './DeleteResourceModal.scss';
 import { LegacyTypes } from 'data/types';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import { Severity, Toast } from 'components/common/Toast';
+import * as viewActions from 'actions/view';
+import { Maybe } from 'tsmonad';
 
 export interface DeleteResourceModalProps {
   resource: Resource;
@@ -23,6 +25,22 @@ interface DeleteResourceModalState {
   edges: OrderedMap<string, Edge>;
   edgesAreLoaded: boolean;
   edgeLoadFailure: boolean;
+}
+
+export function prettyPrintResourceType(type: LegacyTypes): string {
+  switch (type) {
+    case 'x-oli-workbook_page':
+      return 'Workbook Page';
+    case 'x-oli-inline-assessment':
+    case 'x-oli-assessment2':
+      return 'Assessment';
+    case 'x-oli-assessment2-pool':
+      return 'Assessment Pool';
+    case 'x-oli-organization':
+      return 'Organization';
+    default:
+      return type;
+  }
 }
 
 export default class DeleteResourceModal extends
@@ -43,7 +61,7 @@ export default class DeleteResourceModal extends
   componentDidMount() {
     const { course, resource } = this.props;
 
-    persistence.fetchWebContentReferences(course.guid, {}, true, resource.guid)
+    persistence.fetchWebContentReferences(course.guid, {}, true, resource.id)
       .then((edges) => {
         this.setState({
           edges: OrderedMap<string, Edge>(
@@ -76,31 +94,15 @@ export default class DeleteResourceModal extends
   onDelete() {
     const { course, resource, onDeleteResource, orgId } = this.props;
 
-    persistence.deleteResource(course.guid, resource.guid)
+    persistence.deleteResource(course.idvers, resource.id)
       .then(_ => onDeleteResource(resource, course, orgId));
-  }
-
-  prettyPrintResourceType(type: LegacyTypes): string {
-    switch (type) {
-      case 'x-oli-workbook_page':
-        return 'Workbook Page';
-      case 'x-oli-inline-assessment':
-      case 'x-oli-assessment2':
-        return 'Assessment';
-      case 'x-oli-assessment2-pool':
-        return 'Assessment Pool';
-      case 'x-oli-organization':
-        return 'Organization';
-      default:
-        return type;
-    }
   }
 
   render() {
     const { course, resource, onDismissModal } = this.props;
     const { edges, edgesAreLoaded, edgeLoadFailure } = this.state;
 
-    const resourceTypeUppercase = this.prettyPrintResourceType(resource.type as LegacyTypes);
+    const resourceTypeUppercase = prettyPrintResourceType(resource.type as LegacyTypes);
     const resourceTypeLowercase = resourceTypeUppercase.toLowerCase();
 
     const rows = this.state.edges.toArray().map(e => ({ key: e.guid, data: e }));
@@ -144,12 +146,16 @@ export default class DeleteResourceModal extends
       // use the target as the organization in the route. Otherwise, just use the current
       // org since the organization doesn't matter in that case.
       const orgId = edgeResource.type === LegacyTypes.organization
-        ? edgeResource.guid
+        ? edgeResource.id
         : this.props.orgId;
 
       return (text: string) =>
-        <a onClick={this.props.onDismissModal}
-          href={`/#${edgeResource.guid}-${course.guid}-${orgId}`}
+        <a onClick={(e) => {
+          e.preventDefault();
+          this.props.onDismissModal();
+          viewActions.viewDocument(edgeResource.id, course.idvers, Maybe.just(orgId));
+        }}
+          href="#"
           className="btn btn-link">
           {text}
         </a>;
@@ -157,7 +163,7 @@ export default class DeleteResourceModal extends
 
     const columnRenderers = [
       (edge: Edge) => link(edge)(this.edgeResourceTitle(this.edgeResourceId(edge))),
-      (edge: Edge) => <span>{this.prettyPrintResourceType(edge.sourceType)}</span>,
+      (edge: Edge) => <span>{prettyPrintResourceType(edge.sourceType)}</span>,
     ];
 
     const failureIcon =

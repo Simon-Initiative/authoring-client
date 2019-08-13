@@ -55,6 +55,7 @@ class BlockCodeEditor
         <ContiguousTextEditor
           {...this.props}
           onInsertParsedContent={() => { }}
+          orderedIds={null}
           onFocus={this.onFocusOverride}
           model={this.props.model.text}
           onEdit={this.onEditText}

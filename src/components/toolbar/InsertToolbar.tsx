@@ -45,6 +45,7 @@ const WOLFRAM_ICON = require('../../../assets/wolfram.png');
 const imgSize = 24;
 
 import SizePicker from 'editors/content/learning/table/SizePicker';
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object, context?) => void;
@@ -129,7 +130,6 @@ class InsertToolbar
     const { onInsert, parentSupportsElementType, resourcePath, context, editMode,
       courseModel, onDisplayModal, onDismissModal, requestLatestModel,
       onCreateNew } = this.props;
-
     const onTableCreate = (onInsert, numRows, numCols) => {
 
       const rows = [];
@@ -400,12 +400,13 @@ class InsertToolbar
                 const lineId = guid();
 
                 const speaker = new contentTypes.Speaker({
-                  guid: speakerId, id: speakerId, title: Maybe.just('Speaker 1'),
+                  guid: speakerId, id: speakerId,
                 });
                 const speakers =
                   Immutable.OrderedMap<string, contentTypes.Speaker>([[speakerId, speaker]]);
 
-                const material = contentTypes.Material.fromText('Empty text block', '');
+                const material = contentTypes.Material.fromText(
+                  'This is where you can edit each speaker\'s lines', '');
                 const line = new contentTypes.Line({
                   guid: lineId, id: lineId, speaker: speakerId, material,
                 });
@@ -420,27 +421,106 @@ class InsertToolbar
             <ToolbarButtonMenuItem
               onClick={() => {
                 const header1 = new contentTypes.CellHeader();
-                const header2 = new contentTypes.CellHeader();
-                const header3 = new contentTypes.CellHeader();
-                const conjugate = new contentTypes.Conjugate()
-                  .with({
-                    content: ContiguousText.fromText(
-                      'conjugate', guid(), ContiguousTextMode.SimpleText),
-                  });
-                const one = new contentTypes.Cr().with({
+                const header2 = new contentTypes.CellHeader().with({
+                  content: ContentElements.fromText('Présent', guid(), INLINE_ELEMENTS),
+                });
+                const header3 = new contentTypes.CellHeader().with({
+                  content: ContentElements.fromText('Imparfait', guid(), INLINE_ELEMENTS),
+                });
+                const header = new contentTypes.Cr().with({
                   cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
                     .set(header1.guid, header1)
-                    .set(header2.guid, header2),
+                    .set(header2.guid, header2)
+                    .set(header3.guid, header3),
                 });
+                const makeConj = (text: string) => new contentTypes.Conjugate()
+                  .with({
+                    content: ContiguousText.fromText(
+                      text, guid(), ContiguousTextMode.SimpleText),
+                  });
+                const oneHeader = new contentTypes.CellHeader().with({
+                  content: ContentElements.fromText('je', guid(), INLINE_ELEMENTS),
+                });
+                const one1 = makeConj('suis');
+                const one2 = makeConj('étais');
+                const one = new contentTypes.Cr().with({
+                  cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
+                    .set(oneHeader.guid, oneHeader)
+                    .set(one1.guid, one1)
+                    .set(one2.guid, one2),
+                });
+
+                const twoHeader = new contentTypes.CellHeader().with({
+                  content: ContentElements.fromText('tu', guid(), INLINE_ELEMENTS),
+                });
+                const two1 = makeConj('es');
+                const two2 = makeConj('étais');
                 const two = new contentTypes.Cr().with({
                   cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
-                    .set(header3.guid, header3)
-                    .set(conjugate.guid, conjugate),
+                    .set(twoHeader.guid, twoHeader)
+                    .set(two1.guid, two1)
+                    .set(two2.guid, two2),
                 });
+
+                const threeHeader = new contentTypes.CellHeader().with({
+                  content: ContentElements.fromText('il/elle', guid(), INLINE_ELEMENTS),
+                });
+                const three1 = makeConj('est');
+                const three2 = makeConj('était');
+                const three = new contentTypes.Cr().with({
+                  cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
+                    .set(threeHeader.guid, threeHeader)
+                    .set(three1.guid, three1)
+                    .set(three2.guid, three2),
+                });
+
+                const fourHeader = new contentTypes.CellHeader().with({
+                  content: ContentElements.fromText('nous', guid(), INLINE_ELEMENTS),
+                });
+                const four1 = makeConj('sommes');
+                const four2 = makeConj('étions');
+                const four = new contentTypes.Cr().with({
+                  cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
+                    .set(fourHeader.guid, fourHeader)
+                    .set(four1.guid, four1)
+                    .set(four2.guid, four2),
+                });
+
+                const fiveHeader = new contentTypes.CellHeader().with({
+                  content: ContentElements.fromText('vous', guid(), INLINE_ELEMENTS),
+                });
+                const five1 = makeConj('êtes');
+                const five2 = makeConj('étiez');
+                const five = new contentTypes.Cr().with({
+                  cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
+                    .set(fiveHeader.guid, fiveHeader)
+                    .set(five1.guid, five1)
+                    .set(five2.guid, five2),
+                });
+
+                const sixHeader = new contentTypes.CellHeader().with({
+                  content: ContentElements.fromText('ils/elles', guid(), INLINE_ELEMENTS),
+                });
+                const six1 = makeConj('sont');
+                const six2 = makeConj('étaient');
+                const six = new contentTypes.Cr().with({
+                  cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
+                    .set(sixHeader.guid, sixHeader)
+                    .set(six1.guid, six1)
+                    .set(six2.guid, six2),
+                });
+
                 const rows = Immutable.OrderedMap<string, contentTypes.Cr>()
+                  .set(header.guid, header)
                   .set(one.guid, one)
-                  .set(two.guid, two);
+                  .set(two.guid, two)
+                  .set(three.guid, three)
+                  .set(four.guid, four)
+                  .set(five.guid, five)
+                  .set(six.guid, six);
                 const conjugation = new contentTypes.Conjugation().with({
+                  title: Title.fromText('"To Be" en Français'),
+                  verb: 'être',
                   rows,
                 });
 
@@ -505,10 +585,11 @@ class InsertToolbar
                       return onDisplayModal(
                         <ResourceSelection
                           filterPredicate={(res: Resource): boolean =>
-                            res.type === LegacyTypes.inline
-                            && res.resourceState !== ResourceState.DELETED
-                            && !existingInlines.has(res.id)}
-                          courseId={context.courseId}
+                            (res.type === LegacyTypes.inline
+                              && res.resourceState !== ResourceState.DELETED
+                              && !existingInlines.has(res.id))
+                          }
+                          courseId={context.courseModel.guid}
                           onInsert={(resource) => {
                             onDismissModal();
                             const resources = context.courseModel.resources.toArray();
@@ -551,8 +632,9 @@ class InsertToolbar
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.workbook_page
                       && res.id !== PLACEHOLDER_ITEM_ID
-                      && res.resourceState !== ResourceState.DELETED}
-                    courseId={context.courseId}
+                      && res.resourceState !== ResourceState.DELETED
+                      && res.guid !== context.documentId}
+                    courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
                       const resources = context.courseModel.resources.toArray();
@@ -578,7 +660,7 @@ class InsertToolbar
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.assessment2
                       && res.resourceState !== ResourceState.DELETED}
-                    courseId={context.courseId}
+                    courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
                       const resources = context.courseModel.resources.toArray();
@@ -621,7 +703,7 @@ class InsertToolbar
                     filterPredicate={(res: Resource): boolean =>
                       res.type === LegacyTypes.feedback
                       && res.resourceState !== ResourceState.DELETED}
-                    courseId={context.courseId}
+                    courseId={context.courseModel.guid}
                     onInsert={(resource) => {
                       onDismissModal();
                       const resources = context.courseModel.resources.toArray();
@@ -663,6 +745,32 @@ class InsertToolbar
                 Create survey
                 </ToolbarButtonMenuItem>
 
+              <ToolbarButtonMenuItem
+                onClick={() => onDisplayModal(
+                  <ResourceSelection
+                    filterPredicate={(res: Resource): boolean =>
+                      res.type === LegacyTypes.feedback
+                      && res.resourceState !== ResourceState.DELETED}
+                    courseId={context.courseModel.guid}
+                    onInsert={(resource) => {
+                      onDismissModal();
+                      const resources = context.courseModel.resources.toArray();
+                      const found = resources.find(r => r.id === resource.id);
+                      if (found !== undefined) {
+                        onInsert(new contentTypes.ActivityReport().with({
+                          idref: resource.id,
+                          type: Maybe.just(contentTypes.ActivityReportTypes.LikertBar),
+                        }));
+                      }
+
+                    }}
+                    onCancel={onDismissModal}
+                  />)
+                }
+                disabled={false}>
+                <i style={{ width: 22 }} className={'fas fa-clipboard-check'} />
+                Insert Survey{/* Future: Activity */} Report
+                </ToolbarButtonMenuItem>
               <ToolbarButtonMenuDivider />
 
               <ToolbarButtonMenuItem
@@ -689,7 +797,7 @@ class InsertToolbar
                             res.type === LegacyTypes.inline
                             && res.resourceState !== ResourceState.DELETED
                             && !existingInlines.has(res.id)}
-                          courseId={context.courseId}
+                          courseId={context.courseModel.guid}
                           noResourcesMessage={
                             <React.Fragment>
                               No assessments are available for this activity.
@@ -718,6 +826,7 @@ class InsertToolbar
             </ToolbarWideMenu>
           </ToolbarLayout.Column>
           <ToolbarLayout.Column maxWidth="100px">
+
             <ToolbarWideMenu
               icon={<i className={'fa fa-clone'} />}
               label={'Layout'}

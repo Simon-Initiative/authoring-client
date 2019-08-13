@@ -16,6 +16,7 @@ import { caseOf } from 'utils/utils';
 import guid from 'utils/guid';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
+import { Maybe } from 'tsmonad';
 
 type TitleIcon = {
   name: string,
@@ -43,6 +44,10 @@ export const getNameAndIconByType = (type: string) => caseOf<TitleIcon>(type)({
     name: 'Workbook Page',
     icon: <i className="title-icon far fa-file" />,
   },
+  [LegacyTypes.organization]: {
+    name: 'Organization',
+    icon: <i className="title-icon fa fa-th-list" />,
+  },
 })({
   name: 'Unknown',
   icon: <i className="title-icon fa fa-question" />,
@@ -63,7 +68,6 @@ interface ResourceViewState {
 }
 
 export default class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
-  viewActions: any;
 
   state = {
     ...this.state,
@@ -127,9 +131,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   onClickResource(id) {
-    const { course, currentOrg, dispatch } = this.props;
+    const { course, currentOrg } = this.props;
 
-    dispatch(viewActions.viewDocument(id, course.guid, currentOrg));
+    viewActions.viewDocument(id, course.idvers, Maybe.just(currentOrg));
   }
 
   onCreateResource = (type: LegacyTypes) => {
@@ -173,7 +177,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       newItemTitle: '',
     });
 
-    persistence.createDocument(this.props.course.guid, resource)
+    persistence.createDocument(this.props.course.idvers, resource)
       .then((result) => {
         const r = (result as any).model.resource;
 
@@ -229,7 +233,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     };
 
     const link = resource => span =>
-      <button onClick={this.onClickResource.bind(this, resource.guid)}
+      <button onClick={this.onClickResource.bind(this, resource.id)}
         className="btn btn-link title-btn">{span}</button>;
 
     const columnRenderers = [
@@ -243,8 +247,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     ];
 
     return (
-      <div className="">
-        <h2>All Resources</h2>
+      <div>
 
         {this.renderCreation()}
 

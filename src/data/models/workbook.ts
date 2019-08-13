@@ -117,8 +117,11 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     const children = [
       this.head.toPersistence(),
       { body: { '#array': content } },
-      this.bibliography.toPersistence(),
     ];
+
+    if (this.bibliography.bibEntries.size > 0) {
+      children.push(this.bibliography.toPersistence());
+    }
 
     const doc = [{
       workbook_page: {

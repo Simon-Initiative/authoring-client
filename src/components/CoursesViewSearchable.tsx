@@ -12,6 +12,7 @@ import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { safeCompare } from 'components/ResourceView';
 import { buildGeneralErrorMessage } from 'utils/error';
+import { CourseIdVers, CourseGuid } from 'data/types';
 
 function reportProblemAction(): Messages.MessageAction {
 
@@ -40,7 +41,8 @@ function errorMessageAction(): Messages.Message {
 }
 
 export type CourseDescription = {
-  guid: string,
+  guid: CourseGuid,
+  idvers: CourseIdVers,
   id: string,
   version: string,
   title: string,
@@ -54,7 +56,7 @@ export type CoursesViewProps = {
   userId: string,
   createCourse: () => any,
   importCourse: () => any,
-  onSelect: (string) => any, // the id of the course to be viewed
+  onSelect: (id: CourseIdVers) => any, // the id of the course to be viewed
   sendMessage: (msg: Messages.Message) => any;
 };
 
@@ -106,6 +108,7 @@ class CoursesViewSearchable extends React.PureComponent<CoursesViewProps, Course
       .then((docs) => {
         const courses: CourseDescription[] = docs.map(d => ({
           guid: d.guid,
+          idvers: d.idvers,
           id: d.id,
           version: d.version,
           title: d.title,
@@ -213,9 +216,17 @@ const TableToolbar = ({ textChange, createCourse, importCourse }): JSX.Element =
     </div>
   );
 };
-
+interface CoursesViewSearchableTableProps {
+  rows: CourseDescription[];
+  onSelect: (id: CourseIdVers) => void;
+  searchText: string;
+  serverTimeSkewInMs: number;
+  textChange: (s: string) => void;
+  createCourse: () => void;
+  importCourse: () => void;
+}
 const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkewInMs,
-  textChange, createCourse, importCourse }): JSX.Element => {
+  textChange, createCourse, importCourse }: CoursesViewSearchableTableProps): JSX.Element => {
 
   const labels = [
     'Title',
@@ -226,7 +237,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   const link = course => span =>
     <button disabled={course.buildStatus !== 'READY'}
-      onClick={() => onSelect(course.guid)}
+      onClick={() => onSelect(course.idvers)}
       className="btn btn-link">{span}</button>;
 
   const columnRenderers = [
@@ -240,8 +251,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   const highlightedColumnRenderer = (
     prop: string,
-    r: CourseDescription, appendText: string = '') =>
-    searchText.length < 3
+    r: CourseDescription, appendText: string = '') => searchText.length < 3
       ? <span>{r[prop] + appendText}</span>
       : highlightMatchesStr(r[prop] + appendText, searchText);
 
@@ -263,7 +273,7 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
             textChange={textChange}
             createCourse={createCourse} />
           <SortableTable
-            model={rows.map(r => ({ key: r.guid, data: r }))}
+            model={rows.map(r => ({ key: r.guid.value(), data: r }))}
             columnComparators={comparators}
             columnRenderers={columnRenderers}
             columnLabels={labels} />

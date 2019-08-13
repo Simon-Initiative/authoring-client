@@ -1,9 +1,20 @@
 import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
-import { CourseId } from '../types';
 import * as models from '../models';
 import { Resource } from '../content/resource';
 import { DeployStage } from 'data/models/course.ts';
+import { CourseModel } from 'data/models/course';
+import { CourseGuid, CourseIdVers } from 'data/types';
+
+export function createPackage(course: CourseModel): Promise<CourseModel> {
+
+  const url = `${configuration.baseUrl}/packages/`;
+  const body = JSON.stringify(course.toPersistence());
+  const method = 'POST';
+
+  return authenticatedFetch({ url, body, method })
+    .then(CourseModel.fromPersistence);
+}
 
 export function importPackage(repositoryUrl: string): Promise<{}> {
 
@@ -22,25 +33,25 @@ export function getEditablePackages(): Promise<models.CourseModel[]> {
     .then((json: any) => json.map(m => models.createModel(m)));
 }
 
-export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
+export function retrieveCoursePackage(course: CourseGuid | CourseIdVers): Promise<Document> {
 
-  const url = `${configuration.baseUrl}/packages/${courseId}/details`;
+  const url = `${configuration.baseUrl}/packages/${course.value()}/details`;
 
   return authenticatedFetch({ url })
     .then((json: any) => new Document({
-      _courseId: courseId,
+      _courseId: course,
       _id: json.guid,
       _rev: json.rev,
       model: models.createModel(json),
     }));
 }
 
-export function deleteCoursePackage(courseId: CourseId): Promise<{}> {
+export function deleteCoursePackage(courseId: CourseIdVers): Promise<{}> {
 
   const url = `${configuration.baseUrl}/packages/set/visible?visible=false`;
   const method = 'POST';
 
-  const body = JSON.stringify([courseId]);
+  const body = JSON.stringify([courseId.value()]);
 
   return authenticatedFetch({ url, method, body });
 }
@@ -51,17 +62,17 @@ export type CourseResource = {
   type: string,
 };
 
-export function fetchCourseResources(courseId: string): Promise<CourseResource[]> {
+export function fetchCourseResources(course: CourseGuid | CourseIdVers): Promise<CourseResource[]> {
   return new Promise((resolve, reject) => {
 
     try {
 
-      retrieveCoursePackage(courseId)
+      retrieveCoursePackage(course)
         .then((doc) => {
           switch (doc.model.modelType) {
             case 'CourseModel':
               resolve(doc.model.resources.toArray().map(
-                (r: Resource) => ({ _id: r.guid, title: r.title, type: r.type })));
+                (r: Resource) => ({ _id: r.id, title: r.title, type: r.type })));
               return;
             default:
           }
@@ -78,34 +89,36 @@ export type Theme = {
   id: string,
   location: string,
   default: boolean,
+  thumbnail: string,  // The partial url for thumbnail image
+  image: string,  // The partial url for the full-size image
 };
 
-export function fetchCourseThemes(course: string): Promise<Theme[]> {
-  const url = `${configuration.baseUrl}/${course}/themes/available`;
+export function fetchCourseThemes(courseGuid: CourseGuid): Promise<Theme[]> {
+  const url = `${configuration.baseUrl}/${courseGuid.value()}/themes/available`;
   const method = 'GET';
 
   return authenticatedFetch({ url, method }) as Promise<Theme[]>;
 }
 
-export function setCourseTheme(course: string, theme: string): Promise<{}> {
-  const url = `${configuration.baseUrl}/packages/${course}/theme`;
+export function setCourseTheme(courseGuid: CourseGuid, theme: string): Promise<{}> {
+  const url = `${configuration.baseUrl}/packages/${courseGuid.value()}/theme`;
   const method = 'PUT';
   const body = JSON.stringify({ theme });
 
   return authenticatedFetch({ url, method, body });
 }
 
-export function requestDeployment(course: string, stage: DeployStage, redeploy: boolean):
+export function requestDeployment(courseGuid: CourseGuid, stage: DeployStage, redeploy: boolean):
   Promise<{}> {
-  const url = `${configuration.baseUrl}/packages/${course}/deploy`;
+  const url = `${configuration.baseUrl}/packages/${courseGuid.value()}/deploy`;
   const method = 'POST';
   const body = JSON.stringify({ stage, redeploy });
 
   return authenticatedFetch({ url, method, body });
 }
 
-export function createNewVersion(course: string, version: string): Promise<{}> {
-  const url = `${configuration.baseUrl}/packages/${course}/new/version`;
+export function createNewVersion(courseGuid: CourseGuid, version: string): Promise<{}> {
+  const url = `${configuration.baseUrl}/packages/${courseGuid.value()}/new/version`;
   const method = 'POST';
 
   const body = JSON.stringify({ version });

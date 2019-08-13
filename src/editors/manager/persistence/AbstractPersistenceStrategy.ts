@@ -1,5 +1,6 @@
 import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
+import { CourseGuid } from 'data/types';
 
 import {
   onFailureCallback, onSaveCompletedCallback,
@@ -36,9 +37,9 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
 
     // Release the write lock if it was acquired, but fetch
     // the document first to get the most up to date version
-
     if (this.writeLockedDocumentId !== null) {
-      return persistence.releaseLock(this.courseId, this.writeLockedDocumentId);
+      return persistence.releaseLock(CourseGuid.of(this.courseId),
+        this.writeLockedDocumentId);
     }
     return Promise.resolve({});
   }
@@ -60,12 +61,22 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.stateChangeCallback = onStateChange;
 
     return new Promise((resolve, reject) => {
-      persistence.acquireLock(doc._courseId, doc._id)
+      persistence.acquireLock(
+        typeof doc._courseId === 'string'
+          ? CourseGuid.of(doc._courseId)
+          : doc._courseId,
+        typeof doc._id === 'string'
+          ? doc._id
+          : doc._id.value())
         .then((result) => {
           if ((result as any).lockedBy === userName) {
             this.lockDetails = (result as any);
-            this.writeLockedDocumentId = doc._id;
-            this.courseId = doc._courseId;
+            this.writeLockedDocumentId = typeof doc._id === 'string'
+              ? doc._id
+              : doc._id.value();
+            this.courseId = typeof doc._courseId === 'string'
+              ? doc._courseId
+              : doc._courseId.value();
 
             resolve(true);
 

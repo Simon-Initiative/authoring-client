@@ -36,7 +36,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
+const mapDispatchToProps = (dispatch, ownProps: OwnProps): DispatchProps => {
   return {
     onShowPageDetails: () => {
       dispatch(resetActive());
@@ -46,13 +46,13 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
       dispatch(showSidebar(true));
     },
     onQuickPreview: (courseId: string, resource: Resource) => {
-      return dispatch(quickPreview(courseId, resource) as any);
+      return dispatch(quickPreview(courseId, resource));
     },
     onUndo: (documentId: string) => {
-      return dispatch(undo(documentId) as any);
+      return dispatch(undo(documentId));
     },
     onRedo: (documentId: string) => {
-      return dispatch(redo(documentId) as any);
+      return dispatch(redo(documentId));
     },
   };
 };

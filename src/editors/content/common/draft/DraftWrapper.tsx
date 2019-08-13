@@ -37,6 +37,7 @@ export interface DraftWrapperProps {
   onInsertParsedContent: (content: ParsedContent) => void;
   onEntitySelected?: (key: string, data: Object) => void;
   selectedEntity?: Maybe<string>;
+  orderedIds: Immutable.Map<string, number>;
 }
 
 interface DraftWrapperState {
@@ -58,14 +59,14 @@ const styleMap = {
     verticalAlign: 'baseline',
     fontSize: '75%',
     bottom: '-0.25em',
-  },
+  } as any,
   SUPERSCRIPT: {
     lineHeight: '0',
     position: 'relative',
     verticalAlign: 'baseline',
     fontSize: '75%',
     top: '-0.5em',
-  },
+  } as any,
   CITE: {
     fontStyle: 'italic',
     textDecoration: 'underline',
@@ -290,12 +291,16 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     if (this.props.selectedEntity !== nextProps.selectedEntity) {
       return true;
     }
+    if (this.props.orderedIds !== nextProps.orderedIds) {
+      return true;
+    }
     return false;
   }
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
-    if (this.props.selectedEntity !== nextProps.selectedEntity) {
+    if (this.props.selectedEntity !== nextProps.selectedEntity
+      || this.props.orderedIds !== nextProps.orderedIds) {
       this.lastContent = nextProps.content.content;
       const es = EditorState.createWithContent(
         nextProps.content.content,
@@ -359,6 +364,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       props.onSelectionChange(ss, true);
     };
     const compositeDecorator = buildCompositeDecorator({
+      orderedIds: props.orderedIds,
       selectedEntity: props.selectedEntity,
       services: props.services,
       context: props.context, onEdit: onDecoratorEdit,
@@ -464,7 +470,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           stripPastedStyles={false}
           handleReturn={this.handleReturn.bind(this)}
           handlePastedText={this.handlePastedText.bind(this)}
-          customStyleMap={styleMap}
+          customStyleMap={styleMap as any}
           blockRenderMap={blockRenderMap as any}
           blockStyleFn={this.blockStyleFn.bind(this)}
           editorState={this.state.editorState}

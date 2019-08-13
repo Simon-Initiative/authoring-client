@@ -1,45 +1,44 @@
-@import 'oli/colors';
-
+@import "oli/colors";
 
 .treenode-content {
-  height: 36px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  padding: 0 10px;
-  vertical-align: middle;
-  font-size: 1.0em;
-  font-weight: 500;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  cursor: pointer;
-
-  .treenode-title {
-    vertical-align: middle;
-    margin: 4px 0;
+    height: 36px;
+    text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
-  }
+    padding: 0 10px;
+    vertical-align: middle;
+    font-size: 1.0em;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
 
-  &.selected {
-    background-color: $selection;
-    border-color: $selection;
-    color: $white;
-  }
-
-  &:hover {
-    background-color: $gray-lightest;
-    border-color: $gray-lightest;
+    .treenode-title {
+        vertical-align: middle;
+        margin: 4px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 
     &.selected {
-      background-color: $selection;
-      border-color: $selection;
-      color: $white;
+        background-color: $selection;
+        border-color: $selection;
+        color: $white;
     }
-  }
 
-  .toggle {
-    margin-right: 5px;
-  }
+    &:hover {
+        background-color: $gray-lightest;
+        border-color: $gray-lightest;
+
+        &.selected {
+            background-color: $selection;
+            border-color: $selection;
+            color: $white;
+        }
+    }
+
+    .toggle {
+        margin-right: 5px;
+    }
 }

@@ -18,6 +18,7 @@ import { UserState } from 'reducers/user';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { duplicate } from 'actions/duplication';
 import UndoRedoToolbar from 'editors/document/common/UndoRedoToolbar';
+import { Document } from 'data/persistence';
 
 function buildMoreInfoAction(display, dismiss) {
   const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
@@ -36,10 +37,14 @@ function buildMoreInfoAction(display, dismiss) {
   return moreInfoAction;
 }
 
-function buildUnitsMessage(display, dismiss) {
+function buildUnitsMessage(display, dismiss, labels: contentTypes.Labels) {
+
+  const lowerCased = labels.module.toLowerCase();
+
   const content = new Messages.TitledContent().with({
-    title: 'No modules.',
-    message: 'Organizations without modules have learning dashboard limitations in OLI',
+    title: `No ${lowerCased} found.`,
+    message:
+      `Organizations without at least one ${lowerCased} have learning dashboard limitations in OLI`,
   });
 
   return new Messages.Message().with({
@@ -120,11 +125,13 @@ export class OrgDetailsEditor
 
       if (!containsOnly) {
         this.unitsMessageDisplayed = false;
-        props.dismissMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
+        props.dismissMessage(buildUnitsMessage(
+          props.displayModal, props.dismissModal, model.labels));
 
       } else if (!this.unitsMessageDisplayed && containsOnly) {
         this.unitsMessageDisplayed = true;
-        props.showMessage(buildUnitsMessage(props.displayModal, props.dismissModal));
+        props.showMessage(buildUnitsMessage(
+          props.displayModal, props.dismissModal, model.labels));
       }
     });
   }
@@ -206,8 +213,10 @@ export class OrgDetailsEditor
     const { dispatch, course, user } = this.props;
 
     function dupe() {
-      dispatch(duplicate(model)).then((doc) => {
-        updateActiveOrgPref(course.guid, user.profile.username, doc.model.guid);
+      dispatch(duplicate(model)).then((doc: Document) => {
+        updateActiveOrgPref(
+          course.idvers, user.profile.username,
+          (doc.model as models.OrganizationModel).resource.id);
       });
     }
 
@@ -233,28 +242,26 @@ export class OrgDetailsEditor
   render() {
 
     return this.props.model.caseOf({
-      just: (m) => {
-        return (
-          <div className="org-details-editor">
-            <div className="doc-head">
-
+      just: m => (
+        <div className="org-details-editor">
+          <div className="doc-head">
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
               <div className="org-details-title">
-                <h3>Organization: {m.title}</h3>
-                <UndoRedoToolbar
-                  undoEnabled={this.props.canUndo}
-                  redoEnabled={this.props.canRedo}
-                  onUndo={this.props.onUndo.bind(this)}
-                  onRedo={this.props.onRedo.bind(this)} />
+                <div className="info">Course Outline</div>
+                <h3>{m.title}</h3>
               </div>
-
-              {this.renderTabs(m)}
+              <div className="flex-spacer"></div>
+              <UndoRedoToolbar
+                undoEnabled={this.props.canUndo}
+                redoEnabled={this.props.canRedo}
+                onUndo={this.props.onUndo.bind(this)}
+                onRedo={this.props.onRedo.bind(this)} />
             </div>
-          </div>);
-      },
+            {this.renderTabs(m)}
+          </div>
+        </div>),
       nothing: () => null,
     });
-
-
   }
 
 }

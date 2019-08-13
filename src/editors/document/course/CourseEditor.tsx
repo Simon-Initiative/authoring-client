@@ -9,9 +9,10 @@ import { Button } from 'editors/content/common/Button';
 import { Select } from 'editors/content/common/Select';
 import { Document } from 'data/persistence/common';
 import './CourseEditor.scss';
+import * as viewActions from 'actions/view';
 import ModalPrompt from 'utils/selection/ModalPrompt';
 import { DeploymentStatus, DeployStage } from 'data/models/course';
-import { LegacyTypes, CourseId } from 'data/types';
+import { LegacyTypes, CourseId, CourseIdVers } from 'data/types';
 import { ResourceState, Resource } from 'data/content/resource';
 import { Title } from 'components/objectives/Title';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
@@ -29,6 +30,10 @@ import flatui from 'styles/palettes/flatui';
 import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { buildGeneralErrorMessage } from 'utils/error';
+import { configuration } from 'actions/utils/config';
+import ResourceView from 'components/ResourceView';
+import OrgLibrary from 'components/OrgLibrary';
+import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -38,18 +43,24 @@ export interface CourseEditorProps {
   model: models.CourseModel;
   editMode: boolean;
   analytics: AnalyticsState;
+  currentOrgDoc: persistence.Document;
+  dispatch: any;
   courseChanged: (m: models.CourseModel) => any;
   viewAllCourses: () => any;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   onShowMessage: (message: Messages.Message) => void;
-  onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
   onCreateDataset: () => void;
+  onCreateOrg: (title: string) => void;
+  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
+  onReleaseOrg: () => void;
 }
 
 type ThemeSelection = {
   id: string,
   selected: boolean,
+  thumbnail: string,
+  image: string,
 };
 
 interface CourseEditorState {
@@ -59,6 +70,7 @@ interface CourseEditorState {
   newVersionNumber: string;
   isNewVersionValid: boolean;
   newVersionErrorMessage: string;
+  showAdvancedDetails: boolean;
 }
 
 interface RequestButtonProps { text: string; className: string; onClick: () => Promise<any>; }
@@ -132,6 +144,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
         resource.type === LegacyTypes.organization &&
         resource.resourceState !== ResourceState.DELETED)
       .toArray();
+    this.toggleAdvancedDetails = this.toggleAdvancedDetails.bind(this);
   }
 
   // Fetch all globally available themes, sort alphabetically, and choose one to be selected
@@ -145,7 +158,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           // The course may have a default theme set under the 'theme' property of the model.
           // If not, use the global default theme as the selected option
           .map(theme => ({
-            id: theme.id,
+            ...theme,
             selected: model.theme
               ? theme.id === model.theme
               : theme.default,
@@ -191,8 +204,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       return;
     }
 
-    const courseId = this.props.model.guid;
-
     const action = developers.length > this.state.selectedDevelopers.length
       ? 'add' : 'remove';
 
@@ -211,7 +222,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     this.setState(
       { selectedDevelopers: developers },
       () => {
-        persistence.developerRegistration(courseId, changes, action)
+        persistence.developerRegistration(this.props.model.idvers, changes, action)
           .catch((err) => {
             // We need to handle this better.  This editor should be managed
             // by the EditorManager
@@ -295,7 +306,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   removePackage() {
     const { viewAllCourses, onShowMessage } = this.props;
 
-    persistence.deleteCoursePackage(this.props.model.guid)
+    persistence.deleteCoursePackage(this.props.model.idvers)
       .then(document => viewAllCourses())
       .catch(err => onShowMessage(
         buildGeneralErrorMessage(`Error removing package: ${err.message}`)));
@@ -342,24 +353,49 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   renderThemes() {
     const { themes } = this.state;
 
-    const option = (theme: ThemeSelection) =>
-      <option
-        key={theme.id}
-        value={theme.id}>
-        {theme.id}
-      </option>;
+    const urlPrefix = configuration.protocol + configuration.hostname + '/';
 
-    const options = themes.map(option);
-    const selectedTheme = themes.find(theme => theme.selected);
+    const cursor = 'pointer';
+    const marginLeft = '15px';
+
+    const selected = {
+      borderWidth: 8,
+      border: 'solid',
+      borderColor: 'blue',
+      cursor,
+      marginLeft,
+    };
+
+    const notSelected = {
+      borderWidth: 8,
+      border: 'solid',
+      borderColor: 'lightgray',
+      cursor,
+      marginLeft,
+      opacity: 0.5,
+    };
+
+    const toImage = (theme: ThemeSelection) =>
+      <div className="d-flex flex-column">
+        <img
+          style={theme.selected ? selected : notSelected}
+          onClick={this.onEditTheme.bind(this, theme.id)}
+          key={theme.id}
+          src={urlPrefix + theme.thumbnail} />
+        <div style={{ textAlign: 'center' }}>{theme.id}</div>
+      </div>;
+
+    const images = themes.map(toImage);
 
     return (
-      <Select
-        {...this.props}
-        className="themeSelect"
-        value={selectedTheme && selectedTheme.id}
-        onChange={this.onEditTheme}>
-        {options}
-      </Select>
+      <div>
+        <p>Select the look and feel for the course when viewed from
+          a student and instructor perspective.
+        </p>
+        <div className="d-flex flex-row">
+          {images}
+        </div>
+      </div>
     );
   }
 
@@ -538,7 +574,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <Button
             editMode
             type="outline-primary"
-            onClick={() => persistence.skillsDownload(this.props.model.guid)}>
+            onClick={() => persistence.skillsDownload(this.props.model.idvers)}>
             <i className="fa fa-download" /> Download Skill Files
           </Button>
           &nbsp;&nbsp;
@@ -583,10 +619,19 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  // Either Show or Hide the Advanced options in the Details page
+  toggleAdvancedDetails() {
+    this.setState({
+      showAdvancedDetails: !this.state.showAdvancedDetails,
+    });
+  }
+
   renderDetails() {
     const { model } = this.props;
 
     const isAdmin = hasRole('admin');
+
+    const collapseIndicator = this.state.showAdvancedDetails ? '-' : '+';
 
     return (
       <div className="infoContain">
@@ -626,36 +671,57 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <div className="col-3">Team members</div>
           <div className="col-9">{this.renderDevelopers()}</div>
         </div>
+
+        {
+          // Note that the implementation of this toggle is very similar to the
+          // Collapse element. But this required too many changes to Collapse code.
+        }
         <div className="row">
-          <div className="col-3">Theme</div>
-          <div className="col-9">{this.renderThemes()}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">Version</div>
-          <div className="col-9">{model.version}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">License <HelpPopover activateOnClick>
-            <div><img src={CC_LICENSES} />
-              <br /><br />
-              <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
-                target="_blank">
-                More information
-              </a>
-            </div>
-          </HelpPopover>
+          <div className="col-3">
+            <button
+              type="button"
+              className="btn btn-link"
+              onClick={() => this.toggleAdvancedDetails()}>
+              Advanced Details {collapseIndicator}
+            </button>
           </div>
-          <div className="col-9">{this.renderLicenseSelect()}</div>
+          <div className="col-9"></div>
         </div>
+        {this.state.showAdvancedDetails &&
+          <div className="advanced">
+            <div className="row">
+              <div className="col-3">Theme</div>
+              <div className="col-9">{this.renderThemes()}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Version</div>
+              <div className="col-9">{model.version}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">License <HelpPopover activateOnClick>
+                <div><img src={CC_LICENSES} />
+                  <br /><br />
+                  <a href="https://en.wikipedia.org/wiki/Creative_Commons_license"
+                    target="_blank">
+                    More information
+                </a>
+                </div>
+              </HelpPopover>
+              </div>
+              <div className="col-9">{this.renderLicenseSelect()}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Unique ID</div>
+              <div className="col-9">{model.id}</div>
+            </div>
+            <div className="row">
+              <div className="col-3">Package Location</div>
+              <div className="col-9">{model.svnLocation}</div>
+            </div>
+          </div>
+        }
+
         <hr />
-        <div className="row">
-          <div className="col-3">Unique ID</div>
-          <div className="col-9">{model.id}</div>
-        </div>
-        <div className="row">
-          <div className="col-3">Package Location</div>
-          <div className="col-9">{model.svnLocation}</div>
-        </div>
         {/* <div className="row">
           <div className="col-3">Thumbnail<br /><br />
           </div>
@@ -700,6 +766,24 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  renderResources() {
+    const { model, currentOrgDoc, dispatch } = this.props;
+
+    const org =
+      currentOrgDoc !== null
+        ? (currentOrgDoc.model as models.OrganizationModel).id
+        : null;
+
+    return (
+      <ResourceView
+        course={model}
+        dispatch={dispatch}
+        currentOrg={org}
+        serverTimeSkewInMs={0}
+      />
+    );
+  }
+
   renderAnalytics() {
     const { user, analytics, onCreateDataset, editMode, model } = this.props;
 
@@ -740,7 +824,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-    To get the most recent data for analytics, create a new dataset.
+                                          To get the most recent
+                                          data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
@@ -791,13 +876,38 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  onSelectOrg = (orgId: string) => {
+    const course = this.props.model;
+    const profile = this.props.user.profile;
+
+    this.props.onReleaseOrg();
+    updateActiveOrgPref(course.idvers, profile.username, orgId);
+    this.props.onLoadOrg(course.guid, orgId);
+    viewActions.viewCourse(course.idvers, Maybe.just(orgId));
+  }
+
+  renderOrgs() {
+    const org = this.props.currentOrgDoc !== null
+      ? (this.props.currentOrgDoc.model as models.OrganizationModel).resource
+      : null;
+    return (
+      <OrgLibrary
+        course={this.props.model}
+        currentOrg={org}
+        onCreateOrg={this.props.onCreateOrg}
+        onSelectOrg={this.onSelectOrg}
+      />
+    );
+  }
+
   render() {
     return (
       <div className="course-editor" >
         <div className="row info">
           <div className="col-md-12">
-            <h2>Course Package</h2>
-            <TabContainer labels={['Details', 'Workflow', 'Analytics']}>
+            <h2>Course Details</h2>
+            <TabContainer labels={
+              ['Details', 'Workflow', 'Analytics', 'Resources', 'Organizations']}>
               <Tab>
                 {this.renderDetails()}
               </Tab>
@@ -806,6 +916,12 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               </Tab>
               <Tab>
                 {this.renderAnalytics()}
+              </Tab>
+              <Tab>
+                {this.renderResources()}
+              </Tab>
+              <Tab>
+                {this.renderOrgs()}
               </Tab>
             </TabContainer>
           </div>

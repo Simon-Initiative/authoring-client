@@ -148,13 +148,7 @@ class AlternativesEditor
     );
   }
 
-  onAlternativeEdit(a: contentTypes.Alternative, src) {
-
-    // If the value has been edited, sync that content into the title
-    const previous = this.props.model.content.get(a.guid);
-    const updated = a.value === previous.value
-      ? a
-      : a.with({ title: contentTypes.Title.fromText(a.value) });
+  onAlternativeEdit(updated: contentTypes.Alternative, src) {
 
     // Ignore the edit if it would result in multiple alternatives
     // having the same value

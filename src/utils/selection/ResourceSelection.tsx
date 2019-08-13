@@ -8,12 +8,13 @@ import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import * as models from 'data/models';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
+import { CourseGuid } from 'data/types';
 
 export interface ResourceSelectionProps {
   timeSkewInMs: number;
   course: models.CourseModel;
-  courseId: string;
-  title? :string;
+  courseId: CourseGuid;
+  title?: string;
   noResourcesMessage?: string | JSX.Element;
   filterPredicate: (res: Resource) => boolean;
   onInsert: (item: Resource) => void;
@@ -134,7 +135,6 @@ export default class ResourceSelection
     };
 
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
-
     return (
       <div className="resourceSelection">
         <ModalSelection
@@ -157,17 +157,17 @@ export default class ResourceSelection
                 columnRenderers={columnRenderers}
                 columnLabels={labels} />
             )
-          : this.state.searchText !== ''
-            ? (
-            <div className="no-resources-msg">
-              No resources match the search criteria
+            : this.state.searchText !== ''
+              ? (
+                <div className="no-resources-msg">
+                  No resources match the search criteria
             </div>
-            )
-          : (
-            <div className="no-resources-msg">
-              {this.props.noResourcesMessage || 'No resources found'}
-            </div>
-          )
+              )
+              : (
+                <div className="no-resources-msg">
+                  {this.props.noResourcesMessage || 'No resources found'}
+                </div>
+              )
           }
         </ModalSelection>
       </div>

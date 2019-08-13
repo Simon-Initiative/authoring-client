@@ -12,11 +12,12 @@ import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
 import { setCurrentNodeOrPage } from 'actions/document';
+import { CourseState } from 'reducers/course';
 
 interface StateProps {
   activeContext: any;
   hover: string;
-  course: CourseModel;
+  course: CourseState;
   currentNode: FeedbackQuestionNode;
 }
 

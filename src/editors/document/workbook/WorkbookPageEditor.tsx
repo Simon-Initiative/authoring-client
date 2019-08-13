@@ -27,12 +27,12 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import './WorkbookPageEditor.scss';
 import { MessageState } from 'reducers/messages';
-import { LegacyTypes } from 'data/types';
 import { Prerequisites } from 'editors/document/workbook/Prerequisites';
+import { CourseIdVers, LegacyTypes } from 'data/types';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
-  fetchObjectives: (courseId: string) => void;
-  preview: (courseId: string, resource: Resource) => Promise<any>;
+  fetchObjectives: (courseId: CourseIdVers) => void;
+  preview: (courseId: CourseIdVers, resource: Resource) => Promise<any>;
   activeContext: ActiveContext;
   onUpdateContent: (documentId: string, content: Object) => void;
   onUpdateContentSelection: (
@@ -96,14 +96,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
-      props.services.refreshObjectives(props.context.courseId);
+      props.services.refreshObjectives(props.context.courseModel.idvers);
     }
     if (hasMissingResource()) {
-      props.services.refreshCourse(props.context.courseId);
+      props.services.refreshCourse(props.context.courseModel.idvers);
     }
-
-    console.log('key', this.props.context.courseModel.id
-      + this.props.context.courseModel.version)
 
     this.coursePrereqs = JSON.parse(localStorage.getItem(this.props.context.courseModel.id
       + this.props.context.courseModel.version)) || {};
@@ -148,11 +145,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   componentDidMount() {
     super.componentDidMount();
     const { context, showMessage } = this.props;
-    const { objectives, courseId } = context;
+    const { objectives, courseModel } = context;
 
     if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE
       || objectives.size < 1) {
-      this.noObjectivesMessage = buildMissingObjectivesMessage(courseId, context.orgId);
+      this.noObjectivesMessage =
+        buildMissingObjectivesMessage(courseModel.idvers, context.orgId);
       showMessage(this.noObjectivesMessage);
     }
 
@@ -171,7 +169,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     if (nextProps.model !== this.props.model) {
       if (this.hasMissingObjective(
         nextProps.model.head.objrefs, nextProps.context.objectives)) {
-        nextProps.services.refreshObjectives(nextProps.context.courseId);
+        nextProps.services.refreshObjectives(nextProps.context.courseModel.idvers);
       }
     }
 

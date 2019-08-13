@@ -7,6 +7,7 @@ import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
 import { save } from 'actions/document';
 import { State } from 'reducers';
+import { CourseModel } from 'data/models/course';
 
 interface StateProps {
   expanded: any;
@@ -16,7 +17,6 @@ interface StateProps {
   undoRedoGuid: string;
   editingAllowed: boolean;
   hasFailed: boolean;
-  orgId: string;
 }
 
 interface DispatchProps {
@@ -29,34 +29,29 @@ interface OwnProps {
   userId: string;
   userName: string;
   profile: UserProfile;
-  course: any;
+  course: CourseModel;
+  orgId: string;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { expanded, skills, objectives, documents, course, router } = state;
+  const { expanded, skills, objectives, documents } = state;
 
   const ed = documents.get(ownProps.documentId);
 
   let document = null;
   let undoRedoGuid = 'Loading';
-  let editingAllowed = course.editable;
+  let editingAllowed = ownProps.course.editable;
   let hasFailed = false;
 
   if (ed !== undefined) {
     document = ed.document;
     undoRedoGuid = ed.undoRedoGuid;
-    editingAllowed = ed.editingAllowed && course.editable;
+    editingAllowed = ed.editingAllowed && ownProps.course.editable;
     hasFailed = ed.hasFailed;
   }
 
-  const orgId = router.orgId.caseOf({
-    just: s => s,
-    nothing: () => '',
-  });
-
   return {
-    orgId,
     expanded,
     skills,
     objectives,

@@ -1,8 +1,6 @@
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import Header from 'components/Header';
 import { Maybe } from 'tsmonad';
-import * as viewActions from 'actions/view';
 import { RouterState } from 'reducers/router';
 
 interface StateProps {
@@ -15,7 +13,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  viewActions: viewActions.ViewActions;
 }
 
 interface OwnProps {
@@ -29,7 +26,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
     router,
   } = state;
 
-  const doc =  documents.toArray().length > 0
+  const doc = documents.toArray().length > 0
     ? documents.toArray()[0]
     : { isSaving: false, lastRequestSucceeded: Maybe.nothing(), saveCount: 0 };
   const isSaveInProcess = doc.isSaving;
@@ -48,15 +45,8 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
 
-  const actions = Object.keys(viewActions).reduce(
-    (p, c) => {
-      p[c] = viewActions[c];
-      return p;
-    },
-    {});
-
   return {
-    viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
+
   };
 };
 

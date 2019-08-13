@@ -15,6 +15,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { AbstractContentEditorProps } from 'editors/content/common/AbstractContentEditor';
 
 import './QuestionTable.scss';
+import { Maybe } from 'tsmonad';
 
 enum Direction {
   Up,
@@ -26,6 +27,7 @@ export interface Props extends AbstractContentEditorProps<LikertSeries> {
   editMode: boolean;
   onEditScale: (scale: LikertScale, src: ContentElement) => void;
   onEditItems: (items: Immutable.OrderedMap<string, LikertItem>, src: ContentElement) => void;
+  allowGroup?: boolean; // controller by Toggle switch
 }
 
 export interface State { }
@@ -75,6 +77,16 @@ export class QuestionTable extends React.PureComponent<Props, State> {
         .toOrderedMap();
 
     onEditItems(reordered, null);
+  }
+
+  // When the group for an item is edited, update the model.
+  onEditGroup(item: LikertItem, group: string) {
+    const { model, onEditItems } = this.props;
+    const items = model.items;
+
+    onEditItems(
+      items.set(item.guid, item.with({ group: Maybe.just(group) })),
+      item);
   }
 
   renderDropdown(
@@ -129,10 +141,16 @@ export class QuestionTable extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { editMode, model, onEditScale, onEditItems } = this.props;
+    const { editMode, model, onEditScale, onEditItems, allowGroup } = this.props;
     const { scale, items } = model;
 
     const renderTableRow = (item: LikertItem, index: number) => {
+
+      const groupText = item.group.caseOf({
+        just: g => g,
+        nothing: () => '',
+      });
+
       return (
         <tr key={item.guid}>
           <td>
@@ -163,11 +181,23 @@ export class QuestionTable extends React.PureComponent<Props, State> {
                 onChange={null}
                 type="radio" />
             </td>)}
+          <td>
+            {allowGroup ? (
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  disabled={!editMode}
+                  value={groupText}
+                  onChange={({ target: { value } }) => this.onEditGroup(item, value)} />
+              </div>
+            ) : (null)}
+          </td>
         </tr>
       );
     };
 
-    const scaleOptions = [1, 3, 5, 7]
+    const scaleOptions = [1, 2, 3, 4, 5, 6, 7, 8]
       .map(n => <option key={n} value={n}>{n}</option>);
 
     return (
@@ -194,6 +224,9 @@ export class QuestionTable extends React.PureComponent<Props, State> {
                       source)} />
                 </td>
               ))}
+              {allowGroup ?
+                (<td>Group</td>) :
+                (null)}
             </tr>
           </thead>
           <tbody>

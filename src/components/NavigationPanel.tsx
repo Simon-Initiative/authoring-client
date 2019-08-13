@@ -6,8 +6,6 @@ import colors from 'styles/colors';
 import * as viewActions from 'actions/view';
 import { CourseModel } from 'data/models';
 import { UserProfile } from 'types/user';
-import { RouterState } from 'reducers/router';
-import { ROUTE } from 'actions/router';
 import { disableSelect } from 'styles/mixins';
 import { Document } from 'data/persistence';
 import * as nav from 'types/navigation';
@@ -15,10 +13,10 @@ import OrgEditorManager from 'editors/manager/OrgEditorManager.controller';
 import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
 import { Tooltip } from 'utils/tooltip';
 import { RequestButton } from 'editors/document/course/CourseEditor';
-import { CourseId } from 'data/types';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
-import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 import { Resource } from 'data/contentTypes';
+import { RouteCourse } from 'types/router';
+import { CourseIdVers } from 'data/types';
 
 
 const DEFAULT_WIDTH_PX = 400;
@@ -211,7 +209,7 @@ export const styles: JSSStyles = {
   },
   collapseButtonContainer: {
     position: 'absolute',
-    top: 182,
+    top: 142,
     right: -2,
   },
   collapseButton: {
@@ -266,15 +264,15 @@ export const styles: JSSStyles = {
 export interface NavigationPanelProps {
   className?: string;
   course: CourseModel;
-  viewActions: viewActions.ViewActions;
-  router: RouterState;
+  route: RouteCourse;
   profile: UserProfile;
   userId: string;
   userName: string;
   onCreateOrg: () => void;
-  onLoadOrg: (courseId: string, documentId: string) => Promise<Document>;
+  onLoadOrg: (courseId: CourseIdVers, documentId: string) => Promise<Document>;
   onReleaseOrg: () => void;
-  onPreview: (courseId: CourseId, organizationId: string, redeploy: boolean) => Promise<any>;
+  onPreview: (courseId: CourseIdVers, organizationId: string, redeploy: boolean) =>
+    Promise<any>;
 }
 
 export interface NavigationPanelState {
@@ -293,7 +291,7 @@ class NavigationPanel
   extends React.PureComponent<StyledComponentProps<NavigationPanelProps, typeof styles>,
   NavigationPanelState> {
 
-  constructor(props) {
+  constructor(props: StyledComponentProps<NavigationPanelProps, JSSStyles>) {
     super(props);
 
     this.state = {
@@ -390,16 +388,11 @@ class NavigationPanel
   }
 
   onPreview(redeploy: boolean = true): Promise<void> {
-    const { router, onPreview } = this.props;
+    const { route, onPreview, course } = this.props;
 
-    return router.courseId.caseOf({
-      just: courseId =>
-        router.orgId.caseOf({
-          just: orgId =>
-            onPreview(courseId, orgId, redeploy)
-              .catch(err => console.error('Full preview error:', err)),
-          nothing: () => Promise.reject(null),
-        }),
+    return route.orgId.caseOf({
+      just: orgId => onPreview(course.idvers, orgId, redeploy)
+        .catch(err => console.error('Full preview error:', err)),
       nothing: () => Promise.reject(null),
     });
   }
@@ -436,7 +429,7 @@ class NavigationPanel
   }
 
   renderOverview(currentOrg: Resource) {
-    const { classes, viewActions, course, router } = this.props;
+    const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
     return (
@@ -444,121 +437,55 @@ class NavigationPanel
         <div
           className={classNames([
             classes.navItem,
-            Maybe.sequence({ courseId: router.courseId, resourceId: router.resourceId }).caseOf({
-              just: ({ courseId, resourceId }) => courseId === course.guid
-                && resourceId === course.guid && classes.selectedNavItem,
-              nothing: () => undefined,
-            }),
+            route.route.type === 'RouteCourseOverview' && classes.selectedNavItem,
           ])}
-          onClick={() => viewActions.viewDocument(course.guid, course.guid, currentOrg.guid)}>
+          onClick={() => viewActions.viewCourse(course.idvers, Maybe.just(currentOrg.id))}>
           <i className="fa fa-book" />{!collapsed && ' Overview'}
         </div>
       </Tooltip>
-
     );
   }
 
   renderObjectives(currentOrg: Resource) {
-    const { classes, viewActions, course, router } = this.props;
+    const { classes, course, route } = this.props;
     const { collapsed } = this.state;
 
     return (
       <Tooltip disabled={!collapsed} title="Objectives" position="right">
         <div className={classNames([
           classes.navItem,
-          router.route === ROUTE.OBJECTIVES && classes.selectedNavItem,
+          route.route.type === 'RouteObjectives' && classes.selectedNavItem,
         ])}
-          onClick={() => viewActions.viewObjectives(course.guid, currentOrg.guid)}>
+          onClick={() =>
+            viewActions.viewObjectives(course.idvers, Maybe.just(currentOrg.id))}>
           <i className="fa fa-graduation-cap" />{!collapsed && ' Objectives'}
         </div>
       </Tooltip>
     );
   }
 
-  renderAllResources(currentOrg: Resource) {
-    const { classes, viewActions, course, router } = this.props;
+  renderOrgRootNode(currentOrg: Resource) {
+    const { classes, route, course } = this.props;
     const { collapsed } = this.state;
-
-    return (
-      <Tooltip disabled={!collapsed} title="All Resources" position="right">
-        <div
-          className={classNames([
-            classes.navItem,
-            router.route === ROUTE.ALL_RESOURCES && classes.selectedNavItem,
-          ])}
-          onClick={() => viewActions.viewAllResources(course.guid, currentOrg.guid)}>
-          <i className="fas fa-folder-open" />{!collapsed && ' All Resources'}
-        </div>
-      </Tooltip>
-
-    );
-  }
-
-  renderOrgDropdown(currentOrg: Resource) {
-    const { classes, viewActions, course, router, profile, onCreateOrg } = this.props;
-    const { showOrgDropdown, collapsed } = this.state;
 
     const availableOrgs = r => r.type === 'x-oli-organization' && r.resourceState !== 'DELETED';
 
+    const orgCount = course.resources.toArray().filter(availableOrgs).length;
+    const title = orgCount === 1
+      ? 'Course Outline'
+      : currentOrg.title;
+
+    const selected = (route.route as any).resourceId === currentOrg.id;
+
     return (
-      <div className="dropdown">
-        <div className={classNames([
-          classes.navItemDropdown,
-          router.resourceId.caseOf({
-            just: id => id === currentOrg.guid && classes.selectedNavItem,
-            nothing: () => null,
-          }),
-        ])}>
-          <Tooltip
-            disabled={!collapsed}
-            title={`${currentOrg.title} (${currentOrg.id})`}
-            position="right"
-            distance={32}
-            style={{ overflow: 'hidden', flex: 1, display: 'flex' }}>
-            <div className={classNames([
-              classes.dropdownText,
-              collapsed && classes.dropdownTextCollapsed,
-            ])}
-              onClick={() =>
-                viewActions.viewDocument(currentOrg.guid, course.guid, currentOrg.guid)}>
-              <i className="fa fa-th-list" />{!collapsed && ` ${currentOrg.title}`}
-            </div>
-          </Tooltip>
-          <div className={classNames([
-            classes.dropdownToggle,
-            collapsed && classes.dropdownToggleCollapsed,
-          ])}
-            onClick={(e) => {
-              (e.nativeEvent as any).originator = 'OrgDropdownToggle';
-              this.setState({ showOrgDropdown: !showOrgDropdown });
-            }}>
-            <i className={'fas fa-sort-down'} />
-          </div>
-        </div>
-        <div className={classNames(['dropdown-menu', showOrgDropdown && 'show'])}>
-          {course.resources.valueSeq().filter(availableOrgs).map(org => (
-            <a key={org.guid}
-              className={classNames(['dropdown-item'])}
-              onClick={() => {
-
-                if (org.id !== currentOrg.id) {
-                  this.props.onReleaseOrg();
-                  updateActiveOrgPref(course.guid, profile.username, org.guid);
-                  this.props.onLoadOrg(course.guid, org.guid);
-                  viewActions.viewDocument(org.guid, course.guid, org.guid);
-                }
-
-              }}>
-              {org.title} <span style={{ color: colors.gray }}>({org.id})</span>
-            </a>
-          ))}
-          <div className="dropdown-divider" />
-          <a key="create-org"
-            className={classNames(['dropdown-item'])}
-            onClick={() => onCreateOrg()}>
-            <i className={'fa fa-plus-circle'} /> Create New Organization
-          </a>
-        </div>
+      <div className={classNames([
+        classes.navItem, selected && classes.selectedNavItem])}
+        onClick={(e) => {
+          e.preventDefault();
+          viewActions.viewDocument(currentOrg.id, course.idvers, Maybe.just(currentOrg.id));
+        }}>
+        <i className="fa fa-th-list" />
+        {!collapsed && (' ' + title)}
       </div>
     );
   }
@@ -568,7 +495,7 @@ class NavigationPanel
     const { width, collapsed } = this.state;
 
     return (
-      <React.Fragment>
+      <React.Fragment >
         <div className={classes.orgTree}>
           {collapsed
             ? (
@@ -595,9 +522,10 @@ class NavigationPanel
             )
             : (
               <OrgEditorManager
-                documentId={currentOrg.guid}
+                {...this.props}
+                documentId={currentOrg.id}
                 selectedItem={selectedItem}
-                {...this.props} />
+              />
             )
           }
         </div>
@@ -627,32 +555,36 @@ class NavigationPanel
             )
           }
         </div>
-      </React.Fragment>
+      </React.Fragment >
     );
   }
 
   render() {
-    const { className, classes, course, router } = this.props;
+    const { className, classes, course, route } = this.props;
     const { collapsed } = this.state;
 
     // course may not be loaded before first render. wait for it to load before rendering
     if (!course) return null;
 
     // get org id from router or select the first organization
-    const currentOrg = router.orgId.caseOf({
-      just: guid => course.resources.find(r => r.guid === guid),
-      nothing: () => course.resources.find(r => r.type === 'x-oli-organization'),
-    });
 
     let selectedItem: Maybe<nav.NavigationItem> = Maybe.just(nav.makePackageOverview());
-    if (router.route === ROUTE.OBJECTIVES) {
+    if (route.route.type === 'RouteObjectives') {
       selectedItem = Maybe.just(nav.makeLearningObjectives());
-    } else if (router.route === ROUTE.RESOURCE) {
-      selectedItem = router.resourceId.caseOf({
-        just: id => Maybe.just(nav.makeOrganizationItem(id)),
-        nothing: () => Maybe.nothing<nav.NavigationItem>(),
-      });
+    } else if (route.route.type === 'RouteResource') {
+      selectedItem = Maybe.just(nav.makeOrganizationItem(route.route.resourceId));
     }
+
+    const firstOrganization = () => course.resourcesById.find(r => r.type === 'x-oli-organization');
+
+    const currentOrg = route.orgId.caseOf({
+      just: id => Maybe.maybe(course.resourcesById.find(r => r.id === id))
+        .caseOf({
+          just: resource => resource,
+          nothing: () => firstOrganization(),
+        }),
+      nothing: () => firstOrganization(),
+    });
 
     return (
       <div
@@ -668,8 +600,7 @@ class NavigationPanel
 
         {this.renderOverview(currentOrg)}
         {this.renderObjectives(currentOrg)}
-        {this.renderAllResources(currentOrg)}
-        {this.renderOrgDropdown(currentOrg)}
+        {this.renderOrgRootNode(currentOrg)}
         {this.renderOrgTree(currentOrg, selectedItem)}
 
       </div>

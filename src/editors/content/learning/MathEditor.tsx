@@ -36,17 +36,13 @@ export default class MathEditor
 
     return (
       <SidebarContent title="Math Editor">
-        <SidebarGroup label="">
-          <SidebarRow label="">
-            <SourceBasedMathEditor
-              content={model.data}
-              editMode={editMode}
-              onChange={(data) => {
-                onEdit(model.with({ data }));
-              }}
-            />
-          </SidebarRow>
-        </SidebarGroup>
+          <SourceBasedMathEditor
+            content={model.data}
+            editMode={editMode}
+            onChange={(data) => {
+              onEdit(model.with({ data }));
+            }}
+          />
       </SidebarContent>
     );
   }
