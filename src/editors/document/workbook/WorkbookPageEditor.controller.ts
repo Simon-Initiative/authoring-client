@@ -14,10 +14,12 @@ import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import { ContentElement } from 'data/content/common/interfaces';
 import { setOrderedIds } from 'actions/bibliography';
 import { CourseIdVers } from 'data/types';
+import { CourseState } from 'reducers/course';
 
 interface StateProps {
   activeContext: any;
   hover: string;
+  course: CourseState;
 }
 
 interface DispatchProps {
@@ -36,11 +38,12 @@ interface OwnProps extends AbstractEditorProps<WorkbookPageModel> { }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { activeContext, hover } = state;
+  const { activeContext, hover, course } = state;
 
   return {
     activeContext,
     hover,
+    course,
   };
 };
 

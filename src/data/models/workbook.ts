@@ -6,6 +6,7 @@ import { isArray } from 'util';
 import { ContentElements, TEXT_ELEMENTS, BODY_ELEMENTS } from 'data/content/common/elements';
 import { LegacyTypes } from 'data/types';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
+import { Maybe } from 'tsmonad';
 
 const WB_ELEMENTS = [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS];
 
@@ -20,6 +21,7 @@ export type WorkbookPageModelParams = {
   body?: ContentElements,
   lock?: contentTypes.Lock,
   bibliography?: contentTypes.Bibliography,
+  dependencies?: Maybe<contentTypes.WbDependencies>,
 };
 
 const defaultWorkbookPageModelParams = {
@@ -31,6 +33,7 @@ const defaultWorkbookPageModelParams = {
   body: new ContentElements(),
   lock: new contentTypes.Lock(),
   bibliography: new contentTypes.Bibliography(),
+  dependencies: Maybe.nothing(),
 };
 
 export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModelParams) {
@@ -43,6 +46,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   body: ContentElements;
   lock: contentTypes.Lock;
   bibliography: contentTypes.Bibliography;
+  dependencies: Maybe<contentTypes.WbDependencies>;
 
   constructor(params?: WorkbookPageModelParams) {
     params ? super(params) : super();
@@ -101,6 +105,11 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           model = model.with(
             { bibliography: contentTypes.Bibliography.fromPersistence(item, id, notify) });
           break;
+        case 'dependencies':
+          model = model.with({
+            dependencies: Maybe.just(contentTypes.WbDependencies.fromPersistence(item, id, notify)),
+          });
+          break;
         default:
       }
     });
@@ -122,6 +131,12 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     if (this.bibliography.bibEntries.size > 0) {
       children.push(this.bibliography.toPersistence());
     }
+
+    this.dependencies.lift((deps) => {
+      if (deps.size > 0) {
+        children.push(deps.toPersistence());
+      }
+    });
 
     const doc = [{
       workbook_page: {
