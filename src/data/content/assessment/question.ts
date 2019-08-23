@@ -27,7 +27,6 @@ import {
 } from 'editors/content/learning/dynadragdrop/utils';
 import { Custom } from 'data/content/assessment/custom';
 import { pipe } from 'utils/utils';
-import { toArray } from 'data/parsers/common/utils';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
