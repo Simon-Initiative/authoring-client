@@ -209,17 +209,11 @@ class RectangleEditor
           };
 
           // ensure new location is inside the hotspot area
-          const halfWidth = Math.floor(width / 2);
-          const halfHeight = Math.floor(height / 2);
           calculatedCoords = {
-            x1: Math.min(
-              Math.max(calculatedCoords.x1, 0 - halfWidth), (boundingClient.width - halfWidth)),
-            y1: Math.min(
-              Math.max(calculatedCoords.y1, 0 - halfHeight), (boundingClient.height - halfHeight)),
-            x2: Math.min(
-              Math.max(calculatedCoords.x2, halfWidth), boundingClient.width + halfWidth),
-            y2: Math.min(
-              Math.max(calculatedCoords.y2, halfHeight), boundingClient.height + halfHeight),
+            x1: Math.min(Math.max(calculatedCoords.x1, 0), boundingClient.width - 5),
+            y1: Math.min(Math.max(calculatedCoords.y1, 0), boundingClient.height - 5),
+            x2: Math.min(Math.max(calculatedCoords.x2, 0) + 5, boundingClient.width),
+            y2: Math.min(Math.max(calculatedCoords.y2, 0) + 5, boundingClient.height),
           };
 
           this.setState({
