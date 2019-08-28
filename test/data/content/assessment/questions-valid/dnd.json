@@ -1,0 +1,163 @@
+{
+  "question": {
+    "@id": "fedcb3dd11234dd9a7000a129e750cff",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#text": "Drag choices to the correct targets in the table",
+                "@id": "abef523f2d65d4a92aabeb5be24b4976e",
+                "@title": ""
+              }
+            },
+            {
+              "custom": {
+                "@id": "ac2b36c99f754064b55b5ce46c68ffc0",
+                "@type": "javascript",
+                "@logging": false,
+                "@src": "../webcontent/DynaDrop/DynaDropHTML.js",
+                "@width": 100,
+                "@height": 100,
+                "@layout": "../webcontent/DynaDrop/ac2b36c99f754064b55b5ce46c68ffc0_layout.xml",
+                "param": {
+                  "@name": "showInputs",
+                  "#text": "false"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fill_in_the_blank": {
+          "@shuffle": "true",
+          "@id": "adda58dd7a73428eb5389e640c5b4939",
+          "@name": "",
+          "#array": [
+            {
+              "choice": {
+                "#array": [],
+                "@value": "b6aa75dc13684b5293b38cf396c4c436",
+                "@color": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fill_in_the_blank": {
+          "@shuffle": "true",
+          "@id": "b98568ff463c41e48d066128bc76e376",
+          "@name": "",
+          "#array": [
+            {
+              "choice": {
+                "#array": [],
+                "@value": "b6aa75dc13684b5293b38cf396c4c436",
+                "@color": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "part": {
+          "@id": "c8e03ed787a7444cb2124cecc28035e5",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "b6aa75dc13684b5293b38cf396c4c436",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "adda58dd7a73428eb5389e640c5b4939"
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "part": {
+          "@id": "c034ea02de854f55bad0b41511f307ac",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "b6aa75dc13684b5293b38cf396c4c436",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Feedback A",
+                            "@id": "ac53a8e5da1664f86acc4b089aa681e10",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "b98568ff463c41e48d066128bc76e376"
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "Hint A",
+                      "@id": "ab984b75b52c64b78a088b2aca46633ea",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": []
+        }
+      }
+    ]
+  }
+}

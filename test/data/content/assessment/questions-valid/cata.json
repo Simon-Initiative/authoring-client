@@ -1,0 +1,442 @@
+{
+  "question": {
+    "@id": "fda757d825f544c28e6faf9b6aa9f573",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#text": "This is a check all that apply",
+                "@id": "ad82c5104d1ef4c49a2df9df92d9bb48b",
+                "@title": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "multiple_choice": {
+          "@shuffle": "true",
+          "@select": "multiple",
+          "@id": "dcaf7d68353c4ff38cee4b070f7e323f",
+          "@name": "",
+          "@labels": "false",
+          "#array": [
+            {
+              "choice": {
+                "#text": "Choice A",
+                "@value": "A",
+                "@color": ""
+              }
+            },
+            {
+              "choice": {
+                "#text": "Choice B",
+                "@value": "B",
+                "@color": ""
+              }
+            },
+            {
+              "choice": {
+                "#text": "Choice C",
+                "@value": "C",
+                "@color": ""
+              }
+            },
+            {
+              "choice": {
+                "#text": "Choice D",
+                "@value": "D",
+                "@color": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "part": {
+          "@id": "defeddae1732444b870f5ba9d0c55d97",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "A",
+                "@score": "1",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Correct feedback",
+                            "@id": "ad4915b1edbb94d1a8afa2a1fc6494fc5",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,B",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,B}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "ab112d40caed24be499156aec2d22cdd6",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,B,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,B,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "ad85e3d1fb19d4a1ba86e4b2b9a81b1df",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,B,C,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,B,C,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "af133a9359e6640c59cc313088d4955bc",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,B,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,B,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "afa30d8690beb4427b38bc0106f8e386a",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "aedf8c67a4c824af98c238cc6e5c97008",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,C,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,C,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "ab5a2830836a54cd5a11a0dbd6ba45c6c",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "afee15a92a8694f319abfd833d2951802",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B",
+                "@score": "0",
+                "@name": "AUTOGEN_{B}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "af55b381839a0428ea31971de4a73eb24",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{B,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "ac298bb84db444b86b908ceee8f5d7928",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,C,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{B,C,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "accc56817f2414f3bb0da9ad0738f09d0",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{B,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "aa5eb70e032294863a1687ad8618bbb4b",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "C",
+                "@score": "0",
+                "@name": "AUTOGEN_{C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "aea4ffd8dfc3d4b9e9c3bea80f045353c",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "C,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{C,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "abf94f6605d2e43bd80398e9dd0ccc10e",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "D",
+                "@score": "0",
+                "@name": "AUTOGEN_{D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect feedback",
+                            "@id": "aabef7d8a44c74ff59fab9b6a38fcc045",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "This is the first hint",
+                      "@id": "adfd2a63217744268a2733437a9212ed4",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": []
+        }
+      }
+    ]
+  }
+}

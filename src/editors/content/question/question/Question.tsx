@@ -475,7 +475,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           just: partAnalytics => (
             <Tab className="analytics-tab">
               <TabSection key="analytics" className="analytics">
-                <TabSectionHeader title="Analytics"/>
+                <TabSectionHeader title="Analytics" />
                 <TabSectionContent>
                   <PartAnalytics partAnalytics={partAnalytics} expandedView />
                   <div className="instruction-label" style={{ marginTop: 10 }}>
@@ -643,6 +643,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       onBlur,
       onItemFocus,
     } = this.props;
+
+    console.log('question', model)
 
     return (
       <div
