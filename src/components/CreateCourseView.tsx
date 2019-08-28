@@ -36,7 +36,14 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
 
   startCreation(title: string) {
     const g = guid();
-    const id = title.toLowerCase().split(' ')[0] + '-' + g.substring(g.lastIndexOf('-') + 1);
+    const id = (title.toLowerCase().split(' ')[0]
+      // replace non-alphanumberic chars
+      .replace(/[\W_]+/g, '')
+      // slice to prevent id size errors in db
+      .slice(0, 16)
+      + '-' + g.substring(g.lastIndexOf('-') + 1))
+      .slice(0, 20);
+
     const model = new models.CourseModel({
       guid: CourseGuid.of(g), id, title, version: '1.0', idvers: CourseIdVers.of(id, '1.0'),
     });
@@ -87,7 +94,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
         title="What's your course called?"
         placeholder="e.g. Introduction to Psychology, Spanish I"
         buttonLabel="Create Course"
-        submitted={this.state.error || this.state.waiting}
+        submitted={this.state.waiting}
         toast={this.state.waiting
           ? waiting
           : this.state.error
