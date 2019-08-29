@@ -5,6 +5,7 @@ import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { ContentElements } from 'data/content/common/elements';
+import { Maybe } from 'tsmonad';
 
 const sanitizeMatch = (match: string) => {
   // remove trailing # if no precision value is defined
@@ -19,7 +20,7 @@ export type ResponseParams = {
   concepts?: Immutable.List<string>,
   input?: string,
   match?: string,
-  score?: string,
+  score?: Maybe<string>,
   name?: string,
   guid?: string,
 };
@@ -31,7 +32,7 @@ const defaultContent = {
   concepts: Immutable.List<string>(),
   input: '',
   match: '',
-  score: '0',
+  score: Maybe.just(0),
   name: '',
   guid: '',
 };
@@ -44,7 +45,7 @@ export class Response extends Immutable.Record(defaultContent) {
   concepts: Immutable.List<string>;
   input: string;
   match: string;
-  score: string;
+  score: Maybe<string>;
   name: string;
   guid: string;
 
@@ -81,6 +82,8 @@ export class Response extends Immutable.Record(defaultContent) {
     }
     if (r['@score'] !== undefined) {
       model = model.with({ score: r['@score'] });
+    } else {
+      model = model.with({ score: Maybe.nothing() });
     }
 
     getChildren(r).forEach((item) => {
@@ -136,11 +139,16 @@ export class Response extends Immutable.Record(defaultContent) {
     const o = {
       response: {
         '@match': sanitizeMatch(this.match),
-        '@score': this.score.trim() === '' ? '0' : this.score,
         '@name': this.name,
         '#array': [...concepts, ...feedback],
       },
     };
+
+    this.score.lift((score) => {
+      if (score.trim() !== '') {
+        o.response['@score'] = score;
+      }
+    });
 
     if (this.input.trim() !== '') {
       o.response['@input'] = this.input;

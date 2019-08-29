@@ -143,7 +143,7 @@ export abstract class Feedback
                       type="number"
                       className="form-control input-sm form-control-sm"
                       disabled={!this.props.editMode}
-                      value={response.score}
+                      value={response.score.valueOr('')}
                       onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
                     />
                   </div>

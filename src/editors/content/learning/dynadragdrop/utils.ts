@@ -2,13 +2,16 @@ import * as Immutable from 'immutable';
 import { Custom } from 'data/content/assessment/custom';
 import { convert } from 'utils/format';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
-import { Question, Part, Choice, Response,
-  FillInTheBlank } from 'data/contentTypes';
+import {
+  Question, Part, Choice, Response,
+  FillInTheBlank
+} from 'data/contentTypes';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { Feedback } from 'data/content/assessment/feedback';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
 import { Cell } from 'data/content/assessment/dragdrop/htmlLayout/table/cell';
 import { Row } from 'data/content/assessment/dragdrop/htmlLayout/table/row';
+import { Maybe } from 'tsmonad';
 
 export const sortTargetsByRowColumn = (
   layout: HTMLLayout,
@@ -76,7 +79,7 @@ export const buildTargetLabelsMap = (
     (acc, choice: Choice, index) => ({
       ...acc,
       [choice.value]:
-      convert.toAlphaNotation(index),
+        convert.toAlphaNotation(index),
     }),
     {},
   );
@@ -96,8 +99,8 @@ export const buildInitiatorPartMap =
 
 export const buildTargetInitiatorsMap =
   (question: Question, initiators: Immutable.List<InitiatorModel>) => {
-  // A utility map used by the following reduce funciton.
-  // It creates a map of initiators key'd off of their assessmentId
+    // A utility map used by the following reduce funciton.
+    // It creates a map of initiators key'd off of their assessmentId
     const initiatorsMap = initiators.toArray().reduce(
       (acc, initiator) => {
         return {
@@ -146,7 +149,7 @@ export const setQuestionPartWithInitiatorScore = (
   const updatedResponse = initiatorParts.get(initiator.inputVal).responses.find(response =>
     response.match === targetAssessmentId)
     .with({
-      score: `${score}`,
+      score: Maybe.just(`${score}`),
     });
 
   const updatedPart = initiatorParts.get(initiator.inputVal).withMutations((part: Part) =>
@@ -172,7 +175,7 @@ export const getTargetsFromLayout = (layout: HTMLLayout) => {
             }),
             Immutable.List<Cell>(),
           ),
-        ).toList(),
+          ).toList(),
         Immutable.List<Cell>(),
       );
     default:
@@ -189,7 +192,7 @@ export const updateItemPartsFromTargets = (
   items: Immutable.OrderedMap<string, FillInTheBlank>,
   parts: Immutable.OrderedMap<string, Part>,
   targetCells: Immutable.List<Cell>,
-  ) => {
+) => {
   // sort targets to ensure consistent ordering
   const sortedTargetCells = targetCells.sort(targetAssessmentIdSort);
 
@@ -225,7 +228,8 @@ export const updateItemPartsFromTargets = (
             c.value === targetCell.target.valueOrThrow()) || new Choice().with({
               value: targetCell.target.valueOrThrow(),
               body: new ContentElements().with({
-                supportedElements: Immutable.List(FLOW_ELEMENTS) }),
+                supportedElements: Immutable.List(FLOW_ELEMENTS),
+              }),
             });
 
           return accChoices.set(choice.guid, choice);
@@ -246,7 +250,7 @@ export const updateHTMLLayoutTargetRefs = (
   targetValMap: { [oldValue: string]: string },
   initiatorInputMap: { [oldValue: string]: string },
   layout: HTMLLayout,
-  ) => {
+) => {
   switch (layout.targetArea.contentType) {
     case 'DndTableTargetArea':
       return layout.with({

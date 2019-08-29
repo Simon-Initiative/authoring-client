@@ -145,7 +145,7 @@ export abstract class NumericFeedback
                       type="number"
                       className="form-control input-sm form-control-sm"
                       disabled={!this.props.editMode}
-                      value={response.score}
+                      value={response.score.valueOr('')}
                       onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
                     />
                   </div>
@@ -214,7 +214,7 @@ export abstract class NumericFeedback
                   type="number"
                   className="form-control input-sm form-control-sm"
                   disabled={!this.props.editMode}
-                  value={defaultResponse.score}
+                  value={defaultResponse.score.valueOr('')}
                   onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
                 />
               </div>

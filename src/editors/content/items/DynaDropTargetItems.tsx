@@ -14,6 +14,7 @@ import {
   sortChoicesByLayout, sortResponsesByChoice,
 } from 'editors/content/learning/dynadragdrop/utils';
 import { HTMLLayout } from 'data/content/assessment/dragdrop/htmlLayout/html_layout';
+import { Maybe } from 'tsmonad';
 
 export interface DynaDropTargetItemsProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
@@ -83,7 +84,7 @@ export class
       onEdit,
     } = this.props;
 
-    const updated = response.with({ score });
+    const updated = response.with({ score: Maybe.just(score) });
     const newPartModel = partModel.with(
       { responses: partModel.responses.set(updated.guid, updated) });
     onEdit(itemModel, newPartModel, updated);
@@ -94,7 +95,12 @@ export class
 
     const updatedPartModel = partModel.with({
       responses: partModel.responses.set(
-        response.guid, response.with({ score: response.score === '0' ? '1' : '0' }),
+        response.guid, response.with({
+          score: response.score.caseOf({
+            just: score => score === '0' ? Maybe.just('1') : Maybe.just('0'),
+            nothing: () => Maybe.nothing(),
+          }),
+        }),
       ),
     });
 
@@ -123,7 +129,10 @@ export class
           allowFeedback
           allowScore={advancedScoring}
           simpleSelectProps={{
-            selected: response.score !== '0',
+            selected: response.score.caseOf({
+              just: score => score !== '0',
+              nothing: () => true,
+            }),
             onToggleSimpleSelect: this.onToggleSimpleSelect,
           }}
           response={response}
