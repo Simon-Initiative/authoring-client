@@ -511,25 +511,21 @@ function ensureInputAttrsExist(question: Question): Question {
 // This removes the responses with no matching answer choice instead of fixing the root cause.
 function removeResponsesWithNoMatch(question: Question): Question {
   const isMultipleChoice = (item: Item): item is MultipleChoice => item instanceof MultipleChoice;
-  const isFillInTheBlank = (item: Item): item is FillInTheBlank => item instanceof FillInTheBlank;
-  const isOrdering = (item: Item): item is Ordering => item instanceof Ordering;
-  const allowsChoices = (item: Item): item is Ordering | FillInTheBlank | Ordering =>
-    isMultipleChoice(item) || isFillInTheBlank(item) || isOrdering(item);
+
+  if (!question.items.some(isMultipleChoice)) {
+    return question;
+  }
 
   const items = question.items.toArray();
 
   const values: string[] = items.reduce((acc, item) => {
     // These question types have "choices", which have "values"
     // that correspond to the question.part.response.match
-    if (allowsChoices(item)) {
+    if (isMultipleChoice(item)) {
       return acc.concat(item.choices.map(choice => choice.value).toArray());
     }
     return acc;
   }, []);
-
-  if (!items.some(allowsChoices)) {
-    return question;
-  }
 
   // Remove response (question.part.response) if the match attribute does not
   // match any choice values
