@@ -518,9 +518,7 @@ function removeResponsesWithNoMatch(question: Question): Question {
     return question;
   }
 
-  const items = question.items.toArray();
-
-  const values: string[] = items.reduce((acc, item) => {
+  const values: string[] = question.items.toArray().reduce((acc, item) => {
     // These question types have "choices", which have "values"
     // that correspond to the question.part.response.match
     if (isMultipleChoice(item)) {
