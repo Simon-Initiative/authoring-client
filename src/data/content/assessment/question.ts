@@ -513,6 +513,7 @@ function removeResponsesWithNoMatch(question: Question): Question {
   const isMultipleChoice = (item: Item): item is MultipleChoice => item instanceof MultipleChoice
     && item.select === 'single';
 
+  // Only target "true" multiple choice questions (not CATA)
   if (!question.items.some(isMultipleChoice)) {
     return question;
   }
