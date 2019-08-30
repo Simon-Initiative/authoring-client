@@ -510,7 +510,8 @@ function ensureInputAttrsExist(question: Question): Question {
 // correspond to an associated answer choice, but the match points to a missing choice instead.
 // This removes the responses with no matching answer choice instead of fixing the root cause.
 function removeResponsesWithNoMatch(question: Question): Question {
-  const isMultipleChoice = (item: Item): item is MultipleChoice => item instanceof MultipleChoice;
+  const isMultipleChoice = (item: Item): item is MultipleChoice => item instanceof MultipleChoice
+    && item.select === 'single';
 
   if (!question.items.some(isMultipleChoice)) {
     return question;
