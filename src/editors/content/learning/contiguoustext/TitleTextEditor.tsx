@@ -6,8 +6,8 @@ import ContiguousTextEditor from 'editors/content/learning/contiguoustext/Contig
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import { ParentContainer, TextSelection } from 'types/active';
-
 import { styles } from 'editors/content/learning/contiguoustext/TitleTextEditor.styles';
+import { connectTextEditor } from 'editors/content/container/connectEditor';
 
 export interface TitleTextEditorProps {
   editorStyles?: any;
@@ -15,6 +15,7 @@ export interface TitleTextEditorProps {
   context: AppContext;
   services: AppServices;
   editMode: boolean;
+  onUpdateEditor: (editor) => void;
   onEdit: (updated: ContiguousText, source?: Object) => void;
   onFocus: (
     model: any, parent: ParentContainer,
@@ -24,10 +25,10 @@ export interface TitleTextEditorProps {
 /**
  * TitleTextEditor React Stateless Component
  */
-export const TitleTextEditor
+const TitleTextEditorInner
   = withStyles<TitleTextEditorProps>(styles)(({
     className, classes, context, services, model,
-    editMode, onEdit, onFocus, editorStyles,
+    editMode, onEdit, onFocus, editorStyles, onUpdateEditor,
   }) => {
     return (
       <div className={classNames([
@@ -36,6 +37,7 @@ export const TitleTextEditor
         !editMode && classes.disabled,
         className])}>
         <ContiguousTextEditor
+          onUpdateEditor={onUpdateEditor}
           onInsertParsedContent={() => { }}
           className={classes.contiguousTextEditor}
           activeContentGuid={null}
@@ -57,3 +59,6 @@ export const TitleTextEditor
       </div>
     );
   });
+
+export const TitleTextEditor = connectTextEditor(TitleTextEditorInner);
+

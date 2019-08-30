@@ -7,7 +7,7 @@ import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-
+import { Editor } from 'slate-react';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -24,6 +24,22 @@ export const updateContent = (
     type: UPDATE_CONTENT,
     documentId,
     content,
+  });
+
+
+
+export type UPDATE_EDITOR = 'active/UPDATE_EDITOR';
+export const UPDATE_EDITOR: UPDATE_EDITOR = 'active/UPDATE_EDITOR';
+
+export type UpdateEditorAction = {
+  type: UPDATE_EDITOR,
+  editor: Editor,
+};
+
+export const updateEditor = (
+  editor: Editor): UpdateEditorAction => ({
+    type: UPDATE_EDITOR,
+    editor,
   });
 
 

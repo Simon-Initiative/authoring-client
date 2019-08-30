@@ -6,6 +6,7 @@ import { AbstractContentEditor, AbstractContentEditorProps, RenderContext }
 import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockQuoteToolbar from './BlockQuoteToolbar.controller';
+import { connectTextEditor } from 'editors/content/container/connectEditor';
 
 import { styles } from './BlockQuote.styles';
 import { StyledComponentProps } from 'types/component';
@@ -13,6 +14,7 @@ import { StyledComponentProps } from 'types/component';
 export interface BlockQuoteEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockQuote> {
   onShowSidebar: () => void;
+  onUpdateEditor: (editor) => void;
 }
 
 export interface BlockQuoteEditorState {
@@ -69,4 +71,4 @@ class BlockQuoteEditor
 }
 
 const StyledBlockQuoteEditor = withStyles<BlockQuoteEditorProps>(styles)(BlockQuoteEditor);
-export default StyledBlockQuoteEditor;
+export default connectTextEditor(StyledBlockQuoteEditor);

@@ -1,7 +1,8 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { SelectionState } from 'draft-js';
 import { ContentElement } from 'data/content/common/interfaces';
+import { Selection } from 'slate';
+import { Editor } from 'slate-react';
 
 export enum Trigger {
   KEYPRESS,
@@ -11,54 +12,58 @@ export enum Trigger {
 export class TextSelection {
 
   static createEmpty(key) {
-    return new TextSelection(SelectionState.createEmpty(key));
+    return new TextSelection(Selection.create({}));
   }
 
-  ss: SelectionState;
+  slate: Selection;
   triggeredBy: Trigger;
 
-  constructor(ss) {
-    this.ss = ss;
+  constructor(slate) {
+
+    this.slate = slate;
   }
 
   getAnchorKey() {
-    return this.ss.getAnchorKey();
+    return this.slate.anchor.key;
   }
 
   getFocusKey() {
-    return this.ss.getFocusKey();
+    return this.slate.focus.key;
   }
 
   getAnchorOffset() {
-    return this.ss.getAnchorOffset();
+    return this.slate.anchor.offset;
   }
 
   getFocusOffset() {
-    return this.ss.getFocusOffset();
+    return this.slate.focus.offset;
   }
 
   getIsBackward() {
-    return this.ss.getIsBackward();
+    return this.slate.isBackward;
   }
 
   getHasFocus() {
-    return this.ss.getHasFocus();
+    return this.slate.isFocused;
   }
 
   isCollapsed() {
-    return this.ss.isCollapsed();
+    return this.slate.isCollapsed;
   }
 
   hasEdgeWithin(blockKey, start, end) {
-    return this.ss.hasEdgeWithin(blockKey, start, end);
+
+    // TODO
+    return false;
+
   }
 
   getRawSelectionState() {
-    return this.ss;
+    return this.slate;
   }
 
   merge(params) {
-    return new TextSelection(this.ss.merge(params));
+    return new TextSelection(this.slate.merge(params));
   }
 }
 
@@ -79,6 +84,7 @@ export type ActiveContextParams = {
   container?: Maybe<ParentContainer>,
   activeChild?: Maybe<ContentElement>,
   textSelection?: Maybe<TextSelection>,
+  editor?: Maybe<Editor>,
 };
 
 const defaultContent = {
@@ -86,6 +92,7 @@ const defaultContent = {
   container: Maybe.nothing(),
   activeChild: Maybe.nothing(),
   textSelection: Maybe.nothing(),
+  editor: Maybe.nothing(),
 };
 
 export class ActiveContext extends Immutable.Record(defaultContent) {
@@ -101,6 +108,9 @@ export class ActiveContext extends Immutable.Record(defaultContent) {
 
   // The current text selection
   textSelection: Maybe<TextSelection>;
+
+  // The current active slate editor
+  editor: Maybe<Editor>;
 
   constructor(params?: ActiveContextParams) {
     super(params);

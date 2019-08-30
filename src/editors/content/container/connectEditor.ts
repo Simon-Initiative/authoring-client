@@ -1,6 +1,7 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { showSidebar } from 'actions/editorSidebar';
+import { updateEditor } from 'actions/active';
 import { DiscoverableId } from 'types/discoverable';
 import { discover } from 'actions/discoverable';
 
@@ -23,6 +24,26 @@ export const connectEditor = (component) => {
 
   return connect(mapStateToProps, mapDispatchToProps)(component);
 };
+
+
+export const connectTextEditor = (component) => {
+  const mapStateToProps = (state: State, ownProps) => {
+    return {
+
+    };
+  };
+
+  const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps) => {
+    return {
+      onUpdateEditor: (editor) => {
+        dispatch(updateEditor(editor));
+      },
+    };
+  };
+
+  return connect(mapStateToProps, mapDispatchToProps)(component);
+};
+
 
 
 export const connectPopupEditor = (component) => {

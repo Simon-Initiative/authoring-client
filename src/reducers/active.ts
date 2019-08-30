@@ -8,6 +8,7 @@ export type ActionTypes =
   documentActions.DocumentLoadedAction |
   documentActions.ChangeUndoneAction |
   documentActions.ChangeRedoneAction |
+  actions.UpdateEditorAction |
   actions.UpdateContentAction |
   actions.UpdateContextAction |
   actions.ResetActiveAction;
@@ -22,6 +23,11 @@ export const activeContext = (
 ): ActiveContextState => {
 
   switch (action.type) {
+    case actions.UPDATE_EDITOR:
+      return state.with({
+        editor: action.editor === null || action.editor === undefined
+          ? Maybe.nothing() : Maybe.just(action.editor),
+      });
     case actions.UPDATE_CONTENT:
       return state.with({
         activeChild: action.content === null || action.content === undefined

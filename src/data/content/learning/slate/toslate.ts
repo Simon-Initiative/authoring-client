@@ -1,13 +1,26 @@
 
 import * as common from '../common';
+import * as Immutable from 'immutable';
 import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
 
-import { Value, ValueJSON, NodeJSON } from 'slate';
+import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
 
-let inlineHandlers = null;
+const marks = ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em'];
 
+const inlines = ['cite', 'link', 'xref', 'command', 'activity_link',
+  'extra', 'image', 'formula', '#math', 'm:math', 'sym', 'quote', 'code'];
 
+const toSet = arr => arr.reduce(
+  (p, c) => {
+    p[c] = true;
+    return p;
+  },
+  {},
+);
+
+const markSet = toSet(marks);
+const inlineSet = toSet(inlines);
 
 export function toSlate(
   toParse: Object[],
@@ -19,308 +32,40 @@ export function toSlate(
     },
   };
 
-  if (isInlineText) {
-    if (toParse instanceof Array) {
-      parse({ p: { '#array': toParse } }, { json, depth: 0 }, backingTextProvider);
-    } else if (toParse['#array'] !== undefined) {
-      parse({ p: { '#array': toParse['#array'] } }, { json, depth: 0 }, backingTextProvider);
-    } else {
-      parse({ p: { '#array': [toParse] } }, { json, depth: 0 }, backingTextProvider);
-    }
-  } else {
-    toParse.forEach(entry => parse(entry, { json, depth: 0 }, backingTextProvider));
-  }
+  normalizeInput(toParse, isInlineText)
+    .forEach(entry => parse(entry, json, backingTextProvider));
 
   return Value.fromJSON(json);
 }
 
+function normalizeInput(toParse, isInlineText: boolean): Object[] {
 
-const blockHandlers = {
-  p: paragraph,
-  '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
-  '#cdata': pureTextBlockHandler.bind(undefined, common.CDATA),
-  '#array': arrayHandler,
-};
-
-// Translation routines to convert from persistence model to draft model
-
-const inlineTerminalTags = {};
-
-// The following ones simply use one space
-const singleSpace = (item, provider) => ' ';
-inlineTerminalTags['m:math'] = singleSpace;
-inlineTerminalTags['#math'] = singleSpace;
-inlineTerminalTags['image'] = singleSpace;
-inlineTerminalTags['sym'] = singleSpace;
-
-inlineTerminalTags['command'] = (item, provider) => {
-
-  const arr = item['command']['#array'];
-  for (let i = 0; i < arr.length; i += 1) {
-    if (arr[i]['title'] !== undefined) {
-      return arr[i]['title']['#text'];
+  if (isInlineText) {
+    if (toParse instanceof Array) {
+      return [{ p: { '#array': toParse } }];
     }
-  }
-  return 'Command';
-};
-
-// Content of input_refs are data-driven
-inlineTerminalTags['input_ref'] = (item, provider) => {
-  if (item['input_ref']['@input'] !== undefined && provider !== null) {
-    const questionItem = provider[item['input_ref']['@input']];
-    if (questionItem !== undefined) {
-      if (questionItem.contentType === 'FillInTheBlank') {
-        return ' Dropdown ';
-      }
-      return ' ' + questionItem.contentType + ' ';
+    if (toParse['#array'] !== undefined) {
+      return [{ p: { '#array': toParse['#array'] } }];
     }
+    return [{ p: { '#array': [toParse] } }];
   }
-  return ' Input ';
-};
+  return toParse;
 
-
-type ParsingContext = {
-  json: ValueJSON,
-  depth: number,
-};
-
-type WorkingBlock = {
-  fullText: string,
-  markups: common.RawInlineStyle[],
-  entities: common.RawEntityRange[],
-};
-
-type InlineHandler = (
-  offset: number, length: number, item: Object,
-  context: ParsingContext,
-  workingBlock: WorkingBlock,
-  blockBeforeChildren: WorkingBlock,
-  backingTextProvider: Object) => void;
-
-
-function getInlineHandlers() {
-  const inlineHandlers = {
-    command: commandHandler.bind(undefined, 'IMMUTABLE', common.EntityTypes.command),
-    input_ref: inputRefHandler.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
-    activity_link: insertDataDrivenEntity.bind(
-      undefined, 'MUTABLE',
-      common.EntityTypes.activity_link, 'activity_link', registeredTypes['activity_link']),
-    xref: insertDataDrivenEntity.bind(
-      undefined, 'MUTABLE',
-      common.EntityTypes.xref, 'xref', registeredTypes['xref']),
-    link: insertDataDrivenEntity.bind(
-      undefined, 'MUTABLE',
-      common.EntityTypes.link, 'link', registeredTypes['link']),
-    cite: insertDataDrivenEntity.bind(
-      undefined, 'IMMUTABLE',
-      common.EntityTypes.cite, 'cite', registeredTypes['cite']),
-    extra: insertDataDrivenEntity.bind(
-      undefined, 'MUTABLE',
-      common.EntityTypes.extra, 'extra', registeredTypes['extra']),
-    em,
-    foreign: applyStyle.bind(undefined, 'FOREIGN'),
-    ipa: applyStyle.bind(undefined, 'IPA'),
-    sub: applyStyle.bind(undefined, 'SUBSCRIPT'),
-    sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
-    term: applyStyle.bind(undefined, 'TERM'),
-    bdo: applyStyle.bind(undefined, 'BDO'),
-    var: applyStyle.bind(undefined, 'VAR'),
-    image: imageInline,
-    formula: formulaInline,
-    '#math': hashMath,
-    'm:math': insertDataDrivenEntity.bind(
-      undefined, 'IMMUTABLE',
-      common.EntityTypes.math, 'math', registeredTypes['math']),
-    sym: insertDataDrivenEntity.bind(
-      undefined, 'IMMUTABLE',
-      common.EntityTypes.sym, 'sym', registeredTypes['sym']),
-    quote: insertDataDrivenEntity.bind(
-      undefined, 'MUTABLE',
-      common.EntityTypes.quote, 'quote', registeredTypes['quote']),
-    code: insertDataDrivenEntity.bind(
-      undefined, 'MUTABLE',
-      common.EntityTypes.code, 'code', registeredTypes['code']),
-  };
-  return inlineHandlers;
 }
 
-function applyStyle(
-  style: string, offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock) {
-  workingBlock.markups.push({ offset, length, style });
+function isMarkOnly(item: Object): boolean {
+  return item['#text'] === undefined;
 }
 
-function em(
-  offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock) {
-
-  // Handle the case of no @style tag - treat it as italic
-  const em = item[common.getKey(item)];
-  let style;
-  if (em[common.STYLE] === undefined) {
-    style = 'ITALIC';
-  } else {
-    style = common.styleMap[em[common.STYLE]];
-  }
-
-  workingBlock.markups.push({ offset, length, style });
-}
-
-function extractAttrs(item: Object): Object {
+function getMark(item: Object) {
   const key = common.getKey(item);
-  return Object
-    .keys(item[key])
-    .filter(key => key.startsWith('@'))
-    .reduce(
-      (o, k) => {
-        o[k] = item[key][k];
-        return o;
-      },
-      {});
-}
-
-function insertDataDrivenEntity(
-  mutability: string, type: string, label,
-  fromPersistence, offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock,
-  blockBefore: WorkingBlock, backingTextProvider: Object) {
-
-  const key = common.generateRandomKey();
-
-  workingBlock.entities.push({ offset, length, key });
-
-  const data = registeredTypes[type](item);
-
-  context.draft.entityMap[key] = {
-    type,
-    mutability,
-    data,
-  };
-}
-
-function inputRefHandler(
-  mutability: string, type: string, offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock, blockBefore: WorkingBlock,
-  backingTextProvider: Object) {
-
-  const key = common.generateRandomKey();
-
-  workingBlock.entities.push({ offset, length, key });
-
-  const data = extractAttrs(item);
-  data['$type'] = backingTextProvider
-    ? backingTextProvider[item['input_ref']['@input']].contentType
-    : 'unstyled';
-  data[common.CDATA] = item[common.getKey(item)][common.CDATA];
-  data[common.TEXT] = item[common.getKey(item)][common.TEXT];
-
-  context.draft.entityMap[key] = {
-    type,
-    mutability,
-    data,
-  };
-}
-
-
-function commandHandler(
-  mutability: string, type: string, offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock, blockBefore: WorkingBlock,
-  backingTextProvider: Object) {
-
-  const key = common.generateRandomKey();
-
-  workingBlock.entities.push({ offset, length, key });
-
-  const data = registeredTypes['command'](item);
-
-  context.draft.entityMap[key] = {
-    type,
-    mutability,
-    data,
-  };
-}
-
-
-function hashMath(
-  offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock) {
-
-  const key = common.generateRandomKey();
-
-  workingBlock.entities.push({ offset, length, key });
-
-  const data = registeredTypes['math'](item, '');
-
-  context.draft.entityMap[key] = {
-    type: common.EntityTypes.math,
-    mutability: 'IMMUTABLE',
-    data,
-  };
-}
-
-function imageInline(
-  offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock) {
-
-  const key = common.generateRandomKey();
-
-  workingBlock.entities.push({ offset, length, key });
-
-  const image = registeredTypes['image'](item, '');
-
-  context.draft.entityMap[key] = {
-    type: common.EntityTypes.image,
-    mutability: 'IMMUTABLE',
-    data: image,
-  };
-}
-
-
-function formulaInline(
-  offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock,
-  blockBeforeChildren: WorkingBlock) {
-
-  // NoOp - we do nothing with inline formulas
-
-}
-
-
-function getInlineHandler(key: string): InlineHandler {
-
-  // Lazily initialize the handlers to avoid a webpack
-  // module import problem
-  if (inlineHandlers === null) {
-    inlineHandlers = getInlineHandlers();
+  if (key === 'em') {
+    if (item['@style'] !== undefined) {
+      return item['@style'];
+    }
   }
-
-  if (inlineHandlers[key] !== undefined) {
-    return inlineHandlers[key];
-  }
-
-  return applyStyle.bind(undefined, 'UNSUPPORTED');
+  return key;
 }
-
-
-// This is the same code that Draft.js uses to determine
-// random block keys:
-
-
-
-function addNewBlock(json: ValueJSON, values: Object): NodeJSON {
-
-  const block: NodeJSON = {
-    object: 'block',
-    type: 'paragraph',
-    data: {},
-    nodes: [],
-  };
-
-  json.document.nodes.push(block);
-
-  return block;
-}
-
 
 function getChildren(item: Object, ignore = null): Object[] {
 
@@ -344,129 +89,156 @@ function getChildren(item: Object, ignore = null): Object[] {
   return [item[key]];
 }
 
-function cloneWorkingBlock(block: NodeJSON): NodeJSON {
-  return Object.assign({}, block);
+
+function pureTextBlockHandler(
+  key: string, item: Object, json: ValueJSON, backingTextProvider: Object) {
+
+  const p: BlockJSON = {
+    object: 'block',
+    type: 'paragraph',
+    data: extractId(item),
+    nodes: [{
+      object: 'text',
+      text: item[key],
+      marks: [],
+    }],
+  };
+  json.document.nodes.push(p);
 }
 
-function processInline(
-  item: Object,
-  context: ParsingContext, blockContext: WorkingBlock, backingTextProvider: Object) {
-
-  const key = common.getKey(item);
-
-  if (key === common.CDATA || key === common.TEXT) {
-
-    blockContext.fullText += item[key];
-
-  } else {
-
-    const offset = blockContext.fullText.length;
-
-    const blockBeforeChildren = cloneWorkingBlock(blockContext);
-
-    // Handle elements that do not have children, but
-    // do require a specialized entity renderer
-    if (inlineTerminalTags[key]) {
-
-      blockContext.fullText += inlineTerminalTags[key](item, backingTextProvider);
-
-    } else {
-
-      const extractFromExtra = (o) => {
-        const anchor = getChildren(item).find(o => common.getKey(o) === 'anchor');
-        if (anchor !== undefined && anchor !== null) {
-          return getChildren(anchor);
-        }
-        return [{ '#text': ' ' }];
-      };
-
-      // As soon we get another element with a non-standard need to access
-      // child content, we will want to create a generalized navigation system.
-      // But for now, when we encounter an 'extra' element we find its child 'anchor'
-      // element and parse that content, otherwise parse the immediate child content
-      const children = key === 'extra'
-        ? extractFromExtra(item)
-        : getChildren(item);
-
-      children.forEach((subItem) => {
-        const subKey = common.getKey(subItem);
-        if (subKey === common.CDATA || subKey === common.TEXT) {
-          blockContext.fullText += subItem[subKey];
-        } else {
-          processInline(subItem, context, blockContext, backingTextProvider);
-        }
-      });
-
-    }
-
-    let text = blockContext.fullText.substring(offset);
-
-    // Cite elements are unique in that they may or may not have
-    // backing text present (<cite>Thanks to Joe</cite>) or <cite entry="3"/>)
-    // This special case below checks for the latter case and appends
-    // two spaces that will be necessary to display up to two-digit long
-    // bibliography entry when rendered
-    if (key === 'cite' && (text.length === 0 || text === ' ')) {
-      blockContext.fullText += (text.length === 0) ? '  ' : ' ';
-      text = blockContext.fullText.substring(offset);
-    }
-
-    const handler = getInlineHandler(key);
-    handler(
-      offset, text.length, item, context,
-      blockContext, blockBeforeChildren, backingTextProvider);
-  }
-
+function arrayHandler(item: Object, json: ValueJSON, backingTextProvider: Object) {
+  item['#array'].forEach(item => parse(item, json, backingTextProvider));
 }
 
-function paragraph(item: Object, context: ParsingContext, backingTextProvider: Object) {
+
+function paragraph(item: Object, json: ValueJSON, backingTextProvider: Object) {
+
+  const p: BlockJSON = {
+    object: 'block',
+    type: 'paragraph',
+    data: extractId(item),
+    nodes: [],
+  };
+  json.document.nodes.push(p);
 
   const children = getChildren(item);
-
-  const blockContext = {
-    fullText: '',
-    markups: [],
-    entities: [],
-  };
-
-  children.forEach(subItem => processInline(subItem, context, blockContext, backingTextProvider));
-
-  addNewBlock(context.draft, {
-    data: extractIdTitle(item),
-    text: blockContext.fullText,
-    inlineStyleRanges: blockContext.markups,
-    entityRanges: blockContext.entities,
-  });
-
+  children.forEach(subItem => handleChild(subItem, p, backingTextProvider));
 }
 
-function extractIdTitle(item: any): Object {
-  const data = { id: '', title: '', type: '' };
+const inlineHandlers = {
+  link: contentBasedInline,
+  xref: contentBasedInline,
+  activity_link: contentBasedInline,
+  input_ref: terminalInline,
+  quote: contentBasedInline,
+  code: contentBasedInline,
+  formula: stripOutInline,
+  'm:math': terminalInline,
+  '#math': terminalInline,
+  extra: terminalInline,
+  image: terminalInline,
+  sym: terminalInline,
+};
+
+const blockHandlers = {
+  p: paragraph,
+  '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
+  '#cdata': pureTextBlockHandler.bind(undefined, common.CDATA),
+  '#array': arrayHandler,
+};
+
+function stripOutInline(item: Object, parent: BlockJSON, backingTextProvider) {
+  const children = getChildren(item);
+  children.forEach(subItem => handleChild(subItem, parent, backingTextProvider));
+}
+
+function terminalInline(item: Object, parent: BlockJSON, backingTextProvider): InlineJSON {
+
+  const type = common.getKey(item);
+  const data = { value: registeredTypes[type](item) };
+
+  const inline: InlineJSON = {
+    object: 'inline',
+    type,
+    data,
+    nodes: [],
+  };
+  parent.nodes.push(inline);
+
+  return inline;
+}
+
+// Content based inlines deserialize mostly as terminal ones, except that we
+// then need to process their children nodes
+function contentBasedInline(item: Object, parent: BlockJSON, backingTextProvider) {
+
+  const inline = terminalInline(item, parent, backingTextProvider);
+
+  const children = getChildren(item);
+  children.forEach(subItem => handleInlineChild(subItem, inline, backingTextProvider));
+}
+
+function handleChild(item: Object, parent: BlockJSON, backingTextProvider) {
+  const key = common.getKey(item);
+  if (inlineSet[key]) {
+    inlineHandlers[key](item, parent, backingTextProvider);
+  } else if (markSet[key]) {
+    processMark(item, parent, Immutable.List<string>());
+  } else if (key === '#text' || key === '#cdata') {
+    parent.nodes.push({
+      object: 'text',
+      text: item[key],
+      marks: [],
+    });
+  }
+}
+
+function handleInlineChild(item: Object, parent: InlineJSON, backingTextProvider) {
+  const key = common.getKey(item);
+  if (markSet[key]) {
+    processMark(item, parent, Immutable.List<string>());
+  } else if (key === '#text' || key === '#cdata') {
+    parent.nodes.push({
+      object: 'text',
+      text: item[key],
+      marks: [],
+    });
+  }
+}
+
+function processMark(item: Object,
+  parent: BlockJSON | InlineJSON, previousMarks: Immutable.List<string>) {
+
+  if (isMarkOnly(item)) {
+    processMark(getChildren(item)[0], parent, previousMarks.push(getMark(item)));
+    return;
+  }
+
+  const marks = previousMarks.toArray().map(type => ({
+    object: 'mark',
+    type,
+    data: {},
+  }) as MarkJSON);
+
+  parent.nodes.push({
+    object: 'text',
+    text: item['#text'],
+    marks,
+  });
+}
+
+function extractId(item: any): Object {
+  const data = { id: '' };
 
   if (item !== undefined && item !== null && item.p && item.p['@id'] !== undefined) {
     data.id = item.p['@id'];
   } else {
     data.id = guid();
   }
-  if (item !== undefined && item !== null && item.p && item.p['@title'] !== undefined) {
-    data.title = item.p['@title'];
-  }
   return data;
 }
 
-function pureTextBlockHandler(key: string, item: Object, context: ParsingContext) {
-  addNewBlock(context.json, {
-    text: item[key],
-    inlineStyleRanges: [],
-    entityRanges: [],
-  });
-}
-
-function arrayHandler(item: Object, context: ParsingContext, backingTextProvider: Object) {
-  item['#array'].forEach(item => parse(item, context, backingTextProvider));
-}
-
-function parse(item: Object, context: ParsingContext, backingTextProvider: Object) {
+function parse(item: Object, json: ValueJSON, backingTextProvider: Object) {
 
   // item is an object with one key.
 
@@ -479,25 +251,6 @@ function parse(item: Object, context: ParsingContext, backingTextProvider: Objec
     return;
   }
 
-  const handler = blockHandlers[key];
-
-  if (handler === undefined) {
-
-    const inlineHandler = getInlineHandler(key);
-
-    // Handle the case where all that was serialized was a
-    // single inline style tag (e.g. an entire 'choice' was
-    // bold)
-    if (inlineHandler !== undefined) {
-      blockHandlers['p']({ p: { '#array': [item] } }, context, backingTextProvider);
-    } else {
-      // tslint:disable-next-line:no-console
-      console.log('Unsupported Text content encountered: key = [' + key + '], contents next line');
-      console.dir(item);
-    }
-
-  } else {
-    handler(item, context, backingTextProvider);
-  }
+  blockHandlers[key](item, json, backingTextProvider);
 
 }

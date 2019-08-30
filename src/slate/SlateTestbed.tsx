@@ -4,6 +4,7 @@ import { Editor } from 'slate-react';
 import { Value } from 'slate';
 import { Math as MathRenderer } from 'utils/math/Math';
 import { Tooltip } from 'utils/tooltip';
+import * as ct from 'data/contentTypes';
 
 import './SlateTestbed.scss';
 
@@ -35,7 +36,7 @@ function wrapQuote(editor) {
 function wrapLink(editor, href) {
   editor.wrapInline({
     type: 'link',
-    data: { href },
+    data: { value: new ct.Link({ href }) },
   });
 
   editor.moveToEnd();
@@ -152,6 +153,9 @@ export class SlateTestbed
       }
 
       editor.command(wrapLink, href);
+
+      console.log(editor.value.toJSON());
+
     } else {
       const href = window.prompt('Enter the URL of the link:');
 
@@ -249,6 +253,20 @@ export class SlateTestbed
     }
   }
 
+
+  renderButtons() {
+    return (
+      <div>
+        <button onClick={this.addLink}>Add Link</button>
+        <button onClick={this.addFillInTheBlank}>Add FillInTheBlank</button>
+        <button onClick={this.addMathML}>Add Math</button>
+        <button onClick={this.addImage}>Add Image</button>
+        <button onClick={this.addQuote}>Add Quote</button>
+      </div>
+    );
+  }
+
+
   renderInline = (props, editor, next) => {
     const { attributes, children, node } = props;
 
@@ -299,18 +317,6 @@ export class SlateTestbed
         return next();
       }
     }
-  }
-
-  renderButtons() {
-    return (
-      <div>
-        <button onClick={this.addLink}>Add Link</button>
-        <button onClick={this.addFillInTheBlank}>Add FillInTheBlank</button>
-        <button onClick={this.addMathML}>Add Math</button>
-        <button onClick={this.addImage}>Add Image</button>
-        <button onClick={this.addQuote}>Add Quote</button>
-      </div>
-    );
   }
 
   render() {

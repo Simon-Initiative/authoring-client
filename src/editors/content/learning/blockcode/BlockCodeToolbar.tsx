@@ -18,6 +18,7 @@ import { StyledComponentProps } from 'types/component';
 export interface BlockCodeToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
   selection: TextSelection;
+
 }
 
 export interface BlockCodeToolbarState {

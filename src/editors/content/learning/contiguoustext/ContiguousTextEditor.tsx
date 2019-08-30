@@ -3,7 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
-import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
@@ -14,24 +13,28 @@ import { TextSelection, Trigger } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import { styles } from 'editors/content/learning/contiguoustext/ContiguousText.styles';
-
+import { Editor } from 'slate-react';
+import { Value } from 'slate';
+import { renderMark, renderInline, plugins } from './utils';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
   viewOnly?: boolean;
   editorStyles?: any;
   hideBorder?: boolean;
+  onUpdateEditor: (editor) => void;
   onTextSelectionChange?: (selection: any) => void;
   onInsertParsedContent: (resourcePath: string, o) => void;
   orderedIds: Immutable.Map<string, number>;
 }
 
 export interface ContiguousTextEditorState {
-
+  value: Value;
 }
 
 type StyledContiguousTextEditorProps =
   StyledComponentProps<ContiguousTextEditorProps, typeof styles>;
+
 
 /**
  * The content editor for contiguous text.
@@ -41,18 +44,51 @@ class ContiguousTextEditor
   StyledContiguousTextEditorProps, ContiguousTextEditorState> {
 
   selectionState: any;
+  editor;
 
   constructor(props) {
     super(props);
 
-    this.draftDrivenFocus = this.draftDrivenFocus.bind(this);
+    this.handleOnFocus = this.handleOnFocus.bind(this);
+
+    this.state = {
+      value: this.props.model.value,
+    };
+
   }
 
-  shouldComponentUpdate(nextProps: StyledContiguousTextEditorProps) {
-    return nextProps.model !== this.props.model
+
+  onChange = ({ value }) => {
+
+    const json = value.toJSON();
+    console.log(JSON.stringify(json, null, 2));
+
+    const v: Value = value;
+
+    console.log('CTE:onChange');
+
+
+    if (v.document !== this.state.value.document) {
+      console.log('CTE:documentChanged');
+      const updated = this.props.model.with({ value });
+      this.props.onEdit(updated);
+    }
+    if (v.selection !== this.state.value.selection) {
+      console.log('CTE:selectionChanged');
+      const textSelection = new TextSelection(v.selection);
+      this.props.onTextSelectionChange(textSelection);
+    }
+
+    this.setState({ value });
+  }
+
+  shouldComponentUpdate(nextProps: StyledContiguousTextEditorProps, nextState) {
+    return this.state.value !== nextState.value
       || nextProps.selectedEntity !== this.props.selectedEntity
       || nextProps.orderedIds !== this.props.orderedIds;
   }
+
+
 
   renderActiveEntity(entity) {
 
@@ -82,31 +118,33 @@ class ContiguousTextEditor
   }
 
   handleOnFocus(e) {
-    // We override the parent implementation, and instead
-    // defer to the DraftWrapper onSelectionChange for
-    // broadcast of the change in content selection so that
-    // we can get our hands on the text selection
-    e.stopPropagation();
-  }
 
-  handleOnClick(e) {
-    // Override to defer to DraftWrapper selection change
-    e.stopPropagation();
-  }
+    console.log('CTE:onFocus');
+    this.props.onUpdateEditor(this.editor);
 
-  draftDrivenFocus(model, parent, selection, keypress) {
-    this.props.onTextSelectionChange && this.props.onTextSelectionChange(selection);
+    const selection = this.props.model.value.selection;
     const textSelection = new TextSelection(selection);
-    textSelection.triggeredBy = keypress ? Trigger.KEYPRESS : Trigger.OTHER;
+    this.props.onTextSelectionChange && this.props.onTextSelectionChange(textSelection);
 
-    this.props.onFocus(model, parent, Maybe.just(textSelection));
+    textSelection.triggeredBy = Trigger.KEYPRESS;
+
+    this.props.onFocus(this.props.model, this.props.parent, Maybe.just(textSelection));
   }
 
   renderMain(): JSX.Element {
     const { className, classes, model, parent, editMode, viewOnly,
-      hideBorder = false, editorStyles } = this.props;
+      hideBorder = false, editorStyles, context } = this.props;
 
     const showBorder = !viewOnly && !hideBorder;
+
+    const onDecoratorClick = () => {
+
+    };
+
+    const extras = {
+      onDecoratorClick,
+      context,
+    };
 
     return (
       <div
@@ -116,24 +154,15 @@ class ContiguousTextEditor
           !editMode && classes.disabled,
           viewOnly && classes.viewOnly, className])}>
 
-        <DraftWrapper
-          orderedIds={this.props.orderedIds}
-          selectedEntity={this.props.selectedEntity}
-          onEntitySelected={this.props.onEntitySelected}
-          onInsertParsedContent={o =>
-            this.props.onInsertParsedContent(this.props.context.resourcePath, o)}
-          singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
-          parentProps={this.props}
-          parent={this}
-          editorStyles={Object.assign({}, editorStyles)}
-          onSelectionChange={(selection, keypress) =>
-            this.draftDrivenFocus(model, parent, selection, keypress)}
-          services={this.props.services}
-          context={this.props.context}
-          content={this.props.model}
-          locked={!editMode || viewOnly}
-          onEdit={(c, s) => this.props.onEdit(c, s === undefined ? c : s)} />
-
+        <Editor
+          ref={editor => this.editor = editor}
+          onFocus={this.handleOnFocus}
+          plugins={plugins}
+          value={this.state.value}
+          onChange={this.onChange}
+          renderMark={renderMark}
+          renderInline={renderInline.bind(this, extras)}
+        />
       </div>
     );
   }

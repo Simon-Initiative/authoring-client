@@ -21,7 +21,7 @@ export class ApplicationRoot extends React.Component<ApplicationRootProps, {}> {
   render(): JSX.Element {
     return (
       <Provider store={this.props.store}>
-        <SlateTestbed />
+        <Main />
       </Provider>
     );
   }

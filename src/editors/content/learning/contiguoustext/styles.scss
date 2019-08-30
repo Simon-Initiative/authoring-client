@@ -1,0 +1,34 @@
+@import 'oli/colors';
+
+.oli-command {
+  background-color: $primary;
+  color: white;
+  font-weight: bold;
+}
+
+.oli-cite {
+  vertical-align: super;
+  font-size: 10pt;
+  color: blue;
+}
+
+.oli-term {
+  font-weight: bold;
+  font-style: italic;
+  color: green;
+}
+
+.oli-var {
+  font-family: "SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New";
+  font-size: 14pt;
+  background-color: #f8f9fa;
+  padding: .2rem .4rem;
+}
+
+.oli-link {
+  color: blue !important;
+}
+
+.oli-extra {
+  color: green !important;
+}

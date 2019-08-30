@@ -8,10 +8,12 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockCodeToolbar from './BlockCodeToolbar.controller';
 import { styles } from './BlockCode.styles';
 import { StyledComponentProps } from 'types/component';
+import { connectTextEditor } from 'editors/content/container/connectEditor';
 
 export interface BlockCodeEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
   onShowSidebar: () => void;
+  onUpdateEditor: (editor) => void;
 }
 
 export interface BlockCodeEditorState {
@@ -54,6 +56,7 @@ class BlockCodeEditor
       <div className={classNames(['codeEditor', classes.codeEditor])}>
         <ContiguousTextEditor
           {...this.props}
+          onUpdateEditor={this.props.onUpdateEditor}
           onInsertParsedContent={() => { }}
           orderedIds={null}
           onFocus={this.onFocusOverride}
@@ -66,4 +69,4 @@ class BlockCodeEditor
 }
 
 const StyledBlockCodeEditor = withStyles<BlockCodeEditorProps>(styles)(BlockCodeEditor);
-export default StyledBlockCodeEditor;
+export default connectTextEditor(StyledBlockCodeEditor);

@@ -13,9 +13,33 @@ import { EntityTypes } from 'data/content/learning/common';
 import { fromDraft } from 'data/content/learning/draft/topersistence';
 import createGuid from 'utils/guid';
 
+import { Value, Block, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
+
+import { toSlate } from 'data/content/learning/slate/toslate';
+import { toPersistence } from 'data/content/learning/slate/topersistence';
+
 const emptyContent = ContentState.createFromText(' ');
 
 export type ContiguousTextPair = [ContiguousText, ContiguousText];
+
+
+
+const initialValue = Value.fromJSON({
+  document: {
+    nodes: [
+      {
+        object: 'block',
+        type: 'paragraph',
+        nodes: [
+          {
+            object: 'text',
+            text: 'A line of text in a paragraph.',
+          },
+        ],
+      },
+    ],
+  },
+});
 
 export enum ContiguousTextMode {
   Regular,
@@ -24,6 +48,7 @@ export enum ContiguousTextMode {
 
 export type ContiguousTextParams = {
   content?: ContentState,
+  value?: Value,
   entityEditCount?: number,
   mode?: ContiguousTextMode,
   guid?: string,
@@ -32,6 +57,7 @@ export type ContiguousTextParams = {
 const defaultContent = {
   contentType: 'ContiguousText',
   elementType: '#text',
+  value: initialValue,
   content: emptyContent,
   mode: ContiguousTextMode.Regular,
   entityEditCount: 0,
@@ -39,16 +65,16 @@ const defaultContent = {
 };
 
 export enum InlineStyles {
-  Bold = 'BOLD',
-  Italic = 'ITALIC',
-  Strikethrough = 'STRIKETHROUGH',
-  Highlight = 'HIGHLIGHT',
-  Var = 'VAR',
-  Term = 'TERM',
-  Foreign = 'FOREIGN',
-  Subscript = 'SUBSCRIPT',
-  Superscript = 'SUPERSCRIPT',
-  BidirectionTextOverride = 'BDO',
+  Bold = 'em',
+  Italic = 'italic',
+  Strikethrough = 'strikethough',
+  Highlight = 'highlight',
+  Var = 'var',
+  Term = 'term',
+  Foreign = 'foreign',
+  Subscript = 'sub',
+  Superscript = 'sup',
+  BidirectionTextOverride = 'bdo',
 }
 
 export type InlineEntity = {
@@ -75,6 +101,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   contentType: 'ContiguousText';
   elementType: '#text';
+  value: Value;
   content: ContentState;
   entityEditCount: number;
   mode: ContiguousTextMode;
@@ -106,6 +133,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       guid,
       mode,
       content: toDraft(root, mode === ContiguousTextMode.SimpleText, backingTextProvider),
+      value: toSlate(root, mode === ContiguousTextMode.SimpleText, backingTextProvider),
     });
   }
 
@@ -125,7 +153,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
-    return fromDraft(this.content, this.mode === ContiguousTextMode.SimpleText);
+    return toPersistence(this.value, this.mode === ContiguousTextMode.SimpleText);
   }
 
   // Return the OLI ID of the first paragraph in the text block
@@ -203,53 +231,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toggleStyle(style: InlineStyles, selection: TextSelection): ContiguousText {
-    type ContentBlock = any; // so much for type safety
-
-    const rev = selection.getIsBackward(); // its reversed if anchor is after focus
-    const anchorKey = selection.getAnchorKey(); // key of starting ContentBlock
-    const anchorOffset = selection.getAnchorOffset(); // anchor offset from beginning
-    const focusKey = selection.getFocusKey(); // key of ending ContentBlock
-    const focusOffset = selection.getFocusOffset(); // focus offset from beginning
-    const blocks: Immutable.OrderedMap<string, ContentBlock> = this.content.getBlockMap();
-
-    // want blocks from anchorKey to focusKey, or focusKey to anchorKey if rev
-    const startKey = rev ? focusKey : anchorKey;
-    const endKey = rev ? anchorKey : focusKey;
-    let selectedBlocks = blocks.skipUntil((_, x) => x === startKey);
-    let saw = false; // saw used as a hack to get an inclusive upper bound on takeUntil
-    selectedBlocks = selectedBlocks.takeUntil((_, x) => saw || (x === endKey && !(saw = true)));
-
-    // Determine whether we need to apply or remove the style based on the selection
-    // If the current selection is all styled, unstyle it.
-    // If the current selection is partially styled, style it entirely.
-    const startOffset = rev ? focusOffset : anchorOffset;
-    const endOffset = rev ? anchorOffset : focusOffset;
-    let allStyled = true;
-    selectedBlocks.forEach((block, key) => {
-      const chars = block.characterList.toArray().map(x => x.style);
-      const text = block.text;
-      const len = chars.length;
-      const start = key === startKey ? startOffset : 0;
-      const end = key === endKey ? endOffset : len;
-      for (let i = start; i < end; i += 1) {
-        // if the styling isn't the entire section
-        if (!chars[i].has(style) && text[i].trim() !== '') {
-          return allStyled = false; // break out of the forEach
-        }
-      }
-    });
-
-    let content = allStyled
-      ? Modifier.removeInlineStyle(this.content, selection.getRawSelectionState(), style)
-      : Modifier.applyInlineStyle(this.content, selection.getRawSelectionState(), style);
-
-    // handle contradictory styling
-    if (!allStyled && (style === InlineStyles.Subscript || style === InlineStyles.Superscript)) {
-      content = Modifier.removeInlineStyle(
-        content, selection.getRawSelectionState(),
-        style === InlineStyles.Subscript ? InlineStyles.Superscript : InlineStyles.Subscript);
-    }
-    return this.with({ content });
+    return this;
   }
 
   updateEntity(key: string, data: Object) {
@@ -309,6 +291,9 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       anchorOffset: info.range.start,
       focusOffset: info.range.end,
     });
+
+
+
     const selection = new TextSelection(rawSelection);
 
     // Some of the entity data objects are regular objects and do not
@@ -332,94 +317,13 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   addEntity(
     type: string, isMutable: boolean, data: Object, selection: TextSelection): ContiguousText {
 
-    const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
-    let selectionState = selection.getRawSelectionState();
-    let contentState = this.content;
-
-    // We cannot insert an entity at the beginning of a content block,
-    // to handle that case we adjust and add 1 to the focus offset
-    if (selectionState.getFocusOffset() === selectionState.getAnchorOffset()
-      && selectionState.getFocusKey() === selectionState.getAnchorKey()) {
-
-      if (selectionState.getFocusOffset() === 0) {
-
-        const block = contentState.getBlockForKey(selectionState.getAnchorKey());
-        contentState = appendText(block, contentState, '  ');
-        const text = block.getText();
-
-        selectionState = new SelectionState({
-          anchorKey: selectionState.getAnchorKey(),
-          focusKey: selectionState.getFocusKey(),
-          anchorOffset: text.length + 1,
-          focusOffset: text.length + 2,
-        });
-      } else {
-
-        selectionState = new SelectionState({
-          anchorKey: selectionState.getAnchorKey(),
-          focusKey: selectionState.getFocusKey(),
-          anchorOffset: selectionState.getAnchorOffset(),
-          focusOffset: selectionState.getAnchorOffset() + 1,
-        });
-      }
-    }
-
-    const block = contentState.getBlockForKey(selectionState.getAnchorKey());
-    const text = block.getText();
-
-    if (text.length < selectionState.getFocusOffset()) {
-      contentState = appendText(block, contentState, '  ');
-    }
-
-    contentState = contentState.createEntity(type, mutability, data);
-    const entityKey = contentState.getLastCreatedEntityKey();
-
-    contentState = Modifier.applyEntity(
-      contentState,
-      selectionState,
-      entityKey,
-    );
-
-    return this.with({
-      content: contentState,
-      entityEditCount: this.entityEditCount + 1,
-    });
+    return this;
   }
 
   insertEntity(
     type: string, isMutable: boolean, data: Object,
     selection: TextSelection, backingText: string): ContiguousText {
-
-    const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
-    const selectionState = selection.getRawSelectionState();
-
-    let contentState = this.content;
-
-    // Create the entity
-    contentState = contentState.createEntity(type, mutability, data);
-    const entityKey = contentState.getLastCreatedEntityKey();
-
-    // Insert the backing text with entity
-    contentState = Modifier.replaceText(
-      contentState, selectionState, backingText, undefined, entityKey);
-
-    // Add a space if this new entity results in none at the
-    // end of the line
-    const block = this.content.getBlockForKey(selectionState.getFocusKey());
-
-    if (
-      (selectionState.getIsBackward()
-        && selectionState.getAnchorOffset() === block.getText().length) ||
-      (!selectionState.getIsBackward()
-        && selectionState.getFocusOffset() === block.getText().length)) {
-
-      contentState = appendText(block, contentState, '  ');
-    }
-
-    return this.with({
-      content: contentState,
-      entityEditCount: this.entityEditCount + 1,
-    });
+    return this;
   }
 
   removeInputRef(id: string) {
@@ -433,45 +337,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   split(s: TextSelection): ContiguousTextPair {
-
-    // Draft.js splitBlock should only be called when selection is collapsed.
-    // So, if it isn't, we adjust the selection to make it collapsed (just for
-    // the purpose of this split)
-    const raw = s.getRawSelectionState();
-    const selection: SelectionState = raw.isCollapsed()
-      ? raw
-      : raw.merge({
-        anchorKey: raw.getFocusKey(),
-        anchorOffset: raw.getFocusOffset(),
-      }) as SelectionState;
-
-    // Split the current block
-    const split = Modifier.splitBlock(this.content, selection);
-
-    // Now separate the blocks into two arrays, the first up to and including the
-    // block we split, and the second being the new block and all after it
-    const first = [];
-    const second = [];
-
-    let which = first;
-    split.getBlocksAsArray()
-      .forEach((b) => {
-        which.push(b);
-        if (b.getKey() === selection.getFocusKey()) {
-          which = second;
-        }
-      });
-
-    // Reconstruct ContentStates
-    const secondContent = ContentState.createFromBlockArray(second);
-    return [
-      this.with({
-        content: ContentState.createFromBlockArray(first),
-      }),
-      this.with({
-        guid: createGuid(),
-        content: secondContent,
-      })];
+    return null;
   }
 
   // Returns true if the contiguous text contains one block and
@@ -519,11 +385,21 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   extractPlainText(): Maybe<string> {
 
-    const blocks = this.content.getBlocksAsArray();
-    const unstyled = blocks.filter(b => b.getType() === 'unstyled');
-
-    if (unstyled.length > 0) {
-      return Maybe.just(unstyled[0].getText());
+    if (this.value.document.nodes.size > 0) {
+      const n = this.value.document.nodes.first() as Block;
+      let s = '';
+      n.nodes.forEach((t) => {
+        if (t.object === 'text') {
+          s += t.text;
+        } else if (t.object === 'inline') {
+          t.nodes.forEach((tn) => {
+            if (tn.object === 'text') {
+              s += tn.text;
+            }
+          });
+        }
+      });
+      return Maybe.just(s);
     }
     return Maybe.nothing();
   }
@@ -536,37 +412,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   // Otherwise, we return just the raw underlying text substring.
 
   extractParagraphSelectedText(selection: TextSelection): Maybe<string> {
-    // Return nothing if the selection spans multiple blocks
-    if (selection.getAnchorKey() !== selection.getFocusKey()) {
-      return Maybe.nothing();
-    }
 
-    // Return nothing if there is no selection
-    if (selection.getAnchorOffset() === selection.getFocusOffset()) {
-      return Maybe.nothing();
-    }
-
-    // Return nothing if we somehow cannot find this block
-    const block = this.content.getBlockForKey(selection.getAnchorKey());
-    if (block === undefined) {
-      return Maybe.nothing();
-    }
-
-    const text: string = block.getText();
-    // >= is correct here instead of >, since the focus offset value is exclusive
-    if (text.length >= selection.getAnchorOffset() && text.length >= selection.getFocusOffset()) {
-
-      // We must be careful to handle reverse selections
-      const begin = selection.getAnchorOffset() < selection.getFocusOffset()
-        ? selection.getAnchorOffset() : selection.getFocusOffset();
-      const end = selection.getAnchorOffset() > selection.getFocusOffset()
-        ? selection.getAnchorOffset() : selection.getFocusOffset();
-
-      return Maybe.just(text.substring(begin, end));
-    }
-
-    // Return nothing if somehow one or both of the offsets exceeds the
-    // length of the backing block text
     return Maybe.nothing();
   }
 }

@@ -36,6 +36,7 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
 import { LegacyTypes } from 'data/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
+import { Editor } from 'slate-react';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -46,6 +47,7 @@ export interface ContiguousTextToolbarProps
   onAddEntry: (e, documentId) => Promise<void>;
   onFetchContentElementByPredicate: (documentId, predicate) => Promise<Maybe<ContentElement>>;
   selection: TextSelection;
+  editor: Maybe<Editor>;
 }
 
 export interface ContiguousTextToolbarState {
@@ -233,9 +235,9 @@ class ContiguousTextToolbar
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
-              () => onEdit(model.toggleStyle(InlineStyles.Bold, selection))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
-            disabled={!supports('em') || noTextSelected || !editMode}
+            disabled={!supports('em') || !editMode}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
@@ -243,7 +245,7 @@ class ContiguousTextToolbar
             onClick={
               () => onEdit(model.toggleStyle(InlineStyles.Italic, selection))
             }
-            disabled={!supports('em') || noTextSelected || !editMode}
+            disabled={!supports('em') || !editMode}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
@@ -251,7 +253,7 @@ class ContiguousTextToolbar
             onClick={
               () => onEdit(model.toggleStyle(InlineStyles.Strikethrough, selection))
             }
-            disabled={!supports('em') || noTextSelected || !editMode}
+            disabled={!supports('em') || !editMode}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
@@ -259,7 +261,7 @@ class ContiguousTextToolbar
             onClick={
               () => onEdit(model.toggleStyle(InlineStyles.Highlight, selection))
             }
-            disabled={!supports('em') || noTextSelected || !editMode}
+            disabled={!supports('em') || !editMode}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
@@ -267,7 +269,7 @@ class ContiguousTextToolbar
             onClick={
               () => onEdit(model.toggleStyle(InlineStyles.Superscript, selection))
             }
-            disabled={!supports('sup') || noTextSelected || !editMode}
+            disabled={!supports('sup') || !editMode}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
@@ -275,7 +277,7 @@ class ContiguousTextToolbar
             onClick={
               () => onEdit(model.toggleStyle(InlineStyles.Subscript, selection))
             }
-            disabled={!supports('sub') || noTextSelected || !editMode}
+            disabled={!supports('sub') || !editMode}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>
@@ -283,7 +285,7 @@ class ContiguousTextToolbar
             onClick={
               () => onEdit(model.toggleStyle(InlineStyles.Var, selection))
             }
-            disabled={!supports('code') || noTextSelected || !editMode}
+            disabled={!supports('code') || !editMode}
             tooltip="Code">
             {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>
@@ -291,7 +293,7 @@ class ContiguousTextToolbar
             onClick={() => {
               onEdit(model.toggleStyle(InlineStyles.Term, selection));
             }}
-            disabled={!supports('term') || noTextSelected || !editMode}
+            disabled={!supports('term') || !editMode}
             tooltip="Term">
             <i className={'fa fa-book'} />
           </ToolbarButton>
@@ -299,7 +301,7 @@ class ContiguousTextToolbar
             onClick={() => {
               onEdit(model.toggleStyle(InlineStyles.Foreign, selection));
             }}
-            disabled={!supports('foreign') || noTextSelected || !editMode}
+            disabled={!supports('foreign') || !editMode}
             tooltip="Foreign">
             <i className={'fa fa-globe'} />
           </ToolbarButton>
@@ -307,7 +309,7 @@ class ContiguousTextToolbar
             onClick={() => {
               onEdit(model.toggleStyle(InlineStyles.BidirectionTextOverride, selection));
             }}
-            disabled={!supports('bdo') || bdoDisabled || !editMode}
+            disabled={!supports('bdo') || !editMode}
             tooltip="Reverse Text Direction">
             <i className={'fa fa-angle-left'} />
           </ToolbarButton>
@@ -475,7 +477,7 @@ class ContiguousTextToolbar
             {this.renderEntryOptions(selection)}
           </ToolbarNarrowMenu>
         </ToolbarLayout.Inline>
-      </ToolbarGroup>
+      </ToolbarGroup >
     );
   }
 
