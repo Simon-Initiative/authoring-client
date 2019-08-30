@@ -644,8 +644,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       onItemFocus,
     } = this.props;
 
-    console.log('question', model)
-
     return (
       <div
         className={`question ${this.getClassName() || ''}`}
