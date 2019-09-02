@@ -60,21 +60,13 @@ class ContiguousTextEditor
 
   onChange = ({ value }) => {
 
-    const json = value.toJSON();
-    console.log(JSON.stringify(json, null, 2));
-
     const v: Value = value;
 
-    console.log('CTE:onChange');
-
-
     if (v.document !== this.state.value.document) {
-      console.log('CTE:documentChanged');
       const updated = this.props.model.with({ value });
       this.props.onEdit(updated);
     }
     if (v.selection !== this.state.value.selection) {
-      console.log('CTE:selectionChanged');
       const textSelection = new TextSelection(v.selection);
       this.props.onTextSelectionChange(textSelection);
     }
@@ -119,7 +111,6 @@ class ContiguousTextEditor
 
   handleOnFocus(e) {
 
-    console.log('CTE:onFocus');
     this.props.onUpdateEditor(this.editor);
 
     const selection = this.props.model.value.selection;

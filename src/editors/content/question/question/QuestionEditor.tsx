@@ -16,7 +16,6 @@ import { Ordering } from 'editors/content/question/ordering/Ordering.controller'
 import { DynaDropInput } from 'editors/content/question/draganddrop/DynaDropInput.controller';
 import { MultipartInput } from 'editors/content/question/multipart/MultipartInput.controller';
 import { Skill } from 'types/course';
-import { InsertInputRefCommand } from 'editors/content/question/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
 import { Maybe } from 'tsmonad';
@@ -48,12 +47,6 @@ export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, Props, State> {
   lastBody: ContentElements = this.props.model.body;
   itemToAdd: any;
-  fillInTheBlankCommand: InsertInputRefCommand =
-    new InsertInputRefCommand(this, this.createFillInTheBlank, 'FillInTheBlank');
-  numericCommand: InsertInputRefCommand =
-    new InsertInputRefCommand(this, () => new contentTypes.Numeric(), 'Numeric');
-  textCommand: InsertInputRefCommand =
-    new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
 
   state = {
     ...this.state,

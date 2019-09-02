@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { getCaretPosition, setCaretPosition } from '../common/draft/utils';
+import { getCaretPosition, setCaretPosition } from '../common/caret';
 
 require('./PreformattedText.scss');
 
@@ -21,7 +21,7 @@ export interface PreformattedTextEditorProps {
   onBlur?: () => void;
   editMode: boolean;
   src: string;
-  styleName? : string;
+  styleName?: string;
 }
 
 export interface PreformattedTextEditorState {
@@ -89,7 +89,7 @@ class PreformattedTextEditor
     e.stopPropagation();
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     // We cannot use JSX here to render this div because
     // the TypeScript type definitions do not seem to

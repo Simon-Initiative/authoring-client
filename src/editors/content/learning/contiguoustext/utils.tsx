@@ -3,11 +3,14 @@ import { Math as MathRenderer } from 'utils/math/Math';
 import * as ct from 'data/contentTypes';
 import { InputRefType } from 'data/content/learning/input_ref';
 import './styles.scss';
-
+import { Editor, Inline, Value, Document } from 'slate';
 const IMAGE = require('../../../../../assets/400x300.png');
 import { buildUrl } from '../../../../utils/path';
-
+import { InlineTypes } from 'data/content/learning/contiguous';
 import { Tooltip } from 'utils/tooltip';
+
+
+export type ValuePair = [Value, Value];
 
 type StyledInlineProps = {
   children,
@@ -24,6 +27,64 @@ const TooltipInline = (props: StyledInlineProps) => {
     </Tooltip>
   );
 };
+
+
+function wrapInlineWithData(editor, wrapper) {
+  editor.wrapInline({
+    type: wrapper.contentType,
+    data: { value: wrapper },
+  });
+
+  editor.moveToEnd();
+}
+
+function removeInline(editor: Editor, key: string): Editor {
+  return editor.removeNodeByKey(key);
+}
+
+function insertInline(editor: Editor, data: InlineTypes): Editor {
+  const inline = Inline.create({ data, type: data.contentType });
+  return editor.insertInline(inline);
+}
+
+function applyInline(editor: Editor, wrapper: InlineTypes): Editor {
+  return editor.command(wrapInlineWithData, wrapper);
+}
+
+// Split the value of an active editor at its current selection
+// and create two Value objects as a result.
+function split(editor: Editor): ValuePair {
+
+  // Note the key of the block in the selection
+  // that will appear chronologically first in the content
+  const anchorKey = editor.value.selection.isBackward
+    ? editor.value.selection.anchor.key
+    : editor.value.selection.focus.key;
+
+  // Count the ordinal position of that block within the node list
+  let anchorPosition = 0;
+  editor.value.document.nodes.toArray().forEach((n, i) => {
+    if (n.key === anchorKey) {
+      anchorPosition = i;
+    }
+  });
+
+  // Now split the block at the current selection
+  const updated = editor.splitBlock();
+
+  // With the resultant split structure, create two value objects,
+  // one with the blocks from before the split, and one with the
+  // blocks after the split
+  const document = updated.value.document;
+  const value = updated.value;
+  const nodes1 = updated.value.document.nodes.takeWhile(b => b.key === anchorKey);
+  const nodes2 = updated.value.document.nodes.toArray().slice(anchorPosition + 1);
+
+  return [
+    value.merge({ document: document.merge({ nodes: nodes1 }) as Document }) as Value,
+    value.merge({ document: document.merge({ nodes: nodes2 }) as Document }) as Value,
+  ];
+}
 
 function tip(tooltip: string, style: string, children: any) {
   return (
@@ -93,27 +154,27 @@ export function renderInline(extras, props, editor, next) {
   const { data } = node;
 
   switch (node.type) {
-    case 'code':
+    case 'Code':
       return <code>{props.children}</code>;
-    case 'link': {
+    case 'Link': {
       return tip('External Hyperlink', 'oli-link', children);
     }
-    case 'command': {
+    case 'Command': {
       return tip('Command', 'oli-command', children);
     }
-    case 'xref': {
+    case 'Xref': {
       return tip('Cross reference', 'oli-link', children);
     }
-    case 'activity_link': {
+    case 'ActivityLink': {
       return tip('Activity link', 'oli-link', children);
     }
-    case 'extra': {
+    case 'Extra': {
       return tip('Rollover definition', 'oli-extra', children);
     }
-    case 'sym': {
+    case 'Sym': {
 
     }
-    case 'image': {
+    case 'Image': {
 
       const src = data.value.src;
 
@@ -136,7 +197,7 @@ export function renderInline(extras, props, editor, next) {
         height={data.height}
         width={data.width} />;
     }
-    case 'input': {
+    case 'InputRef': {
       const type = data.value.inputType;
       if (type === InputRefType.Numeric) {
         return <input readOnly value="Numeric" size={15} />;
@@ -149,13 +210,13 @@ export function renderInline(extras, props, editor, next) {
       }
 
     }
-    case 'math': {
+    case 'Math': {
       const { data } = node.value as ct.Math;
       return (
         <MathRenderer inline >{data}</MathRenderer>
       );
     }
-    case 'quote': {
+    case 'Quote': {
       return (
         <span>&quot;{children}&quot;</span>
       );

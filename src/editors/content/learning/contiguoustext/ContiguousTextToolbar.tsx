@@ -13,7 +13,6 @@ import {
   ToolbarButtonMenuItem,
 } from 'components/toolbar/ToolbarButtonMenu';
 import { InlineStyles } from 'data/content/learning/contiguous';
-import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -202,24 +201,26 @@ class ContiguousTextToolbar
 
   renderToolbar() {
 
-    const { model, onEdit, editMode, selection } = this.props;
+    const { model, onEdit, editMode, selection, editor } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
+
+    const currentMarks = model.value.activeMarks.toArray().map(m => m.type);
+    const currentInlines = model.value.inlines;
 
     const noTextSelected = selection && selection.isCollapsed();
 
     const bareTextSelected = selection && selection.isCollapsed()
       ? false
-      : !model.selectionOverlapsEntity(selection);
+      : currentInlines.size === 0;
 
     // We enable the bdo button only when there is a selection that
     // doesn't overlap an entity, and that selection selects only
     // bare text or just another bdo
-    const intersectingStyles = model.getOverlappingInlineStyles(selection);
-    const onlyBdoOrEmpty = intersectingStyles.size === 0
-      || (intersectingStyles.size === 1 && intersectingStyles.contains('BDO'));
+    const onlyBdoOrEmpty = currentMarks.length === 0
+      || (currentMarks.length === 1 && (currentMarks.indexOf('bdo') >= 0));
 
     const bdoDisabled = !selection || selection.isCollapsed()
-      || model.selectionOverlapsEntity(selection)
+      || currentInlines.size > 0
       || !onlyBdoOrEmpty;
 
     const cursorInEntity = selection && selection.isCollapsed()
@@ -309,7 +310,7 @@ class ContiguousTextToolbar
             onClick={() => {
               onEdit(model.toggleStyle(InlineStyles.BidirectionTextOverride, selection));
             }}
-            disabled={!supports('bdo') || !editMode}
+            disabled={!supports('bdo') || bdoDisabled || !editMode}
             tooltip="Reverse Text Direction">
             <i className={'fa fa-angle-left'} />
           </ToolbarButton>

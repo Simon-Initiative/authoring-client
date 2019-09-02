@@ -53,6 +53,18 @@ function normalizeInput(toParse, isInlineText: boolean): Object[] {
 
 }
 
+function parse(item: Object, json: ValueJSON, backingTextProvider: Object) {
+
+  const key = common.getKey(item);
+
+  if (key === undefined) {
+    return;
+  }
+
+  blockHandlers[key](item, json, backingTextProvider);
+}
+
+
 function isMarkOnly(item: Object): boolean {
   return item['#text'] === undefined;
 }
@@ -154,8 +166,9 @@ function stripOutInline(item: Object, parent: BlockJSON, backingTextProvider) {
 
 function terminalInline(item: Object, parent: BlockJSON, backingTextProvider): InlineJSON {
 
-  const type = common.getKey(item);
-  const data = { value: registeredTypes[type](item) };
+  const key = common.getKey(item);
+  const data = { value: registeredTypes[key](item) };
+  const type = data.value.contentType;
 
   const inline: InlineJSON = {
     object: 'inline',
@@ -236,21 +249,4 @@ function extractId(item: any): Object {
     data.id = guid();
   }
   return data;
-}
-
-function parse(item: Object, json: ValueJSON, backingTextProvider: Object) {
-
-  // item is an object with one key.
-
-  // Get the key and then get the registered key handler
-  const key = common.getKey(item);
-
-  // Handle the case where we have keyless data...aka, a blank
-  // JS object.  Just ignore it in the UI, but log to the console
-  if (key === undefined) {
-    return;
-  }
-
-  blockHandlers[key](item, json, backingTextProvider);
-
 }

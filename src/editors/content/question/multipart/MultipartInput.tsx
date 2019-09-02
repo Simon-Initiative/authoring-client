@@ -10,7 +10,6 @@ import { Text } from '../../items/Text';
 import { Numeric } from '../../items/Numeric';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
 import { ActiveContext, TextSelection } from 'types/active';
-import { EntityTypes } from '../../../../data/content/learning/common';
 import guid from 'utils/guid';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
@@ -73,7 +72,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             const selection = activeContext.textSelection.caseOf({
               just: s => s,
               nothing: () =>
-                TextSelection.createEmpty((c as ContiguousText).content.getFirstBlock().getKey()),
+                TextSelection.createEmpty({}),
             });
 
             const input = guid();
