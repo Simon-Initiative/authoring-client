@@ -1,0 +1,647 @@
+{
+  "question": {
+    "@id": "b1a12f60c290405a969550b9d98ffb9c",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#text": "This is my ordering question.",
+                "@id": "aa5a2d224407b430399f7fcd87e4a3f95",
+                "@title": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "ordering": {
+          "@shuffle": "false",
+          "@id": "a3e85854170b4a41a53f598bd53347b8",
+          "@name": "",
+          "#array": [
+            {
+              "choice": {
+                "#text": "Choice A",
+                "@value": "A",
+                "@color": ""
+              }
+            },
+            {
+              "choice": {
+                "#text": "Choice B",
+                "@value": "B",
+                "@color": ""
+              }
+            },
+            {
+              "choice": {
+                "#text": "Choice C",
+                "@value": "C",
+                "@color": ""
+              }
+            },
+            {
+              "choice": {
+                "#text": "Choice D",
+                "@value": "D",
+                "@color": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "part": {
+          "@id": "cb2fe38d92bc4276b0da0acf6ec62f35",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "A,B,C,D",
+                "@score": "1",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the correct feedback.",
+                            "@id": "af6935e9d6c254d9c92e858ffe6cc3565",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,A,C,D",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Targeted Feedback 2",
+                            "@id": "ac06ad18b5967429397643987cce6d6ea",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,B,D,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,B,D,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "ae8576c8f0f5e456fb25998a4142d0ee6",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,C,B,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,C,B,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "ac256b6fe604f478ebd5aa0b0aa745f20",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,C,D,B",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,C,D,B}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "acdfa19fb65774ac181afec246f68fc67",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,D,B,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,D,B,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "acb966124c08d46dc8f3c9586e9a54b9a",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "A,D,C,B",
+                "@score": "0",
+                "@name": "AUTOGEN_{A,D,C,B}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aeaa817f10df1445babf59982aaf16fb9",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,A,D,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{B,A,D,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "acd1ae4223b8e402a88a1fa6b164a11bb",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,C,A,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{B,C,A,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "ab2cf93514bf144e284212abb40964835",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,C,D,A",
+                "@score": "0",
+                "@name": "AUTOGEN_{B,C,D,A}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aef399d883a3d46dfb635b538b8380885",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,D,A,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{B,D,A,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aaed92a963aa2431a9c3774f207ae4fb9",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "B,D,C,A",
+                "@score": "0",
+                "@name": "AUTOGEN_{B,D,C,A}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aee20f43bf66d4a5bbec5a4bb8c2a506a",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "C,A,B,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{C,A,B,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "afee22b1043d349c1a60f466a082e235c",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "C,A,D,B",
+                "@score": "0",
+                "@name": "AUTOGEN_{C,A,D,B}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aaab209f91c0845f3b8c76c18c2e8f647",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "C,B,A,D",
+                "@score": "0",
+                "@name": "AUTOGEN_{C,B,A,D}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "af04cb314ff784785b097d0d96e5b3d92",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "C,B,D,A",
+                "@score": "0",
+                "@name": "AUTOGEN_{C,B,D,A}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "ab8edf9fcdc6f42f9bcc429dd5704f120",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "C,D,A,B",
+                "@score": "0",
+                "@name": "AUTOGEN_{C,D,A,B}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "ab173e3c72a4340a28a731e1d1a19e32e",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "C,D,B,A",
+                "@score": "0",
+                "@name": "AUTOGEN_{C,D,B,A}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "ad13dc3f37883457491ac7c8cb34f40e2",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "D,A,B,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{D,A,B,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aea311461477c4e878fb8a2ce8aa3412a",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "D,A,C,B",
+                "@score": "0",
+                "@name": "AUTOGEN_{D,A,C,B}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aaeff608bb4084738ab7f74169ba1fffc",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "D,B,A,C",
+                "@score": "0",
+                "@name": "AUTOGEN_{D,B,A,C}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "ae7229524a0d04ad582436df83af691a2",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "D,B,C,A",
+                "@score": "0",
+                "@name": "AUTOGEN_{D,B,C,A}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "acbd47c4453664fceabd7026ebf246c29",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "D,C,A,B",
+                "@score": "0",
+                "@name": "AUTOGEN_{D,C,A,B}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aafc2acece3704459a131e422992a32c3",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "D,C,B,A",
+                "@score": "0",
+                "@name": "AUTOGEN_{D,C,B,A}",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is the incorrect feedback.",
+                            "@id": "aeb2cc8ae203c4cf7a8d562016f96da2f",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "Hint 1",
+                      "@id": "abfed20d5f36a49649172e0ecbbdb23c7",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": []
+        }
+      }
+    ]
+  }
+}

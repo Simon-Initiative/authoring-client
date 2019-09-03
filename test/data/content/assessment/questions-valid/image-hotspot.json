@@ -1,0 +1,159 @@
+{
+  "question": {
+    "@id": "d48e5b18af1744cfac98d66534e337f6",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#text": "This is my image hotspot.",
+                "@id": "afdd077dc9f5640588b621adc68ac2e28",
+                "@title": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "image_hotspot": {
+          "@id": "f833f73c102347c0862361f05998011a",
+          "@src": "NO_IMAGE_SELECTED",
+          "@width": "600",
+          "@height": "400",
+          "@select": "single",
+          "#array": [
+            {
+              "hotspot": {
+                "@value": "c5e078cb5296444e9826fa06b511264a",
+                "@shape": "rect",
+                "@coords": "88,87,188,187"
+              }
+            },
+            {
+              "hotspot": {
+                "@value": "a9aab73918e741d2bbd0dea4adc6b30b",
+                "@shape": "circle",
+                "@coords": "334,153,100"
+              }
+            },
+            {
+              "hotspot": {
+                "@value": "ba1470cf40524fc9bca20950f875f579",
+                "@shape": "rect",
+                "@coords": "114,190,214,290"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "part": {
+          "@id": "e22182cbf30349cbab7be1b8446d8dd4",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "c5e078cb5296444e9826fa06b511264a",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Feedback for A",
+                            "@id": "acb28e3d6ca1d4e47807b674f4bd9f9dc",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "a9aab73918e741d2bbd0dea4adc6b30b",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Feedback for B",
+                            "@id": "aca6b62a06b2c488491174076c41f9b7b",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "response": {
+                "@match": "ba1470cf40524fc9bca20950f875f579",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Feedback for C",
+                            "@id": "aa4069221f2824d5a8ec62f9af65af787",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "This is my hint.",
+                      "@id": "af855a12deac8416bae519fa620a91020",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": []
+        }
+      }
+    ]
+  }
+}
