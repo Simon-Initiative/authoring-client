@@ -18,6 +18,7 @@ const jsonInputNumeric = require('./questions-valid/input-numeric.json');
 const jsonDnd = require('./questions-valid/dnd.json');
 const jsonImageHotspot = require('./questions-valid/image-hotspot.json');
 const jsonEssay = require('./questions-valid/essay.json');
+const jsonAsterisk = require('./questions-valid/with-asterisk.json');
 
 it('Filters out extra parts', () => {
   const updated = filterOutExtraParts([new Part(), new Part(), new Part()], 1);
@@ -86,6 +87,29 @@ describe('multiple choice questions should be parsed correctly', () => {
     const matches = responses.toArray().map(response => response.match);
 
     expect(responsesMatchAnswerChoices(values, matches)).toBeTruthy();
+  });
+
+  // tslint:disable-next-line: max-line-length
+  it('ignores the asterisk in the match', () => {
+    const question: Question = Question.fromPersistence(jsonAsterisk, guid());
+
+    const items = question.items;
+    const item = items.first() as MultipleChoice;
+
+    const choices = item.choices;
+
+    const parts = question.parts;
+    const part = parts.first();
+
+    const responses = part.responses;
+
+    const values = choices.toArray().map(choice => choice.value);
+    const matches = responses.toArray().map(response => response.match);
+
+    expect(choices.size).toEqual(4);
+    expect(parts.size).toEqual(1);
+    expect(responses.size).toEqual(2);
+
   });
 
   // tslint:disable-next-line: max-line-length

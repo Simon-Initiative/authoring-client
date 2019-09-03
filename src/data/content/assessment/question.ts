@@ -533,7 +533,7 @@ function removeResponsesWithNoMatch(question: Question): Question {
     parts: question.parts.map((part) => {
       return part.with({
         responses: part.responses
-          .filter(response => values.includes(response.match))
+          .filter(response => response.match === '*' || values.includes(response.match))
           .toOrderedMap(),
       });
     }).toOrderedMap(),
