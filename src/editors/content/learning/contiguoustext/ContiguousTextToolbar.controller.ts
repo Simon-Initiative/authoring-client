@@ -12,7 +12,7 @@ import { addEntry } from 'actions/bibliography';
 import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
 import { fetchContentElementByPredicate } from 'actions/document';
-import { Editor } from 'slate-react';
+import { Editor } from 'slate';
 
 interface StateProps {
   selection: TextSelection;

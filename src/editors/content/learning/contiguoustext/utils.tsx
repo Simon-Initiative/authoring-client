@@ -38,22 +38,22 @@ function wrapInlineWithData(editor, wrapper) {
   editor.moveToEnd();
 }
 
-function removeInline(editor: Editor, key: string): Editor {
+export function removeInline(editor: Editor, key: string): Editor {
   return editor.removeNodeByKey(key);
 }
 
-function insertInline(editor: Editor, data: InlineTypes): Editor {
+export function insertInline(editor: Editor, data: InlineTypes): Editor {
   const inline = Inline.create({ data, type: data.contentType });
   return editor.insertInline(inline);
 }
 
-function applyInline(editor: Editor, wrapper: InlineTypes): Editor {
+export function applyInline(editor: Editor, wrapper: InlineTypes): Editor {
   return editor.command(wrapInlineWithData, wrapper);
 }
 
 // Split the value of an active editor at its current selection
 // and create two Value objects as a result.
-function split(editor: Editor): ValuePair {
+export function split(editor: Editor): ValuePair {
 
   // Note the key of the block in the selection
   // that will appear chronologically first in the content

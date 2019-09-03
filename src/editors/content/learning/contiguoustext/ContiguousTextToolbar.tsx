@@ -12,7 +12,7 @@ import {
   ToolbarNarrowMenu,
   ToolbarButtonMenuItem,
 } from 'components/toolbar/ToolbarButtonMenu';
-import { InlineStyles } from 'data/content/learning/contiguous';
+import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -35,7 +35,8 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
 import { LegacyTypes } from 'data/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
-import { Editor } from 'slate-react';
+import { Editor } from 'slate';
+import * as editorUtils from './utils';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -55,6 +56,13 @@ export interface ContiguousTextToolbarState {
 
 type StyledContiguousTextToolbarProps =
   StyledComponentProps<ContiguousTextToolbarProps, typeof styles>;
+
+function applyInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.applyInline(e, wrapper));
+}
+function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.insertInline(e, wrapper));
+}
 
 function selectBibEntry(bib: contentTypes.Bibliography, display, dismiss)
   : Promise<Maybe<contentTypes.Entry>> {
@@ -98,21 +106,18 @@ class ContiguousTextToolbar
 
     const { key, data } = entity;
 
+    const model = this.props.model;
+    const onCtEdit = this.props.onEdit;
+
     const props = {
       ...this.props,
       renderContext: RenderContext.Sidebar,
       onFocus: (c, p) => true,
       model: data,
       onEdit: (updated) => {
-
-        // We special case the command entity updates as they need
-        // to update both the data backing the entity and the text
-        // that is displayed
-        const updatedModel = updated.contentType === 'Command'
-          ? this.props.model.replaceEntity(key, EntityTypes.command, false, updated, updated.title)
-          : this.props.model.updateEntity(key, updated);
-
-        this.props.onEdit(updatedModel, updated);
+        this.props.editor.lift((e) => {
+          onCtEdit(model.updateInlineData(key, updated));
+        });
       },
     };
 
@@ -125,7 +130,7 @@ class ContiguousTextToolbar
     const { model, selection } = this.props;
 
     const entity = selection.isCollapsed()
-      ? model.getEntityAtCursor(selection).caseOf({ just: n => n, nothing: () => null })
+      ? model.getEntityAtCursor().caseOf({ just: n => n, nothing: () => null })
       : null;
 
     if (entity !== null) {
@@ -137,8 +142,7 @@ class ContiguousTextToolbar
   renderEntryOptions(selection) {
 
     const addCitationWithEntry = (id) => {
-      this.props.onEdit(this.props.model.addEntity(
-        EntityTypes.cite, true, new contentTypes.Cite().with({ entry: id }), selection));
+      insertInline(this.props.editor, new contentTypes.Cite().with({ entry: id }));
     };
 
     const createCitationForExistingEntry = () => {
@@ -167,11 +171,9 @@ class ContiguousTextToolbar
       // with the dispatched based mutation
       setTimeout(
         () => {
-          this.props.onEdit(this.props.model.addEntity(
-            EntityTypes.cite, true, new contentTypes.Cite().with({ entry: withId.id }), selection));
+          insertInline(this.props.editor, new contentTypes.Cite().with({ entry: withId.id }));
         },
         100);
-
 
     };
 
@@ -224,7 +226,7 @@ class ContiguousTextToolbar
       || !onlyBdoOrEmpty;
 
     const cursorInEntity = selection && selection.isCollapsed()
-      ? model.getEntityAtCursor(selection).caseOf({ just: n => true, nothing: () => false })
+      ? model.getEntityAtCursor().caseOf({ just: n => true, nothing: () => false })
       : false;
 
     const rangeEntitiesEnabled = editMode && bareTextSelected;
@@ -244,7 +246,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.toggleStyle(InlineStyles.Italic, selection))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
             disabled={!supports('em') || !editMode}
             tooltip="Italic">
@@ -252,7 +254,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.toggleStyle(InlineStyles.Strikethrough, selection))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
             disabled={!supports('em') || !editMode}
             tooltip="Strikethrough">
@@ -260,7 +262,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.toggleStyle(InlineStyles.Highlight, selection))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
             disabled={!supports('em') || !editMode}
             tooltip="Highlight">
@@ -268,7 +270,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.toggleStyle(InlineStyles.Superscript, selection))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
             disabled={!supports('sup') || !editMode}
             tooltip="Superscript">
@@ -276,7 +278,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.toggleStyle(InlineStyles.Subscript, selection))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
             disabled={!supports('sub') || !editMode}
             tooltip="Subscript">
@@ -284,32 +286,32 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.toggleStyle(InlineStyles.Var, selection))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Var))
             }
             disabled={!supports('code') || !editMode}
             tooltip="Code">
             {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>
           <ToolbarButton
-            onClick={() => {
-              onEdit(model.toggleStyle(InlineStyles.Term, selection));
-            }}
+            onClick={
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Term))
+            }
             disabled={!supports('term') || !editMode}
             tooltip="Term">
             <i className={'fa fa-book'} />
           </ToolbarButton>
           <ToolbarButton
-            onClick={() => {
-              onEdit(model.toggleStyle(InlineStyles.Foreign, selection));
-            }}
+            onClick={
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Foreign))
+            }
             disabled={!supports('foreign') || !editMode}
             tooltip="Foreign">
             <i className={'fa fa-globe'} />
           </ToolbarButton>
           <ToolbarButton
-            onClick={() => {
-              onEdit(model.toggleStyle(InlineStyles.BidirectionTextOverride, selection));
-            }}
+            onClick={
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.BidirectionTextOverride))
+            }
             disabled={!supports('bdo') || bdoDisabled || !editMode}
             tooltip="Reverse Text Direction">
             <i className={'fa fa-angle-left'} />
@@ -317,8 +319,7 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.addEntity(
-                  EntityTypes.quote, true, new contentTypes.Quote(), selection));
+                applyInline(this.props.editor, new contentTypes.Quote());
               }
             }
             disabled={!supports('quote') || !rangeEntitiesEnabled}
@@ -328,8 +329,7 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.addEntity(
-                  EntityTypes.link, true, new contentTypes.Link(), selection));
+                applyInline(this.props.editor, new contentTypes.Link());
               }
             }
             disabled={!supports('link') || !rangeEntitiesEnabled}
@@ -345,8 +345,7 @@ class ContiguousTextToolbar
                   meaning: Immutable.OrderedMap<string, contentTypes.Meaning>().set(m.guid, m),
                 });
 
-                onEdit(model.addEntity(
-                  EntityTypes.extra, true, extra, selection));
+                applyInline(this.props.editor, extra);
               }
             }
             disabled={!supports('extra') || !rangeEntitiesEnabled}
@@ -359,9 +358,7 @@ class ContiguousTextToolbar
                 const extra = new contentTypes.Extra().with({
                   content: ContentElements.fromText('Sample content', '', EXTRA_ELEMENTS),
                 });
-
-                onEdit(model.addEntity(
-                  EntityTypes.extra, true, extra, selection));
+                applyInline(this.props.editor, extra);
               }
             }
             disabled={!supports('extra') || !rangeEntitiesEnabled}
@@ -371,8 +368,7 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.addEntity(
-                  EntityTypes.activity_link, true, new contentTypes.ActivityLink(), selection));
+                applyInline(this.props.editor, new contentTypes.ActivityLink());
               }
             }
             disabled={!supports('activity_link') || !rangeEntitiesEnabled}
@@ -396,9 +392,8 @@ class ContiguousTextToolbar
                 const xrefDefault = pages[0] ? pages[0].id : thisId;
 
                 if (pages.length > 0) {
-                  onEdit(model.addEntity(
-                    EntityTypes.xref, true,
-                    new contentTypes.Xref({ page: xrefDefault, idref: xrefDefault }), selection));
+                  applyInline(this.props.editor,
+                    new contentTypes.Xref({ page: xrefDefault, idref: xrefDefault }));
                 }
               }
             }
@@ -409,8 +404,7 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.addEntity(
-                  EntityTypes.math, true, new contentTypes.Math(), selection));
+                insertInline(this.props.editor, new contentTypes.Math());
               }
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
@@ -420,8 +414,7 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.addEntity(
-                  EntityTypes.sym, true, new contentTypes.Sym(), selection));
+                insertInline(this.props.editor, new contentTypes.Sym());
               }
             }
             disabled={!supports('sym') || !pointEntitiesEnabled}
@@ -435,7 +428,7 @@ class ContiguousTextToolbar
                 this.props.onDisplayModal, this.props.onDismissModal)
                 .then((image) => {
                   if (image !== null) {
-                    onEdit(model.addEntity(EntityTypes.image, true, image, selection));
+                    insertInline(this.props.editor, image);
                   }
                 });
             }}
@@ -454,8 +447,7 @@ class ContiguousTextToolbar
                     e.lift((element) => {
                       const command = new contentTypes.Command()
                         .with({ target: element.id, title });
-                      onEdit(model.addEntity(
-                        EntityTypes.command, false, command, selectionSnapshot));
+                      applyInline(this.props.editor, command);
                     });
                   });
               });
