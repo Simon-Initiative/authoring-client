@@ -525,13 +525,13 @@ export function renderInline(extras, props, editor, next) {
       if (type === InputRefType.Numeric) {
         return <input readOnly value="Numeric" size={15} />;
       }
-      if (type === InputRefType.Numeric) {
+      if (type === InputRefType.Text) {
         return <input readOnly value="Text" size={15} />;
       }
-      if (type === InputRefType.Numeric) {
+      if (type === InputRefType.FillInTheBlank) {
         return <select size={15} />;
       }
-
+      return <input readOnly value="Text" size={15} />;
     }
     case 'Math': {
       const math = data.get('value') as ct.Math;

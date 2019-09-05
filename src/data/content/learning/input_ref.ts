@@ -49,7 +49,7 @@ export class InputRef extends Immutable.Record(defaultContent) {
   static fromPersistence(root: Object, guid: string, notify: () => void): InputRef {
 
     const t = (root as any).input_ref;
-    return new InputRef({ guid, input: t.input });
+    return new InputRef({ guid, input: t['@input'] });
   }
 
   toPersistence(): Object {

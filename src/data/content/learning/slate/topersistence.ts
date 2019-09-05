@@ -131,6 +131,7 @@ const inlineHandlers = {
   Extra: extra,
   Image: terminalInline,
   Sym: terminalInline,
+  InputRef: terminalInline,
 };
 
 // terminal inlines just serialize using the embedded wrapper

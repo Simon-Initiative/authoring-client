@@ -1,4 +1,3 @@
-
 import * as common from '../common';
 import * as Immutable from 'immutable';
 import { registeredTypes } from '../../common/parse';
@@ -6,21 +5,8 @@ import guid from 'utils/guid';
 
 import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
 
-const marks = ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em'];
-
-const inlines = ['cite', 'link', 'xref', 'command', 'activity_link',
-  'extra', 'image', 'formula', '#math', 'm:math', 'sym', 'quote', 'code'];
-
-const toSet = arr => arr.reduce(
-  (p, c) => {
-    p[c] = true;
-    return p;
-  },
-  {},
-);
-
-const markSet = toSet(marks);
-const inlineSet = toSet(inlines);
+const marks = Immutable.Set<string>(
+  ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em']);
 
 export function toSlate(
   toParse: Object[],
@@ -122,7 +108,6 @@ function arrayHandler(item: Object, json: ValueJSON, backingTextProvider: Object
   item['#array'].forEach(item => parse(item, json, backingTextProvider));
 }
 
-
 function paragraph(item: Object, json: ValueJSON, backingTextProvider: Object) {
 
   const p: BlockJSON = {
@@ -133,8 +118,7 @@ function paragraph(item: Object, json: ValueJSON, backingTextProvider: Object) {
   };
   json.document.nodes.push(p);
 
-  const children = getChildren(item);
-  children.forEach(subItem => handleChild(subItem, p, backingTextProvider));
+  getChildren(item).forEach(subItem => handleChild(subItem, p, backingTextProvider));
 }
 
 const inlineHandlers = {
@@ -193,9 +177,9 @@ function contentBasedInline(item: Object, parent: BlockJSON, backingTextProvider
 
 function handleChild(item: Object, parent: BlockJSON, backingTextProvider) {
   const key = common.getKey(item);
-  if (inlineSet[key]) {
+  if (inlineHandlers[key] !== undefined) {
     inlineHandlers[key](item, parent, backingTextProvider);
-  } else if (markSet[key]) {
+  } else if (marks.contains(key)) {
     processMark(item, parent, Immutable.List<string>());
   } else if (key === '#text' || key === '#cdata') {
     parent.nodes.push({
@@ -208,7 +192,7 @@ function handleChild(item: Object, parent: BlockJSON, backingTextProvider) {
 
 function handleInlineChild(item: Object, parent: InlineJSON, backingTextProvider) {
   const key = common.getKey(item);
-  if (markSet[key]) {
+  if (marks.contains(key)) {
     processMark(item, parent, Immutable.List<string>());
   } else if (key === '#text' || key === '#cdata') {
     parent.nodes.push({
