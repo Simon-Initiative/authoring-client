@@ -45,7 +45,7 @@ class InputRefDisplay extends React.PureComponent<InputRefProps, InputRefState> 
       return <input className={active} onClick={handleClick} readOnly value="Text" size={15} />;
     }
     if (inputType === InputRefType.FillInTheBlank) {
-      return <select className={active} onClick={handleClick} size={15} />;
+      return <select className={active} onClick={handleClick} style={{ width: '100px' }} />;
     }
     return <input className={active} onClick={handleClick} readOnly value="Text" size={15} />;
   }
