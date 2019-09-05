@@ -80,11 +80,14 @@ class ContiguousTextEditor
     }
   }
 
-  shouldComponentUpdate(nextProps: StyledContiguousTextEditorProps, nextState) {
-    return super.shouldComponentUpdate(nextProps, nextState)
+  shouldComponentUpdate(
+    nextProps: ContiguousTextEditorProps, nextState: ContiguousTextEditorState) {
+    return this.props.model.forcedUpdateCount !== nextProps.model.forcedUpdateCount
+      || this.props.editMode !== nextProps.editMode
       || this.state.value !== nextState.value
       || nextProps.selectedEntity !== this.props.selectedEntity
-      || nextProps.orderedIds !== this.props.orderedIds;
+      || nextProps.orderedIds !== this.props.orderedIds
+      || this.props.hover !== nextProps.hover;
   }
 
   renderSidebar() {
