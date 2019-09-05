@@ -2,7 +2,7 @@ import * as common from '../common';
 import * as Immutable from 'immutable';
 import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
-
+import { InputRef, InputRefType } from 'data/content/learning/input_ref';
 import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
 
 const marks = Immutable.Set<string>(
@@ -125,7 +125,7 @@ const inlineHandlers = {
   link: contentBasedInline,
   xref: contentBasedInline,
   activity_link: contentBasedInline,
-  input_ref: terminalInline,
+  input_ref: inputRef,
   quote: contentBasedInline,
   code: contentBasedInline,
   formula: stripOutInline,
@@ -152,6 +152,30 @@ function terminalInline(item: Object, parent: BlockJSON, backingTextProvider): I
 
   const key = common.getKey(item);
   const data = { value: registeredTypes[key](item) };
+  const type = data.value.contentType;
+
+  const inline: InlineJSON = {
+    object: 'inline',
+    type,
+    data,
+    nodes: [],
+  };
+  parent.nodes.push(inline);
+
+  return inline;
+}
+
+function inputRef(item: Object, parent: BlockJSON, backingTextProvider): InlineJSON {
+
+  const value = (InputRef.fromPersistence as any)(item);
+  const inputTypeStr = backingTextProvider[value.input].contentType;
+  let inputType = InputRefType.Numeric;
+  if (inputTypeStr === 'Text') {
+    inputType = InputRefType.Text;
+  } else if (inputTypeStr === 'FillInTheBlank') {
+    inputType = InputRefType.FillInTheBlank;
+  }
+  const data = { value: value.with({ inputType }) };
   const type = data.value.contentType;
 
   const inline: InlineJSON = {
