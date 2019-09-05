@@ -35,7 +35,7 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
 import { LegacyTypes } from 'data/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
-import { Editor, Selection } from 'slate';
+import { Editor, Inline } from 'slate';
 import * as editorUtils from './utils';
 
 
@@ -49,6 +49,7 @@ export interface ContiguousTextToolbarProps
   onAddEntry: (e, documentId) => Promise<void>;
   onFetchContentElementByPredicate: (documentId, predicate) => Promise<Maybe<ContentElement>>;
   editor: Maybe<Editor>;
+  activeInline: Maybe<Inline>;
 }
 
 export interface ContiguousTextToolbarState {
@@ -101,7 +102,8 @@ class ContiguousTextToolbar
   shouldComponentUpdate(nextProps: StyledContiguousTextToolbarProps, nextState) {
 
     const should = super.shouldComponentUpdate(nextProps, nextState)
-      || nextProps.editor !== this.props.editor;
+      || nextProps.editor !== this.props.editor
+      || nextProps.activeInline !== this.props.activeInline;
     return should;
   }
 
@@ -130,9 +132,18 @@ class ContiguousTextToolbar
   }
 
   renderSidebar() {
-    const { editor } = this.props;
+    const { editor, activeInline } = this.props;
 
     const plainSidebar = <SidebarContent title="Text Block" />;
+
+    const inline = activeInline.caseOf({
+      just: i => i,
+      nothing: () => null,
+    });
+
+    if (inline !== null) {
+      return this.renderActiveEntity(inline);
+    }
 
     return editor.caseOf({
       just: (e) => {

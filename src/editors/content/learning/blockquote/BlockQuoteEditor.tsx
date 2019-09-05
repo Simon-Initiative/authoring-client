@@ -7,15 +7,15 @@ import ContiguousTextEditor from 'editors/content/learning/contiguoustext/Contig
 import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockQuoteToolbar from './BlockQuoteToolbar.controller';
 import { connectTextEditor } from 'editors/content/container/connectEditor';
-
 import { styles } from './BlockQuote.styles';
 import { StyledComponentProps } from 'types/component';
+import { Inline } from 'slate';
 
 export interface BlockQuoteEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockQuote> {
   onShowSidebar: () => void;
   onUpdateEditor: (editor) => void;
-
+  onSelectInline: (wrapper: Inline) => void;
 }
 
 export interface BlockQuoteEditorState {

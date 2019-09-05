@@ -10,7 +10,7 @@ import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
 import { styles } from 'editors/content/learning/contiguoustext/ContiguousText.styles';
 import { Editor } from 'slate-react';
-import { Value } from 'slate';
+import { Value, Inline } from 'slate';
 import { renderMark, renderInline, plugins, renderBlock } from './utils';
 
 export interface ContiguousTextEditorProps
@@ -19,6 +19,7 @@ export interface ContiguousTextEditorProps
   editorStyles?: any;
   hideBorder?: boolean;
   onUpdateEditor: (editor) => void;
+  onSelectInline: (inline: Inline) => void;
   onTextSelectionChange?: (selection: any) => void;
   onInsertParsedContent: (resourcePath: string, o) => void;
   orderedIds: Immutable.Map<string, number>;
@@ -39,8 +40,7 @@ class ContiguousTextEditor
   extends AbstractContentEditor<contentTypes.ContiguousText,
   StyledContiguousTextEditorProps, ContiguousTextEditorState> {
 
-  selectionState: any;
-  editor;
+  editor: Editor;
 
   constructor(props) {
     super(props);
@@ -106,12 +106,12 @@ class ContiguousTextEditor
 
   renderMain(): JSX.Element {
     const { className, classes, editMode, viewOnly,
-      hideBorder = false, context } = this.props;
+      hideBorder = false, context, onSelectInline } = this.props;
 
     const showBorder = !viewOnly && !hideBorder;
 
-    const onInlineClick = (node) => {
-
+    const onInlineClick = (node: Inline) => {
+      onSelectInline(node);
     };
 
     const extras = {

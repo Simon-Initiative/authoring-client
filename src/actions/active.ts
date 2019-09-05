@@ -5,9 +5,10 @@ import { ParsedContent } from 'data/parsers/common/types';
 import * as contentTypes from 'data/contentTypes';
 import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
+import { InlineTypes } from 'data/content/learning/contiguous';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-import { Editor } from 'slate';
+import { Editor, Inline } from 'slate';
 import { removeInlineEntity, getEntityAtCursor }
   from 'editors/content/learning/contiguoustext/utils';
 
@@ -28,7 +29,19 @@ export const updateContent = (
     content,
   });
 
+export type SELECT_INLINE = 'active/SELECT_INLINE';
+export const SELECT_INLINE: SELECT_INLINE = 'active/SELECT_INLINE';
 
+export type SelectInlineAction = {
+  type: SELECT_INLINE,
+  inline: Inline,
+};
+
+export const selectInline = (
+  inline: Inline): SelectInlineAction => ({
+    type: SELECT_INLINE,
+    inline,
+  });
 
 export type UPDATE_EDITOR = 'active/UPDATE_EDITOR';
 export const UPDATE_EDITOR: UPDATE_EDITOR = 'active/UPDATE_EDITOR';

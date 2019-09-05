@@ -39,6 +39,7 @@ const TitleTextEditorInner
         <ContiguousTextEditor
           onUpdateEditor={onUpdateEditor}
           onInsertParsedContent={() => { }}
+          onSelectInline={() => { }}
           className={classes.contiguousTextEditor}
           activeContentGuid={null}
           hover={null}

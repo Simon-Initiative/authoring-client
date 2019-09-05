@@ -445,8 +445,7 @@ export function renderInline(extras, props, editor: Editor, next) {
   const { attributes, children, node, parent } = props;
   const { data } = node;
 
-  const onClick = (e) => {
-    e.preventDefault();
+  const onClick = () => {
     onInlineClick(node);
   };
 
@@ -545,7 +544,7 @@ export function renderInline(extras, props, editor: Editor, next) {
     case 'Math': {
       const math = data.get('value') as ct.Math;
       return (
-        <MathRenderer onClick={onClick.bind(this, node)} inline >{math.data}</MathRenderer>
+        <MathRenderer onClick={onClick} inline >{math.data}</MathRenderer>
       );
     }
     case 'Quote': {

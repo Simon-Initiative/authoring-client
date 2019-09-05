@@ -1,9 +1,10 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { showSidebar } from 'actions/editorSidebar';
-import { updateEditor } from 'actions/active';
+import { updateEditor, selectInline } from 'actions/active';
 import { DiscoverableId } from 'types/discoverable';
 import { discover } from 'actions/discoverable';
+import { Inline } from 'slate';
 
 export const connectEditor = (component) => {
   const mapStateToProps = (state: State, ownProps) => {
@@ -37,6 +38,9 @@ export const connectTextEditor = (component) => {
     return {
       onUpdateEditor: (editor) => {
         dispatch(updateEditor(editor));
+      },
+      onSelectInline: (wrapper: Inline) => {
+        dispatch(selectInline(wrapper));
       },
     };
   };

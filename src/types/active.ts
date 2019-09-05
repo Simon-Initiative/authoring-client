@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
-import { Selection, Editor } from 'slate';
+import { Selection, Editor, Inline } from 'slate';
 
 export enum Trigger {
   KEYPRESS,
@@ -81,6 +81,7 @@ export type ActiveContextParams = {
   container?: Maybe<ParentContainer>,
   activeChild?: Maybe<ContentElement>,
   editor?: Maybe<Editor>,
+  activeInline?: Maybe<Inline>,
 };
 
 const defaultContent = {
@@ -88,6 +89,7 @@ const defaultContent = {
   container: Maybe.nothing(),
   activeChild: Maybe.nothing(),
   editor: Maybe.nothing(),
+  activeInline: Maybe.nothing(),
 };
 
 export class ActiveContext extends Immutable.Record(defaultContent) {
@@ -103,6 +105,8 @@ export class ActiveContext extends Immutable.Record(defaultContent) {
 
   // The current active slate editor
   editor: Maybe<Editor>;
+
+  activeInline: Maybe<Inline>;
 
   constructor(params?: ActiveContextParams) {
     super(params);

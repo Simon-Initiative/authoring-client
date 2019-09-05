@@ -26,6 +26,7 @@ const ContiguousTextViewerInner:
       <div className={classNames([className])}>
         <ContiguousTextEditor
           onUpdateEditor={onUpdateEditor}
+          onSelectInline={() => { }}
           onInsertParsedContent={() => { }}
           activeContentGuid={null}
           hover={null}

@@ -8,6 +8,7 @@ export type ActionTypes =
   documentActions.DocumentLoadedAction |
   documentActions.ChangeUndoneAction |
   documentActions.ChangeRedoneAction |
+  actions.SelectInlineAction |
   actions.UpdateEditorAction |
   actions.UpdateContentAction |
   actions.UpdateContextAction |
@@ -23,8 +24,13 @@ export const activeContext = (
 ): ActiveContextState => {
 
   switch (action.type) {
+    case actions.SELECT_INLINE:
+      return state.with({
+        activeInline: Maybe.just(action.inline),
+      });
     case actions.UPDATE_EDITOR:
       return state.with({
+        activeInline: Maybe.nothing(),
         editor: action.editor === null || action.editor === undefined
           ? Maybe.nothing() : Maybe.just(action.editor),
       });
@@ -44,6 +50,7 @@ export const activeContext = (
       });
     case documentActions.DOCUMENT_RELEASED:
       return state.with({
+        activeInline: Maybe.nothing(),
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),
         documentId: Maybe.nothing(),
@@ -51,6 +58,7 @@ export const activeContext = (
       });
     case documentActions.DOCUMENT_LOADED:
       return state.with({
+        activeInline: Maybe.nothing(),
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),
         documentId: Maybe.just(action.documentId),
@@ -60,6 +68,7 @@ export const activeContext = (
     case documentActions.CHANGE_UNDONE:
     case documentActions.CHANGE_REDONE:
       return state.with({
+        activeInline: Maybe.nothing(),
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),
       });

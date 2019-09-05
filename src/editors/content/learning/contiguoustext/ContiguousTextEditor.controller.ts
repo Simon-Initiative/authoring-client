@@ -1,8 +1,9 @@
 import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
 import ContiguousTextEditor from './ContiguousTextEditor';
-import { insertParsedContent, updateEditor } from 'actions/active';
+import { insertParsedContent, updateEditor, selectInline } from 'actions/active';
 import { ParsedContent } from 'data/parsers/common/types';
+import { Inline } from 'slate';
 
 interface StateProps {
   orderedIds: Immutable.Map<string, number>;
@@ -11,6 +12,7 @@ interface StateProps {
 interface DispatchProps {
   onInsertParsedContent: (resourcePath: string, content: ParsedContent) => void;
   onUpdateEditor: (editor) => void;
+  onSelectInline: (inline: Inline) => void;
 }
 
 interface OwnProps {
@@ -28,6 +30,8 @@ const mapDispatchToProps = (dispatch, getState): DispatchProps => {
   return {
     onUpdateEditor: editor =>
       dispatch(updateEditor(editor)),
+    onSelectInline: inline =>
+      dispatch(selectInline(inline)),
     onInsertParsedContent: (
       resourcePath: string, content: ParsedContent) =>
       dispatch(insertParsedContent(resourcePath, content)),
