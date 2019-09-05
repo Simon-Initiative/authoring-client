@@ -8,6 +8,7 @@ export interface Math {
 
 export interface MathProps {
   inline: boolean;
+  onClick: () => void;
 }
 
 /**
@@ -15,7 +16,7 @@ export interface MathProps {
  * @type {ReactClass}
  */
 export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }> {
-  MathJax : any;
+  MathJax: any;
 
   constructor(props) {
     super(props);
@@ -44,9 +45,9 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
 
   }
 
-    /**
-     * Update the jax, force update if the display mode changed
-     */
+  /**
+   * Update the jax, force update if the display mode changed
+   */
   componentDidUpdate(prevProps) {
     if (this.state.isMathJaxReady) {
       const forceUpdate = prevProps.inline !== this.props.inline;
@@ -59,10 +60,10 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
    */
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     return (
-        nextState.isMathJaxReady !== this.state.isMathJaxReady
-        || nextProps.children !== this.props.children
-        || nextProps.inline !== this.props.inline
-        || nextContext.MathJax !== this.context.MathJax
+      nextState.isMathJaxReady !== this.state.isMathJaxReady
+      || nextProps.children !== this.props.children
+      || nextProps.inline !== this.props.inline
+      || nextContext.MathJax !== this.context.MathJax
     );
   }
 
@@ -109,17 +110,17 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
         const jax = this.MathJax.Hub.getJaxFor(this.script);
 
         if (jax) {
-          jax.Text(text, () => {});
+          jax.Text(text, () => { });
         } else {
           const script = this.setScriptText(text);
-          process(this.MathJax, script, () => {});
+          process(this.MathJax, script, () => { });
         }
       });
 
 
     } else {
       const script = this.setScriptText(text);
-      process(this.MathJax, script, () => {});
+      process(this.MathJax, script, () => { });
     }
   }
 
@@ -146,7 +147,7 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
     }
 
     if ('text' in this.script) {
-        // IE8, etc
+      // IE8, etc
       this.script.text = text;
     } else {
       this.script.textContent = text;
@@ -156,7 +157,7 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
   }
 
   render() {
-    return <span ref={ n => this.node = n} />;
+    return <span onClick={this.props.onClick} ref={n => this.node = n} />;
   }
 }
 

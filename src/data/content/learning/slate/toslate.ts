@@ -58,8 +58,8 @@ function isMarkOnly(item: Object): boolean {
 function getMark(item: Object) {
   const key = common.getKey(item);
   if (key === 'em') {
-    if (item['@style'] !== undefined) {
-      return item['@style'];
+    if (item['em']['@style'] !== undefined) {
+      return item['em']['@style'];
     }
   }
   return key;

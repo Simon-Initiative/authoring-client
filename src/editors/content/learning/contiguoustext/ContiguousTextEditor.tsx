@@ -110,12 +110,12 @@ class ContiguousTextEditor
 
     const showBorder = !viewOnly && !hideBorder;
 
-    const onDecoratorClick = () => {
+    const onInlineClick = (node) => {
 
     };
 
     const extras = {
-      onDecoratorClick,
+      onInlineClick,
       context,
     };
 

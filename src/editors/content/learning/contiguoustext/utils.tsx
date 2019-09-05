@@ -400,7 +400,7 @@ export const plugins = [
   markHotkey({ key: 'b', type: 'em' }),
   markHotkey({ key: '`', type: 'code' }),
   markHotkey({ key: 'i', type: 'italic' }),
-  markHotkey({ key: '~', type: 'strikethrough' }),
+  markHotkey({ key: '~', type: 'line-through' }),
   markHotkey({ key: 'h', type: 'highlight' }),
 ];
 
@@ -430,7 +430,7 @@ export function renderMark(props, editor, next) {
       return <span className="oli-var">{props.children}</span>;
     case 'italic':
       return <em>{props.children}</em>;
-    case 'strikethrough':
+    case 'line-through':
       return <del>{props.children}</del>;
     case 'highlight':
       return <mark>{props.children}</mark>;
@@ -440,10 +440,15 @@ export function renderMark(props, editor, next) {
 }
 
 // Slate inline rendering
-export function renderInline(extras, props, editor, next) {
-  const { onDecoratorClick, context } = extras;
+export function renderInline(extras, props, editor: Editor, next) {
+  const { onInlineClick, context } = extras;
   const { attributes, children, node, parent } = props;
   const { data } = node;
+
+  const onClick = (e) => {
+    e.preventDefault();
+    onInlineClick(node);
+  };
 
   switch (node.type) {
     case 'Code':
@@ -524,10 +529,7 @@ export function renderInline(extras, props, editor, next) {
           src);
       }
       return <img
-        onClick={(e) => {
-          e.stopPropagation();
-          onDecoratorClick(this.props.entityKey);
-        }}
+        onClick={onClick}
         src={fullSrc}
         height={data.height}
         width={data.width} />;
@@ -535,20 +537,20 @@ export function renderInline(extras, props, editor, next) {
     case 'InputRef': {
       const type = data.get('value').inputType;
       if (type === InputRefType.Numeric) {
-        return <input readOnly value="Numeric" size={15} />;
+        return <input onClick={onClick} readOnly value="Numeric" size={15} />;
       }
       if (type === InputRefType.Text) {
-        return <input readOnly value="Text" size={15} />;
+        return <input onClick={onClick} readOnly value="Text" size={15} />;
       }
       if (type === InputRefType.FillInTheBlank) {
-        return <select size={15} />;
+        return <select onClick={onClick} size={15} />;
       }
-      return <input readOnly value="Text" size={15} />;
+      return <input onClick={onClick} readOnly value="Text" size={15} />;
     }
     case 'Math': {
       const math = data.get('value') as ct.Math;
       return (
-        <MathRenderer inline >{math.data}</MathRenderer>
+        <MathRenderer onClick={onClick.bind(this, node)} inline >{math.data}</MathRenderer>
       );
     }
     case 'Quote': {

@@ -105,11 +105,11 @@ function adjustInline(root) {
 // object trees needed to represent them.  Functions
 // are present here to provide a poor-man's immutability.
 const styleContainers = {
-  em: () => ({ em: { '@style': 'bold' } }),
+  em: () => ({ em: {} }),
   italic: () => ({ em: { '@style': 'italic' } }),
   deemphasis: () => ({ em: { '@style': 'deemphasis' } }),
   highlight: () => ({ em: { '@style': 'highlight' } }),
-  strikethrough: () => ({ em: { '@style': 'line-through' } }),
+  'line-through': () => ({ em: { '@style': 'line-through' } }),
   oblique: () => ({ em: { '@style': 'oblique' } }),
   var: () => ({ var: {} }),
   term: () => ({ term: {} }),
