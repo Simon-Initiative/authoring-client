@@ -144,8 +144,8 @@ export class ContentContainer
             // Otherwise we split the contiguous block in two parts and insert in between
           } else {
             const pair = editorUtils.split(e);
-
-            const first = active.with({ slateValue: pair[0] });
+            const forcedUpdateCount = active.forcedUpdateCount + 1;
+            const first = active.with({ slateValue: pair[0], forcedUpdateCount });
             const second = new ContiguousText({ slateValue: pair[1] });
 
             let updated = model.with({ content: model.content.set(first.guid, first) });

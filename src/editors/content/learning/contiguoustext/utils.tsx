@@ -337,17 +337,12 @@ export function split(editor: Editor): ValuePair {
 
   // Note the key of the block in the selection
   // that will appear chronologically first in the content
-  const anchorKey = editor.value.selection.isBackward
-    ? editor.value.selection.anchor.key
-    : editor.value.selection.focus.key;
+  const anchor = editor.value.selection.isBackward
+    ? editor.value.selection.anchor
+    : editor.value.selection.focus;
 
   // Count the ordinal position of that block within the node list
-  let anchorPosition = 0;
-  editor.value.document.nodes.toArray().forEach((n, i) => {
-    if (n.key === anchorKey) {
-      anchorPosition = i;
-    }
-  });
+  const anchorPosition = anchor.path.get(0);
 
   // Now split the block at the current selection
   const updated = editor.splitBlock();
@@ -357,12 +352,18 @@ export function split(editor: Editor): ValuePair {
   // blocks after the split
   const document = updated.value.document;
   const value = updated.value;
-  const nodes1 = updated.value.document.nodes.takeWhile(b => b.key === anchorKey);
+  const nodes1 = updated.value.document.nodes.toArray().slice(0, anchorPosition + 1);
   const nodes2 = updated.value.document.nodes.toArray().slice(anchorPosition + 1);
 
   return [
-    value.merge({ document: document.merge({ nodes: nodes1 }) as Document }) as Value,
-    value.merge({ document: document.merge({ nodes: nodes2 }) as Document }) as Value,
+    value.merge({
+      document: document.merge(
+        { nodes: Immutable.List(nodes1) }) as Document,
+    }) as Value,
+    value.merge({
+      document: document.merge(
+        { nodes: Immutable.List(nodes2) }) as Document,
+    }) as Value,
   ];
 }
 
@@ -402,6 +403,17 @@ export const plugins = [
   markHotkey({ key: '~', type: 'strikethrough' }),
   markHotkey({ key: 'h', type: 'highlight' }),
 ];
+
+export function renderBlock(props, editor, next) {
+  const { node, attributes, children } = props;
+
+  switch (node.type) {
+    case 'paragraph':
+      return <p {...attributes}>{children}</p>;
+    default:
+      return next();
+  }
+}
 
 // Slate mark rendering
 export function renderMark(props, editor, next) {

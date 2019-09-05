@@ -8,11 +8,10 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
-import { getEditorByContentType } from 'editors/content/container/registry';
 import { styles } from 'editors/content/learning/contiguoustext/ContiguousText.styles';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
-import { renderMark, renderInline, plugins } from './utils';
+import { renderMark, renderInline, plugins, renderBlock } from './utils';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -134,6 +133,7 @@ class ContiguousTextEditor
           plugins={plugins}
           value={this.state.value}
           onChange={this.onChange}
+          renderBlock={renderBlock}
           renderMark={renderMark}
           renderInline={renderInline.bind(this, extras)}
         />
