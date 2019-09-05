@@ -4,7 +4,7 @@ import { Maybe } from 'tsmonad';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
 import { TextSelection } from 'types/active';
 
-import { Value, Block, Inline, Document } from 'slate';
+import { Value, Block, Inline } from 'slate';
 import Html from 'slate-html-serializer';
 import { toSlate } from 'data/content/learning/slate/toslate';
 import { toPersistence } from 'data/content/learning/slate/topersistence';
@@ -41,8 +41,8 @@ export type InputRefChanges = {
 };
 
 export type ContiguousTextParams = {
-  value?: Value,
-  entityEditCount?: number,
+  slateValue?: Value,
+  forcedUpdateCount?: number,
   mode?: ContiguousTextMode,
   guid?: string,
 };
@@ -50,9 +50,9 @@ export type ContiguousTextParams = {
 const defaultContent = {
   contentType: 'ContiguousText',
   elementType: '#text',
-  value: valueFromText(''),
+  slateValue: valueFromText(''),
   mode: ContiguousTextMode.Regular,
-  entityEditCount: 0,
+  forcedUpdateCount: 0,
   guid: '',
 };
 
@@ -93,8 +93,8 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   contentType: 'ContiguousText';
   elementType: '#text';
-  value: Value;
-  entityEditCount: number;
+  slateValue: Value;
+  forcedUpdateCount: number;
   mode: ContiguousTextMode;
   guid: string;
 
@@ -116,39 +116,34 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return new ContiguousText({
       guid,
       mode,
-      value: toSlate(root, mode === ContiguousTextMode.SimpleText, backingTextProvider),
+      slateValue: toSlate(root, mode === ContiguousTextMode.SimpleText, backingTextProvider),
     });
   }
 
   static fromText(text: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
-    return new ContiguousText({ guid, mode, value: valueFromText(text) });
+    return new ContiguousText({ guid, mode, slateValue: valueFromText(text) });
   }
 
   static fromHTML(html: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
-    return new ContiguousText({ guid, mode, value: Html.deserialize(html) });
+    return new ContiguousText({ guid, mode, slateValue: Html.deserialize(html) });
   }
 
   toPersistence(): Object {
-    return toPersistence(this.value, this.mode === ContiguousTextMode.SimpleText);
+    return toPersistence(this.slateValue, this.mode === ContiguousTextMode.SimpleText);
   }
 
   // Return the OLI ID of the first paragraph in the text block
   getFirstReferenceId(): string | undefined {
-    const firstBlock = this.value.document.nodes[0];
+    const firstBlock = this.slateValue.document.nodes[0];
     if (firstBlock) {
       return firstBlock.data.get('id');
     }
     return undefined;
   }
 
-  getEntityAtCursor(): Maybe<Inline> {
-    return this.value.inlines.size === 0
-      ? Maybe.nothing()
-      : Maybe.just(this.value.inlines.first());
-  }
 
   getEntitiesByType(type: InlineEntities): Inline[] {
-    return this.value.document.nodes
+    return this.slateValue.document.nodes
       .toArray()
       .reduce(
         (p, c) => {
@@ -176,6 +171,49 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
         {});
   }
 
+  updateInputRefs(itemMap: Object): ContiguousText {
+    const nodes = this.slateValue.document.nodes.map((n) => {
+      const block = n as Block;
+      const nodes = block.nodes.map((m) => {
+        if (m.object === 'inline' && m.type === 'InputRef') {
+          const i = m.data.get('value');
+          const mapped = itemMap[i.input];
+          if (mapped !== undefined) {
+            const data = m.data.merge({ value: itemMap[i.input] });
+            return m.merge({ data });
+          }
+        }
+        return m;
+      }).toList();
+      return block.merge({ nodes });
+    }).toList();
+
+    const document = this.slateValue.document.merge({ nodes });
+    const slateValue = this.slateValue.merge({ document }) as Value;
+    return this.with({ slateValue });
+  }
+
+  removeInlineEntity(key: string): ContiguousText {
+
+    let removed = false;
+    const nodes = this.slateValue.document.nodes.map((n) => {
+      const block = n as Block;
+      const nodes = block.nodes.filter((m) => {
+        if (m.key === key) {
+          removed = true;
+        }
+        return m.key !== key;
+      }).toList();
+      return block.merge({ nodes });
+    }).toList();
+
+    const document = this.slateValue.document.merge({ nodes });
+    const slateValue = this.slateValue.merge({ document }) as Value;
+    const forcedUpdateCount = removed ? this.forcedUpdateCount + 1 : this.forcedUpdateCount;
+
+    return this.with({ slateValue, forcedUpdateCount });
+  }
+
   detectInputRefChanges(prev: ContiguousText): InputRefChanges {
 
     let additions = Immutable.List<ct.InputRef>();
@@ -201,78 +239,10 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     };
   }
 
-  // Returns true if the contiguous text contains one block and
-  // the text in that block is empty or contains all spaces
-  isEffectivelyEmpty(): boolean {
-    return this.value.document.nodes.size === 1
-      && this.value.document.nodes[0].object === 'text'
-      && this.value.document.nodes[0].text.trim() === '';
-  }
-
-  // Returns true if the selection is collapsed and the cursor is
-  // positioned in the last block and no text other than spaces
-  // follows the cursor
-  isCursorAtEffectiveEnd(textSelection: TextSelection): boolean {
-    const node = (this.value.document.nodes.get(this.value.document.nodes.size - 1) as Block);
-    const { key, text } = node;
-
-    return textSelection.isCollapsed()
-      && key === textSelection.getAnchorKey()
-      && (text.length <= textSelection.getAnchorOffset()
-        || text.substr(textSelection.getAnchorOffset()).trim() === '');
-  }
-
-  // Returns true if the selection is collapsed and is at the
-  // very beginning of the first block
-  isCursorAtBeginning(textSelection: TextSelection): boolean {
-    const key = (this.value.document.nodes.get(0) as Block).key;
-    return textSelection.isCollapsed()
-      && key === textSelection.getAnchorKey()
-      && textSelection.getAnchorOffset() === 0;
-  }
-
-  updateInlineData(key: string, wrapper: InlineTypes): ContiguousText {
-
-    const nodes = this.value.document.nodes.map((n: Block) => {
-      return n.nodes.map((inner) => {
-        if (inner.key === key) {
-          const data = { value: wrapper };
-          return inner.merge({ data });
-        }
-        return inner;
-      });
-    });
-
-    const document = this.value.document.merge({ nodes }) as Document;
-    const value = this.value.merge({ document }) as Value;
-    return this.with({ value });
-  }
-
-  updateAllInputRefs(itemMap: Object): ContiguousText {
-
-    const nodes = this.value.document.nodes.map((n: Block) => {
-      return n.nodes.map((inner) => {
-        if (inner.object === 'inline'
-          && inner.data.value.contentType === 'InputRef'
-          && itemMap[inner.data.value.input] !== undefined) {
-
-          const data = { value: itemMap[inner.data.value.input] };
-          return inner.merge({ data });
-        }
-        return inner;
-      });
-    });
-
-    const document = this.value.document.merge({ nodes }) as Document;
-    const value = this.value.merge({ document }) as Value;
-    return this.with({ value });
-
-  }
-
   extractPlainText(): Maybe<string> {
 
-    if (this.value.document.nodes.size > 0) {
-      const n = this.value.document.nodes.first() as Block;
+    if (this.slateValue.document.nodes.size > 0) {
+      const n = this.slateValue.document.nodes.first() as Block;
       let s = '';
       n.nodes.forEach((t) => {
         if (t.object === 'text') {
@@ -290,15 +260,5 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return Maybe.nothing();
   }
 
-  // Accesses the plain text from a selection with a single
-  // paragraph of continguous text.  If the selection spans
-  // multiple content blocks (i.e. paragraphs) we return Nothing. If
-  // the block is not found or the selection offsets exceed the
-  // length of the raw text for the block, we return nothing.
-  // Otherwise, we return just the raw underlying text substring.
 
-  extractParagraphSelectedText(selection: TextSelection): Maybe<string> {
-
-    return Maybe.nothing();
-  }
 }

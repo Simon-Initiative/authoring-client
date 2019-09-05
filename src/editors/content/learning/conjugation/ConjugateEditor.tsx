@@ -291,7 +291,7 @@ class ConjugateEditor
 
     let hideDecorator = false;
     if (model.content.contentType === 'ContiguousText') {
-      hideDecorator = model.content.value.document.nodes.size === 1;
+      hideDecorator = model.content.slateValue.document.nodes.size === 1;
     } else {
       hideDecorator = model.content.content.size === 0;
     }

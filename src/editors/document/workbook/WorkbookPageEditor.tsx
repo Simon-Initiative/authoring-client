@@ -13,10 +13,9 @@ import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.cont
 import { Objectives } from 'editors/document/workbook/Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 
-import { EntityTypes } from 'data/content/learning/common';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
-import { ContiguousText } from 'data/content/learning/contiguous';
+import { ContiguousText, InlineEntities } from 'data/content/learning/contiguous';
 import * as Messages from 'types/messages';
 import { buildMissingObjectivesMessage } from 'utils/error';
 import { DEFAULT_OBJECTIVE_TITLE } from 'data/models/objective';
@@ -221,11 +220,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       const remove = (id, e) => {
         if ('ContiguousText' === e.contentType) {
           const ct = e as ContiguousText;
-          const citations = ct.getEntitiesByType(EntityTypes.cite);
-          const matched = citations.filter(c => c.entity.getData().entry === id);
+          const citations = ct.getEntitiesByType(InlineEntities.Cite);
+          const matched = citations.filter(c => c.data.value.entry === id);
 
           return matched.reduce(
-            (ct, e) => ct.removeEntity(e.entityKey),
+            (ct, e) => ct.removeInlineEntity(e.key),
             ct,
           );
         }

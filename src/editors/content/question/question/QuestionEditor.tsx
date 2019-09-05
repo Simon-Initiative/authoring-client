@@ -122,7 +122,7 @@ export class QuestionEditor
           for (let i = 0; i < itemArray.length; i += 1) {
             const currentItem = (itemArray[i] as any);
 
-            if (currentItem.id !== undefined && currentItem.id === d.entity.getData()['@input']) {
+            if (currentItem.id !== undefined && currentItem.id === d.input) {
               items = items.delete(currentItem.guid);
               parts = parts.delete(partsArray[i].guid);
               break;
@@ -133,7 +133,7 @@ export class QuestionEditor
 
       } else if (delta.additions.size > 0) {
 
-        const input = delta.additions.toArray()[0].entity.getData()['@input'];
+        const input = delta.additions.toArray()[0].input;
 
         const item = this.itemToAdd.with({ guid: input, id: input });
 

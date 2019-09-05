@@ -6,7 +6,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { InlineStyles } from 'data/content/learning/contiguous';
+import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -15,10 +15,14 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { styles } from './BlockCode.styles';
 import { StyledComponentProps } from 'types/component';
 
+import { Maybe } from 'tsmonad';
+import { Editor } from 'slate';
+import * as editorUtils from '../contiguoustext/utils';
+
 export interface BlockCodeToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
   selection: TextSelection;
-
+  editor: Maybe<Editor>;
 }
 
 export interface BlockCodeToolbarState {
@@ -26,6 +30,17 @@ export interface BlockCodeToolbarState {
 }
 
 type StyledBlockCodeToolbarProps = StyledComponentProps<BlockCodeToolbarProps, typeof styles>;
+
+
+function applyInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.applyInline(e, wrapper));
+}
+function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.insertInline(e, wrapper));
+}
+function updateInline(editor: Maybe<Editor>, key: string, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.updateInlineData(e, key, wrapper));
+}
 
 class BlockCodeToolbar
   extends AbstractContentEditor<contentTypes.BlockCode,
@@ -50,8 +65,7 @@ class BlockCodeToolbar
       onFocus: (c, p) => true,
       model: data,
       onEdit: (updated) => {
-        const text = this.props.model.text.updateEntity(key, updated);
-        this.props.onEdit(this.props.model.with({ text }), updated);
+        updateInline(this.props.editor, key, updated);
       },
     };
 
@@ -61,16 +75,19 @@ class BlockCodeToolbar
   }
 
   renderSidebar() {
-    const { model, selection } = this.props;
+    const { editor } = this.props;
 
-    const entity = selection.isCollapsed()
-      ? model.text.getEntityAtCursor(selection).caseOf({ just: n => n, nothing: () => null })
-      : null;
+    const plainSidebar = <SidebarContent title="Code" />;
 
-    if (entity !== null) {
-      return this.renderActiveEntity(entity);
-    }
-    return <SidebarContent title="Code" />;
+    return editor.caseOf({
+      just: (e) => {
+        return editorUtils.getEntityAtCursor(e).caseOf({
+          just: entity => this.renderActiveEntity(entity),
+          nothing: () => plainSidebar,
+        });
+      },
+      nothing: () => plainSidebar,
+    });
   }
 
   renderToolbar() {
@@ -84,9 +101,7 @@ class BlockCodeToolbar
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Bold, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
             disabled={noTextSelected || !editMode}
             tooltip="Bold">
@@ -94,9 +109,7 @@ class BlockCodeToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Italic, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
             disabled={noTextSelected || !editMode}
             tooltip="Italic">
@@ -104,9 +117,7 @@ class BlockCodeToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
             disabled={noTextSelected || !editMode}
             tooltip="Strikethrough">
@@ -114,9 +125,7 @@ class BlockCodeToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Highlight, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
             disabled={noTextSelected || !editMode}
             tooltip="Highlight">
@@ -124,9 +133,7 @@ class BlockCodeToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Superscript, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
             disabled={noTextSelected || !editMode}
             tooltip="Superscript">
@@ -134,9 +141,7 @@ class BlockCodeToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Subscript, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
             disabled={noTextSelected || !editMode}
             tooltip="Subscript">

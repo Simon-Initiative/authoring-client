@@ -7,7 +7,9 @@ import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-import { Editor } from 'slate-react';
+import { Editor } from 'slate';
+import { removeInlineEntity, getEntityAtCursor }
+  from 'editors/content/learning/contiguoustext/utils';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -94,7 +96,7 @@ export function insert(
       : contextSnapshot;
 
     activeContext.container.lift((parent: ParentContainer) => {
-      parent.onAddNew(content, activeContext.textSelection);
+      parent.onAddNew(content, activeContext.editor);
     });
 
   };
@@ -119,12 +121,13 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
           courseId,
           resourcePath,
           (e) => {
-            parent.onAddNew(e.toArray(), activeContext.textSelection);
+            parent.onAddNew(e.toArray(), activeContext.editor);
           });
 
       } else {
         // Otherwise, just add the elements
-        parent.onAddNew(parsedContent.elements.toArray(), activeContext.textSelection);
+        parent.onAddNew(parsedContent.elements.toArray(),
+          activeContext.editor);
       }
     });
 
@@ -138,6 +141,7 @@ export function edit(content: ContentElement) {
     const { activeContext } = getState();
     activeContext.container.lift((parent: ParentContainer) => {
       parent.onEdit(content, content);
+
     });
   };
 }
@@ -161,15 +165,12 @@ export function remove(item: ContentElement) {
 
     dispatch(resetActive());
 
-    activeContext.textSelection.caseOf({
-      just: (textSelection) => {
+    activeContext.editor.caseOf({
+      just: (e) => {
         if (item instanceof contentTypes.ContiguousText) {
-          const text = item as contentTypes.ContiguousText;
-          const entity = text.getEntityAtCursor(textSelection);
-          entity.caseOf({
-            just: (e) => {
-              const updated = text.removeEntity(e.key);
-              container.onEdit(updated, updated);
+          getEntityAtCursor(e).caseOf({
+            just: (en) => {
+              removeInlineEntity(e, en.key);
             },
             nothing: () => container.onRemove(item),
           });

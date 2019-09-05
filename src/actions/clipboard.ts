@@ -74,7 +74,6 @@ export function paste() {
         return;
       }
 
-      const { textSelection } = activeContext;
       let elementToPaste: ContentElement;
       let elementType: string;
       // ContiguousText components serialize to lists of inline elements (e.g. 'p' tags),
@@ -117,7 +116,7 @@ export function paste() {
 
         if (removed.length > 0) {
           const message = 'WARNING: the following content types can not be copied and pasted. '
-                      + 'Please adjust your course accordingly.';
+            + 'Please adjust your course accordingly.';
 
           // FIXME: actions should not have side effects. Should call "setState".
           displayModalMessasge(
@@ -126,7 +125,7 @@ export function paste() {
           );
         }
 
-        parent.onPaste(filtered, textSelection);
+        parent.onPaste(filtered, activeContext.editor);
       }
     }
   };

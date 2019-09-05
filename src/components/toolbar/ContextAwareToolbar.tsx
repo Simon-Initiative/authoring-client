@@ -18,6 +18,8 @@ import { Message } from 'types/messages';
 import {
   styles, TOOLBAR_HIDE_ANIMATION_DURATION_MS,
 } from 'components/toolbar/ContextAwareToolbar.styles';
+import ContiguousTextToolbar
+  from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
 
 interface ToolbarGroupProps {
   className?: string;
@@ -204,10 +206,16 @@ class ContextAwareToolbar
         context: contentParent.props.context,
         services: contentParent.props.services,
         editMode: contentParent.props.editMode,
+        hover: '',
+        onUpdateHover: () => { },
       };
 
-      contentRenderer = React.createElement(
-        getEditorByContentType((contentModel as any).contentType), props);
+      if (contentModel.contentType === 'ContiguousText') {
+        contentRenderer = <ContiguousTextToolbar {...props} />;
+      } else {
+        contentRenderer = React.createElement(
+          getEditorByContentType((contentModel as any).contentType), props);
+      }
 
     }
 

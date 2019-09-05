@@ -35,8 +35,10 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
 import { LegacyTypes } from 'data/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
-import { Editor } from 'slate';
+import { Editor, Selection } from 'slate';
 import * as editorUtils from './utils';
+
+
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -46,7 +48,6 @@ export interface ContiguousTextToolbarProps
   onDismissModal: () => void;
   onAddEntry: (e, documentId) => Promise<void>;
   onFetchContentElementByPredicate: (documentId, predicate) => Promise<Maybe<ContentElement>>;
-  selection: TextSelection;
   editor: Maybe<Editor>;
 }
 
@@ -98,48 +99,53 @@ class ContiguousTextToolbar
   }
 
   shouldComponentUpdate(nextProps: StyledContiguousTextToolbarProps, nextState) {
-    return super.shouldComponentUpdate(nextProps, nextState)
-      || nextProps.selection !== this.props.selection;
+
+    const should = super.shouldComponentUpdate(nextProps, nextState)
+      || nextProps.editor !== this.props.editor;
+    return should;
   }
 
   renderActiveEntity(entity) {
 
     const { key, data } = entity;
 
-    const model = this.props.model;
+    const model = this.getModel();
     const onCtEdit = this.props.onEdit;
 
     const props = {
       ...this.props,
       renderContext: RenderContext.Sidebar,
       onFocus: (c, p) => true,
-      model: data,
+      model: data.get('value'),
       onEdit: (updated) => {
         this.props.editor.lift((e) => {
-          onCtEdit(model.updateInlineData(key, updated));
+          editorUtils.updateInlineData(e, key, updated);
         });
       },
     };
 
     return React.createElement(
-      getEditorByContentType((data as any).contentType), props);
+      getEditorByContentType((data as any).get('value').contentType), props);
 
   }
 
   renderSidebar() {
-    const { model, selection } = this.props;
+    const { editor } = this.props;
 
-    const entity = selection.isCollapsed()
-      ? model.getEntityAtCursor().caseOf({ just: n => n, nothing: () => null })
-      : null;
+    const plainSidebar = <SidebarContent title="Text Block" />;
 
-    if (entity !== null) {
-      return this.renderActiveEntity(entity);
-    }
-    return <SidebarContent title="Text Block" />;
+    return editor.caseOf({
+      just: (e) => {
+        return editorUtils.getEntityAtCursor(e).caseOf({
+          just: entity => this.renderActiveEntity(entity),
+          nothing: () => plainSidebar,
+        });
+      },
+      nothing: () => plainSidebar,
+    });
   }
 
-  renderEntryOptions(selection) {
+  renderEntryOptions() {
 
     const addCitationWithEntry = (id) => {
       insertInline(this.props.editor, new contentTypes.Cite().with({ entry: id }));
@@ -201,36 +207,24 @@ class ContiguousTextToolbar
     );
   }
 
+  getModel() {
+    const { editor } = this.props;
+    const value = editor.caseOf({
+      just: e => e.value,
+      nothing: () => this.props.model.slateValue,
+    });
+
+    return this.props.model.with({ slateValue: value });
+  }
+
   renderToolbar() {
 
-    const { model, onEdit, editMode, selection, editor } = this.props;
+    const { editMode, editor } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
-
-    const currentMarks = model.value.activeMarks.toArray().map(m => m.type);
-    const currentInlines = model.value.inlines;
-
-    const noTextSelected = selection && selection.isCollapsed();
-
-    const bareTextSelected = selection && selection.isCollapsed()
-      ? false
-      : currentInlines.size === 0;
-
-    // We enable the bdo button only when there is a selection that
-    // doesn't overlap an entity, and that selection selects only
-    // bare text or just another bdo
-    const onlyBdoOrEmpty = currentMarks.length === 0
-      || (currentMarks.length === 1 && (currentMarks.indexOf('bdo') >= 0));
-
-    const bdoDisabled = !selection || selection.isCollapsed()
-      || currentInlines.size > 0
-      || !onlyBdoOrEmpty;
-
-    const cursorInEntity = selection && selection.isCollapsed()
-      ? model.getEntityAtCursor().caseOf({ just: n => true, nothing: () => false })
-      : false;
-
-    const rangeEntitiesEnabled = editMode && bareTextSelected;
-    const pointEntitiesEnabled = editMode && !cursorInEntity && noTextSelected;
+    const cursorInEntity = editorUtils.cursorInEntity(editor);
+    const rangeEntitiesEnabled = editMode && editorUtils.bareTextSelected(editor);
+    const pointEntitiesEnabled = editMode && !cursorInEntity && editorUtils.noTextSelected(editor);
+    const bdoDisabled = editorUtils.bdoDisabled(editor);
 
     return (
       <ToolbarGroup
@@ -439,9 +433,7 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={() => {
 
-              const selectionSnapshot = selection;
-
-              model.extractParagraphSelectedText(selection).lift((title) => {
+              editorUtils.extractParagraphSelectedText(editor).lift((title) => {
                 selectTargetElement()
                   .then((e) => {
                     e.lift((element) => {
@@ -467,7 +459,7 @@ class ContiguousTextToolbar
             tooltip="Insert Citation"
             disabled={!supports('cite') || !pointEntitiesEnabled}>
 
-            {this.renderEntryOptions(selection)}
+            {this.renderEntryOptions()}
           </ToolbarNarrowMenu>
         </ToolbarLayout.Inline>
       </ToolbarGroup >

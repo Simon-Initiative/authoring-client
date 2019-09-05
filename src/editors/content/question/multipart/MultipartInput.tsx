@@ -13,12 +13,15 @@ import { ActiveContext, TextSelection } from 'types/active';
 import guid from 'utils/guid';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
-import { ContiguousText } from 'data/content/learning/contiguous';
+import { InputRefType } from 'data/content/learning/input_ref';
 import { Badge } from '../../common/Badge';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
 import { RouterState } from 'reducers/router';
 import { map } from 'data/utils/map';
+import { Editor } from 'slate';
+import { InlineTypes } from 'data/content/learning/contiguous';
+import * as editorUtils from 'editors/content/learning/contiguoustext/utils';
 
 export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
@@ -31,10 +34,16 @@ export interface MultipartInputProps
   setActiveItemIdActionAction: (activeItemId: string) => void;
   onClearSearchParam: (name) => void;
   onAddItemPart: (item, part, body) => void;
+  editor: Maybe<Editor>;
 }
 
 export interface MultipartInputState extends QuestionState {
 
+}
+
+
+function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.insertInline(e, wrapper));
 }
 
 /**
@@ -69,16 +78,16 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
           if (c instanceof contentTypes.ContiguousText) {
 
-            const selection = activeContext.textSelection.caseOf({
-              just: s => s,
-              nothing: () =>
-                TextSelection.createEmpty({}),
-            });
-
             const input = guid();
-            const data = {};
-            data['@input'] = input;
-            data['$type'] = type;
+
+            let inputType = InputRefType.Numeric;
+            if (type === 'FillInTheBlank') {
+              inputType = InputRefType.FillInTheBlank;
+            } else if (type === 'Text') {
+              inputType = InputRefType.Text;
+            }
+
+            const inputRef = new contentTypes.InputRef({ input, inputType });
 
             const backingText = type === 'FillInTheBlank'
               ? ' Dropdown '
@@ -86,8 +95,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
             const mapFn = (e: ContentElement) => {
               if (e.guid === c.guid) {
-                return (c as contentTypes.ContiguousText).insertEntity(
-                  EntityTypes.input_ref, false, data, selection, backingText);
+                insertInline(this.props.editor, inputRef);
               }
               return e;
             };

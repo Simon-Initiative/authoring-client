@@ -19,6 +19,11 @@ export function toPersistence(value: Value, inlineText = false): Object {
 
 function translateNode(node: Block) {
   const content = [];
+
+  if (node.nodes === undefined) {
+    console.log('here');
+  }
+
   node.nodes.forEach((n) => {
     if (n.object === 'text' && n.text.length > 0) {
       handleText(n, content);
@@ -121,16 +126,15 @@ const styleContainers = {
 
 
 const inlineHandlers = {
-  link: contentBasedInline,
-  xref: contentBasedInline,
-  activity_link: contentBasedInline,
-  quote: contentBasedInline,
-  code: contentBasedInline,
-  'm:math': terminalInline,
-  '#math': terminalInline,
-  extra,
-  image: terminalInline,
-  sym: terminalInline,
+  Link: contentBasedInline,
+  Xref: contentBasedInline,
+  ActivityLink: contentBasedInline,
+  Quote: contentBasedInline,
+  Code: contentBasedInline,
+  Math: terminalInline,
+  Extra: extra,
+  Image: terminalInline,
+  Sym: terminalInline,
 };
 
 // terminal inlines just serialize using the embedded wrapper

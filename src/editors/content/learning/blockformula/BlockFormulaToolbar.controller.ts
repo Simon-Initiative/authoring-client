@@ -5,9 +5,12 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import BlockFormulaToolbar from './BlockFormulaToolbar';
 import { BlockFormula } from 'data/content/learning/blockformula';
+import { Maybe } from 'tsmonad';
+import { Editor } from 'slate';
 
 interface StateProps {
   selection: TextSelection;
+  editor: Maybe<Editor>;
 }
 
 interface DispatchProps {
@@ -23,8 +26,9 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const { activeContext } = state;
 
   return {
-    selection: activeContext.textSelection.caseOf({
-      just: s => s,
+    editor: activeContext.editor,
+    selection: activeContext.editor.caseOf({
+      just: s => new TextSelection(s.value.selection),
       nothing: () => TextSelection.createEmpty(''),
     }),
   };

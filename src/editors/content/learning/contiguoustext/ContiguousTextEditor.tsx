@@ -8,10 +8,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
-import { Maybe } from 'tsmonad';
-import { TextSelection, Trigger } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
-import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import { styles } from 'editors/content/learning/contiguoustext/ContiguousText.styles';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
@@ -49,10 +46,10 @@ class ContiguousTextEditor
   constructor(props) {
     super(props);
 
-    this.handleOnFocus = this.handleOnFocus.bind(this);
+    this.slateOnFocus = this.slateOnFocus.bind(this);
 
     this.state = {
-      value: this.props.model.value,
+      value: this.props.model.slateValue,
     };
 
   }
@@ -62,43 +59,27 @@ class ContiguousTextEditor
 
     const v: Value = value;
 
-    if (v.document !== this.state.value.document) {
-      const updated = this.props.model.with({ value });
-      this.props.onEdit(updated);
-    }
-    if (v.selection !== this.state.value.selection) {
-      const textSelection = new TextSelection(v.selection);
-      this.props.onTextSelectionChange(textSelection);
-    }
+    const edited = v.document !== this.state.value.document;
+    const updateSelection = v.selection !== this.state.value.selection;
 
-    this.setState({ value });
+    this.setState({ value }, () => {
+
+      if (edited) {
+        const updated = this.props.model.with({ slateValue: value });
+        this.props.onEdit(updated, updated);
+        this.props.onUpdateEditor(this.editor);
+
+      } else if (updateSelection) {
+        this.props.onUpdateEditor(this.editor);
+      }
+    });
   }
 
   shouldComponentUpdate(nextProps: StyledContiguousTextEditorProps, nextState) {
-    return this.state.value !== nextState.value
+    return super.shouldComponentUpdate(nextProps, nextState)
+      || this.state.value !== nextState.value
       || nextProps.selectedEntity !== this.props.selectedEntity
       || nextProps.orderedIds !== this.props.orderedIds;
-  }
-
-
-
-  renderActiveEntity(entity) {
-
-    const { key, data } = entity;
-
-    const props = {
-      ...this.props,
-      renderContext: RenderContext.Sidebar,
-      onFocus: (c, p) => true,
-      model: data,
-      onEdit: (updated) => {
-        this.props.onEdit(this.props.model.updateEntity(key, updated));
-      },
-    };
-
-    return React.createElement(
-      getEditorByContentType((data as any).contentType), props);
-
   }
 
   renderSidebar() {
@@ -110,21 +91,17 @@ class ContiguousTextEditor
   }
 
   handleOnFocus(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 
+  slateOnFocus(e) {
     this.props.onUpdateEditor(this.editor);
-
-    const selection = this.props.model.value.selection;
-    const textSelection = new TextSelection(selection);
-    this.props.onTextSelectionChange && this.props.onTextSelectionChange(textSelection);
-
-    textSelection.triggeredBy = Trigger.KEYPRESS;
-
-    this.props.onFocus(this.props.model, this.props.parent, Maybe.just(textSelection));
   }
 
   renderMain(): JSX.Element {
-    const { className, classes, model, parent, editMode, viewOnly,
-      hideBorder = false, editorStyles, context } = this.props;
+    const { className, classes, editMode, viewOnly,
+      hideBorder = false, context } = this.props;
 
     const showBorder = !viewOnly && !hideBorder;
 
@@ -147,7 +124,7 @@ class ContiguousTextEditor
 
         <Editor
           ref={editor => this.editor = editor}
-          onFocus={this.handleOnFocus}
+          onFocus={this.slateOnFocus}
           plugins={plugins}
           value={this.state.value}
           onChange={this.onChange}

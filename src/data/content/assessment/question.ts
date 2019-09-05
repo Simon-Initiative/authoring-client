@@ -16,17 +16,15 @@ import { Variable, Variables } from 'data/content/assessment/variable';
 import createGuid from 'utils/guid';
 import { getKey } from 'data/common';
 import { augment, getChildren, setId, ensureIdGuidPresent } from 'data/content/common';
-import { ContiguousText } from 'data/content/learning/contiguous';
-import { Changes } from 'data/content/learning/draft/changes';
+import { ContiguousText, InputRefChanges, InlineEntities } from 'data/content/learning/contiguous';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
-import { EntityTypes } from 'data/content/learning/common';
-import { EntityInfo } from 'data/content/learning/changes';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
 import {
   updateHTMLLayoutTargetRefs,
 } from 'editors/content/learning/dynadragdrop/utils';
 import { Custom } from 'data/content/assessment/custom';
 import { pipe } from 'utils/utils';
+import { Inline } from 'slate';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
@@ -93,17 +91,17 @@ export function buildItemMap(model: Question) {
 }
 
 export function detectInputRefChanges(
-  current: ContentElements, previous: ContentElements): Changes {
+  current: ContentElements, previous: ContentElements): InputRefChanges {
 
-  const inputRefMap = (content: ContentElements): Immutable.Map<string, EntityInfo> =>
+  const inputRefMap = (content: ContentElements): Immutable.Map<string, Inline> =>
     content.content.toArray()
       .filter(c => c.contentType === 'ContiguousText')
       .reduce(
-        (refMap: Immutable.Map<string, EntityInfo>, c: ContiguousText) =>
+        (refMap: Immutable.Map<string, Inline>, c: ContiguousText) =>
           refMap.concat(
-            c.getEntitiesByType(EntityTypes.input_ref)
+            c.getEntitiesByType(InlineEntities.InputRef)
               .reduce(
-                (tempMap, ref) => tempMap.set(ref.entity.getData()['@input'], ref),
+                (tempMap, ref) => tempMap.set(ref.data.value.input, ref),
                 Immutable.Map(),
               )).toMap(),
         Immutable.Map());
@@ -347,7 +345,7 @@ function cloneInputQuestion(question: Question): Question {
   const body = cloned.body.with({
     content: cloned.body.content.map((c) => {
       if (c.contentType === 'ContiguousText') {
-        return (c as ContiguousText).updateAllInputRefs(itemMap);
+        return (c as ContiguousText).updateInputRefs(itemMap);
       }
       return c;
     }).toOrderedMap(),
@@ -593,7 +591,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
     const content = this.body.content.map((c) => {
       if (c.contentType === 'ContiguousText') {
-        return (c as ContiguousText).removeInputRef(itemModelId);
+        return c.removeInputRef(itemModelId);
       }
       return c;
     }).toOrderedMap();

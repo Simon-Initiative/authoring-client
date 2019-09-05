@@ -5,8 +5,11 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import BlockCodeToolbar from './BlockCodeToolbar';
 import { BlockCode } from 'data/content/learning/blockcode';
+import { Maybe } from 'tsmonad';
+import { Editor } from 'slate';
 
 interface StateProps {
+  editor: Maybe<Editor>;
   selection: TextSelection;
 }
 
@@ -23,8 +26,9 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const { activeContext } = state;
 
   return {
-    selection: activeContext.textSelection.caseOf({
-      just: s => s,
+    editor: activeContext.editor,
+    selection: activeContext.editor.caseOf({
+      just: s => new TextSelection(s.value.selection),
       nothing: () => TextSelection.createEmpty(''),
     }),
   };

@@ -15,6 +15,7 @@ export interface BlockQuoteEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockQuote> {
   onShowSidebar: () => void;
   onUpdateEditor: (editor) => void;
+
 }
 
 export interface BlockQuoteEditorState {

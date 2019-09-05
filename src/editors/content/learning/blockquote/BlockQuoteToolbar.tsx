@@ -6,20 +6,25 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { InlineStyles } from 'data/content/learning/contiguous';
-import { EntityTypes } from 'data/content/learning/common';
+import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
-
+import { LegacyTypes } from 'data/types';
+import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
+import { ResourceState } from 'data/content/resource';
 import { styles } from './BlockQuote.styles';
 import { StyledComponentProps } from 'types/component';
+import { Maybe } from 'tsmonad';
+import { Editor } from 'slate';
+import * as editorUtils from '../contiguoustext/utils';
 
 export interface BlockQuoteToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockQuote> {
   selection: TextSelection;
+  editor: Maybe<Editor>;
 }
 
 export interface BlockQuoteToolbarState {
@@ -27,6 +32,17 @@ export interface BlockQuoteToolbarState {
 }
 
 type StyledBlockQuoteToolbarProps = StyledComponentProps<BlockQuoteToolbarProps, typeof styles>;
+
+
+function applyInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.applyInline(e, wrapper));
+}
+function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.insertInline(e, wrapper));
+}
+function updateInline(editor: Maybe<Editor>, key: string, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.updateInlineData(e, key, wrapper));
+}
 
 class BlockQuoteToolbar
   extends AbstractContentEditor<contentTypes.BlockQuote,
@@ -51,8 +67,7 @@ class BlockQuoteToolbar
       onFocus: (c, p) => true,
       model: data,
       onEdit: (updated) => {
-        const text = this.props.model.text.updateEntity(key, updated);
-        this.props.onEdit(this.props.model.with({ text }), updated);
+        updateInline(this.props.editor, key, updated);
       },
     };
 
@@ -62,34 +77,28 @@ class BlockQuoteToolbar
   }
 
   renderSidebar() {
-    const { model, selection } = this.props;
+    const { editor } = this.props;
 
-    const entity = selection.isCollapsed()
-      ? model.text.getEntityAtCursor(selection).caseOf({ just: n => n, nothing: () => null })
-      : null;
+    const plainSidebar = <SidebarContent title="Quote" />;
 
-    if (entity !== null) {
-      return this.renderActiveEntity(entity);
-    }
-    return <SidebarContent title="Quote" />;
+    return editor.caseOf({
+      just: (e) => {
+        return editorUtils.getEntityAtCursor(e).caseOf({
+          just: entity => this.renderActiveEntity(entity),
+          nothing: () => plainSidebar,
+        });
+      },
+      nothing: () => plainSidebar,
+    });
   }
 
   renderToolbar() {
 
-    const { model, onEdit, editMode, selection } = this.props;
+    const { editMode, editor } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
-    const noTextSelected = selection && selection.isCollapsed();
-
-    const bareTextSelected = selection && selection.isCollapsed()
-      ? false
-      : !model.text.selectionOverlapsEntity(selection);
-
-    const cursorInEntity = selection && selection.isCollapsed()
-      ? model.text.getEntityAtCursor(selection).caseOf({ just: n => true, nothing: () => false })
-      : false;
-
-    const rangeEntitiesEnabled = editMode && bareTextSelected;
-    const pointEntitiesEnabled = editMode && !cursorInEntity && noTextSelected;
+    const cursorInEntity = editorUtils.cursorInEntity(editor);
+    const rangeEntitiesEnabled = editMode && editorUtils.bareTextSelected(editor);
+    const pointEntitiesEnabled = editMode && !cursorInEntity && editorUtils.noTextSelected(editor);
 
     return (
       <ToolbarGroup
@@ -97,81 +106,64 @@ class BlockQuoteToolbar
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Bold, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Italic, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Highlight, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Superscript, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Subscript, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Var, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Var))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
             tooltip="Code">
             {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.with({
-                  text: model.text.addEntity(
-                    EntityTypes.math, true, new contentTypes.Math(), selection),
-                }));
+                insertInline(this.props.editor, new contentTypes.Math());
               }
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
@@ -181,11 +173,7 @@ class BlockQuoteToolbar
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.with({
-                  text: model.text.addEntity(
-                    EntityTypes.link, true,
-                    new contentTypes.Link(), selection),
-                }));
+                applyInline(this.props.editor, new contentTypes.Link());
               }
             }
             disabled={!supports('link') || !rangeEntitiesEnabled}
@@ -195,11 +183,23 @@ class BlockQuoteToolbar
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.with({
-                  text: model.text.addEntity(
-                    EntityTypes.xref, true,
-                    new contentTypes.Xref(), selection),
-                }));
+
+                const thisId = this.props.context.courseModel.resourcesById.get(
+                  this.props.context.documentId).id;
+
+                const pages = this.props.context.courseModel.resources
+                  .toArray()
+                  .filter(r => r.type === LegacyTypes.workbook_page &&
+                    r.id !== thisId &&
+                    r.id !== PLACEHOLDER_ITEM_ID &&
+                    r.resourceState !== ResourceState.DELETED);
+
+                const xrefDefault = pages[0] ? pages[0].id : thisId;
+
+                if (pages.length > 0) {
+                  applyInline(this.props.editor,
+                    new contentTypes.Xref({ page: xrefDefault, idref: xrefDefault }));
+                }
               }
             }
             disabled={!supports('xref') || !rangeEntitiesEnabled}

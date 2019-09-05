@@ -19,8 +19,8 @@ import { extractFullText } from 'data/content/objectives/objective';
 import { dedupeArray } from 'utils/utils';
 import { AnalyticsState as ReduxAnalyticsState } from 'reducers/analytics';
 import { ContentElements } from 'data/content/common/elements';
+import { InlineEntities } from 'data/content/learning/contiguous';
 import { map } from 'data/utils/map';
-import { EntityTypes } from 'data/content/learning/common';
 import { DatasetStatus } from 'types/analytics/dataset';
 import { PartAnalytics } from './PartAnalytics';
 
@@ -30,9 +30,9 @@ const getOrderedParts = (body: ContentElements, parts: List<contentTypes.Part>) 
       let updatedAcc = acc;
       map((ce) => {
         if (ce.contentType === 'ContiguousText') {
-          (ce as contentTypes.ContiguousText).getEntitiesByType(EntityTypes.input_ref)
+          (ce as contentTypes.ContiguousText).getEntitiesByType(InlineEntities.InputRef)
             .forEach(entityInfo => updatedAcc = updatedAcc.push(
-              entityInfo.entity.getData()['@input']));
+              entityInfo.data.value.input));
         }
         return ce;
       }, contentElement);

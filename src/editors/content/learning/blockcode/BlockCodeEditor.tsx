@@ -14,6 +14,7 @@ export interface BlockCodeEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
   onShowSidebar: () => void;
   onUpdateEditor: (editor) => void;
+  
 }
 
 export interface BlockCodeEditorState {

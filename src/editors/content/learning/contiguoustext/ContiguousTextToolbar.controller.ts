@@ -15,7 +15,6 @@ import { fetchContentElementByPredicate } from 'actions/document';
 import { Editor } from 'slate';
 
 interface StateProps {
-  selection: TextSelection;
   resource: Resource;
   courseModel: CourseModel;
   orderedIds?: any;
@@ -45,11 +44,6 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
     editor: activeContext.editor,
     courseModel,
     resource,
-    selection: activeContext.textSelection.caseOf({
-      just: s => s, nothing: () => {
-        return TextSelection.createEmpty('');
-      },
-    }),
   };
 };
 

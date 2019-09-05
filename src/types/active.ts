@@ -1,8 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
-import { Selection } from 'slate';
-import { Editor } from 'slate-react';
+import { Selection, Editor } from 'slate';
 
 export enum Trigger {
   KEYPRESS,
@@ -15,65 +14,63 @@ export class TextSelection {
     return new TextSelection(Selection.create({}));
   }
 
-  slate: Selection;
+  anchorKey: string;
+  anchorOffset: number;
+  focusKey: string;
+  focusOffset: number;
+  isBackward: boolean;
+  hasFocus: boolean;
+  collapsed: boolean;
   triggeredBy: Trigger;
 
   constructor(slate) {
-
-    this.slate = slate;
+    this.anchorKey = slate.anchor.key;
+    this.focusKey = slate.focus.key;
+    this.anchorOffset = slate.anchor.offset;
+    this.focusOffset = slate.focus.offset;
+    this.isBackward = slate.isBackward;
+    this.hasFocus = slate.isFocused;
+    this.collapsed = slate.isCollapsed;
   }
 
   getAnchorKey() {
-    return this.slate.anchor.key;
+    return this.anchorKey;
   }
 
   getFocusKey() {
-    return this.slate.focus.key;
+    return this.focusKey;
   }
 
   getAnchorOffset() {
-    return this.slate.anchor.offset;
+    return this.anchorOffset;
   }
 
   getFocusOffset() {
-    return this.slate.focus.offset;
+    return this.focusOffset;
   }
 
   getIsBackward() {
-    return this.slate.isBackward;
+    return this.isBackward;
   }
 
   getHasFocus() {
-    return this.slate.isFocused;
+    return this.hasFocus;
   }
 
   isCollapsed() {
-    return this.slate.isCollapsed;
+    return this.collapsed;
   }
 
-  hasEdgeWithin(blockKey, start, end) {
-
-    // TODO
-    return false;
-
-  }
-
-  getRawSelectionState() {
-    return this.slate;
-  }
-
-  merge(params) {
-    return new TextSelection(this.slate.merge(params));
-  }
 }
 
 export interface ParentContainer {
   supportedElements: Immutable.List<string>;
   onAddNew: (
-    content: ContentElement | ContentElement[], textSelection: Maybe<TextSelection>) => void;
+    content: ContentElement | ContentElement[], editor: Maybe<Editor>) => void;
   onEdit: (content: ContentElement, source: Object) => void;
   onRemove: (content: ContentElement) => void;
-  onPaste: (content: ContentElement, textSelection: Maybe<TextSelection>) => void;
+  onPaste: (content: ContentElement,
+    editor: Maybe<Editor>) => void;
   onDuplicate: (content: ContentElement) => void;
   onMoveUp: (content: ContentElement) => void;
   onMoveDown: (content: ContentElement) => void;
@@ -83,7 +80,6 @@ export type ActiveContextParams = {
   documentId?: Maybe<string>,
   container?: Maybe<ParentContainer>,
   activeChild?: Maybe<ContentElement>,
-  textSelection?: Maybe<TextSelection>,
   editor?: Maybe<Editor>,
 };
 
@@ -91,7 +87,6 @@ const defaultContent = {
   documentId: Maybe.nothing(),
   container: Maybe.nothing(),
   activeChild: Maybe.nothing(),
-  textSelection: Maybe.nothing(),
   editor: Maybe.nothing(),
 };
 
@@ -105,9 +100,6 @@ export class ActiveContext extends Immutable.Record(defaultContent) {
 
   // The current active child component of the parent container
   activeChild: Maybe<ContentElement>;
-
-  // The current text selection
-  textSelection: Maybe<TextSelection>;
 
   // The current active slate editor
   editor: Maybe<Editor>;

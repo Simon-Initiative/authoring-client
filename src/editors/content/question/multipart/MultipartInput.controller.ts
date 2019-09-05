@@ -10,6 +10,7 @@ import { RouterState } from 'reducers/router';
 import { clearSearchParam } from 'actions/router';
 import { AnalyticsState } from 'reducers/analytics';
 import { AssessmentModel } from 'data/models';
+import { Editor } from 'slate';
 
 interface StateProps {
   activeContext: ActiveContext;
@@ -17,6 +18,7 @@ interface StateProps {
   router: RouterState;
   analytics: AnalyticsState;
   assessmentId: string;
+  editor: Maybe<Editor>;
 }
 
 interface DispatchProps {
@@ -31,6 +33,7 @@ interface OwnProps extends OwnQuestionProps<contentTypes.QuestionItem> {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
+    editor: state.activeContext.editor,
     activeContext: state.activeContext,
     selectedInput: state.inputRef,
     router: state.router,

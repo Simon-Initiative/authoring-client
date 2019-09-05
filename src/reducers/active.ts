@@ -41,21 +41,20 @@ export const activeContext = (
         container: action.container === null || action.container === undefined
           ? Maybe.nothing() : Maybe.just(action.container),
         documentId: Maybe.just(action.documentId),
-        textSelection: action.textSelection,
       });
     case documentActions.DOCUMENT_RELEASED:
       return state.with({
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),
         documentId: Maybe.nothing(),
-        textSelection: Maybe.nothing(),
+        editor: Maybe.nothing(),
       });
     case documentActions.DOCUMENT_LOADED:
       return state.with({
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),
         documentId: Maybe.just(action.documentId),
-        textSelection: Maybe.nothing(),
+        editor: Maybe.nothing(),
       });
     case actions.RESET_ACTIVE:
     case documentActions.CHANGE_UNDONE:
@@ -63,7 +62,6 @@ export const activeContext = (
       return state.with({
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),
-        textSelection: Maybe.nothing(),
       });
 
     default:
