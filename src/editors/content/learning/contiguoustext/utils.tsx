@@ -65,8 +65,8 @@ export function applyInline(editor: Editor, wrapper: InlineTypes): Editor {
 export function isEffectivelyEmpty(editor: Editor): boolean {
   const nodes = editor.value.document.nodes;
   return nodes.size === 1
-    && nodes[0].object === 'text'
-    && nodes[0].text.trim() === '';
+    && nodes.get(0).object === 'text'
+    && nodes.get(0).text.trim() === '';
 }
 
 // Returns true if the selection is collapsed and the cursor is

@@ -75,36 +75,35 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
       activeContext.container.lift((p) => {
         activeContext.activeChild.lift((c) => {
+          activeContext.editor.lift((editor) => {
 
-          if (c instanceof contentTypes.ContiguousText) {
+            if (c instanceof contentTypes.ContiguousText) {
 
-            const input = guid();
+              const input = guid();
 
-            let inputType = InputRefType.Numeric;
-            if (type === 'FillInTheBlank') {
-              inputType = InputRefType.FillInTheBlank;
-            } else if (type === 'Text') {
-              inputType = InputRefType.Text;
-            }
-
-            const inputRef = new contentTypes.InputRef({ input, inputType });
-
-            const backingText = type === 'FillInTheBlank'
-              ? ' Dropdown '
-              : ' ' + type + ' ';
-
-            const mapFn = (e: ContentElement) => {
-              if (e.guid === c.guid) {
-                insertInline(this.props.editor, inputRef);
+              let inputType = InputRefType.Numeric;
+              if (type === 'FillInTheBlank') {
+                inputType = InputRefType.FillInTheBlank;
+              } else if (type === 'Text') {
+                inputType = InputRefType.Text;
               }
-              return e;
-            };
 
-            result = [map(mapFn, this.props.body), input];
+              const inputRef = new contentTypes.InputRef({ input, inputType });
 
-            this.props.setActiveItemIdActionAction(input);
+              const mapFn = (e: ContentElement) => {
+                if (e.guid === c.guid) {
+                  return (e as contentTypes.ContiguousText).addInlineEntity(
+                    inputRef, editor.value.selection);
+                }
+                return e;
+              };
 
-          }
+              result = [map(mapFn, this.props.body), input];
+
+              this.props.setActiveItemIdActionAction(input);
+
+            }
+          });
 
         });
       });

@@ -75,6 +75,12 @@ class ContiguousTextEditor
     });
   }
 
+  componentWillReceiveProps(nextProps: StyledContiguousTextEditorProps) {
+    if (this.props.model.forcedUpdateCount !== nextProps.model.forcedUpdateCount) {
+      this.setState({ value: nextProps.model.slateValue });
+    }
+  }
+
   shouldComponentUpdate(nextProps: StyledContiguousTextEditorProps, nextState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || this.state.value !== nextState.value

@@ -20,10 +20,6 @@ export function toPersistence(value: Value, inlineText = false): Object {
 function translateNode(node: Block) {
   const content = [];
 
-  if (node.nodes === undefined) {
-    console.log('here');
-  }
-
   node.nodes.forEach((n) => {
     if (n.object === 'text' && n.text.length > 0) {
       handleText(n, content);

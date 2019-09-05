@@ -2,9 +2,8 @@ import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
-import { TextSelection } from 'types/active';
 
-import { Value, Block, Inline } from 'slate';
+import { Value, Block, Inline, Text, Selection } from 'slate';
 import Html from 'slate-html-serializer';
 import { toSlate } from 'data/content/learning/slate/toslate';
 import { toPersistence } from 'data/content/learning/slate/topersistence';
@@ -149,7 +148,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
         (p, c) => {
           return (c as Block).nodes.toArray().reduce(
             (p1, c1) => {
-              if (c1.object === 'inline' && c1.data.value.contentType === type) {
+              if (c1.object === 'inline' && c1.data.get('value').contentType === type) {
                 p1.push(c1);
               }
               return p1;
@@ -165,7 +164,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return inlines
       .reduce(
         (p, c) => {
-          p[c.data.value.input] = c;
+          p[c.data.get('value').input] = c;
           return p;
         },
         {});
@@ -210,6 +209,59 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     const document = this.slateValue.document.merge({ nodes });
     const slateValue = this.slateValue.merge({ document }) as Value;
     const forcedUpdateCount = removed ? this.forcedUpdateCount + 1 : this.forcedUpdateCount;
+
+    return this.with({ slateValue, forcedUpdateCount });
+  }
+
+  addInlineEntity(wrapper: InlineTypes, selection: Selection): ContiguousText {
+
+    const inline = Inline.create({
+      text: '',
+      type: wrapper.contentType,
+      data: { value: wrapper },
+    });
+
+    const { offset, path } = selection.anchor;
+
+    const nodes = Immutable.List(this.slateValue.document.nodes
+      .toArray()
+      .reduce(
+        (arr, n: Block, i) => {
+          if (i === path.get(0)) {
+            const text = n.text;
+
+            if (offset === 0) {
+              arr.push(n.merge({ nodes: n.nodes.insert(0, inline) }));
+              return arr;
+
+            }
+            if (offset === text.length - 1) {
+              arr.push(n.merge({ nodes: n.nodes.push(inline) }));
+              return arr;
+            }
+
+            const nodes = n.nodes.toArray();
+
+            const t = n.nodes.get(path.get(1)).text;
+            const text1 = Text.create({ text: t.substr(0, offset) });
+            const text2 = Text.create({ text: t.substr(offset) });
+
+            nodes.splice(path.get(1), 1, text1, inline, text2);
+
+            arr.push(n.merge({ nodes: Immutable.List(nodes) }));
+            return arr;
+
+
+          }
+          arr.push(n);
+          return arr;
+        },
+        [],
+      ));
+
+    const document = this.slateValue.document.merge({ nodes });
+    const slateValue = this.slateValue.merge({ document }) as Value;
+    const forcedUpdateCount = this.forcedUpdateCount + 1;
 
     return this.with({ slateValue, forcedUpdateCount });
   }

@@ -24,7 +24,7 @@ export function validateRemoval(model: ContentModel, itemToRemove: ContentElemen
         const ct = e as ContiguousText;
 
         ct.getEntitiesByType(InlineEntities.Command).forEach((e) => {
-          p[1].push(e.data.value.target);
+          p[1].push(e.data.get('value').target);
         });
       }
       return p;

@@ -101,7 +101,7 @@ export function detectInputRefChanges(
           refMap.concat(
             c.getEntitiesByType(InlineEntities.InputRef)
               .reduce(
-                (tempMap, ref) => tempMap.set(ref.data.value.input, ref),
+                (tempMap, ref) => tempMap.set(ref.data.get('value').input, ref),
                 Immutable.Map(),
               )).toMap(),
         Immutable.Map());
