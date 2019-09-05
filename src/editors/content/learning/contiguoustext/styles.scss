@@ -1,5 +1,18 @@
 @import 'oli/colors';
 
+
+.oli-active-input {
+  background-color:  #b9d2f7e5;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.oli-input {
+  background-color:  #e7e7f2e5;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
 .oli-command {
   background-color: $primary;
   color: white;

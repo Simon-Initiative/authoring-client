@@ -2,7 +2,6 @@
 import * as Immutable from 'immutable';
 import { Math as MathRenderer } from 'utils/math/Math';
 import * as ct from 'data/contentTypes';
-import { InputRefType } from 'data/content/learning/input_ref';
 import './styles.scss';
 import { Editor, Inline, Text, Value, Block, Document, Mark } from 'slate';
 const IMAGE = require('../../../../../assets/400x300.png');
@@ -10,6 +9,7 @@ import { buildUrl } from '../../../../utils/path';
 import { InlineTypes } from 'data/content/learning/contiguous';
 import { Tooltip } from 'utils/tooltip';
 import { Extra } from './Extra';
+import { InputRefDisplay } from './InputRefDisplay';
 import { Maybe } from 'tsmonad';
 const LARR_ICON = require('../../../../../assets/lArr.png');
 const LRARR_ICON = require('../../../../../assets/lrarr.png');
@@ -535,17 +535,12 @@ export function renderInline(extras, props, editor: Editor, next) {
         width={data.width} />;
     }
     case 'InputRef': {
-      const type = data.get('value').inputType;
-      if (type === InputRefType.Numeric) {
-        return <input onClick={onClick} readOnly value="Numeric" size={15} />;
-      }
-      if (type === InputRefType.Text) {
-        return <input onClick={onClick} readOnly value="Text" size={15} />;
-      }
-      if (type === InputRefType.FillInTheBlank) {
-        return <select onClick={onClick} size={15} />;
-      }
-      return <input onClick={onClick} readOnly value="Text" size={15} />;
+      return (
+        <InputRefDisplay
+          onClick={onClick.bind(this, node)}
+          inputRef={data.get('value')}
+        />
+      );
     }
     case 'Math': {
       const math = data.get('value') as ct.Math;

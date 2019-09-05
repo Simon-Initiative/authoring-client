@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import * as contentTypes from 'data/contentTypes';
-import { OwnQuestionProps, QuestionProps } from '../question/Question';
+import { OwnQuestionProps } from '../question/Question';
 import { MultipartInput, PartAddPredicate } from './MultipartInput';
 import { State } from 'reducers';
 import { ActiveContext } from 'types/active';

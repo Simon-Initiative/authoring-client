@@ -9,7 +9,7 @@ import { FillInTheBlank } from '../../items/FillInTheBlank';
 import { Text } from '../../items/Text';
 import { Numeric } from '../../items/Numeric';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
-import { ActiveContext, TextSelection } from 'types/active';
+import { ActiveContext } from 'types/active';
 import guid from 'utils/guid';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
