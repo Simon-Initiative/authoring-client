@@ -111,9 +111,6 @@ class ContiguousTextToolbar
 
     const { key, data } = entity;
 
-    const model = this.getModel();
-    const onCtEdit = this.props.onEdit;
-
     const props = {
       ...this.props,
       renderContext: RenderContext.Sidebar,

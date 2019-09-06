@@ -131,7 +131,7 @@ const inlineHandlers = {
   formula: stripOutInline,
   'm:math': terminalInline,
   '#math': terminalInline,
-  extra: terminalInline,
+  extra,
   image: terminalInline,
   sym: terminalInline,
 };
@@ -163,6 +163,14 @@ function terminalInline(item: Object, parent: BlockJSON, backingTextProvider): I
   parent.nodes.push(inline);
 
   return inline;
+}
+
+function extra(item: Object, parent: BlockJSON, backingTextProvider) {
+
+  const inline = terminalInline(item, parent, backingTextProvider);
+  const anchor = item['extra']['#array'].filter(k => common.getKey(k) === 'anchor')[0];
+  const children = getChildren(anchor);
+  children.forEach(subItem => handleInlineChild(subItem, inline, backingTextProvider));
 }
 
 function inputRef(item: Object, parent: BlockJSON, backingTextProvider): InlineJSON {

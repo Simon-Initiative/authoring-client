@@ -12,7 +12,6 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { getEditorByContentType } from 'editors/content/container/registry';
-import { TextSelection } from 'types/active';
 import { Editor } from 'slate';
 import { Maybe } from 'tsmonad';
 import {

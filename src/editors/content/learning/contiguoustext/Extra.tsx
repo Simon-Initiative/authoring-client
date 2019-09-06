@@ -14,6 +14,7 @@ const Provider = (require('react-redux') as any).Provider;
 
 interface ExtraProps {
   entityKey: string;
+  extra: contentTypes.Extra;
   parentProps: any;
   parent: any;
   editor: Editor;
@@ -45,14 +46,13 @@ export class Extra extends React.PureComponent<ExtraProps, ExtraState> {
   }
 
   render(): JSX.Element {
-    // TODO
-    const data = new contentTypes.Extra();
 
+    const extra = this.props.extra;
     const editor = getEditorByContentType('Extra');
 
     const props = Object.assign({}, this.props.parentProps, {
       renderContext: RenderContext.MainEditor,
-      model: data as contentTypes.Extra,
+      model: extra,
       onEdit: this.onEdit.bind(this),
       parent: this.props.parent,
     });
@@ -77,7 +77,7 @@ export class Extra extends React.PureComponent<ExtraProps, ExtraState> {
         trigger="click"
         hideOnClick="false"
         html={closeable}>
-        <a className="entity-extra"
+        <a className="oli-extra"
           onClick={this.onOpen.bind(this)}>
           {this.props.children}
         </a>

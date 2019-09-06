@@ -467,9 +467,10 @@ export function renderInline(extras, props, editor: Editor, next) {
     case 'Extra': {
       return <Extra
         entityKey={node.key}
+        extra={node.data.get('value')}
         editor={editor}
         parent={parent}
-        parentProps={props} />;
+        parentProps={props} >{children}</Extra>;
     }
     case 'Sym': {
 
