@@ -53,7 +53,6 @@ class ContiguousTextEditor
 
   }
 
-
   onChange = ({ value }) => {
 
     const v: Value = value;
