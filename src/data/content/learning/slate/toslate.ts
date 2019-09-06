@@ -125,6 +125,7 @@ function paragraph(item: Object, json: ValueJSON, backingTextProvider: Object) {
 }
 
 const inlineHandlers = {
+  command,
   link: contentBasedInline,
   xref: contentBasedInline,
   activity_link: contentBasedInline,
@@ -173,6 +174,14 @@ function extra(item: Object, parent: BlockJSON, backingTextProvider) {
 
   const inline = terminalInline(item, parent, backingTextProvider);
   const anchor = item['extra']['#array'].filter(k => common.getKey(k) === 'anchor')[0];
+  const children = getChildren(anchor);
+  children.forEach(subItem => handleInlineChild(subItem, inline, backingTextProvider));
+}
+
+function command(item: Object, parent: BlockJSON, backingTextProvider) {
+
+  const inline = terminalInline(item, parent, backingTextProvider);
+  const anchor = item['command']['#array'].filter(k => common.getKey(k) === 'title')[0];
   const children = getChildren(anchor);
   children.forEach(subItem => handleInlineChild(subItem, inline, backingTextProvider));
 }

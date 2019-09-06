@@ -74,8 +74,8 @@ export function renderMark(props, editor, next) {
 
 // Slate inline rendering
 export function renderInline(extras, props, editor: Editor, next) {
-  const { onInlineClick, context } = extras;
-  const { attributes, children, node, parent } = props;
+  const { onInlineClick, context, parentProps, parent } = extras;
+  const { attributes, children, node } = props;
   const { data } = node;
 
   const onClick = () => {
@@ -111,7 +111,7 @@ export function renderInline(extras, props, editor: Editor, next) {
       return <Extra
         {...standardProps}
         parent={parent}
-        parentProps={props}>{children}</Extra>;
+        parentProps={parentProps}>{children}</Extra>;
     }
     case 'Sym': {
       return <SymDisplay {...standardProps} />;

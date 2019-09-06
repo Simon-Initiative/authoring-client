@@ -3,6 +3,7 @@ import { JSSStyles } from 'styles/jss';
 export const styles: JSSStyles = {
   definition: {
     marginLeft: '30px',
+    textAlign: 'left',
   },
   meaning: {
     display: 'flex',

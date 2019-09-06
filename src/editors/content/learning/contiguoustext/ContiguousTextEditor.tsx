@@ -119,6 +119,8 @@ class ContiguousTextEditor
     const extras = {
       onInlineClick,
       context,
+      parentProps: this.props,
+      parent: this,
     };
 
     return (

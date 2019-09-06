@@ -123,6 +123,7 @@ const styleContainers = {
 
 const inlineHandlers = {
   Cite: cite,
+  Command: command,
   Link: contentBasedInline,
   Xref: contentBasedInline,
   ActivityLink: contentBasedInline,
@@ -164,6 +165,23 @@ function cite(i: Inline, container) {
   wrapper.entry !== ''
     ? terminalInline(i, container)
     : contentBasedInline(i, container);
+}
+
+function command(i: Inline, container) {
+  const item = i.data.get('value').toPersistence();
+
+  const title = { title: { '#array': [] } };
+  const arr = title.title['#array'];
+
+  i.nodes.forEach((node) => {
+    const textNode = node as Text;
+    handleText(textNode, arr);
+  });
+
+  // Replace the serialized anchor with the latest
+  // from the slate nodes
+  item.command['#array'][0] = title;
+  container.push(item);
 }
 
 function extra(i: Inline, container) {
