@@ -7,17 +7,15 @@ import './styles.scss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { accessStore } from 'utils/store';
-import * as editorUtils from './utils';
+import { InlineDisplayProps } from './common';
+import * as editorUtils from '../utils';
 import { Editor } from 'slate';
 
 const Provider = (require('react-redux') as any).Provider;
 
-interface ExtraProps {
-  entityKey: string;
-  extra: contentTypes.Extra;
+interface ExtraProps extends InlineDisplayProps {
   parentProps: any;
   parent: any;
-  editor: Editor;
 }
 
 interface ExtraState {
@@ -33,8 +31,8 @@ export class Extra extends React.PureComponent<ExtraProps, ExtraState> {
   }
 
   onEdit(e, src) {
-    const { entityKey } = this.props;
-    editorUtils.updateInlineData(this.props.editor, entityKey, e);
+    const { node, editor } = this.props;
+    editorUtils.updateInlineData(editor, node.key, e);
   }
 
   onClose() {
@@ -47,7 +45,7 @@ export class Extra extends React.PureComponent<ExtraProps, ExtraState> {
 
   render(): JSX.Element {
 
-    const extra = this.props.extra;
+    const extra = this.props.node.data.get('value');
     const editor = getEditorByContentType('Extra');
 
     const props = Object.assign({}, this.props.parentProps, {
@@ -78,6 +76,7 @@ export class Extra extends React.PureComponent<ExtraProps, ExtraState> {
         hideOnClick="false"
         html={closeable}>
         <a className="oli-extra"
+          {...this.props.attrs}
           onClick={this.onOpen.bind(this)}>
           {this.props.children}
         </a>

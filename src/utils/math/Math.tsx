@@ -7,6 +7,7 @@ export interface Math {
 }
 
 export interface MathProps {
+  attrs: any;
   inline: boolean;
   onClick: () => void;
 }
@@ -157,7 +158,8 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
   }
 
   render() {
-    return <span onClick={this.props.onClick} ref={n => this.node = n} />;
+    const { attrs, onClick } = this.props;
+    return <span {...attrs} onClick={onClick} ref={n => this.node = n} />;
   }
 }
 

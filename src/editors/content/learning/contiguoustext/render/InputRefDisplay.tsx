@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { InputRefType, InputRef } from 'data/content/learning/input_ref';
+import { InputRefType } from 'data/content/learning/input_ref';
 import './styles.scss';
 import { connect } from 'react-redux';
 import { Maybe } from 'tsmonad';
 import { setActiveItemIdActionAction } from 'actions/inputRef';
+import { InlineDisplayProps } from './common';
 
-interface InputRefProps {
+interface InputRefProps extends InlineDisplayProps {
   setActiveItemIdActionAction: (inputId: string) => void;
-  inputRef: InputRef;
-  onClick: () => void;
   activeInputId: Maybe<string>;
 }
 
@@ -24,9 +23,9 @@ class InputRefDisplay extends React.PureComponent<InputRefProps, InputRefState> 
 
   render(): JSX.Element {
 
-    const { onClick, inputRef, activeInputId,
+    const { onClick, node, activeInputId, attrs,
       setActiveItemIdActionAction } = this.props;
-    const { inputType, input } = inputRef;
+    const { inputType, input } = node.data.get('value');
 
     const handleClick = () => {
       setActiveItemIdActionAction(input);
@@ -39,15 +38,19 @@ class InputRefDisplay extends React.PureComponent<InputRefProps, InputRefState> 
     });
 
     if (inputType === InputRefType.Numeric) {
-      return <input className={active} onClick={handleClick} readOnly value="Numeric" size={15} />;
+      return <input {...attrs} className={active}
+        onClick={handleClick} readOnly value="Numeric" size={15} />;
     }
     if (inputType === InputRefType.Text) {
-      return <input className={active} onClick={handleClick} readOnly value="Text" size={15} />;
+      return <input {...attrs} className={active}
+        onClick={handleClick} readOnly value="Text" size={15} />;
     }
     if (inputType === InputRefType.FillInTheBlank) {
-      return <select className={active} onClick={handleClick} style={{ width: '100px' }} />;
+      return <select {...attrs} className={active}
+        onClick={handleClick} style={{ width: '100px' }} />;
     }
-    return <input className={active} onClick={handleClick} readOnly value="Text" size={15} />;
+    return <input {...attrs} className={active}
+      onClick={handleClick} readOnly value="Text" size={15} />;
   }
 }
 
@@ -60,9 +63,8 @@ interface DispatchProps {
   setActiveItemIdActionAction: (activeItemId: string) => void;
 }
 
-interface OwnProps {
-  inputRef: InputRef;
-  onClick: () => void;
+interface OwnProps extends InlineDisplayProps {
+
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {

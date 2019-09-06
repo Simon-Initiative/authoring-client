@@ -1,42 +1,9 @@
-// Slate.js specific rendering utilities
 import * as Immutable from 'immutable';
-import { Math as MathRenderer } from 'utils/math/Math';
-import * as ct from 'data/contentTypes';
-import './styles.scss';
 import { Editor, Inline, Text, Value, Block, Document, Mark } from 'slate';
-const IMAGE = require('../../../../../assets/400x300.png');
-import { buildUrl } from '../../../../utils/path';
 import { InlineTypes } from 'data/content/learning/contiguous';
-import { Tooltip } from 'utils/tooltip';
-import { Extra } from './Extra';
-import { InputRefDisplay } from './InputRefDisplay';
 import { Maybe } from 'tsmonad';
-const LARR_ICON = require('../../../../../assets/lArr.png');
-const LRARR_ICON = require('../../../../../assets/lrarr.png');
-const LRHAR_ICON = require('../../../../../assets/lrhar.png');
-const NOT_INDEP_ICON = require('../../../../../assets/not_indep.gif');
-const RARR_ICON = require('../../../../../assets/rArr.png');
-const RLARR_ICON = require('../../../../../assets/rlarr.png');
-const VBAR_ICON = require('../../../../../assets/Vbar.png');
 
 export type ValuePair = [Value, Value];
-
-type StyledInlineProps = {
-  children,
-  textStyle: string,
-  tooltip: string,
-};
-const TooltipInline = (props: StyledInlineProps) => {
-  const { tooltip, textStyle, children } = props;
-  return (
-    <Tooltip title={tooltip} delay={1000} size="small" arrowSize="small">
-      <a className={textStyle}>
-        {children}
-      </a>
-    </Tooltip>
-  );
-};
-
 
 function wrapInlineWithData(editor, wrapper) {
   editor.wrapInline({
@@ -367,16 +334,6 @@ export function split(editor: Editor): ValuePair {
   ];
 }
 
-function tip(tooltip: string, style: string, children: any) {
-  return (
-    <TooltipInline
-      tooltip={tooltip}
-      textStyle={style}>
-      {children}
-    </TooltipInline>
-  );
-}
-
 // Slate plugin to allow Ctrl plus a character to
 // toggle character styling
 function markHotkey(options) {
@@ -436,126 +393,5 @@ export function renderMark(props, editor, next) {
       return <mark>{props.children}</mark>;
     default:
       return next();
-  }
-}
-
-// Slate inline rendering
-export function renderInline(extras, props, editor: Editor, next) {
-  const { onInlineClick, context } = extras;
-  const { attributes, children, node, parent } = props;
-  const { data } = node;
-
-  const onClick = () => {
-    onInlineClick(node);
-  };
-
-  switch (node.type) {
-    case 'Code':
-      return <code>{props.children}</code>;
-    case 'Link': {
-      return tip('External Hyperlink', 'oli-link', children);
-    }
-    case 'Command': {
-      return tip('Command', 'oli-command', children);
-    }
-    case 'Xref': {
-      return tip('Cross reference', 'oli-link', children);
-    }
-    case 'ActivityLink': {
-      return tip('Activity link', 'oli-link', children);
-    }
-    case 'Extra': {
-      return <Extra
-        entityKey={node.key}
-        extra={node.data.get('value')}
-        editor={editor}
-        parent={parent}
-        parentProps={props} >{children}</Extra>;
-    }
-    case 'Sym': {
-
-      const sepStyle: any = {
-        fontSize: '70%',
-        color: '#c00',
-        backgroundColor: 'inherit',
-        fontWeight: 'bold',
-        verticalAlign: 'sub',
-      };
-
-      const symbols = {
-        amp: () => <span className="sym">&amp;</span>,
-        mdash: () => <span className="sym">&mdash;</span>,
-        equals: () => <span className="sym">&#61;</span>,
-        ne: () => <span className="sym">&ne;</span>,
-        lt: () => <span className="sym">&lt;</span>,
-        le: () => <span className="sym">&le;</span>,
-        gt: () => <span className="sym">&gt;</span>,
-        ge: () => <span className="sym">&ge;</span>,
-        larr: () => <span className="sym">&larr;</span>,
-        lArr: () => <span className="sym"><img src={LARR_ICON} /></span>,
-        lrarr: () => <span className="sym"><img src={LRARR_ICON} /></span>,
-        lrhar: () => <span className="sym"><img src={LRHAR_ICON} /></span>,
-        rarr: () => <span className="sym">&rarr;</span>,
-        rArr: () => <span className="sym"><img src={RARR_ICON} /></span>,
-        rlarr: () => <span className="sym"><img src={RLARR_ICON} /></span>,
-        Vbar: () => <span className="sym"><img src={VBAR_ICON} /></span>,
-        oslash: () => <span className="sym">&empty;</span>,
-        not_indep: () => <span className="sym"><img height="11" width="18"
-          src={NOT_INDEP_ICON} /></span>,
-        set_by_interv: () => <span className="sym"><span style={sepStyle}>
-          <sub>sep</sub></span></span>,
-      };
-
-      const sym = data.get('value');
-
-      return (
-        <span>
-          {symbols[sym.name]()}
-        </span>
-      );
-    }
-    case 'Image': {
-
-      const src = data.get('value').src;
-
-      let fullSrc;
-      if (src === undefined || src === null || src === '') {
-        fullSrc = IMAGE;
-      } else {
-        fullSrc = buildUrl(
-          context.baseUrl,
-          context.courseModel.guid,
-          context.resourcePath,
-          src);
-      }
-      return <img
-        onClick={onClick}
-        src={fullSrc}
-        height={data.height}
-        width={data.width} />;
-    }
-    case 'InputRef': {
-      return (
-        <InputRefDisplay
-          onClick={onClick.bind(this, node)}
-          inputRef={data.get('value')}
-        />
-      );
-    }
-    case 'Math': {
-      const math = data.get('value') as ct.Math;
-      return (
-        <MathRenderer onClick={onClick} inline >{math.data}</MathRenderer>
-      );
-    }
-    case 'Quote': {
-      return (
-        <span>&quot;{children}&quot;</span>
-      );
-    }
-
-    default: {
-      return next();
-    }
   }
 }

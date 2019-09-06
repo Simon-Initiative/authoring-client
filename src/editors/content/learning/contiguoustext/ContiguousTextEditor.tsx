@@ -11,7 +11,7 @@ import ContiguousTextToolbar
 import { styles } from 'editors/content/learning/contiguoustext/ContiguousText.styles';
 import { Editor } from 'slate-react';
 import { Value, Inline } from 'slate';
-import { renderMark, renderInline, plugins, renderBlock } from './utils';
+import { renderMark, renderInline, plugins, renderBlock } from './render/render';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
