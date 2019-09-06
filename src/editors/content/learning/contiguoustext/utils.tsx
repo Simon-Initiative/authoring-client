@@ -297,6 +297,14 @@ export function getEntityAtCursor(editor: Editor): Maybe<Inline> {
   return Maybe.nothing();
 }
 
+export function getActiveStyles(e: Maybe<Editor>): Immutable.Set<string> {
+  return e.caseOf({
+    just: (editor : Editor) => {
+      return editor.value.activeMarks.map(m => m.type).toSet();
+    },
+    nothing: () => Immutable.Set<string>(),
+  });
+}
 
 // Split the value of an active editor at its current selection
 // and create two Value objects as a result.

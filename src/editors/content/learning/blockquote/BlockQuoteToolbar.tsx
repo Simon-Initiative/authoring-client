@@ -99,6 +99,7 @@ class BlockQuoteToolbar
     const cursorInEntity = editorUtils.cursorInEntity(editor);
     const rangeEntitiesEnabled = editMode && editorUtils.bareTextSelected(editor);
     const pointEntitiesEnabled = editMode && !cursorInEntity && editorUtils.noTextSelected(editor);
+    const styles = editorUtils.getActiveStyles(editor);
 
     return (
       <ToolbarGroup
@@ -109,6 +110,7 @@ class BlockQuoteToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
             disabled={!editMode}
+            active={styles.has('em')}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
@@ -117,6 +119,7 @@ class BlockQuoteToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
             disabled={!editMode}
+            active={styles.has('italic')}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
@@ -125,6 +128,7 @@ class BlockQuoteToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
             disabled={!editMode}
+            active={styles.has('line-through')}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
@@ -133,6 +137,7 @@ class BlockQuoteToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
             disabled={!editMode}
+            active={styles.has('highlight')}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
@@ -141,6 +146,7 @@ class BlockQuoteToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
             disabled={!editMode}
+            active={styles.has('sup')}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
@@ -149,6 +155,7 @@ class BlockQuoteToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
             disabled={!editMode}
+            active={styles.has('sub')}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>
@@ -157,6 +164,7 @@ class BlockQuoteToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Var))
             }
             disabled={!editMode}
+            active={styles.has('var')}
             tooltip="Code">
             {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>

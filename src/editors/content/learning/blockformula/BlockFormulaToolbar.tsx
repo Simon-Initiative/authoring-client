@@ -93,7 +93,7 @@ class BlockFormulaToolbar
     const { editor, editMode, selection } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
     const noTextSelected = selection && selection.isCollapsed();
-
+    const styles = editorUtils.getActiveStyles(editor);
     const cursorInEntity = editor.caseOf({
       just: e => editorUtils.getEntityAtCursor(e).caseOf({
         just: i => true,
@@ -113,6 +113,7 @@ class BlockFormulaToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
             disabled={!editMode}
+            active={styles.has('em')}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
@@ -121,6 +122,7 @@ class BlockFormulaToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
             disabled={!editMode}
+            active={styles.has('italic')}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
@@ -129,6 +131,7 @@ class BlockFormulaToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
             disabled={!editMode}
+            active={styles.has('line-through')}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
@@ -137,6 +140,7 @@ class BlockFormulaToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
             disabled={!editMode}
+            active={styles.has('highlight')}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
@@ -145,6 +149,7 @@ class BlockFormulaToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
             disabled={!editMode}
+            active={styles.has('sup')}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
@@ -153,6 +158,7 @@ class BlockFormulaToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
             disabled={!editMode}
+            active={styles.has('sub')}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>

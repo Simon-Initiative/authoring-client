@@ -14,7 +14,6 @@ import {
 } from 'components/toolbar/ToolbarButtonMenu';
 import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import { getEditorByContentType } from 'editors/content/container/registry';
-import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { entryInstances } from 'editors/content/learning/bibliography/utils';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
@@ -233,6 +232,7 @@ class ContiguousTextToolbar
     const rangeEntitiesEnabled = editMode && editorUtils.bareTextSelected(editor);
     const pointEntitiesEnabled = editMode && !cursorInEntity && editorUtils.noTextSelected(editor);
     const bdoDisabled = editorUtils.bdoDisabled(editor);
+    const styles = editorUtils.getActiveStyles(editor);
 
     return (
       <ToolbarGroup
@@ -243,6 +243,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
             disabled={!supports('em') || !editMode}
+            active={styles.has('em')}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
@@ -251,6 +252,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
             disabled={!supports('em') || !editMode}
+            active={styles.has('italic')}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
@@ -259,6 +261,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
             disabled={!supports('em') || !editMode}
+            active={styles.has('line-through')}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
@@ -267,6 +270,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
             disabled={!supports('em') || !editMode}
+            active={styles.has('highlight')}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
@@ -275,6 +279,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
             disabled={!supports('sup') || !editMode}
+            active={styles.has('sup')}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
@@ -283,6 +288,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
             disabled={!supports('sub') || !editMode}
+            active={styles.has('sub')}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>
@@ -290,7 +296,8 @@ class ContiguousTextToolbar
             onClick={
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Var))
             }
-            disabled={!supports('code') || !editMode}
+            disabled={!supports('var') || !editMode}
+            active={styles.has('var')}
             tooltip="Code">
             {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>
@@ -299,6 +306,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Term))
             }
             disabled={!supports('term') || !editMode}
+            active={styles.has('term')}
             tooltip="Term">
             <i className={'fa fa-book'} />
           </ToolbarButton>
@@ -307,6 +315,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Foreign))
             }
             disabled={!supports('foreign') || !editMode}
+            active={styles.has('foreign')}
             tooltip="Foreign">
             <i className={'fa fa-globe'} />
           </ToolbarButton>
@@ -315,6 +324,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.BidirectionTextOverride))
             }
             disabled={!supports('bdo') || bdoDisabled || !editMode}
+            active={styles.has('bdo')}
             tooltip="Reverse Text Direction">
             <i className={'fa fa-angle-left'} />
           </ToolbarButton>
