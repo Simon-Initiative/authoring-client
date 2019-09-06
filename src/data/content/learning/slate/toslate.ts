@@ -8,6 +8,8 @@ import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
 const marks = Immutable.Set<string>(
   ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em']);
 
+// The only exported function and the entry point for all contiguous
+// text to slate conversion
 export function toSlate(
   toParse: Object[],
   isInlineText: boolean = false, backingTextProvider: Object = null): Value {
@@ -19,11 +21,12 @@ export function toSlate(
   };
 
   normalizeInput(toParse, isInlineText)
-    .forEach(entry => parse(entry, json, backingTextProvider));
+    .forEach(entry => handleBlock(entry, json, backingTextProvider));
 
   return Value.fromJSON(json);
 }
 
+// Normalize the input to an array of blocks
 function normalizeInput(toParse, isInlineText: boolean): Object[] {
 
   if (isInlineText) {
@@ -39,7 +42,7 @@ function normalizeInput(toParse, isInlineText: boolean): Object[] {
 
 }
 
-function parse(item: Object, json: ValueJSON, backingTextProvider: Object) {
+function handleBlock(item: Object, json: ValueJSON, backingTextProvider: Object) {
 
   const key = common.getKey(item);
 
@@ -105,7 +108,7 @@ function pureTextBlockHandler(
 }
 
 function arrayHandler(item: Object, json: ValueJSON, backingTextProvider: Object) {
-  item['#array'].forEach(item => parse(item, json, backingTextProvider));
+  item['#array'].forEach(item => handleBlock(item, json, backingTextProvider));
 }
 
 function paragraph(item: Object, json: ValueJSON, backingTextProvider: Object) {
@@ -134,6 +137,7 @@ const inlineHandlers = {
   extra,
   image: terminalInline,
   sym: terminalInline,
+  cite: contentBasedInline,
 };
 
 const blockHandlers = {

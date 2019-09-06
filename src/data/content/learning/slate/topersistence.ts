@@ -122,6 +122,7 @@ const styleContainers = {
 
 
 const inlineHandlers = {
+  Cite: cite,
   Link: contentBasedInline,
   Xref: contentBasedInline,
   ActivityLink: contentBasedInline,
@@ -158,6 +159,13 @@ function contentBasedInline(i: Inline, container) {
 
 }
 
+function cite(i: Inline, container) {
+  const wrapper = i.data.get('value');
+  wrapper.entry !== ''
+    ? terminalInline(i, container)
+    : contentBasedInline(i, container);
+}
+
 function extra(i: Inline, container) {
   const item = i.data.get('value').toPersistence();
 
@@ -173,7 +181,4 @@ function extra(i: Inline, container) {
   // from the slate nodes
   item.extra['#array'][0] = anchor;
   container.push(item);
-
 }
-
-
