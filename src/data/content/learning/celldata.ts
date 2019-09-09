@@ -39,13 +39,14 @@ export class CellData extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : CellData {
+  clone(): CellData {
     return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void) : CellData {
+  static fromPersistence(
+    root: Object, guid: string, notify: () => void, backingTextProvider: Object = null): CellData {
 
     const t = (root as any).td;
 
@@ -61,13 +62,15 @@ export class CellData extends Immutable.Record(defaultContent) {
       model = model.with({ align: t['@align'] });
     }
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(t, createGuid(), INLINE_ELEMENTS, null, notify) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(t, createGuid(), INLINE_ELEMENTS, backingTextProvider, notify),
+    });
 
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return {
       td: {
         '@colspan': this.colspan,

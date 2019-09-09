@@ -67,7 +67,8 @@ export class Ol extends Immutable.Record(defaultContent) {
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void): Ol {
+  static fromPersistence(
+    root: Object, guid: string, notify: () => void, backingTextProvider: Object = null): Ol {
 
     const t = (root as any).ol;
 
@@ -97,7 +98,9 @@ export class Ol extends Immutable.Record(defaultContent) {
           break;
         case 'li':
           model = model.with({
-            listItems: model.listItems.set(id, Li.fromPersistence(item, id, notify)) });
+            listItems: model.listItems.set(
+              id, Li.fromPersistence(item, id, notify, backingTextProvider)),
+          });
           break;
 
         default:

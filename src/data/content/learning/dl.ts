@@ -50,7 +50,8 @@ export class Dl extends Immutable.Record(defaultContent) {
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void): Dl {
+  static fromPersistence(
+    root: Object, guid: string, notify: () => void, backingTextProvider: Object = null): Dl {
 
     const t = (root as any).dl;
 
@@ -79,7 +80,10 @@ export class Dl extends Immutable.Record(defaultContent) {
           model = model.with({ title: Maybe.just(Title.fromPersistence(item, id, notify)) });
           break;
         case 'dt':
-          model = model.with({ terms: model.terms.set(id, Dt.fromPersistence(item, id, notify)) });
+          model = model.with({
+            terms: model.terms.set(
+              id, Dt.fromPersistence(item, id, notify, backingTextProvider)),
+          });
           break;
         case 'dd':
           // Attach the dd to the last dt created
@@ -87,7 +91,8 @@ export class Dl extends Immutable.Record(defaultContent) {
             const lastTerm = model.terms.last();
             model = model.with({
               terms: model.terms.set(lastTerm.guid, lastTerm.with({
-                definitions: lastTerm.definitions.set(id, Dd.fromPersistence(item, id, notify)),
+                definitions: lastTerm.definitions.set(
+                  id, Dd.fromPersistence(item, id, notify, backingTextProvider)),
               })),
             });
           }
