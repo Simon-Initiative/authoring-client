@@ -9,9 +9,10 @@ import {
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
 import { styles } from 'editors/content/learning/contiguoustext/ContiguousText.styles';
-import { Editor } from 'slate-react';
-import { Value, Inline } from 'slate';
+import { Editor, getEventTransfer } from 'slate-react';
+import { Value, Inline, Editor as EditorCore } from 'slate';
 import { renderMark, renderInline, plugins, renderBlock } from './render/render';
+import * as editorUtils from './utils';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -46,6 +47,7 @@ class ContiguousTextEditor
     super(props);
 
     this.slateOnFocus = this.slateOnFocus.bind(this);
+    this.onPaste = this.onPaste.bind(this);
 
     this.state = {
       value: this.props.model.slateValue,
@@ -106,6 +108,28 @@ class ContiguousTextEditor
     this.props.onUpdateEditor(this.editor);
   }
 
+  onPaste(event, editor: EditorCore, next): boolean {
+
+    const et = getEventTransfer(event);
+
+    if (et.type === 'fragment') {
+
+      // Marshalling of clipboard data of a slate fragment results
+      // in the wrappers that are present in the inline data map being
+      // turned into plain javascript objects. To fix this, we manually apply
+      // the paste and (depending on the wrapper type) either strip out
+      // or reapply the wrapper
+      const updated = editorUtils.reapplyWrappers((et as any).fragment);
+      editor.insertFragment(updated);
+      event.preventDefault();
+
+    } else {
+      next();
+    }
+
+    return true;
+  }
+
   renderMain(): JSX.Element {
     const { className, classes, editMode, viewOnly,
       hideBorder = false, context, onSelectInline } = this.props;
@@ -133,6 +157,7 @@ class ContiguousTextEditor
 
         <Editor
           ref={editor => this.editor = editor}
+          onPaste={this.onPaste}
           onFocus={this.slateOnFocus}
           plugins={plugins}
           value={this.state.value}

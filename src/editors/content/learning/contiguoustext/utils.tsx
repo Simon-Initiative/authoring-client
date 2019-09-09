@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import * as ct from 'data/contentTypes';
 import { Editor, Inline, Text, Value, Block, Document, Mark } from 'slate';
 import { InlineTypes } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
@@ -297,9 +298,65 @@ export function getEntityAtCursor(editor: Editor): Maybe<Inline> {
   return Maybe.nothing();
 }
 
+const wrappers = {
+  Cite: ct.Cite,
+  Command: ct.Command,
+  Link: ct.Link,
+  Xref: ct.Xref,
+  ActivityLink: ct.ActivityLink,
+  Quote: ct.Quote,
+  Code: ct.Code,
+  Math: ct.Math,
+  Extra: ct.Extra,
+  Image: ct.Image,
+  Sym: ct.Sym,  //
+  InputRef: ct.InputRef, // strip
+};
+
+const construct = Immutable.Set<string>(
+  ['Command', 'Xref', 'ActivityLink', 'Quote', 'Code', 'Math', 'Image', 'Sym']);
+
+function reapply(node) {
+
+  const rawValue = node.data.get('value');
+  const { contentType } = rawValue;
+
+  // Simple rehydration into wrapper
+  if (construct.has(contentType)) {
+    const value = new wrappers[contentType](rawValue);
+    const data = { value };
+    return node.merge({ data });
+  }
+
+  // Handle Links
+  if (contentType === 'Link') {
+    delete rawValue.content;
+    const value = new wrappers[contentType]().with(rawValue);
+    const data = { value };
+    return node.merge({ data });
+  }
+
+  // Cite, Extra, InputRef (or anthing else) just gets
+  // stripped out and replaced with a text node
+  return Text.create({ text: node.text });
+}
+
+export function reapplyWrappers(node) {
+
+  if (node.object === 'document' || node.object === 'block') {
+    return node.merge(
+      { nodes: node.nodes.map(n => reapplyWrappers(n)).toList() });
+  }
+  if (node.object === 'inline') {
+    return reapply(node);
+  }
+  return node;
+
+}
+
 export function getActiveStyles(e: Maybe<Editor>): Immutable.Set<string> {
   return e.caseOf({
-    just: (editor : Editor) => {
+    just: (editor: Editor) => {
       return editor.value.activeMarks.map(m => m.type).toSet();
     },
     nothing: () => Immutable.Set<string>(),
