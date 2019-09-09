@@ -69,14 +69,13 @@ class ContiguousTextEditor
         const updated = this.props.model.with({ slateValue: value });
         this.props.onEdit(updated, updated);
         this.props.onUpdateEditor(this.editor);
+        this.editor.focus();
 
       } else if (updateSelection) {
         this.props.onUpdateEditor(this.editor);
         this.props.onSelectInline(
           editorUtils.getEntityAtCursor(this.editor as any));
       }
-
-      this.editor.focus();
 
     });
 
