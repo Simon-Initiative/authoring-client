@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
 import { Editor, Inline, Text, Value, Block, Document, Mark, Range } from 'slate';
-import { InlineTypes } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
+import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 
 export type ValuePair = [Value, Value];
 
@@ -150,6 +150,10 @@ export function updateInlineData(editor: Editor, key: string, wrapper: InlineTyp
     nothing: () => editor,
   });
 
+}
+
+export function toggleMark(e: Editor, style: InlineStyles) {
+  e.toggleMark(style);
 }
 
 // Helper to determine if a selection is not collapsed and

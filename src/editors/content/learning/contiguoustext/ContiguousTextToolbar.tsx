@@ -225,7 +225,6 @@ class ContiguousTextToolbar
   }
 
   renderToolbar() {
-
     const { editMode, editor } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
     const cursorInEntity = editorUtils.cursorInEntity(editor);
@@ -240,7 +239,7 @@ class ContiguousTextToolbar
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Bold))
             }
             disabled={!supports('em') || !editMode}
             active={styles.has('em')}
@@ -249,7 +248,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Italic))
             }
             disabled={!supports('em') || !editMode}
             active={styles.has('italic')}
@@ -258,7 +257,8 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
+              () => this.props.editor.lift(
+                e => editorUtils.toggleMark(e, InlineStyles.Strikethrough))
             }
             disabled={!supports('em') || !editMode}
             active={styles.has('line-through')}
@@ -267,7 +267,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Highlight))
             }
             disabled={!supports('em') || !editMode}
             active={styles.has('highlight')}
@@ -276,7 +276,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Superscript))
             }
             disabled={!supports('sup') || !editMode}
             active={styles.has('sup')}
@@ -285,7 +285,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Subscript))
             }
             disabled={!supports('sub') || !editMode}
             active={styles.has('sub')}
@@ -294,7 +294,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Var))
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Var))
             }
             disabled={!supports('var') || !editMode}
             active={styles.has('var')}
@@ -303,7 +303,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Term))
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Term))
             }
             disabled={!supports('term') || !editMode}
             active={styles.has('term')}
@@ -312,7 +312,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Foreign))
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Foreign))
             }
             disabled={!supports('foreign') || !editMode}
             active={styles.has('foreign')}
@@ -321,7 +321,8 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.BidirectionTextOverride))
+              () => this.props.editor.lift(
+                e => editorUtils.toggleMark(e, InlineStyles.BidirectionTextOverride))
             }
             disabled={!supports('bdo') || bdoDisabled || !editMode}
             active={styles.has('bdo')}

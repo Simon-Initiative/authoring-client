@@ -75,7 +75,11 @@ class ContiguousTextEditor
         this.props.onSelectInline(
           editorUtils.getEntityAtCursor(this.editor as any));
       }
+
+      this.editor.focus();
+
     });
+
   }
 
   componentWillReceiveProps(nextProps: StyledContiguousTextEditorProps) {
