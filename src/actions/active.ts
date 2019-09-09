@@ -5,7 +5,6 @@ import { ParsedContent } from 'data/parsers/common/types';
 import * as contentTypes from 'data/contentTypes';
 import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
-import { InlineTypes } from 'data/content/learning/contiguous';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
 import { Editor, Inline } from 'slate';

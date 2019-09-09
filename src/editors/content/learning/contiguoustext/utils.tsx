@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
-import { Editor, Inline, Text, Value, Block, Document, Mark } from 'slate';
+import { Editor, Inline, Text, Value, Block, Document, Mark, Range } from 'slate';
 import { InlineTypes } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 
@@ -156,12 +156,15 @@ export function updateInlineData(editor: Editor, key: string, wrapper: InlineTyp
 // that only bare (i.e. non inline) text is selected
 export function bareTextSelected(editor: Maybe<Editor>): boolean {
   return editor.caseOf({
-    just: e => e.value.selection.isCollapsed
-      ? false
-      : getEntityAtCursor(e).caseOf({
-        just: en => false,
-        nothing: () => true,
-      }),
+    just: (e) => {
+
+      if (e.value.selection.isCollapsed) {
+        return false;
+      }
+      const s = e.value.selection;
+      const range = new Range({ anchor: s.anchor, focus: s.focus });
+      return e.value.document.getInlinesAtRange(range).size === 0;
+    },
     nothing: () => false,
   });
 }
