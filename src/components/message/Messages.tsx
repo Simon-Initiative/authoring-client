@@ -66,7 +66,8 @@ export class Messages
               case Scope.PackageDetails:
                 return route.type === 'RouteCourse' && route.route.type === 'RouteCourseOverview';
               case Scope.Resource:
-                return route.type === 'RouteCourse' && route.route.type === 'RouteResource';
+                return route.type === 'RouteCourse' && route.route.type === 'RouteResource'
+                  || (route.type === 'RouteCourse' && route.route.type === 'RouteObjectives');
               case Scope.CoursePackage:
                 return route.type === 'RouteCourse';
               case Scope.Application:

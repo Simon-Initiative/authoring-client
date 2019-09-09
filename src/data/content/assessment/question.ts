@@ -504,6 +504,40 @@ function ensureInputAttrsExist(question: Question): Question {
   return modifiedQuestion;
 }
 
+// There's a bug that causes responses to sometimes be saved with "match" values that should
+// correspond to an associated answer choice, but the match points to a missing choice instead.
+// This removes the responses with no matching answer choice instead of fixing the root cause.
+function removeResponsesWithNoMatch(question: Question): Question {
+  const isMultipleChoice = (item: Item): item is MultipleChoice => item instanceof MultipleChoice
+    && item.select === 'single';
+
+  // Only target "true" multiple choice questions (not CATA)
+  if (!question.items.some(isMultipleChoice)) {
+    return question;
+  }
+
+  const values: string[] = question.items.toArray().reduce((acc, item) => {
+    // These question types have "choices", which have "values"
+    // that correspond to the question.part.response.match
+    if (isMultipleChoice(item)) {
+      return acc.concat(item.choices.map(choice => choice.value).toArray());
+    }
+    return acc;
+  }, []);
+
+  // Remove response (question.part.response) if the match attribute does not
+  // match any choice values
+  return question.with({
+    parts: question.parts.map((part) => {
+      return part.with({
+        responses: part.responses
+          .filter(response => response.match === '*' || values.includes(response.match))
+          .toOrderedMap(),
+      });
+    }).toOrderedMap(),
+  });
+}
+
 function parseVariables(item: any, model: Question) {
 
   const vars = [];
@@ -717,8 +751,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       migrateSkillsToParts,
       ensureResponsesExist,
       migrateThenSyncFeedbackAndExplanation,
-      ensureInputAttrsExist)
-      (model);
+      ensureInputAttrsExist,
+      removeResponsesWithNoMatch,
+    )(model);
   }
 
   toPersistence(): Object {
