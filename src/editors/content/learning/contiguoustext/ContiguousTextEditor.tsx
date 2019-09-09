@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 import * as contentTypes from 'data/contentTypes';
 import { withStyles, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
@@ -20,7 +21,7 @@ export interface ContiguousTextEditorProps
   editorStyles?: any;
   hideBorder?: boolean;
   onUpdateEditor: (editor) => void;
-  onSelectInline: (inline: Inline) => void;
+  onSelectInline: (inline: Maybe<Inline>) => void;
   onTextSelectionChange?: (selection: any) => void;
   onInsertParsedContent: (resourcePath: string, o) => void;
   orderedIds: Immutable.Map<string, number>;
@@ -71,11 +72,19 @@ class ContiguousTextEditor
 
       } else if (updateSelection) {
         this.props.onUpdateEditor(this.editor);
+        this.props.onSelectInline(
+          editorUtils.getEntityAtCursor(this.editor as any));
       }
     });
   }
 
   componentWillReceiveProps(nextProps: StyledContiguousTextEditorProps) {
+
+    // We ignore the model being pushed down to us from parent updates,
+    // because we know we already have the most up to date Slate value in
+    // the local state.  Except for when the "forcedUpdateCount" changes,
+    // as that is a signal to us that something external has changed the
+    // content and we must pull it down into state to rerender.
     if (this.props.model.forcedUpdateCount !== nextProps.model.forcedUpdateCount) {
       this.setState({ value: nextProps.model.slateValue });
     }
@@ -137,7 +146,7 @@ class ContiguousTextEditor
     const showBorder = !viewOnly && !hideBorder;
 
     const onInlineClick = (node: Inline) => {
-      onSelectInline(node);
+      onSelectInline(Maybe.just(node));
     };
 
     const extras = {

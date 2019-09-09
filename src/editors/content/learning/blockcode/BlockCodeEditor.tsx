@@ -10,12 +10,13 @@ import { styles } from './BlockCode.styles';
 import { StyledComponentProps } from 'types/component';
 import { connectTextEditor } from 'editors/content/container/connectEditor';
 import { Inline } from 'slate';
+import { Maybe } from 'tsmonad';
 
 export interface BlockCodeEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
   onShowSidebar: () => void;
   onUpdateEditor: (editor) => void;
-  onSelectInline: (wrapper: Inline) => void;
+  onSelectInline: (wrapper: Maybe<Inline>) => void;
 }
 
 export interface BlockCodeEditorState {

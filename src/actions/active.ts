@@ -34,11 +34,11 @@ export const SELECT_INLINE: SELECT_INLINE = 'active/SELECT_INLINE';
 
 export type SelectInlineAction = {
   type: SELECT_INLINE,
-  inline: Inline,
+  inline: Maybe<Inline>,
 };
 
 export const selectInline = (
-  inline: Inline): SelectInlineAction => ({
+  inline: Maybe<Inline>): SelectInlineAction => ({
     type: SELECT_INLINE,
     inline,
   });

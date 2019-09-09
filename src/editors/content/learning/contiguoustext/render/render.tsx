@@ -1,8 +1,7 @@
 import { Editor } from 'slate';
-import { Math as MathRenderer } from 'utils/math/Math';
-import * as ct from 'data/contentTypes';
 import './styles.scss';
 import { Extra } from './Extra';
+import { MathDisplay } from './Math';
 import { InputRefDisplay } from './InputRefDisplay';
 import { tip } from './common';
 import { ImageDisplay } from './Image';
@@ -76,7 +75,6 @@ export function renderMark(props, editor, next) {
 export function renderInline(extras, props, editor: Editor, next) {
   const { onInlineClick, context, parentProps, parent } = extras;
   const { attributes, children, node } = props;
-  const { data } = node;
 
   const onClick = () => {
     onInlineClick(node);
@@ -123,10 +121,7 @@ export function renderInline(extras, props, editor: Editor, next) {
       return <InputRefDisplay {...standardProps} />;
     }
     case 'Math': {
-      const math = data.get('value') as ct.Math;
-      return (
-        <MathRenderer attrs={attributes} onClick={onClick} inline >{math.data}</MathRenderer>
-      );
+      return <MathDisplay {...standardProps} />;
     }
     case 'Quote': {
       return <span {...attributes}>&quot;{children}&quot;</span>;

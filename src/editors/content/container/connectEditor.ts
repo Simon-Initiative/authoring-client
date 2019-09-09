@@ -1,5 +1,6 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
+import { Maybe } from 'tsmonad';
 import { showSidebar } from 'actions/editorSidebar';
 import { updateEditor, selectInline } from 'actions/active';
 import { DiscoverableId } from 'types/discoverable';
@@ -39,7 +40,7 @@ export const connectTextEditor = (component) => {
       onUpdateEditor: (editor) => {
         dispatch(updateEditor(editor));
       },
-      onSelectInline: (wrapper: Inline) => {
+      onSelectInline: (wrapper: Maybe<Inline>) => {
         dispatch(selectInline(wrapper));
       },
     };

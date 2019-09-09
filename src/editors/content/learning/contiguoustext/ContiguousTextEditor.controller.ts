@@ -1,5 +1,6 @@
 import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
+import { Maybe } from 'tsmonad';
 import ContiguousTextEditor from './ContiguousTextEditor';
 import { insertParsedContent, updateEditor, selectInline } from 'actions/active';
 import { ParsedContent } from 'data/parsers/common/types';
@@ -12,7 +13,7 @@ interface StateProps {
 interface DispatchProps {
   onInsertParsedContent: (resourcePath: string, content: ParsedContent) => void;
   onUpdateEditor: (editor) => void;
-  onSelectInline: (inline: Inline) => void;
+  onSelectInline: (inline: Maybe<Inline>) => void;
 }
 
 interface OwnProps {

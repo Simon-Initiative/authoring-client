@@ -6,6 +6,7 @@ import { Maybe } from 'tsmonad';
 
 export type ValuePair = [Value, Value];
 
+// Helper routine to turn the current selection into an inline
 function wrapInlineWithData(editor, wrapper) {
   editor.wrapInline({
     type: wrapper.contentType,
@@ -15,15 +16,18 @@ function wrapInlineWithData(editor, wrapper) {
   editor.moveToEnd();
 }
 
+// Remove the inline specified by the given key
 export function removeInline(editor: Editor, key: string): Editor {
   return editor.removeNodeByKey(key);
 }
 
+// Inserting an inline adds an inline as new content
 export function insertInline(editor: Editor, wrapper: InlineTypes): Editor {
   const inline = Inline.create({ data: { value: wrapper }, type: wrapper.contentType });
   return editor.insertInline(inline);
 }
 
+// Applying an inline turns the current selection into an inline
 export function applyInline(editor: Editor, wrapper: InlineTypes): Editor {
   return editor.command(wrapInlineWithData, wrapper);
 }
@@ -62,11 +66,13 @@ export function isCursorAtBeginning(editor: Editor): boolean {
     && selection.anchor.offset === 0;
 }
 
+// Find a specific node by its key
 function findNodeByKey(editor: Editor, key: string): Maybe<Inline | Text | Block> {
   const predicate = b => b.key === key;
   return findNodeByPredicate(editor, predicate);
 }
 
+// Find an input ref inline by its input attribute
 function findInputRef(editor: Editor, input: string): Maybe<Inline | Text | Block> {
   const predicate = b => b.object === 'inline'
     && b.data.get('value').contenType === 'InputRef'
@@ -74,6 +80,7 @@ function findInputRef(editor: Editor, input: string): Maybe<Inline | Text | Bloc
   return findNodeByPredicate(editor, predicate);
 }
 
+// Flexible find a node by a supplied predicate
 function findNodeByPredicate(editor: Editor,
   predicate: (node: Block | Inline | Text) => boolean): Maybe<Inline | Text | Block> {
 
@@ -94,6 +101,7 @@ function findNodeByPredicate(editor: Editor,
   return Maybe.nothing();
 }
 
+// Find a collection of nodes based on a predicate
 function findNodesByPredicate(editor: Editor,
   predicate: (node: Block | Inline | Text) => boolean): Immutable.List<Inline | Text | Block> {
 
@@ -124,6 +132,8 @@ function findNodesByPredicate(editor: Editor,
   return Immutable.List(found);
 }
 
+// For an inline specified by a given key, update its data wrapper
+// with the supplied wrapper
 export function updateInlineData(editor: Editor, key: string, wrapper: InlineTypes): Editor {
 
   const selection = editor.value.selection;
@@ -142,6 +152,8 @@ export function updateInlineData(editor: Editor, key: string, wrapper: InlineTyp
 
 }
 
+// Helper to determine if a selection is not collapsed and
+// that only bare (i.e. non inline) text is selected
 export function bareTextSelected(editor: Maybe<Editor>): boolean {
   return editor.caseOf({
     just: e => e.value.selection.isCollapsed
@@ -154,6 +166,7 @@ export function bareTextSelected(editor: Maybe<Editor>): boolean {
   });
 }
 
+// Helper to determine if no text is selected
 export function noTextSelected(editor: Maybe<Editor>): boolean {
   return editor.caseOf({
     just: e => e.value.selection.isCollapsed,
@@ -161,6 +174,7 @@ export function noTextSelected(editor: Maybe<Editor>): boolean {
   });
 }
 
+// Is the current selection inside an inline?
 export function cursorInEntity(editor: Maybe<Editor>): boolean {
   return editor.caseOf({
     just: e => getEntityAtCursor(e).caseOf({
@@ -229,6 +243,7 @@ export function bdoDisabled(editor: Maybe<Editor>): boolean {
 
 }
 
+// Remove an inline
 export function removeInlineEntity(editor: Editor, key: string): Editor {
 
   return findNodeByKey(editor, key).caseOf({
@@ -244,6 +259,7 @@ export function removeInlineEntity(editor: Editor, key: string): Editor {
 
 }
 
+// Updates the wrappers for all input ref inlines
 export function updateAllInputRefs(
   editor: Editor, itemMap: Object): Editor {
 
@@ -262,6 +278,7 @@ export function updateAllInputRefs(
   );
 }
 
+// Remove an input ref given its input (item id) value
 export function removeInputRef(editor: Editor, itemId: string): Editor {
   return findInputRef(editor, itemId).caseOf({
     just: n => editor.removeNodeByKey(n.key),
@@ -269,6 +286,7 @@ export function removeInputRef(editor: Editor, itemId: string): Editor {
   });
 }
 
+// Access the inline present at the users current selection
 export function getEntityAtCursor(editor: Editor): Maybe<Inline> {
 
   const s = editor.value.selection;
@@ -341,6 +359,8 @@ function reapply(node) {
   return Text.create({ text: node.text });
 }
 
+// Reapplies all wrappers that have been turned into
+// plain javascript objects as the result of a paste operation
 export function reapplyWrappers(node) {
 
   if (node.object === 'document' || node.object === 'block') {
@@ -354,6 +374,7 @@ export function reapplyWrappers(node) {
 
 }
 
+// Access the set of style names active in the current selection
 export function getActiveStyles(e: Maybe<Editor>): Immutable.Set<string> {
   return e.caseOf({
     just: (editor: Editor) => {

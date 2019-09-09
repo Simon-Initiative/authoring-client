@@ -26,7 +26,7 @@ export const activeContext = (
   switch (action.type) {
     case actions.SELECT_INLINE:
       return state.with({
-        activeInline: Maybe.just(action.inline),
+        activeInline: action.inline,
       });
     case actions.UPDATE_EDITOR:
       return state.with({

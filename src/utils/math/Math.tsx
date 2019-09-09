@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { process } from './process';
+import './Math.scss';
 
 export interface Math {
   node: any;
@@ -7,6 +8,7 @@ export interface Math {
 }
 
 export interface MathProps {
+  isSelected: boolean;
   attrs: any;
   inline: boolean;
   onClick: () => void;
@@ -158,8 +160,9 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
   }
 
   render() {
-    const { attrs, onClick } = this.props;
-    return <span {...attrs} onClick={onClick} ref={n => this.node = n} />;
+    const { isSelected, onClick, attrs } = this.props;
+    const sel = isSelected ? 'selectedMath' : '';
+    return <span {...attrs} className={sel} onClick={onClick} ref={n => this.node = n} />;
   }
 }
 
