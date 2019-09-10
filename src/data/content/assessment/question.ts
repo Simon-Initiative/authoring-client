@@ -26,6 +26,7 @@ import {
 import { Custom } from 'data/content/assessment/custom';
 import { pipe } from 'utils/utils';
 import { Inline } from 'slate';
+import { map } from 'data/utils/map';
 
 export type InputRefChanges = {
   additions: Immutable.List<ct.InputRef>;
@@ -99,9 +100,20 @@ export function buildItemMap(model: Question) {
 export function detectInputRefChanges(
   current: ContentElements, previous: ContentElements): InputRefChanges {
 
+  const collect = (elements: ContentElements) => {
+    const texts = [];
+    const textCollect = (e) => {
+      if (e.contentType === 'ContiguousText') {
+        texts.push(e);
+      }
+      return e;
+    };
+    elements.content.toArray().forEach(el => map(textCollect, el));
+    return texts;
+  };
+
   const inputRefMap = (content: ContentElements): Immutable.Map<string, Inline> =>
-    content.content.toArray()
-      .filter(c => c.contentType === 'ContiguousText')
+    collect(content)
       .reduce(
         (refMap: Immutable.Map<string, Inline>, c: ContiguousText) =>
           refMap.concat(
