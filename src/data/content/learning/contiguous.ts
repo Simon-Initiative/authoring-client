@@ -208,58 +208,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return this.with({ slateValue, forcedUpdateCount });
   }
 
-  addInlineEntity(wrapper: InlineTypes, selection: Selection): ContiguousText {
-
-    const inline = Inline.create({
-      text: '',
-      type: wrapper.contentType,
-      data: { value: wrapper },
-    });
-
-    const { offset, path } = selection.anchor;
-
-    const nodes = Immutable.List(this.slateValue.document.nodes
-      .toArray()
-      .reduce(
-        (arr, n: Block, i) => {
-          if (i === path.get(0)) {
-            const text = n.text;
-
-            if (offset === 0) {
-              arr.push(n.merge({ nodes: n.nodes.insert(0, inline) }));
-              return arr;
-
-            }
-            if (offset === text.length - 1) {
-              arr.push(n.merge({ nodes: n.nodes.push(inline) }));
-              return arr;
-            }
-
-            const nodes = n.nodes.toArray();
-
-            const t = n.nodes.get(path.get(1)).text;
-            const text1 = Text.create({ text: t.substr(0, offset) });
-            const text2 = Text.create({ text: t.substr(offset) });
-
-            nodes.splice(path.get(1), 1, text1, inline, text2);
-
-            arr.push(n.merge({ nodes: Immutable.List(nodes) }));
-            return arr;
-
-          }
-          arr.push(n);
-          return arr;
-        },
-        [],
-      ));
-
-    const document = this.slateValue.document.merge({ nodes });
-    const slateValue = this.slateValue.merge({ document }) as Value;
-    const forcedUpdateCount = this.forcedUpdateCount + 1;
-
-    return this.with({ slateValue, forcedUpdateCount });
-  }
-
   extractPlainText(): Maybe<string> {
 
     if (this.slateValue.document.nodes.size > 0) {

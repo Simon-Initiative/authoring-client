@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
@@ -9,16 +8,13 @@ import { FillInTheBlank } from '../../items/FillInTheBlank';
 import { Text } from '../../items/Text';
 import { Numeric } from '../../items/Numeric';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
-import { ActiveContext } from 'types/active';
 import guid from 'utils/guid';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { InputRefType } from 'data/content/learning/input_ref';
 import { Badge } from '../../common/Badge';
-import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
 import { RouterState } from 'reducers/router';
-import { map } from 'data/utils/map';
 import { Editor } from 'slate';
 import { InlineTypes } from 'data/content/learning/contiguous';
 import * as editorUtils from 'editors/content/learning/contiguoustext/utils';
@@ -27,23 +23,16 @@ export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank'
 
 export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
-  activeContext: ActiveContext;
   canInsertAnotherPart: PartAddPredicate;
   selectedInput: Maybe<string>;
   router: RouterState;
   setActiveItemIdActionAction: (activeItemId: string) => void;
   onClearSearchParam: (name) => void;
-  onAddItemPart: (item, part, body) => void;
-  editor: Maybe<Editor>;
+  onInsertInputRef: (inputRef: contentTypes.InputRef) => void;
 }
 
 export interface MultipartInputState extends QuestionState {
 
-}
-
-
-function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
-  editor.lift(e => editorUtils.insertInline(e, wrapper));
 }
 
 /**
@@ -55,6 +44,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   }
 
   componentDidMount() {
+    super.componentDidMount();
     this.setRoutedOrFirstItemActive();
   }
 
@@ -67,121 +57,23 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     canInsertAnotherPart: PartAddPredicate,
     type: 'FillInTheBlank' | 'Numeric' | 'Text') {
 
-    let result = null;
-
     if (canInsertAnotherPart(type)) {
 
-      const { activeContext } = this.props;
+      const input = guid();
 
-      activeContext.container.lift((p) => {
-        activeContext.activeChild.lift((c) => {
-          activeContext.editor.lift((editor) => {
+      let inputType = InputRefType.Numeric;
+      if (type === 'FillInTheBlank') {
+        inputType = InputRefType.FillInTheBlank;
+      } else if (type === 'Text') {
+        inputType = InputRefType.Text;
+      }
 
-            if (c instanceof contentTypes.ContiguousText) {
-
-              const input = guid();
-
-              let inputType = InputRefType.Numeric;
-              if (type === 'FillInTheBlank') {
-                inputType = InputRefType.FillInTheBlank;
-              } else if (type === 'Text') {
-                inputType = InputRefType.Text;
-              }
-
-              const inputRef = new contentTypes.InputRef({ input, inputType });
-
-              const mapFn = (e: ContentElement) => {
-                if (e.guid === c.guid) {
-                  return (e as contentTypes.ContiguousText).addInlineEntity(
-                    inputRef, editor.value.selection);
-                }
-                return e;
-              };
-
-              result = [map(mapFn, this.props.body), input];
-
-              this.props.setActiveItemIdActionAction(input);
-
-            }
-          });
-
-        });
-      });
+      const inputRef = new contentTypes.InputRef({ input, inputType });
+      this.props.onInsertInputRef(inputRef);
     }
 
-    return result;
   }
 
-  buildPartWithInitialResponse(match: string, input): contentTypes.Part {
-
-    const correctFeedback = contentTypes.Feedback.fromText('Correct!', guid());
-    const correctResponse = new contentTypes.Response().with({
-      feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
-        .set(correctFeedback.guid, correctFeedback),
-      score: '1',
-      input,
-      match,
-    });
-
-    const otherFeedback = contentTypes.Feedback.fromText('Incorrect.', guid());
-    const otherResponse = new contentTypes.Response().with({
-      feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
-        .set(otherFeedback.guid, otherFeedback),
-      score: '0',
-      input,
-      match: '*',
-    });
-
-    return new contentTypes.Part().with({
-      responses: Immutable.OrderedMap<string, contentTypes.Response>()
-        .set(correctResponse.guid, correctResponse)
-        .set(otherResponse.guid, otherResponse),
-    });
-
-  }
-
-  onInsertNumeric(canInsertAnotherPart: PartAddPredicate) {
-    const result = this.onInsertInputRef(canInsertAnotherPart, 'Numeric');
-
-    if (Array.isArray(result) && result.length >= 2) {
-      const item = new contentTypes.Numeric().with({ id: result[1] });
-      const part = this.buildPartWithInitialResponse('0', result[1]);
-
-      this.props.onAddItemPart(item, part, result[0]);
-    }
-  }
-
-  onInsertText(canInsertAnotherPart: PartAddPredicate) {
-    const result = this.onInsertInputRef(canInsertAnotherPart, 'Text');
-
-    if (Array.isArray(result) && result.length >= 2) {
-      const item = new contentTypes.Text().with({ id: result[1] });
-      const part = this.buildPartWithInitialResponse('answer', result[1]);
-
-      this.props.onAddItemPart(item, part, result[0]);
-    }
-  }
-
-  onInsertFillInTheBlank(canInsertAnotherPart: PartAddPredicate) {
-    const result = this.onInsertInputRef(canInsertAnotherPart, 'FillInTheBlank');
-
-    if (Array.isArray(result) && result.length >= 2) {
-      const item = new contentTypes.FillInTheBlank().with({ id: result[1] });
-      const part = new contentTypes.Part();
-
-      // values are formatted like guids without dashes in the DTD
-      const value = guid().replace('-', '');
-      const choice = contentTypes.Choice.fromText('', guid()).with({ value });
-      const feedback = contentTypes.Feedback.fromText('', guid());
-      let response = new contentTypes.Response().with({ match: value, input: result[1] });
-      response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
-
-      const newItem = item.with({ choices: item.choices.set(choice.guid, choice) });
-      const newPart = part.with({ responses: part.responses.set(response.guid, response) });
-
-      this.props.onAddItemPart(newItem, newPart, result[0]);
-    }
-  }
 
   setRoutedOrFirstItemActive = () => {
     const { model, router, setActiveItemIdActionAction, onClearSearchParam } = this.props;
@@ -260,17 +152,17 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
           <span>Insert:</span>
           <button className="btn btn-sm btn-link" type="button"
             disabled={!this.props.editMode || !canInsertAnotherPart('Numeric')}
-            onClick={() => this.onInsertNumeric(canInsertAnotherPart)}>
+            onClick={this.onInsertInputRef.bind(this, canInsertAnotherPart, 'Numeric')}>
             Numeric
             </button>
           <button className="btn btn-sm btn-link" type="button"
             disabled={!this.props.editMode || !canInsertAnotherPart('Text')}
-            onClick={() => this.onInsertText(canInsertAnotherPart)}>
+            onClick={() => this.onInsertInputRef(canInsertAnotherPart, 'Text')}>
             Text
             </button>
           <button className="btn btn-sm btn-link" type="button"
             disabled={!this.props.editMode || !canInsertAnotherPart('FillInTheBlank')}
-            onClick={() => this.onInsertFillInTheBlank(canInsertAnotherPart)}>
+            onClick={() => this.onInsertInputRef(canInsertAnotherPart, 'FillInTheBlank')}>
             Dropdown
             </button>
 
