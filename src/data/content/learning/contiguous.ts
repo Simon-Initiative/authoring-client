@@ -34,11 +34,6 @@ export enum ContiguousTextMode {
   SimpleText,
 }
 
-export type InputRefChanges = {
-  additions: Immutable.List<ct.InputRef>;
-  deletions: Immutable.List<ct.InputRef>;
-};
-
 export type ContiguousTextParams = {
   slateValue?: Value,
   forcedUpdateCount?: number,
@@ -251,7 +246,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
             arr.push(n.merge({ nodes: Immutable.List(nodes) }));
             return arr;
 
-
           }
           arr.push(n);
           return arr;
@@ -264,31 +258,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     const forcedUpdateCount = this.forcedUpdateCount + 1;
 
     return this.with({ slateValue, forcedUpdateCount });
-  }
-
-  detectInputRefChanges(prev: ContiguousText): InputRefChanges {
-
-    let additions = Immutable.List<ct.InputRef>();
-    let deletions = Immutable.List<ct.InputRef>();
-
-    const prevEntities = this.keyedByInput(prev.getEntitiesByType(InlineEntities.InputRef));
-    const currentEntities = this.keyedByInput(this.getEntitiesByType(InlineEntities.InputRef));
-
-    for (const key in prevEntities) {
-      if (currentEntities[key] === undefined) {
-        deletions = deletions.push(prevEntities[key]);
-      }
-    }
-    for (const key in currentEntities) {
-      if (prevEntities[key] === undefined) {
-        additions = additions.push(currentEntities[key]);
-      }
-    }
-
-    return {
-      additions,
-      deletions,
-    };
   }
 
   extractPlainText(): Maybe<string> {

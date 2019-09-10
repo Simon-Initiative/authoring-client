@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import * as ct from 'data/contentTypes';
 import { ContentElements } from 'data/content/common/elements';
 import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from 'data/content/assessment/types';
 import { Part } from 'data/content/assessment/part';
@@ -16,7 +17,7 @@ import { Variable, Variables } from 'data/content/assessment/variable';
 import createGuid from 'utils/guid';
 import { getKey } from 'data/common';
 import { augment, getChildren, setId, ensureIdGuidPresent } from 'data/content/common';
-import { ContiguousText, InputRefChanges, InlineEntities } from 'data/content/learning/contiguous';
+import { ContiguousText, InlineEntities } from 'data/content/learning/contiguous';
 import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
 import {
@@ -25,6 +26,11 @@ import {
 import { Custom } from 'data/content/assessment/custom';
 import { pipe } from 'utils/utils';
 import { Inline } from 'slate';
+
+export type InputRefChanges = {
+  additions: Immutable.List<ct.InputRef>;
+  deletions: Immutable.List<ct.InputRef>;
+};
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
@@ -101,7 +107,7 @@ export function detectInputRefChanges(
           refMap.concat(
             c.getEntitiesByType(InlineEntities.InputRef)
               .reduce(
-                (tempMap, ref) => tempMap.set(ref.data.get('value').input, ref),
+                (tempMap, ref) => tempMap.set(ref.data.get('value').input, ref.data.get('value')),
                 Immutable.Map(),
               )).toMap(),
         Immutable.Map());
