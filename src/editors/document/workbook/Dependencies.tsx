@@ -4,28 +4,22 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-
-import './Dependencies.scss';
-import { WbDependencies } from 'data/contentTypes';
+import { WbDependencies, Resource } from 'data/contentTypes';
 import { Dependency } from 'data/content/workbook/dependency';
+import './Dependencies.scss';
 
 type PrereqTitle = { id: string, title: string };
 
 export interface Props extends AbstractContentEditorProps<WbDependencies> {
-  workbookPages: Immutable.OrderedMap<string, any>;
-  // workbook page id to ids of pages that it depends on
-  // courseDependencies: Immutable.Map<string, Immutable.List<string>>;
-  // workbook page id to ids of pages that depend on it
-  // courseDependents: Immutable.Map<string, Immutable.List<string>>;
+  workbookPages: Immutable.OrderedMap<string, Resource>;
 }
 
 export interface State {
-  selected: any;
+  selected: PrereqTitle[];
 }
 
-function toWbpArray(
-  dependencies: WbDependencies,
-  wbps: Immutable.OrderedMap<string, any>): Object[] {
+function toWbpArray(dependencies: WbDependencies, wbps: Immutable.OrderedMap<string, any>):
+  PrereqTitle[] {
 
   return dependencies.dependencies
     .toArray()
@@ -38,7 +32,6 @@ function toWbpArray(
 }
 
 export class Dependencies extends AbstractContentEditor<WbDependencies, Props, State> {
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,27 +40,20 @@ export class Dependencies extends AbstractContentEditor<WbDependencies, Props, S
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.model !== this.props.model
-      || nextProps.context.courseModel !== this.props.context.courseModel) {
+    const { model: thisModel, context: thisContext } = this.props;
+    const { model: nextModel, context: nextContext } = nextProps;
 
+    if (nextModel !== thisModel || nextContext.courseModel !== thisContext.courseModel) {
       this.setState({
-        selected: toWbpArray(nextProps.model, nextProps.workbookPages),
+        selected: toWbpArray(nextModel, nextProps.workbookPages),
       });
     }
-
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextProps.context !== this.props.context) {
-      return true;
-    }
-    if (nextState.selected !== this.state.selected) {
-      return true;
-    }
-    return false;
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    return nextProps.model !== this.props.model
+      || nextProps.context !== this.props.context
+      || nextState.selected !== this.state.selected;
   }
 
   renderSidebar() {
@@ -77,44 +63,27 @@ export class Dependencies extends AbstractContentEditor<WbDependencies, Props, S
     return null;
   }
 
-  onRenderMenuItemChildren = (pageOption: PrereqTitle, props, index) => {
-    // const { courseDependencies, courseDependents } = this.props;
-
-    // const pageDependencies = courseDependencies.get(pageOption.id, Immutable.List()).size;
-    // const pageDependents = courseDependents.get(pageOption.id, Immutable.List()).size;
-
-    // const isConnected = pageDependencies > 0 || pageDependents > 0;
-    // const color = isConnected ? '#2ecc71' : '#e74c3c';
-
-    return [
-      <strong key="name">{pageOption.title}</strong>,
-      <div key="email">
-        <small>
-          {/* Dependencies: <span>{pageDependencies}</span> */}
-          {/* {' | '}
-          Dependents: <span>{pageDependents}</span>
-          {isConnected && <span> | <span style={{ color }}>Disconnected</span></span>} */}
-        </small>
-      </div>,
-    ];
+  onRenderMenuItemChildren = (pageOption: PrereqTitle, props: any, index: number) => {
+    return [pageOption.title];
   }
 
   renderMain(): JSX.Element {
+    const isNotSelected = (selected: PrereqTitle[], r: Resource) =>
+      !selected.map(s => s.id).includes(r.id);
 
     const options = this.props.workbookPages
       .toArray()
+      .filter(resource => isNotSelected(this.state.selected, resource))
       .map(resource => ({
         id: resource.id,
         title: resource.title || 'Loading...',
-        dependencies: resource.dependencies,
+        dependencies: (resource as any).dependencies,
       }))
       .sort((a, b) => a.title.trim() < b.title.trim() ? -1 : 1);
 
     return (
       <div className="dependencies-editor">
-
         <p>Learning Dependencies</p>
-
         <Typeahead
           multiple
           disabled={!this.props.editMode}
@@ -136,7 +105,7 @@ export class Dependencies extends AbstractContentEditor<WbDependencies, Props, S
           selected={this.state.selected}
           renderMenuItemChildren={this.onRenderMenuItemChildren}
         />
-      </div >
+      </div>
     );
   }
 }

@@ -79,10 +79,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, WorkbookPageEditorState> {
 
   noObjectivesMessage: Messages.Message;
-  workbookPages: Immutable.OrderedMap<string, any>;
-  coursePrereqs: Object;
-  coursePostreqs: Object;
-  prereqRefs: Immutable.List<string>;
+  otherWorkbookPages: Immutable.OrderedMap<string, Resource>;
 
   constructor(props: WorkbookPageEditorProps) {
     super(props, { collapseInsertPopup: true });
@@ -104,37 +101,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       props.services.refreshCourse(props.context.courseModel.idvers);
     }
 
-    // this.coursePrereqs = props.course.resources.filter(r => r.type === LegacyTypes.workbook_page)
+    const isWorkbookPage = (r: Resource) => r.type === LegacyTypes.workbook_page;
+    const isNotThisWorkbookPage = (r1: Resource, r2: Resource) => r1.id !== r2.id;
 
-    // JSON.parse(localStorage.getItem(this.props.context.courseModel.id
-    //   + this.props.context.courseModel.version)) || {};
-
-    // this.coursePostreqs = this.createPostreqs(this.coursePrereqs);
-
-    // this.prereqRefs = this.coursePrereqs && this.coursePrereqs[this.props.model.resource.id]
-    //   ? Immutable.List<string>(this.coursePrereqs[this.props.model.resource.id])
-    //   : Immutable.List<string>();
-
-    this.workbookPages = this.props.course.resourcesById
-      .filter(r => r.type === LegacyTypes.workbook_page && r.id !== this.props.model.resource.id)
-      .toOrderedMap() as Immutable.OrderedMap<string, any>;
-  }
-
-  createPostreqs = (prereqs: Object) => {
-    const postreqs = {};
-    Object.keys(prereqs).forEach((child) => {
-      const parents = prereqs[child];
-      parents.forEach((parent) => {
-        if (!postreqs[parent]) {
-          postreqs[parent] = [child];
-        } else {
-          if (postreqs[parent].indexOf(child) === -1) {
-            postreqs[parent].push(child);
-          }
-        }
-      });
-    });
-    return postreqs;
+    this.otherWorkbookPages = this.props.course.resourcesById
+      .filter(r => isWorkbookPage(r) && isNotThisWorkbookPage(r, this.props.model.resource))
+      .toOrderedMap();
   }
 
   hasMissingObjective(
@@ -160,8 +132,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     this.props.setOrderedIds(toOrderedIds(this.props.model.bibliography));
   }
-
-
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
     if (this.props.context.objectives.size <= 1 &&
@@ -308,9 +278,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         hover={null}
         onUpdateHover={() => { }}
         model={dependencies}
-        workbookPages={this.workbookPages}
-        // courseDependencies={Immutable.Map()}
-        // courseDependents={Immutable.Map()}
+        workbookPages={this.otherWorkbookPages}
         onFocus={() => { }}
         onEdit={this.onDependenciesEdit} />
     );
