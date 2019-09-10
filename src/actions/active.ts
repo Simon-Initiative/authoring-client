@@ -180,12 +180,13 @@ export function remove(item: ContentElement) {
     activeContext.editor.caseOf({
       just: (e) => {
         if (item instanceof contentTypes.ContiguousText) {
-          getEntityAtCursor(e).caseOf({
+          activeContext.activeInline.caseOf({
             just: (en) => {
               removeInlineEntity(e, en.key);
             },
             nothing: () => container.onRemove(item),
           });
+
         } else {
           container.onRemove(item);
         }
