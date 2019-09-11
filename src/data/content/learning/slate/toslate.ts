@@ -9,10 +9,26 @@ const marks = Immutable.Set<string>(
   ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em']);
 
 // The only exported function and the entry point for all contiguous
-// text to slate conversion
+// text to slate conversion.
 export function toSlate(
+
+  // The objects representing the raw data that we need to parse
+  // into the corresponding slate representation
   toParse: Object[],
-  isInlineText: boolean = false, backingTextProvider: Object = null): Value {
+
+  // Indicates whether the text being parsed is 'inline' - meaning it
+  // comes from a context (like a choice in a mc question) where if
+  // there is only one block we do not want it to serialize back with
+  // an outer paragraph
+  isInlineText: boolean = false,
+
+  // An object map of input items ids to input ref wrappers. This is
+  // used only in the context of parsing assessments - where we have
+  // already parsed the items and parts portion of a question and now
+  // are parsing the body. This is used primarily to know what the type
+  // (numeric, text, fillintheblank) an input_ref element is when we
+  // encounter it in the body.
+  backingTextProvider: Object = null): Value {
 
   const json: ValueJSON = {
     document: {
@@ -26,7 +42,7 @@ export function toSlate(
   return Value.fromJSON(json);
 }
 
-// Normalize the input to an array of blocks
+// Normalize the sometimes strange format of the input to an array of blocks
 function normalizeInput(toParse, isInlineText: boolean): Object[] {
 
   if (isInlineText) {
@@ -42,14 +58,17 @@ function normalizeInput(toParse, isInlineText: boolean): Object[] {
 
 }
 
+// Handle parsing of a block based off of a registry of
+// block handlers.
 function handleBlock(item: Object, json: ValueJSON, backingTextProvider: Object) {
 
   const key = common.getKey(item);
-
   if (key === undefined) {
     return;
   }
 
+  // Based off of the key, we look up the corresponding block handler and
+  // invoke it so that it gets parsed correctly.
   blockHandlers[key](item, json, backingTextProvider);
 }
 
@@ -58,21 +77,24 @@ function isMarkOnly(item: Object): boolean {
   return item['#text'] === undefined;
 }
 
+// Extract the mark style name from a mark element. For em elements,
+// we use 'em' as the mark style for bold, all other em styles we use
+// the style name.  sub, sup and other non em styles are just there
+// element names.
 function getMark(item: Object) {
   const key = common.getKey(item);
   if (key === 'em') {
-    if (item['em']['@style'] !== undefined) {
+    if (item['em']['@style'] !== undefined && item['em']['@style'] !== 'bold') {
       return item['em']['@style'];
     }
   }
   return key;
 }
 
+// Safely access the children elements of an item.
 function getChildren(item: Object, ignore = null): Object[] {
 
   const key = common.getKey(item);
-
-  // Handle a case where there is no key
   if (key === undefined) {
     return [];
   }

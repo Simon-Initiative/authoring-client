@@ -3,7 +3,7 @@ import * as ct from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
 
-import { Value, Block, Inline, Text, Selection } from 'slate';
+import { Value, Block, Inline } from 'slate';
 import Html from 'slate-html-serializer';
 import { toSlate } from 'data/content/learning/slate/toslate';
 import { toPersistence } from 'data/content/learning/slate/topersistence';
@@ -88,9 +88,21 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   contentType: 'ContiguousText';
   elementType: '#text';
   slateValue: Value;
-  forcedUpdateCount: number;
   mode: ContiguousTextMode;
   guid: string;
+
+  // This is used to 'force' the contiguous text editor to re-render.
+  // That component, by design, ignores parent props pushed down to
+  // it, and instead maintains its 'source of truth' in local state.
+  // Almost all edits in contiguous text are triggered from that
+  // component, so they get captured in local state before they bubble up.
+  // There are some edits, like undo and redo, and citation removal, where
+  // the edits cannot bubble up and instead must be pushed down. To force
+  // the component to not ignore these pushed down models, we tick this
+  // update count.  In ContiguousTextEditor::componentWillReceiveProps we
+  // check to see if the update count has changed, if so, we update state
+  // from the new model.
+  forcedUpdateCount: number;
 
   constructor(params?: ContiguousTextParams) {
     super(augment(params));
@@ -136,6 +148,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
 
+  // Get all entities of a certain type.
   getEntitiesByType(type: InlineEntities): Inline[] {
     return this.slateValue.document.nodes
       .toArray()
@@ -165,6 +178,8 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
         {});
   }
 
+  // Update all Input Ref wrappers from the given map of
+  // item ids to input refs.
   updateInputRefs(itemMap: Object): ContiguousText {
     const nodes = this.slateValue.document.nodes.map((n) => {
       const block = n as Block;
@@ -187,6 +202,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return this.with({ slateValue });
   }
 
+  // Remove the inline specified by the given key
   removeInlineEntity(key: string): ContiguousText {
 
     let removed = false;
@@ -208,6 +224,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return this.with({ slateValue, forcedUpdateCount });
   }
 
+  // Extract the plain text of the first block of this text
   extractPlainText(): Maybe<string> {
 
     if (this.slateValue.document.nodes.size > 0) {

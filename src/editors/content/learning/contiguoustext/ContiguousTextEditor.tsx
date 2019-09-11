@@ -22,7 +22,6 @@ export interface ContiguousTextEditorProps
   hideBorder?: boolean;
   onUpdateEditor: (editor) => void;
   onSelectInline: (inline: Maybe<Inline>) => void;
-  onTextSelectionChange?: (selection: any) => void;
   onInsertParsedContent: (resourcePath: string, o) => void;
   orderedIds: Immutable.Map<string, number>;
 }
@@ -63,16 +62,26 @@ class ContiguousTextEditor
     const edited = v.document !== this.state.value.document;
     const updateSelection = v.selection !== this.state.value.selection;
 
+    // Always update local state with the new slate value
     this.setState({ value }, () => {
 
       if (edited) {
+        // But only notify our parent of an edit when something
+        // has actually changed
         const updated = this.props.model.with({ slateValue: value });
         this.props.onEdit(updated, updated);
+
+        // We must always broadcast the latest version of the editor
         this.props.onUpdateEditor(this.editor);
         this.editor.focus();
 
       } else if (updateSelection) {
+
+        // Broadcast the fact that the editor updated
         this.props.onUpdateEditor(this.editor);
+
+        // Based on the new selection, update whether or not
+        // the cursor is 'in' an inline or not
         this.props.onSelectInline(
           editorUtils.getEntityAtCursor(this.editor as any));
       }
@@ -130,7 +139,7 @@ class ContiguousTextEditor
       // in the wrappers that are present in the inline data map being
       // turned into plain javascript objects. To fix this, we manually apply
       // the paste and (depending on the wrapper type) either strip out
-      // or reapply the wrapper
+      // or reapply the wrapper.
       const updated = editorUtils.reapplyWrappers((et as any).fragment);
       editor.insertFragment(updated);
       event.preventDefault();
@@ -174,6 +183,7 @@ class ContiguousTextEditor
           plugins={plugins}
           value={this.state.value}
           onChange={this.onChange}
+          readOnly={!editMode}
           renderBlock={renderBlock}
           renderMark={renderMark}
           renderInline={renderInline.bind(this, extras)}
