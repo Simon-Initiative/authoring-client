@@ -4,6 +4,7 @@ import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
 import { InputRef, InputRefType } from 'data/content/learning/input_ref';
 import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
+import { instanceOf } from 'prop-types';
 
 // The elements that we handle as slate marks
 const marks = Immutable.Set<string>(
@@ -81,6 +82,7 @@ function normalizeInput(toParse, isInlineText: boolean): Object[] {
     }
     return [{ p: { '#array': [toParse] } }];
   }
+
   return toParse;
 
 }
@@ -90,7 +92,7 @@ function normalizeInput(toParse, isInlineText: boolean): Object[] {
 function handleBlock(item: Object, json: ValueJSON, backingTextProvider: Object) {
 
   const key = common.getKey(item);
-  if (key === undefined) {
+  if (key === undefined || blockHandlers[key] === undefined) {
     return;
   }
 
