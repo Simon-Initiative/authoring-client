@@ -153,7 +153,8 @@ export function updateInlineData(editor: Editor, key: string, wrapper: InlineTyp
 }
 
 export function toggleMark(e: Editor, style: InlineStyles) {
-  e.toggleMark(style);
+  e.toggleMark(style)
+    .focus();
 }
 
 // Helper to determine if a selection is not collapsed and
