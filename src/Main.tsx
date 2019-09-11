@@ -255,9 +255,11 @@ export default class Main extends React.Component<MainProps, MainState> {
 
 const createOrg = (courseGuid: CourseGuid, title, courseTitle: string, wbId: string) => {
   const g = guid();
-  const id = courseGuid.value() + '_' +
+  const id = (courseGuid.value() + '_' +
     title.toLowerCase().split(' ')[0] + '_'
-    + g.substring(g.lastIndexOf('-') + 1);
+    + g.substring(g.lastIndexOf('-') + 1))
+    // slice to prevent id size errors in db
+    .slice(0, 40);
 
   const prefix = courseTitle.toLowerCase().startsWith('Welcome')
     ? '' : 'Welcome to ';

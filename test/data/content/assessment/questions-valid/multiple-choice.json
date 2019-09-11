@@ -1,0 +1,93 @@
+{
+  "question": {
+    "@id": "human_inheritance_q1_dominant",
+    "#array": [
+      {
+        "body": {
+          "#text": "A genetic disorder that is sex-linked cannot also be ___________________. "
+        }
+      },
+      {
+        "multiple_choice": {
+          "#array": [
+            {
+              "choice": {
+                "#text": "dominant",
+                "@value": "A"
+              }
+            },
+            {
+              "choice": {
+                "#text": "recessive",
+                "@value": "B"
+              }
+            },
+            {
+              "choice": {
+                "#text": "autosomal",
+                "@value": "C"
+              }
+            },
+            {
+              "choice": {
+                "#text": "all of these are possible",
+                "@value": "D"
+              }
+            }
+          ],
+          "@select": "single",
+          "@shuffle": "true"
+        }
+      },
+      {
+        "part": {
+          "#array": [
+            {
+              "response": {
+                "@match": "A",
+                "@score": "0",
+                "feedback": {
+                  "#text": "Incorrect. Sex-linked refers to disorders found on the X or Y chromosomes. These disorders can be either dominant or recessive."
+                }
+              }
+            },
+            {
+              "response": {
+                "@match": "B",
+                "@score": "0",
+                "feedback": {
+                  "#text": "Incorrect. Sex-linked refers to disorders found on the X or Y chromosomes. These disorders can be either dominant or recessive."
+                }
+              }
+            },
+            {
+              "response": {
+                "@match": "C",
+                "@score": "10",
+                "feedback": {
+                  "#text": "Correct. Sex-linked refers to disorders found on the X or Y chromosomes, whereas autosomal disorders are not found on the sex chromosomes."
+                }
+              }
+            },
+            {
+              "response": {
+                "@match": "D",
+                "@score": "0",
+                "feedback": {
+                  "#text": "Incorrect. Sex-linked refers to disorders found on the X or Y chromosomes. These disorders can be either dominant or recessive. Autosomal disorders are not found on the sex chromosomes."
+                }
+              }
+            },
+            {
+              "no_response": {
+                "feedback": {
+                  "#text": "You did not respond to this question. "
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
