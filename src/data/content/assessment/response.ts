@@ -32,7 +32,7 @@ const defaultContent = {
   concepts: Immutable.List<string>(),
   input: '',
   match: '',
-  score: Maybe.just(0),
+  score: Maybe.just('0'),
   name: '',
   guid: '',
 };
