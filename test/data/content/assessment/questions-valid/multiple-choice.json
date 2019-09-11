@@ -54,7 +54,6 @@
             {
               "response": {
                 "@match": "B",
-                "@score": "0",
                 "feedback": {
                   "#text": "Incorrect. Sex-linked refers to disorders found on the X or Y chromosomes. These disorders can be either dominant or recessive."
                 }

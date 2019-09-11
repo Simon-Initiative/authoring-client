@@ -19,6 +19,7 @@ import {
 } from 'editors/content/part/defaultFeedbackGenerator';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import createGuid from 'utils/guid';
+import { Maybe } from 'tsmonad';
 
 export interface CheckAllThatApplyProps extends QuestionProps<contentTypes.MultipleChoice> {
   advancedScoringInitialized: boolean;
@@ -62,7 +63,7 @@ export const resetAllFeedback = (partModel: contentTypes.Part) => {
     .slice(0, 1);
 
   // reset score of correct response
-  updateResponses = updateResponses.map(r => r.with({ score: '1' }));
+  updateResponses = updateResponses.map(r => r.with({ score: Maybe.just('1') }));
 
   const updatedPartModel = partModel.with({
     responses: updateResponses.toOrderedMap(),
@@ -263,7 +264,12 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
               .concat([choice.value]).join(','),
           })
             // set response score to 1 if score is less than 1
-            .with({ score: +correct.score < 1 ? '1' : correct.score }),
+            .with({
+              score: correct.score.caseOf({
+                just: score => +score < 1 ? Maybe.just('1') : correct.score,
+                nothing: () => Maybe.just('1'),
+              }),
+            }),
         ),
       });
       if (invalidChoiceValue) {
@@ -320,7 +326,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       // copy the response matches from the last existing response as default
       match: partModel.responses.filter(autogenResponseFilter).last().match,
       feedback: feedbacks.set(feedback.guid, feedback),
-    })).with({ score: '0' });
+    })).with({ score: Maybe.just('0') });
 
     const updatedPartModel = partModel.with({
       responses: partModel.responses.set(response.guid, response),

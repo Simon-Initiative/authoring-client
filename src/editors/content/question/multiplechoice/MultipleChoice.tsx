@@ -13,24 +13,30 @@ import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 import './MultipleChoice.scss';
+import { Maybe } from 'tsmonad';
 
 export const isComplexScoring = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.filter(r => !r.name.match(/^AUTOGEN/)).toArray();
 
-  // scoring is complex (advanced mode) if scores exist for multiple
-  // responses OR score is not 0 or 1
+  // scoring is complex (advanced mode) if there is more than 1
+  // response, score doesn't exist (optional question), or score exists and is not 0 or 1
   let prevEncounteredScore = false;
-  const isAdvancedScoringMode = responses.reduce(
+  const isAdvancedScoringMode = responses.length > 1 || responses.reduce(
     (acc, val, i) => {
-      const score = +val.score;
-      if (prevEncounteredScore && score !== 0) {
-        return true;
-      }
-      if (score !== 0) {
-        prevEncounteredScore = true;
-      }
+      return val.score.caseOf({
+        nothing: () => true,
+        just: (stringScore) => {
+          const score = +stringScore;
+          if (prevEncounteredScore && score !== 0) {
+            return true;
+          }
+          if (score !== 0) {
+            prevEncounteredScore = true;
+          }
 
-      return acc || (score !== 0 && score !== 1);
+          return acc || (score !== 0 && score !== 1);
+        },
+      });
     },
     false,
   );
@@ -42,7 +48,7 @@ export const resetAllScores = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
 
   const updatedResponses = responses.reduce(
-    (acc, r) => acc.set(r.guid, r.with({ score: '0' })),
+    (acc, r) => acc.set(r.guid, r.with({ score: Maybe.just('0') })),
     partModel.responses,
   );
 
@@ -140,7 +146,12 @@ export class MultipleChoice
 
     updatedPartModel = updatedPartModel.with({
       responses: updatedPartModel.responses.set(
-        response.guid, response.with({ score: response.score === '0' ? '1' : '0' }),
+        response.guid, response.with({
+          score: response.score.caseOf({
+            just: score => score === '0' ? Maybe.just('1') : Maybe.just('0'),
+            nothing: () => Maybe.just('1'),
+          }),
+        }),
       ),
     });
 
@@ -189,7 +200,9 @@ export class MultipleChoice
   onScoreEdit(response: contentTypes.Response, score: string) {
     const { partModel, itemModel, onEdit } = this.props;
 
-    const updatedScore = response.with({ score });
+    const updatedScore = response.with({
+      score: score === '' ? Maybe.nothing<string>() : Maybe.just(score),
+    });
     const updatedPartModel = partModel.with(
       { responses: partModel.responses.set(updatedScore.guid, updatedScore) },
     );
@@ -285,7 +298,10 @@ export class MultipleChoice
             allowFeedback
             allowScore={advancedScoring}
             simpleSelectProps={{
-              selected: response.score !== '0',
+              selected: response.score.caseOf({
+                just: score => score !== '0',
+                nothing: () => true,
+              }),
               onToggleSimpleSelect: this.onToggleSimpleSelect,
             }}
             response={response}

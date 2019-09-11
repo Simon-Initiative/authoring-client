@@ -64,7 +64,7 @@ export function createMultipleChoiceQuestion(
     const incorrectFeedback = contentTypes.Feedback.fromText('', guid());
     let incorrectResponse = new contentTypes.Response({ match: incorrectValue });
     incorrectResponse = incorrectResponse.with({
-      feedback: incorrectResponse.feedback.set(incorrectFeedback.guid, incorrectFeedback)
+      feedback: incorrectResponse.feedback.set(incorrectFeedback.guid, incorrectFeedback),
     });
 
     part = part.with({
@@ -77,7 +77,7 @@ export function createMultipleChoiceQuestion(
       part,
       item.choices.toArray(),
       defaultBody,
-      '0',
+      Maybe.just('0'),
       onGetChoiceCombinations,
     );
   }
@@ -125,7 +125,7 @@ export function createOrdering(onGetChoicePermutations: (comboNum: number) => Pe
     part,
     item.choices.toArray(),
     defaultBody,
-    '0',
+    Maybe.just('0'),
     onGetChoicePermutations,
   );
 

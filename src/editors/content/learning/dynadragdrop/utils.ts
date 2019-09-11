@@ -4,7 +4,7 @@ import { convert } from 'utils/format';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/htmlLayout/initiator';
 import {
   Question, Part, Choice, Response,
-  FillInTheBlank
+  FillInTheBlank,
 } from 'data/contentTypes';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { Feedback } from 'data/content/assessment/feedback';

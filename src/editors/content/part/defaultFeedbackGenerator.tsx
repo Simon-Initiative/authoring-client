@@ -66,7 +66,8 @@ const getFeedbackCombinations =
  *                      be a single feedback item with match set to the match-all 'glob'
  */
 export const modelWithDefaultFeedback = (
-  model: contentTypes.Part, choices: contentTypes.Choice[], body: ContentElements, score: string,
+  model: contentTypes.Part, choices: contentTypes.Choice[],
+  body: ContentElements, score: Maybe<string>,
   onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap,
   lang: string = undefined) => {
   // remove all existing default responses
@@ -87,7 +88,7 @@ export const modelWithDefaultFeedback = (
     generatedResponses = [
       new contentTypes.Response({
         name: 'AUTOGEN_*',
-        score: score === '' ? Maybe.nothing() : Maybe.just(score),
+        score,
         match: '*',
         feedback: feedbacks.set(feedback.guid, feedback),
       }),
@@ -137,7 +138,7 @@ export const modelWithDefaultFeedback = (
 
         return new contentTypes.Response({
           name: `AUTOGEN_{${match}}`,
-          score: score === '' ? Maybe.nothing() : Maybe.just(score),
+          score,
           match,
           feedback: feedbacks.set(feedback.guid, feedback),
         });
@@ -162,8 +163,7 @@ export const getGeneratedResponseItem = (partModel): contentTypes.Response => {
 
 export const getGeneratedResponseScore = (partModel) => {
   const item = getGeneratedResponseItem(partModel);
-
-  return item ? item.score : '0';
+  return item ? item.score : Maybe.just('0');
 };
 
 export const getGeneratedResponseBody = (partModel) => {

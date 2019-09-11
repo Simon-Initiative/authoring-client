@@ -98,7 +98,7 @@ export abstract class ChoiceFeedback
     onEdit(updatedModel, src);
   }
 
-  onResponseRemove(response) {
+  onResponseRemove(response: contentTypes.Response) {
     const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
     let updatedModel = model.with({
@@ -116,14 +116,24 @@ export abstract class ChoiceFeedback
     onEdit(updatedModel);
   }
 
-  onScoreEdit(response, score) {
+  onScoreEdit(response: contentTypes.Response, score: string) {
     const { model, onEdit } = this.props;
 
     const updatedModel = model.with({
-      responses: response.match.match(/^AUTOGEN.*/) ? model.responses.map(
-        x => x.match.match(/^AUTOGEN.*/) ? x.with({ score }) : x).toOrderedMap()
-        : model.responses.set(response.guid, response.with({ score }),
-        ),
+      responses: response.match.match(/^AUTOGEN.*/)
+        ? model.responses.map(
+          x => x.match.match(/^AUTOGEN.*/)
+            ? x.with({
+              score: score === ''
+                ? Maybe.nothing<string>()
+                : Maybe.just(score),
+            })
+            : x).toOrderedMap()
+        : model.responses.set(response.guid, response.with({
+          score: score === ''
+            ? Maybe.nothing<string>()
+            : Maybe.just(score),
+        })),
     });
 
     onEdit(updatedModel);
@@ -225,7 +235,8 @@ export abstract class ChoiceFeedback
     const { invalidFeedback } = this.state;
 
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
-    const userResponses = model.responses.toArray().filter(autogenResponseFilter);
+    const userResponses: contentTypes.Response[] =
+      model.responses.toArray().filter(autogenResponseFilter);
 
     const responsesOrPlaceholder = userResponses.length === 0
       ? [this.placeholderResponse]

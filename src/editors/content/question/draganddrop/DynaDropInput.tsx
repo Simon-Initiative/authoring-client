@@ -38,7 +38,12 @@ export const convertToSimpleScoring = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
 
   const updatedResponses = responses.reduce(
-    (acc, r) => acc.set(r.guid, r.with({ score: +r.score > 0 ? '1' : '0' })),
+    (acc, r) => acc.set(r.guid, r.with({
+      score: r.score.caseOf({
+        just: score => score === '0' ? Maybe.just('1') : Maybe.just('0'),
+        nothing: () => Maybe.just('1'),
+      }),
+    })),
     partModel.responses,
   );
 

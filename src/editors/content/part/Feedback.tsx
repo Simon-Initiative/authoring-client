@@ -47,7 +47,7 @@ export abstract class Feedback
     onEdit(updatedModel, source);
   }
 
-  onResponseRemove(response) {
+  onResponseRemove(response: contentTypes.Response) {
     const { model, onEdit } = this.props;
     if (model.responses.size <= 2) {
       return;
@@ -60,13 +60,15 @@ export abstract class Feedback
     onEdit(updatedModel);
   }
 
-  onScoreEdit(response, score) {
+  onScoreEdit(response: contentTypes.Response, score: string) {
     const { model, onEdit } = this.props;
 
     onEdit(model.with({
       responses: model.responses.set(
         response.guid,
-        model.responses.get(response.guid).with({ score }),
+        model.responses.get(response.guid).with({
+          score: score === '' ? Maybe.nothing<string>() : Maybe.just(score),
+        }),
       ),
     }));
   }
@@ -212,7 +214,7 @@ export abstract class Feedback
                   type="number"
                   className="form-control input-sm form-control-sm"
                   disabled={!this.props.editMode}
-                  value={defaultResponse.score}
+                  value={defaultResponse.score.valueOr('')}
                   onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
                 />
               </div>

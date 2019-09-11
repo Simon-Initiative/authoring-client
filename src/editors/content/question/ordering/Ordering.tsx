@@ -28,24 +28,30 @@ import { ContentElements } from 'data/content/common/elements';
 import './Ordering.scss';
 import { ConditionalBranchSelect } from '../../common/BranchSelect';
 import { classNames } from 'styles/jss';
+import { Maybe } from 'tsmonad';
 
 export const isComplexFeedback = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.filter(autogenResponseFilter).toArray();
 
   // scoring is complex (advanced mode) if there is more than 1
-  // response OR score is not 0 or 1
+  // response, score doesn't exist (optional question), or score exists and is not 0 or 1
   let prevEncounteredScore = false;
   const isAdvancedScoringMode = responses.length > 1 || responses.reduce(
     (acc, val, i) => {
-      const score = +val.score;
-      if (prevEncounteredScore && score !== 0) {
-        return true;
-      }
-      if (score !== 0) {
-        prevEncounteredScore = true;
-      }
+      return val.score.caseOf({
+        nothing: () => true,
+        just: (stringScore) => {
+          const score = +stringScore;
+          if (prevEncounteredScore && score !== 0) {
+            return true;
+          }
+          if (score !== 0) {
+            prevEncounteredScore = true;
+          }
 
-      return acc || (score !== 0 && score !== 1);
+          return acc || (score !== 0 && score !== 1);
+        },
+      });
     },
     false,
   );
@@ -60,7 +66,7 @@ export const resetAllFeedback = (partModel: contentTypes.Part) => {
     .slice(0, 1);
 
   // reset score of correct response
-  updateResponses = updateResponses.map(r => r.with({ score: '1' }));
+  updateResponses = updateResponses.map(r => r.with({ score: Maybe.just('1') }));
 
   const updatedPartModel = partModel.with({
     responses: updateResponses.toOrderedMap(),
@@ -97,7 +103,7 @@ const buildResponsePlaceholder = (): contentTypes.Response => {
 
   return new contentTypes.Response({
     guid: guid(),
-    score: '1',
+    score: Maybe.just('1'),
     feedback: feedbacks.set(feedback.guid, feedback),
   });
 };
@@ -227,7 +233,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
-      score: '0',
+      score: Maybe.just('0'),
       match: itemModel.choices.map(c => c.value).join(','),
       feedback: feedbacks.set(feedback.guid, feedback),
     });
@@ -279,14 +285,16 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     this.onPartEdit(updatedModel, null);
   }
 
-  onScoreEdit = (response, score) => {
+  onScoreEdit = (response: contentTypes.Response, score: string) => {
     const { partModel } = this.props;
 
     this.onPartEdit(
       partModel.with({
         responses: partModel.responses.set(
           response.guid,
-          response.with({ score }),
+          response.with({
+            score: score === '' ? Maybe.nothing<string>() : Maybe.just(score),
+          }),
         ),
       }),
       null,
@@ -398,7 +406,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     );
   }
 
-  onDefaultFeedbackEdit = (body: ContentElements, score: string, lang: string, src) => {
+  onDefaultFeedbackEdit = (body: ContentElements, score: Maybe<string>, lang: string, src) => {
     const { partModel, itemModel, onGetChoicePermutations } = this.props;
 
     const choices = itemModel.choices.toArray();
@@ -543,7 +551,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                           type="number"
                           className="form-control input-sm form-control-sm"
                           disabled={!this.props.editMode}
-                          value={response.score}
+                          value={response.score.valueOr('')}
                           onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
                         />
                       </div>
@@ -634,9 +642,13 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                       type="number"
                       className="form-control input-sm form-control-sm"
                       disabled={!this.props.editMode}
-                      value={defaultFeedbackScore}
+                      value={defaultFeedbackScore.valueOr('')}
                       onChange={({ target: { value } }) =>
-                        this.onDefaultFeedbackEdit(feedback.body, value, feedback.lang, null)}
+                        this.onDefaultFeedbackEdit(
+                          feedback.body,
+                          value === '' ? Maybe.nothing<string>() : Maybe.just(value),
+                          feedback.lang,
+                          null)}
                     />
                   </div>
                 </ItemOption>

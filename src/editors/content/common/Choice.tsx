@@ -148,7 +148,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
             type="number"
             className="form-control"
             disabled={!editMode}
-            value={response.score}
+            value={response.score.valueOr('')}
             onChange={({ target: { value } }) => onEditScore(response, value)} />
         </div>
       );

@@ -81,7 +81,9 @@ export class Response extends Immutable.Record(defaultContent) {
       model = model.with({ match: r['@match'] });
     }
     if (r['@score'] !== undefined) {
-      model = model.with({ score: r['@score'] });
+      model = model.with({
+        score: r['@score'] === '' ? Maybe.nothing<string>() : Maybe.just(r['@score']),
+      });
     } else {
       model = model.with({ score: Maybe.nothing() });
     }

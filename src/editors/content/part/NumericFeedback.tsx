@@ -62,13 +62,15 @@ export abstract class NumericFeedback
     onEdit(updatedModel);
   }
 
-  onScoreEdit(response, score) {
+  onScoreEdit(response: contentTypes.Response, score: string) {
     const { model, onEdit } = this.props;
 
     onEdit(model.with({
       responses: model.responses.set(
         response.guid,
-        model.responses.get(response.guid).with({ score }),
+        model.responses.get(response.guid).with({
+          score: score === '' ? Maybe.nothing<string>() : Maybe.just(score),
+        }),
       ),
     }));
   }
