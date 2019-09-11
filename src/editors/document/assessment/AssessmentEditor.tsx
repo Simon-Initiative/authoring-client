@@ -35,7 +35,6 @@ import { RouterState } from 'reducers/router';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import { CourseState } from 'reducers/course';
-import { AssessmentModel } from 'data/models/assessment';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: CourseIdVers) => void;
