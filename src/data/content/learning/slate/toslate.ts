@@ -5,10 +5,12 @@ import guid from 'utils/guid';
 import { InputRef, InputRefType } from 'data/content/learning/input_ref';
 import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
 
-
+// The elements that we handle as slate marks
 const marks = Immutable.Set<string>(
   ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em']);
 
+// The elements that are handled as slate inlines, and their corresponding
+// handlers.
 const inlineHandlers = {
   command: subElementInline.bind(undefined, 'command', 'title'),
   link: contentBasedInline,

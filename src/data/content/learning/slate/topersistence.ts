@@ -1,5 +1,6 @@
 
 import { Value, Block, Inline, Text } from 'slate';
+import guid from 'utils/guid';
 
 import * as common from '../common';
 
@@ -7,17 +8,18 @@ import * as common from '../common';
 export function toPersistence(value: Value, inlineText = false): Object {
 
   const root = { body: { '#array': [] } };
+  const seenIds = {};
 
   root.body['#array'] = value.document.nodes
     .toArray()
-    .map(node => translateNode(node as Block));
+    .map(node => translateNode(node as Block, seenIds));
 
   return inlineText
     ? adjustInline(root)
     : root.body['#array'];
 }
 
-function translateNode(node: Block) {
+function translateNode(node: Block, seenIds: Object) {
   const content = [];
 
   node.nodes.forEach((n) => {
@@ -27,7 +29,23 @@ function translateNode(node: Block) {
       handleInline(n, content);
     }
   });
-  return { p: { '#array': content } };
+
+  const originalId = node.data.get('id') === undefined
+    ? guid()
+    : node.data.get('id');
+  const id = dedupe(seenIds, originalId);
+
+  return { p: { '#array': content, '@id': id } };
+}
+
+function dedupe(seenIds: Object, id: string): string {
+  if (seenIds[id] !== undefined) {
+    const newId = guid();
+    seenIds[newId] = true;
+    return newId;
+  }
+  seenIds[id] = true;
+  return id;
 }
 
 function handleText(node: Text, content) {
