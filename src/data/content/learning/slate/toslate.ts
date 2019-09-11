@@ -83,6 +83,16 @@ function normalizeInput(toParse, isInlineText: boolean): Object[] {
     return [{ p: { '#array': [toParse] } }];
   }
 
+  // Normalize the case where a single entry exists - and that entry is a
+  // mark or inline.  This can happen with choice bodies, where we strip
+  // out the outer paragraph on one paragraph long choice bodies.
+  if (toParse instanceof Array && toParse.length === 1) {
+    const key = common.getKey(toParse[0]);
+    if (marks.contains(key) || inlineHandlers[key] !== undefined) {
+      return [{ p: { '#array': toParse } }];
+    }
+  }
+
   return toParse;
 
 }
