@@ -569,8 +569,6 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
 
     const page = this.getCurrentPage(this.props);
 
-    console.log('current node', currentNode)
-
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
@@ -631,11 +629,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
             services={services}
             editMode={editMode}
             model={model}
-            onEditModel={(model: AssessmentModel) => {
-              console.log('editing model', model.branching);
-              console.log('model.pages', model.pages)
-              onEdit(model);
-            }} />
+            onEditModel={onEdit} />
         </div>
       </div>);
   }
