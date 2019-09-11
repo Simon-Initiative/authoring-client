@@ -65,6 +65,7 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
     return (
       nextState.isMathJaxReady !== this.state.isMathJaxReady
       || nextProps.children !== this.props.children
+      || nextProps.isSelected !== this.props.isSelected
       || nextProps.inline !== this.props.inline
       || nextContext.MathJax !== this.context.MathJax
     );
@@ -161,8 +162,8 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
 
   render() {
     const { isSelected, onClick, attrs } = this.props;
-    const sel = isSelected ? 'selectedMath' : '';
-    return <span {...attrs} className={sel} onClick={onClick} ref={n => this.node = n} />;
+    const classes = 'mathRenderer ' + (isSelected ? 'selectedMath' : '');
+    return <span {...attrs} className={classes} onClick={onClick} ref={n => this.node = n} />;
   }
 }
 

@@ -47,8 +47,14 @@ interface OwnProps extends InlineDisplayProps {
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
+
+  const isSelected = state.activeContext.activeInline.caseOf({
+    just: i => i.key === ownProps.node.key,
+    nothing: () => false,
+  });
+
   return {
-    isSelected: state.activeContext.activeInline.key === ownProps.node.key,
+    isSelected,
   };
 };
 
