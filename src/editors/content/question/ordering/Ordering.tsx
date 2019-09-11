@@ -31,7 +31,7 @@ import { classNames } from 'styles/jss';
 import { Maybe } from 'tsmonad';
 
 export const isComplexFeedback = (partModel: contentTypes.Part) => {
-  const responses = partModel.responses.filter(autogenResponseFilter).toArray();
+  const responses = partModel.responses.toArray();
 
   // scoring is complex (advanced mode) if there is more than 1
   // response, score doesn't exist (optional question), or score exists and is not 0 or 1
