@@ -136,12 +136,9 @@ class ContiguousTextEditor
 
     if (et.type === 'fragment') {
 
-      // Marshalling of clipboard data of a slate fragment results
-      // in the wrappers that are present in the inline data map being
-      // turned into plain javascript objects. To fix this, we manually apply
-      // the paste and (depending on the wrapper type) either strip out
-      // or reapply the wrapper.
-      const updated = editorUtils.reapplyWrappers((et as any).fragment);
+      // We have to pre-process slate fragments before pasting them to
+      // correct for a few things
+      const updated = editorUtils.adjustForPasting((et as any).fragment);
       editor.insertFragment(updated);
       event.preventDefault();
 

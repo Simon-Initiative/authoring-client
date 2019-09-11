@@ -3,6 +3,7 @@ import * as ct from 'data/contentTypes';
 import { Editor, Inline, Text, Value, Block, Document, Mark, Range } from 'slate';
 import { Maybe } from 'tsmonad';
 import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
+import guid from 'utils/guid';
 
 export type ValuePair = [Value, Value];
 
@@ -367,13 +368,21 @@ function reapply(node) {
   return Text.create({ text: node.text });
 }
 
-// Reapplies all wrappers that have been turned into
-// plain javascript objects as the result of a paste operation
-export function reapplyWrappers(node) {
+// Pre-processes slate fragments prior to allowing them to be pated.
+// 1. Reapplies all wrappers that have been turned into
+// plain javascript objects as the result of a paste operation.
+// 2. Changes the ids for all paragraphs
+export function adjustForPasting(node) {
 
-  if (node.object === 'document' || node.object === 'block') {
+  if (node.object === 'document') {
     return node.merge(
-      { nodes: node.nodes.map(n => reapplyWrappers(n)).toList() });
+      { nodes: node.nodes.map(n => adjustForPasting(n)).toList() });
+  }
+  if (node.object === 'block') {
+    return node.merge({
+      nodes: node.nodes.map(n => adjustForPasting(n)).toList(),
+      data: { id: guid() },
+    });
   }
   if (node.object === 'inline') {
     return reapply(node);
@@ -414,7 +423,11 @@ export function split(editor: Editor): ValuePair {
   const document = updated.value.document;
   const value = updated.value;
   const nodes1 = updated.value.document.nodes.toArray().slice(0, anchorPosition + 1);
+
   const nodes2 = updated.value.document.nodes.toArray().slice(anchorPosition + 1);
+
+  // Give the new split block a different id
+  nodes2[0] = nodes2[0].merge({ data: { id: guid() } }) as Block;
 
   return [
     value.merge({
