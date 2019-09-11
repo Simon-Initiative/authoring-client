@@ -35,6 +35,7 @@ import { RouterState } from 'reducers/router';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import { CourseState } from 'reducers/course';
+import { AssessmentModel } from 'data/models/assessment';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: CourseIdVers) => void;
@@ -86,6 +87,8 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     nextProps: AssessmentEditorProps,
     nextState: AssessmentEditorState): boolean {
 
+
+
     const shouldUpdate = this.props.model !== nextProps.model
       || this.props.activeContext !== nextProps.activeContext
       || this.props.expanded !== nextProps.expanded
@@ -97,7 +100,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
       || this.state.undoStackSize !== nextState.undoStackSize
       || this.state.redoStackSize !== nextState.redoStackSize
       || this.state.collapseInsertPopup !== nextState.collapseInsertPopup;
-
+    console.log('should update', shouldUpdate)
     return shouldUpdate;
   }
 
@@ -566,6 +569,8 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
 
     const page = this.getCurrentPage(this.props);
 
+    console.log('current node', currentNode)
+
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
@@ -626,7 +631,11 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
             services={services}
             editMode={editMode}
             model={model}
-            onEditModel={onEdit} />
+            onEditModel={(model: AssessmentModel) => {
+              console.log('editing model', model.branching);
+              console.log('model.pages', model.pages)
+              onEdit(model);
+            }} />
         </div>
       </div>);
   }
