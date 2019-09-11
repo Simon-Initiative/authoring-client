@@ -5,8 +5,33 @@ import guid from 'utils/guid';
 import { InputRef, InputRefType } from 'data/content/learning/input_ref';
 import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
 
+
 const marks = Immutable.Set<string>(
   ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em']);
+
+const inlineHandlers = {
+  command: subElementInline.bind(undefined, 'command', 'title'),
+  link: contentBasedInline,
+  xref: contentBasedInline,
+  activity_link: contentBasedInline,
+  input_ref: inputRef,
+  quote: contentBasedInline,
+  code: contentBasedInline,
+  formula: stripOutInline,
+  'm:math': terminalInline,
+  '#math': terminalInline,
+  extra: subElementInline.bind(undefined, 'extra', 'anchor'),
+  image: terminalInline,
+  sym: terminalInline,
+  cite: contentBasedInline,
+};
+
+const blockHandlers = {
+  p: paragraph,
+  '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
+  '#cdata': pureTextBlockHandler.bind(undefined, common.CDATA),
+  '#array': arrayHandler,
+};
 
 // The only exported function and the entry point for all contiguous
 // text to slate conversion.
@@ -72,8 +97,10 @@ function handleBlock(item: Object, json: ValueJSON, backingTextProvider: Object)
   blockHandlers[key](item, json, backingTextProvider);
 }
 
-
-function isMarkOnly(item: Object): boolean {
+// Given a style mark object, determine if it is the parent of
+// another, nested mark.  A regular mark would have a #text attr,
+// so we simply check for that to be undefined.
+function isNestedMark(item: Object): boolean {
   return item['#text'] === undefined;
 }
 
@@ -146,38 +173,21 @@ function paragraph(item: Object, json: ValueJSON, backingTextProvider: Object) {
   getChildren(item).forEach(subItem => handleChild(subItem, p, backingTextProvider));
 }
 
-const inlineHandlers = {
-  command,
-  link: contentBasedInline,
-  xref: contentBasedInline,
-  activity_link: contentBasedInline,
-  input_ref: inputRef,
-  quote: contentBasedInline,
-  code: contentBasedInline,
-  formula: stripOutInline,
-  'm:math': terminalInline,
-  '#math': terminalInline,
-  extra,
-  image: terminalInline,
-  sym: terminalInline,
-  cite: contentBasedInline,
-};
-
-const blockHandlers = {
-  p: paragraph,
-  '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
-  '#cdata': pureTextBlockHandler.bind(undefined, common.CDATA),
-  '#array': arrayHandler,
-};
-
+// This inline handler bypasses the inline and simply adds the content
+// that it contains.  When this document is saved, the inline is effectively stripped out.
 function stripOutInline(item: Object, parent: BlockJSON, backingTextProvider) {
   const children = getChildren(item);
   children.forEach(subItem => handleChild(subItem, parent, backingTextProvider));
 }
 
+// A terminal inline is one that has no nested content that is displayed in the
+// slate editor.  We handle it strictly by parsing any content that we do find
+// into the corresponding content type wrapper.
 function terminalInline(item: Object, parent: BlockJSON, backingTextProvider): InlineJSON {
 
   const key = common.getKey(item);
+
+  // This is the call to 'fromPersistence' on the data wrapper
   const data = { value: registeredTypes[key](item) };
   const type = data.value.contentType;
 
@@ -192,22 +202,21 @@ function terminalInline(item: Object, parent: BlockJSON, backingTextProvider): I
   return inline;
 }
 
-function extra(item: Object, parent: BlockJSON, backingTextProvider) {
+// Sub element inline elements are unique in that they have content that is displayed
+// and edited within the slate editor - but that content is serialized to and
+// from a specific sub element of the parent, as opposed to directly in the '#array' array.
+function subElementInline(
+  key: string, subElementKey: string, item: Object, parent: BlockJSON, backingTextProvider) {
 
   const inline = terminalInline(item, parent, backingTextProvider);
-  const anchor = item['extra']['#array'].filter(k => common.getKey(k) === 'anchor')[0];
-  const children = getChildren(anchor);
-  children.forEach(subItem => handleInlineChild(subItem, inline, backingTextProvider));
+  const subElement = item[key]['#array'].filter(k => common.getKey(k) === subElementKey)[0];
+  const children = getChildren(subElement);
+  children.forEach(subItem => handleChild(subItem, inline, backingTextProvider));
 }
 
-function command(item: Object, parent: BlockJSON, backingTextProvider) {
-
-  const inline = terminalInline(item, parent, backingTextProvider);
-  const anchor = item['command']['#array'].filter(k => common.getKey(k) === 'title')[0];
-  const children = getChildren(anchor);
-  children.forEach(subItem => handleInlineChild(subItem, inline, backingTextProvider));
-}
-
+// Input refs must be handled specially - since we need to set the
+// type of the input ref based on the contentType of the input from
+// the backingTextProvider
 function inputRef(item: Object, parent: BlockJSON, backingTextProvider): InlineJSON {
 
   const value = (InputRef.fromPersistence as any)(item);
@@ -239,28 +248,25 @@ function contentBasedInline(item: Object, parent: BlockJSON, backingTextProvider
   const inline = terminalInline(item, parent, backingTextProvider);
 
   const children = getChildren(item);
-  children.forEach(subItem => handleInlineChild(subItem, inline, backingTextProvider));
+  children.forEach(subItem => handleChild(subItem, inline, backingTextProvider));
 }
 
-function handleChild(item: Object, parent: BlockJSON, backingTextProvider) {
+function handleChild(item: Object, parent: BlockJSON | InlineJSON, backingTextProvider) {
+
   const key = common.getKey(item);
+
+  // The key determines the type of the child element that we have encountered.
+  // It can be one of three types:
+
+  // 1. An inline element such as link or input_ref
   if (inlineHandlers[key] !== undefined) {
     inlineHandlers[key](item, parent, backingTextProvider);
+
+    // 2. A style mark, such as em or sup
   } else if (marks.contains(key)) {
     processMark(item, parent, Immutable.List<string>());
-  } else if (key === '#text' || key === '#cdata') {
-    parent.nodes.push({
-      object: 'text',
-      text: item[key],
-      marks: [],
-    });
-  }
-}
 
-function handleInlineChild(item: Object, parent: InlineJSON, backingTextProvider) {
-  const key = common.getKey(item);
-  if (marks.contains(key)) {
-    processMark(item, parent, Immutable.List<string>());
+    // 3. Unmarked text
   } else if (key === '#text' || key === '#cdata') {
     parent.nodes.push({
       object: 'text',
@@ -273,11 +279,22 @@ function handleInlineChild(item: Object, parent: InlineJSON, backingTextProvider
 function processMark(item: Object,
   parent: BlockJSON | InlineJSON, previousMarks: Immutable.List<string>) {
 
-  if (isMarkOnly(item)) {
+  // If this mark is the parent of another mark, add this style and
+  // process recursively. This allows us to handle situations like this:
+  // {
+  //   em: {
+  //     sub: {
+  //       "#text": "This is both bold and subscript"
+  //     }
+  //   }
+  // }
+  //
+  if (isNestedMark(item)) {
     processMark(getChildren(item)[0], parent, previousMarks.push(getMark(item)));
     return;
   }
 
+  // Create the mark array for all styles that we need to apply
   const marks = previousMarks.toArray().map(type => ({
     object: 'mark',
     type,
