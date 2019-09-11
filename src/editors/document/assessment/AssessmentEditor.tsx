@@ -87,8 +87,6 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     nextProps: AssessmentEditorProps,
     nextState: AssessmentEditorState): boolean {
 
-
-
     const shouldUpdate = this.props.model !== nextProps.model
       || this.props.activeContext !== nextProps.activeContext
       || this.props.expanded !== nextProps.expanded
@@ -100,7 +98,7 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
       || this.state.undoStackSize !== nextState.undoStackSize
       || this.state.redoStackSize !== nextState.redoStackSize
       || this.state.collapseInsertPopup !== nextState.collapseInsertPopup;
-    console.log('should update', shouldUpdate)
+
     return shouldUpdate;
   }
 
