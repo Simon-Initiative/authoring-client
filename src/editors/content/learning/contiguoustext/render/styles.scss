@@ -1,5 +1,8 @@
 @import 'oli/colors';
 
+
+
+
 .tooltip-editor {
   height: 250px;
   width: 350px;
@@ -23,10 +26,25 @@
   font-weight: bold;
 }
 
+.oli-cite-entry-active {
+  background-color:  #b9d2f7e5;
+  vertical-align: super;
+  font-size: 10pt;
+  font-weight: bold;
+  margin-left: 3px;
+  margin-right: 3px;
+  padding-right: 7px;
+  color: blue;
+}
+
 .oli-cite-entry {
   vertical-align: super;
   font-size: 10pt;
+  font-weight: bold;
   color: blue;
+  margin-left: 3px;
+  margin-right: 3px;
+  padding-right: 7px;
 }
 
 .oli-cite {

@@ -8,6 +8,7 @@ import './styles.scss';
 
 interface CiteProps extends InlineDisplayProps {
   orderedIds: Immutable.Map<string, number>;
+  isSelected: boolean;
 }
 
 interface CiteState {
@@ -22,12 +23,19 @@ class CiteDisplay extends React.PureComponent<CiteProps, CiteState> {
 
   render(): JSX.Element {
 
-    const { children, orderedIds, attrs } = this.props;
+    const { children, orderedIds, attrs, onClick, isSelected } = this.props;
 
     const data = this.props.node.data.get('value') as CiteData;
     const entry = data.entry;
 
-    let toDisplay = <span {...attrs} className="oli-cite">{children}</span>;
+    let toDisplay = (
+      <span
+        {...attrs}
+        onClick={onClick}
+        className="oli-cite">
+        {children}
+      </span>
+    );
 
     if (entry !== '') {
 
@@ -37,7 +45,19 @@ class CiteDisplay extends React.PureComponent<CiteProps, CiteState> {
       if ((position + '').length === 1) {
         position = ' ' + position;
       }
-      toDisplay = <span {...attrs} className="oli-cite-entry">{position}</span>;
+
+      const cls = isSelected
+        ? 'oli-cite-entry-active'
+        : 'oli-cite-entry';
+
+      toDisplay = (
+        <span
+          {...attrs}
+          onClick={onClick}
+          className={cls}>
+          {position}
+        </span>
+      );
     }
 
     return toDisplay;
@@ -47,6 +67,7 @@ class CiteDisplay extends React.PureComponent<CiteProps, CiteState> {
 
 interface StateProps {
   orderedIds: Immutable.Map<string, number>;
+  isSelected: boolean;
 }
 
 interface DispatchProps {
@@ -58,8 +79,14 @@ interface OwnProps extends InlineDisplayProps {
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
+
+  const isSelected = state.activeContext.activeInline.caseOf({
+    just: i => i.key === ownProps.node.key,
+    nothing: () => false,
+  });
   return {
     orderedIds: state.orderedIds,
+    isSelected,
   };
 };
 
