@@ -4,24 +4,34 @@ import guid from 'utils/guid';
 
 import * as common from '../common';
 
-// Translation routine from slate to OLI JSON
+// Translation routine from slate to OLI JSON. The basic approach is
+// to iterate through the top-level Slate blocks, and for each block
+// iterate through the child nodes.  We currently are using Slate in
+// a way where we have only these two levels, so the parsing is rather
+// straightforward.  Blocks get turned into paragraphs, and child elements
+// get translated to #text elements, style elements and things like
+// links, input refs, etc.
 export function toPersistence(value: Value, inlineText = false): Object {
 
   const root = { body: { '#array': [] } };
   const seenIds = {};
 
+  // Loop through the top-level blocks
   root.body['#array'] = value.document.nodes
     .toArray()
     .map(node => translateNode(node as Block, seenIds));
 
+  // If inlineText is set - we strip off the outer paragraph
   return inlineText
-    ? adjustInline(root)
+    ? adjustInlineText(root)
     : root.body['#array'];
 }
 
+// Top-level block handler.
 function translateNode(node: Block, seenIds: Object) {
   const content = [];
 
+  // Process each child node
   node.nodes.forEach((n) => {
     if (n.object === 'text' && n.text.length > 0) {
       handleText(n, content);
@@ -30,11 +40,14 @@ function translateNode(node: Block, seenIds: Object) {
     }
   });
 
+  // An extra step for safety - we dedupe any ids that
+  // we have already seen
   const originalId = node.data.get('id') === undefined
     ? guid()
     : node.data.get('id');
   const id = dedupe(seenIds, originalId);
 
+  // Return it as a paragraph
   return { p: { '#array': content, '@id': id } };
 }
 
@@ -58,10 +71,15 @@ function handleText(node: Text, content) {
   }
 }
 
+// Handler for a text node that contains one or more marks
 function handleMarkedText(node: Text, content) {
+
+  // We only care about the string type of the mark, so
+  // map the mark object array to just an array of strings
   const marks = node.marks.toArray().map(m => m.type);
 
-  // if bdo is present, it must be first
+  // if bdo is present, it must be the first element that
+  // we place in the OLI JSON.  This is a DTD constraint.
   const adjusted = marks.includes('bdo')
     ? ['bdo', ...marks.filter(m => m !== 'bdo')]
     : marks;
@@ -100,8 +118,9 @@ function handleInline(node: Inline, content) {
   }
 }
 
-// Remove the outer paragraph from inline text
-function adjustInline(root) {
+// Remove the outer paragraph when we are operating
+// in inline text mode
+function adjustInlineText(root) {
   const arr = root.body['#array'];
   const p = arr.find(e => common.getKey(e) === 'p');
 
@@ -138,17 +157,17 @@ const styleContainers = {
   sup: () => ({ sup: {} }),
 };
 
-
+// The handlers for the items that we represent as slate inlines.
 const inlineHandlers = {
   Cite: cite,
-  Command: command,
+  Command: subElementInlineHandler.bind(undefined, 'command', 'title'),
   Link: contentBasedInline,
   Xref: contentBasedInline,
   ActivityLink: contentBasedInline,
   Quote: contentBasedInline,
   Code: contentBasedInline,
   Math: terminalInline,
-  Extra: extra,
+  Extra: subElementInlineHandler.bind(undefined, 'extra', 'anchor'),
   Image: terminalInline,
   Sym: terminalInline,
   InputRef: terminalInline,
@@ -185,36 +204,22 @@ function cite(i: Inline, container) {
     : contentBasedInline(i, container);
 }
 
-function command(i: Inline, container) {
+// An inline handler that serializes from the content wrapper
+// but that serializes the #array content from a sub element
+function subElementInlineHandler(elementKey: string, subElementKey: string, i: Inline, container) {
   const item = i.data.get('value').toPersistence();
 
-  const title = { title: { '#array': [] } };
-  const arr = title.title['#array'];
+  const sub = { [subElementKey]: { '#array': [] } };
+  const arr = sub[subElementKey]['#array'];
 
   i.nodes.forEach((node) => {
     const textNode = node as Text;
     handleText(textNode, arr);
   });
 
-  // Replace the serialized anchor with the latest
+  // Replace the serialized sub element with the latest
   // from the slate nodes
-  item.command['#array'][0] = title;
+  item[elementKey]['#array'][0] = sub;
   container.push(item);
 }
 
-function extra(i: Inline, container) {
-  const item = i.data.get('value').toPersistence();
-
-  const anchor = { anchor: { '#array': [] } };
-  const arr = anchor.anchor['#array'];
-
-  i.nodes.forEach((node) => {
-    const textNode = node as Text;
-    handleText(textNode, arr);
-  });
-
-  // Replace the serialized anchor with the latest
-  // from the slate nodes
-  item.extra['#array'][0] = anchor;
-  container.push(item);
-}

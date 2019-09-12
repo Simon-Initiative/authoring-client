@@ -290,6 +290,7 @@ function handleChild(item: Object, parent: BlockJSON | InlineJSON, backingTextPr
   }
 }
 
+// Handle an OLI style element that we will render as a Slate mark.
 function processMark(item: Object,
   parent: BlockJSON | InlineJSON, previousMarks: Immutable.List<string>) {
 
