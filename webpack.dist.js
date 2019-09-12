@@ -11,6 +11,10 @@ module.exports = {
     entry: {
         app: ['whatwg-fetch', './src/app.tsx'],
         vendor: [
+            'slate',
+            'slate-react',
+            'slate-html-serializer',
+            'slate-plain-serializer',
             'history',
             'immutable',
             'json-beautify',
