@@ -257,9 +257,14 @@ class ContextAwareSidebar
   }
 
   onToggleBranching() {
-    const { model, onEditModel, onDisplayModal, onDismissModal } = this.props;
+    const { model, onEditModel, onDisplayModal, onDismissModal, onSetCurrentNodeOrPage,
+      resource } = this.props;
 
-    const toggleBranching = (model: AssessmentModel) => onEditModel(model);
+    const toggleBranching = (model: AssessmentModel) => {
+      onEditModel(model);
+      const firstPage = model.pages.first() && model.pages.first().guid;
+      onSetCurrentNodeOrPage(resource.id, firstPage);
+    };
 
     const assessmentModel = model as AssessmentModel;
     const newModel = assessmentModel.with({

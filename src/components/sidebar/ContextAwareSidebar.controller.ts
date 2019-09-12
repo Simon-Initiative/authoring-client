@@ -12,7 +12,7 @@ import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentElement } from 'data/content/common/interfaces';
-import { ContentModel, CourseModel, Node, ModelTypes, OrganizationModel } from 'data/models';
+import { ContentModel, Node, OrganizationModel } from 'data/models';
 import { modalActions } from 'actions/modal';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
