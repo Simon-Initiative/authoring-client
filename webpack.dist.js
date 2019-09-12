@@ -11,7 +11,6 @@ module.exports = {
     entry: {
         app: ['whatwg-fetch', './src/app.tsx'],
         vendor: [
-            'draft-js',
             'history',
             'immutable',
             'json-beautify',
