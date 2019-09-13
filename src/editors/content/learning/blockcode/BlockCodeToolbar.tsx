@@ -16,13 +16,14 @@ import { styles } from './BlockCode.styles';
 import { StyledComponentProps } from 'types/component';
 
 import { Maybe } from 'tsmonad';
-import { Editor } from 'slate';
+import { Editor, Inline } from 'slate';
 import * as editorUtils from '../contiguoustext/utils';
 
 export interface BlockCodeToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
   selection: TextSelection;
   editor: Maybe<Editor>;
+  activeInline: Maybe<Inline>;
 }
 
 export interface BlockCodeToolbarState {
@@ -63,21 +64,30 @@ class BlockCodeToolbar
       ...this.props,
       renderContext: RenderContext.Sidebar,
       onFocus: (c, p) => true,
-      model: data,
+      model: data.get('value'),
       onEdit: (updated) => {
         updateInline(this.props.editor, key, updated);
       },
     };
 
     return React.createElement(
-      getEditorByContentType((data as any).contentType), props);
+      getEditorByContentType(data.get('value').contentType), props);
 
   }
 
   renderSidebar() {
-    const { editor } = this.props;
+    const { editor, activeInline } = this.props;
 
     const plainSidebar = <SidebarContent title="Code" />;
+
+    const inline = activeInline.caseOf({
+      just: i => i,
+      nothing: () => null,
+    });
+
+    if (inline !== null) {
+      return this.renderActiveEntity(inline);
+    }
 
     return editor.caseOf({
       just: (e) => {

@@ -17,13 +17,14 @@ import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
 import { styles } from './BlockFormula.styles';
 import { StyledComponentProps } from 'types/component';
 import { Maybe } from 'tsmonad';
-import { Editor } from 'slate';
+import { Editor, Inline } from 'slate';
 import * as editorUtils from '../contiguoustext/utils';
 
 export interface BlockFormulaToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockFormula> {
   selection: TextSelection;
   editor: Maybe<Editor>;
+  activeInline: Maybe<Inline>;
 }
 
 export interface BlockFormulaToolbarState {
@@ -61,21 +62,30 @@ class BlockFormulaToolbar
       ...this.props,
       renderContext: RenderContext.Sidebar,
       onFocus: (c, p) => true,
-      model: data,
+      model: data.get('value'),
       onEdit: (updated) => {
         updateInline(this.props.editor, key, updated);
       },
     };
 
     return React.createElement(
-      getEditorByContentType((data as any).contentType), props);
+      getEditorByContentType(data.get('value').contentType), props);
 
   }
 
   renderSidebar() {
-    const { editor } = this.props;
+    const { editor, activeInline } = this.props;
 
     const plainSidebar = <SidebarContent title="Formula" />;
+
+    const inline = activeInline.caseOf({
+      just: i => i,
+      nothing: () => null,
+    });
+
+    if (inline !== null) {
+      return this.renderActiveEntity(inline);
+    }
 
     return editor.caseOf({
       just: (e) => {

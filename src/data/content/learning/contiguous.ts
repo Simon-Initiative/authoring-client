@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
-
+import guid from 'utils/guid';
 import { Value, Block, Inline } from 'slate';
 import Html from 'slate-html-serializer';
 import { toSlate } from 'data/content/learning/slate/toslate';
@@ -113,7 +113,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   clone(): ContiguousText {
-    return ensureIdGuidPresent(this);
+    return this.assignNewIds();
   }
 
   static fromPersistence(
@@ -132,6 +132,17 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   static fromHTML(html: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
     return new ContiguousText({ guid, mode, slateValue: Html.deserialize(html) });
+  }
+
+  // Creates a new ContiguousText, but with all of the block level ids changed
+  assignNewIds(): ContiguousText {
+    const nodes = this.slateValue.document.nodes.map((node) => {
+      const data = { id: guid() };
+      return node.merge({ data });
+    });
+    const document = this.slateValue.document.merge({ nodes });
+    const slateValue = this.slateValue.merge({ document }) as Value;
+    return this.with({ slateValue });
   }
 
   toPersistence(): Object {
