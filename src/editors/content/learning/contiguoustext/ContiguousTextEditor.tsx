@@ -168,6 +168,7 @@ class ContiguousTextEditor
 
     return (
       <div
+        onClick={() => this.editor.focus()}
         className={classNames([
           'contiguousTextEditor', classes.contiguousText,
           showBorder && classes.showBorder,
