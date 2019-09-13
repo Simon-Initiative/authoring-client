@@ -82,7 +82,8 @@ export function renderInline(extras, props, editor: Editor, next) {
   const { onInlineClick, context, parentProps, parent } = extras;
   const { attributes, children, node } = props;
 
-  const onClick = () => {
+  const onClick = (e) => {
+    e.preventDefault();
     onInlineClick(node);
   };
 

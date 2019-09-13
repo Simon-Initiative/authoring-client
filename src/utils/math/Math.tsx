@@ -11,7 +11,7 @@ export interface MathProps {
   isSelected: boolean;
   attrs: any;
   inline: boolean;
-  onClick: () => void;
+  onClick: (e) => void;
 }
 
 /**

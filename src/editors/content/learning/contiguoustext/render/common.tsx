@@ -8,7 +8,7 @@ export type InlineDisplayProps = {
   node: Inline;
   attrs,
   children?,
-  onClick: () => void;
+  onClick: (e) => void;
 };
 
 export type StyledInlineProps = {

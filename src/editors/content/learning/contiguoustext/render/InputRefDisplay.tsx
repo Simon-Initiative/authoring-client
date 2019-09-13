@@ -27,9 +27,9 @@ class InputRefDisplay extends React.PureComponent<InputRefProps, InputRefState> 
       setActiveItemIdActionAction } = this.props;
     const { inputType, input } = node.data.get('value');
 
-    const handleClick = () => {
+    const handleClick = (e) => {
       setActiveItemIdActionAction(input);
-      onClick();
+      onClick(e);
     };
 
     const active = activeInputId.caseOf({
