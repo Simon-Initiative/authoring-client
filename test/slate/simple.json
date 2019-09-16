@@ -1,0 +1,86 @@
+{
+  "data": [
+    {
+      "p": {
+        "em": {
+          "sub": {
+            "#text": "One"
+          }
+        }
+      }
+    },
+    {
+      "p": {
+        "#array": [
+          {
+            "#text": "This "
+          },
+          {
+            "em": {
+              "#text": "is bold"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "p": {
+        "#array": [
+          {
+            "link": {
+              "@href": "www.google.com",
+              "#text": "Inside link"
+            }
+          },
+          {
+            "#text": " and outside"
+          },
+          {
+            "link": {
+              "@href": "www.google.com",
+              "em": {
+                "#text": "bolded"
+              }
+            }
+          },
+          {
+            "link": {
+              "@href": "www.google.com",
+              "#array": [
+                {
+                  "#text": "This "
+                },
+                {
+                  "sub": {
+                    "#text": "sup "
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "p": {
+        "#array": [
+          {
+            "#text": "This "
+          },
+          {
+            "image": {
+              "@src": "this/source/file.jpg",
+              "#array": [
+                {
+                  "caption": {
+                    "#text": "the caption"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

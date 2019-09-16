@@ -7,7 +7,9 @@ import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-
+import { Editor, Inline } from 'slate';
+import { removeInlineEntity, getEntityAtCursor }
+  from 'editors/content/learning/contiguoustext/utils';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -24,6 +26,34 @@ export const updateContent = (
     type: UPDATE_CONTENT,
     documentId,
     content,
+  });
+
+export type SELECT_INLINE = 'active/SELECT_INLINE';
+export const SELECT_INLINE: SELECT_INLINE = 'active/SELECT_INLINE';
+
+export type SelectInlineAction = {
+  type: SELECT_INLINE,
+  inline: Maybe<Inline>,
+};
+
+export const selectInline = (
+  inline: Maybe<Inline>): SelectInlineAction => ({
+    type: SELECT_INLINE,
+    inline,
+  });
+
+export type UPDATE_EDITOR = 'active/UPDATE_EDITOR';
+export const UPDATE_EDITOR: UPDATE_EDITOR = 'active/UPDATE_EDITOR';
+
+export type UpdateEditorAction = {
+  type: UPDATE_EDITOR,
+  editor: Editor,
+};
+
+export const updateEditor = (
+  editor: Editor): UpdateEditorAction => ({
+    type: UPDATE_EDITOR,
+    editor,
   });
 
 
@@ -78,7 +108,7 @@ export function insert(
       : contextSnapshot;
 
     activeContext.container.lift((parent: ParentContainer) => {
-      parent.onAddNew(content, activeContext.textSelection);
+      parent.onAddNew(content, activeContext.editor);
     });
 
   };
@@ -103,12 +133,13 @@ export function insertParsedContent(resourcePath: string, parsedContent: ParsedC
           courseId,
           resourcePath,
           (e) => {
-            parent.onAddNew(e.toArray(), activeContext.textSelection);
+            parent.onAddNew(e.toArray(), activeContext.editor);
           });
 
       } else {
         // Otherwise, just add the elements
-        parent.onAddNew(parsedContent.elements.toArray(), activeContext.textSelection);
+        parent.onAddNew(parsedContent.elements.toArray(),
+          activeContext.editor);
       }
     });
 
@@ -122,6 +153,7 @@ export function edit(content: ContentElement) {
     const { activeContext } = getState();
     activeContext.container.lift((parent: ParentContainer) => {
       parent.onEdit(content, content);
+
     });
   };
 }
@@ -145,18 +177,16 @@ export function remove(item: ContentElement) {
 
     dispatch(resetActive());
 
-    activeContext.textSelection.caseOf({
-      just: (textSelection) => {
+    activeContext.editor.caseOf({
+      just: (e) => {
         if (item instanceof contentTypes.ContiguousText) {
-          const text = item as contentTypes.ContiguousText;
-          const entity = text.getEntityAtCursor(textSelection);
-          entity.caseOf({
-            just: (e) => {
-              const updated = text.removeEntity(e.key);
-              container.onEdit(updated, updated);
+          activeContext.activeInline.caseOf({
+            just: (en) => {
+              removeInlineEntity(e, en.key);
             },
             nothing: () => container.onRemove(item),
           });
+
         } else {
           container.onRemove(item);
         }

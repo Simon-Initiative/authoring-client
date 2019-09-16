@@ -38,6 +38,7 @@ export function registerContentTypes() {
   registerType('formula', ct.BlockFormula.fromPersistence);
   registerType('iframe', ct.IFrame.fromPersistence);
   registerType('image', ct.Image.fromPersistence);
+  registerType('input_ref', ct.InputRef.fromPersistence);
   registerType('inquiry', ct.Inquiry.fromPersistence);
   registerType('instructions', ct.Instructions.fromPersistence);
   registerType('li', ct.Li.fromPersistence);
@@ -46,6 +47,8 @@ export function registerContentTypes() {
   registerType('material', ct.Material.fromPersistence);
   registerType('materials', ct.Materials.fromPersistence);
   registerType('math', ct.Math.fromPersistence);
+  registerType('#math', ct.Math.fromPersistence);
+  registerType('m:math', ct.Math.fromPersistence);
   registerType('mathematica', ct.Mathematica.fromPersistence);
   registerType('meaning', ct.Meaning.fromPersistence);
   registerType('multipanel', ct.Multipanel.fromPersistence);

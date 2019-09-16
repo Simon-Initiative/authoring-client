@@ -11,11 +11,14 @@ import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
+import { connect } from 'react-redux';
+import { Editor } from 'slate';
 
 import { styles } from 'editors/content/container/ToolbarContentContainer.styles';
 
 export interface ToolbarContentContainerProps extends ContentContainerProps {
   className?: string;
+  editor: Maybe<Editor>;
 }
 
 export interface ToolbarContentContainerState {
@@ -74,49 +77,45 @@ class ToolbarContentContainer
     return (
       <div className={classes.miniToolbar}>
         <ToolbarButton
-          onClick={() => {
-            this.onFormatEdit(text.toggleStyle(InlineStyles.Bold, selection));
-          }}
+          onClick={
+            () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
+          }
           tooltip="Bold"
           disabled={!formatEnabled}>
           <i className={'fa fa-bold'} />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => {
-            this.onFormatEdit(text.toggleStyle(InlineStyles.Italic, selection));
-          }}
+          onClick={() => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))}
           tooltip="Italic"
           disabled={!formatEnabled}>
           <i className={'fa fa-italic'} />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => {
-            this.onFormatEdit(text.toggleStyle(InlineStyles.Strikethrough, selection));
-          }}
+          onClick={() => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))}
           tooltip="Strikethrough"
           disabled={!formatEnabled}>
           <i className={'fa fa-strikethrough'} />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => {
-            this.onFormatEdit(text.toggleStyle(InlineStyles.Highlight, selection));
-          }}
+          onClick={
+            () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
+          }
           tooltip="Highlight"
           disabled={!formatEnabled}>
           <i className={'fas fa-pencil-alt'} />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => {
-            this.onFormatEdit(text.toggleStyle(InlineStyles.Superscript, selection));
-          }}
+          onClick={
+            () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
+          }
           tooltip="Superscript"
           disabled={!formatEnabled}>
           <i className={'fa fa-superscript'} />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => {
-            this.onFormatEdit(text.toggleStyle(InlineStyles.Subscript, selection));
-          }}
+          onClick={
+            () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
+          }
           tooltip="Subscript"
           disabled={!formatEnabled}>
           <i className={'fa fa-subscript'} />
@@ -128,23 +127,23 @@ class ToolbarContentContainer
           hideArrow
           label={<i className={classNames(['fa fa-ellipsis-v', classes.moreLabel])} />} >
           <button className="dropdown-item"
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Var, selection));
-            }}
+            onClick={
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Var))
+            }
             disabled={!formatEnabled}>
             <i className="fa fa-code" /> Code
           </button>
           <button className="dropdown-item"
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Term, selection));
-            }}
+            onClick={
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Term))
+            }
             disabled={!formatEnabled}>
             <i className="fa fa-book" /> Term
           </button>
           <button className="dropdown-item"
-            onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Foreign, selection));
-            }}
+            onClick={
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Foreign))
+            }
             disabled={!formatEnabled}>
             <i className="fa fa-globe" /> Foreign
           </button>
@@ -175,4 +174,20 @@ class ToolbarContentContainer
 
 const StyledToolbarContentContainer = withStyles<ToolbarContentContainerProps>(styles)
   (ToolbarContentContainer);
-export { StyledToolbarContentContainer as ToolbarContentContainer };
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    editor: state.activeContext.editor,
+  };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+  };
+};
+
+const ConnectedEditor = connect(mapStateToProps, mapDispatchToProps)(StyledToolbarContentContainer);
+
+export { ConnectedEditor as ToolbarContentContainer };
+
+

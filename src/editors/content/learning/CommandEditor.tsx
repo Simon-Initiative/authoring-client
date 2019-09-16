@@ -14,7 +14,7 @@ import { CommandType, CommandStyle } from 'data/content/learning/command';
 import {
   selectTargetElement,
 } from 'components/message/selection';
-import '../common/draft/decorators/styles.scss';
+import './CommandEditor.scss';
 import { IdentifiableContentElement } from 'data/content/common/interfaces';
 
 import { caseOf } from 'utils/utils';

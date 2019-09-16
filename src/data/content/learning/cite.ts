@@ -8,7 +8,6 @@ export type CiteParams = {
   title?: string,
   id?: string,
   entry?: string,
-  content?: ContentElements,
   guid?: string,
 };
 
@@ -18,7 +17,6 @@ const defaultContent = {
   title: '',
   id: '',
   entry: '',
-  content: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   guid: '',
 };
 
@@ -29,7 +27,6 @@ export class Cite extends Immutable.Record(defaultContent) {
   title: string;
   id: string;
   entry: string;
-  content: ContentElements;
   guid: string;
 
   constructor(params?: CiteParams) {
@@ -42,9 +39,7 @@ export class Cite extends Immutable.Record(defaultContent) {
 
 
   clone(): Cite {
-    return ensureIdGuidPresent(this.with({
-      content: this.content.clone(),
-    }));
+    return ensureIdGuidPresent(this);
   }
 
   static fromPersistence(root: Object, guid: string, notify: () => void): Cite {
@@ -59,13 +54,6 @@ export class Cite extends Immutable.Record(defaultContent) {
     model = setId(model, t, notify);
     if (t['@entry'] !== undefined) {
       model = model.with({ entry: t['@entry'] === '' ? ' ' : t['@entry'] });
-    }
-
-    if (!Object.keys(t).every(k => k.startsWith('@'))) {
-      model = model.with({
-        content: ContentElements
-          .fromPersistence(except(getChildren(t), 'title'), '', TEXT_ELEMENTS, null, notify),
-      });
     }
 
     return model;

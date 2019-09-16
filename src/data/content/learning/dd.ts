@@ -40,7 +40,8 @@ export class Dd extends Immutable.Record(defaultContent) {
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void): Dd {
+  static fromPersistence(
+    root: Object, guid: string, notify: () => void, backingTextProvider: Object = null): Dd {
 
     const t = (root as any).dd;
 
@@ -52,7 +53,7 @@ export class Dd extends Immutable.Record(defaultContent) {
 
     model = model.with({
       content: ContentElements
-        .fromPersistence(t, createGuid(), INLINE_ELEMENTS, null, notify),
+        .fromPersistence(t, createGuid(), INLINE_ELEMENTS, backingTextProvider, notify),
     });
 
     return model;

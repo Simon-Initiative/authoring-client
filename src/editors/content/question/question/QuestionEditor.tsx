@@ -16,13 +16,13 @@ import { Ordering } from 'editors/content/question/ordering/Ordering.controller'
 import { DynaDropInput } from 'editors/content/question/draganddrop/DynaDropInput.controller';
 import { MultipartInput } from 'editors/content/question/multipart/MultipartInput.controller';
 import { Skill } from 'types/course';
-import { InsertInputRefCommand } from 'editors/content/question/question/commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
 import { containsDynaDropCustom } from 'editors/content/utils/common';
 import { Maybe } from 'tsmonad';
 
 import './QuestionEditor.scss';
 import { ContentElement } from 'data/content/common/interfaces';
+import { InputRefType } from 'data/content/learning/input_ref';
 
 export interface Props extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
@@ -47,13 +47,6 @@ export interface State {
 export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, Props, State> {
   lastBody: ContentElements = this.props.model.body;
-  itemToAdd: any;
-  fillInTheBlankCommand: InsertInputRefCommand =
-    new InsertInputRefCommand(this, this.createFillInTheBlank, 'FillInTheBlank');
-  numericCommand: InsertInputRefCommand =
-    new InsertInputRefCommand(this, () => new contentTypes.Numeric(), 'Numeric');
-  textCommand: InsertInputRefCommand =
-    new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
 
   state = {
     ...this.state,
@@ -129,7 +122,7 @@ export class QuestionEditor
           for (let i = 0; i < itemArray.length; i += 1) {
             const currentItem = (itemArray[i] as any);
 
-            if (currentItem.id !== undefined && currentItem.id === d.entity.getData()['@input']) {
+            if (currentItem.id !== undefined && currentItem.id === d.input) {
               items = items.delete(currentItem.guid);
               parts = parts.delete(partsArray[i].guid);
               break;
@@ -140,29 +133,40 @@ export class QuestionEditor
 
       } else if (delta.additions.size > 0) {
 
-        const input = delta.additions.toArray()[0].entity.getData()['@input'];
+        const inputRef = delta.additions.toArray()[0];
 
-        const item = this.itemToAdd.with({ guid: input, id: input });
+        let newItem = null;
+        let newPart = null;
 
-        question = question.with({ items: question.items.set(item.guid, item) });
+        if (inputRef.inputType === InputRefType.FillInTheBlank) {
+          const item = new contentTypes.FillInTheBlank().with({ id: inputRef.input });
+          const part = new contentTypes.Part();
 
-        let responses = Immutable.OrderedMap<string, contentTypes.Response>();
-        if (item.contentType === 'FillInTheBlank') {
-
+          // values are formatted like guids without dashes in the DTD
+          const value = guid().replace('-', '');
+          const choice = contentTypes.Choice.fromText('', guid()).with({ value });
           const feedback = contentTypes.Feedback.fromText('', guid());
-          let response = new contentTypes.Response({ match: item.choices.first().value });
+          let response = new contentTypes.Response().with({ match: value, input: inputRef.input });
+          response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
 
-          response = response.with({
-            guid: guid(),
-            feedback: response.feedback.set(feedback.guid, feedback),
-          });
-          responses = responses
-            .set(response.guid, response);
+          newItem = item.with({ choices: item.choices.set(choice.guid, choice) });
+          newPart = part.with({ responses: part.responses.set(response.guid, response) });
+
+        } else if (inputRef.inputType === InputRefType.Text) {
+
+          newItem = new contentTypes.Text().with({ id: inputRef.input });
+          newPart = this.buildPartWithInitialResponse('answer', inputRef.input);
+
+        } else {
+
+          newItem = new contentTypes.Numeric().with({ id: inputRef.input });
+          newPart = this.buildPartWithInitialResponse('0', inputRef.input);
         }
 
-        let part = new contentTypes.Part();
-        part = part.with({ guid: guid(), responses });
-        question = question.with({ parts: question.parts.set(part.guid, part) });
+        question = question.with({
+          items: question.items.set(newItem.guid, newItem),
+          parts: question.parts.set(newPart.guid, newPart),
+        });
 
       }
     }
@@ -170,6 +174,35 @@ export class QuestionEditor
     this.lastBody = body;
 
     this.props.onEdit(question, src);
+  }
+
+
+  buildPartWithInitialResponse(match: string, input): contentTypes.Part {
+
+    const correctFeedback = contentTypes.Feedback.fromText('Correct!', guid());
+    const correctResponse = new contentTypes.Response().with({
+      feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
+        .set(correctFeedback.guid, correctFeedback),
+      score: Maybe.just('1'),
+      input,
+      match,
+    });
+
+    const otherFeedback = contentTypes.Feedback.fromText('Incorrect.', guid());
+    const otherResponse = new contentTypes.Response().with({
+      feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
+        .set(otherFeedback.guid, otherFeedback),
+      score: Maybe.just('0'),
+      input,
+      match: '*',
+    });
+
+    return new contentTypes.Part().with({
+      responses: Immutable.OrderedMap<string, contentTypes.Response>()
+        .set(correctResponse.guid, correctResponse)
+        .set(otherResponse.guid, otherResponse),
+    });
+
   }
 
   onItemPartEdit = (
@@ -274,7 +307,7 @@ export class QuestionEditor
           {...questionProps}
           itemModel={item}
           canInsertAnotherPart={part => this.canInsertAnotherPart(model, part)}
-          onAddItemPart={this.onAddItemPart} />
+        />
       );
     }
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {

@@ -38,6 +38,8 @@ import { Edge } from 'types/edge';
 import { CourseState } from 'reducers/course';
 import { viewDocument, viewOrganizations } from 'actions/view';
 import { getNameAndIconByType } from 'components/ResourceView';
+import ContiguousTextToolbar
+  from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
 
 interface SidebarRowProps {
   label?: string;
@@ -710,8 +712,12 @@ class ContextAwareSidebar
         onUpdateHover: () => { },
       };
 
-      contentRenderer = React.createElement(
-        getEditorByContentType((contentElement as any).contentType), props);
+      if (contentElement.contentType === 'ContiguousText') {
+        contentRenderer = <ContiguousTextToolbar {...props} />;
+      } else {
+        contentRenderer = React.createElement(
+          getEditorByContentType((contentElement as any).contentType), props);
+      }
 
     }
 

@@ -39,7 +39,7 @@ export class Dt extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Dt {
+  clone(): Dt {
     return ensureIdGuidPresent(this.with({
       content: this.content.clone(),
       definitions: this.definitions.mapEntries(([_, v]) => {
@@ -49,7 +49,8 @@ export class Dt extends Immutable.Record(defaultContent) {
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void) : Dt {
+  static fromPersistence(
+    root: Object, guid: string, notify: () => void, backingTextProvider: Object = null): Dt {
 
     const t = (root as any).dt;
 
@@ -59,8 +60,10 @@ export class Dt extends Immutable.Record(defaultContent) {
       model = model.with({ title: Maybe.just(t['@title']) });
     }
 
-    model = model.with({ content: ContentElements
-      .fromPersistence(t, createGuid(), INLINE_ELEMENTS, null, notify) });
+    model = model.with({
+      content: ContentElements
+        .fromPersistence(t, createGuid(), INLINE_ELEMENTS, backingTextProvider, notify),
+    });
 
     return model;
   }

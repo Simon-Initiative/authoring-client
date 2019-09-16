@@ -8,10 +8,15 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockFormulaToolbar from './BlockFormulaToolbar.controller';
 import { styles } from './BlockFormula.styles';
 import { StyledComponentProps } from 'types/component';
+import { connectTextEditor } from 'editors/content/container/connectEditor';
+import { Inline } from 'slate';
+import { Maybe } from 'tsmonad';
 
 export interface BlockFormulaEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockFormula> {
   onShowSidebar: () => void;
+  onUpdateEditor: (editor) => void;
+  onSelectInline: (wrapper: Maybe<Inline>) => void;
 }
 
 export interface BlockFormulaEditorState {
@@ -68,4 +73,4 @@ class BlockFormulaEditor
 }
 
 const StyledBlockFormulaEditor = withStyles<BlockFormulaEditorProps>(styles)(BlockFormulaEditor);
-export default StyledBlockFormulaEditor;
+export default connectTextEditor(StyledBlockFormulaEditor);

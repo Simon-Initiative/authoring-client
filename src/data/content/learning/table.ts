@@ -63,7 +63,7 @@ export class Table extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Table {
+  clone(): Table {
     return ensureIdGuidPresent(this.with({
       title: this.title.clone(),
       caption: this.caption.clone(),
@@ -76,7 +76,8 @@ export class Table extends Immutable.Record(defaultContent) {
   }
 
 
-  static fromPersistence(root: Object, guid: string, notify: () => void) : Table {
+  static fromPersistence(root: Object, guid: string,
+    notify: () => void, backingTextProvider: Object = null): Table {
 
     const t = (root as any).table;
 
@@ -98,7 +99,10 @@ export class Table extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'tr':
-          model = model.with({ rows: model.rows.set(id, Row.fromPersistence(item, id, notify)) });
+          model = model.with({
+            rows: model.rows.set(id, Row.fromPersistence(
+              item, id, notify, backingTextProvider)),
+          });
           break;
         case 'title':
           model = model.with(
@@ -119,7 +123,7 @@ export class Table extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const rows = this.rows.size === 0
       ? createDefaultRows().toArray().map(p => p.toPersistence())

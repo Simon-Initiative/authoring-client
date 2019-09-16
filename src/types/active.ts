@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { SelectionState } from 'draft-js';
 import { ContentElement } from 'data/content/common/interfaces';
+import { Selection, Editor, Inline } from 'slate';
 
 export enum Trigger {
   KEYPRESS,
@@ -11,64 +11,66 @@ export enum Trigger {
 export class TextSelection {
 
   static createEmpty(key) {
-    return new TextSelection(SelectionState.createEmpty(key));
+    return new TextSelection(Selection.create({}));
   }
 
-  ss: SelectionState;
+  anchorKey: string;
+  anchorOffset: number;
+  focusKey: string;
+  focusOffset: number;
+  isBackward: boolean;
+  hasFocus: boolean;
+  collapsed: boolean;
   triggeredBy: Trigger;
 
-  constructor(ss) {
-    this.ss = ss;
+  constructor(slate) {
+    this.anchorKey = slate.anchor.key;
+    this.focusKey = slate.focus.key;
+    this.anchorOffset = slate.anchor.offset;
+    this.focusOffset = slate.focus.offset;
+    this.isBackward = slate.isBackward;
+    this.hasFocus = slate.isFocused;
+    this.collapsed = slate.isCollapsed;
   }
 
   getAnchorKey() {
-    return this.ss.getAnchorKey();
+    return this.anchorKey;
   }
 
   getFocusKey() {
-    return this.ss.getFocusKey();
+    return this.focusKey;
   }
 
   getAnchorOffset() {
-    return this.ss.getAnchorOffset();
+    return this.anchorOffset;
   }
 
   getFocusOffset() {
-    return this.ss.getFocusOffset();
+    return this.focusOffset;
   }
 
   getIsBackward() {
-    return this.ss.getIsBackward();
+    return this.isBackward;
   }
 
   getHasFocus() {
-    return this.ss.getHasFocus();
+    return this.hasFocus;
   }
 
   isCollapsed() {
-    return this.ss.isCollapsed();
+    return this.collapsed;
   }
 
-  hasEdgeWithin(blockKey, start, end) {
-    return this.ss.hasEdgeWithin(blockKey, start, end);
-  }
-
-  getRawSelectionState() {
-    return this.ss;
-  }
-
-  merge(params) {
-    return new TextSelection(this.ss.merge(params));
-  }
 }
 
 export interface ParentContainer {
   supportedElements: Immutable.List<string>;
   onAddNew: (
-    content: ContentElement | ContentElement[], textSelection: Maybe<TextSelection>) => void;
+    content: ContentElement | ContentElement[], editor: Maybe<Editor>) => void;
   onEdit: (content: ContentElement, source: Object) => void;
   onRemove: (content: ContentElement) => void;
-  onPaste: (content: ContentElement, textSelection: Maybe<TextSelection>) => void;
+  onPaste: (content: ContentElement,
+    editor: Maybe<Editor>) => void;
   onDuplicate: (content: ContentElement) => void;
   onMoveUp: (content: ContentElement) => void;
   onMoveDown: (content: ContentElement) => void;
@@ -78,14 +80,16 @@ export type ActiveContextParams = {
   documentId?: Maybe<string>,
   container?: Maybe<ParentContainer>,
   activeChild?: Maybe<ContentElement>,
-  textSelection?: Maybe<TextSelection>,
+  editor?: Maybe<Editor>,
+  activeInline?: Maybe<Inline>,
 };
 
 const defaultContent = {
   documentId: Maybe.nothing(),
   container: Maybe.nothing(),
   activeChild: Maybe.nothing(),
-  textSelection: Maybe.nothing(),
+  editor: Maybe.nothing(),
+  activeInline: Maybe.nothing(),
 };
 
 export class ActiveContext extends Immutable.Record(defaultContent) {
@@ -99,8 +103,10 @@ export class ActiveContext extends Immutable.Record(defaultContent) {
   // The current active child component of the parent container
   activeChild: Maybe<ContentElement>;
 
-  // The current text selection
-  textSelection: Maybe<TextSelection>;
+  // The current active slate editor
+  editor: Maybe<Editor>;
+
+  activeInline: Maybe<Inline>;
 
   constructor(params?: ActiveContextParams) {
     super(params);

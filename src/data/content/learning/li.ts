@@ -40,7 +40,8 @@ export class Li extends Immutable.Record(defaultContent) {
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void): Li {
+  static fromPersistence(
+    root: Object, guid: string, notify: () => void, backingTextProvider: Object = null): Li {
 
     const t = (root as any).li;
 
@@ -52,7 +53,7 @@ export class Li extends Immutable.Record(defaultContent) {
 
     model = model.with({
       content: ContentElements
-        .fromPersistence(t, createGuid(), FLOW_ELEMENTS, null, notify),
+        .fromPersistence(t, createGuid(), FLOW_ELEMENTS, backingTextProvider, notify),
     });
 
     return model;
