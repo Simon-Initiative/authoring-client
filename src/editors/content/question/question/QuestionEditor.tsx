@@ -183,7 +183,7 @@ export class QuestionEditor
     const correctResponse = new contentTypes.Response().with({
       feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
         .set(correctFeedback.guid, correctFeedback),
-      score: '1',
+      score: Maybe.just('1'),
       input,
       match,
     });
@@ -192,7 +192,7 @@ export class QuestionEditor
     const otherResponse = new contentTypes.Response().with({
       feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
         .set(otherFeedback.guid, otherFeedback),
-      score: '0',
+      score: Maybe.just('0'),
       input,
       match: '*',
     });
