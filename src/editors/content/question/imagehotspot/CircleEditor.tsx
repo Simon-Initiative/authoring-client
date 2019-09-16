@@ -36,8 +36,8 @@ export interface CircleEditorState {
  * CircleEditor React Component
  */
 class CircleEditor
-    extends React.PureComponent<StyledComponentProps<CircleEditorProps, typeof styles>,
-    CircleEditorState> {
+  extends React.PureComponent<StyledComponentProps<CircleEditorProps, typeof styles>,
+  CircleEditorState> {
 
   constructor(props) {
     super(props);
@@ -186,9 +186,9 @@ class CircleEditor
           // ensure new location is inside the hotspot area
           calculatedCoords = {
             cx: Math.min(
-              Math.max(calculatedCoords.cx, 0), boundingClient.width),
+              Math.max(calculatedCoords.cx, 0 + radius), boundingClient.width - radius),
             cy: Math.min(
-              Math.max(calculatedCoords.cy, 0), boundingClient.height),
+              Math.max(calculatedCoords.cy, 0 + radius), boundingClient.height - radius),
           };
 
           this.setState({

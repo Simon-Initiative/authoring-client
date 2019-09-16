@@ -1,0 +1,221 @@
+{
+  "question": {
+    "@id": "d6336a7e26994071a81192c69f3a07ba",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#array": [
+                  {
+                    "#text": "This is my "
+                  },
+                  {
+                    "input_ref": {
+                      "@input": "a81ae9df104549ef9343bc32ecf8552d"
+                    }
+                  },
+                  {
+                    "#text": " text input question.   "
+                  },
+                  {
+                    "input_ref": {
+                      "@input": "e2e2b31686ae4fbdb0ba77bf4f9bbbb5"
+                    }
+                  }
+                ],
+                "@id": "adfa5a4cdd861452f9df0d13ca7bd7eae",
+                "@title": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "text": {
+          "@id": "a81ae9df104549ef9343bc32ecf8552d",
+          "@name": "",
+          "@size": "small",
+          "@whitespace": "trim",
+          "@case_sensitive": false
+        }
+      },
+      {
+        "text": {
+          "@id": "e2e2b31686ae4fbdb0ba77bf4f9bbbb5",
+          "@name": "",
+          "@size": "small",
+          "@whitespace": "trim",
+          "@case_sensitive": false
+        }
+      },
+      {
+        "part": {
+          "@id": "e1d6890203ee491386348a163dc08acd",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "answer",
+                "@score": "1",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Correct!",
+                            "@id": "aceedde95ee4040e0aceb5c98c7a637ee",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "a81ae9df104549ef9343bc32ecf8552d"
+              }
+            },
+            {
+              "response": {
+                "@match": "*",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect.",
+                            "@id": "ad8c61edaf38f4b1196103b0ec2030ef8",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "a81ae9df104549ef9343bc32ecf8552d"
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "Hint 1",
+                      "@id": "abdcb201f063f48509d9f0b62d9d6a7f9",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "part": {
+          "@id": "fc4f7d5fb1d2476381fd030797c8489e",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "answer",
+                "@score": "1",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Correct!",
+                            "@id": "ab0c154bba0444b399a02b25853a5570f",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "e2e2b31686ae4fbdb0ba77bf4f9bbbb5"
+              }
+            },
+            {
+              "response": {
+                "@match": "*",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "Incorrect.",
+                            "@id": "afd8b2f62af4a4797a2f83e375331aa5f",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "e2e2b31686ae4fbdb0ba77bf4f9bbbb5"
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "Hint 1",
+                      "@id": "ae12bd61521684320801c04e9d204e027",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": []
+        }
+      }
+    ]
+  }
+}

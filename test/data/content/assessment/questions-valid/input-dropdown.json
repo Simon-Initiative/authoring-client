@@ -1,0 +1,235 @@
+{
+  "question": {
+    "@id": "cfda8592aab04bffabd571ea567d3487",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#array": [
+                  {
+                    "#text": "This is my "
+                  },
+                  {
+                    "input_ref": {
+                      "@input": "d67fff85702d476d81ff5c499c2f7d00"
+                    }
+                  },
+                  {
+                    "#text": " input question.   "
+                  },
+                  {
+                    "input_ref": {
+                      "@input": "d9f52eed86f043609745f025ad3bd4b1"
+                    }
+                  }
+                ],
+                "@id": "aa5dc00431bed4926a550d50a85dc2d75",
+                "@title": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fill_in_the_blank": {
+          "@shuffle": "true",
+          "@id": "d67fff85702d476d81ff5c499c2f7d00",
+          "@name": "",
+          "#array": [
+            {
+              "choice": {
+                "#text": "DD 1 - Choice A",
+                "@value": "fde6c7040283436ab0956af6685a3fd2",
+                "@color": ""
+              }
+            },
+            {
+              "choice": {
+                "#text": "DD 1 - Choice B",
+                "@value": "e9cd576411024bc392ea391e857b6123",
+                "@color": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fill_in_the_blank": {
+          "@shuffle": "true",
+          "@id": "d9f52eed86f043609745f025ad3bd4b1",
+          "@name": "",
+          "#array": [
+            {
+              "choice": {
+                "#text": "DD 2 - Choice A",
+                "@value": "ac44321d1f7f4d93bb3fbc722a5067ba",
+                "@color": ""
+              }
+            },
+            {
+              "choice": {
+                "#text": "DD 2 - Choice B",
+                "@value": "b4e3097eaef64a759cf144287615eccc",
+                "@color": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "part": {
+          "@id": "ed6503efb8e045a7ab80c4ffef114c8e",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "fde6c7040283436ab0956af6685a3fd2",
+                "@score": "1",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "DD1 - Feedback for A",
+                            "@id": "ae6251d65de134914bbb4d7983ac3a767",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "d67fff85702d476d81ff5c499c2f7d00"
+              }
+            },
+            {
+              "response": {
+                "@match": "e9cd576411024bc392ea391e857b6123",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "DD1 - Feedback for B",
+                            "@id": "ad9a86d015d664b8fb90b927a1022b9be",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "d67fff85702d476d81ff5c499c2f7d00"
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "Hint 1",
+                      "@id": "ab4540bcea0b246a680260352360217ab",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "part": {
+          "@id": "dee417fc6d5a495abe5b61864a85d937",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "ac44321d1f7f4d93bb3fbc722a5067ba",
+                "@score": "1",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "DD2 - Feedback A",
+                            "@id": "afba1754cc2f04f828f982666b748c56f",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "d9f52eed86f043609745f025ad3bd4b1"
+              }
+            },
+            {
+              "response": {
+                "@match": "b4e3097eaef64a759cf144287615eccc",
+                "@score": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "DD2 - Feedback B",
+                            "@id": "ad026e6bbabae4e51bd23da7b7054a38c",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@input": "d9f52eed86f043609745f025ad3bd4b1"
+              }
+            },
+            {
+              "explanation": {
+                "#array": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": []
+        }
+      }
+    ]
+  }
+}

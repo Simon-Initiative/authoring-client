@@ -1,0 +1,97 @@
+{
+  "question": {
+    "@id": "cafcb1b97fc64d1eb3919f22486b9890",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#text": "This is my short answer",
+                "@id": "ad4293eacb2b049c8b2a728c6ee0eca7a",
+                "@title": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "short_answer": {
+          "@id": "f1f9520815644e0aa47c9ea3836d6440",
+          "@name": "",
+          "@whitespace": "trim",
+          "@case_sensitive": false
+        }
+      },
+      {
+        "part": {
+          "@id": "f759efb064204f9e877c9f93df75576f",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "*",
+                "@score": "1",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is. my feedback",
+                            "@id": "af1f2755154b7453c9881e65cfcbdc83e",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "This is my hint",
+                      "@id": "acea2e4fdf29d44ba91a1aa7ee1e4b41f",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "This is. my feedback",
+                      "@id": "ad04c17351b334b9a8dc3e6a28b210bed",
+                      "@title": ""
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": []
+        }
+      }
+    ]
+  }
+}

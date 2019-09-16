@@ -9,6 +9,7 @@ import { Maybe } from 'tsmonad';
 
 interface StateProps {
   activeChild: Maybe<ContentElement>;
+  sidebarShown: boolean;
 }
 
 interface DispatchProps {
@@ -23,6 +24,7 @@ interface OwnProps extends AbstractContentEditorProps<Variables> {
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
     activeChild: state.activeContext.activeChild,
+    sidebarShown: state.editorSidebar.show,
   };
 };
 

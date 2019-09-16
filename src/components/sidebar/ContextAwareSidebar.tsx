@@ -11,7 +11,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 import {
   ModelTypes, ContentModel, AssessmentModel, CourseModel, OrganizationModel,
 } from 'data/models';
@@ -181,10 +181,16 @@ class ContextAwareSidebar
     const { course, resource } = props;
 
     persistence.fetchEdges(course.guid).then((edges) => {
-
-      const sources = edges.filter((edge) => {
-        return (this.stripId(edge.destinationId) === resource.id);
-      });
+ // returns a list of edges pointing to the current page, with no edges sharing the same source
+      const sources: Edge[] = edges.filter(edge => this.stripId(edge.destinationId) === resource.id)
+      .reduce((prev : {usedResources: any, edges: Edge[]}, edge) => {
+        if (prev.usedResources[edge.sourceId]) {
+          return prev;
+        }
+        prev.usedResources[edge.sourceId] = edge;
+        prev.edges.push(edge);
+        return prev;
+      }, { usedResources: {}, edges: [] }).edges;
 
       this.setState({
         resourceRefs: Maybe.just(sources),
@@ -317,15 +323,6 @@ class ContextAwareSidebar
       </SidebarGroup>
     );
 
-    const getRefGuidFromRef = (ref: Edge) => {
-      const id = stripId(ref.sourceId);
-
-      return Maybe.maybe(course.resourcesById.get(id)).caseOf({
-        just: resource => resource.guid,
-        nothing: () => '',
-      });
-    };
-
     const stripId = (id: string) => {
       const splits = id.split(':');
       if (splits.length === 3) {
@@ -333,13 +330,9 @@ class ContextAwareSidebar
       }
     };
 
-    const getRefTitleFromRef = (ref: Edge) => {
+    const getRefResourceFromRef = (ref: Edge) => {
       const id = stripId(ref.sourceId);
-
-      return Maybe.maybe(course.resourcesById.get(id)).caseOf({
-        just: resource => resource.title,
-        nothing: () => '[Error loading page title]',
-      });
+      return course.resourcesById.get(id);
     };
 
     const orgGuid = selectedOrganization.caseOf({
@@ -360,24 +353,45 @@ class ContextAwareSidebar
                     <div className="container">
 
                       {
-                        refs.map(ref => (
-                          <div key={ref.guid} className="ref-thing">
+                        refs.map(ref => getRefResourceFromRef(ref))
+                        .filter(res => res !== undefined &&
+                                       res.resourceState !== ResourceState.DELETED)
+                        .sort((a, b) => {
+                          if (a.type === b.type) {
+                            return (a.title < b.title ? -1 : 1);
+                          }
+                          if (a.type === 'x-oli-organization') {
+                            return -1;
+                          }
+                          if (b.type === 'x-oli-organization') {
+                            return 1;
+                          }
+                          if (a.type === 'x-oli-workbook_page') {
+                            return -1;
+                          }
+                          if (b.type === 'x-oli-workbook_page') {
+                            return 1;
+                          }
+                          return 0;
+                        })
+                        .map(res => (
+                          <div key={res.guid} className="ref-thing">
                             <a href="#" onClick={(event) => {
                               event.preventDefault();
                               // if link is to org, just switch org and stay on current page
-                              if (ref.sourceType === 'x-oli-organization') {
+                              if (res.type === 'x-oli-organization') {
                                 viewDocument(resource.id, course.idvers,
-                                  Maybe.maybe(stripId(ref.sourceId)));
+                                  Maybe.maybe(res.id));
                               } else {
-                                viewDocument(stripId(ref.sourceId), course.idvers, Maybe.nothing());
+                                viewDocument(res.id, course.idvers, Maybe.nothing());
                               }
                             }
                             }>
                               <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
                                 {
-                                  getNameAndIconByType(ref.sourceType).icon}
+                                  getNameAndIconByType(res.type).icon}
                               </span>
-                              {getRefTitleFromRef(ref)}
+                              {res.title}
                             </a>
                           </div>
                         ))}

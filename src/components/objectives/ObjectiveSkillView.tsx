@@ -296,7 +296,7 @@ class ObjectiveSkillView
   componentWillUpdate(
     nextProps: Readonly<ObjectiveSkillViewProps>, nextState: Readonly<ObjectiveSkillViewState>) {
 
-    const obj = this.props.selectedOrganization.caseOf({
+    const org = this.props.selectedOrganization.caseOf({
       just: o => o,
       nothing: () => null,
     });
@@ -305,10 +305,10 @@ class ObjectiveSkillView
     if (nextState.aggregateModel !== null
       && nextState.aggregateModel !== this.state.aggregateModel) {
 
-      this.fetchAllRefs(this.props.skills, nextState.objectives, obj);
+      this.fetchAllRefs(this.props.skills, nextState.objectives, org);
 
     } else if (this.state.aggregateModel !== null && nextProps.skills !== this.props.skills) {
-      this.fetchAllRefs(nextProps.skills, this.state.objectives, obj);
+      this.fetchAllRefs(nextProps.skills, this.state.objectives, org);
     }
   }
 
@@ -339,7 +339,9 @@ class ObjectiveSkillView
   ) {
     const { course } = this.props;
 
-    const directResources = org.getFlattenedResources().toArray();
+    const directResources = org
+      ? org.getFlattenedResources().toArray()
+      : [];
     const directLookup = Immutable.Set<string>(directResources);
 
 
