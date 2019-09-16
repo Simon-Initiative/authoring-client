@@ -84,7 +84,6 @@
             {
               "response": {
                 "@match": "*",
-                "@score": "0",
                 "@name": "",
                 "#array": [
                   {

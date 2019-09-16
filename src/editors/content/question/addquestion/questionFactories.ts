@@ -43,7 +43,7 @@ export function createMultipleChoiceQuestion(
   correctResponse = correctResponse.with({
     guid: guid(),
     match: correctMatch,
-    score: '1',
+    score: Maybe.just('1'),
     feedback: correctResponse.feedback.set(correctFeedback.guid, correctFeedback),
   });
 
@@ -64,7 +64,8 @@ export function createMultipleChoiceQuestion(
     const incorrectFeedback = contentTypes.Feedback.fromText('', guid());
     let incorrectResponse = new contentTypes.Response({ match: incorrectValue });
     incorrectResponse = incorrectResponse.with({
-      feedback: incorrectResponse.feedback.set(incorrectFeedback.guid, incorrectFeedback) });
+      feedback: incorrectResponse.feedback.set(incorrectFeedback.guid, incorrectFeedback),
+    });
 
     part = part.with({
       responses: part.responses.set(incorrectResponse.guid, incorrectResponse),
@@ -76,7 +77,7 @@ export function createMultipleChoiceQuestion(
       part,
       item.choices.toArray(),
       defaultBody,
-      '0',
+      Maybe.just('0'),
       onGetChoiceCombinations,
     );
   }
@@ -109,7 +110,7 @@ export function createOrdering(onGetChoicePermutations: (comboNum: number) => Pe
   response = response.with({
     guid: guid(),
     match: `${firstValue},${secondValue}`,
-    score: '1',
+    score: Maybe.just('1'),
     feedback: response.feedback.set(feedback.guid, feedback),
   });
 
@@ -124,7 +125,7 @@ export function createOrdering(onGetChoicePermutations: (comboNum: number) => Pe
     part,
     item.choices.toArray(),
     defaultBody,
-    '0',
+    Maybe.just('0'),
     onGetChoicePermutations,
   );
 
@@ -139,7 +140,7 @@ export function createShortAnswer() {
     .set(feedback.guid, feedback);
 
   const response = new contentTypes.Response()
-    .with({ match: '*', score: '1', feedback: feedbacks });
+    .with({ match: '*', score: Maybe.just('1'), feedback: feedbacks });
 
   const part = new contentTypes.Part()
     .with({
@@ -164,7 +165,9 @@ export function createEssay() {
   const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
     .set(feedback.guid, feedback);
 
-  const response = new contentTypes.Response({ match: '*', score: '1', feedback: feedbacks });
+  const response = new contentTypes.Response({
+    match: '*', score: Maybe.just('1'), feedback: feedbacks,
+  });
 
   const part = new contentTypes.Part()
     .with({
@@ -272,7 +275,7 @@ export function createDragDrop() {
   const newResponse = new contentTypes.Response({
     match: matchValue,
     input: inputVal,
-    score: '0',
+    score: Maybe.just('0'),
     feedback: newFeedbacks,
   });
   const newPart = new contentTypes.Part().with({

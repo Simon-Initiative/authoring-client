@@ -62,13 +62,15 @@ export abstract class NumericFeedback
     onEdit(updatedModel);
   }
 
-  onScoreEdit(response, score) {
+  onScoreEdit(response: contentTypes.Response, score: string) {
     const { model, onEdit } = this.props;
 
     onEdit(model.with({
       responses: model.responses.set(
         response.guid,
-        model.responses.get(response.guid).with({ score }),
+        model.responses.get(response.guid).with({
+          score: score === '' ? Maybe.nothing<string>() : Maybe.just(score),
+        }),
       ),
     }));
   }
@@ -145,7 +147,7 @@ export abstract class NumericFeedback
                       type="number"
                       className="form-control input-sm form-control-sm"
                       disabled={!this.props.editMode}
-                      value={response.score}
+                      value={response.score.valueOr('')}
                       onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
                     />
                   </div>
@@ -214,7 +216,7 @@ export abstract class NumericFeedback
                   type="number"
                   className="form-control input-sm form-control-sm"
                   disabled={!this.props.editMode}
-                  value={defaultResponse.score}
+                  value={defaultResponse.score.valueOr('')}
                   onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
                 />
               </div>

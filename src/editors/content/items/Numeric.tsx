@@ -2,8 +2,8 @@ import * as React from 'react';
 import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
-    AbstractItemPartEditor, AbstractItemPartEditorProps,
-    AbstractItemPartEditorState,
+  AbstractItemPartEditor, AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Select, Button } from '../common/controls';
 import {
@@ -11,6 +11,7 @@ import {
 } from 'components/common/TabContainer';
 import guid from 'utils/guid';
 import { NumericFeedback } from '../part/NumericFeedback';
+import { Maybe } from 'tsmonad';
 
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
 
@@ -47,7 +48,7 @@ export class Numeric
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
-      score: '0',
+      score: Maybe.just('0'),
       match: '',
       input: this.props.itemModel.id,
       feedback: feedbacks.set(feedback.guid, feedback),
@@ -84,7 +85,7 @@ export class Numeric
 
     return (
       <TabSection className="numeric">
-        <TabSectionHeader title="Details"/>
+        <TabSectionHeader title="Details" />
         <TabSectionContent>
           <Select editMode={this.props.editMode}
             label="Size" value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>

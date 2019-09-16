@@ -9,6 +9,7 @@ import {
 } from 'components/common/TabContainer';
 import guid from 'utils/guid';
 import { ExplanationEditor } from 'editors/content/part/ExplanationEditor';
+import { Maybe } from 'tsmonad';
 
 export interface EssayProps extends QuestionProps<contentTypes.Essay> {
 
@@ -47,7 +48,7 @@ export class Essay
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
-      score: '0',
+      score: Maybe.just('0'),
       match: '',
       feedback: feedbacks.set(feedback.guid, feedback),
     });

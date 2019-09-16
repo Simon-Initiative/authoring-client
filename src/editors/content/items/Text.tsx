@@ -2,8 +2,8 @@ import * as React from 'react';
 import { OrderedMap } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import {
-    AbstractItemPartEditor, AbstractItemPartEditorProps,
-    AbstractItemPartEditorState,
+  AbstractItemPartEditor, AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Select, Button } from '../common/controls';
 import {
@@ -12,6 +12,7 @@ import {
 import { Feedback } from '../part/Feedback';
 import guid from 'utils/guid';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { Maybe } from 'tsmonad';
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
 
@@ -53,7 +54,7 @@ export class Text
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
-      score: '0',
+      score: Maybe.just('0'),
       match: '',
       input: this.props.itemModel.id,
       feedback: feedbacks.set(feedback.guid, feedback),
@@ -111,7 +112,7 @@ export class Text
 
     return (
       <TabSection className="numeric">
-        <TabSectionHeader title="Details"/>
+        <TabSectionHeader title="Details" />
         <TabSectionContent>
           <Select
             editMode={editMode}
