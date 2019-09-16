@@ -1,100 +1,99 @@
-@import 'oli/colors';
-@import 'oli/zindex';
+@import "oli/colors";
+@import "oli/zindex";
 
 .choice {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 5px;
-
-  .choice-item {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    margin-bottom: 5px;
 
-    .choice-label {
-      vertical-align: middle;
-      margin-right: 10px;
-      padding-top: 6px;
-      min-width: 16px;
-    }
+    .choice-item {
+        display: flex;
+        flex-direction: row;
 
-    .choice-content {
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-    }
-
-    .dragHandleGrab {
-      margin-top: 10px;
-      margin-right: 10px;
-    }
-
-    .remove-btn {
-      padding-top: 8px;
-    }
-  }
-
-  .input-list-item-control {
-    padding-top: 2px;
-  }
-
-  .simple-select {
-    .btn-link {
-      font-size: 24px;
-      color: $gray-light;
-      padding: 0;
-
-      &:hover {
-        color: lighten($emerald, 20%);
-      }
-
-      &:active {
-        color: $emerald;
-      }
-    }
-
-    &.selected {
-      .btn-link {
-        color: $emerald;
-
-        &:hover {
-          color: $emerald;
+        .choice-label {
+            vertical-align: middle;
+            margin-right: 10px;
+            padding-top: 6px;
+            min-width: 16px;
         }
 
-        &:active {
-          color: lighten($emerald, 20%);
+        .choice-content {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
         }
-      }
+
+        .dragHandleGrab {
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+
+        .remove-btn {
+            padding-top: 8px;
+        }
     }
-  }
 
-  &.input-list-item .input-list-item-label .input-list-item-controls .input-list-item-control.simple-select {
-    margin-top: 0;
-  }
-
-  .choice-drop-target-container {
-    position: relative;
-
-    .choice-drop-target {
-      position: absolute;
-      top: 0;
-      left: 0;
-      background-color: #f4bf42;
-      height: 10px;
-      width: 100%;
-      margin-bottom: 8px;
-      z-index: $reposition-target;
-      opacity: 0;
-
-      &.hover {
-        opacity: 1;
-      }
+    .input-list-item-control {
+        padding-top: 2px;
     }
-  }
 
+    .simple-select {
+        .btn-link {
+            font-size: 24px;
+            color: $gray-light;
+            padding: 0;
 
-  .score {
-    input {
-      width: 80px;
+            &:hover {
+                color: lighten($emerald, 20%);
+            }
+
+            &:active {
+                color: $emerald;
+            }
+        }
+
+        &.selected {
+            .btn-link {
+                color: $emerald;
+
+                &:hover {
+                    color: $emerald;
+                }
+
+                &:active {
+                    color: lighten($emerald, 20%);
+                }
+            }
+        }
     }
-  }
+
+    &.input-list-item .input-list-item-label .input-list-item-controls .input-list-item-control.simple-select {
+        margin-top: 0;
+    }
+
+    .choice-drop-target-container {
+        position: relative;
+
+        .choice-drop-target {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #f4bf42;
+            height: 10px;
+            width: 100%;
+            margin-bottom: 8px;
+            z-index: $reposition-target;
+            opacity: 0;
+
+            &.hover {
+                opacity: 1;
+            }
+        }
+    }
+
+    .score {
+        input {
+            width: 55px;
+        }
+    }
 }

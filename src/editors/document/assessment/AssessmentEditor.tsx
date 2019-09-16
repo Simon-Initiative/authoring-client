@@ -377,10 +377,9 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
 
     page = page.with({ nodes: page.nodes.set(node.guid, node) });
 
-    onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node);
     this.handleEdit(model.with({
       pages: model.pages.set(page.guid, page),
-    }));
+    }), () => onSetCurrentNodeOrPage(activeContext.documentId.valueOr(null), node));
   }
 
   onRemove() {

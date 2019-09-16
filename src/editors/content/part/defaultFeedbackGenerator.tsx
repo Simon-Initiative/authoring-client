@@ -4,6 +4,7 @@ import { ContentElements } from 'data/content/common/elements';
 import { CombinationsMap } from 'types/combinations';
 import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { convert } from 'utils/format';
+import { Maybe } from 'tsmonad';
 
 // This sets the limit for the number of choices to use the autogenerate
 // feedback combinations feature. When exceeded, the editor will switch to
@@ -34,7 +35,7 @@ export const autogenResponseFilter = (response) => {
  */
 const getFeedbackCombinations =
   (userResponses, choices, allCombinations: CombinationsMap,
-   normalizerMap: Object): Immutable.List<string> => {
+    normalizerMap: Object): Immutable.List<string> => {
     // get all user specified combinations
 
     const existingCombinations = userResponses.map(response => response.match.split(',')
@@ -65,7 +66,8 @@ const getFeedbackCombinations =
  *                      be a single feedback item with match set to the match-all 'glob'
  */
 export const modelWithDefaultFeedback = (
-  model: contentTypes.Part, choices: contentTypes.Choice[], body: ContentElements, score: string,
+  model: contentTypes.Part, choices: contentTypes.Choice[],
+  body: ContentElements, score: Maybe<string>,
   onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap,
   lang: string = undefined) => {
   // remove all existing default responses
@@ -161,8 +163,7 @@ export const getGeneratedResponseItem = (partModel): contentTypes.Response => {
 
 export const getGeneratedResponseScore = (partModel) => {
   const item = getGeneratedResponseItem(partModel);
-
-  return item ? item.score : '0';
+  return item ? item.score : Maybe.just('0');
 };
 
 export const getGeneratedResponseBody = (partModel) => {
