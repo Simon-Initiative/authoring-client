@@ -128,15 +128,15 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
       { body: { '#array': content } },
     ];
 
-    if (this.bibliography.bibEntries.size > 0) {
-      children.push(this.bibliography.toPersistence());
-    }
-
     this.dependencies.lift((deps) => {
       if (deps.size > 0) {
         children.push(deps.toPersistence());
       }
     });
+
+    if (this.bibliography.bibEntries.size > 0) {
+      children.push(this.bibliography.toPersistence());
+    }
 
     const doc = [{
       workbook_page: {
