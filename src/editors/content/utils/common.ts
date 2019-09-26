@@ -22,3 +22,5 @@ export const containsDynaDropCustom = (modelBody: ContentElements) => modelBody.
   },
   false,
 );
+
+export const isReplActivity = (filepath: string) => false;
