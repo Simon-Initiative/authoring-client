@@ -25,7 +25,6 @@ export const course = (
     case COURSE_CHANGED:
       return action.model;
     case UPDATE_COURSE_RESOURCES:
-      console.log('new resources', action.resources)
       return state.with({ resources: state.resources.merge(action.resources) });
     case ENTER_APPLICATION_VIEW:
       return initialState;

@@ -57,7 +57,6 @@ function parseBody(id, data): Context {
   };
 
   try {
-    console.log('content', data.body.content)
     data.body.content.forEach(content => processContent(context, content));
   } catch (e) {
     context.errors.push(e);
@@ -223,7 +222,6 @@ function list(context: Context): Ul | Ol {
   let li: Li;
   let remaining = context.activeListItems;
   const outerList = makeList(context.activeListItems[0]);
-  console.log('remaining', remaining)
 
   function go(list: Ol | Ul, nestingLevel: number): Ul | Ol {
     const item = remaining[0];
@@ -250,7 +248,6 @@ function list(context: Context): Ul | Ol {
 
     // 2. Element at same level, add it
     if (isSameLevel(level(item), nestingLevel)) {
-      console.log('para for list item', extractParagraph(context, item.paragraph, FLOW_ELEMENTS))
       li = new Li({
         content: extractParagraph(context, item.paragraph, FLOW_ELEMENTS),
       });
@@ -285,7 +282,6 @@ function processNested(context: Context, nested, supportedElements = WB_ELEMENTS
   let content = new ContentElements({
     supportedElements: Immutable.List(supportedElements),
   });
-  throw new Error('hey');
   nested.forEach((item) => {
     if (isImage(item)) {
       const image = imageWithContext(context, inlineIdFromContent(item));
@@ -362,12 +358,12 @@ function extractCustomElementName(t): string | null {
     if (cell.content.length === 1 && cell.content[0].paragraph) {
       const p = cell.content[0].paragraph;
       if (p.elements.length > 0) {
-        if (p.elements[0].textRun) {
+        if (p.elements[0].textRun && p.elements[0].textRun.content) {
           return p.elements[0].textRun.content.trim();
         }
       }
     }
-    return null;
+    return '';
   };
 
   const row = t.tableRows[0];
@@ -430,7 +426,6 @@ function extractParagraph(context: Context, p, supportedElements = WB_ELEMENTS):
     parseElement(p);
   }
 
-  console.log('lines at end', lines)
   return ContentElements.fromPersistence(
     paragraphDto(lines), guid(), supportedElements, null, () => { });
 
@@ -474,8 +469,6 @@ function extractParagraph(context: Context, p, supportedElements = WB_ELEMENTS):
 
       lines.push(content);
 
-      console.log('parsed: ', content)
-
     } else if (e.footnoteReference !== undefined) {
       lines.push(citeDto(e.footNoteReference.footnoteId));
 
@@ -492,7 +485,7 @@ function getBasicText(cell): string {
   if (cell.content.length === 1 && cell.content[0].paragraph) {
     const p = cell.content[0].paragraph;
     if (p.elements.length > 0) {
-      if (p.elements[0].textRun) {
+      if (p.elements[0].textRun && p.elements[0].textRun.content) {
         return p.elements[0].textRun.content.trim();
       }
     }

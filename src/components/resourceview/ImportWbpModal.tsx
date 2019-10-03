@@ -116,23 +116,43 @@ export const ImportWbpModal = ({ dismissModal, updateCourseResources, course }) 
 
   useEffect(() => {
     setupGapi().then(setGapi);
-  });
+  }, []);
 
   async function onInsert() {
     setErrors([]);
+    try {
+      await googleSignin(gapi);
+    } catch (e) {
+      setErrors([
+        new Error('You\'ll need to sign in through a Google account that has access to the page to allow OLI to import it.'),
+      ]);
+    }
 
-    await googleSignin(gapi);
-    const document = await retrieveDocument(gapi, documentId);
-    await googleSignout(gapi);
+    try {
+      const document = await retrieveDocument(gapi, documentId);
+      const context = processPage(document);
+      setErrors(context.errors);
 
-    const context = processPage(document);
-    setErrors(context.errors);
-
-    const workbookPage = await createWorkbookPage(context, course);
-    doUpdateCourseResources(workbookPage, updateCourseResources);
-
-    if (context.errors.length === 0) {
-      dismissModal();
+      try {
+        const workbookPage = await createWorkbookPage(context, course);
+        doUpdateCourseResources(workbookPage, updateCourseResources);
+        if (context.errors.length === 0) {
+          dismissModal();
+        }
+      } catch (e) {
+        setErrors([
+          new Error('There was a problem creating the workbook page in OLI after it was processed. Please give it another try.'),
+        ]);
+      }
+    } catch (e) {
+      setErrors([
+        new Error('There was a problem retrieving that document ID. Make sure the ID is correct and try again.'),
+      ]);
+    }
+    try {
+      await googleSignout(gapi);
+    } catch (e) {
+      // Google signout error. Not really a problem.
     }
   }
 
@@ -194,19 +214,19 @@ const HowDoesThisWork = () =>
         <div style={{ margin: 20 }}>
           <p>To see a sample doc with content that demonstrates the basics,
 check out <a target="_blank" href="https://docs.google.com/document/d/1URR7Ii4LFQwhHllqYtV3sHaU7tQMeIUzG0iU6qm27Z0/edit?usp=sharing">
-              the example OLI Google Doc.
+              the example OLI Google Doc
         </a>.</p>
           <h5>Supported Elements</h5>
           <ul>
             <li>Paragraphs</li>
-            <li>Markup including bold and italic</li>
+            <li>Text formats including bold and italic</li>
             <li>Hyperlinks</li>
             <li>Tables</li>
-            <li>Embedded images</li>
+            <li>Images</li>
             <li>Ordered and bulleted lists</li>
           </ul>
           <h5>Custom Element Support</h5>
-          <p>This tool supports the importing of non-native Google Docs elements
+          <p>This tool also supports importing non-native Google Docs elements
 through a <code>CustomElement</code> table that the author of the doc inserts.
     </p>
           <h6>YouTube Video</h6>
@@ -288,7 +308,7 @@ const ImportForm = ({ documentId, setDocumentId }) => {
       <form id="convert">
         <div className="form-group">
           <label htmlFor="id" style={{ width: '100%' }}>Document ID
-    <input type="text" className="form-control" id="id" aria-describedby="idHelp" placeholder="Unique ID"
+    <input type="text" className="form-control" id="id" aria-describedby="idHelp" placeholder="1URR7Ii4LFQwhHllqYtV3sHaU7tQMeIUzG0iU6qm27Z0"
               value={documentId}
               onChange={e => setDocumentId(parseDocumentId(e.target.value))} />
           </label>
@@ -296,9 +316,6 @@ const ImportForm = ({ documentId, setDocumentId }) => {
     https://docs.google.com/document/d/<b>1URR7Ii4LFQwhHllqYtV3sHaU7tQMeIUzG0iU6qm27Z0</b>/edit</small>
         </div>
       </form>
-      <div id="errorDisplay" className="alert alert-danger" role="info" style={{ visibility: 'hidden' }}>
-        placeholder
-  </div>
     </div>
   );
 };
@@ -315,12 +332,12 @@ const Errors = ({ errors }: { errors: Error[] }) => {
   );
 
   return (
-    <div className="card" style={{ marginBottom: 10 }}>
-      <div className="card-header">
+    <div className="card alert alert-danger" role="info" style={{ marginBottom: 10 }}>
+      <div className="card-header" style={{ background: 'white' }}>
         <h5 className="card-title">Errors</h5>
         <h6 className="card-subtitle text-muted">
           <span style={{ display: 'inline-block' }}>There were some errors with the document you imported.</span>
-          <span style={{ display: 'inline-block' }}>If you need some guidance, please reach out to the OLI support team with the link under the account dropdown menu.</span>
+          <span style={{ display: 'inline-block' }}>If you need some guidance, please reach out to us with the link under the account dropdown menu.</span>
         </h6>
       </div>
       <ul className="list-group list-group-flush" style={{ listStyle: 'decimal inside' }}>

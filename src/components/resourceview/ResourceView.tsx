@@ -79,24 +79,21 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     selected: undefined,
     searchText: '',
     newItemTitle: '',
-    resources: this.getRows(),
+    resources: this.getRows(this.props),
   };
 
   componentWillReceiveProps(nextProps: ResourceViewProps): void {
-    console.log('this props', nextProps.course.resources)
-    console.log('next props', nextProps.course.resources)
-    console.log('nextProps.course.resources !== this.props.course.resources', nextProps.course.resources !== this.props.course.resources)
     if (nextProps.course.resources !== this.props.course.resources) {
       this.setState({
         resources: this.state.searchText !== ''
-          ? this.getRowsFilteredBySearch(this.state.searchText)
-          : this.getRows(),
+          ? this.getRowsFilteredBySearch(this.state.searchText, nextProps)
+          : this.getRows(nextProps),
       });
     }
   }
 
-  getRows(): Resource[] {
-    const { course } = this.props;
+  getRows(props: ResourceViewProps): Resource[] {
+    const { course } = props;
 
     return course.resources.toArray().filter(r =>
       r.id !== PLACEHOLDER_ITEM_ID
@@ -112,7 +109,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   // Filter resources shown based on title and id
-  getRowsFilteredBySearch = (searchText: string): Resource[] => {
+  getRowsFilteredBySearch = (searchText: string, props: ResourceViewProps): Resource[] => {
     const text = searchText.trim().toLowerCase();
     const filterFn = (r: Resource): boolean => {
 
@@ -129,7 +126,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         idLower.indexOf(text) > -1;
     };
 
-    return this.getRows().filter(filterFn);
+    return this.getRows(props).filter(filterFn);
   }
 
   onNewItemTitleChange = (newItemTitle: string) => {
@@ -202,7 +199,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     // one row in the table for each resource present
     this.setState({
       searchText,
-      resources: this.getRowsFilteredBySearch(searchText),
+      resources: this.getRowsFilteredBySearch(searchText, this.props),
     });
   }
 
@@ -343,6 +340,18 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
             Import Existing
           </div>
           <div className="card-body" style={{ flexDirection: 'row' }}>
+            <button onClick={() => {
+              dispatch(modalActions.display(
+                <ImportWbpModal
+                  updateCourseResources={updated => dispatch(updateCourseResources(updated))}
+                  dismissModal={() => dispatch(modalActions.dismiss())}
+                  course={this.props.course}
+                />,
+              ));
+            }}
+              type="button" className="btn btn-md btn-primary import-button">
+              Workbook Page
+            </button>
             <button disabled onClick={() => {
               dispatch(modalActions.display(
                 <ImportObjSkillsModal dismissModal={() => dispatch(modalActions.dismiss())} />,
@@ -366,18 +375,6 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
             }}
               type="button" className="btn btn-md btn-primary import-button">
               Assessment
-            </button>
-            <button onClick={() => {
-              dispatch(modalActions.display(
-                <ImportWbpModal
-                  updateCourseResources={updated => dispatch(updateCourseResources(updated))}
-                  dismissModal={() => dispatch(modalActions.dismiss())}
-                  course={this.props.course}
-                />,
-              ));
-            }}
-              type="button" className="btn btn-md btn-primary import-button">
-              Workbook Page
             </button>
           </div>
         </div>
