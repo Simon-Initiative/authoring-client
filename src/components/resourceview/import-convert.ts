@@ -58,6 +58,7 @@ function questionHandler(sheet) {
     }
 
   } catch (e) {
+    // tslint:disable-next-line:no-console
     console.log('error encountered in extracting values: ' + e);
     return null;
   }
@@ -96,6 +97,7 @@ function poolHandler(sheet) {
     }
 
   } catch (e) {
+    // tslint:disable-next-line:no-console
     console.log('error encountered in extracting values: ' + e);
     return null;
   }
@@ -120,6 +122,7 @@ function extractComponents(file) {
       if (c !== null && c.id !== undefined) {
         components.push(c);
       } else {
+        // tslint:disable-next-line:no-console
         console.log('error in sheet ' + key);
       }
     }

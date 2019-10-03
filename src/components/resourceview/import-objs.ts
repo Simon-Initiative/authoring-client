@@ -18,6 +18,7 @@ function toModel(sheet) {
     }
 
   } catch (e) {
+    // tslint:disable-next-line:no-console
     console.log('error encountered in extracting values: ' + e);
     return null;
   }
