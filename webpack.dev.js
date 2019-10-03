@@ -29,10 +29,11 @@ module.exports = {
             'whatwg-fetch'
         ]
     },
+    externals: {
+
+    },
     output: {
         filename: '[name].js'
-    },
-    externals: {
     },
     devtool: 'source-map',
     devServer: {

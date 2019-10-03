@@ -1,0 +1,46 @@
+@import "oli/layout";
+
+.container-fluid {
+    padding: 0;
+}
+
+.import-skills,
+.import-organization,
+.import-assessment,
+.import-page {
+    margin-top: 20px;
+}
+
+.resource-view {
+    flex: 1;
+    overflow: auto;
+
+    .table-toolbar {
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+        margin-top: 10px;
+    }
+
+    .import-button {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+    .title-btn {
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    .title-icon {
+        width: 20px;
+    }
+}
+
+.inlineSearch {
+    width: 500px;
+    margin-bottom: 20px;
+}

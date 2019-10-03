@@ -35,6 +35,7 @@ export interface SortableTableProps {
   rowRenderer?: RowRenderer;
   columnRenderers: ColumnRenderer[];
   model: DataRow[];
+  style?: Object;
 }
 
 export interface SortableTableState {
@@ -61,7 +62,7 @@ export class SortableTable
   }
 
 
-  sort(model: DataRow[], columnIndex: number, sortDirection: SortDirection) : DataRow[] {
+  sort(model: DataRow[], columnIndex: number, sortDirection: SortDirection): DataRow[] {
 
     const i = columnIndex;
     return model.sort((a: DataRow, b: DataRow) => {
@@ -84,7 +85,7 @@ export class SortableTable
     if (sortColumnIndex === this.state.sortColumnIndex) {
 
       const sortDirection = this.state.sortDirection === SortDirection.Ascending
-          ? SortDirection.Descending : SortDirection.Ascending;
+        ? SortDirection.Descending : SortDirection.Ascending;
 
       this.setState({
         sortDirection,
@@ -110,7 +111,7 @@ export class SortableTable
       <span>&nbsp;&nbsp;
         <a onClick={_ => this.onSortChange(this.state.sortColumnIndex)}>
           <span>
-          <i className={classes}></i>
+            <i className={classes}></i>
           </span>
         </a>
       </span>
@@ -125,7 +126,7 @@ export class SortableTable
             <a>{label}</a>
             {index === this.state.sortColumnIndex
               ? this.renderSortIndicator(true)
-              : this.renderSortIndicator(false) }
+              : this.renderSortIndicator(false)}
           </th>
         );
       });
@@ -148,7 +149,7 @@ export class SortableTable
 
   render() {
     return (
-      <table className="table table-sm customTable">
+      <table style={this.props.style} className="table table-sm customTable">
         <thead>
           <tr>
             {this.renderColumnHeaders()}

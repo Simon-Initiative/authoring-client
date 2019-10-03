@@ -10,7 +10,7 @@ import './CoursesViewSearchable.scss';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
-import { safeCompare } from 'components/ResourceView';
+import { safeCompare } from 'components/resourceview/ResourceView';
 import { buildGeneralErrorMessage } from 'utils/error';
 import { CourseIdVers, CourseGuid } from 'data/types';
 
