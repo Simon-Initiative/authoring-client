@@ -89,7 +89,6 @@
             {
               "response": {
                 "@match": "B,A,C,D",
-                "@score": "0",
                 "@name": "",
                 "#array": [
                   {

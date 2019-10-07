@@ -90,7 +90,7 @@ function parseElements(
           const parse = factories[key];
 
           if (parse !== undefined) {
-            parsedObjects.push(parse(e, guid(), notify));
+            parsedObjects.push(parse(e, guid(), notify, backingTextProvider));
           } else {
             // unsupported element
             parsedObjects.push(Unsupported.fromPersistence(e, guid(), notify));

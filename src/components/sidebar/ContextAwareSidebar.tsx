@@ -38,6 +38,8 @@ import { Edge } from 'types/edge';
 import { CourseState } from 'reducers/course';
 import { viewDocument, viewOrganizations } from 'actions/view';
 import { getNameAndIconByType } from 'components/ResourceView';
+import ContiguousTextToolbar
+  from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
 
 interface SidebarRowProps {
   label?: string;
@@ -181,16 +183,16 @@ class ContextAwareSidebar
     const { course, resource } = props;
 
     persistence.fetchEdges(course.guid).then((edges) => {
- // returns a list of edges pointing to the current page, with no edges sharing the same source
+      // returns a list of edges pointing to the current page, with no edges sharing the same source
       const sources: Edge[] = edges.filter(edge => this.stripId(edge.destinationId) === resource.id)
-      .reduce((prev : {usedResources: any, edges: Edge[]}, edge) => {
-        if (prev.usedResources[edge.sourceId]) {
+        .reduce((prev: { usedResources: any, edges: Edge[] }, edge) => {
+          if (prev.usedResources[edge.sourceId]) {
+            return prev;
+          }
+          prev.usedResources[edge.sourceId] = edge;
+          prev.edges.push(edge);
           return prev;
-        }
-        prev.usedResources[edge.sourceId] = edge;
-        prev.edges.push(edge);
-        return prev;
-      }, { usedResources: {}, edges: [] }).edges;
+        }, { usedResources: {}, edges: [] }).edges;
 
       this.setState({
         resourceRefs: Maybe.just(sources),
@@ -255,9 +257,14 @@ class ContextAwareSidebar
   }
 
   onToggleBranching() {
-    const { model, onEditModel, onDisplayModal, onDismissModal } = this.props;
+    const { model, onEditModel, onDisplayModal, onDismissModal, onSetCurrentNodeOrPage,
+      resource } = this.props;
 
-    const toggleBranching = (model: AssessmentModel) => onEditModel(model);
+    const toggleBranching = (model: AssessmentModel) => {
+      onEditModel(model);
+      const firstPage = model.pages.first() && model.pages.first().guid;
+      onSetCurrentNodeOrPage(resource.id, firstPage);
+    };
 
     const assessmentModel = model as AssessmentModel;
     const newModel = assessmentModel.with({
@@ -354,47 +361,47 @@ class ContextAwareSidebar
 
                       {
                         refs.map(ref => getRefResourceFromRef(ref))
-                        .filter(res => res !== undefined &&
-                                       res.resourceState !== ResourceState.DELETED)
-                        .sort((a, b) => {
-                          if (a.type === b.type) {
-                            return (a.title < b.title ? -1 : 1);
-                          }
-                          if (a.type === 'x-oli-organization') {
-                            return -1;
-                          }
-                          if (b.type === 'x-oli-organization') {
-                            return 1;
-                          }
-                          if (a.type === 'x-oli-workbook_page') {
-                            return -1;
-                          }
-                          if (b.type === 'x-oli-workbook_page') {
-                            return 1;
-                          }
-                          return 0;
-                        })
-                        .map(res => (
-                          <div key={res.guid} className="ref-thing">
-                            <a href="#" onClick={(event) => {
-                              event.preventDefault();
-                              // if link is to org, just switch org and stay on current page
-                              if (res.type === 'x-oli-organization') {
-                                viewDocument(resource.id, course.idvers,
-                                  Maybe.maybe(res.id));
-                              } else {
-                                viewDocument(res.id, course.idvers, Maybe.nothing());
-                              }
+                          .filter(res => res !== undefined &&
+                            res.resourceState !== ResourceState.DELETED)
+                          .sort((a, b) => {
+                            if (a.type === b.type) {
+                              return (a.title < b.title ? -1 : 1);
                             }
-                            }>
-                              <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
-                                {
-                                  getNameAndIconByType(res.type).icon}
-                              </span>
-                              {res.title}
-                            </a>
-                          </div>
-                        ))}
+                            if (a.type === 'x-oli-organization') {
+                              return -1;
+                            }
+                            if (b.type === 'x-oli-organization') {
+                              return 1;
+                            }
+                            if (a.type === 'x-oli-workbook_page') {
+                              return -1;
+                            }
+                            if (b.type === 'x-oli-workbook_page') {
+                              return 1;
+                            }
+                            return 0;
+                          })
+                          .map(res => (
+                            <div key={res.guid} className="ref-thing">
+                              <a href="#" onClick={(event) => {
+                                event.preventDefault();
+                                // if link is to org, just switch org and stay on current page
+                                if (res.type === 'x-oli-organization') {
+                                  viewDocument(resource.id, course.idvers,
+                                    Maybe.maybe(res.id));
+                                } else {
+                                  viewDocument(res.id, course.idvers, Maybe.nothing());
+                                }
+                              }
+                              }>
+                                <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
+                                  {
+                                    getNameAndIconByType(res.type).icon}
+                                </span>
+                                {res.title}
+                              </a>
+                            </div>
+                          ))}
                     </div>
                   ) : (
                     <div>No references found</div>
@@ -705,8 +712,12 @@ class ContextAwareSidebar
         onUpdateHover: () => { },
       };
 
-      contentRenderer = React.createElement(
-        getEditorByContentType((contentElement as any).contentType), props);
+      if (contentElement.contentType === 'ContiguousText') {
+        contentRenderer = <ContiguousTextToolbar {...props} />;
+      } else {
+        contentRenderer = React.createElement(
+          getEditorByContentType((contentElement as any).contentType), props);
+      }
 
     }
 

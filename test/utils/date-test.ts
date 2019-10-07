@@ -17,16 +17,12 @@ it('compareDates test', () => {
   expect(compareDates(new Date(500000001999), new Date(500000000000))).toBe(1999);
   expect(compareDates(new Date(500000000000), new Date(500000001999))).toBe(-1999);
   expect(compareDates(
-    new Date('2019-05-05T03:24:00Z'),
+    new Date('2019-05-05T03:24'),
     new Date('May 5, 2019 3:24:00 AM'))).toEqual(0);
   expect(compareDates(new Date('June 19, 1965 7:37:07 PM'), new Date('1965-06-19T19:37:07Z'))).toBe(
     (new Date().getTimezoneOffset() * 60000));
   expect(compareDates(new Date('2079-05-05T03:24:00Z'), new Date('2019-05-05T03:24:00Z'))).toBe(
     1893456000000);
-
-
-
-
 });
 
 // testing for all 13 possible outputs
@@ -94,5 +90,4 @@ it('relativeTo test', () => {
     new Date(563072000000))).toBe('2 years ago');
   expect(relativeTo(new Date(500000000000),
     new Date('June 21, 2019 2:24:00 PM'))).toBe('33 years ago');
-
 });

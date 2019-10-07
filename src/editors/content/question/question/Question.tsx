@@ -134,6 +134,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   }
 
   componentDidMount() {
+
     // Hotkey for Georgia State to enable the first generation variable editor.
     handleKey(
       '⌘+shift+0, ctrl+shift+0',

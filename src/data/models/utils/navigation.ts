@@ -156,9 +156,9 @@ export function getChildren<NodeType extends HasGuid>(
     case 'Cr':
       return Maybe.just((node as contentTypes.Cr).cells as any);
     case 'ConjugationCell':
-      return Maybe.just((node as contentTypes.ConjugationCell).content.content as any);
+      return Maybe.just((node as contentTypes.ConjugationCell).content as any);
     case 'Conjugate':
-      return Maybe.just((node as contentTypes.Conjugate).content.content as any);
+      return Maybe.just((node as contentTypes.Conjugate).content as any);
     case 'Instructions':
       return Maybe.just((node as contentTypes.Instructions).content.content as any);
     default:

@@ -53,12 +53,25 @@ let experimentalOrgEditing = (window as Window)
     ? 'Experimental org editing enabled' : 'Experimental org editing disabled';
 };
 
+let prereqEditing = (window as Window)
+  .localStorage.getItem('prereq-editing') === 'true';
+(window as any).enablePrereqEditing = (show: boolean) => {
+  prereqEditing = !!show;
+  (window as Window).localStorage
+    .setItem('prereq-editing', prereqEditing ? 'true' : 'false');
+
+  return prereqEditing
+    ? 'Page prerequisite editing enabled' : 'Page prerequisite editing disabled';
+};
+
 (window as any).help = () => {
   // tslint:disable-next-line:no-console
   console.log(`
 Available Commands:
   enableExperimentalOrgEditing(enable: boolean)
     Enable experimental support for editing preconditions
+  enablePrereqEditing(enable: boolean)
+    Enable support for editing page prerequisites
   showReduxLogs(show: boolean)
     Enable redux logging if show is true, otherwise disable redux logging.
     Setting persists in local storage.

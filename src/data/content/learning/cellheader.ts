@@ -45,7 +45,9 @@ export class CellHeader extends Immutable.Record(defaultContent) {
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void): CellHeader {
+  static fromPersistence(
+    root: Object, guid: string,
+    notify: () => void, backingTextProvider: Object = null): CellHeader {
 
     const t = (root as any).th;
 
@@ -63,12 +65,13 @@ export class CellHeader extends Immutable.Record(defaultContent) {
 
     if (t['#text'] !== undefined) {
       model = model.with({
-        content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS, null, notify),
+        content: ContentElements.fromPersistence(
+          t, '', INLINE_ELEMENTS, backingTextProvider, notify),
       });
     } else {
       model = model.with({
         content: ContentElements
-          .fromPersistence(getChildren(t), '', INLINE_ELEMENTS, null, notify),
+          .fromPersistence(getChildren(t), '', INLINE_ELEMENTS, backingTextProvider, notify),
       });
     }
 

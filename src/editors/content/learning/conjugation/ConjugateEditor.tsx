@@ -289,9 +289,12 @@ class ConjugateEditor
       return [];
     };
 
-    const hideDecorator = model.content.content.size === 0 ||
-      (model.content.content.size === 1
-        && model.content.content.first().contentType === 'ContiguousText');
+    let hideDecorator = false;
+    if (model.content.contentType === 'ContiguousText') {
+      hideDecorator = model.content.slateValue.document.nodes.size === 1;
+    } else {
+      hideDecorator = model.content.content.size === 0;
+    }
 
     const contentEditor = this.props.model.contentType === 'Conjugate'
       ? this.renderSimplifiedTextEditor()

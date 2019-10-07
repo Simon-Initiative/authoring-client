@@ -7,7 +7,10 @@ module.exports = {
     entry: {
         app: ['whatwg-fetch', 'react-hot-loader/patch', './src/app.tsx'],
         vendor: [
-            'draft-js',
+            'slate',
+            'slate-react',
+            'slate-html-serializer',
+            'slate-plain-serializer',
             'history',
             'immutable',
             'json-beautify',

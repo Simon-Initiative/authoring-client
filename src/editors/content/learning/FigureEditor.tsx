@@ -37,7 +37,6 @@ export default class FigureEditor
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
     this.onCitationTitleEdit = this.onCitationTitleEdit.bind(this);
     this.onCitationEntryEdit = this.onCitationEntryEdit.bind(this);
-    this.onCitationContentEdit = this.onCitationContentEdit.bind(this);
   }
 
   onTitleEdit(ct: ContiguousText, src) {
@@ -83,15 +82,6 @@ export default class FigureEditor
     });
     const model = this.props.model.with({ cite: Maybe.just(cite) });
     this.props.onEdit(model, model);
-  }
-
-  onCitationContentEdit(content: ContentElements, src) {
-    const cite = this.props.model.cite.caseOf({
-      just: cite => cite.with({ content }),
-      nothing: () => new contentTypes.Cite().with({ content }),
-    });
-    const model = this.props.model.with({ cite: Maybe.just(cite) });
-    this.props.onEdit(model, src);
   }
 
   renderSidebar(): JSX.Element {

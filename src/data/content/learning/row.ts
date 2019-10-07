@@ -45,7 +45,8 @@ export class Row extends Immutable.Record(defaultContent) {
     }));
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void): Row {
+  static fromPersistence(
+    root: Object, guid: string, notify: () => void, backingTextProvider: Object = null): Row {
 
     const t = (root as any).tr;
 
@@ -59,12 +60,14 @@ export class Row extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'td':
           model = model.with({
-            cells: model.cells.set(id, CellData.fromPersistence(item, id, notify)),
+            cells: model.cells.set(
+              id, CellData.fromPersistence(item, id, notify, backingTextProvider)),
           });
           break;
         case 'th':
           model = model.with({
-            cells: model.cells.set(id, CellHeader.fromPersistence(item, id, notify)),
+            cells: model.cells.set(
+              id, CellHeader.fromPersistence(item, id, notify, backingTextProvider)),
           });
           break;
         default:

@@ -4,10 +4,11 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren, ensureIdGuidPresent } from '../common';
 import { getKey } from '../../common';
 import { Match } from './match';
+import { Maybe } from 'tsmonad';
 
 export type ResponseMultParams = {
   matchStyle?: string,
-  score?: string,
+  score?: Maybe<string>,
   name?: string,
   matches?: Immutable.OrderedMap<string, Match>,
   guid?: string,
@@ -17,7 +18,7 @@ const defaultContent = {
   contentType: 'ResponseMult',
   elementType: 'response_mult',
   matchStyle: 'any',
-  score: '0',
+  score: Maybe.just('0'),
   name: '',
   matches: Immutable.OrderedMap<string, Match>(),
   guid: '',
@@ -28,7 +29,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
   contentType: 'ResponseMult';
   elementType: 'response_mult';
   matchStyle: string;
-  score: string;
+  score: Maybe<string>;
   name: string;
   matches: Immutable.OrderedMap<string, Match>;
   guid: string;
@@ -38,7 +39,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
   }
 
 
-  clone() : ResponseMult {
+  clone(): ResponseMult {
     return ensureIdGuidPresent(this);
   }
 
@@ -46,7 +47,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string, notify: () => void) : ResponseMult {
+  static fromPersistence(root: Object, guid: string, notify: () => void): ResponseMult {
 
     const p = (root as any).response_mult;
 
@@ -57,6 +58,8 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
     }
     if (p['@score'] !== undefined) {
       model = model.with({ score: p['@score'] });
+    } else {
+      model = model.with({ score: Maybe.nothing() });
     }
     if (p['@name'] !== undefined) {
       model = model.with({ name: p['@name'] });
@@ -79,17 +82,24 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
 
     const matches = this.matches.toArray().map(m => m.toPersistence());
 
-    return {
+    const o = {
       response_mult: {
-        '@score': this.score.trim() === '' ? '0' : this.score,
         '@name': this.name,
         '@match_style': this.matchStyle,
         '#array': [...matches],
       },
     };
+
+    this.score.lift((score) => {
+      if (score.trim() !== '') {
+        o.response_mult['@score'] = score;
+      }
+    });
+
+    return o;
   }
 }

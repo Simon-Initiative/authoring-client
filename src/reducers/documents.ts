@@ -2,8 +2,10 @@ import * as Immutable from 'immutable';
 import * as documentActions from 'actions/document';
 import { EditedDocument } from 'types/document';
 import createGuid from 'utils/guid';
-import { ModelTypes, AssessmentModel, PoolModel } from 'data/models';
+import { ContentElement } from 'data/content/common/interfaces';
+import { ModelTypes, AssessmentModel, PoolModel, ContentModel } from 'data/models';
 import { Maybe } from 'tsmonad';
+import { map } from 'data/utils/map';
 import * as contentTypes from 'data/contentTypes';
 
 export type ActionTypes =
@@ -28,7 +30,7 @@ function processUndo(
 
   const ed = state.get(action.documentId);
   const model = ed.undoStack.peek();
-  const document = ed.document.with({ model });
+  const document = ed.document.with({ model: forceUpdate(model) });
 
   const undoStack = ed.undoStack.pop();
   const redoStack = ed.redoStack.push(ed.document.model);
@@ -41,6 +43,16 @@ function processUndo(
   }));
 }
 
+function forceUpdate(model: ContentModel): ContentModel {
+  const force = (e) => {
+    if (e.contentType === 'ContiguousText') {
+      return e.with({ forcedUpdateCount: Math.ceil(Math.random() * 100000) });
+    }
+    return e;
+  };
+  return map(force, (model as any) as ContentElement) as any as ContentModel;
+}
+
 function processRedo(
   state: DocumentsState, action: documentActions.ChangeRedoneAction): DocumentsState {
 
@@ -50,7 +62,7 @@ function processRedo(
   const undoStack = ed.undoStack.push(ed.document.model);
   const redoStack = ed.redoStack.pop();
 
-  const document = ed.document.with({ model });
+  const document = ed.document.with({ model: forceUpdate(model) });
 
   return state.set(action.documentId, ed.with({
     undoRedoGuid: createGuid(),

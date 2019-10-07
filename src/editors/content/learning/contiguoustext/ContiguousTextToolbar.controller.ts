@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { TextSelection } from 'types/active';
 import {
   AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -12,12 +11,14 @@ import { addEntry } from 'actions/bibliography';
 import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
 import { fetchContentElementByPredicate } from 'actions/document';
+import { Editor, Inline } from 'slate';
 
 interface StateProps {
-  selection: TextSelection;
   resource: Resource;
   courseModel: CourseModel;
   orderedIds?: any;
+  editor: Maybe<Editor>;
+  activeInline: Maybe<Inline>;
 }
 
 interface DispatchProps {
@@ -40,13 +41,10 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const resource = state.documents.get(documentId).document.model.resource;
 
   return {
+    editor: activeContext.editor,
     courseModel,
     resource,
-    selection: activeContext.textSelection.caseOf({
-      just: s => s, nothing: () => {
-        return TextSelection.createEmpty('');
-      },
-    }),
+    activeInline: activeContext.activeInline,
   };
 };
 

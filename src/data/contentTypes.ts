@@ -37,6 +37,7 @@ export { Flash } from 'data/content/learning/flash';
 export { Formula } from 'data/content/learning/formula';
 export { IFrame } from 'data/content/learning/iframe';
 export { Image } from 'data/content/learning/image';
+export { InputRef } from 'data/content/learning/input_ref';
 export { Inquiry } from 'data/content/learning/inquiry';
 export { Question as InquiryQuestion } from 'data/content/learning/question';
 export { Instructions } from 'data/content/learning/instructions';
@@ -115,6 +116,8 @@ export { Section as WorkbookSection } from 'data/content/workbook/section';
 export { WbInline } from 'data/content/workbook/wbinline';
 export { Xref } from 'data/content/workbook/xref';
 export { Multipanel } from 'data/content/workbook/multipanel/multipanel';
+export { Dependencies as WbDependencies } from 'data/content/workbook/dependencies';
+export { Dependency as WbDependency } from 'data/content/workbook/dependency';
 
 // Resource level
 export { FileNode } from 'data/content/file_node';

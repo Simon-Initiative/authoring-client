@@ -12,6 +12,7 @@ import {
 } from 'components/common/TabContainer';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { Maybe } from 'tsmonad';
 
 export interface FillInTheBlankProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
@@ -179,7 +180,9 @@ export class
       onEdit,
     } = this.props;
 
-    const updated = response.with({ score });
+    const updated = response.with({
+      score: score === '' ? Maybe.nothing<string>() : Maybe.just(score),
+    });
     const newPartModel = partModel.with(
       { responses: partModel.responses.set(updated.guid, updated) });
     onEdit(itemModel, newPartModel, updated);

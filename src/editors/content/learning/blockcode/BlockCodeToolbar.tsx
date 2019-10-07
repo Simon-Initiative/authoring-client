@@ -6,7 +6,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { InlineStyles } from 'data/content/learning/contiguous';
+import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -15,9 +15,15 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { styles } from './BlockCode.styles';
 import { StyledComponentProps } from 'types/component';
 
+import { Maybe } from 'tsmonad';
+import { Editor, Inline } from 'slate';
+import * as editorUtils from '../contiguoustext/utils';
+
 export interface BlockCodeToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
   selection: TextSelection;
+  editor: Maybe<Editor>;
+  activeInline: Maybe<Inline>;
 }
 
 export interface BlockCodeToolbarState {
@@ -25,6 +31,17 @@ export interface BlockCodeToolbarState {
 }
 
 type StyledBlockCodeToolbarProps = StyledComponentProps<BlockCodeToolbarProps, typeof styles>;
+
+
+function applyInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.applyInline(e, wrapper));
+}
+function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.insertInline(e, wrapper));
+}
+function updateInline(editor: Maybe<Editor>, key: string, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.updateInlineData(e, key, wrapper));
+}
 
 class BlockCodeToolbar
   extends AbstractContentEditor<contentTypes.BlockCode,
@@ -47,35 +64,47 @@ class BlockCodeToolbar
       ...this.props,
       renderContext: RenderContext.Sidebar,
       onFocus: (c, p) => true,
-      model: data,
+      model: data.get('value'),
       onEdit: (updated) => {
-        const text = this.props.model.text.updateEntity(key, updated);
-        this.props.onEdit(this.props.model.with({ text }), updated);
+        updateInline(this.props.editor, key, updated);
       },
     };
 
     return React.createElement(
-      getEditorByContentType((data as any).contentType), props);
+      getEditorByContentType(data.get('value').contentType), props);
 
   }
 
   renderSidebar() {
-    const { model, selection } = this.props;
+    const { editor, activeInline } = this.props;
 
-    const entity = selection.isCollapsed()
-      ? model.text.getEntityAtCursor(selection).caseOf({ just: n => n, nothing: () => null })
-      : null;
+    const plainSidebar = <SidebarContent title="Code" />;
 
-    if (entity !== null) {
-      return this.renderActiveEntity(entity);
+    const inline = activeInline.caseOf({
+      just: i => i,
+      nothing: () => null,
+    });
+
+    if (inline !== null) {
+      return this.renderActiveEntity(inline);
     }
-    return <SidebarContent title="Code" />;
+
+    return editor.caseOf({
+      just: (e) => {
+        return editorUtils.getEntityAtCursor(e).caseOf({
+          just: entity => this.renderActiveEntity(entity),
+          nothing: () => plainSidebar,
+        });
+      },
+      nothing: () => plainSidebar,
+    });
   }
 
   renderToolbar() {
 
-    const { model, onEdit, editMode, selection } = this.props;
+    const { editMode, selection, editor } = this.props;
     const noTextSelected = selection && selection.isCollapsed();
+    const styles = editorUtils.getActiveStyles(editor);
 
     return (
       <ToolbarGroup
@@ -83,61 +112,55 @@ class BlockCodeToolbar
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Bold, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
             disabled={noTextSelected || !editMode}
+            active={styles.has('em')}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Italic, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
             disabled={noTextSelected || !editMode}
+            active={styles.has('italic')}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
             disabled={noTextSelected || !editMode}
+            active={styles.has('line-through')}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Highlight, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
             disabled={noTextSelected || !editMode}
+            active={styles.has('highlight')}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Superscript, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
             disabled={noTextSelected || !editMode}
+            active={styles.has('sup')}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Subscript, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
             disabled={noTextSelected || !editMode}
+            active={styles.has('sub')}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>

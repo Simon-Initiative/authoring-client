@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import * as contentTypes from 'data/contentTypes';
 import { withStyles } from 'styles/jss';
 import {
@@ -6,8 +7,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { InlineStyles } from 'data/content/learning/contiguous';
-import { EntityTypes } from 'data/content/learning/common';
+import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -16,14 +16,27 @@ import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
 
 import { styles } from './BlockFormula.styles';
 import { StyledComponentProps } from 'types/component';
+import { Maybe } from 'tsmonad';
+import { Editor, Inline } from 'slate';
+import * as editorUtils from '../contiguoustext/utils';
 
 export interface BlockFormulaToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockFormula> {
   selection: TextSelection;
+  editor: Maybe<Editor>;
+  activeInline: Maybe<Inline>;
 }
 
 export interface BlockFormulaToolbarState {
 
+}
+
+
+function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.insertInline(e, wrapper));
+}
+function updateInline(editor: Maybe<Editor>, key: string, wrapper: InlineTypes) {
+  editor.lift(e => editorUtils.updateInlineData(e, key, wrapper));
 }
 
 type StyledBlockFormulaToolbarProps = StyledComponentProps<BlockFormulaToolbarProps, typeof styles>;
@@ -49,40 +62,55 @@ class BlockFormulaToolbar
       ...this.props,
       renderContext: RenderContext.Sidebar,
       onFocus: (c, p) => true,
-      model: data,
+      model: data.get('value'),
       onEdit: (updated) => {
-        const text = this.props.model.text.updateEntity(key, updated);
-        this.props.onEdit(this.props.model.with({ text }), updated);
+        updateInline(this.props.editor, key, updated);
       },
     };
 
     return React.createElement(
-      getEditorByContentType((data as any).contentType), props);
+      getEditorByContentType(data.get('value').contentType), props);
 
   }
 
   renderSidebar() {
-    const { model, selection } = this.props;
+    const { editor, activeInline } = this.props;
 
-    const entity = selection.isCollapsed()
-      ? model.text.getEntityAtCursor(selection).caseOf({ just: n => n, nothing: () => null })
-      : null;
+    const plainSidebar = <SidebarContent title="Formula" />;
 
-    if (entity !== null) {
-      return this.renderActiveEntity(entity);
+    const inline = activeInline.caseOf({
+      just: i => i,
+      nothing: () => null,
+    });
+
+    if (inline !== null) {
+      return this.renderActiveEntity(inline);
     }
-    return <SidebarContent title="Formula" />;
+
+    return editor.caseOf({
+      just: (e) => {
+        return editorUtils.getEntityAtCursor(e).caseOf({
+          just: entity => this.renderActiveEntity(entity),
+          nothing: () => plainSidebar,
+        });
+      },
+      nothing: () => plainSidebar,
+    });
   }
 
   renderToolbar() {
 
-    const { model, onEdit, editMode, selection } = this.props;
+    const { editor, editMode, selection } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
     const noTextSelected = selection && selection.isCollapsed();
-
-    const cursorInEntity = selection && selection.isCollapsed()
-      ? model.text.getEntityAtCursor(selection).caseOf({ just: n => true, nothing: () => false })
-      : false;
+    const styles = editorUtils.getActiveStyles(editor);
+    const cursorInEntity = editor.caseOf({
+      just: e => editorUtils.getEntityAtCursor(e).caseOf({
+        just: i => true,
+        nothing: () => false,
+      }),
+      nothing: () => false,
+    });
 
     const pointEntitiesEnabled = editMode && !cursorInEntity && noTextSelected;
 
@@ -92,71 +120,62 @@ class BlockFormulaToolbar
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Bold, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
+            active={styles.has('em')}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Italic, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
+            active={styles.has('italic')}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
+            active={styles.has('line-through')}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Highlight, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
+            active={styles.has('highlight')}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Superscript, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
+            active={styles.has('sup')}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => onEdit(model.with({
-                text: model.text.toggleStyle(InlineStyles.Subscript, selection),
-              }))
+              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
-            disabled={noTextSelected || !editMode}
+            disabled={!editMode}
+            active={styles.has('sub')}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
               () => {
-                onEdit(model.with({
-                  text: model.text.addEntity(
-                    EntityTypes.math, true, new contentTypes.Math(), selection),
-                }));
+                insertInline(this.props.editor, new contentTypes.Math());
               }
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}

@@ -5,9 +5,13 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import BlockQuoteToolbar from './BlockQuoteToolbar';
 import { BlockQuote } from 'data/content/learning/blockquote';
+import { Maybe } from 'tsmonad';
+import { Editor, Inline } from 'slate';
 
 interface StateProps {
   selection: TextSelection;
+  editor: Maybe<Editor>;
+  activeInline: Maybe<Inline>;
 }
 
 interface DispatchProps {
@@ -23,8 +27,10 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const { activeContext } = state;
 
   return {
-    selection: activeContext.textSelection.caseOf({
-      just: s => s,
+    editor: activeContext.editor,
+    activeInline: activeContext.activeInline,
+    selection: activeContext.editor.caseOf({
+      just: s => new TextSelection(s.value.selection),
       nothing: () => TextSelection.createEmpty(''),
     }),
   };

@@ -145,11 +145,31 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
       scoreEditor = (
         <div className="input-group">
           <input
-            type="number"
+            type="text"
             className="form-control"
             disabled={!editMode}
-            value={response.score}
-            onChange={({ target: { value } }) => onEditScore(response, value)} />
+            value={response.score.valueOr('')}
+            onChange={(e) => {
+              const value = e.target.value;
+
+              // Allow empty scores ('')
+              if (value === '') {
+                return onEditScore(response, value);
+              }
+
+              const number = parseInt(value, 10);
+
+              if (Number.isNaN(number)) {
+                return e.preventDefault();
+              }
+
+              // Allow scores in range [0, 1000)
+              if (number < 0 || number > 999) {
+                return e.preventDefault();
+              }
+
+              onEditScore(response, String(number));
+            }} />
         </div>
       );
     }

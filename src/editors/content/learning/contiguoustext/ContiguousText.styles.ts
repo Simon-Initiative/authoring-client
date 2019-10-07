@@ -1,6 +1,9 @@
 import { JSSStyles } from 'styles/jss';
 
 export const styles: JSSStyles = {
+  activeStyle: {
+    color: 'blue',
+  },
   contiguousText: {
     padding: 5,
     backgroundColor: 'white',

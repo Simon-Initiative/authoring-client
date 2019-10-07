@@ -11,9 +11,10 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
 import guid from 'utils/guid';
-
 import './ContentContainer.scss';
 import { classNames } from 'styles/jss';
+import * as editorUtils from '../learning/contiguoustext/utils';
+import { Editor } from 'slate';
 
 export type BoundProperty = {
   propertyName: string,
@@ -108,7 +109,7 @@ export class ContentContainer
     return this.insertAt(model, toInsert, index + 1);
   }
 
-  onAddNew(toAdd, textSelection: Maybe<TextSelection>) {
+  onAddNew(toAdd, editor: Maybe<Editor>) {
     const { onEdit, model, activeContentGuid } = this.props;
 
     // The following defines the insertion logic
@@ -126,32 +127,36 @@ export class ContentContainer
 
       if (active instanceof ContiguousText) {
 
-        const selection = textSelection.caseOf({
-          just: s => s,
-          nothing: () => undefined,
+        editor.lift((e) => {
+          // We replace the text when it is effectively empty
+          if (editorUtils.isEffectivelyEmpty(e)) {
+            const updated: ContentElements = this.insertAfter(model, arrToAdd, index);
+            onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), firstItem);
+
+            // We insert after when the cursor is at the end
+          } else if (editorUtils.isCursorAtEffectiveEnd(e)) {
+            onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
+
+            // If it is at the beginning, insert the new item before the text
+          } else if (editorUtils.isCursorAtBeginning(e)) {
+            onEdit(this.insertAfter(model, arrToAdd, index - 1), firstItem);
+
+            // Otherwise we split the contiguous block in two parts and insert in between
+          } else {
+            const pair = editorUtils.split(e);
+            const forcedUpdateCount = active.forcedUpdateCount + 1;
+            const first = active.with({ slateValue: pair[0], forcedUpdateCount });
+            const second = new ContiguousText({ slateValue: pair[1] });
+
+            let updated = model.with({ content: model.content.set(first.guid, first) });
+
+            updated = this.insertAfter(updated, arrToAdd, index);
+            updated = this.insertAfter(updated, [second], index + arrToAdd.length);
+            onEdit(updated, firstItem);
+          }
         });
 
-        // We replace the text when it is effectively empty
-        if (active.isEffectivelyEmpty()) {
-          const updated: ContentElements = this.insertAfter(model, arrToAdd, index);
-          onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), firstItem);
 
-          // We insert after when the cursor is at the end
-        } else if (selection === undefined || active.isCursorAtEffectiveEnd(selection)) {
-          onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
-
-          // If it is at the beginning, insert the new item before the text
-        } else if (active.isCursorAtBeginning(selection)) {
-          onEdit(this.insertAfter(model, arrToAdd, index - 1), firstItem);
-
-          // Otherwise we split the contiguous block in two parts and insert in between
-        } else {
-          const pair = active.split(selection);
-          let updated = model.with({ content: model.content.set(pair[0].guid, pair[0]) });
-          updated = this.insertAfter(updated, arrToAdd, index);
-          updated = this.insertAfter(updated, [pair[1]], index + arrToAdd.length);
-          onEdit(updated, firstItem);
-        }
 
       } else {
         onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
@@ -209,9 +214,9 @@ export class ContentContainer
     }
   }
 
-  onPaste(item: ContentElement, textSelection: Maybe<TextSelection>) {
+  onPaste(item: ContentElement, editor: Maybe<Editor>) {
     const duplicate: ContentElement = item.clone();
-    this.onAddNew(duplicate, textSelection);
+    this.onAddNew(duplicate, editor);
   }
 
   onDuplicate(childModel) {

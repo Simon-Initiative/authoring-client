@@ -16,6 +16,7 @@ import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { ImageHotspotEditor } from './ImageHotspotEditor';
 
 import { styles } from './ImageHotspot.styles';
+import { Maybe } from 'tsmonad';
 
 export const isComplexScoring = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
@@ -36,7 +37,7 @@ export const resetAllScores = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
 
   const updatedResponses = responses.reduce(
-    (acc, r) => acc.set(r.guid, r.with({ score: '0' })),
+    (acc, r) => acc.set(r.guid, r.with({ score: Maybe.just('0') })),
     partModel.responses,
   );
 
@@ -118,7 +119,12 @@ class ImageHotspot
 
     updatedPartModel = updatedPartModel.with({
       responses: updatedPartModel.responses.set(
-        response.guid, response.with({ score: response.score === '0' ? '1' : '0' }),
+        response.guid, response.with({
+          score: response.score.caseOf({
+            just: score => score === '0' ? Maybe.just('1') : Maybe.just('0'),
+            nothing: () => Maybe.just('1'),
+          }),
+        }),
       ),
     });
 
@@ -137,7 +143,9 @@ class ImageHotspot
   onScoreEdit(response: contentTypes.Response, score: string) {
     const { partModel, itemModel, onEdit } = this.props;
 
-    const updatedScore = response.with({ score });
+    const updatedScore = response.with({
+      score: score === '' ? Maybe.nothing<string>() : Maybe.just(score),
+    });
     const updatedPartModel = partModel.with(
       { responses: partModel.responses.set(updatedScore.guid, updatedScore) },
     );
@@ -219,7 +227,10 @@ class ImageHotspot
           allowFeedback
           allowScore={advancedScoring}
           simpleSelectProps={{
-            selected: response.score !== '0',
+            selected: response.score.caseOf({
+              just: score => score !== '0',
+              nothing: () => true,
+            }),
             onToggleSimpleSelect: this.onToggleSimpleSelect,
           }}
           response={response}

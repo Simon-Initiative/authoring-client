@@ -12,8 +12,7 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { getEditorByContentType } from 'editors/content/container/registry';
-import { TextSelection } from 'types/active';
-
+import { Editor } from 'slate';
 import { Maybe } from 'tsmonad';
 import {
   DiscoverableId,
@@ -180,7 +179,7 @@ class ExtraDefinitionEditor
       onEdit(content: Object, source: Object) {
         this.props.onEdit(this.props.model.with({ translation: content }), source);
       },
-      onAddNew(content: Object, textSelection: Maybe<TextSelection>) { },
+      onAddNew(content: Object, editor: Maybe<Editor>) { },
       onRemove(content: Object) { },
       onDuplicate(content: Object) { },
       onMoveUp(content: Object) { },
@@ -203,7 +202,7 @@ class ExtraDefinitionEditor
       onEdit(content: Object, source: Object) {
         this.props.onEdit(this.props.model.with({ pronunciation: content }), source);
       },
-      onAddNew(content: Object, textSelection: Maybe<TextSelection>) { },
+      onAddNew(content: Object, editor: Maybe<Editor>) { },
       onRemove(content: Object) { },
       onDuplicate(content: Object) { },
       onMoveUp(content: Object) { },

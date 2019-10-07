@@ -1,0 +1,94 @@
+{
+  "question": {
+    "@id": "f52a5463741a407aa574c1e668add686",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#text": "This is my essay question.",
+                "@id": "af92f28cb53e1402990e0e9f37b958c28",
+                "@title": ""
+              }
+            }
+          ]
+        }
+      },
+      {
+        "essay": {
+          "@id": "b6cef763883549f4b290a2f43fedfe30",
+          "@name": ""
+        }
+      },
+      {
+        "part": {
+          "@id": "ae95ccdeccba44a1a371eea3bb84719b",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "*",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#text": "This is my feedback.",
+                            "@id": "ab40c09a57cbb4ec9959b3242acf64be9",
+                            "@title": ""
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "hint": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "This is my hint.",
+                      "@id": "adaa3aad1ad8441cf942c2babf4bf93c1",
+                      "@title": ""
+                    }
+                  }
+                ],
+                "@targets": ""
+              }
+            },
+            {
+              "explanation": {
+                "#array": [
+                  {
+                    "p": {
+                      "#text": "This is my feedback.",
+                      "@id": "ac2d28795d68f4b42bad4da2ec9c15ea8",
+                      "@title": ""
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": []
+        }
+      }
+    ]
+  }
+}
