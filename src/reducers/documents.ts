@@ -147,9 +147,6 @@ export const documents = (
 
     case documentActions.SET_CURRENT_PAGE_OR_NODE:
 
-      console.log('here')
-      console.log(action)
-
       // For pools, there are no pages, so just set the node
       if (ed.document.model instanceof PoolModel
         && (!(typeof action.nodeOrPageId === 'string'))) {
