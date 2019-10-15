@@ -31,7 +31,7 @@ import { Maybe } from 'tsmonad';
 import * as Messages from 'types/messages';
 import { buildGeneralErrorMessage } from 'utils/error';
 import { configuration } from 'actions/utils/config';
-import ResourceView from 'components/ResourceView';
+import ResourceView from 'components/resourceview/ResourceView';
 import OrgLibrary from 'components/OrgLibrary';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
 
@@ -834,7 +834,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                            To get the most recent data for analytics, create a new dataset.
+                              To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size

@@ -80,6 +80,12 @@
   });
 </script>
 
+  <script>
+      function handleClientLoad() {
+        gapi.load('client:auth2', function () { });
+      }
+  </script>
+
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js">
   </script>
 
@@ -93,6 +99,10 @@
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.0/js/bootstrap.min.js"
     integrity="sha256-C8oQVJ33cKtnkARnmeWp6SDChkU+u7KvsNMFUzkkUzk=" crossorigin="anonymous"></script>
+
+  <script async="" defer="" onload="this.onload=function(){};handleClientLoad()"
+    onreadystatechange="if (this.readyState === 'complete') this.onload()"
+    src="https://apis.google.com/js/api.js"></script>
 
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
