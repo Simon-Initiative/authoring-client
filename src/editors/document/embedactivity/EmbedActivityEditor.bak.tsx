@@ -18,7 +18,7 @@ import {
   Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
-import { styles } from 'editors/content/learning/EmbedActivityEditor.styles';
+import { styles } from './EmbedActivityEditor.bak.styles';
 
 export interface EmbedActivityProps extends AbstractContentEditorProps<Custom> {
   onShowSidebar: () => void;
