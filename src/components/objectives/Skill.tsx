@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
@@ -12,9 +12,7 @@ import { Tooltip } from 'utils/tooltip';
 import { calculateGuaranteedSummativeCount } from 'components/objectives/utils';
 import { QuestionRef } from 'types/questionRef';
 import { LegacyTypes } from 'data/types';
-import {
-  checkModel, ModelCheckerRule, RequirementType,
-} from 'data/linter/modelChecker';
+import { checkModel, ModelCheckerRule, RequirementType } from 'data/linter/modelChecker';
 
 export interface ModelRuleData {
   formativeCount: number;
@@ -110,6 +108,7 @@ export interface SkillProps {
   onEnterEditMode: () => void;
   onExitEditMode: () => void;
   onRemoveSkill: (skill: contentTypes.Skill) => void;
+  showId?: boolean;
 }
 
 export interface SkillState {
@@ -243,8 +242,12 @@ class Skill
   render() {
     const {
       className, classes, skill, editMode, loading, highlightText, isEditing, onEditSkill,
-      onExitEditMode,
+      onExitEditMode, showId,
     } = this.props;
+
+    const displayValue = showId
+      ? skill.title + ` (${skill.id})`
+      : skill.title;
 
     return (
       <div className={classNames(['Skill', classes.Skill, className])}>
@@ -260,7 +263,9 @@ class Skill
             }}
             onCancel={() => onExitEditMode()}
             editMode={editMode && !loading}
-            value={skill.title} />
+            value={displayValue}
+            hiddenValues={showId ? List([]) : List([skill.id])}
+          />
         </div>
         {!isEditing &&
           <div className={classes.skillActions}>
