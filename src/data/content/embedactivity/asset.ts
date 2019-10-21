@@ -41,8 +41,6 @@ export class Asset extends Immutable.Record(defaultContent) {
 
     let model = new Asset({ guid });
 
-    model = setId(model, t, notify);
-
     if (t['@name'] !== undefined) {
       model = model.with({ name: t['@name'] });
     }

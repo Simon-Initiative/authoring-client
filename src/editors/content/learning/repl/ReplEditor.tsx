@@ -1,16 +1,11 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { withStyles, classNames } from 'styles/jss';
-import { Custom } from 'data/content/assessment/custom';
-import { isReplActivity } from 'editors/content/utils/common';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-// TODO: Add ReplEditor
-// import { ReplEditor }
-//   from 'editors/content/learning/repl/ReplEditor.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
@@ -18,20 +13,21 @@ import {
   Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
-import { styles } from './EmbedActivityEditor.bak.styles';
+import { styles } from './ReplEditor.styles';
+import { EmbedActivityModel } from 'data/models/embedactivity';
 
-export interface EmbedActivityProps extends AbstractContentEditorProps<Custom> {
+export interface ReplEditorProps extends AbstractContentEditorProps<EmbedActivityModel> {
   onShowSidebar: () => void;
   onDiscover: (id: DiscoverableId) => void;
 }
 
-export interface EmbedActivityState {
+export interface ReplEditorState {
 
 }
 
-class EmbedActivity
-  extends AbstractContentEditor<Custom,
-  StyledComponentProps<EmbedActivityProps, typeof styles>, EmbedActivityState> {
+class ReplEditor
+  extends AbstractContentEditor<EmbedActivityModel,
+  StyledComponentProps<ReplEditorProps, typeof styles>, ReplEditorState> {
 
   constructor(props) {
     super(props);
@@ -44,8 +40,8 @@ class EmbedActivity
       <SidebarContent title="Custom">
         <SidebarGroup>
           <SidebarRow label="Type">
-            <Discoverable id={DiscoverableId.EmbedActivityDetails} focusChild>
-              [Embed Activity]
+            <Discoverable id={DiscoverableId.ReplEditorDetails} focusChild>
+              [Repl Activity Controls]
             </Discoverable>
           </SidebarRow>
         </SidebarGroup>
@@ -61,7 +57,7 @@ class EmbedActivity
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
-            onDiscover(DiscoverableId.EmbedActivityDetails);
+            onDiscover(DiscoverableId.ReplEditorDetails);
           }} size={ToolbarButtonSize.Large}>
           <div><i className="fas fa-sliders-h" /></div>
           <div>Details</div>
@@ -75,18 +71,11 @@ class EmbedActivity
 
     return (
       <div className={classNames([classes.customEditor, className])}>
-        {isReplActivity(model.src)
-          ? <div>Repl Activity</div>
-          : (
-            <div className={classes.customEditorOther}>
-              Embed Activity
-            </div>
-          )
-        }
+        <div>Repl Activity</div>
       </div>
     );
   }
 }
 
-const StyledEmbedActivity = withStyles<EmbedActivityProps>(styles)(EmbedActivity);
-export { StyledEmbedActivity as EmbedActivity };
+const StyledReplEditor = withStyles<ReplEditorProps>(styles)(ReplEditor);
+export { StyledReplEditor as ReplEditor };

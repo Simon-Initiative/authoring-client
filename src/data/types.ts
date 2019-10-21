@@ -74,6 +74,7 @@ export enum LegacyTypes {
   assessment2 = 'x-oli-assessment2',
   inline = 'x-oli-inline-assessment',
   feedback = 'x-oli-feedback',
+  embed_activity = 'x-oli-embed-activity',
   organization = 'x-oli-organization',
   learning_objective = 'x-oli-objective',
   learning_objectives = 'x-oli-learning_objectives',

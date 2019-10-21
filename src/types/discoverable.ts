@@ -6,7 +6,7 @@ export enum DiscoverableId {
   DlEditorTitle,
   DtEditorTitle,
   DdEditorTitle,
-  EmbedActivityDetails,
+  ReplEditorDetails,
   OrderedListEditorTitle,
   OrderedListEditorStyle,
   OrderedListEditorStart,

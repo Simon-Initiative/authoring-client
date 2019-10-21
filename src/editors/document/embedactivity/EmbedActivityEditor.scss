@@ -45,69 +45,8 @@
         }
     }
 
-    .slash {
-        color: #606060;
-    }
-
-    .outline-and-node-container {
+    .embed-activity-container {
         display: flex;
         flex: 1 1 auto;
-    }
-
-    .insert-new {
-        cursor: pointer;
-        background-color: #EAECEF;
-        font-size: 80%;
-        border-radius: 0 0 3px 3px;
-        padding: 8px 10px;
-        flex: 0 0 auto;
-    }
-
-    a.insert-new:not([href]):not([tabindex]):hover {
-        color: darken(#3f4446, 20%);
-        text-decoration: underline;
-        background-color: darken(#edeff0, 10%);
-    }
-
-    a.insert-new:not([href]):not([tabindex]) {
-        color: #3f4446;
-    }
-
-    .insert-popup {
-        background-color: #EAECEF;
-        font-size: 80%;
-        max-height: 100%;
-        width: 100%;
-        transition: max-height .4s;
-        overflow: hidden;
-        flex: 0 0 auto;
-
-        &.collapsed {
-            max-height: 0;
-        }
-
-        a.dropdown-item {
-            &:hover {
-                background-color: #f8f9fa;
-            }
-
-            &:active {
-                background-color: #f8f9fa;
-            }
-
-            cursor: pointer;
-        }
-    }
-
-    .label {
-        font-family: $sans-font;
-        font-size: 13px;
-        color: #606060;
-    }
-
-    .add-menu {
-        button.btn.btn-sm {
-            font-size: 1rem;
-        }
     }
 }

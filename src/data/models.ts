@@ -9,12 +9,13 @@ import { LearningObjectivesModel } from './models/objective';
 import { OrganizationModel } from './models/org';
 import { SkillsModel } from './models/skill';
 import { WorkbookPageModel } from './models/workbook';
-
+import { EmbedActivityModel } from './models/embedactivity';
 
 export { Node, AssessmentNode, FeedbackQuestionNode } from './content/assessment/node';
 export { PoolModel } from './models/pool';
 export { AssessmentModel } from './models/assessment';
 export { FeedbackModel } from './models/feedback';
+export { EmbedActivityModel } from './models/embedactivity';
 export { CourseModel } from './models/course';
 export { DefaultModel } from './models/default';
 export { MediaModel } from './models/media';
@@ -32,6 +33,7 @@ export enum ModelTypes {
   WorkbookPageModel = 'WorkbookPageModel',
   AssessmentModel = 'AssessmentModel',
   FeedbackModel = 'FeedbackModel',
+  EmbedActivityModel = 'EmbedActivityModel',
   MediaModel = 'MediaModel',
   OrganizationModel = 'OrganizationModel',
   LearningObjectiveModel = 'LearningObjectiveModel',
@@ -58,6 +60,8 @@ export function createModel(object: any, notify: () => void = () => null): Conte
       return AssessmentModel.fromPersistence(object, notify);
     case types.LegacyTypes.feedback:
       return FeedbackModel.fromPersistence(object, notify);
+    case types.LegacyTypes.embed_activity:
+      return EmbedActivityModel.fromPersistence(object, notify);
     case types.LegacyTypes.organization:
       return OrganizationModel.fromPersistence(object, notify);
     case types.LegacyTypes.learning_objectives:
@@ -82,6 +86,7 @@ export function createModel(object: any, notify: () => void = () => null): Conte
 export type ContentModel =
   AssessmentModel |
   FeedbackModel |
+  EmbedActivityModel |
   CourseModel |
   MediaModel |
   WorkbookPageModel |

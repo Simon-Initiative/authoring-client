@@ -15,6 +15,8 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import './WbInline.scss';
 import { ResourceState } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
+import { Map } from 'immutable';
+import { CourseModel } from 'data/models';
 
 export interface WbInlineEditorProps extends AbstractContentEditorProps<contentTypes.WbInline> {
   onShowSidebar: () => void;
@@ -25,7 +27,7 @@ export interface WbInlineEditorState {
 }
 
 export interface WbInlineEditorProps {
-
+  course: CourseModel;
 }
 
 export default class WbInlineEditor
@@ -113,20 +115,46 @@ export default class WbInlineEditor
     );
   }
 
+  renderIcon() {
+    const { model, course } = this.props;
+    const iconStyle = { color: CONTENT_COLORS.WbInline };
+
+    switch (course.embedActivityTypes.get(model.idref)) {
+      case 'REPL':
+        return (
+          <i className="fa fa-terminal" style={iconStyle} />
+        );
+      default:
+        return (
+          <i className="fa fa-flask" style={iconStyle} />
+        );
+    }
+  }
+
+  renderActivityName() {
+    const { model, course } = this.props;
+    const iconStyle = { color: CONTENT_COLORS.WbInline };
+
+    switch (course.embedActivityTypes.get(model.idref)) {
+      case 'REPL':
+        return 'REPL Activity';
+      default:
+        return 'Formative Assessment';
+    }
+  }
+
   renderMain() {
     const resource = this.props.context.courseModel.resourcesById.get(this.props.model.idref);
     const title = resource === undefined ? 'Loading...' : resource.title;
 
-    const iconStyle = { color: CONTENT_COLORS.WbInline };
-
     return (
       <div className="wbinline">
-        <h5><i className="fa fa-flask" style={iconStyle} /> {title}</h5>
+        <h5>{this.renderIcon()} {title}</h5>
         <button
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit Formative Assessment
+          Edit {this.renderActivityName()}
         </button>
       </div>
     );

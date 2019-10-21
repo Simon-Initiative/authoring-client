@@ -1,8 +1,8 @@
 import { connect, Dispatch } from 'react-redux';
-import FeedbackEditor from 'editors/document/feedback/FeedbackEditor';
+import EmbedActivityEditor from 'editors/document/embedactivity/EmbedActivityEditor';
 import { State } from 'reducers';
 import { AbstractEditorProps } from 'editors/document/common/AbstractEditor';
-import { CourseModel, FeedbackModel, FeedbackQuestionNode } from 'data/models';
+import { CourseModel, EmbedActivityModel, FeedbackQuestionNode } from 'data/models';
 import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';
 import { ParentContainer, TextSelection } from 'types/active';
@@ -18,7 +18,6 @@ interface StateProps {
   activeContext: any;
   hover: string;
   course: CourseState;
-  currentNode: FeedbackQuestionNode;
 }
 
 interface DispatchProps {
@@ -32,20 +31,15 @@ interface DispatchProps {
   onSetCurrentNode: (documentId: string, node: Node) => void;
 }
 
-interface OwnProps extends AbstractEditorProps<FeedbackModel> { }
+interface OwnProps extends AbstractEditorProps<EmbedActivityModel> { }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const { activeContext, hover, documents, course } = state;
-  const currentNode = activeContext.documentId.caseOf({
-    just: docId => documents.get(docId).currentNode.valueOr(null),
-    nothing: null,
-  });
 
   return {
     activeContext,
     hover,
     course,
-    currentNode,
   };
 };
 
@@ -74,4 +68,4 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
 };
 
 export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(FeedbackEditor);
+  (mapStateToProps, mapDispatchToProps)(EmbedActivityEditor);
