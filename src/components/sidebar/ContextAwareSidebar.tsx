@@ -140,6 +140,7 @@ export interface ContextAwareSidebarProps {
   supportedElements: Immutable.List<string>;
   show: boolean;
   sidebarContent: JSX.Element;
+  embedActivityTypes: Immutable.Map<string, string>;
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
@@ -666,6 +667,29 @@ class ContextAwareSidebar
                   Delete this Survey
               </Button>
               </SidebarRow>
+            </SidebarGroup>
+          </SidebarContent>
+        );
+      case ModelTypes.EmbedActivityModel:
+        return (
+          <SidebarContent title="Embed Activity" onHide={this.props.onHide}>
+            <SidebarGroup label="General">
+              <SidebarRow>
+                <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  Created {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+              <SidebarRow>
+                <Tooltip title={dateFormatted(adjusted(resource.dateUpdated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  Updated {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+            </SidebarGroup>
+            {idDisplay}
+            {referenceLocations}
+            <SidebarGroup label="Advanced">
             </SidebarGroup>
           </SidebarContent>
         );

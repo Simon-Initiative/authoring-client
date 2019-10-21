@@ -30,6 +30,7 @@ interface StateProps {
   currentPage: string;
   timeSkewInMs: number;
   selectedOrganization: Maybe<OrganizationModel>;
+  embedActivityTypes: Immutable.Map<string, string>;
 }
 
 interface DispatchProps {
@@ -82,6 +83,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     }),
     selectedOrganization: orgs.activeOrg.lift(doc =>
       (doc.model as OrganizationModel)),
+    embedActivityTypes: state.course.embedActivityTypes,
   };
 };
 
