@@ -7,7 +7,6 @@ import { extractFullText, LearningObjective } from 'data/content/objectives/obje
 import { Button } from 'components/common/Button';
 import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
-import { disableSelect } from 'styles/mixins';
 import { LegacyTypes } from 'data/types';
 import { InlineEdit } from './InlineEdit';
 import { CourseModel, OrganizationModel } from 'data/models';
@@ -120,8 +119,6 @@ const getOrderedObjectiveQuestions = (
 
 export const styles: JSSStyles = {
   Objective: {
-    extend: [disableSelect],
-
     borderBottom: [1, 'solid', colors.grayLight],
 
     '&:last-child': {
@@ -334,6 +331,7 @@ export interface ObjectiveProps {
   onRemove: (model: contentTypes.LearningObjective) => void;
   onRemoveSkill: (model: contentTypes.Skill) => void;
   onPushRoute: (path: string) => void;
+  showId?: boolean;
 }
 
 export interface ObjectiveState {
@@ -387,12 +385,16 @@ class Objective
 
   renderSkillGridHeader() {
     const {
-      classes, course, onPushRoute, skills, organization, skillQuestionRefs,
+      classes, course, skills, organization, skillQuestionRefs, showId,
     } = this.props;
 
     const LEFT_OFFSET = 20;
     const diagonalDist = (height: number) => Math.sqrt(2 * (height * height));
     const orderedObjectiveQuestionRefs = getOrderedObjectiveQuestions(skills, skillQuestionRefs);
+
+    const questionText = (question: QuestionRef) => showId
+      ? question.id
+      : question.title.valueOr(getReadableTitleFromType(question.type));
 
     return orderedObjectiveQuestionRefs.length > 0
       ? (
@@ -424,16 +426,16 @@ class Objective
                     transform={`translate(${LEFT_OFFSET + (35 * i)}, `
                       + `${SKILL_GRID_HEADER_HEIGHT}) rotate(-45)`}>
                     <text
-                      className={classes.assessmentLink}
-                      transform="translate(10, 2)"
-                      onClick={() => onPushRoute(
-                        `/${course.idvers.value()}/${question.assessmentId}`
-                        + `?organization=${organization.resource.id}`
-                        + `&questionId=${question.id}`)}>
-                      {stringFormat.ellipsizePx(
-                        question.title.valueOr(
-                          getReadableTitleFromType(question.type)),
-                        diagonalDist(SKILL_GRID_HEADER_HEIGHT) - 120, 'Open Sans', 16)}
+                      transform="translate(10, 2)">
+                      <a
+                        className={classes.assessmentLink}
+                        href={`/#${course.idvers}/${question.assessmentId}`
+                          + `?organization=${organization.resource.id}`
+                          + `&questionId=${question.id}`}>
+                        {stringFormat.ellipsizePx(
+                          questionText(question),
+                          diagonalDist(SKILL_GRID_HEADER_HEIGHT) - 120, 'Open Sans', 16)}
+                      </a>
                     </text>
                     <line
                       x1={10}
@@ -445,7 +447,7 @@ class Objective
                 ))}
             </svg>
           </div>
-        </div>
+        </div >
       )
       : null;
   }
@@ -532,7 +534,7 @@ class Objective
   }
 
   renderSkills() {
-    const { skills, editMode, loading, onEditSkill, highlightText } = this.props;
+    const { skills, editMode, loading, onEditSkill, highlightText, showId } = this.props;
     const { skillQuestionRefs } = this.props;
     const { skillEdits } = this.state;
 
@@ -552,7 +554,9 @@ class Objective
           skillEdits: skillEdits.set(skill.guid, false),
         })}
         onRemoveSkill={this.onSkillRemove}
-        onEditSkill={onEditSkill} />
+        onEditSkill={onEditSkill}
+        showId={showId}
+      />
     ));
   }
 
@@ -841,7 +845,7 @@ class Objective
   render(): JSX.Element {
     const {
       className, classes, editMode, objective, isExpanded, onEdit, loading, onRemove,
-      onBeginExternalEdit, highlightText,
+      onBeginExternalEdit, highlightText, showId,
     } = this.props;
     const { mouseOver, isEditingTitle } = this.state;
 
@@ -850,6 +854,10 @@ class Objective
 
     const displayedTitle = objective
       .rawContent.caseOf({ just: c => extractFullText(c), nothing: () => objective.title });
+
+    const displayValue = showId
+      ? displayedTitle + ` (${objective.id})`
+      : displayedTitle;
 
     const actionButtons = mouseOver && editMode
       ? (
@@ -894,7 +902,7 @@ class Objective
           onClick={() => this.onToggleDetails()}>
           <div><i className="fa fa-graduation-cap" /></div>
           <div className={classNames([classes.titleText])}>
-            <div className="flex-spacer">
+            <div style={{ flexDirection: 'row' }}>
               <InlineEdit
                 inputStyle={{ width: '80%' }}
                 highlightText={highlightText}
@@ -910,8 +918,11 @@ class Objective
                     isEditingTitle: false,
                   })}
                 editMode={editMode && !loading}
-                value={displayedTitle} />
+                value={displayValue}
+                hiddenValues={showId ? List([]) : List([objective.id])}
+              />
             </div>
+            <div className="flex-spacer" />
             <div>
               {!isExpanded && !isEditingTitle && this.renderAggregateDetails()}
             </div>
@@ -919,7 +930,7 @@ class Objective
           <div className={classes.actionButtons}>{actionButtons}</div>
         </div>
         {isExpanded && this.renderDetails()}
-      </div>
+      </div >
     );
 
   }
