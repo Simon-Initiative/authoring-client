@@ -169,7 +169,7 @@ export function bareTextSelected(editor: Maybe<Editor>): boolean {
       }
       const s = e.value.selection;
       const range = new Range({ anchor: s.anchor, focus: s.focus });
-      return e.value.document.getInlinesAtRange(range).size === 0;
+      return e.value.document.getLeafInlinesAtRange(range).size === 0;
     },
     nothing: () => false,
   });
@@ -225,6 +225,10 @@ export function extractParagraphSelectedText(editor: Maybe<Editor>): Maybe<strin
     },
     nothing: () => Maybe.nothing(),
   });
+}
+
+export function currentMarks(editor: Editor) {
+  return editor.value.marks;
 }
 
 export function bdoDisabled(editor: Maybe<Editor>): boolean {

@@ -26,6 +26,7 @@ import DirectorEditor from 'editors/content/learning/DirectorEditor';
 import ExampleEditor from 'editors/content/learning/ExampleEditor';
 import ExtraDefinitionEditor from 'editors/content/learning/ExtraDefinitionEditor';
 import FigureEditor from 'editors/content/learning/FigureEditor';
+import ForeignEditor from 'editors/content/learning/ForeignEditor';
 import FlashEditor from 'editors/content/learning/FlashEditor';
 import HintEditor from 'editors/content/part/HintEditor';
 import IFrameEditor from 'editors/content/learning/IFrameEditor';
@@ -124,6 +125,7 @@ function init() {
   registry['FeedbackOpenResponse'] = connectEditor(FeedbackOpenResponseEditor);
   registry['Figure'] = connectEditor(FigureEditor);
   registry['Flash'] = connectEditor(FlashEditor);
+  registry['Foreign'] = connectEditor(ForeignEditor);
   registry['Hint'] = HintEditor;
   registry['IFrame'] = connectEditor(IFrameEditor);
   registry['Image'] = connectEditor(ImageEditor);

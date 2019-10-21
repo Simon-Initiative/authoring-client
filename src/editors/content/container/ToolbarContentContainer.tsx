@@ -15,6 +15,7 @@ import { connect } from 'react-redux';
 import { Editor } from 'slate';
 
 import { styles } from 'editors/content/container/ToolbarContentContainer.styles';
+import { applyInline } from 'editors/content/learning/contiguoustext/ContiguousTextToolbar';
 
 export interface ToolbarContentContainerProps extends ContentContainerProps {
   className?: string;

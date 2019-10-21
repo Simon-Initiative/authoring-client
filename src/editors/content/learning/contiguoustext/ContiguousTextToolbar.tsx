@@ -34,8 +34,11 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
 import { LegacyTypes } from 'data/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
-import { Editor, Inline } from 'slate';
+import { Editor, Inline, Mark, Editor as EditorCore, Data } from 'slate';
 import * as editorUtils from './utils';
+import { currentMarks } from 'editors/content/learning/contiguoustext/utils';
+import { localeCodes } from 'data/content/learning/foreign';
+import { Select } from 'editors/content/common/Select';
 
 
 
@@ -58,10 +61,10 @@ export interface ContiguousTextToolbarState {
 type StyledContiguousTextToolbarProps =
   StyledComponentProps<ContiguousTextToolbarProps, typeof styles>;
 
-function applyInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+export function applyInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
   editor.lift(e => editorUtils.applyInline(e, wrapper));
 }
-function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+export function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
   editor.lift(e => editorUtils.insertInline(e, wrapper));
 }
 
@@ -124,7 +127,6 @@ class ContiguousTextToolbar
 
     return React.createElement(
       getEditorByContentType((data as any).get('value').contentType), props);
-
   }
 
   renderSidebar() {
@@ -143,6 +145,15 @@ class ContiguousTextToolbar
 
     return editor.caseOf({
       just: (e) => {
+
+        const isForeign = (mark: Mark) => mark.type === 'foreign';
+        const marksInSelection = currentMarks(e).toArray();
+
+        if (marksInSelection.some(isForeign)) {
+          // Only one mark in the selection can be a foreign
+          return this.renderForeignOptions(e, marksInSelection.find(isForeign));
+        }
+
         return editorUtils.getEntityAtCursor(e).caseOf({
           just: entity => this.renderActiveEntity(entity),
           nothing: () => plainSidebar,
@@ -150,6 +161,35 @@ class ContiguousTextToolbar
       },
       nothing: () => plainSidebar,
     });
+  }
+
+  renderForeignOptions(editor: EditorCore, foreign: Mark) {
+
+    const locale = foreign.data.get('lang');
+    console.log('foreign', foreign)
+    const localeOptions = Object.entries(localeCodes)
+      .map(([code, friendly]) => <option key={code} value={code}>{friendly}</option>);
+
+    return (
+      <SidebarContent title="Foreign Text">
+        <Select
+          className="localeSelect"
+          editMode={this.props.editMode}
+          value={locale}
+          onChange={(lang: string) => {
+            editor.replaceMark(
+              'foreign',
+              Mark.create({
+                type: 'foreign',
+                data: Data.create({
+                  lang,
+                }),
+              }));
+          }}>
+          {localeOptions}
+        </Select>
+      </SidebarContent>
+    );
   }
 
   renderEntryOptions() {
@@ -313,6 +353,9 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Foreign))
+              // () => {
+              // applyInline(this.props.editor, new contentTypes.Foreign());
+              // }
             }
             disabled={!supports('foreign') || !editMode}
             active={styles.has('foreign')}

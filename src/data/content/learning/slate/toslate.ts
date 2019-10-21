@@ -4,7 +4,6 @@ import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
 import { InputRef, InputRefType } from 'data/content/learning/input_ref';
 import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
-import { instanceOf } from 'prop-types';
 
 // The elements that we handle as slate marks
 const marks = Immutable.Set<string>(

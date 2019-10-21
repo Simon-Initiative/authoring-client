@@ -7,6 +7,7 @@ import { tip } from './common';
 import { ImageDisplay } from './Image';
 import { SymDisplay } from './Sym';
 import { CiteDisplay } from './Cite';
+import { ForeignDisplay } from 'editors/content/learning/contiguoustext/render/Foreign';
 
 // Slate plugin to allow Ctrl plus a character to
 // toggle character styling
@@ -61,8 +62,6 @@ export function renderMark(props, editor, next) {
       return <span className="oli-var">{props.children}</span>;
     case 'italic':
       return <em>{props.children}</em>;
-    case 'foreign':
-      return <em>{props.children}</em>;
     case 'ipa':
       return <em>{props.children}</em>;
     case 'bdo':
@@ -71,6 +70,11 @@ export function renderMark(props, editor, next) {
       return <del>{props.children}</del>;
     case 'highlight':
       return <mark>{props.children}</mark>;
+    case 'foreign':
+      return <span
+        style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', color: 'red' }}>
+        {props.children}
+      </span>;
     default:
       return next();
   }
@@ -133,6 +137,15 @@ export function renderInline(extras, props, editor: Editor, next) {
     case 'Quote': {
       return <span {...attributes}>&quot;{children}&quot;</span>;
     }
+    // case 'Foreign': {
+    //   // return tip('Foreign', 'oli-link', attributes, children);
+    //   // return <ForeignDisplay {...standardProps} />;
+    //   return <span
+    //     style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', color: 'red' }}
+    //     {...attributes}>
+    //     {children}
+    //   </span>;
+    // }
 
     default: {
       return next();

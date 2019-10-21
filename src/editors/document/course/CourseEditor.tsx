@@ -34,6 +34,7 @@ import { configuration } from 'actions/utils/config';
 import ResourceView from 'components/resourceview/ResourceView';
 import OrgLibrary from 'components/OrgLibrary';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
+import { localeCodes } from 'data/content/learning/foreign';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -360,6 +361,57 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     ];
   }
 
+  renderForeignLanguageAccessibility = () => {
+    if (localStorage.getItem('foreign-language-accessibility') !== 'true') {
+      return null;
+    }
+
+    const locale = this.props.model.metadata.license;
+    const localeOptions = Object.entries(localeCodes)
+      .map(([code, friendly]) => <option key={code} value={code}>{friendly}</option>);
+
+    return (
+      <div className="row">
+        <div className="col-3">
+          Accessibility
+          <br />
+          (Default Language)
+          <br />
+          <HelpPopover>
+            <div>
+
+            </div>
+          </HelpPopover>
+        </div>
+        <div className="col-9">
+          <Select
+            className="localeSelect"
+            editMode={this.props.editMode}
+            value={locale}
+            onChange={this.onLocaleChange}>
+            {localeOptions}
+          </Select>
+        </div>
+      </div>
+    );
+  }
+
+  onLocaleChange = (localeCode: string) => {
+    const model = this.props.model.with({
+      // metadata: this.props.model.metadata.with({
+      // defaultForeignLocale: localeCode,
+      // })
+    });
+    this.props.courseChanged(model);
+    const doc = new Document().with({
+      _courseId: model.guid,
+      _id: model.id,
+      _rev: model.rev.toString(),
+      model,
+    });
+    persistence.persistDocument(doc);
+  }
+
   renderThemes() {
     const { themes } = this.state;
 
@@ -681,6 +733,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <div className="col-3">Team members</div>
           <div className="col-9">{this.renderDevelopers()}</div>
         </div>
+        {this.renderForeignLanguageAccessibility()}
 
         {
           // Note that the implementation of this toggle is very similar to the
@@ -834,7 +887,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                              To get the most recent data for analytics, create a new dataset.
+                                                                      To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
