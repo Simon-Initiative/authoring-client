@@ -5,6 +5,7 @@ import { LegacyTypes } from '../types';
 import { parseDate } from 'utils/date';
 import { DatasetStatus } from 'types/analytics/dataset';
 import { CourseIdVers, CourseGuid } from 'data/types';
+import { Maybe } from 'tsmonad';
 
 // Must match DeployStage enum values in ContentService
 export enum DeployStage {
@@ -45,6 +46,7 @@ export type CourseModelParams = {
     dateCreated: string;
     guid: string;
   };
+  language?: Maybe<string>;
   resources?: Immutable.OrderedMap<string, contentTypes.Resource>,
   resourcesById?: Immutable.OrderedMap<string, contentTypes.Resource>,
   webContents?: Immutable.OrderedMap<string, contentTypes.WebContent>,
@@ -71,6 +73,7 @@ const defaultCourseModel = {
   icon: new contentTypes.WebContent(),
   theme: '',
   activeDataset: null,
+  language: Maybe.nothing<string>(),
   resources: Immutable.OrderedMap<string, contentTypes.Resource>(),
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>(),
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>(),
@@ -124,6 +127,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     dateCreated: string;
     guid: string;
   };
+  language: Maybe<string>;
   resources: Immutable.OrderedMap<string, contentTypes.Resource>;
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>;
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>;
@@ -186,6 +190,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       icon: new contentTypes.WebContent(),
       theme: c.theme,
       activeDataset: c.activeDataset,
+      language: c.language ? Maybe.just(c.language) : Maybe.nothing<string>(),
       metadata,
       resources,
       webContents,
@@ -206,6 +211,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         metadata: this.metadata.toPersistence(),
         description: this.description,
         preferences: this.options,
+        language: this.language.valueOr(null),
       },
     }];
     const values = {

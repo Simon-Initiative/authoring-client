@@ -366,7 +366,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       return null;
     }
 
-    const locale = this.props.model.metadata.license;
+    const locale = this.props.model.language;
+
+    console.log('locale', locale.valueOr(null))
     const localeOptions = Object.entries(localeCodes)
       .map(([code, friendly]) => <option key={code} value={code}>{friendly}</option>);
 
@@ -387,7 +389,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <Select
             className="localeSelect"
             editMode={this.props.editMode}
-            value={locale}
+            value={locale.valueOr(null)}
             onChange={this.onLocaleChange}>
             {localeOptions}
           </Select>
@@ -398,9 +400,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   onLocaleChange = (localeCode: string) => {
     const model = this.props.model.with({
-      // metadata: this.props.model.metadata.with({
-      // defaultForeignLocale: localeCode,
-      // })
+      language: localeCode ? Maybe.just(localeCode) : Maybe.nothing<string>(),
     });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -887,7 +887,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                                                                      To get the most recent data for analytics, create a new dataset.
+                                                        To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size
