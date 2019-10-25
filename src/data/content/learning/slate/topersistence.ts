@@ -119,8 +119,6 @@ function handleMarkedText(node: Text, content) {
   // Set the text on the last one, add the tree to the container
   last[common.getKey(last)]['#text'] = node.text;
   content.push(root.root);
-
-  console.log('After handling marked, content is', content)
 }
 
 function handleInline(node: Inline, content) {

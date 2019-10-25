@@ -143,7 +143,6 @@ class ContiguousTextToolbar
 
         activeInline.lift(inline => sidebarRenderers.push(this.renderActiveEntity(inline)));
 
-
         if (Text.isText(leaf) && isForeign(leaf)) {
           sidebarRenderers.push(this.renderForeignOptions(e, leaf));
         }
