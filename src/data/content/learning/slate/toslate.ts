@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
 import { InputRef, InputRefType } from 'data/content/learning/input_ref';
-import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON } from 'slate';
+import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON, Data, Mark } from 'slate';
 
 // The elements that we handle as slate marks
 const marks = Immutable.Set<string>(
@@ -117,18 +117,33 @@ function isNestedMark(item: Object): boolean {
   return item['#text'] === undefined;
 }
 
-// Extract the mark style name from a mark element. For em elements,
+// Create a slate mark from a persisted from a mark element. For em elements,
 // we use 'em' as the mark style for bold, all other em styles we use
-// the style name.  sub, sup and other non em styles are just there
+// the style name. sub, sup and other non em styles are just their
 // element names.
-function getMark(item: Object) {
+function getMark(item: Object): Mark {
   const key = common.getKey(item);
   if (key === 'em') {
     if (item['em']['@style'] !== undefined && item['em']['@style'] !== 'bold') {
-      return item['em']['@style'];
+      return Mark.create({
+        object: 'mark',
+        type: item['em']['@style'],
+        data: {},
+      });
     }
   }
-  return key;
+
+  // Currently, `foreign` is the only mark to use the data object to store additional
+  // attributes.
+  const data = key === 'foreign'
+    ? Data.create({ lang: item[key]['@lang'] })
+    : {};
+
+  return Mark.create({
+    object: 'mark',
+    type: key,
+    data,
+  });
 }
 
 // Safely access the children elements of an item.
@@ -277,7 +292,7 @@ function handleChild(item: Object, parent: BlockJSON | InlineJSON, backingTextPr
 
     // 2. A style mark, such as em or sup
   } else if (marks.contains(key)) {
-    processMark(item, parent, Immutable.List<string>());
+    processMark(item, parent, Immutable.List<Mark>());
 
     // 3. Unmarked text
   } else if (key === '#text' || key === '#cdata') {
@@ -291,7 +306,7 @@ function handleChild(item: Object, parent: BlockJSON | InlineJSON, backingTextPr
 
 // Handle an OLI style element that we will render as a Slate mark.
 function processMark(item: Object,
-  parent: BlockJSON | InlineJSON, previousMarks: Immutable.List<string>) {
+  parent: BlockJSON | InlineJSON, previousMarks: Immutable.List<Mark>) {
 
   // If this mark is the parent of another mark, add this style and
   // process recursively. This allows us to handle situations like this:
@@ -308,17 +323,10 @@ function processMark(item: Object,
     return;
   }
 
-  // Create the mark array for all styles that we need to apply
-  const marks = previousMarks.toArray().map(type => ({
-    object: 'mark',
-    type,
-    data: {},
-  }) as MarkJSON);
-
   parent.nodes.push({
     object: 'text',
     text: item['#text'],
-    marks,
+    marks: previousMarks.toArray(),
   });
 }
 

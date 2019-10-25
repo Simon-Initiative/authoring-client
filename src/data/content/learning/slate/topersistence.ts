@@ -90,35 +90,37 @@ function handleMarkedText(node: Text, content) {
 
   adjustedMarks.forEach((mark) => {
     // For each style, create the object representation for that style
-    if (mark !== undefined) {
-      const type = mark.type;
-      const container = styleContainers[type];
-      let style;
-      if (container === undefined) {
-        style = Object.assign({}, styleContainers.em());
-      } else {
-        style = Object.assign({}, container());
-      }
-
-      // Foreigns are a special case because they are currently the only
-      // slate marks where we use the "data" object. Specifically,
-      // we store the `@lang` attr here before it is persisted to OLI.
-      if (isForeign(mark)) {
-        style.foreign = { ...style.foreign, '@lang': mark.data.get('lang') };
-      }
-      console.log('style', style)
-
-      // Now root this style object into the parent style
-      const key = common.getKey(last);
-      last[key][common.getKey(style)] = style[common.getKey(style)];
-      last = style;
+    if (mark === undefined) {
+      return;
     }
+
+    const type = mark.type;
+    const container = styleContainers[type];
+    let style;
+    if (container === undefined) {
+      style = Object.assign({}, styleContainers.em());
+    } else {
+      style = Object.assign({}, container());
+    }
+
+    // Foreigns are a special case because they are currently the only
+    // slate marks where we use the "data" object. Specifically,
+    // we store the `@lang` attr here before it is persisted to OLI.
+    if (isForeign(mark)) {
+      style.foreign = { ...style.foreign, '@lang': mark.data.get('lang') };
+    }
+
+    // Now root this style object into the parent style
+    const key = common.getKey(last);
+    last[key][common.getKey(style)] = style[common.getKey(style)];
+    last = style;
   });
 
   // Set the text on the last one, add the tree to the container
   last[common.getKey(last)]['#text'] = node.text;
   content.push(root.root);
 
+  console.log('After handling marked, content is', content)
 }
 
 function handleInline(node: Inline, content) {

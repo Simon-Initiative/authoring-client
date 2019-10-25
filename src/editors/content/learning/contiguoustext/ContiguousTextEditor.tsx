@@ -83,7 +83,7 @@ class ContiguousTextEditor
         // Based on the new selection, update whether or not
         // the cursor is 'in' an inline or not
         this.props.onSelectInline(
-          editorUtils.getEntityAtCursor(this.editor as any));
+          editorUtils.getInlineAtCursor(this.editor as any));
       }
 
     });

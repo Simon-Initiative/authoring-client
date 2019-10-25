@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
-import { Editor, Inline, Text, Value, Block, Document, Mark, Range } from 'slate';
+import { Editor, Inline, Text, Value, Block, Document, Mark, Range, Node } from 'slate';
 import { Maybe } from 'tsmonad';
 import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
@@ -83,23 +83,24 @@ function findInputRef(editor: Editor, input: string): Maybe<Inline | Text | Bloc
 
 // Flexible find a node by a supplied predicate
 function findNodeByPredicate(editor: Editor,
-  predicate: (node: Block | Inline | Text) => boolean): Maybe<Inline | Text | Block> {
+  predicate: (node: Inline | Text | Block) => boolean): Maybe<Inline | Text | Block> {
 
-  const nodes = editor.value.document.nodes.toArray();
-  for (let i = 0; i < nodes.length; i += 1) {
-    const b = nodes[i] as Block;
-    if (predicate(b)) {
-      return Maybe.just(b);
+  return dfs(editor.value.document.nodes as Immutable.List<Inline | Text | Block>);
+
+  function dfs(nodes: Immutable.List<Inline | Text | Block>) {
+    if (nodes.size === 0) {
+      return Maybe.nothing<Inline | Text | Block>();
     }
-    const inner = b.nodes.toArray();
-    for (let j = 0; j < inner.length; j += 1) {
-      const m = inner[j];
-      if (predicate(m)) {
-        return Maybe.just(m);
-      }
+    const first = nodes.first();
+    if (predicate(first)) {
+      return Maybe.just(first);
     }
+    // Text nodes are always leaves
+    if (Text.isText(first)) {
+      return dfs(nodes.rest().toList());
+    }
+    return dfs(first.nodes.concat(nodes.rest().toList()).toList());
   }
-  return Maybe.nothing();
 }
 
 // Find a collection of nodes based on a predicate
@@ -186,7 +187,7 @@ export function noTextSelected(editor: Maybe<Editor>): boolean {
 // Is the current selection inside an inline?
 export function cursorInEntity(editor: Maybe<Editor>): boolean {
   return editor.caseOf({
-    just: e => getEntityAtCursor(e).caseOf({
+    just: e => getInlineAtCursor(e).caseOf({
       just: i => true,
       nothing: () => false,
     }),
@@ -245,7 +246,7 @@ export function bdoDisabled(editor: Maybe<Editor>): boolean {
 
       const onlyBdoOrEmpty = currentMarks.size === 0
         || (currentMarks.size === 1 && (currentMarks.map(m => m.type).contains('bdo')));
-      const inline = getEntityAtCursor(e).caseOf({ just: n => true, nothing: () => false });
+      const inline = getInlineAtCursor(e).caseOf({ just: n => true, nothing: () => false });
 
       return selection.isCollapsed
         || inline
@@ -299,9 +300,7 @@ export function removeInputRef(editor: Editor, itemId: string): Editor {
   });
 }
 
-// Access the inline present at the users current selection
-export function getEntityAtCursor(editor: Editor): Maybe<Inline> {
-
+export function getBlockAtCursor(editor: Editor): Maybe<Block> {
   const s = editor.value.selection;
 
   if (s.anchor.key === null) {
@@ -316,17 +315,40 @@ export function getEntityAtCursor(editor: Editor): Maybe<Inline> {
   if (b === undefined) {
     return Maybe.nothing();
   }
-  const inner = b.nodes.get(s.anchor.path.get(1));
+  return Maybe.just(b);
+}
 
-  if (inner === undefined) {
-    return Maybe.nothing();
-  }
+export function getLeafAtCursor(editor: Editor): Maybe<Block | Text | Inline> {
+  console.log('editor', editor)
+  const selection = editor.value.selection;
+  console.log(selection.anchor.key)
+  console.log(selection.end.key)
+  const atAnchor = findNodeByKey(editor, selection.anchor.key);
+  const atEnd = findNodeByKey(editor, selection.end.key);
+  const singleNodeSelected = atAnchor.valueOr(null) !== null
+    && atAnchor.valueOr(null) === atEnd.valueOr(null);
+  console.log('singleNodeSelected', singleNodeSelected)
+  console.log('at anchor', atAnchor)
+  console.log('atEnd', atEnd)
+  return singleNodeSelected ? atAnchor : Maybe.nothing();
+}
 
-  if (inner.object === 'inline') {
-    return Maybe.just(inner);
-  }
+// Access the inline present at the users current selection
+export function getInlineAtCursor(editor: Editor): Maybe<Inline> {
+  const s = editor.value.selection;
+  return getBlockAtCursor(editor).lift((block) => {
+    const inner = block.nodes.get(s.anchor.path.get(1));
 
-  return Maybe.nothing();
+    if (inner === undefined) {
+      return undefined;
+    }
+
+    if (inner.object === 'inline') {
+      return inner;
+    }
+
+    return undefined;
+  });
 }
 
 const wrappers = {

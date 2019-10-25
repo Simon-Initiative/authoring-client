@@ -366,10 +366,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
       return null;
     }
 
-    const locale = this.props.model.language;
-
-    console.log('locale', locale.valueOr(null))
-    const localeOptions = Object.entries(localeCodes)
+    const languageOptions = Object.entries(localeCodes)
       .map(([code, friendly]) => <option key={code} value={code}>{friendly}</option>);
 
     return (
@@ -381,7 +378,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <br />
           <HelpPopover>
             <div>
-
+              This allows you to set the default language of "Foreign" elements
+              in workbook pages and assessments. Text inside a Foreign element
+              allows screen readers to provide the correct accent and pronunciation
+              for students.
             </div>
           </HelpPopover>
         </div>
@@ -389,16 +389,16 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <Select
             className="localeSelect"
             editMode={this.props.editMode}
-            value={locale.valueOr(null)}
-            onChange={this.onLocaleChange}>
-            {localeOptions}
+            value={this.props.model.language.valueOr(null)}
+            onChange={this.onChangeLanguage}>
+            {languageOptions}
           </Select>
         </div>
       </div>
     );
   }
 
-  onLocaleChange = (localeCode: string) => {
+  onChangeLanguage = (localeCode: string) => {
     const model = this.props.model.with({
       language: localeCode ? Maybe.just(localeCode) : Maybe.nothing<string>(),
     });
@@ -590,7 +590,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           className="licenseSelect"
           editMode={this.props.editMode}
           value={license}
-          onChange={this.onLicenseChange}>
+          onChange={this.onChangeLicense}>
           {licenseOptions}
         </Select> {isCCUrl ? <a title="License Summary" href={license} target="_blank">
           <i className="fas fa-external-link-alt" /></a> : null}
@@ -598,7 +598,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  onLicenseChange = (license: string) => {
+  onChangeLicense = (license: string) => {
     const model = this.props.model.with({ metadata: this.props.model.metadata.with({ license }) });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -887,7 +887,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       <React.Fragment>
                         Analytics for this course are based on the latest dataset, which was created
                       {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                                                        To get the most recent data for analytics, create a new dataset.
+                                                                  To get the most recent data for analytics, create a new dataset.
                         <br />
                         <br />
                         <b>Notice:</b> Dataset creation may take a few minutes depending on the size

@@ -34,9 +34,9 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
 import { LegacyTypes } from 'data/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
-import { Editor, Inline, Mark, Editor as EditorCore, Data } from 'slate';
+import { Editor, Inline, Mark, Editor as EditorCore, Data, Text } from 'slate';
 import * as editorUtils from './utils';
-import { currentMarks } from 'editors/content/learning/contiguoustext/utils';
+import { currentMarks, getBlockAtCursor, getLeafAtCursor } from 'editors/content/learning/contiguoustext/utils';
 import { localeCodes } from 'data/content/learning/foreign';
 import { Select } from 'editors/content/common/Select';
 
@@ -134,39 +134,42 @@ class ContiguousTextToolbar
 
     const plainSidebar = <SidebarContent title="Text Block" />;
 
-    const inline = activeInline.caseOf({
-      just: i => i,
-      nothing: () => null,
-    });
-
-    if (inline !== null) {
-      return this.renderActiveEntity(inline);
-    }
-
     return editor.caseOf({
-      just: (e) => {
+      just: (e: Editor) => {
+        const isForeign = (text: Text) => text.marks.toArray().find(m => m.type === 'foreign');
+        const leaf = getLeafAtCursor(e).valueOr(null);
 
-        const isForeign = (mark: Mark) => mark.type === 'foreign';
-        const marksInSelection = currentMarks(e).toArray();
+        const sidebarRenderers = [];
 
-        if (marksInSelection.some(isForeign)) {
-          // Only one mark in the selection can be a foreign
-          return this.renderForeignOptions(e, marksInSelection.find(isForeign));
+        activeInline.lift(inline => sidebarRenderers.push(this.renderActiveEntity(inline)));
+
+
+        if (Text.isText(leaf) && isForeign(leaf)) {
+          sidebarRenderers.push(this.renderForeignOptions(e, leaf));
         }
 
-        return editorUtils.getEntityAtCursor(e).caseOf({
-          just: entity => this.renderActiveEntity(entity),
-          nothing: () => plainSidebar,
-        });
+        if (sidebarRenderers.length === 0) {
+          sidebarRenderers.push(plainSidebar);
+        }
+
+        return (
+          <React.Fragment>
+            {sidebarRenderers.reduce((acc, curr, i, arr) => {
+              // Intersperse renderers with paragraph breaks
+              acc.push(curr);
+              i !== arr.length - 1 && acc.push(<br />);
+              return acc;
+            }, [])}
+          </React.Fragment>
+        );
       },
       nothing: () => plainSidebar,
     });
   }
 
-  renderForeignOptions(editor: EditorCore, foreign: Mark) {
+  renderForeignOptions(editor: EditorCore, markedText: Text) {
 
-    const locale = foreign.data.get('lang');
-    console.log('foreign', foreign)
+    const locale = markedText.marks.find(m => m.type === 'foreign').data.get('lang');
     const localeOptions = Object.entries(localeCodes)
       .map(([code, friendly]) => <option key={code} value={code}>{friendly}</option>);
 
@@ -177,14 +180,22 @@ class ContiguousTextToolbar
           editMode={this.props.editMode}
           value={locale}
           onChange={(lang: string) => {
-            editor.replaceMark(
-              'foreign',
-              Mark.create({
-                type: 'foreign',
-                data: Data.create({
-                  lang,
-                }),
-              }));
+            const selection = editor.value.selection;
+
+            editor.replaceNodeByKey(markedText.key, Text.create({
+              key: markedText.key,
+              text: markedText.text,
+              marks: markedText.marks.toArray().map((mark) => {
+                if (mark.type === 'foreign') {
+                  return Mark.create({
+                    type: 'foreign',
+                    data: Data.create({ lang }),
+                  });
+                }
+                return mark;
+              }),
+            }));
+            editor.select(selection);
           }}>
           {localeOptions}
         </Select>
