@@ -18,13 +18,13 @@ export type LocaleCode =
 export const localeCodes: LocaleCodes = {
   Default: 'Default',
   ar: 'Arabic',
-  de: 'German',
+  zh_CN: 'Chinese (Mandarin)',
   en_GB: 'English (Great Britain)',
   en_US: 'English (USA)',
-  es: 'Spanish (Spain)',
-  es_419: 'Spanish (LATAM)',
   fr: 'French',
+  de: 'German',
   it: 'Italian',
   ru: 'Russian',
-  zh_CN: 'Chinese (Mandarin)',
+  es_419: 'Spanish (LATAM)',
+  es: 'Spanish (Spain)',
 };

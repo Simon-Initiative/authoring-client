@@ -15,7 +15,6 @@ export { CellData } from 'data/content/learning/celldata';
 export { CellHeader } from 'data/content/learning/cellheader';
 export { Cite } from 'data/content/learning/cite';
 export { Code } from 'data/content/learning/code';
-export { Foreign } from 'data/content/learning/foreign';
 export { CodeBlock } from 'data/content/learning/codeblock';
 export { Command } from 'data/content/learning/command';
 export { Composite } from 'data/content/learning/composite';

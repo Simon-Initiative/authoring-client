@@ -319,17 +319,11 @@ export function getBlockAtCursor(editor: Editor): Maybe<Block> {
 }
 
 export function getLeafAtCursor(editor: Editor): Maybe<Block | Text | Inline> {
-  console.log('editor', editor)
   const selection = editor.value.selection;
-  console.log(selection.anchor.key)
-  console.log(selection.end.key)
   const atAnchor = findNodeByKey(editor, selection.anchor.key);
   const atEnd = findNodeByKey(editor, selection.end.key);
   const singleNodeSelected = atAnchor.valueOr(null) !== null
     && atAnchor.valueOr(null) === atEnd.valueOr(null);
-  console.log('singleNodeSelected', singleNodeSelected)
-  console.log('at anchor', atAnchor)
-  console.log('atEnd', atEnd)
   return singleNodeSelected ? atAnchor : Maybe.nothing();
 }
 

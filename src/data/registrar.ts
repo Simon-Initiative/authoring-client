@@ -36,7 +36,6 @@ export function registerContentTypes() {
   registerType('figure', ct.Figure.fromPersistence);
   registerType('flash', ct.Flash.fromPersistence);
   registerType('formula', ct.BlockFormula.fromPersistence);
-  registerType('foreign', ct.Foreign.fromPersistence);
   registerType('iframe', ct.IFrame.fromPersistence);
   registerType('image', ct.Image.fromPersistence);
   registerType('input_ref', ct.InputRef.fromPersistence);

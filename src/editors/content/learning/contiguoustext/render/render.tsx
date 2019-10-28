@@ -72,7 +72,12 @@ export function renderMark(props, editor, next) {
       return <mark>{props.children}</mark>;
     case 'foreign':
       return <span
-        style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', color: 'red' }}>
+        style={{
+          display: 'inline-block',
+          borderBottom: '1px dashed #d35400',
+          textDecorationStyle: 'dotted',
+          color: '#d35400',
+        }}>
         {props.children}
       </span>;
     default:
@@ -137,15 +142,6 @@ export function renderInline(extras, props, editor: Editor, next) {
     case 'Quote': {
       return <span {...attributes}>&quot;{children}&quot;</span>;
     }
-    // case 'Foreign': {
-    //   // return tip('Foreign', 'oli-link', attributes, children);
-    //   // return <ForeignDisplay {...standardProps} />;
-    //   return <span
-    //     style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', color: 'red' }}
-    //     {...attributes}>
-    //     {children}
-    //   </span>;
-    // }
 
     default: {
       return next();

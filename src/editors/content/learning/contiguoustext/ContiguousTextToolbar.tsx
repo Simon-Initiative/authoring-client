@@ -39,6 +39,7 @@ import * as editorUtils from './utils';
 import { currentMarks, getBlockAtCursor, getLeafAtCursor } from 'editors/content/learning/contiguoustext/utils';
 import { localeCodes } from 'data/content/learning/foreign';
 import { Select } from 'editors/content/common/Select';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 
 
 
@@ -174,30 +175,32 @@ class ContiguousTextToolbar
 
     return (
       <SidebarContent title="Foreign Text">
-        <Select
-          className="localeSelect"
-          editMode={this.props.editMode}
-          value={locale}
-          onChange={(lang: string) => {
-            const selection = editor.value.selection;
+        <SidebarGroup label="Screen Reader Accent">
+          <Select
+            className="localeSelect"
+            editMode={this.props.editMode}
+            value={locale}
+            onChange={(lang: string) => {
+              const selection = editor.value.selection;
 
-            editor.replaceNodeByKey(markedText.key, Text.create({
-              key: markedText.key,
-              text: markedText.text,
-              marks: markedText.marks.toArray().map((mark) => {
-                if (mark.type === 'foreign') {
-                  return Mark.create({
-                    type: 'foreign',
-                    data: Data.create({ lang }),
-                  });
-                }
-                return mark;
-              }),
-            }));
-            editor.select(selection);
-          }}>
-          {localeOptions}
-        </Select>
+              editor.replaceNodeByKey(markedText.key, Text.create({
+                key: markedText.key,
+                text: markedText.text,
+                marks: markedText.marks.toArray().map((mark) => {
+                  if (mark.type === 'foreign') {
+                    return Mark.create({
+                      type: 'foreign',
+                      data: Data.create({ lang }),
+                    });
+                  }
+                  return mark;
+                }),
+              }));
+              editor.select(selection);
+            }}>
+            {localeOptions}
+          </Select>
+        </SidebarGroup>
       </SidebarContent>
     );
   }
@@ -363,9 +366,6 @@ class ContiguousTextToolbar
           <ToolbarButton
             onClick={
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Foreign))
-              // () => {
-              // applyInline(this.props.editor, new contentTypes.Foreign());
-              // }
             }
             disabled={!supports('foreign') || !editMode}
             active={styles.has('foreign')}
