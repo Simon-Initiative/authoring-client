@@ -103,8 +103,10 @@ const logger = createLogger({
 });
 
 const middleware = nodeEnv === 'production'
-  ? applyMiddleware(thunkMiddleware)
-  : composeEnhancers(applyMiddleware(thunkMiddleware));
+  ? applyMiddleware(thunkMiddleware, logger)
+  : composeEnhancers(applyMiddleware(
+    thunkMiddleware, logger,
+  ));
 
 function getPathName(pathname: string): string {
   return pathname.startsWith('/state') ? '' : pathname;

@@ -9,7 +9,10 @@ it('Contiguous text parsing', () => {
   const content = require('./simple.json');
 
   const value = toSlate(content.data, false, null);
+<<<<<<< HEAD
   // tslint:disable-next-line:no-console
+=======
+>>>>>>> master
   console.log(JSON.stringify(value.toJSON(), null, 2));
 
 

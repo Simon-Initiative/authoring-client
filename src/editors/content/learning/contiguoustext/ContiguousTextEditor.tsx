@@ -126,8 +126,8 @@ class ContiguousTextEditor
   }
 
   slateOnFocus(e) {
-    this.props.onFocus(this.props.model, this.props.parent, Maybe.nothing());
     this.props.onUpdateEditor(this.editor);
+    this.props.onFocus(this.props.model, this.props.parent, Maybe.nothing());
   }
 
   onPaste(event, editor: EditorCore, next): boolean {
