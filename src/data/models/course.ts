@@ -211,7 +211,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         metadata: this.metadata.toPersistence(),
         description: this.description,
         preferences: this.options,
-        language: this.language.valueOr(null),
+        language: this.language.valueOr(''),
       },
     }];
     const values = {
