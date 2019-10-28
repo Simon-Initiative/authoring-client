@@ -7,7 +7,6 @@ import { tip } from './common';
 import { ImageDisplay } from './Image';
 import { SymDisplay } from './Sym';
 import { CiteDisplay } from './Cite';
-import { ForeignDisplay } from 'editors/content/learning/contiguoustext/render/Foreign';
 
 // Slate plugin to allow Ctrl plus a character to
 // toggle character styling
@@ -71,15 +70,7 @@ export function renderMark(props, editor, next) {
     case 'highlight':
       return <mark>{props.children}</mark>;
     case 'foreign':
-      return <span
-        style={{
-          display: 'inline-block',
-          borderBottom: '1px dashed #d35400',
-          textDecorationStyle: 'dotted',
-          color: '#d35400',
-        }}>
-        {props.children}
-      </span>;
+      return <span className="oli-foreign">{props.children}</span>;
     default:
       return next();
   }
