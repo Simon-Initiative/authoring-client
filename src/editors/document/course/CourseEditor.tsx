@@ -886,16 +886,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       </React.Fragment>
                     )
                     : (
-                      <React.Fragment>
-                        Analytics for this course are based on the latest dataset, which was created
-                      {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                                                                    To get the most recent data for analytics, create a new dataset.
-                        <br />
-                        <br />
-                        <b>Notice:</b> Dataset creation may take a few minutes depending on the size
-                        of the course. You may continue to use the editor while the operation is in
-                        progress.
-                    </React.Fragment>
+                      // tslint:disable-next-line:max-line-length
+                      <div><p>Analytics for this course are based on the latest dataset, which was created <b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>. To get the most recent data for analytics, create a new dataset.</p><p><b>Notice:</b> Dataset creation may take a few minutes depending on the size of the course. You may continue to use the editor while the operation is in progress.</p></div>
                     ),
                 nothing: () => (
                   <React.Fragment>
