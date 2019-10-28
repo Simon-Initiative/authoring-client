@@ -106,7 +106,7 @@ function handleMarkedText(node: Text, content) {
     // Foreigns are a special case because they are currently the only
     // slate marks where we use the "data" object. Specifically,
     // we store the `@lang` attr here before it is persisted to OLI.
-    if (isForeign(mark)) {
+    if (isForeign(mark) && mark.data && mark.data.get('lang')) {
       style.foreign = { ...style.foreign, '@lang': mark.data.get('lang') };
     }
 

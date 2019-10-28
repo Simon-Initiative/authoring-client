@@ -278,7 +278,7 @@ class ContiguousTextToolbar
   }
 
   renderToolbar() {
-    const { editMode, editor } = this.props;
+    const { editMode, editor, courseModel } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
     const cursorInEntity = editorUtils.cursorInEntity(editor);
     const rangeEntitiesEnabled = editMode && editorUtils.bareTextSelected(editor);
@@ -365,7 +365,12 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Foreign))
+              () => this.props.editor.lift((e) => {
+                e.toggleMark({
+                  type: InlineStyles.Foreign,
+                  data: Data.create({ lang: courseModel.language.valueOr(null) }),
+                });
+              })
             }
             disabled={!supports('foreign') || !editMode}
             active={styles.has('foreign')}
