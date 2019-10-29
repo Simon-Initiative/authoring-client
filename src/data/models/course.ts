@@ -197,7 +197,6 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       webContents,
       developers,
     });
-    console.log('model', model)
 
     return model;
   }
