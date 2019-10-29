@@ -16,6 +16,7 @@ import { Editor, Data } from 'slate';
 import { styles } from 'editors/content/container/ToolbarContentContainer.styles';
 import { State } from 'reducers/index';
 import { CourseModel } from 'data/models/course';
+import { localeCodes } from 'data/content/learning/foreign';
 
 export interface ToolbarContentContainerProps extends ContentContainerProps {
   className?: string;
@@ -145,7 +146,7 @@ class ToolbarContentContainer
               () => this.props.editor.lift((e) => {
                 e.toggleMark({
                   type: InlineStyles.Foreign,
-                  data: Data.create({ lang: course.language.valueOr(null) }),
+                  data: Data.create({ lang: course.language || localeCodes['Spanish (LATAM)'] }),
                 });
               })
             }

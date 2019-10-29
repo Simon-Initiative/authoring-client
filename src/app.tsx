@@ -64,19 +64,6 @@ let prereqEditing = (window as Window)
     ? 'Page prerequisite editing enabled' : 'Page prerequisite editing disabled';
 };
 
-let foreignLanguageAccessibility = (window as Window)
-  .localStorage.getItem('foreign-language-accessibility') === 'true';
-(window as any).enableForeignLanguageAccessibility = (show: boolean) => {
-  foreignLanguageAccessibility = !!show;
-  (window as Window).localStorage.setItem(
-    'foreign-language-accessibility',
-    foreignLanguageAccessibility ? 'true' : 'false');
-
-  return foreignLanguageAccessibility
-    ? 'Foreign language accessibility support enabled'
-    : 'Foreign language accessibility support disabled';
-};
-
 (window as any).help = () => {
   // tslint:disable-next-line:no-console
   console.log(`
@@ -85,11 +72,6 @@ Available Commands:
     Enable experimental support for editing preconditions
   enablePrereqEditing(enable: boolean)
     Enable support for editing page prerequisites
-  enableForeignLanguageAccessibility(enable: boolean)
-    Enable support for tagging text in foreign languages through the use of the
-    "Foreign" element, which will improve the experience for students with screen
-    readers when encountering text in a different language from the student's default
-    computer settings.
   showReduxLogs(show: boolean)
     Enable redux logging if show is true, otherwise disable redux logging.
     Setting persists in local storage.

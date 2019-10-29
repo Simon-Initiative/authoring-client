@@ -362,12 +362,13 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   renderForeignLanguageAccessibility = () => {
-    if (localStorage.getItem('foreign-language-accessibility') !== 'true') {
-      return null;
-    }
+    const languageOptions = Object.keys(localeCodes)
+      .map(friendly => <option key={friendly} value={friendly}>{friendly}</option>);
 
-    const languageOptions = Object.entries(localeCodes)
-      .map(([code, friendly]) => <option key={code} value={code}>{friendly}</option>);
+    const savedLocale = Object.entries(localeCodes).find(
+      ([_, code]) => code as string === this.props.model.language);
+
+    const defaultValue = savedLocale ? savedLocale[0] : localeCodes['Spanish (LATAM)'];
 
     return (
       <div className="row">
@@ -391,7 +392,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <Select
             className="localeSelect"
             editMode={this.props.editMode}
-            value={this.props.model.language.valueOr(null)}
+            value={defaultValue}
             onChange={this.onChangeLanguage}>
             {languageOptions}
           </Select>
@@ -400,9 +401,11 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  onChangeLanguage = (localeCode: string) => {
+  onChangeLanguage = (localeFriendly: string) => {
     const model = this.props.model.with({
-      language: localeCode ? Maybe.just(localeCode) : Maybe.nothing<string>(),
+      language: localeFriendly in localeCodes
+        ? localeCodes[localeFriendly]
+        : localeCodes['Spanish (LATAM)'],
     });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -735,8 +738,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <div className="col-3">Team members</div>
           <div className="col-9">{this.renderDevelopers()}</div>
         </div>
-        {this.renderForeignLanguageAccessibility()}
-
         {
           // Note that the implementation of this toggle is very similar to the
           // Collapse element. But this required too many changes to Collapse code.
@@ -775,6 +776,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               </div>
               <div className="col-9">{this.renderLicenseSelect()}</div>
             </div>
+            {this.renderForeignLanguageAccessibility()}
             <div className="row">
               <div className="col-3">Unique ID</div>
               <div className="col-9">{model.id}</div>

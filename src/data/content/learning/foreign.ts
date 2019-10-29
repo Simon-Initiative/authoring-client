@@ -1,9 +1,21 @@
 type LocaleCodes = {
-  [Code in LocaleCode]: string;
+  [Friendly in LocaleFriendly]: LocaleCode;
 };
 
+export type LocaleFriendly =
+  | 'Arabic'
+  | 'Chinese (Mandarin)'
+  | 'English (Great Britain)'
+  | 'English (USA)'
+  | 'French'
+  | 'German'
+  | 'Italian'
+  | 'Japanese'
+  | 'Russian'
+  | 'Spanish (LATAM)'
+  | 'Spanish (Spain)';
+
 export type LocaleCode =
-  | 'Default'
   | 'ar'
   | 'de'
   | 'en_GB'
@@ -12,19 +24,20 @@ export type LocaleCode =
   | 'es_419'
   | 'fr'
   | 'it'
+  | 'ja'
   | 'ru'
   | 'zh_CN';
 
 export const localeCodes: LocaleCodes = {
-  Default: 'Default',
-  ar: 'Arabic',
-  zh_CN: 'Chinese (Mandarin)',
-  en_GB: 'English (Great Britain)',
-  en_US: 'English (USA)',
-  fr: 'French',
-  de: 'German',
-  it: 'Italian',
-  ru: 'Russian',
-  es_419: 'Spanish (LATAM)',
-  es: 'Spanish (Spain)',
+  Arabic: 'ar',
+  'Chinese (Mandarin)': 'zh_CN',
+  'English (Great Britain)': 'en_GB',
+  'English (USA)': 'en_US',
+  French: 'fr',
+  German: 'de',
+  Italian: 'it',
+  Japanese: 'ja',
+  Russian: 'ru',
+  'Spanish (LATAM)': 'es_419',
+  'Spanish (Spain)': 'es',
 };

@@ -36,7 +36,7 @@ import { LegacyTypes } from 'data/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
 import { Editor, Inline, Mark, Editor as EditorCore, Data, Text } from 'slate';
 import * as editorUtils from './utils';
-import { currentMarks, getBlockAtCursor, getLeafAtCursor } from 'editors/content/learning/contiguoustext/utils';
+import { getLeafAtCursor } from 'editors/content/learning/contiguoustext/utils';
 import { localeCodes } from 'data/content/learning/foreign';
 import { Select } from 'editors/content/common/Select';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
@@ -171,7 +171,7 @@ class ContiguousTextToolbar
 
     const locale = markedText.marks.find(m => m.type === 'foreign').data.get('lang');
     const localeOptions = Object.entries(localeCodes)
-      .map(([code, friendly]) => <option key={code} value={code}>{friendly}</option>);
+      .map(([friendly, code]) => <option key={friendly} value={code}>{friendly}</option>);
 
     return (
       <SidebarContent title="Foreign Text">
@@ -179,7 +179,7 @@ class ContiguousTextToolbar
           <Select
             className="localeSelect"
             editMode={this.props.editMode}
-            value={locale}
+            value={locale || localeCodes['Spanish (LATAM)']}
             onChange={(lang: string) => {
               const selection = editor.value.selection;
 
@@ -368,7 +368,10 @@ class ContiguousTextToolbar
               () => this.props.editor.lift((e) => {
                 e.toggleMark({
                   type: InlineStyles.Foreign,
-                  data: Data.create({ lang: courseModel.language.valueOr(null) }),
+                  data: Data.create({
+                    lang: courseModel.language ||
+                      localeCodes['Spanish (LATAM)'],
+                  }),
                 });
               })
             }

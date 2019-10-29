@@ -6,6 +6,7 @@ import { parseDate } from 'utils/date';
 import { DatasetStatus } from 'types/analytics/dataset';
 import { CourseIdVers, CourseGuid } from 'data/types';
 import { Maybe } from 'tsmonad';
+import { localeCodes } from 'data/content/learning/foreign';
 
 // Must match DeployStage enum values in ContentService
 export enum DeployStage {
@@ -46,7 +47,7 @@ export type CourseModelParams = {
     dateCreated: string;
     guid: string;
   };
-  language?: Maybe<string>;
+  language?: string;
   resources?: Immutable.OrderedMap<string, contentTypes.Resource>,
   resourcesById?: Immutable.OrderedMap<string, contentTypes.Resource>,
   webContents?: Immutable.OrderedMap<string, contentTypes.WebContent>,
@@ -73,7 +74,7 @@ const defaultCourseModel = {
   icon: new contentTypes.WebContent(),
   theme: '',
   activeDataset: null,
-  language: Maybe.nothing<string>(),
+  language: localeCodes['Spanish (LATAM)'],
   resources: Immutable.OrderedMap<string, contentTypes.Resource>(),
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>(),
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>(),
@@ -127,7 +128,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     dateCreated: string;
     guid: string;
   };
-  language: Maybe<string>;
+  language: '';
   resources: Immutable.OrderedMap<string, contentTypes.Resource>;
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>;
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>;
@@ -190,12 +191,13 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       icon: new contentTypes.WebContent(),
       theme: c.theme,
       activeDataset: c.activeDataset,
-      language: c.language ? Maybe.just(c.language) : Maybe.nothing<string>(),
+      language: c.language || localeCodes['Spanish (LATAM)'],
       metadata,
       resources,
       webContents,
       developers,
     });
+    console.log('model', model)
 
     return model;
   }
@@ -211,7 +213,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         metadata: this.metadata.toPersistence(),
         description: this.description,
         preferences: this.options,
-        language: this.language.valueOr(''),
+        language: this.language || localeCodes['Spanish (LATAM)'],
       },
     }];
     const values = {
