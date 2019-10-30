@@ -9,7 +9,6 @@ import { ContentDecorator } from 'editors/content/container/ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
-import { TextSelection } from 'types/active';
 import guid from 'utils/guid';
 import './ContentContainer.scss';
 import { classNames } from 'styles/jss';
@@ -133,8 +132,10 @@ export class ContentContainer
             const updated: ContentElements = this.insertAfter(model, arrToAdd, index);
             onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), firstItem);
 
-            // We insert after when the cursor is at the end
-          } else if (editorUtils.isCursorAtEffectiveEnd(e)) {
+
+            // We insert after when the cursor is at the end or
+            // the content decorator is selected
+          } else if (!editorUtils.isCursorInText(e) || editorUtils.isCursorAtEffectiveEnd(e)) {
             onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
 
             // If it is at the beginning, insert the new item before the text

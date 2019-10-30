@@ -7,6 +7,10 @@ import guid from 'utils/guid';
 
 export type ValuePair = [Value, Value];
 
+export function isCursorInText(editor: Editor): boolean {
+  return editor.value.selection.isFocused;
+}
+
 // Helper routine to turn the current selection into an inline
 function wrapInlineWithData(editor, wrapper) {
   editor.wrapInline({
