@@ -61,8 +61,6 @@ export function renderMark(props, editor, next) {
       return <span className="oli-var">{props.children}</span>;
     case 'italic':
       return <em>{props.children}</em>;
-    case 'foreign':
-      return <em>{props.children}</em>;
     case 'ipa':
       return <em>{props.children}</em>;
     case 'bdo':
@@ -71,6 +69,8 @@ export function renderMark(props, editor, next) {
       return <del>{props.children}</del>;
     case 'highlight':
       return <mark>{props.children}</mark>;
+    case 'foreign':
+      return <span className="oli-foreign">{props.children}</span>;
     default:
       return next();
   }

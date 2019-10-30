@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as contentTypes from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
 import {
   ContentContainer, ContentContainerProps,
@@ -12,13 +11,17 @@ import { InlineStyles } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
 import { connect } from 'react-redux';
-import { Editor } from 'slate';
+import { Editor, Data } from 'slate';
 
 import { styles } from 'editors/content/container/ToolbarContentContainer.styles';
+import { State } from 'reducers/index';
+import { CourseModel } from 'data/models/course';
+import { localeCodes } from 'data/content/learning/foreign';
 
 export interface ToolbarContentContainerProps extends ContentContainerProps {
   className?: string;
   editor: Maybe<Editor>;
+  course: CourseModel;
 }
 
 export interface ToolbarContentContainerState {
@@ -62,10 +65,8 @@ class ToolbarContentContainer
   }
 
   renderMiniToolbar() {
-    const { classes, model, editMode } = this.props;
+    const { classes, editMode, course } = this.props;
     const { textSelection } = this.state;
-
-    const text = model.content.first() as contentTypes.ContiguousText;
 
     const selection = textSelection.caseOf({
       just: s => s,
@@ -142,7 +143,12 @@ class ToolbarContentContainer
           </button>
           <button className="dropdown-item"
             onClick={
-              () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Foreign))
+              () => this.props.editor.lift((e) => {
+                e.toggleMark({
+                  type: InlineStyles.Foreign,
+                  data: Data.create({ lang: course.language || localeCodes['Spanish (LATAM)'] }),
+                });
+              })
             }
             disabled={!formatEnabled}>
             <i className="fa fa-globe" /> Foreign
@@ -175,9 +181,10 @@ class ToolbarContentContainer
 const StyledToolbarContentContainer = withStyles<ToolbarContentContainerProps>(styles)
   (ToolbarContentContainer);
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state: State, ownProps) => {
   return {
     editor: state.activeContext.editor,
+    course: state.course,
   };
 };
 

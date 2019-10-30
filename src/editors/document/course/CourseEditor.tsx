@@ -34,6 +34,7 @@ import { configuration } from 'actions/utils/config';
 import ResourceView from 'components/resourceview/ResourceView';
 import OrgLibrary from 'components/OrgLibrary';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
+import { localeCodes } from 'data/content/learning/foreign';
 
 // const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 const CC_LICENSES = require('../../../../assets/cclicenses.png');
@@ -360,6 +361,62 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     ];
   }
 
+  renderForeignLanguageAccessibility = () => {
+    const languageOptions = Object.keys(localeCodes)
+      .map(friendly => <option key={friendly} value={friendly}>{friendly}</option>);
+
+    const savedLocale = Object.entries(localeCodes).find(
+      ([_, code]) => code as string === this.props.model.language);
+
+    const defaultValue = savedLocale ? savedLocale[0] : localeCodes['Spanish (LATAM)'];
+
+    return (
+      <div className="row">
+        <div className="col-3">
+          Accessibility
+          <br />
+          (Default Language)
+          <br />
+          <HelpPopover>
+            <div>
+              This allows you to set the default language of "Foreign" elements
+              in workbook pages and assessments.
+              <br /><br />
+              Text inside a Foreign element
+              allows screen readers to provide the correct accent and pronunciation
+              for students.
+            </div>
+          </HelpPopover>
+        </div>
+        <div className="col-9">
+          <Select
+            className="localeSelect"
+            editMode={this.props.editMode}
+            value={defaultValue}
+            onChange={this.onChangeLanguage}>
+            {languageOptions}
+          </Select>
+        </div>
+      </div>
+    );
+  }
+
+  onChangeLanguage = (localeFriendly: string) => {
+    const model = this.props.model.with({
+      language: localeFriendly in localeCodes
+        ? localeCodes[localeFriendly]
+        : localeCodes['Spanish (LATAM)'],
+    });
+    this.props.courseChanged(model);
+    const doc = new Document().with({
+      _courseId: model.guid,
+      _id: model.id,
+      _rev: model.rev.toString(),
+      model,
+    });
+    persistence.persistDocument(doc);
+  }
+
   renderThemes() {
     const { themes } = this.state;
 
@@ -538,7 +595,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           className="licenseSelect"
           editMode={this.props.editMode}
           value={license}
-          onChange={this.onLicenseChange}>
+          onChange={this.onChangeLicense}>
           {licenseOptions}
         </Select> {isCCUrl ? <a title="License Summary" href={license} target="_blank">
           <i className="fas fa-external-link-alt" /></a> : null}
@@ -546,7 +603,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
-  onLicenseChange = (license: string) => {
+  onChangeLicense = (license: string) => {
     const model = this.props.model.with({ metadata: this.props.model.metadata.with({ license }) });
     this.props.courseChanged(model);
     const doc = new Document().with({
@@ -681,7 +738,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           <div className="col-3">Team members</div>
           <div className="col-9">{this.renderDevelopers()}</div>
         </div>
-
         {
           // Note that the implementation of this toggle is very similar to the
           // Collapse element. But this required too many changes to Collapse code.
@@ -720,6 +776,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               </div>
               <div className="col-9">{this.renderLicenseSelect()}</div>
             </div>
+            {this.renderForeignLanguageAccessibility()}
             <div className="row">
               <div className="col-3">Unique ID</div>
               <div className="col-9">{model.id}</div>
@@ -831,16 +888,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                       </React.Fragment>
                     )
                     : (
-                      <React.Fragment>
-                        Analytics for this course are based on the latest dataset, which was created
-                      {' '}<b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>.
-                              To get the most recent data for analytics, create a new dataset.
-                        <br />
-                        <br />
-                        <b>Notice:</b> Dataset creation may take a few minutes depending on the size
-                        of the course. You may continue to use the editor while the operation is in
-                        progress.
-                    </React.Fragment>
+                      // tslint:disable-next-line:max-line-length
+                      <div><p>Analytics for this course are based on the latest dataset, which was created <b>{dateFormatted(parseDate(dataSet.dateCreated))}</b>. To get the most recent data for analytics, create a new dataset.</p><p><b>Notice:</b> Dataset creation may take a few minutes depending on the size of the course. You may continue to use the editor while the operation is in progress.</p></div>
                     ),
                 nothing: () => (
                   <React.Fragment>

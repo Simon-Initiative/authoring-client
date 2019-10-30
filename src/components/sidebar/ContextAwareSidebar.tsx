@@ -13,7 +13,7 @@ import { ParentContainer } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { Resource, ResourceState } from 'data/content/resource';
 import {
-  ModelTypes, ContentModel, AssessmentModel, CourseModel, OrganizationModel,
+  ModelTypes, ContentModel, AssessmentModel, OrganizationModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
@@ -36,7 +36,7 @@ import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 import { CombinationsMap } from 'types/combinations';
 import { Edge } from 'types/edge';
 import { CourseState } from 'reducers/course';
-import { viewDocument, viewOrganizations } from 'actions/view';
+import { viewDocument } from 'actions/view';
 import { getNameAndIconByType } from 'components/resourceview/ResourceView';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';

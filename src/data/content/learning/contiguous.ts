@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
-import { augment, ensureIdGuidPresent } from 'data/content/common';
+import { augment } from 'data/content/common';
 import guid from 'utils/guid';
 import { Value, Block, Inline } from 'slate';
 import Html from 'slate-html-serializer';

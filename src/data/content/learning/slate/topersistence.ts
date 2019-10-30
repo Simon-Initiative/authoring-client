@@ -1,5 +1,5 @@
 
-import { Value, Block, Inline, Text } from 'slate';
+import { Value, Block, Inline, Text, Mark } from 'slate';
 import guid from 'utils/guid';
 
 import * as common from '../common';
@@ -73,43 +73,52 @@ function handleText(node: Text, content) {
 
 // Handler for a text node that contains one or more marks
 function handleMarkedText(node: Text, content) {
+  const isBdo = (m: Mark) => m.type === 'bdo';
+  const isForeign = (m: Mark) => m.type === 'foreign';
 
-  // We only care about the string type of the mark, so
-  // map the mark object array to just an array of strings
-  const marks = node.marks.toArray().map(m => m.type);
+  // const marks = node.marks.toArray().map(m => m.type);
+  const marks = node.marks.toArray();
 
   // if bdo is present, it must be the first element that
   // we place in the OLI JSON.  This is a DTD constraint.
-  const adjusted = marks.includes('bdo')
-    ? ['bdo', ...marks.filter(m => m !== 'bdo')]
+  const adjustedMarks = marks.some(isBdo)
+    ? [Mark.create({ type: 'bdo' }), ...marks.filter(m => !isBdo(m))]
     : marks;
 
   const root = { root: {} };
   let last = root;
 
-  adjusted.forEach((s) => {
-
+  adjustedMarks.forEach((mark) => {
     // For each style, create the object representation for that style
-    if (s !== undefined) {
-      const container = styleContainers[s];
-      let style;
-      if (container === undefined) {
-        style = Object.assign({}, styleContainers.em());
-      } else {
-        style = Object.assign({}, container());
-      }
-
-      // Now root this style object into the parent style
-      const key = common.getKey(last);
-      last[key][common.getKey(style)] = style[common.getKey(style)];
-      last = style;
+    if (mark === undefined) {
+      return;
     }
+
+    const type = mark.type;
+    const container = styleContainers[type];
+    let style;
+    if (container === undefined) {
+      style = Object.assign({}, styleContainers.em());
+    } else {
+      style = Object.assign({}, container());
+    }
+
+    // Foreigns are a special case because they are currently the only
+    // slate marks where we use the "data" object. Specifically,
+    // we store the `@lang` attr here before it is persisted to OLI.
+    if (isForeign(mark) && mark.data && mark.data.get('lang')) {
+      style.foreign = { ...style.foreign, '@lang': mark.data.get('lang') };
+    }
+
+    // Now root this style object into the parent style
+    const key = common.getKey(last);
+    last[key][common.getKey(style)] = style[common.getKey(style)];
+    last = style;
   });
 
   // Set the text on the last one, add the tree to the container
   last[common.getKey(last)]['#text'] = node.text;
   content.push(root.root);
-
 }
 
 function handleInline(node: Inline, content) {
