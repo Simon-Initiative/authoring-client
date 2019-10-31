@@ -5,7 +5,7 @@ import * as models from 'data/models';
 import * as React from 'react';
 import { relativeToNow } from 'utils/date';
 import { LegacyTypes } from 'data/types';
-import './ResourceView.scss';
+import './resourceview/ResourceView.scss';
 
 export interface OrgLibraryProps {
   course: models.CourseModel;
@@ -129,7 +129,8 @@ export default class OrgLibrary extends React.Component<OrgLibraryProps, OrgLibr
 
   render() {
     return (
-      <div className="resource-view container-fluid new">
+      <div style={{ paddingLeft: 15, paddingRight: 15 }}
+        className="resource-view container-fluid new">
         <div className="row">
           <div className="col-sm-12 col-md-12 document">
             <div className="container-fluid editor">

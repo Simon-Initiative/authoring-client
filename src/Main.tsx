@@ -14,7 +14,6 @@ import guid from 'utils/guid';
 import Header from 'components/Header.controller';
 import { CoursesViewSearchable } from './components/CoursesViewSearchable.controller';
 import DocumentView from 'components/DocumentView';
-import ResourceView from 'components/ResourceView';
 import CreateCourseView from 'components/CreateCourseView';
 import { ObjectiveSkillView } from 'components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from 'components/ImportCourseView';
@@ -34,7 +33,6 @@ import { controller as OrgDetailsEditor } from 'editors/document/org/OrgDetailsE
 import './Main.scss';
 import Preview from 'components/Preview';
 import { NavigationPanel } from 'components/NavigationPanel.controller';
-import * as viewActions from 'actions/view';
 import { NEW_PAGE_CONTENT } from 'data/models/workbook';
 import { FourZeroFour } from 'components/404';
 import { OrganizationModel } from 'data/models/org';

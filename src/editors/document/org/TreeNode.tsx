@@ -6,7 +6,7 @@ import { NodeTypes } from './traversal';
 import * as org from 'data/models/utils/org';
 
 import './TreeNode.scss';
-import { getNameAndIconByType } from 'components/ResourceView';
+import { getNameAndIconByType } from 'components/resourceview/ResourceView';
 
 export interface TreeNodeProps {
   isSelected: boolean;

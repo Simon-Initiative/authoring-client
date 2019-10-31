@@ -9,7 +9,7 @@ it('Contiguous text parsing', () => {
   const content = require('./simple.json');
 
   const value = toSlate(content.data, false, null);
-  console.log(JSON.stringify(value.toJSON(), null, 2));
+
 
 
 
