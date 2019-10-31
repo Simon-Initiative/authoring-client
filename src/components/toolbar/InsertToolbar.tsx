@@ -129,7 +129,13 @@ class InsertToolbar
   render() {
     const { onInsert, parentSupportsElementType, resourcePath, context, editMode,
       courseModel, onDisplayModal, onDismissModal, requestLatestModel,
-      onCreateNew } = this.props;
+      onCreateNew, activeContext } = this.props;
+
+    const isParagraphSelected = activeContext.activeChild.caseOf({
+      just: c => c instanceof ContiguousText,
+      nothing: () => false,
+    });
+
     const onTableCreate = (onInsert, numRows, numCols) => {
 
       const rows = [];
@@ -254,7 +260,7 @@ class InsertToolbar
             <ToolbarButton
               size={ToolbarButtonSize.Wide}
               onClick={() => onInsert(contentTypes.ContiguousText.fromText('', guid()))}
-              disabled={!editMode || !parentSupportsElementType('p')}>
+              disabled={!editMode || !parentSupportsElementType('p') || isParagraphSelected}>
               {getContentIcon(insertableContentTypes.ContiguousText)} Text
               </ToolbarButton>
             <ToolbarWideMenu
