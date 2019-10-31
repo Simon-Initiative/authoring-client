@@ -11,8 +11,5 @@ it('Contiguous text parsing', () => {
   const value = toSlate(content.data, false, null);
   // tslint:disable-next-line:no-console
   console.log(JSON.stringify(value.toJSON(), null, 2));
-
-
-
 });
 
