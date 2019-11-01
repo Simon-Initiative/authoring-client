@@ -150,7 +150,7 @@ class ContiguousTextEditor
   }
 
   renderMain(): JSX.Element {
-    const { className, classes, editMode, viewOnly,
+    const { className, classes, editMode, viewOnly, editorStyles,
       hideBorder = false, context, onSelectInline } = this.props;
 
     const showBorder = !viewOnly && !hideBorder;
@@ -168,6 +168,7 @@ class ContiguousTextEditor
 
     return (
       <div
+        style={editorStyles}
         className={classNames([
           'contiguousTextEditor', classes.contiguousText,
           showBorder && classes.showBorder,

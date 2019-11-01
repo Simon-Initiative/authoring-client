@@ -121,6 +121,10 @@ function render(store): Promise<boolean> {
   });
 }
 
+if ((module as any).hot) {
+  (module as any).hot.accept('./ApplicationRoot', () => { render(ApplicationRoot); });
+}
+
 function main() {
   // Application specific initialization
   initEditorRegistry();

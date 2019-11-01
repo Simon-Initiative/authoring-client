@@ -88,11 +88,11 @@ export class EmbedActivityModel extends Immutable.Record(defaultEmbedActivityMod
       embedActivity = o.doc.embed_activity;
     }
 
-    model = model.with({ id: embedActivity.id });
-    model = model.with({ width: Maybe.maybe<string>(embedActivity['width']) });
-    model = model.with({ height: Maybe.maybe<string>(embedActivity['height']) });
-    model = model.with({ maxAttempts: Maybe.maybe<string>(embedActivity['max_attempts']) });
-    model = model.with({ activityType: Maybe.maybe<string>(embedActivity['activity_type']) });
+    model = model.with({ id: embedActivity['@id'] });
+    model = model.with({ width: Maybe.maybe<string>(embedActivity['@width']) });
+    model = model.with({ height: Maybe.maybe<string>(embedActivity['@height']) });
+    model = model.with({ maxAttempts: Maybe.maybe<string>(embedActivity['@max_attempts']) });
+    model = model.with({ activityType: Maybe.maybe<string>(embedActivity['@activity_type']) });
 
     embedActivity['#array'].forEach((item) => {
 

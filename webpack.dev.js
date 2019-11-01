@@ -1,5 +1,4 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -14,6 +13,7 @@ module.exports = {
             'history',
             'immutable',
             'json-beautify',
+            'jquery',
             'keycloak-js',
             'react',
             'react-addons-css-transition-group',
@@ -38,12 +38,16 @@ module.exports = {
     devServer: {
         contentBase: __dirname,
         historyApiFallback: true,
-        hot: false,
+        hot: true,
         disableHostCheck: true,
         port: 9000,
         host: '0.0.0.0',
         stats: {
             colors: true
+        },
+        proxy: {
+          '/webcontents': 'http://dev.local',
+          '/content-service': 'http://dev.local',
         }
     },
     resolve: {
@@ -93,9 +97,7 @@ module.exports = {
                             // It enables caching results in ./node_modules/.cache/babel-loader/
                             // directory for faster rebuilds.
                             cacheDirectory: true,
-                            plugins: [
-                                'react-hot-loader/babel'
-                            ]
+                            plugins: []
                         },
                     },
                     { loader: 'ts-loader' }

@@ -15,6 +15,9 @@ import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import { CourseState } from 'reducers/course';
 import { ReplEditor } from 'editors/content/learning/repl/ReplEditor';
 import './EmbedActivityEditor.scss';
+import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
+import guid from 'utils/guid';
+import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 
 interface Props extends AbstractEditorProps<models.EmbedActivityModel> {
   activeContext: ActiveContext;
@@ -36,6 +39,7 @@ interface State extends AbstractEditorState {
 
 export default class EmbedActivityEditor
   extends AbstractEditor<models.EmbedActivityModel, Props, State> {
+  titleEditorGuid: string = guid();
 
   state: State = {
     ...this.state,
@@ -53,10 +57,10 @@ export default class EmbedActivityEditor
 
   supportedElements: Immutable.List<string> = Immutable.List<string>();
 
-  onTitleEdit = (title: string, src: ContentElement) => {
+  onTitleEdit = (title: ContiguousText, src: ContentElement) => {
     const { model, onEdit } = this.props;
 
-    onEdit(model.with({ title }));
+    onEdit(model.with({ title: title.extractPlainText().valueOr('') }));
   }
 
   onRemove() {
@@ -105,14 +109,15 @@ export default class EmbedActivityEditor
           <div className="html-editor-well" onClick={() => this.unFocus()}>
             <SidebarToggle />
 
-            {/* <TitleTextEditor
+            <TitleTextEditor
               context={context}
               services={services}
               onFocus={() => this.unFocus()}
-              model={(model.title.text.content.first() as ContiguousText)}
+              model={ContiguousText.fromText(
+                model.title, this.titleEditorGuid, ContiguousTextMode.SimpleText)}
               editMode={editMode}
               onEdit={this.onTitleEdit}
-              editorStyles={{ fontSize: 32 }} /> */}
+              editorStyles={{ fontSize: 32 }} />
 
             <div className="embed-activity-container">
               {course.embedActivityTypes.has(model.resource.id)

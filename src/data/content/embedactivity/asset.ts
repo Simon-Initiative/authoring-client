@@ -1,10 +1,12 @@
 import * as Immutable from 'immutable';
 import { augment, ensureIdGuidPresent, setId } from '../common';
+import { Maybe } from 'tsmonad';
 
 export type AssetParams = {
   guid?: string,
   name?: string,
-  text?: string,
+  src?: string,
+  content?: Maybe<string>;
 };
 
 const defaultContent = {
@@ -12,7 +14,8 @@ const defaultContent = {
   elementType: 'asset',
   guid: '',
   name: '',
-  text: '',
+  src: '',
+  content: Maybe.nothing<string>(),
 };
 
 export class Asset extends Immutable.Record(defaultContent) {
@@ -21,7 +24,8 @@ export class Asset extends Immutable.Record(defaultContent) {
   elementType: 'asset';
   guid: string;
   name: string;
-  text: string;
+  src: string;
+  content: Maybe<string>;
 
   constructor(params?: AssetParams) {
     super(augment(params, true));
@@ -45,7 +49,10 @@ export class Asset extends Immutable.Record(defaultContent) {
       model = model.with({ name: t['@name'] });
     }
     if (t['#text'] !== undefined) {
-      model = model.with({ text: t['#text'] });
+      model = model.with({ src: t['#text'] });
+    }
+    if (t['content'] !== undefined) {
+      model = model.with({ content: Maybe.just(t['content']) });
     }
 
     return model;
@@ -55,7 +62,11 @@ export class Asset extends Immutable.Record(defaultContent) {
     return {
       asset: {
         '@name': this.name,
-        '#text': this.text,
+        '#text': this.src,
+        content: this.content.caseOf({
+          just: content => content,
+          nothing: () => undefined,
+        }),
       },
     };
   }
