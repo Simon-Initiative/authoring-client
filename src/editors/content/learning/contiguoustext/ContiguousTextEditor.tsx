@@ -177,6 +177,7 @@ class ContiguousTextEditor
 
         <Editor
           ref={editor => this.editor = editor}
+          className={classes.contiguousTextSlateEditor}
           onPaste={this.onPaste}
           onFocus={this.slateOnFocus}
           plugins={plugins}

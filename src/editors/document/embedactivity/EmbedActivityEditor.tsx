@@ -103,9 +103,9 @@ export default class EmbedActivityEditor
     const { context, services, editMode, model, course, onEdit } = this.props;
 
     return (
-      <div className="feedback-editor">
+      <div className="embed-activity-editor">
         <ContextAwareToolbar editMode={editMode} context={context} model={model} />
-        <div className="feedback-content">
+        <div className="embed-activity-content">
           <div className="html-editor-well" onClick={() => this.unFocus()}>
             <SidebarToggle />
 
@@ -126,7 +126,7 @@ export default class EmbedActivityEditor
                     {...this.props}
                     onShowSidebar={() => {}}
                     onDiscover={() => {}}
-                    onFocus={() => {}}
+                    onFocus={this.onFocus}
                     activeContentGuid={''} />
                 )
                 : (

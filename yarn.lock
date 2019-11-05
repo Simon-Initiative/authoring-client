@@ -165,6 +165,14 @@
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
   integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
+"@types/slate-html-serializer@^0.6.3":
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/@types/slate-html-serializer/-/slate-html-serializer-0.6.3.tgz#f18da3c68ccc5b25b12eb4f709b2120b2d2d954e"
+  integrity sha512-edpVOozSya2XkGtJ0qKeP986hOutGS1jff+G1ysv6tPYl+ix0JNDtwjiBJ8iofl07SBghNB0kUr82CI8i+Za2g==
+  dependencies:
+    "@types/react" "*"
+    "@types/slate" "*"
+
 "@types/slate-react@^0.22.5":
   version "0.22.5"
   resolved "https://registry.yarnpkg.com/@types/slate-react/-/slate-react-0.22.5.tgz#a10796758aa6b3133e1c777959facbf8806959f7"

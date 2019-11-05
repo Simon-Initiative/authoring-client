@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { List } from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import {
-  AbstractContentEditor, AbstractContentEditorProps, RenderContext,
+  AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -16,15 +15,13 @@ import {
 
 import { styles } from './ReplEditor.styles';
 import { EmbedActivityModel } from 'data/models/embedactivity';
-import { ContiguousTextEditor } from '../contiguoustext/ContiguousTextEditor.controller';
-import { TextInput } from 'editors/content/common/controls';
-import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
-import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
-import { Maybe } from 'tsmonad';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { Maybe, maybe } from 'tsmonad';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
+import { Editor } from 'slate-react';
+import Html from 'slate-html-serializer';
 import * as $ from 'jquery';
+import { Value } from 'slate';
+import { plugins } from 'editors/content/learning/contiguoustext/render/render';
 
 import AceEditor from 'react-ace';
 
@@ -37,14 +34,11 @@ import 'brace/mode/sh';
 import 'brace/mode/c_cpp';
 import 'brace/mode/text';
 import 'brace/theme/chrome';
-import { webContentsPath } from 'editors/content/media/utils';
-import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
-import guid from 'utils/guid';
-import { ContentElement } from 'data/content/common/interfaces';
 
-export const renderLayoutHtml = ({ prompt, showCodeEditor }) => `
+export const renderLayoutHtml = ({ prompt, showCodeEditor, editorText = '' }) => `
 <div id="q1" class="question">
-  <p id="q1_prompt" class="prompt">${prompt}</p>
+  <div id="prompt">${prompt}</div>
+  <div id="editor_text" style="display: none">${editorText}</div>
   ${showCodeEditor
     ? `
     <div>
@@ -62,14 +56,124 @@ export const renderLayoutHtml = ({ prompt, showCodeEditor }) => `
 </div>
 `;
 
+const renderNode = (props, editor, next) => {
+  switch (props.node.type) {
+    case 'code':
+      return (
+        <pre {...props.attributes}>
+          <code>{props.children}</code>
+        </pre>
+      );
+    case 'paragraph':
+      return (
+        <p {...props.attributes} className={props.node.data.get('className')}>
+          {props.children}
+        </p>
+      );
+    case 'quote':
+      return <blockquote {...props.attributes}>{props.children}</blockquote>
+    default:
+      return next();
+  }
+};
+
+const renderMark = (props, editor, next) => {
+  const { mark, attributes } = props;
+  switch (mark.type) {
+    case 'bold':
+      return <strong {...attributes}>{props.children}</strong>;
+    case 'italic':
+      return <em {...attributes}>{props.children}</em>;
+    case 'underline':
+      return <u {...attributes}>{props.children}</u>;
+    case 'code':
+      return <code {...attributes}>{props.children}</code>;
+    default:
+      return next();
+  }
+};
+
+const BLOCK_TAGS = {
+  blockquote: 'quote',
+  p: 'paragraph',
+  pre: 'code',
+};
+
+const MARK_TAGS = {
+  em: 'italic',
+  strong: 'bold',
+  u: 'underline',
+  code: 'code',
+};
+
+const rules = [
+  {
+    deserialize(el, next) {
+      const type = BLOCK_TAGS[el.tagName.toLowerCase()];
+      if (type) {
+        return {
+          object: 'block',
+          type,
+          data: {
+            className: el.getAttribute('class'),
+          },
+          nodes: next(el.childNodes),
+        };
+      }
+    },
+    serialize(obj, children) {
+      if (obj.object === 'block') {
+        switch (obj.type) {
+          case 'code':
+            return (
+              <pre>
+                <code>{children}</code>
+              </pre>
+            );
+          case 'paragraph':
+            return <p className={obj.data.get('className')}>{children}</p>;
+          case 'quote':
+            return <blockquote>{children}</blockquote>;
+        }
+      }
+    },
+  },
+  // Add a new rule that handles marks...
+  {
+    deserialize(el, next) {
+      const type = MARK_TAGS[el.tagName.toLowerCase()]
+      if (type) {
+        return {
+          object: 'mark',
+          type,
+          nodes: next(el.childNodes),
+        };
+      }
+    },
+    serialize(obj, children) {
+      if (obj.object === 'mark') {
+        switch (obj.type) {
+          case 'bold':
+            return <strong>{children}</strong>;
+          case 'italic':
+            return <em>{children}</em>;
+          case 'underline':
+            return <u>{children}</u>;
+        }
+      }
+    },
+  },
+];
+
+const html = new Html({ rules });
+
 export interface ReplEditorProps extends AbstractContentEditorProps<EmbedActivityModel> {
   onShowSidebar: () => void;
   onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface ReplEditorState {
-  isLayoutLoaded: boolean;
-  prompt: Maybe<ContentElements>;
+  maybePrompt: Maybe<Value>;
   showCodeEditor: boolean;
   editorText: string;
 }
@@ -83,8 +187,7 @@ class ReplEditor
     super(props);
 
     this.state = {
-      isLayoutLoaded: false,
-      prompt: Maybe.nothing<ContentElements>(),
+      maybePrompt: Maybe.nothing(),
       showCodeEditor: true,
       editorText: '',
     };
@@ -93,43 +196,38 @@ class ReplEditor
   shouldComponentUpdate(
     nextProps: StyledComponentProps<ReplEditorProps, JSSStyles>, nextState: ReplEditorState) {
     return super.shouldComponentUpdate(nextProps, nextState)
-      || this.state.isLayoutLoaded !== nextState.isLayoutLoaded
-      || this.state.prompt !== nextState.prompt
+      || this.state.maybePrompt !== nextState.maybePrompt
       || this.state.showCodeEditor !== nextState.showCodeEditor;
   }
 
   componentDidMount() {
-    const { model } = this.props;
+    const { model, onFocus } = this.props;
 
     // this should always execute
-    Maybe.maybe(model.assets.find(asset => asset.name === 'layout')).caseOf({
-      just: (layoutAsset) => {
-        const html = layoutAsset.content.caseOf({
-          just: html => html,
-          nothing: () => renderLayoutHtml({ prompt: '', showCodeEditor }),
-        });
-        const parsedHtmlLayout = $(html);
-        const prompt = $('p', parsedHtmlLayout)[0] && $('p', parsedHtmlLayout)[0].textContent || '';
-        const showCodeEditor = $('#editor')[0] !== undefined;
-        // const editorText =
+    Maybe.maybe(model.assets.find(asset => asset.name === 'layout')).lift((layoutAsset) => {
+      const layoutHtml = layoutAsset.content.caseOf({
+        just: html => html,
+        nothing: () => renderLayoutHtml({ prompt: '', showCodeEditor }),
+      });
 
-        this.setState({
-          isLayoutLoaded: true,
-          prompt: Maybe.just(
-            ContentElements.fromText(prompt, guid(), ['#text', 'em', 'sub', 'sup']),
-          ),
-          showCodeEditor,
-        });
-      },
-      nothing: () => {
-        this.setState({
-          isLayoutLoaded: true,
-          prompt: Maybe.just(
-            ContentElements.fromText('', guid(), ['#text', 'em', 'sub', 'sup']),
-          ),
-        });
-      },
+      const parsedHtmlLayout = $(layoutHtml);
+      const promptHtml = $('#prompt', parsedHtmlLayout)[0]
+          && $('#prompt', parsedHtmlLayout)[0].innerHTML
+        || $('#q1_prompt', parsedHtmlLayout)[0]
+          && $('#q1_prompt', parsedHtmlLayout)[0].innerHTML
+        || '<p></p>';
+      const showCodeEditor = $('#editor', parsedHtmlLayout)[0] !== undefined;
+      const editorText = $('#editor_text', parsedHtmlLayout)[0]
+        && $('#editor_text', parsedHtmlLayout)[0].textContent || '';
+
+      this.setState({
+        maybePrompt: Maybe.just(html.deserialize(promptHtml)),
+        showCodeEditor,
+        editorText,
+      });
     });
+
+    onFocus(model, null, Maybe.nothing());
   }
 
   onConsoleLoad(consoleDiv: HTMLDivElement) {
@@ -150,15 +248,16 @@ class ReplEditor
     }
   }
 
-  onEditPrompt(updated: ContentElements) {
-    const { model, onEdit } = this.props;
+  onEditPrompt = ({ value }: { value: Value }) => {
+    const { maybePrompt } = this.state;
 
-    const layoutAssetIndex = model.assets.findIndex(asset => asset.name === 'layout');
-    const layoutAsset = model.assets.get(layoutAssetIndex);
-
-    this.setState({
-      prompt: Maybe.just(updated),
-    }, () => this.saveActivityFromCurrentState());
+    maybePrompt.lift((prompt) => {
+      if (value.document !== prompt.document) {
+        this.setState({
+          maybePrompt: Maybe.just(value),
+        }, () => this.saveActivityFromCurrentState());
+      }
+    });
   }
 
   onShowCodeEditorToggle(show: boolean) {
@@ -195,8 +294,7 @@ class ReplEditor
   onEditEditorText(editorText: string) {
     this.setState({
       editorText,
-    });
-  // }, () => this.saveActivityFromCurrentState());
+    }, () => this.saveActivityFromCurrentState());
   }
 
   saveActivityFromCurrentState() {
@@ -205,25 +303,31 @@ class ReplEditor
     const layoutAssetIndex = model.assets.findIndex(asset => asset.name === 'layout');
     const layoutAsset = model.assets.get(layoutAssetIndex);
 
-    onEdit(model.with({
+    const updated = model.with({
       assets: model.assets.set(
         layoutAssetIndex,
         layoutAsset.with({
           content: Maybe.just(this.getActivityLayoutHTML()),
         }),
       ),
-    }));
+    });
+
+    onEdit(updated);
   }
 
   getActivityLayoutHTML() {
-    const { prompt, showCodeEditor } = this.state;
+    const { maybePrompt, showCodeEditor, editorText } = this.state;
 
-    const promptText = prompt.caseOf({
-      just: p => p.extractPlainText().valueOr(''),
+    const promptInnerHtml = maybePrompt.caseOf({
+      just: prompt => html.serialize(prompt),
       nothing: () => '',
     });
 
-    return renderLayoutHtml({ prompt: promptText, showCodeEditor });
+    return renderLayoutHtml({
+      prompt: promptInnerHtml,
+      showCodeEditor,
+      editorText,
+    });
   }
 
   renderSidebar(): JSX.Element {
@@ -259,36 +363,33 @@ class ReplEditor
     );
   }
 
+  /**
+   * We are overriding the parent render() method, so implement renderMain
+   * to make appease abstract parent class even though it will be bypassed
+   */
   renderMain() {
     return <div />;
   }
 
   render(): JSX.Element {
-    const { className, classes, model, editMode, context, services } = this.props;
-    const { isLayoutLoaded, prompt, showCodeEditor, editorText } = this.state;
+    const { className, classes, editMode } = this.props;
+    const { maybePrompt, showCodeEditor, editorText } = this.state;
 
     return (
       <div className={classNames([classes.ReplEditor, className])}>
-        {isLayoutLoaded
-        ? (
+        <div className={classes.replActivityLabel}>REPL Activity</div>
+        {maybePrompt.caseOf({
+          just: prompt => (
             <React.Fragment>
-              <ContentContainer
-                context={context}
-                services={services}
-                editMode={editMode}
-                model={prompt.caseOf({
-                  just: prompt => prompt,
-                  nothing: () => new ContentElements().with({
-                    supportedElements: List(['#text', 'em', 'sub', 'sup']),
-                  }),
-                })}
-                hover={null}
-                onUpdateHover={() => {}}
-                onFocus={() => {}}
-                renderContext={RenderContext.MainEditor}
-                onEdit={updated => this.onEditPrompt(updated)}
-                hideContentLabel
-                activeContentGuid={model.guid} />
+              <Editor
+                className={classNames([classes.prompt, classes.textarea])}
+                value={prompt}
+                placeholder="Enter prompt text for REPL activity"
+                onChange={this.onEditPrompt}
+                // Add the ability to render our nodes and marks...
+                renderBlock={renderNode}
+                renderMark={renderMark}
+                plugins={plugins} />
 
               <ToggleSwitch
                 label="Show Code Editor"
@@ -350,11 +451,9 @@ class ReplEditor
                 </div>
               </div>
             </React.Fragment>
-          )
-          :(
-            <LoadingSpinner size={LoadingSpinnerSize.Large} message="Loading REPL Activity..."/>
-          )
-        }
+          ),
+          nothing: () => undefined,
+        })}
       </div>
     );
   }

@@ -2,7 +2,7 @@
 @import "oli/colors";
 @import "oli/mixins";
 
-.feedback-editor {
+.embed-activity-editor {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -12,7 +12,7 @@
         margin: 10px 0;
     }
 
-    .feedback-content {
+    .embed-activity-content {
         display: flex;
         flex-direction: row;
         overflow: hidden;

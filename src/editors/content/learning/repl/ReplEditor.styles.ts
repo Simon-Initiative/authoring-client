@@ -7,6 +7,23 @@ export const styles: JSSStyles = {
     extend: [disableSelect],
     width: '100%',
   },
+  replActivityLabel: {
+    color: '#666666',
+    marginBottom: 10,
+  },
+  prompt: {
+    marginBottom: 10,
+  },
+  textarea: {
+    padding: 5,
+    backgroundColor: 'white',
+    border: '1px solid #ced4da',
+    borderRadius: 4,
+
+    '& p:last-child': {
+      marginBottom: 0,
+    },
+  },
   showCodeEditorBtn: {
     marginRight: 10,
   },
