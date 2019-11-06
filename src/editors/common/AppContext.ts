@@ -10,6 +10,7 @@ export type AppContext = {
   resourcePath: string;
   courseModel: models.CourseModel;
   undoRedoGuid: string;
+  undoRedoActionGuid: string;
   skills: Map<string, Skill>;
   objectives: Map<string, LearningObjective>;
 };

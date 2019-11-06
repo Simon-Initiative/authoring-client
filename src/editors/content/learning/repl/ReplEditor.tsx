@@ -35,7 +35,17 @@ import 'brace/mode/c_cpp';
 import 'brace/mode/text';
 import 'brace/theme/chrome';
 
-export const renderLayoutHtml = ({ prompt, showCodeEditor, editorText = '' }) => `
+type RenderLayoutHtmlOptions = {
+  prompt?: string,
+  showCodeEditor?: boolean,
+  editorText?: string,
+};
+
+export const renderLayoutHtml = ({
+  prompt = '',
+  showCodeEditor = true,
+  editorText = '',
+}: RenderLayoutHtmlOptions = {}) => `
 <div id="q1" class="question">
   <div id="prompt">${prompt}</div>
   <div id="editor_text" style="display: none">${editorText}</div>
@@ -141,7 +151,7 @@ const rules = [
   // Add a new rule that handles marks...
   {
     deserialize(el, next) {
-      const type = MARK_TAGS[el.tagName.toLowerCase()]
+      const type = MARK_TAGS[el.tagName.toLowerCase()];
       if (type) {
         return {
           object: 'mark',
@@ -159,6 +169,8 @@ const rules = [
             return <em>{children}</em>;
           case 'underline':
             return <u>{children}</u>;
+          case 'code':
+            return <code>{children}</code>;
         }
       }
     },
@@ -166,6 +178,42 @@ const rules = [
 ];
 
 const html = new Html({ rules });
+
+const parseLayoutHtmlFromModel = (model: EmbedActivityModel) => {
+  const layoutHtml = maybe(model.assets.find(asset => asset.name === 'layout')).caseOf({
+    just: layoutAsset => layoutAsset.content.caseOf({
+      just: html => html,
+      nothing: () => renderLayoutHtml(),
+    }),
+    nothing: () => renderLayoutHtml(),
+  });
+
+  return $(layoutHtml);
+};
+
+const promptHtmlFromModel = (model: EmbedActivityModel) => {
+  const parsedLayoutHtml = parseLayoutHtmlFromModel(model);
+  const promptHtml = $('#prompt', parsedLayoutHtml)[0]
+      && $('#prompt', parsedLayoutHtml)[0].innerHTML
+    || $('#q1_prompt', parsedLayoutHtml)[0]
+      && $('#q1_prompt', parsedLayoutHtml)[0].innerHTML
+    || '<p></p>';
+
+  return promptHtml;
+};
+
+const isCodeEditorVisibleFromModel = (model: EmbedActivityModel) => {
+  const parsedLayoutHtml = parseLayoutHtmlFromModel(model);
+
+  return $('#editor', parsedLayoutHtml)[0] !== undefined;
+};
+
+const editorTextFromModel = (model: EmbedActivityModel) => {
+  const parsedLayoutHtml = parseLayoutHtmlFromModel(model);
+
+  return $('#editor_text', parsedLayoutHtml)[0]
+    && $('#editor_text', parsedLayoutHtml)[0].textContent || '';
+};
 
 export interface ReplEditorProps extends AbstractContentEditorProps<EmbedActivityModel> {
   onShowSidebar: () => void;
@@ -196,37 +244,39 @@ class ReplEditor
   shouldComponentUpdate(
     nextProps: StyledComponentProps<ReplEditorProps, JSSStyles>, nextState: ReplEditorState) {
     return super.shouldComponentUpdate(nextProps, nextState)
+      || this.props.model !== nextProps.model
       || this.state.maybePrompt !== nextState.maybePrompt
       || this.state.showCodeEditor !== nextState.showCodeEditor;
+  }
+
+  componentWillReceiveProps(nextProps: StyledComponentProps<ReplEditorProps, JSSStyles>) {
+    if (this.state.editorText !== editorTextFromModel(nextProps.model)) {
+      this.setState({
+        editorText: editorTextFromModel(nextProps.model),
+      });
+    }
+
+    if (this.props.context.undoRedoActionGuid !== nextProps.context.undoRedoActionGuid) {
+      this.setState({
+        maybePrompt: Maybe.just(
+          html.deserialize(promptHtmlFromModel(nextProps.model)),
+        ),
+      });
+    }
   }
 
   componentDidMount() {
     const { model, onFocus } = this.props;
 
-    // this should always execute
-    Maybe.maybe(model.assets.find(asset => asset.name === 'layout')).lift((layoutAsset) => {
-      const layoutHtml = layoutAsset.content.caseOf({
-        just: html => html,
-        nothing: () => renderLayoutHtml({ prompt: '', showCodeEditor }),
-      });
+    const promptHtml = promptHtmlFromModel(model);
+    const showCodeEditor = isCodeEditorVisibleFromModel(model);
+    const editorText = editorTextFromModel(model);
 
-      const parsedHtmlLayout = $(layoutHtml);
-      const promptHtml = $('#prompt', parsedHtmlLayout)[0]
-          && $('#prompt', parsedHtmlLayout)[0].innerHTML
-        || $('#q1_prompt', parsedHtmlLayout)[0]
-          && $('#q1_prompt', parsedHtmlLayout)[0].innerHTML
-        || '<p></p>';
-      const showCodeEditor = $('#editor', parsedHtmlLayout)[0] !== undefined;
-      const editorText = $('#editor_text', parsedHtmlLayout)[0]
-        && $('#editor_text', parsedHtmlLayout)[0].textContent || '';
-
-      this.setState({
-        maybePrompt: Maybe.just(html.deserialize(promptHtml)),
-        showCodeEditor,
-        editorText,
-      });
+    this.setState({
+      maybePrompt: Maybe.just(html.deserialize(promptHtml)),
+      showCodeEditor,
+      editorText,
     });
-
     onFocus(model, null, Maybe.nothing());
   }
 
