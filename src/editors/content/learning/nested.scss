@@ -1,3 +1,7 @@
 .nested-container {
   margin-left: 20px;
+
+  & > .TitleTextEditor {
+    margin-bottom: 10px;
+  }
 }

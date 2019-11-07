@@ -5,14 +5,11 @@ import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import {
-  Discoverable, DiscoverableId,
+  DiscoverableId,
 } from 'components/common/Discoverable.controller';
-
 import { styles } from './ReplEditor.styles';
 import { EmbedActivityModel } from 'data/models/embedactivity';
 import { Maybe, maybe } from 'tsmonad';
@@ -22,9 +19,7 @@ import * as $ from 'jquery';
 import { Value } from 'slate';
 import { plugins } from 'editors/content/learning/contiguoustext/render/render';
 import * as contentTypes from 'data/contentTypes';
-
 import AceEditor from 'react-ace';
-
 import 'brace/mode/java';
 import 'brace/mode/python';
 import 'brace/mode/html';
@@ -36,37 +31,7 @@ import 'brace/mode/text';
 import 'brace/theme/chrome';
 import { RichText, renderMark, renderNode } from 'data/content/rich_text';
 import { TextSelection } from 'types/active';
-
-type RenderLayoutHtmlOptions = {
-  prompt?: string,
-  showCodeEditor?: boolean,
-  editorText?: string,
-};
-
-export const renderLayoutHtml = ({
-  prompt = '',
-  showCodeEditor = true,
-  editorText = '',
-}: RenderLayoutHtmlOptions = {}) => `
-<div id="q1" class="question">
-  <div id="prompt">${prompt}</div>
-  <div id="editor_text" style="display: none">${editorText}</div>
-  ${showCodeEditor
-    ? `
-    <div>
-      <button id="run" class="btn btn-primary btn-xs">Run</button>
-      <button id="clear" class="btn btn-primary btn-xs" style="float: right;">Clear</button>
-    </div>
-    <div id="editor"></div>
-    <div id="console"></div>`
-    : `
-    <div>
-      <button id="clear" class="btn btn-primary btn-xs" style="float: right;">Clear</button>
-    </div>
-    <div id="console"></div>`
-  }
-</div>
-`;
+import { renderLayoutHtml } from './repl_assets';
 
 const parseLayoutHtmlFromModel = (model: EmbedActivityModel) => {
   const layoutHtml = maybe(model.assets.find(asset => asset.name === 'layout')).caseOf({

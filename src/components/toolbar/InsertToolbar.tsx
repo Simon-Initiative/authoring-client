@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { ActiveContextState } from 'reducers/active';
-import { ContentModel, AssessmentModel } from 'data/models';
+import { ContentModel, AssessmentModel, EmbedActivityModel } from 'data/models';
 import { withStyles } from 'styles/jss';
 import { ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -46,6 +46,10 @@ const imgSize = 24;
 
 import SizePicker from 'editors/content/learning/table/SizePicker';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
+import {
+  renderLayoutHtml, renderDefaultStylesCss, renderDefaultControlsHtml, renderQuestionsXml,
+  renderSolutionsXml,
+} from 'editors/content/learning/repl/repl_assets';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object, context?) => void;
@@ -822,6 +826,54 @@ class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('multipanel')}>
                 {getContentIcon(insertableContentTypes.Multipanel, { width: 22 })}
                 {' Image hotspot activity'}
+              </ToolbarButtonMenuItem>
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  const id = guid();
+                  const model = new EmbedActivityModel({
+                    id,
+                    title: 'New REPL Activity',
+                    activityType: Maybe.just('REPL'),
+                    width: Maybe.just('670'),
+                    height: Maybe.just('600'),
+                    source: 'webcontent/repl/repl.js',
+                    assets: Immutable.List([
+                      new contentTypes.Asset({
+                        name: 'layout',
+                        src: `webcontent/repl/${id}/layout.html`,
+                        content: Maybe.just(renderLayoutHtml()),
+                      }),
+                      new contentTypes.Asset({
+                        name: 'emstyles',
+                        src: 'webcontent/repl/emstyles.css',
+                        content: Maybe.just(renderDefaultStylesCss()),
+                      }),
+                      new contentTypes.Asset({
+                        name: 'controls',
+                        src: 'webcontent/repl/controls.html',
+                        content: Maybe.just(renderDefaultControlsHtml()),
+                      }),
+                      new contentTypes.Asset({
+                        name: 'questions',
+                        src: `webcontent/repl/${id}/questions.xml`,
+                        content: Maybe.just(renderQuestionsXml()),
+                      }),
+                      new contentTypes.Asset({
+                        name: 'solutions',
+                        src: `webcontent/repl/${id}/solutions.xml`,
+                        content: Maybe.just(renderSolutionsXml()),
+                      }),
+                    ]),
+                  });
+
+                  onCreateNew(model)
+                    .then((resource) => {
+                      onInsert(new contentTypes.WbInline().with({ idref: resource.id }));
+                    });
+
+                }}
+                disabled={!editMode || !parentSupportsElementType('wb:inline')}>
+                <i style={{ width: 22 }} className="fa fa-terminal" /> Create REPL Activity
               </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>

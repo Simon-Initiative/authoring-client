@@ -6,6 +6,7 @@ export { Alternatives } from 'data/content/learning/alternatives';
 export { Anchor } from 'data/content/learning/anchor';
 export { Answer } from 'data/content/learning/answer';
 export { Applet } from 'data/content/learning/applet';
+export { Asset } from 'data/content/embedactivity/asset';
 export { Audio } from 'data/content/learning/audio';
 export { BlockCode } from 'data/content/learning/blockcode';
 export { BlockFormula } from 'data/content/learning/blockformula';

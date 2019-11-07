@@ -12,7 +12,7 @@ import { Asset } from 'data/content/embedactivity/asset';
 export type EmbedActivityModelParams = {
   resource?: contentTypes.Resource,
   guid?: string,
-  type?: LegacyTypes,
+  type?: LegacyTypes.embed_activity,
   lock?: contentTypes.Lock,
   id?: string,
   width?: Maybe<string>,
@@ -28,7 +28,7 @@ const defaultEmbedActivityModelParams = {
   modelType: 'EmbedActivityModel',
   resource: new contentTypes.Resource(),
   guid: '',
-  type: LegacyTypes.feedback,
+  type: LegacyTypes.embed_activity,
   lock: new contentTypes.Lock(),
   id: '',
   width: Maybe.nothing<string>(),
@@ -44,7 +44,7 @@ export class EmbedActivityModel extends Immutable.Record(defaultEmbedActivityMod
   modelType: 'EmbedActivityModel';
   resource: contentTypes.Resource;
   guid: string;
-  type: LegacyTypes;
+  type: LegacyTypes.embed_activity;
   lock: contentTypes.Lock;
   id: string;
   width: Maybe<string>;
