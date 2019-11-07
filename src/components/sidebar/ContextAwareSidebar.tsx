@@ -40,6 +40,8 @@ import { viewDocument, viewOrganizations } from 'actions/view';
 import { getNameAndIconByType } from 'components/resourceview/ResourceView';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
+import RichTextToolbar
+  from 'editors/content/learning/contiguoustext/RichTextToolbar.controller';
 
 interface SidebarRowProps {
   label?: string;
@@ -736,7 +738,9 @@ class ContextAwareSidebar
         onUpdateHover: () => { },
       };
 
-      if (contentElement.contentType === 'ContiguousText') {
+      if (contentElement.contentType === 'RichText') {
+        contentRenderer = <RichTextToolbar {...props} />;
+      } else if (contentElement.contentType === 'ContiguousText') {
         contentRenderer = <ContiguousTextToolbar {...props} />;
       } else {
         contentRenderer = React.createElement(

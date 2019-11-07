@@ -70,6 +70,7 @@ export const CONTENT_COLORS = {
   Pronunciation: flatui.alizarin,
   Proof: flatui.peterRiver,
   Pullout: distinct.distinctNavy,
+  RichText: distinct.distinctYellow,
   Section: distinct.distinctBlue,
   Speaker: distinct.distinctTeal,
   Statement: distinct.distinctNavy,

@@ -23,12 +23,13 @@ interface StateProps {
 interface DispatchProps {
   onUpdateContent: (documentId: string, content: Object) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer,
+    documentId: string, content: ContentElement, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
   onSetCurrentNode: (documentId: string, node: Node) => void;
+  onUpdateEditor: (editor) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<EmbedActivityModel> { }
@@ -64,6 +65,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>): DispatchProps => {
 
     onSetCurrentNode: (documentId: string, node: Node) =>
       dispatch(setCurrentNodeOrPage(documentId, node)),
+
+    onUpdateEditor: editor =>
+      dispatch(activeActions.updateEditor(editor)),
   };
 };
 

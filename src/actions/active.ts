@@ -7,7 +7,7 @@ import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-import { Editor, Inline } from 'slate';
+import { Editor, Inline, Value } from 'slate';
 import { removeInlineEntity, getEntityAtCursor }
   from 'editors/content/learning/contiguoustext/utils';
 
@@ -70,7 +70,8 @@ export type UpdateContextAction = {
 
 export const updateContext = (
   documentId: string,
-  content: ContentElement, container: ParentContainer,
+  content: ContentElement,
+  container: ParentContainer,
   textSelection: Maybe<TextSelection>): UpdateContextAction => ({
     type: UPDATE_CONTEXT,
     documentId,

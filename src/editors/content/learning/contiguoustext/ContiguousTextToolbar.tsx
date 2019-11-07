@@ -242,7 +242,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Bold))
             }
             disabled={!supports('em') || !editMode}
-            active={styles.has('em')}
+            selected={styles.has('em')}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
@@ -251,7 +251,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Italic))
             }
             disabled={!supports('em') || !editMode}
-            active={styles.has('italic')}
+            selected={styles.has('italic')}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
@@ -261,7 +261,7 @@ class ContiguousTextToolbar
                 e => editorUtils.toggleMark(e, InlineStyles.Strikethrough))
             }
             disabled={!supports('em') || !editMode}
-            active={styles.has('line-through')}
+            selected={styles.has('line-through')}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
@@ -270,7 +270,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Highlight))
             }
             disabled={!supports('em') || !editMode}
-            active={styles.has('highlight')}
+            selected={styles.has('highlight')}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
@@ -279,7 +279,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Superscript))
             }
             disabled={!supports('sup') || !editMode}
-            active={styles.has('sup')}
+            selected={styles.has('sup')}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
@@ -288,7 +288,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Subscript))
             }
             disabled={!supports('sub') || !editMode}
-            active={styles.has('sub')}
+            selected={styles.has('sub')}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>
@@ -297,7 +297,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Var))
             }
             disabled={!supports('var') || !editMode}
-            active={styles.has('var')}
+            selected={styles.has('var')}
             tooltip="Code">
             {getContentIcon(insertableContentTypes.BlockCode)}
           </ToolbarButton>
@@ -306,7 +306,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Term))
             }
             disabled={!supports('term') || !editMode}
-            active={styles.has('term')}
+            selected={styles.has('term')}
             tooltip="Term">
             <i className={'fa fa-book'} />
           </ToolbarButton>
@@ -315,7 +315,7 @@ class ContiguousTextToolbar
               () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Foreign))
             }
             disabled={!supports('foreign') || !editMode}
-            active={styles.has('foreign')}
+            selected={styles.has('foreign')}
             tooltip="Foreign">
             <i className={'fa fa-globe'} />
           </ToolbarButton>
@@ -325,7 +325,7 @@ class ContiguousTextToolbar
                 e => editorUtils.toggleMark(e, InlineStyles.BidirectionTextOverride))
             }
             disabled={!supports('bdo') || bdoDisabled || !editMode}
-            active={styles.has('bdo')}
+            selected={styles.has('bdo')}
             tooltip="Reverse Text Direction">
             <i className={'fa fa-angle-left'} />
           </ToolbarButton>

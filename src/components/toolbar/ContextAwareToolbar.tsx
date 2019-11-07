@@ -20,6 +20,8 @@ import {
 } from 'components/toolbar/ContextAwareToolbar.styles';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
+import RichTextToolbar
+  from 'editors/content/learning/contiguoustext/RichTextToolbar.controller';
 
 interface ToolbarGroupProps {
   className?: string;
@@ -210,7 +212,9 @@ class ContextAwareToolbar
         onUpdateHover: () => { },
       };
 
-      if (contentModel.contentType === 'ContiguousText') {
+      if (contentModel.contentType === 'RichText') {
+        contentRenderer = <RichTextToolbar {...props} />;
+      } else if (contentModel.contentType === 'ContiguousText') {
         contentRenderer = <ContiguousTextToolbar {...props} />;
       } else {
         contentRenderer = React.createElement(

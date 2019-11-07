@@ -18,6 +18,8 @@ import './EmbedActivityEditor.scss';
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
+import * as contentTypes from 'data/contentTypes';
+import { Editor } from 'slate-react';
 
 interface Props extends AbstractEditorProps<models.EmbedActivityModel> {
   activeContext: ActiveContext;
@@ -31,6 +33,7 @@ interface Props extends AbstractEditorProps<models.EmbedActivityModel> {
   dismissMessage: (message: Messages.Message) => void;
   course: CourseState;
   onSetCurrentNode: (documentId: string, node: Node) => void;
+  onUpdateEditor: (editor) => void;
 }
 
 interface State extends AbstractEditorState {
@@ -88,10 +91,29 @@ export default class EmbedActivityEditor
     // do nothing
   }
 
+  onAddNew(item) {
+    // this method is never used, but is required by ParentContainer
+    // do nothing
+  }
+
+  onEdit(item) {
+    // this method is never used, but is required by ParentContainer
+    // do nothing
+  }
+
   onFocus = (
-    model: ContentElement, parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
+    model: any, parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
     this.props.onUpdateContentSelection(
-      this.props.context.documentId, model, parent, textSelection);
+      this.props.context.documentId, model, this, textSelection);
+  }
+
+  onRichTextFocus = (
+    model: contentTypes.RichText,
+    editor: Editor,
+    textSelection:  Maybe<TextSelection>,
+  ) => {
+    this.props.onUpdateEditor(editor);
+    this.onFocus(model, null, textSelection);
   }
 
   unFocus = () => {
@@ -100,7 +122,7 @@ export default class EmbedActivityEditor
   }
 
   render() {
-    const { context, services, editMode, model, course, onEdit } = this.props;
+    const { context, services, editMode, model, course, onEdit, onUpdateEditor } = this.props;
 
     return (
       <div className="embed-activity-editor">
@@ -126,7 +148,9 @@ export default class EmbedActivityEditor
                     {...this.props}
                     onShowSidebar={() => {}}
                     onDiscover={() => {}}
-                    onFocus={this.onFocus}
+                    onFocus={() => {}}
+                    onRichTextFocus={this.onRichTextFocus}
+                    onUpdateEditor={onUpdateEditor}
                     activeContentGuid={''} />
                 )
                 : (
@@ -142,6 +166,7 @@ export default class EmbedActivityEditor
             model={model}
             onEditModel={onEdit} />
         </div>
-      </div>);
+      </div>
+    );
   }
 }

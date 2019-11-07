@@ -62,6 +62,7 @@ export { Proof } from 'data/content/learning/proof';
 export { Pullout } from 'data/content/learning/pullout';
 export { Quote } from 'data/content/learning/quote';
 export { Row } from 'data/content/learning/row';
+export { RichText } from 'data/content/rich_text';
 export { Source } from 'data/content/learning/source';
 export { Speaker } from 'data/content/learning/speaker';
 export { Statement } from 'data/content/learning/statement';

@@ -115,7 +115,7 @@ class BlockCodeToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
             disabled={noTextSelected || !editMode}
-            active={styles.has('em')}
+            selected={styles.has('em')}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
@@ -124,7 +124,7 @@ class BlockCodeToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
             disabled={noTextSelected || !editMode}
-            active={styles.has('italic')}
+            selected={styles.has('italic')}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
@@ -133,7 +133,7 @@ class BlockCodeToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
             disabled={noTextSelected || !editMode}
-            active={styles.has('line-through')}
+            selected={styles.has('line-through')}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
@@ -142,7 +142,7 @@ class BlockCodeToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
             disabled={noTextSelected || !editMode}
-            active={styles.has('highlight')}
+            selected={styles.has('highlight')}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
@@ -151,7 +151,7 @@ class BlockCodeToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
             disabled={noTextSelected || !editMode}
-            active={styles.has('sup')}
+            selected={styles.has('sup')}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
@@ -160,7 +160,7 @@ class BlockCodeToolbar
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
             disabled={noTextSelected || !editMode}
-            active={styles.has('sub')}
+            selected={styles.has('sub')}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>

@@ -18,10 +18,10 @@ import { EmbedActivityModel } from 'data/models/embedactivity';
 import { Maybe, maybe } from 'tsmonad';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { Editor } from 'slate-react';
-import Html from 'slate-html-serializer';
 import * as $ from 'jquery';
 import { Value } from 'slate';
 import { plugins } from 'editors/content/learning/contiguoustext/render/render';
+import * as contentTypes from 'data/contentTypes';
 
 import AceEditor from 'react-ace';
 
@@ -34,6 +34,8 @@ import 'brace/mode/sh';
 import 'brace/mode/c_cpp';
 import 'brace/mode/text';
 import 'brace/theme/chrome';
+import { RichText, renderMark, renderNode } from 'data/content/rich_text';
+import { TextSelection } from 'types/active';
 
 type RenderLayoutHtmlOptions = {
   prompt?: string,
@@ -65,119 +67,6 @@ export const renderLayoutHtml = ({
   }
 </div>
 `;
-
-const renderNode = (props, editor, next) => {
-  switch (props.node.type) {
-    case 'code':
-      return (
-        <pre {...props.attributes}>
-          <code>{props.children}</code>
-        </pre>
-      );
-    case 'paragraph':
-      return (
-        <p {...props.attributes} className={props.node.data.get('className')}>
-          {props.children}
-        </p>
-      );
-    case 'quote':
-      return <blockquote {...props.attributes}>{props.children}</blockquote>
-    default:
-      return next();
-  }
-};
-
-const renderMark = (props, editor, next) => {
-  const { mark, attributes } = props;
-  switch (mark.type) {
-    case 'bold':
-      return <strong {...attributes}>{props.children}</strong>;
-    case 'italic':
-      return <em {...attributes}>{props.children}</em>;
-    case 'underline':
-      return <u {...attributes}>{props.children}</u>;
-    case 'code':
-      return <code {...attributes}>{props.children}</code>;
-    default:
-      return next();
-  }
-};
-
-const BLOCK_TAGS = {
-  blockquote: 'quote',
-  p: 'paragraph',
-  pre: 'code',
-};
-
-const MARK_TAGS = {
-  em: 'italic',
-  strong: 'bold',
-  u: 'underline',
-  code: 'code',
-};
-
-const rules = [
-  {
-    deserialize(el, next) {
-      const type = BLOCK_TAGS[el.tagName.toLowerCase()];
-      if (type) {
-        return {
-          object: 'block',
-          type,
-          data: {
-            className: el.getAttribute('class'),
-          },
-          nodes: next(el.childNodes),
-        };
-      }
-    },
-    serialize(obj, children) {
-      if (obj.object === 'block') {
-        switch (obj.type) {
-          case 'code':
-            return (
-              <pre>
-                <code>{children}</code>
-              </pre>
-            );
-          case 'paragraph':
-            return <p className={obj.data.get('className')}>{children}</p>;
-          case 'quote':
-            return <blockquote>{children}</blockquote>;
-        }
-      }
-    },
-  },
-  // Add a new rule that handles marks...
-  {
-    deserialize(el, next) {
-      const type = MARK_TAGS[el.tagName.toLowerCase()];
-      if (type) {
-        return {
-          object: 'mark',
-          type,
-          nodes: next(el.childNodes),
-        };
-      }
-    },
-    serialize(obj, children) {
-      if (obj.object === 'mark') {
-        switch (obj.type) {
-          case 'bold':
-            return <strong>{children}</strong>;
-          case 'italic':
-            return <em>{children}</em>;
-          case 'underline':
-            return <u>{children}</u>;
-          case 'code':
-            return <code>{children}</code>;
-        }
-      }
-    },
-  },
-];
-
-const html = new Html({ rules });
 
 const parseLayoutHtmlFromModel = (model: EmbedActivityModel) => {
   const layoutHtml = maybe(model.assets.find(asset => asset.name === 'layout')).caseOf({
@@ -218,10 +107,16 @@ const editorTextFromModel = (model: EmbedActivityModel) => {
 export interface ReplEditorProps extends AbstractContentEditorProps<EmbedActivityModel> {
   onShowSidebar: () => void;
   onDiscover: (id: DiscoverableId) => void;
+  onRichTextFocus: (
+    model: contentTypes.RichText,
+    editor: Editor,
+    textSelection:  Maybe<TextSelection>,
+  ) => void;
+  onUpdateEditor: (editor) => void;
 }
 
 export interface ReplEditorState {
-  maybePrompt: Maybe<Value>;
+  maybePrompt: Maybe<RichText>;
   showCodeEditor: boolean;
   editorText: string;
 }
@@ -230,6 +125,7 @@ class ReplEditor
   extends AbstractContentEditor<EmbedActivityModel,
   StyledComponentProps<ReplEditorProps, typeof styles>, ReplEditorState> {
   replClient: any;
+  promptEditor: Editor;
 
   constructor(props) {
     super(props);
@@ -258,8 +154,8 @@ class ReplEditor
 
     if (this.props.context.undoRedoActionGuid !== nextProps.context.undoRedoActionGuid) {
       this.setState({
-        maybePrompt: Maybe.just(
-          html.deserialize(promptHtmlFromModel(nextProps.model)),
+        maybePrompt: maybe(
+          RichText.fromHtml(promptHtmlFromModel(nextProps.model)),
         ),
       });
     }
@@ -273,11 +169,10 @@ class ReplEditor
     const editorText = editorTextFromModel(model);
 
     this.setState({
-      maybePrompt: Maybe.just(html.deserialize(promptHtml)),
+      maybePrompt: maybe(RichText.fromHtml(promptHtml)),
       showCodeEditor,
       editorText,
     });
-    onFocus(model, null, Maybe.nothing());
   }
 
   onConsoleLoad(consoleDiv: HTMLDivElement) {
@@ -302,12 +197,28 @@ class ReplEditor
     const { maybePrompt } = this.state;
 
     maybePrompt.lift((prompt) => {
-      if (value.document !== prompt.document) {
-        this.setState({
-          maybePrompt: Maybe.just(value),
-        }, () => this.saveActivityFromCurrentState());
-      }
+      const edited = value.document !== prompt.value.document;
+      const updateSelection = value.selection !== prompt.value.selection;
+
+      // Always update local state with the new slate value
+      this.setState({ maybePrompt: maybe(prompt.with({ value })) }, () => {
+        if (edited) {
+          // But only notify our parent of an edit when something
+          // has actually changed
+          this.saveActivityFromCurrentState();
+
+          // We must always broadcast the latest version of the editor
+          this.props.onUpdateEditor(this.promptEditor);
+          this.promptEditor.focus();
+
+        } else if (updateSelection) {
+          // Broadcast the fact that the editor updated
+          this.props.onUpdateEditor(this.promptEditor);
+        }
+
+      });
     });
+
   }
 
   onShowCodeEditorToggle(show: boolean) {
@@ -369,7 +280,7 @@ class ReplEditor
     const { maybePrompt, showCodeEditor, editorText } = this.state;
 
     const promptInnerHtml = maybePrompt.caseOf({
-      just: prompt => html.serialize(prompt),
+      just: prompt => prompt.toHtml(),
       nothing: () => '',
     });
 
@@ -380,19 +291,13 @@ class ReplEditor
     });
   }
 
-  renderSidebar(): JSX.Element {
-    const { editMode, model, onEdit } = this.props;
+  captureEditorRef = (ref: Editor) => {
+    this.promptEditor = ref;
+  }
 
+  renderSidebar(): JSX.Element {
     return (
-      <SidebarContent title="Custom">
-        <SidebarGroup>
-          <SidebarRow label="Type">
-            <Discoverable id={DiscoverableId.ReplEditorDetails} focusChild>
-              [Repl Activity Controls]
-            </Discoverable>
-          </SidebarRow>
-        </SidebarGroup>
-      </SidebarContent>
+      <SidebarContent title="REPL Activity" />
     );
   }
 
@@ -400,7 +305,7 @@ class ReplEditor
     const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Custom" highlightColor={CONTENT_COLORS.Custom} columns={3}>
+      <ToolbarGroup label="REPL Activity">
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
@@ -414,15 +319,15 @@ class ReplEditor
   }
 
   /**
-   * We are overriding the parent render() method, so implement renderMain
-   * to make appease abstract parent class even though it will be bypassed
+   * We are overriding the render() method, so implement renderMain
+   * to appease abstract parent class even though it will be bypassed
    */
   renderMain() {
     return <div />;
   }
 
   render(): JSX.Element {
-    const { className, classes, editMode } = this.props;
+    const { className, classes, editMode, onRichTextFocus } = this.props;
     const { maybePrompt, showCodeEditor, editorText } = this.state;
 
     return (
@@ -431,16 +336,26 @@ class ReplEditor
         {maybePrompt.caseOf({
           just: prompt => (
             <React.Fragment>
-              <Editor
-                className={classNames([classes.prompt, classes.textarea])}
-                value={prompt}
-                placeholder="Enter prompt text for REPL activity"
-                onChange={this.onEditPrompt}
-                // Add the ability to render our nodes and marks...
-                renderBlock={renderNode}
-                renderMark={renderMark}
-                plugins={plugins} />
-
+              {/* Prevent click event from propagating through to parent to keep correct focus */}
+              <div onClick={e => e.stopPropagation()}>
+                <Editor
+                  ref={this.captureEditorRef}
+                  className={classNames([classes.prompt, classes.textarea])}
+                  value={prompt.value}
+                  placeholder="Enter a prompt for this REPL activity"
+                  onChange={this.onEditPrompt}
+                  onFocus={() =>
+                    onRichTextFocus(
+                      prompt,
+                      this.promptEditor,
+                      maybe(new TextSelection(prompt.value.selection)),
+                    )
+                  }
+                  // Add the ability to render our nodes and marks...
+                  renderBlock={renderNode}
+                  renderMark={renderMark}
+                  plugins={plugins} />
+              </div>
               <ToggleSwitch
                 label="Show Code Editor"
                 checked={showCodeEditor}
@@ -478,8 +393,6 @@ class ReplEditor
                           mode="python"
                           theme="chrome"
                           readOnly={!editMode}
-                          // minLines={1}
-                          // maxLines={40}
                           value={editorText}
                           onChange={text => this.onEditEditorText(text)}
                           setOptions={{
