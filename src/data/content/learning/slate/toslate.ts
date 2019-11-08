@@ -248,7 +248,7 @@ function subElementInline(
 function inputRef(item: Object, parent: BlockJSON, backingTextProvider): InlineJSON {
 
   const value = (InputRef.fromPersistence as any)(item);
-  const inputTypeStr = backingTextProvider[value.input].contentType;
+  const inputTypeStr = backingTextProvider && backingTextProvider[value.input].contentType;
   let inputType = InputRefType.Numeric;
   if (inputTypeStr === 'Text') {
     inputType = InputRefType.Text;
