@@ -692,6 +692,15 @@ class ContextAwareSidebar
             {idDisplay}
             {referenceLocations}
             <SidebarGroup label="Advanced">
+              <SidebarRow>
+                <Button
+                  className={classes.deleteButton}
+                  onClick={this.showDeleteModal}
+                  editMode={editMode}
+                  type="outline-danger">
+                  Delete this Embed Activity
+              </Button>
+              </SidebarRow>
             </SidebarGroup>
           </SidebarContent>
         );

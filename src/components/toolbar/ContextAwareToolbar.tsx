@@ -139,6 +139,7 @@ export interface ContextAwareToolbarProps {
   onCreateNew: (model: ContentModel) => Promise<Resource>;
   onShowMessage: (message: Message) => void;
   onDismissMessage: (message: Message) => void;
+  onUpdateCourse: (course: CourseModel) => void;
 }
 
 type StyledContextAwareToolbarProps = StyledComponentProps<ContextAwareToolbarProps, typeof styles>;
@@ -183,7 +184,7 @@ class ContextAwareToolbar
     const {
       onInsert, onEdit, content, container, supportedElements, model,
       classes, onDisplayModal, onDismissModal, context, resource, editMode,
-      onCreateNew, onDismissMessage, onShowMessage, activeContext,
+      onCreateNew, onDismissMessage, onShowMessage, activeContext, onUpdateCourse,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -266,7 +267,8 @@ class ContextAwareToolbar
             onDismissMessage={onDismissMessage}
             onShowMessage={onShowMessage}
             onDisplayModal={onDisplayModal}
-            onDismissModal={onDismissModal} />
+            onDismissModal={onDismissModal}
+            onUpdateCourse={onUpdateCourse} />
         </ToolbarGroup>
 
         <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={7.4}>

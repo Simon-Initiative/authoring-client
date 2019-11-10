@@ -62,6 +62,7 @@ export interface InsertToolbarProps {
   onCreateNew: (model: ContentModel) => Promise<Resource>;
   resourcePath: string;
   courseModel: CourseModel;
+  onUpdateCourse: (courseModel: CourseModel) => void;
   onShowMessage: (message: Message) => void;
   onDismissMessage: (message: Message) => void;
   content: Maybe<Object>;
@@ -132,7 +133,7 @@ class InsertToolbar
 
   render() {
     const { onInsert, parentSupportsElementType, resourcePath, context, editMode,
-      courseModel, onDisplayModal, onDismissModal, requestLatestModel,
+      courseModel, onDisplayModal, onDismissModal, requestLatestModel, onUpdateCourse,
       onCreateNew } = this.props;
     const onTableCreate = (onInsert, numRows, numCols) => {
 
@@ -829,6 +830,37 @@ class InsertToolbar
               </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
+                  requestLatestModel()
+                    .then((model) => {
+
+                      const existingInlines = collectInlines(model);
+
+                      return onDisplayModal(
+                        <ResourceSelection
+                          filterPredicate={(res: Resource): boolean =>
+                            (res.type === LegacyTypes.embed_activity
+                              && courseModel.embedActivityTypes.get(res.id) === 'REPL'
+                              && res.resourceState !== ResourceState.DELETED
+                              && !existingInlines.has(res.id))
+                          }
+                          courseId={context.courseModel.guid}
+                          onInsert={(resource) => {
+                            onDismissModal();
+                            const resources = context.courseModel.resources.toArray();
+                            const found = resources.find(r => r.id === resource.id);
+                            if (found !== undefined) {
+                              onInsert(new contentTypes.WbInline().with({ idref: found.id }));
+                            }
+                          }}
+                          onCancel={onDismissModal}
+                        />);
+                    });
+                }}
+                disabled={!editMode || !parentSupportsElementType('wb:inline')}>
+                <i style={{ width: 22 }} className="fa fa-terminal" /> Insert REPL Activity
+              </ToolbarButtonMenuItem>
+              <ToolbarButtonMenuItem
+                onClick={() => {
                   const id = guid();
                   const model = new EmbedActivityModel({
                     id,
@@ -869,6 +901,9 @@ class InsertToolbar
                   onCreateNew(model)
                     .then((resource) => {
                       onInsert(new contentTypes.WbInline().with({ idref: resource.id }));
+                      onUpdateCourse(courseModel.with({
+                        embedActivityTypes: courseModel.embedActivityTypes.set(resource.id, 'REPL'),
+                      }));
                     });
 
                 }}
