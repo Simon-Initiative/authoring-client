@@ -98,11 +98,19 @@ function findNodeByPredicate(editor: Editor,
     const first = nodes.first();
     if (predicate(first)) {
       return Maybe.just(first);
+<<<<<<< HEAD
     }
     // Text nodes are always leaves
     if (Text.isText(first)) {
       return dfs(nodes.rest().toList());
     }
+=======
+    }
+    // Text nodes are always leaves
+    if (Text.isText(first)) {
+      return dfs(nodes.rest().toList());
+    }
+>>>>>>> master
     return dfs(first.nodes.concat(nodes.rest().toList()).toList());
   }
 }
