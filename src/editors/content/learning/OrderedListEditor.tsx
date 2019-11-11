@@ -15,7 +15,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
-'editors/content/utils/content';
+  'editors/content/utils/content';
 import { Select, TextInput } from 'editors/content/common/controls';
 import { Maybe } from 'tsmonad';
 import {
@@ -23,6 +23,7 @@ import {
 } from 'components/common/Discoverable.controller';
 
 import { styles } from 'editors/content/learning/List.styles';
+import { Styles } from 'data/content/learning/ol';
 
 export interface OrderedListEditorProps
   extends AbstractContentEditorProps<contentTypes.Ol> {
@@ -128,7 +129,7 @@ class OrderedListEditor
   }
 
   onStyleChange(s) {
-    const style = s === ''
+    const style: Maybe<Styles> = s === ''
       ? Maybe.nothing()
       : Maybe.just(s);
 
@@ -136,7 +137,7 @@ class OrderedListEditor
   }
 
   onStartChange(s) {
-    const start = s === ''
+    const start: Maybe<string> = s === ''
       ? Maybe.nothing()
       : Maybe.just(s);
 

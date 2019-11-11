@@ -10,8 +10,5 @@ it('Contiguous text parsing', () => {
 
   const value = toSlate(content.data, false, null);
 
-
-
-
 });
 
