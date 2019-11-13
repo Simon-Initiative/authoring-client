@@ -14,6 +14,8 @@ import './ContentContainer.scss';
 import { classNames } from 'styles/jss';
 import * as editorUtils from '../learning/contiguoustext/utils';
 import { Editor } from 'slate';
+import { updateEditor } from 'actions/active';
+import { connect } from 'react-redux';
 
 export type BoundProperty = {
   propertyName: string,
@@ -37,6 +39,7 @@ export interface ContentContainerProps
   layout?: Layout;
   selectedEntity?: Maybe<string>;
   overrideRemove?: (model: ContentElements, childModel: Object) => boolean;
+  onUpdateEditor: (editor) => void;
 }
 
 export interface ContentContainerState {
@@ -59,7 +62,7 @@ export function indexOf(guid: string, model: ContentElements): number {
 /**
  * The content container editor.
  */
-export class ContentContainer
+class ContentContainer
   extends AbstractContentEditor<ContentElements,
   ContentContainerProps, ContentContainerState> {
 
@@ -125,39 +128,39 @@ export class ContentContainer
       const active = model.content.get(activeContentGuid);
 
       if (active instanceof ContiguousText) {
+        editor.caseOf({
+          nothing: () => onEdit(this.insertAfter(model, arrToAdd, index), firstItem),
+          just: (e) => {
+            // We replace the text when it is effectively empty
+            if (editorUtils.isEffectivelyEmpty(e)) {
+              const updated: ContentElements = this.insertAfter(model, arrToAdd, index);
+              onEdit(updated.with({
+                content: updated.content.delete(activeContentGuid),
+              }), firstItem);
 
-        editor.lift((e) => {
-          // We replace the text when it is effectively empty
-          if (editorUtils.isEffectivelyEmpty(e)) {
-            const updated: ContentElements = this.insertAfter(model, arrToAdd, index);
-            onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), firstItem);
+              // We insert after when the cursor is at the end
+            } else if (editorUtils.isCursorAtEffectiveEnd(e)) {
+              onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
 
+              // If it is at the beginning, insert the new item before the text
+            } else if (editorUtils.isCursorAtBeginning(e)) {
+              onEdit(this.insertAfter(model, arrToAdd, index - 1), firstItem);
 
-            // We insert after when the cursor is at the end or
-            // the content decorator is selected
-          } else if (!editorUtils.isCursorInText(e) || editorUtils.isCursorAtEffectiveEnd(e)) {
-            onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
+              // Otherwise we split the contiguous block in two parts and insert in between
+            } else {
+              const pair = editorUtils.split(e);
+              const forcedUpdateCount = active.forcedUpdateCount + 1;
+              const first = active.with({ slateValue: pair[0], forcedUpdateCount });
+              const second = new ContiguousText({ slateValue: pair[1] });
 
-            // If it is at the beginning, insert the new item before the text
-          } else if (editorUtils.isCursorAtBeginning(e)) {
-            onEdit(this.insertAfter(model, arrToAdd, index - 1), firstItem);
+              let updated = model.with({ content: model.content.set(first.guid, first) });
 
-            // Otherwise we split the contiguous block in two parts and insert in between
-          } else {
-            const pair = editorUtils.split(e);
-            const forcedUpdateCount = active.forcedUpdateCount + 1;
-            const first = active.with({ slateValue: pair[0], forcedUpdateCount });
-            const second = new ContiguousText({ slateValue: pair[1] });
-
-            let updated = model.with({ content: model.content.set(first.guid, first) });
-
-            updated = this.insertAfter(updated, arrToAdd, index);
-            updated = this.insertAfter(updated, [second], index + arrToAdd.length);
-            onEdit(updated, firstItem);
-          }
+              updated = this.insertAfter(updated, arrToAdd, index);
+              updated = this.insertAfter(updated, [second], index + arrToAdd.length);
+              onEdit(updated, firstItem);
+            }
+          },
         });
-
-
 
       } else {
         onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
@@ -266,13 +269,11 @@ export class ContentContainer
   }
 
   onSelect(model) {
-    const { onFocus } = this.props;
+    const { onFocus, onUpdateEditor } = this.props;
 
     if (model.contentType === 'ContiguousText') {
-      const currentTextSelection = this.textSelections.get(model.guid)
-        ? Maybe.just(this.textSelections.get(model.guid))
-        : Maybe.nothing<any>();
-      return onFocus(model, this, currentTextSelection);
+      // Reset the active slate editor
+      onUpdateEditor(undefined);
     }
 
     return onFocus(model, this, Maybe.nothing());
@@ -385,3 +386,36 @@ export class ContentContainer
   }
 
 }
+
+interface OwnProps extends AbstractContentEditorProps<ContentElements> {
+  className?: string;
+  hideContentLabel?: boolean | string[];
+  disableContentSelection?: boolean | string[];
+  bindProperties?: (element: ContentElement) => BoundProperty[];
+  activeContentGuid: string;
+  hideSingleDecorator?: boolean;
+  hideAllDecorators?: boolean;
+  layout?: Layout;
+  selectedEntity?: Maybe<string>;
+  overrideRemove?: (model: ContentElements, childModel: Object) => boolean;
+}
+
+interface StateProps { }
+
+interface DispatchProps {
+  onUpdateEditor: (editor) => void;
+}
+
+const mapStateToProps = (state, ownProps): StateProps => {
+  return {};
+};
+
+const mapDispatchToProps = (dispatch, ownProps): DispatchProps => {
+  return {
+    onUpdateEditor: editor => dispatch(updateEditor(editor)),
+  };
+};
+
+const controller = connect<StateProps, DispatchProps, OwnProps>
+  (mapStateToProps, mapDispatchToProps)(ContentContainer);
+export { controller as ContentContainer };
