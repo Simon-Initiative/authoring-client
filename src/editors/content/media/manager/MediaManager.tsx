@@ -22,6 +22,7 @@ export enum MIMETYPE_FILTERS {
   IMAGE = 'image',
   AUDIO = 'audio',
   VIDEO = 'video',
+  HTML = 'text/html',
   ALL = '',
 }
 
