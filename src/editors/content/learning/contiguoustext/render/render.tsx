@@ -10,7 +10,7 @@ import { CiteDisplay } from './Cite';
 
 // Slate plugin to allow Ctrl plus a character to
 // toggle character styling
-function markHotkey(options) {
+export function markHotkey(options) {
   const { type, key } = options;
 
   return {

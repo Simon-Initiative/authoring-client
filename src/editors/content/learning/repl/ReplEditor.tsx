@@ -17,7 +17,6 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { Editor } from 'slate-react';
 import * as $ from 'jquery';
 import { Value } from 'slate';
-import { plugins } from 'editors/content/learning/contiguoustext/render/render';
 import * as contentTypes from 'data/contentTypes';
 import AceEditor from 'react-ace';
 import 'brace/mode/java';
@@ -31,7 +30,13 @@ import 'brace/mode/text';
 import 'brace/theme/chrome';
 import { RichText, renderMark, renderNode } from 'data/content/rich_text';
 import { TextSelection } from 'types/active';
-import { renderLayoutHtml } from './repl_assets';
+import { renderLayoutHtml, renderQuestionsXml, renderSolutionsXml, Question } from './repl_assets';
+import guid from 'utils/guid';
+import { Button } from 'components/common/Button';
+import { Tooltip } from 'utils/tooltip';
+import colors from 'styles/colors';
+import { Badge } from 'editors/content/common/Badge';
+import { markHotkey } from '../contiguoustext/render/render';
 
 const parseLayoutHtmlFromModel = (model: EmbedActivityModel) => {
   const layoutHtml = maybe(model.assets.find(asset => asset.name === 'layout')).caseOf({
@@ -43,6 +48,28 @@ const parseLayoutHtmlFromModel = (model: EmbedActivityModel) => {
   });
 
   return $(layoutHtml);
+};
+const parseQuestionsXmlFromModel = (model: EmbedActivityModel) => {
+  const questionsXml = maybe(model.assets.find(asset => asset.name === 'questions')).caseOf({
+    just: questionsAsset => questionsAsset.content.caseOf({
+      just: xml => xml,
+      nothing: () => renderQuestionsXml(),
+    }),
+    nothing: () => renderQuestionsXml(),
+  });
+
+  return $.parseXML(questionsXml);
+};
+const parseSolutionXmlFromModel = (model: EmbedActivityModel) => {
+  const solutionsXml = maybe(model.assets.find(asset => asset.name === 'solutions')).caseOf({
+    just: solutionsAsset => solutionsAsset.content.caseOf({
+      just: xml => xml,
+      nothing: () => renderSolutionsXml(),
+    }),
+    nothing: () => renderSolutionsXml(),
+  });
+
+  return $.parseXML(solutionsXml);
 };
 
 const promptHtmlFromModel = (model: EmbedActivityModel) => {
@@ -62,11 +89,37 @@ const isCodeEditorVisibleFromModel = (model: EmbedActivityModel) => {
   return $('#editor', parsedLayoutHtml)[0] !== undefined;
 };
 
-const editorTextFromModel = (model: EmbedActivityModel) => {
-  const parsedLayoutHtml = parseLayoutHtmlFromModel(model);
+const questionFromModel = (model: EmbedActivityModel) => {
+  const parsedQuestionsXmlFromModel = parseQuestionsXmlFromModel(model);
 
-  return $('#editor_text', parsedLayoutHtml)[0]
-    && $('#editor_text', parsedLayoutHtml)[0].textContent || '';
+  const q1 = $('question', parsedQuestionsXmlFromModel)[0];
+  return q1 && {
+    id: q1.getAttribute('id'),
+    initeditortext: $('initeditortext', q1).text().trim(),
+    language: $('language', q1).text().trim(),
+    functionname: $('functionname', q1).text().trim(),
+    testCases: $('testcase', q1).map(function () {
+      return {
+        guid: guid(),
+        input: $('input', this).text().trim(),
+        output: $('output', this).text().trim(),
+      };
+    }).toArray(),
+  };
+};
+
+const defaultQuestion = () => ({
+  id: guid(),
+  initeditortext: '',
+  language: 'python',
+  functionname: '',
+  testCases: [],
+});
+
+const solutionTextFromModel = (model: EmbedActivityModel) => {
+  const parsedSolutionXmlFromModel = parseSolutionXmlFromModel(model);
+  return $('solution', parsedSolutionXmlFromModel)[0] &&
+    $('solution', parsedSolutionXmlFromModel).text().trim();
 };
 
 export interface ReplEditorProps extends AbstractContentEditorProps<EmbedActivityModel> {
@@ -83,7 +136,8 @@ export interface ReplEditorProps extends AbstractContentEditorProps<EmbedActivit
 export interface ReplEditorState {
   maybePrompt: Maybe<RichText>;
   showCodeEditor: boolean;
-  editorText: string;
+  solutionText: string;
+  question: Question;
 }
 
 class ReplEditor
@@ -98,7 +152,8 @@ class ReplEditor
     this.state = {
       maybePrompt: Maybe.nothing(),
       showCodeEditor: true,
-      editorText: '',
+      solutionText: '',
+      question: defaultQuestion(),
     };
   }
 
@@ -106,37 +161,32 @@ class ReplEditor
     nextProps: StyledComponentProps<ReplEditorProps, JSSStyles>, nextState: ReplEditorState) {
     return super.shouldComponentUpdate(nextProps, nextState)
       || this.props.model !== nextProps.model
-      || this.state.maybePrompt !== nextState.maybePrompt
-      || this.state.showCodeEditor !== nextState.showCodeEditor;
+      || Object.keys(this.state).some(key => this.state[key] !== nextState[key]);
   }
 
   componentWillReceiveProps(nextProps: StyledComponentProps<ReplEditorProps, JSSStyles>) {
-    if (this.state.editorText !== editorTextFromModel(nextProps.model)) {
-      this.setState({
-        editorText: editorTextFromModel(nextProps.model),
-      });
-    }
-
     if (this.props.context.undoRedoActionGuid !== nextProps.context.undoRedoActionGuid) {
-      this.setState({
-        maybePrompt: maybe(
-          RichText.fromHtml(promptHtmlFromModel(nextProps.model)),
-        ),
-      });
+      this.loadStateFromProps();
     }
   }
 
   componentDidMount() {
-    const { model, onFocus } = this.props;
+    this.loadStateFromProps();
+  }
+
+  loadStateFromProps() {
+    const { model } = this.props;
 
     const promptHtml = promptHtmlFromModel(model);
     const showCodeEditor = isCodeEditorVisibleFromModel(model);
-    const editorText = editorTextFromModel(model);
+    const question = questionFromModel(model) || this.state.question;
+    const solutionText = solutionTextFromModel(model);
 
     this.setState({
       maybePrompt: maybe(RichText.fromHtml(promptHtml)),
       showCodeEditor,
-      editorText,
+      question,
+      solutionText,
     });
   }
 
@@ -186,7 +236,7 @@ class ReplEditor
 
   }
 
-  onShowCodeEditorToggle(show: boolean) {
+  setShowCodeEditor(show: boolean) {
     this.setState({
       showCodeEditor: show,
     }, () => {
@@ -198,7 +248,8 @@ class ReplEditor
 
   onRunBtnClick () {
     const ReplClient = (window as any).ReplClient;
-    const { editorText } = this.state;
+    const { question } = this.state;
+    const editorText = question.initeditortext;
 
     this.replClient.clearScreen();
     this.replClient.writeln(editorText);
@@ -218,31 +269,95 @@ class ReplEditor
   }
 
   onEditEditorText(editorText: string) {
+    const question = this.state.question;
+    question.initeditortext = editorText;
     this.setState({
-      editorText,
+      question,
+    }, () => this.saveActivityFromCurrentState());
+  }
+
+  onEditSolutionText(solutionText: string) {
+    this.setState({
+      solutionText,
+    }, () => this.saveActivityFromCurrentState());
+  }
+
+  onEditFunctionName(value) {
+    const question = this.state.question;
+    question.functionname = value;
+
+    this.setState({
+      question,
+    }, () => this.saveActivityFromCurrentState());
+  }
+
+  onEditTestCaseInput(guid, value) {
+    const question = this.state.question;
+    question.testCases = question.testCases.map((testCase) => {
+      if (testCase.guid === guid) {
+        testCase.input = value;
+      }
+      return testCase;
+    });
+
+    this.setState({
+      question,
+    }, () => this.saveActivityFromCurrentState());
+  }
+
+  onEditTestCaseOutput(guid, value) {
+    const question = this.state.question;
+    question.testCases = question.testCases.map((testCase) => {
+      if (testCase.guid === guid) {
+        testCase.output = value;
+      }
+      return testCase;
+    });
+
+    this.setState({
+      question,
+    }, () => this.saveActivityFromCurrentState());
+  }
+
+  onRemoveTestCase(guid) {
+    const question = this.state.question;
+    question.testCases = question.testCases.filter(testCase =>
+      testCase.guid !== guid);
+
+    this.setState({
+      question,
     }, () => this.saveActivityFromCurrentState());
   }
 
   saveActivityFromCurrentState() {
     const { model, onEdit } = this.props;
 
-    const layoutAssetIndex = model.assets.findIndex(asset => asset.name === 'layout');
-    const layoutAsset = model.assets.get(layoutAssetIndex);
-
     const updated = model.with({
-      assets: model.assets.set(
-        layoutAssetIndex,
-        layoutAsset.with({
-          content: Maybe.just(this.getActivityLayoutHTML()),
-        }),
-      ),
+      assets: model.assets.map((asset) => {
+        switch (asset.name) {
+          case 'layout':
+            return asset.with({
+              content: Maybe.just(this.getActivityLayoutHTML()),
+            });
+          case 'questions':
+            return asset.with({
+              content: Maybe.just(this.getActivityQuestionsXml()),
+            });
+          case 'solutions':
+            return asset.with({
+              content: Maybe.just(this.getActivitySolutionsXml()),
+            });
+          default:
+            return asset;
+        }
+      }).toList(),
     });
 
     onEdit(updated);
   }
 
   getActivityLayoutHTML() {
-    const { maybePrompt, showCodeEditor, editorText } = this.state;
+    const { maybePrompt, showCodeEditor, question } = this.state;
 
     const promptInnerHtml = maybePrompt.caseOf({
       just: prompt => prompt.toHtml(),
@@ -252,12 +367,45 @@ class ReplEditor
     return renderLayoutHtml({
       prompt: promptInnerHtml,
       showCodeEditor,
-      editorText,
+    });
+  }
+
+  getActivityQuestionsXml() {
+    const { question } = this.state;
+
+    return renderQuestionsXml({
+      questions: [question],
+    });
+  }
+
+  getActivitySolutionsXml() {
+    const { solutionText } = this.state;
+
+    return renderSolutionsXml({
+      solutions: [{
+        language: 'python',
+        value: solutionText,
+      }],
     });
   }
 
   captureEditorRef = (ref: Editor) => {
     this.promptEditor = ref;
+  }
+
+  onAddTestCase() {
+    const { question } = this.state;
+
+    const updatedQuestion = question;
+    updatedQuestion.testCases.push({
+      guid: guid(),
+      input: '',
+      output: '',
+    });
+
+    this.setState({
+      question: updatedQuestion,
+    }, () => this.saveActivityFromCurrentState());
   }
 
   renderSidebar(): JSX.Element {
@@ -293,7 +441,40 @@ class ReplEditor
 
   render(): JSX.Element {
     const { className, classes, editMode, onRichTextFocus } = this.props;
-    const { maybePrompt, showCodeEditor, editorText } = this.state;
+    const {
+      maybePrompt, showCodeEditor, solutionText, question,
+    } = this.state;
+    const editorText = question.initeditortext;
+
+    const ACE_EDITOR_OPTIONS = {
+      enableBasicAutocompletion: true,
+      enableLiveAutocompletion: true,
+      enableSnippets: false,
+      showLineNumbers: true,
+      tabSize: 2,
+      useWorker: false,
+      showGutter: true,
+      highlightActiveLine: false,
+    };
+
+    const HelpPopover = ({ children }) => (
+      <Tooltip
+        theme="light"
+        animation="shift"
+        interactive={true}
+        arrow={true}
+        style={{ color: colors.blue }}
+        html={children}>
+        <i className={'fa fa-question-circle'}></i>
+      </Tooltip>
+    );
+
+    const editorPlugins = [
+      markHotkey({ key: 'b', type: 'bold' }),
+      markHotkey({ key: 'i', type: 'italic' }),
+      markHotkey({ key: 'u', type: 'underline' }),
+      markHotkey({ key: 'h', type: 'highlight' }),
+    ];
 
     return (
       <div className={classNames([classes.ReplEditor, className])}>
@@ -316,22 +497,10 @@ class ReplEditor
                       maybe(new TextSelection(prompt.value.selection)),
                     )
                   }
-                  // Add the ability to render our nodes and marks...
                   renderBlock={renderNode}
                   renderMark={renderMark}
-                  plugins={plugins} />
+                  plugins={editorPlugins} />
               </div>
-              <ToggleSwitch
-                label="Show Code Editor"
-                checked={showCodeEditor}
-                className={classes.showCodeEditorBtn}
-                onClick={() => this.onShowCodeEditorToggle(!showCodeEditor)}
-                editMode={editMode}/>
-              <ToggleSwitch
-                label="Activity is Graded"
-                checked={false}
-                onClick={() => {}}
-                editMode={false} />
 
               <div className={classes.combined}>
                 <div>
@@ -360,22 +529,113 @@ class ReplEditor
                           readOnly={!editMode}
                           value={editorText}
                           onChange={text => this.onEditEditorText(text)}
-                          setOptions={{
-                            enableBasicAutocompletion: true,
-                            enableLiveAutocompletion: true,
-                            enableSnippets: false,
-                            showLineNumbers: true,
-                            tabSize: 2,
-                            useWorker: false,
-                            showGutter: true,
-                            highlightActiveLine: false,
-                          }} />
+                          setOptions={ACE_EDITOR_OPTIONS} />
                     </div>
                   }
                   <div
                     className={classes.console}
                     style={{ width: showCodeEditor ? 350 : 700 }}
                     ref={div => this.onConsoleLoad(div)}></div>
+                </div>
+              </div>
+
+              <div className={classes.options}>
+                <h4>Options</h4>
+                <ToggleSwitch
+                  label="Show Code Editor"
+                  checked={showCodeEditor}
+                  className={classes.showCodeEditorToggle}
+                  onClick={() => this.setShowCodeEditor(!showCodeEditor)}
+                  editMode={editMode}/>
+              </div>
+
+              <div className={classes.gradingEditor}>
+                <h4>Test Cases <Badge>{question.testCases.length}</Badge></h4>
+                <div className={classes.explanation}>
+                  Student responses can be evaluated for correctness by specifying
+                  a set of test cases below. <HelpPopover>
+                    <div className={classes.helpPopover}>
+                      Each test case below should specify an expected result
+                      given a particular set of parameters for the function
+                      specified.
+                      <br /><br />
+                      <b>Parameters</b> and <b>Expected Result</b> must be
+                      specified in the exact syntax of the language being evaluated.
+                      <br /><br />
+                      For example, in python <b>parameters</b> should be
+                      comma-separated: <code>param1, param2</code> and <b>
+                      Expected Result</b> should contain quotes if it
+                      is a string: <code>"result string"</code>.
+                    </div>
+                </HelpPopover>
+                </div>
+                <label>Function Name</label> <input type="text"
+                  className={classNames([classes.monospace , 'text-input'])}
+                  placeholder="Enter a function name"
+                  onChange={({ target: { value } }) => this.onEditFunctionName(value)}
+                  style={{ marginLeft: 10, width: 300, color: '#e83e8c' }}
+                  value={question.functionname} />
+                <div className={classes.testCases}>
+                  {question.testCases.map((testCase, index) => (
+                    <div key={testCase.guid} className={classes.testCase}>
+                      <div className={classes.testCaseNumber}>
+                        {index + 1}.
+                      </div>
+                      <div>
+                        <div className={classes.monospace}>
+                          <span style={{ color: '#e83e8c' }}>{question.functionname}</span> (
+                          <input type="text"
+                            className={classes.codeInput}
+                            onChange={({ target: { value } }) =>
+                              this.onEditTestCaseInput(testCase.guid, value)}
+                            value={testCase.input} />)
+                        </div>
+                        <div className={classes.resultLabel}>
+                          <b>Expected Result</b> <input type="text"
+                            className={classes.codeInput}
+                            onChange={({ target: { value } }) =>
+                              this.onEditTestCaseOutput(testCase.guid, value)}
+                            value={testCase.output} />
+                        </div>
+                      </div>
+                      <div className="flex-spacer" />
+                      <div>
+                        <Button
+                          editMode={editMode}
+                          type="secondary"
+                          className="btn-remove"
+                          onClick={() => this.onRemoveTestCase(testCase.guid)}>Remove</Button>
+                      </div>
+                    </div>
+                  ))}
+                  {question.testCases.length < 1 && (
+                    <div className={classes.noTestCasesMsg}>
+                      No test cases have been created for this activity, therefore it
+                      will be considered <b>ungraded</b>.
+                    </div>
+                  )}
+                </div>
+                <div className={classes.testCaseButtons}>
+                  <div className="flex-spacer" />
+                  <div>
+                    <Button
+                      type="secondary"
+                      editMode={editMode}
+                      onClick={() => this.onAddTestCase()}>Add Test Case</Button>
+                  </div>
+                </div>
+                <div className={classes.solution}>
+                  <h4>Solution</h4>
+                  <AceEditor
+                      name="REPL_CODE_EDITOR"
+                      width="700px"
+                      height="250px"
+                      mode="python"
+                      theme="chrome"
+                      readOnly={!editMode}
+                      value={solutionText}
+                      onChange={text => this.onEditSolutionText(text)}
+                      setOptions={ACE_EDITOR_OPTIONS} />
                 </div>
               </div>
             </React.Fragment>

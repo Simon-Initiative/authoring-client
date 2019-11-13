@@ -325,7 +325,7 @@ class ContextAwareSidebar
     const idDisplay = (
       <SidebarGroup label="OLI Identifier">
         <SidebarRow>
-          <Tooltip title={resource.id}
+          <Tooltip title={resource.id} style={{ fontSize: 14 }}
             delay={150} distance={5} size="small" arrowSize="small">
             {resource.id}
           </Tooltip>

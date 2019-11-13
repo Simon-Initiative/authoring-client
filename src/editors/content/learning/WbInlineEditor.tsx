@@ -69,42 +69,67 @@ export default class WbInlineEditor
       .filter(r => r.type === LegacyTypes.inline && r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.guid} value={r.id}>{r.title}</option>);
 
+    const embedActivityTypes = this.props.context.courseModel.embedActivityTypes;
+    const isReplActivity = embedActivityTypes.get(this.props.model.idref) === 'REPL';
+
     // A purpose is not required, so we need to add an option for an empty type
     const purposeTypesWithEmpty = PurposeTypes.slice();
     purposeTypesWithEmpty.unshift({ value: '', label: '' });
 
-    return (
-      <SidebarContent title="Inline Assessment">
-        <SidebarGroup label="Assessment">
-          <Select
-            editMode={this.props.editMode}
-            value={this.props.model.idref}
-            onChange={this.onAssessmentChange}>
-            {inlineAssessmentOptions}
-          </Select>
-        </SidebarGroup>
-        <SidebarGroup label="Purpose">
-          <Select
-            editMode={this.props.editMode}
-            value={this.props.model.purpose.valueOr('')}
-            onChange={this.onPurposeEdit}>
-            {purposeTypesWithEmpty.map(p =>
-              <option
-                key={p.value}
-                value={p.value}>
-                {p.label}
-              </option>)}
-          </Select>
-        </SidebarGroup>
-      </SidebarContent>
-    );
+    return isReplActivity
+      ? (
+        <SidebarContent title="REPL Activity">
+          <SidebarGroup label="Purpose">
+            <Select
+              editMode={this.props.editMode}
+              value={this.props.model.purpose.valueOr('')}
+              onChange={this.onPurposeEdit}>
+              {purposeTypesWithEmpty.map(p =>
+                <option
+                  key={p.value}
+                  value={p.value}>
+                  {p.label}
+                </option>)}
+            </Select>
+          </SidebarGroup>
+        </SidebarContent>
+      )
+      : (
+        <SidebarContent title="Inline Assessment">
+          <SidebarGroup label="Assessment">
+            <Select
+              editMode={this.props.editMode}
+              value={this.props.model.idref}
+              onChange={this.onAssessmentChange}>
+              {inlineAssessmentOptions}
+            </Select>
+          </SidebarGroup>
+          <SidebarGroup label="Purpose">
+            <Select
+              editMode={this.props.editMode}
+              value={this.props.model.purpose.valueOr('')}
+              onChange={this.onPurposeEdit}>
+              {purposeTypesWithEmpty.map(p =>
+                <option
+                  key={p.value}
+                  value={p.value}>
+                  {p.label}
+                </option>)}
+            </Select>
+          </SidebarGroup>
+        </SidebarContent>
+      );
   }
 
   renderToolbar() {
     const { onShowSidebar } = this.props;
 
+    const embedActivityTypes = this.props.context.courseModel.embedActivityTypes;
+    const isReplActivity = embedActivityTypes.get(this.props.model.idref) === 'REPL';
+    const title = isReplActivity ? 'REPL Activity' : 'Assessment';
+
     return (
-      <ToolbarGroup label="Assessment" highlightColor={CONTENT_COLORS.WbInline} columns={3}>
+      <ToolbarGroup label={title} highlightColor={CONTENT_COLORS.WbInline} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fas fa-sliders-h" /></div>

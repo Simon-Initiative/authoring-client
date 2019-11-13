@@ -17,14 +17,14 @@
         flex-direction: row;
         overflow: hidden;
         flex: 1;
+        position: relative;
 
         .html-editor-well {
             display: flex;
             flex: 1;
             flex-direction: column;
             overflow: auto;
-            padding: 10px 40px 0 40px;
-            position: relative;
+            padding: 10px 40px 75px 40px;
 
             .TitleTextEditor {
                 margin-bottom: 10px;

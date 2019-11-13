@@ -10,6 +10,7 @@ h2 {
 
 a, .text-link {
   color: $primary;
+  cursor: pointer;
 
   &:hover {
     text-decoration: underline;

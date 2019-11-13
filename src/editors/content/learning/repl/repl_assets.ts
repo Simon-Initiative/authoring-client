@@ -7,10 +7,8 @@ type RenderLayoutHtmlOptions = Partial<{
 export const renderLayoutHtml = ({
     prompt = '',
     showCodeEditor = true,
-    editorText = '',
   }: RenderLayoutHtmlOptions = {}) => `<div id="q1" class="question">
   <div id="prompt">${prompt}</div>
-  <div id="editor_text" style="display: none">${editorText}</div>
   ${showCodeEditor
     ? `
     <div>
@@ -160,8 +158,22 @@ export const renderDefaultControlsHtml = () => `<div>
 </div>
 `;
 
+export type TestCase = {
+  guid: string;
+  input: string;
+  output: string;
+};
+
+export type Question = {
+  id: string,
+  initeditortext: string,
+  language: string,
+  functionname: string,
+  testCases: TestCase[],
+};
+
 type RenderQuestionsXmlParams = Partial<{
-  questions: any[],
+  questions: Question[],
 }>;
 
 export const renderQuestionsXml = ({
@@ -170,20 +182,18 @@ export const renderQuestionsXml = ({
 <root>
 ${
   questions.map(question => `
-  <question id="q1">
-    <part id="q1_1">
-        <initeditortext><![CDATA[def bye():
-# put your function here
-]]></initeditortext>
+  <question id="${question.id}">
+    <part id="${question.id}_1">
+        <initeditortext><![CDATA[${question.initeditortext}]]></initeditortext>
         <feedbackengine>
             <cloudcoder>
-                <language>python</language>
+                <language>${question.language}</language>
                 <problemtype>function</problemtype>
-                <functionname>bye</functionname>
-                <testcase>
-                    <input></input>
-                    <output>'Goodbye'</output>
-                </testcase>
+                <functionname>${question.functionname}</functionname>
+                ${question.testCases.map(testcase => `<testcase>
+                    <input>${testcase.input}</input>
+                    <output>${testcase.output}</output>
+                </testcase>`)}
             </cloudcoder>
         </feedbackengine>
     </part>
@@ -193,8 +203,13 @@ ${
 </root>
 `;
 
+export type Solution = {
+  language: string;
+  value: string;
+};
+
 type RenderSolutionsXmlParams = Partial<{
-  solutions: any[];
+  solutions: Solution[];
 }>;
 
 export const renderSolutionsXml = ({
@@ -203,8 +218,8 @@ export const renderSolutionsXml = ({
 <root>
 ${
   solutions.map(solution => `
-  <solution><![CDATA[def bye():
-print('Goodbye')]]>
+  <solution>
+    <pre class="brush: ${solution.language}">${solution.value}</pre>
   </solution>
 `)
 }
