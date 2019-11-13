@@ -398,8 +398,7 @@ class ContextAwareSidebar
                               }
                               }>
                                 <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
-                                  {
-                                    getNameAndIconByType(res.type).icon}
+                                  {getNameAndIconByType(res, course.embedActivityTypes).icon}
                                 </span>
                                 {res.title}
                               </a>

@@ -123,7 +123,7 @@ export default class EmbedActivityEditor
 
   render() {
     const { context, services, editMode, model, course, onEdit, onUpdateEditor } = this.props;
-
+    const activityType = course.embedActivityTypes.get(model.resource.id);
     return (
       <div className="embed-activity-editor">
         <ContextAwareToolbar editMode={editMode} context={context} model={model} />
@@ -142,7 +142,7 @@ export default class EmbedActivityEditor
               editorStyles={{ fontSize: 32 }} />
 
             <div className="embed-activity-container">
-              {course.embedActivityTypes.has(model.resource.id)
+              {activityType === 'REPL'
                 ? (
                   <ReplEditor
                     {...this.props}
@@ -154,7 +154,7 @@ export default class EmbedActivityEditor
                     activeContentGuid={''} />
                 )
                 : (
-                  <div>Embed Activity [Activity Type Not Supported]</div>
+                  <div>Editing of Embed Activity type '{activityType}' is not supported</div>
                 )
               }
             </div>

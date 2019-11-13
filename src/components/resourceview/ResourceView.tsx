@@ -28,7 +28,10 @@ type TitleIcon = {
   icon: JSX.Element,
 };
 
-export const getNameAndIconByType = (type: string) => caseOf<TitleIcon>(type)({
+export const getNameAndIconByType = (
+  r: Resource,
+  embedActivityTypes: Immutable.Map<string, string>,
+) => caseOf<TitleIcon>(r.type)({
   [LegacyTypes.inline]: {
     name: 'Formative Assessment',
     icon: <i className="title-icon fa fa-flask" />,
@@ -44,6 +47,18 @@ export const getNameAndIconByType = (type: string) => caseOf<TitleIcon>(type)({
   [LegacyTypes.feedback]: {
     name: 'Survey',
     icon: <i className="title-icon fas fa-poll" />,
+  },
+  [LegacyTypes.embed_activity]: () => {
+    if (embedActivityTypes.get(r.id) === 'REPL') {
+      return {
+        name: 'REPL Activity',
+        icon: <i className="title-icon fa fa-terminal" />,
+      };
+    }
+    return {
+      name: 'Embed Activity',
+      icon: <i className="title-icon fa fa-window-restore" />,
+    };
   },
   [LegacyTypes.workbook_page]: {
     name: 'Workbook Page',
@@ -103,6 +118,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         || r.type === LegacyTypes.assessment2
         || r.type === LegacyTypes.assessment2_pool
         || r.type === LegacyTypes.feedback
+        || r.type === LegacyTypes.embed_activity
         || r.type === LegacyTypes.workbook_page
       ),
     );
@@ -204,6 +220,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderResources() {
+    const { course } = this.props;
+
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
 
     const labels = [
@@ -232,7 +250,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         : highlightMatches(prop, r, this.state.searchText);
 
       return prop === 'title'
-        ? <span>{getNameAndIconByType(r.type).icon} {maybeHighlighted}</span>
+        ? <span>{getNameAndIconByType(r, course.embedActivityTypes).icon} {maybeHighlighted}</span>
         : <span>{maybeHighlighted}</span>;
 
     };
@@ -242,12 +260,12 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         className="btn btn-link title-btn">{span}</button>;
 
     const columnRenderers = [
-      r => link(r)(highlightedColumnRenderer('title', r)),
-      r => <span>{getNameAndIconByType(r.type).name}</span>,
-      r => highlightedColumnRenderer('id', r),
-      r => <span>{relativeToNow(
+      (r: Resource) => link(r)(highlightedColumnRenderer('title', r)),
+      (r: Resource) => <span>{getNameAndIconByType(r, course.embedActivityTypes).name}</span>,
+      (r: Resource) => highlightedColumnRenderer('id', r),
+      (r: Resource) => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
-      r => <span>{relativeToNow(
+      (r: Resource) => <span>{relativeToNow(
         adjustForSkew(r.dateUpdated, this.props.serverTimeSkewInMs))}</span>,
     ];
 

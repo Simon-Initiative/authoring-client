@@ -20,6 +20,7 @@ export interface TreeNodeProps {
   isExpanded: boolean;        // Is node expanded or not
   context: AppContext;
   org: models.OrganizationModel;
+  course: models.CourseModel;
   onEdit: (request: org.OrgChangeRequest) => void;
   editMode: boolean;
   onClick: (model: NodeTypes) => void;
@@ -56,13 +57,13 @@ export class TreeNode
     return '';
   }
 
-  getResourceIcon(resource: contentTypes.Resource) {
-    return getNameAndIconByType(resource.type).icon;
+  getResourceIcon(resource: contentTypes.Resource, course: models.CourseModel) {
+    return getNameAndIconByType(resource, course.embedActivityTypes).icon;
   }
 
   renderTitle() {
 
-    const { isExpanded, model } = this.props;
+    const { isExpanded, course } = this.props;
 
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
 
@@ -70,7 +71,8 @@ export class TreeNode
         this.props.model.resourceref.idref);
       return resource !== undefined
         ? <React.Fragment>
-          <span style={{ marginRight: 8 }}>{this.getResourceIcon(resource)}</span>{resource.title}
+          <span style={{ marginRight: 8 }}>
+            {this.getResourceIcon(resource, course)}</span>{resource.title}
         </React.Fragment>
         : 'Loading...';
     }
