@@ -9,7 +9,7 @@ export const styles: JSSStyles = {
 
     '& h4': {
       fontSize: 20,
-    }
+    },
   },
   replActivityLabel: {
     color: '#666666',
@@ -26,7 +26,7 @@ export const styles: JSSStyles = {
 
     '& .help-popover-container': {
       maxWidth: 500,
-    }
+    },
   },
   prompt: {
     marginBottom: 10,
