@@ -220,8 +220,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderResources() {
-    const { course } = this.props;
-
+    const { course, currentOrg } = this.props;
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
 
     const labels = [
@@ -245,25 +244,32 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     ];
 
     const highlightedColumnRenderer = (prop: string, r: Resource) => {
-      const maybeHighlighted = this.state.searchText.length < 3
+      return this.state.searchText.length < 3
         ? r[prop]
         : highlightMatches(prop, r, this.state.searchText);
-
-      return prop === 'title'
-        ? <span>{getNameAndIconByType(r, course.embedActivityTypes).icon} {maybeHighlighted}</span>
-        : <span>{maybeHighlighted}</span>;
-
     };
 
-    const link = resource => span =>
-      <button onClick={this.onClickResource.bind(this, resource.id)}
-        className="btn btn-link title-btn">{span}</button>;
+    const titleColumnRenderer = (r: Resource) => {
+      const link = resource => element => (
+        <a className="btn-link"
+          href={`/#${course.idvers}/${resource.id}?organization=${currentOrg}`}>
+          {element}
+        </a>
+      );
+      const title = link(r)(highlightedColumnRenderer('title', r));
+      return (
+        <span>{title}</span>
+      );
+    };
+
+    const icon = r => getNameAndIconByType(r.type, course.embedActivityTypes).icon;
+    const resourceType = r => getNameAndIconByType(r.type,  course.embedActivityTypes).name;
 
     const columnRenderers = [
-      (r: Resource) => link(r)(highlightedColumnRenderer('title', r)),
-      (r: Resource) => <span>{getNameAndIconByType(r, course.embedActivityTypes).name}</span>,
-      (r: Resource) => highlightedColumnRenderer('id', r),
-      (r: Resource) => <span>{relativeToNow(
+      r => titleColumnRenderer(r),
+      r => <span>{icon(r)} {resourceType(r)}</span>,
+      r => highlightedColumnRenderer('id', r),
+      r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
       (r: Resource) => <span>{relativeToNow(
         adjustForSkew(r.dateUpdated, this.props.serverTimeSkewInMs))}</span>,

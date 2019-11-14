@@ -1,73 +1,80 @@
-@import 'oli/colors';
-
-
-
+@import "oli/colors";
 
 .tooltip-editor {
-  height: 250px;
-  width: 350px;
+    height: 250px;
+    width: 350px;
 }
 
 .oli-active-input {
-  background-color:  #b9d2f7e5;
-  margin-left: 4px;
-  margin-right: 4px;
+    background-color: #b9d2f7e5;
+    margin-left: 4px;
+    margin-right: 4px;
 }
 
 .oli-input {
-  background-color:  #e7e7f2e5;
-  margin-left: 4px;
-  margin-right: 4px;
+    background-color: #e7e7f2e5;
+    margin-left: 4px;
+    margin-right: 4px;
 }
 
 .oli-command {
-  background-color: $primary;
-  color: white;
-  font-weight: bold;
+    background-color: $primary;
+    color: white;
+    font-weight: bold;
 }
 
 .oli-cite-entry-active {
-  background-color:  #b9d2f7e5;
-  vertical-align: super;
-  font-size: 10pt;
-  font-weight: bold;
-  margin-left: 3px;
-  margin-right: 3px;
-  padding-right: 7px;
-  color: blue;
+    background-color: #b9d2f7e5;
+    vertical-align: super;
+    font-size: 10pt;
+    font-weight: bold;
+    margin-left: 3px;
+    margin-right: 3px;
+    padding-right: 7px;
+    color: blue;
 }
 
 .oli-cite-entry {
-  vertical-align: super;
-  font-size: 10pt;
-  font-weight: bold;
-  color: blue;
-  margin-left: 3px;
-  margin-right: 3px;
-  padding-right: 7px;
+    vertical-align: super;
+    font-size: 10pt;
+    font-weight: bold;
+    color: blue;
+    margin-left: 3px;
+    margin-right: 3px;
+    padding-right: 7px;
 }
 
 .oli-cite {
-  color: blue;
+    color: blue;
 }
 
 .oli-term {
-  font-weight: bold;
-  font-style: italic;
-  color: green;
+    font-weight: bold;
+    font-style: italic;
+    color: green;
 }
 
 .oli-var {
-  font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New;
-  font-size: 14pt;
-  background-color: #f8f9fa;
-  padding: .2rem .4rem;
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New;
+    font-size: 14pt;
+    background-color: #f8f9fa;
+    padding: .2rem .4rem;
 }
 
 .oli-link {
-  color: blue !important;
+    color: blue !important;
 }
 
 .oli-extra {
-  color: green !important;
+    color: green !important;
+}
+
+.oli-foreign {
+    display: inline-block;
+    border-bottom: 1px dashed #d35400;
+    color: #d35400;
+}
+
+.contiguousTextEditor p:last-child {
+    margin-bottom: 0;
 }

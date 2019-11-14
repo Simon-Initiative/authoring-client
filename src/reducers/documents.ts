@@ -176,15 +176,14 @@ export const documents = (
 
       // Else we are setting the node, so also set the corresponding page
       const node = action.nodeOrPageId;
-      return state.set(action.documentId, ed.with({
-        currentNode: Maybe.just(action.nodeOrPageId),
-        currentPage: assessment.modelType === 'AssessmentModel'
-          ? assessment.pages.reduce(
-            (activePage, page: contentTypes.Page) =>
-              page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
-            ed.currentPage)
-          : Maybe.nothing(),
-      }));
+      const currentPage = assessment.modelType === 'AssessmentModel'
+        ? assessment.pages.reduce(
+          (activePage, page: contentTypes.Page) =>
+            page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
+          ed.currentPage)
+        : Maybe.nothing<string>();
+      const currentNode = Maybe.just(node);
+      return state.set(action.documentId, ed.with({ currentNode, currentPage }));
     default:
       return state;
   }

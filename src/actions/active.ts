@@ -7,8 +7,8 @@ import { resolveWithProgressUI } from 'actions/progress';
 import { ContentElement } from 'data/content/common/interfaces';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
-import { Editor, Inline, Value } from 'slate';
-import { removeInlineEntity, getEntityAtCursor }
+import { Editor, Inline } from 'slate';
+import { removeInlineEntity }
   from 'editors/content/learning/contiguoustext/utils';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';

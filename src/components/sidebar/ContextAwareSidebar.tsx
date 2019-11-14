@@ -13,7 +13,7 @@ import { ParentContainer } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { Resource, ResourceState } from 'data/content/resource';
 import {
-  ModelTypes, ContentModel, AssessmentModel, CourseModel, OrganizationModel,
+  ModelTypes, ContentModel, AssessmentModel, OrganizationModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';

@@ -93,7 +93,7 @@ class BlockQuoteToolbar
 
     return editor.caseOf({
       just: (e) => {
-        return editorUtils.getEntityAtCursor(e).caseOf({
+        return editorUtils.getInlineAtCursor(e).caseOf({
           just: entity => this.renderActiveEntity(entity),
           nothing: () => plainSidebar,
         });

@@ -89,7 +89,7 @@ class BlockFormulaToolbar
 
     return editor.caseOf({
       just: (e) => {
-        return editorUtils.getEntityAtCursor(e).caseOf({
+        return editorUtils.getInlineAtCursor(e).caseOf({
           just: entity => this.renderActiveEntity(entity),
           nothing: () => plainSidebar,
         });
@@ -105,7 +105,7 @@ class BlockFormulaToolbar
     const noTextSelected = selection && selection.isCollapsed();
     const styles = editorUtils.getActiveStyles(editor);
     const cursorInEntity = editor.caseOf({
-      just: e => editorUtils.getEntityAtCursor(e).caseOf({
+      just: e => editorUtils.getInlineAtCursor(e).caseOf({
         just: i => true,
         nothing: () => false,
       }),

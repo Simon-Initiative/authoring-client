@@ -34,8 +34,12 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { StyledComponentProps } from 'types/component';
 import { LegacyTypes } from 'data/types';
 import { PLACEHOLDER_ITEM_ID } from 'data/content/org/common';
-import { Editor, Inline } from 'slate';
+import { Editor, Inline, Mark, Editor as EditorCore, Data, Text } from 'slate';
 import * as editorUtils from './utils';
+import { getLeafAtCursor } from 'editors/content/learning/contiguoustext/utils';
+import { localeCodes } from 'data/content/learning/foreign';
+import { Select } from 'editors/content/common/Select';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 
 
 
@@ -58,10 +62,10 @@ export interface ContiguousTextToolbarState {
 type StyledContiguousTextToolbarProps =
   StyledComponentProps<ContiguousTextToolbarProps, typeof styles>;
 
-function applyInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+export function applyInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
   editor.lift(e => editorUtils.applyInline(e, wrapper));
 }
-function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
+export function insertInline(editor: Maybe<Editor>, wrapper: InlineTypes) {
   editor.lift(e => editorUtils.insertInline(e, wrapper));
 }
 
@@ -124,7 +128,6 @@ class ContiguousTextToolbar
 
     return React.createElement(
       getEditorByContentType((data as any).get('value').contentType), props);
-
   }
 
   renderSidebar() {
@@ -132,24 +135,74 @@ class ContiguousTextToolbar
 
     const plainSidebar = <SidebarContent title="Text Block" />;
 
-    const inline = activeInline.caseOf({
-      just: i => i,
-      nothing: () => null,
-    });
-
-    if (inline !== null) {
-      return this.renderActiveEntity(inline);
-    }
-
     return editor.caseOf({
-      just: (e) => {
-        return editorUtils.getEntityAtCursor(e).caseOf({
-          just: entity => this.renderActiveEntity(entity),
-          nothing: () => plainSidebar,
-        });
+      just: (e: Editor) => {
+        const isForeign = (text: Text) => text.marks.toArray().find(m => m.type === 'foreign');
+        const leaf = getLeafAtCursor(e).valueOr(null);
+
+        const sidebarRenderers = [];
+
+        activeInline.lift(inline => sidebarRenderers.push(this.renderActiveEntity(inline)));
+
+        if (Text.isText(leaf) && isForeign(leaf)) {
+          sidebarRenderers.push(this.renderForeignOptions(e, leaf));
+        }
+
+        if (sidebarRenderers.length === 0) {
+          sidebarRenderers.push(plainSidebar);
+        }
+
+        return (
+          <React.Fragment>
+            {sidebarRenderers.reduce((acc, curr, i, arr) => {
+              // Intersperse renderers with paragraph breaks
+              acc.push(curr);
+              i !== arr.length - 1 && acc.push(<br />);
+              return acc;
+            }, [])}
+          </React.Fragment>
+        );
       },
       nothing: () => plainSidebar,
     });
+  }
+
+  renderForeignOptions(editor: EditorCore, markedText: Text) {
+
+    const locale = markedText.marks.find(m => m.type === 'foreign').data.get('lang');
+    const localeOptions = Object.entries(localeCodes)
+      .map(([friendly, code]) => <option key={friendly} value={code}>{friendly}</option>);
+
+    return (
+      <SidebarContent title="Foreign Text">
+        <SidebarGroup label="Screen Reader Accent">
+          <Select
+            className="localeSelect"
+            editMode={this.props.editMode}
+            value={locale || localeCodes['Spanish (LATAM)']}
+            onChange={(lang: string) => {
+              const selection = editor.value.selection;
+
+              editor.replaceNodeByKey(markedText.key, Text.create({
+                key: markedText.key,
+                text: markedText.text,
+                marks: markedText.marks.toArray().map((mark) => {
+                  if (mark.type === 'foreign') {
+                    return Mark.create({
+                      type: 'foreign',
+                      data: Data.create({ lang }),
+                    });
+                  }
+                  return mark;
+                }),
+              }));
+              editor.select(selection);
+            }}>
+            {localeOptions}
+          </Select>
+        </SidebarGroup>
+      </SidebarContent>
+    );
   }
 
   renderEntryOptions() {
@@ -225,7 +278,7 @@ class ContiguousTextToolbar
   }
 
   renderToolbar() {
-    const { editMode, editor } = this.props;
+    const { editMode, editor, courseModel } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
     const cursorInEntity = editorUtils.cursorInEntity(editor);
     const rangeEntitiesEnabled = editMode && editorUtils.bareTextSelected(editor);
@@ -312,7 +365,15 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={
-              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Foreign))
+              () => this.props.editor.lift((e) => {
+                e.toggleMark({
+                  type: InlineStyles.Foreign,
+                  data: Data.create({
+                    lang: courseModel.language ||
+                      localeCodes['Spanish (LATAM)'],
+                  }),
+                });
+              })
             }
             disabled={!supports('foreign') || !editMode}
             selected={styles.has('foreign')}

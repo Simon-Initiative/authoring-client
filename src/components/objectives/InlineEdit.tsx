@@ -2,9 +2,12 @@ import * as React from 'react';
 import { Button } from 'components/common/Button';
 import { classNames } from 'styles/jss';
 import { highlightMatchesStr } from 'components/common/SearchBarLogic.tsx';
+import * as Immutable from 'immutable';
 
 export interface InlineEditProps {
   value: string;
+  // Allows the InlineEdit to "match" values that aren't displayed, like Obj/Skill IDs
+  hiddenValues?: Immutable.List<string>;
   editMode: boolean;
   isEditing: boolean;
   autoFocus?: boolean;
@@ -64,9 +67,9 @@ export class InlineEdit
     }
   }
 
-
-  render() : JSX.Element {
-    const { inputStyle, isEditing, value, editMode, highlightText } = this.props;
+  render(): JSX.Element {
+    const { inputStyle, isEditing, value, editMode, highlightText, hiddenValues }
+      = this.props;
 
     if (isEditing) {
       return (
@@ -81,7 +84,7 @@ export class InlineEdit
             onKeyUp={this.onKeyUp}
             onChange={this.onTextChange}
             onClick={e => e.stopPropagation()}
-            value={this.state.value}/>
+            value={this.state.value} />
           <Button
             className={classNames(['btn btn-sm'])}
             editMode={editMode}
@@ -100,9 +103,24 @@ export class InlineEdit
       );
     }
 
+    const displayValue = <span>
+      {highlightText ? highlightMatchesStr(value, highlightText) : value}
+    </span>;
+
+    const hiddenValueMatch = (displayText: string) => highlightText &&
+      highlightText.length > 2 &&
+      hiddenValues.some(s => s.trim().toLowerCase().includes(highlightText))
+      && (
+        <span style={{ margin: '0 5px', padding: '0 5px' }} className="searchMatch">
+          {displayText}
+        </span>
+      );
+
+    const idMatch = hiddenValueMatch('ID Match');
+
     return (
       <React.Fragment>
-        {highlightText ? highlightMatchesStr(value, highlightText) : value}
+        {displayValue} {idMatch}
       </React.Fragment>
     );
   }

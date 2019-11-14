@@ -1,74 +1,73 @@
-@import 'oli/colors';
-@import 'oli/layout';
+@import "oli/colors";
+@import "oli/layout";
 
 .objective-skill-view {
-  flex: 1;
-  overflow: auto;
+    flex: 1;
+    overflow: auto;
 
-  td {
-    border-top: 0;
-    padding: .3rem 0;
-  }
-
-  .document {
-    padding-top: 30px;
-  }
-
-  .table-toolbar {
-    display: flex;
-    flex-direction: row;
-    justify-items: center;
-    margin: 20px 0 10px 0;
-  }
-
-  .filter-bar {
-    .selected-org-info {
-      font-size: 0.9rem;
-      color: $gray-darker;
+    td {
+        border-top: 0;
+        padding: .3rem 0;
     }
-  }
 
-  .rst__node .rst__nodeContent h2 {
-    color: $blue;
-    margin-top: 10px;
-  }
+    .document {
+        padding: 30px;
+    }
 
-  .objectives-list {
-    margin-top: 10px;
-    margin-bottom: 30px;
-    background: #fff;
-    padding: 0px 20px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-  }
+    .table-toolbar {
+        display: flex;
+        flex-direction: row;
+        justify-items: center;
+        margin: 20px 0 10px 0;
+    }
 
-  .page-loading {
-    text-align: center;
-    margin-top: 50px;
-    font-size: 1.3em;
-  }
+    .filter-bar {
+        .selected-org-info {
+            font-size: 0.9rem;
+            color: $gray-darker;
+        }
+    }
 
+    .rst__node .rst__nodeContent h2 {
+        color: $blue;
+        margin-top: 10px;
+    }
+
+    .objectives-list {
+        margin-top: 10px;
+        margin-bottom: 30px;
+        background: #fff;
+        padding: 0px 20px;
+        border: 1px solid #ddd;
+        border-radius: 2px;
+    }
+
+    .page-loading {
+        text-align: center;
+        margin-top: 50px;
+        font-size: 1.3em;
+    }
 }
 
 .ConfirmModal {
-  &.confirm-delete-modal {
-    .btn.btn-primary.confirmBtn {
-      background-color: $remove;
-      border-color: $remove;
+    &.confirm-delete-modal {
+        .btn.btn-primary.confirmBtn {
+            background-color: $remove;
+            border-color: $remove;
 
-      &:hover {
-        background-color: darken($remove, 10%);
-        border-color: darken($remove, 10%);
-      }
+            &:hover {
+                background-color: darken($remove, 10%);
+                border-color: darken($remove, 10%);
+            }
 
-      &:active {
-        background-color: darken($remove, 15%);
-        border-color: darken($remove, 15%);
-      }
+            &:active {
+                background-color: darken($remove, 15%);
+                border-color: darken($remove, 15%);
+            }
 
-      &:focus {
-        outline: none;
-      }
+            &:focus {
+                outline: none;
+            }
+        }
     }
-  }
 }

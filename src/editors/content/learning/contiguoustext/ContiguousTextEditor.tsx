@@ -76,6 +76,10 @@ class ContiguousTextEditor
         this.props.onUpdateEditor(this.editor);
         this.editor.focus();
 
+        // Do not broadcast changes if the editor is unfocused (de-selected)
+      } else if (updateSelection && !v.selection.isFocused) {
+        return;
+
       } else if (updateSelection) {
 
         // Broadcast the fact that the editor updated
@@ -84,7 +88,7 @@ class ContiguousTextEditor
         // Based on the new selection, update whether or not
         // the cursor is 'in' an inline or not
         this.props.onSelectInline(
-          editorUtils.getEntityAtCursor(this.editor as any));
+          editorUtils.getInlineAtCursor(this.editor as any));
       }
 
     });
@@ -127,8 +131,8 @@ class ContiguousTextEditor
   }
 
   slateOnFocus(e) {
-    this.props.onFocus(this.props.model, this.props.parent, Maybe.nothing());
     this.props.onUpdateEditor(this.editor);
+    this.props.onFocus(this.props.model, this.props.parent, Maybe.nothing());
   }
 
   onPaste(event, editor: EditorCore, next): boolean {

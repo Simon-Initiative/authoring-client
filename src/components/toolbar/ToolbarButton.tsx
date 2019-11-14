@@ -52,8 +52,15 @@ class ToolbarButton
 
     return tooltip ?
       (
-        <Tooltip title={tooltip} delay={1000} distance={5} style={{ display: 'inline-block' }}
-          size="small" arrowSize="small">
+        <Tooltip
+          duration={0}
+          title={tooltip}
+          delay={0}
+          distance={5}
+          style={{ display: 'inline-block' }}
+          size="small"
+          arrowSize="small"
+        >
           {button}
         </Tooltip>
       )

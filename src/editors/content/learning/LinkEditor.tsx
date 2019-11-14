@@ -19,6 +19,8 @@ export interface LinkEditorProps extends AbstractContentEditorProps<contentTypes
 
 export interface LinkEditorState {
   isExternal: boolean;
+  hrefEditing: boolean;
+  href: string;
 }
 
 /**
@@ -32,26 +34,33 @@ export default class LinkEditor
 
     this.state = {
       isExternal: !props.model.href.startsWith('..'),
+      hrefEditing: false,
+      href: props.model.href,
     };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     const doesSuperWantToUpdate = super.shouldComponentUpdate(nextProps, nextState);
-    return doesSuperWantToUpdate || this.state.isExternal !== nextState.isExternal;
+    return doesSuperWantToUpdate
+      || this.state.isExternal !== nextState.isExternal
+      || this.state.href !== nextState.href
+      || this.state.hrefEditing !== nextState.hrefEditing;
   }
 
   renderMain() {
     return null;
   }
 
-  renderSideBarExternal() {
-    const { editMode, model, onEdit } = this.props;
+  renderHrefEditing() {
+    const { editMode } = this.props;
+
+    const href = this.state.href;
 
     const isMissingScheme = !(
-      model.href.startsWith('mailto://') ||
-      model.href.startsWith('ftp://') ||
-      model.href.startsWith('http://') ||
-      model.href.startsWith('https://')
+      href.startsWith('mailto://') ||
+      href.startsWith('ftp://') ||
+      href.startsWith('http://') ||
+      href.startsWith('https://')
     );
 
     const missingSchemeMessage = isMissingScheme
@@ -60,20 +69,56 @@ export default class LinkEditor
 
     return (
       <React.Fragment>
+        {missingSchemeMessage}
+
+        <TextInput
+          editMode={editMode}
+          width="100%"
+          label=""
+          hasError={isMissingScheme}
+          value={this.state.href}
+          type="string"
+          onEdit={(href) => {
+            this.setState({ href });
+          }}
+        />
+        <button
+          className="btn-sm btn btn-primary"
+          onClick={() => {
+            this.setState({ hrefEditing: false });
+            const model = this.props.model.with({ href: this.state.href });
+            this.props.onEdit(model);
+          }}>
+          Done
+        </button>
+      </React.Fragment>
+    );
+
+  }
+
+  renderHrefViewing() {
+    return (
+      <React.Fragment>
+        <div>{this.state.href}</div>
+        <button
+          disabled={!this.props.editMode}
+          className="btn-sm btn btn-primary"
+          onClick={() => this.setState({ hrefEditing: true })}>
+          Edit
+        </button>
+      </React.Fragment>
+    );
+  }
+
+  renderSideBarExternal() {
+    const { editMode, model, onEdit } = this.props;
+
+
+    return (
+      <React.Fragment>
 
         <SidebarGroup label="URL">
-
-          {missingSchemeMessage}
-
-          <TextInput
-            editMode={editMode}
-            width="100%"
-            label=""
-            hasError={isMissingScheme}
-            value={model.href}
-            type="string"
-            onEdit={href => onEdit(model.with({ href }))}
-          />
+          {this.state.hrefEditing ? this.renderHrefEditing() : this.renderHrefViewing()}
         </SidebarGroup>
 
         <SidebarGroup label="Target">
@@ -255,7 +300,7 @@ export default class LinkEditor
                 checked={!this.state.isExternal}
                 onChange={() => this.onSourceChange(false)}
                 type="radio" />&nbsp;
-      Media Library
+Media Library
             </label>
           </div>
           <div className="form-check" style={{ marginBottom: '30px' }}>
@@ -267,7 +312,7 @@ export default class LinkEditor
                 disabled={!editMode}
                 checked={this.state.isExternal}
                 type="radio" />&nbsp;
-      URL
+URL
             </label>
           </div>
         </SidebarGroup>

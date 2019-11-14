@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { bindActionCreators } from 'redux';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
@@ -25,9 +24,6 @@ import {
   QuestionRef, PoolInfo, getQuestionRefFromPathInfo,
 } from 'types/questionRef';
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
-import { LearningObjectivesModel } from 'data/models/objective';
-import { SkillsModel } from 'data/models/skill';
-import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
 import { LegacyTypes, CourseIdVers } from 'data/types';
@@ -42,6 +38,7 @@ import './ObjectiveSkillView.scss';
 import { extractFullText } from 'data/content/objectives/objective';
 import { WritelockModal } from 'components/WritelockModal';
 import { ConflictModal } from 'components/ConflictModal.controller';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 const getQuestionRefFromSkillEdge = (
   edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
@@ -235,6 +232,7 @@ interface ObjectiveSkillViewState {
   skillQuestionRefs: Maybe<Immutable.Map<string, Immutable.List<QuestionRef>>>;
   workbookPageRefs: Maybe<Immutable.Map<string, Immutable.List<string>>>;
   searchText: string;
+  showIds: boolean;
 }
 
 // The Learning Objectives and Skills documents require specialized handling
@@ -252,7 +250,7 @@ class ObjectiveSkillView
   unmounted: boolean;
   failureMessage: Maybe<Messages.Message>;
 
-  constructor(props) {
+  constructor(props: ObjectiveSkillViewProps) {
     super(props);
 
     this.state = {
@@ -267,6 +265,7 @@ class ObjectiveSkillView
       skillQuestionRefs: Maybe.nothing(),
       workbookPageRefs: Maybe.nothing(),
       searchText: '',
+      showIds: false,
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
@@ -278,6 +277,7 @@ class ObjectiveSkillView
     this.onToggleExpanded = this.onToggleExpanded.bind(this);
     this.onExistingSkillInsert = this.onExistingSkillInsert.bind(this);
     this.onBeginExternalEdit = this.onBeginExternalEdit.bind(this);
+    this.onToggleShowIds = this.onToggleShowIds.bind(this);
 
     this.services = new DispatchBasedServices(
       this.props.dispatch,
@@ -519,8 +519,6 @@ class ObjectiveSkillView
 
         } else {
 
-          this.logObjectivesAndSkills(aggregateModel);
-
           if (aggregateModel.isLocked) {
 
             const locks = [...aggregateModel.objectives, ...aggregateModel.skills]
@@ -559,54 +557,10 @@ class ObjectiveSkillView
     this.props.dispatch(expandNodes('objectives', objectiveIds));
   }
 
-  logObjectivesAndSkills(aggregateModel: AggregateModel) {
-    const { objectives, skills } = aggregateModel;
-
-    const objectiveObjects = objectives.map(objective =>
-      (objective.model as LearningObjectivesModel)
-        .objectives
-        .toArray()
-        .map(o => ({
-          title: o.rawContent.caseOf({
-            just: c => extractFullText(c),
-            nothing: () => o.title,
-          }), id: o.id,
-        })));
-
-    const skillObjects = skills.map(skill => (skill.model as SkillsModel)
-      .skills
-      .toArray()
-      .map(s => ({ title: s.title, id: s.id })));
-
-    logger.group(
-      LogLevel.INFO,
-      LogTag.DEFAULT,
-      'Objective Details:',
-      (logger) => {
-        objectiveObjects[0].forEach((objective) => {
-          logger
-            .setVisibility(LogAttribute.TAG, false)
-            .setVisibility(LogAttribute.DATE, false)
-            .info(LogTag.DEFAULT, `${objective.title} (id: ${objective.id})`);
-        });
-      },
-      LogStyle.HEADER + LogStyle.BLUE,
-    );
-
-    logger.group(
-      LogLevel.INFO,
-      LogTag.DEFAULT,
-      'Skill Details:',
-      (logger) => {
-        skillObjects[0].forEach((skill) => {
-          logger
-            .setVisibility(LogAttribute.TAG, false)
-            .setVisibility(LogAttribute.DATE, false)
-            .info(LogTag.DEFAULT, `${skill.title} (${skill.id})`);
-        });
-      },
-      LogStyle.HEADER + LogStyle.BLUE,
-    );
+  onToggleShowIds() {
+    this.setState({
+      showIds: !this.state.showIds,
+    });
   }
 
   saveCompleted() {
@@ -1122,16 +1076,31 @@ class ObjectiveSkillView
   // Filter resources shown based on title and id
   filterBySearchText(searchText: string): void {
     const { skills } = this.props;
-    const text = searchText.trim().toLowerCase();
 
-    const filterFn = (o: contentTypes.LearningObjective): boolean => {
-      const objTitle = o.rawContent.caseOf({
+    function normalize(s: string) {
+      return s.trim().toLowerCase();
+    }
+
+    const text = normalize(searchText);
+
+    const filterFn = (objective: contentTypes.LearningObjective): boolean => {
+      function matches(s: string, substring: string) {
+        return normalize(s).includes(normalize(substring));
+      }
+
+      function matchesSkill(skill: string, getProp: (s: any) => string) {
+        return skills.has(skill) && matches(getProp(skills.get(skill)), text);
+      }
+
+      const objectiveTitle = objective.rawContent.caseOf({
         just: c => extractFullText(c),
-        nothing: () => o.title,
+        nothing: () => objective.title,
       });
-      return objTitle.toLowerCase().includes(text)
-        || o.skills.toArray().reduce(
-          (acc, s) => acc || (skills.has(s) && skills.get(s).title.toLowerCase().includes(text)),
+
+      return matches(objectiveTitle, text)
+        || matches(objective.id, text)
+        || objective.skills.toArray().reduce(
+          (acc, s) => acc || matchesSkill(s, s => s.title) || matchesSkill(s, s => s.id),
           false,
         );
     };
@@ -1205,7 +1174,9 @@ class ObjectiveSkillView
                 editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
                 onEdit={this.onObjectiveEdit}
                 onEditSkill={this.onSkillEdit}
-                loading={this.state.loading} />,
+                loading={this.state.loading}
+                showId={this.state.showIds}
+              />,
             );
           });
 
@@ -1286,7 +1257,7 @@ class ObjectiveSkillView
       <div className="table-toolbar">
         <SearchBar
           className="inlineSearch"
-          placeholder="Search by Objective or Skill"
+          placeholder="Search objectives and skills"
           onChange={searchText => this.filterBySearchText(searchText)} />
         <div className="input-group">
           <div className="flex-spacer" />
@@ -1310,6 +1281,7 @@ class ObjectiveSkillView
 
   renderFilterbar() {
     const { course, selectedOrganization } = this.props;
+    const { showIds } = this.state;
 
     return selectedOrganization.caseOf({
       just: org => (
@@ -1321,6 +1293,13 @@ class ObjectiveSkillView
             }}>
               {org.title}
             </a>
+            <div style={{ marginTop: 15, marginBottom: 15 }}>
+              <div style={{ marginBottom: 5 }}>Advanced:</div>
+              <ToggleSwitch
+                checked={showIds}
+                label="Show Objective and Skill IDs"
+                onClick={this.onToggleShowIds} />
+            </div>
             <div className="flex-spacer" />
           </div>
         </div>

@@ -1,11 +1,15 @@
 import * as Immutable from 'immutable';
 import * as ct from 'data/contentTypes';
-import { Editor, Inline, Text, Value, Block, Document, Mark, Range } from 'slate';
+import { Editor, Inline, Text, Value, Block, Document, Mark, Range, Node } from 'slate';
 import { Maybe } from 'tsmonad';
 import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 
 export type ValuePair = [Value, Value];
+
+export function isCursorInText(editor: Editor): boolean {
+  return editor.value.selection.isFocused;
+}
 
 // Helper routine to turn the current selection into an inline
 function wrapInlineWithData(editor, wrapper) {
@@ -46,9 +50,10 @@ export function isEffectivelyEmpty(editor: Editor): boolean {
 // positioned in the last block and no text other than spaces
 // follows the cursor
 export function isCursorAtEffectiveEnd(editor: Editor): boolean {
-  const node = (editor.value.document.nodes
+  const block = (editor.value.document.nodes
     .get(editor.value.document.nodes.size - 1) as Block);
-  const { key, text } = node;
+  const { nodes, text } = block;
+  const key = nodes.get(0).key;
 
   const selection = editor.value.selection;
 
@@ -60,7 +65,8 @@ export function isCursorAtEffectiveEnd(editor: Editor): boolean {
 // Returns true if the selection is collapsed and is at the
 // very beginning of the first block
 export function isCursorAtBeginning(editor: Editor): boolean {
-  const key = (editor.value.document.nodes.get(0) as Block).key;
+  const block = (editor.value.document.nodes.get(0) as Block);
+  const key = block.nodes.get(0).key;
   const selection = editor.value.selection;
   return selection.isCollapsed
     && key === selection.anchor.key
@@ -83,23 +89,24 @@ function findInputRef(editor: Editor, input: string): Maybe<Inline | Text | Bloc
 
 // Flexible find a node by a supplied predicate
 function findNodeByPredicate(editor: Editor,
-  predicate: (node: Block | Inline | Text) => boolean): Maybe<Inline | Text | Block> {
+  predicate: (node: Inline | Text | Block) => boolean): Maybe<Inline | Text | Block> {
 
-  const nodes = editor.value.document.nodes.toArray();
-  for (let i = 0; i < nodes.length; i += 1) {
-    const b = nodes[i] as Block;
-    if (predicate(b)) {
-      return Maybe.just(b);
+  return dfs(editor.value.document.nodes as Immutable.List<Inline | Text | Block>);
+
+  function dfs(nodes: Immutable.List<Inline | Text | Block>) {
+    if (nodes.size === 0) {
+      return Maybe.nothing<Inline | Text | Block>();
     }
-    const inner = b.nodes.toArray();
-    for (let j = 0; j < inner.length; j += 1) {
-      const m = inner[j];
-      if (predicate(m)) {
-        return Maybe.just(m);
-      }
+    const first = nodes.first();
+    if (predicate(first)) {
+      return Maybe.just(first);
     }
+    // Text nodes are always leaves
+    if (Text.isText(first)) {
+      return dfs(nodes.rest().toList());
+    }
+    return dfs(first.nodes.concat(nodes.rest().toList()).toList());
   }
-  return Maybe.nothing();
 }
 
 // Find a collection of nodes based on a predicate
@@ -169,7 +176,7 @@ export function bareTextSelected(editor: Maybe<Editor>): boolean {
       }
       const s = e.value.selection;
       const range = new Range({ anchor: s.anchor, focus: s.focus });
-      return e.value.document.getInlinesAtRange(range).size === 0;
+      return e.value.document.getLeafInlinesAtRange(range).size === 0;
     },
     nothing: () => false,
   });
@@ -186,7 +193,7 @@ export function noTextSelected(editor: Maybe<Editor>): boolean {
 // Is the current selection inside an inline?
 export function cursorInEntity(editor: Maybe<Editor>): boolean {
   return editor.caseOf({
-    just: e => getEntityAtCursor(e).caseOf({
+    just: e => getInlineAtCursor(e).caseOf({
       just: i => true,
       nothing: () => false,
     }),
@@ -227,6 +234,10 @@ export function extractParagraphSelectedText(editor: Maybe<Editor>): Maybe<strin
   });
 }
 
+export function currentMarks(editor: Editor) {
+  return editor.value.marks;
+}
+
 export function bdoDisabled(editor: Maybe<Editor>): boolean {
 
   // We enable the bdo button only when there is a selection that
@@ -241,7 +252,7 @@ export function bdoDisabled(editor: Maybe<Editor>): boolean {
 
       const onlyBdoOrEmpty = currentMarks.size === 0
         || (currentMarks.size === 1 && (currentMarks.map(m => m.type).contains('bdo')));
-      const inline = getEntityAtCursor(e).caseOf({ just: n => true, nothing: () => false });
+      const inline = getInlineAtCursor(e).caseOf({ just: n => true, nothing: () => false });
 
       return selection.isCollapsed
         || inline
@@ -295,9 +306,7 @@ export function removeInputRef(editor: Editor, itemId: string): Editor {
   });
 }
 
-// Access the inline present at the users current selection
-export function getEntityAtCursor(editor: Editor): Maybe<Inline> {
-
+export function getBlockAtCursor(editor: Editor): Maybe<Block> {
   const s = editor.value.selection;
 
   if (s.anchor.key === null) {
@@ -312,17 +321,34 @@ export function getEntityAtCursor(editor: Editor): Maybe<Inline> {
   if (b === undefined) {
     return Maybe.nothing();
   }
-  const inner = b.nodes.get(s.anchor.path.get(1));
+  return Maybe.just(b);
+}
 
-  if (inner === undefined) {
-    return Maybe.nothing();
-  }
+export function getLeafAtCursor(editor: Editor): Maybe<Block | Text | Inline> {
+  const selection = editor.value.selection;
+  const atAnchor = findNodeByKey(editor, selection.anchor.key);
+  const atEnd = findNodeByKey(editor, selection.end.key);
+  const singleNodeSelected = atAnchor.valueOr(null) !== null
+    && atAnchor.valueOr(null) === atEnd.valueOr(null);
+  return singleNodeSelected ? atAnchor : Maybe.nothing();
+}
 
-  if (inner.object === 'inline') {
-    return Maybe.just(inner);
-  }
+// Access the inline present at the users current selection
+export function getInlineAtCursor(editor: Editor): Maybe<Inline> {
+  const s = editor.value.selection;
+  return getBlockAtCursor(editor).lift((block) => {
+    const inner = block.nodes.get(s.anchor.path.get(1));
 
-  return Maybe.nothing();
+    if (inner === undefined) {
+      return undefined;
+    }
+
+    if (inner.object === 'inline') {
+      return inner;
+    }
+
+    return undefined;
+  });
 }
 
 const wrappers = {
