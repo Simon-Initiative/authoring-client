@@ -37,6 +37,7 @@ import { Tooltip } from 'utils/tooltip';
 import colors from 'styles/colors';
 import { Badge } from 'editors/content/common/Badge';
 import { markHotkey } from '../contiguoustext/render/render';
+import { caseOf } from 'utils/utils';
 
 const parseLayoutHtmlFromModel = (model: EmbedActivityModel) => {
   const layoutHtml = maybe(model.assets.find(asset => asset.name === 'layout')).caseOf({
@@ -122,6 +123,11 @@ const solutionTextFromModel = (model: EmbedActivityModel) => {
     $('solution', parsedSolutionXmlFromModel).text().trim();
 };
 
+const replLangFromQuetsion = (q: Question) => caseOf(q.language)({
+  python: 'python3',
+  java: 'java9',
+})(q.language);
+
 export interface ReplEditorProps extends AbstractContentEditorProps<EmbedActivityModel> {
   onShowSidebar: () => void;
   onDiscover: (id: DiscoverableId) => void;
@@ -145,6 +151,7 @@ class ReplEditor
   StyledComponentProps<ReplEditorProps, typeof styles>, ReplEditorState> {
   replClient: any;
   promptEditor: Editor;
+  consoleDiv: HTMLDivElement;
 
   constructor(props) {
     super(props);
@@ -187,24 +194,38 @@ class ReplEditor
       showCodeEditor,
       question,
       solutionText,
+    }, () => {
+      if (question.language !== this.state.question.language) {
+        if (this.replClient) {
+          this.replClient.detach();
+          this.replClient = undefined;
+        }
+
+        this.onConsoleLoad(this.consoleDiv);
+      }
     });
   }
 
   onConsoleLoad(consoleDiv: HTMLDivElement) {
+    const { question } = this.state;
+    this.consoleDiv = consoleDiv;
+
     if (!this.replClient) {
       const ReplClient = (window as any).ReplClient;
 
-      this.replClient = new ReplClient({
-        host: 'repl.oli.cmu.edu',
-        language: 'python3',
-        terminalOptions: {
-          convertEol: true,
-          cursorBlink: true,
-          fontSize: 12,
-        },
-      });
+      if (ReplClient) {
+        this.replClient = new ReplClient({
+          host: 'repl.oli.cmu.edu',
+          language: replLangFromQuetsion(question),
+          terminalOptions: {
+            convertEol: true,
+            cursorBlink: true,
+            fontSize: 12,
+          },
+        });
 
-      this.replClient.attach(consoleDiv);
+        this.replClient.attach(consoleDiv);
+      }
     }
   }
 
@@ -255,7 +276,11 @@ class ReplEditor
     this.replClient.writeln(editorText);
     this.replClient.disableStdin();
 
-    ReplClient.exec(editorText, { host: 'repl.oli.cmu.edu', language: 'python3' })
+    ReplClient.exec(
+      editorText, {
+        host: 'repl.oli.cmu.edu',
+        language: replLangFromQuetsion(question),
+      })
       .then((result) => {
         this.replClient.writeln('---------------------------------------');
         this.replClient.write(result.combined);
@@ -379,11 +404,11 @@ class ReplEditor
   }
 
   getActivitySolutionsXml() {
-    const { solutionText } = this.state;
+    const { solutionText, question } = this.state;
 
     return renderSolutionsXml({
       solutions: [{
-        language: 'python',
+        language: question.language,
         value: solutionText,
       }],
     });
@@ -406,6 +431,24 @@ class ReplEditor
     this.setState({
       question: updatedQuestion,
     }, () => this.saveActivityFromCurrentState());
+  }
+
+  onSelectLanguage(language: string) {
+    const { question } = this.state;
+
+    question.language = language;
+    this.setState({
+      question,
+    }, () => {
+      this.saveActivityFromCurrentState();
+
+      if (this.replClient) {
+        this.replClient.detach();
+        this.replClient = undefined;
+      }
+
+      this.onConsoleLoad(this.consoleDiv);
+    });
   }
 
   renderSidebar(): JSX.Element {
@@ -476,6 +519,13 @@ class ReplEditor
       markHotkey({ key: 'h', type: 'highlight' }),
     ];
 
+    const languageToReadableLabel = (language: string) => caseOf(language)({
+      python3: 'Python 3',
+      python: 'Python 3',
+      java9: 'Java 9',
+      java: 'Java 9',
+    })('Python 3');
+
     return (
       <div className={classNames([classes.ReplEditor, className])}>
         <div className={classes.replActivityLabel}>REPL Activity</div>
@@ -524,7 +574,7 @@ class ReplEditor
                           name="REPL_CODE_EDITOR"
                           width="initial"
                           height="250px"
-                          mode="python"
+                          mode={question.language}
                           theme="chrome"
                           readOnly={!editMode}
                           value={editorText}
@@ -547,6 +597,25 @@ class ReplEditor
                   className={classes.showCodeEditorToggle}
                   onClick={() => this.setShowCodeEditor(!showCodeEditor)}
                   editMode={editMode}/>
+
+                <span className={classes.languageDropdown}>
+                  <div className="btn-group">
+                    <button
+                      className="btn btn-secondary dropdown-toggle"
+                      type="button"
+                      data-toggle="dropdown">
+                      Language: {languageToReadableLabel(question.language)}
+                    </button>
+                    <div className="dropdown-menu">
+                      <div
+                        className="dropdown-item"
+                        onClick={() => this.onSelectLanguage('python')}>Python</div>
+                      <div
+                        className="dropdown-item"
+                        onClick={() => this.onSelectLanguage('java')}>Java</div>
+                    </div>
+                  </div>
+                </span>
               </div>
 
               <div className={classes.gradingEditor}>
@@ -630,7 +699,7 @@ class ReplEditor
                       name="REPL_CODE_EDITOR"
                       width="700px"
                       height="250px"
-                      mode="python"
+                      mode={question.language}
                       theme="chrome"
                       readOnly={!editMode}
                       value={solutionText}

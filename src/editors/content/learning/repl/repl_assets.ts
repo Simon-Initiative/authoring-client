@@ -1,3 +1,5 @@
+import { valueOr } from 'utils/utils';
+
 type RenderLayoutHtmlOptions = Partial<{
   prompt: string,
   showCodeEditor: boolean,
@@ -8,7 +10,7 @@ export const renderLayoutHtml = ({
     prompt = '',
     showCodeEditor = true,
   }: RenderLayoutHtmlOptions = {}) => `<div id="q1" class="question">
-  <div id="prompt">${prompt}</div>
+  <div id="prompt">${valueOr(prompt, '')}</div>
   ${showCodeEditor
     ? `
     <div>
@@ -184,15 +186,15 @@ ${
   questions.map(question => `
   <question id="${question.id}">
     <part id="${question.id}_1">
-        <initeditortext><![CDATA[${question.initeditortext}]]></initeditortext>
+        <initeditortext><![CDATA[${valueOr(question.initeditortext, '')}]]></initeditortext>
         <feedbackengine>
             <cloudcoder>
-                <language>${question.language}</language>
+                <language>${valueOr(question.language, '')}</language>
                 <problemtype>function</problemtype>
-                <functionname>${question.functionname}</functionname>
+                <functionname>${valueOr(question.functionname, '')}</functionname>
                 ${question.testCases.map(testcase => `<testcase>
-                    <input>${testcase.input}</input>
-                    <output>${testcase.output}</output>
+                    <input>${valueOr(testcase.input, '')}</input>
+                    <output>${valueOr(testcase.output, '')}</output>
                 </testcase>`)}
             </cloudcoder>
         </feedbackengine>
@@ -219,7 +221,7 @@ export const renderSolutionsXml = ({
 ${
   solutions.map(solution => `
   <solution>
-    <pre class="brush: ${solution.language}">${solution.value}</pre>
+    <pre class="brush: ${valueOr(solution.language, '')}"><![CDATA[${valueOr(solution.value, '')}]]></pre>
   </solution>
 `)
 }

@@ -150,4 +150,15 @@ export const styles: JSSStyles = {
   helpPopover: {
     textAlign: 'left',
   },
+  languageDropdown: {
+    marginLeft: 30,
+
+    '& .btn-group': {
+      verticalAlign: 'initial',
+    },
+    '& button': {
+      border: [[1, 'solid', colors.primary], '!important'],
+      marginLeft: 10,
+    },
+  },
 };
