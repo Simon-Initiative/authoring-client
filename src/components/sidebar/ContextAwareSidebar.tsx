@@ -36,7 +36,7 @@ import { splitQuestionsIntoPages } from 'data/models/utils/assessment';
 import { CombinationsMap } from 'types/combinations';
 import { Edge } from 'types/edge';
 import { CourseState } from 'reducers/course';
-import { viewDocument } from 'actions/view';
+import { viewDocument, viewOrganizations } from 'actions/view';
 import { getNameAndIconByType } from 'components/resourceview/ResourceView';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';

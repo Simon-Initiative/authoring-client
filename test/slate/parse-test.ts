@@ -12,4 +12,3 @@ it('Contiguous text parsing', () => {
   // tslint:disable-next-line:no-console
   console.log(JSON.stringify(value.toJSON(), null, 2));
 });
-
