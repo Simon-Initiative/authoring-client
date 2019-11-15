@@ -17,3 +17,6 @@ WORKDIR /app
 COPY package.json /app
 COPY yarn.lock /app
 RUN yarn
+
+# increase Javascript heap space for webpack build
+ENV NODE_OPTS=--max-old-space-size=2048
