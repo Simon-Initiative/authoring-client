@@ -7,6 +7,10 @@ import guid from 'utils/guid';
 
 export type ValuePair = [Value, Value];
 
+export function isCursorInText(editor: Editor): boolean {
+  return editor.value.selection.isFocused;
+}
+
 // Helper routine to turn the current selection into an inline
 function wrapInlineWithData(editor, wrapper) {
   editor.wrapInline({
@@ -46,9 +50,10 @@ export function isEffectivelyEmpty(editor: Editor): boolean {
 // positioned in the last block and no text other than spaces
 // follows the cursor
 export function isCursorAtEffectiveEnd(editor: Editor): boolean {
-  const node = (editor.value.document.nodes
+  const block = (editor.value.document.nodes
     .get(editor.value.document.nodes.size - 1) as Block);
-  const { key, text } = node;
+  const { nodes, text } = block;
+  const key = nodes.get(0).key;
 
   const selection = editor.value.selection;
 
@@ -60,7 +65,8 @@ export function isCursorAtEffectiveEnd(editor: Editor): boolean {
 // Returns true if the selection is collapsed and is at the
 // very beginning of the first block
 export function isCursorAtBeginning(editor: Editor): boolean {
-  const key = (editor.value.document.nodes.get(0) as Block).key;
+  const block = (editor.value.document.nodes.get(0) as Block);
+  const key = block.nodes.get(0).key;
   const selection = editor.value.selection;
   return selection.isCollapsed
     && key === selection.anchor.key

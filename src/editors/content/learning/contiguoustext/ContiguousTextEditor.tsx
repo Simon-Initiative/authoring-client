@@ -75,6 +75,10 @@ class ContiguousTextEditor
         this.props.onUpdateEditor(this.editor);
         this.editor.focus();
 
+        // Do not broadcast changes if the editor is unfocused (de-selected)
+      } else if (updateSelection && !v.selection.isFocused) {
+        return;
+
       } else if (updateSelection) {
 
         // Broadcast the fact that the editor updated
