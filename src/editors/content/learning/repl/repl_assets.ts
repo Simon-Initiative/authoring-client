@@ -4,17 +4,19 @@ type RenderLayoutHtmlOptions = Partial<{
   prompt: string,
   showCodeEditor: boolean,
   editorText: string,
+  isGraded: boolean,
 }>;
 
 export const renderLayoutHtml = ({
     prompt = '',
     showCodeEditor = true,
+    isGraded = false,
   }: RenderLayoutHtmlOptions = {}) => `<div id="q1" class="question">
   <div id="prompt">${valueOr(prompt, '')}</div>
   ${showCodeEditor
     ? `
     <div>
-      <button id="run" class="btn btn-primary btn-xs">Run</button>
+      <button id="run" class="btn btn-primary btn-xs">${isGraded ? 'Submit' : 'Run'}</button>
       <button id="clear" class="btn btn-primary btn-xs" style="float: right;">Clear</button>
     </div>
     <div id="editor"></div>
@@ -187,17 +189,22 @@ ${
   <question id="${question.id}">
     <part id="${question.id}_1">
         <initeditortext><![CDATA[${valueOr(question.initeditortext, '')}]]></initeditortext>
-        <feedbackengine>
-            <cloudcoder>
-                <language>${valueOr(question.language, '')}</language>
-                <problemtype>function</problemtype>
-                <functionname>${valueOr(question.functionname, '')}</functionname>
-                ${question.testCases.map(testcase => `<testcase>
-                    <input>${valueOr(testcase.input, '')}</input>
-                    <output>${valueOr(testcase.output, '')}</output>
-                </testcase>`)}
-            </cloudcoder>
-        </feedbackengine>
+        ${question.testCases.length > 0
+          ? `
+          <feedbackengine>
+              <cloudcoder>
+                  <language>${valueOr(question.language, '')}</language>
+                  <problemtype>function</problemtype>
+                  <functionname>${valueOr(question.functionname, '')}</functionname>
+                  ${question.testCases.map(testcase => `<testcase>
+                      <input>${valueOr(testcase.input, '')}</input>
+                      <output>${valueOr(testcase.output, '')}</output>
+                  </testcase>`)}
+              </cloudcoder>
+          </feedbackengine>
+          `
+          : ''
+        }
     </part>
   </question>
 `)

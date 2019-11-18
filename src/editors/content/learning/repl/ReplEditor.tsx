@@ -389,9 +389,12 @@ class ReplEditor
       nothing: () => '',
     });
 
+    const isGraded = question.testCases.length > 0 && showCodeEditor;
+
     return renderLayoutHtml({
       prompt: promptInnerHtml,
       showCodeEditor,
+      isGraded,
     });
   }
 
@@ -488,6 +491,7 @@ class ReplEditor
       maybePrompt, showCodeEditor, solutionText, question,
     } = this.state;
     const editorText = question.initeditortext;
+    const isGraded = question.testCases.length > 0 && showCodeEditor;
 
     const ACE_EDITOR_OPTIONS = {
       enableBasicAutocompletion: true,
@@ -553,12 +557,16 @@ class ReplEditor
               </div>
 
               <div className={classes.combined}>
+                <div className={classes.explanation}>
+                  Run your activity below using the '{isGraded ? 'Submit' : 'Run'}' and
+                  'Clear' buttons, similar to how students will see it.
+                </div>
                 <div>
                   <button
                     id="run"
                     className="btn btn-primary btn-xs"
                     onClick={() => this.onRunBtnClick()}
-                    disabled={!showCodeEditor}>Run</button>
+                    disabled={!showCodeEditor}>{isGraded ? 'Submit' : 'Run'}</button>
                   <button
                     id="clear"
                     className="btn btn-primary btn-xs"
@@ -587,6 +595,13 @@ class ReplEditor
                     style={{ width: showCodeEditor ? 350 : 700 }}
                     ref={div => this.onConsoleLoad(div)}></div>
                 </div>
+                {showCodeEditor &&
+                  <div className={classes.explanation}>
+                    Use the editor above to specify any initial code
+                    to begin the activity with. This code <b>should not</b> contain
+                    the solution to the activity.
+                  </div>
+                }
               </div>
 
               <div className={classes.options}>
