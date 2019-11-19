@@ -362,13 +362,19 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   renderForeignLanguageAccessibility = () => {
+    console.log('rendering')
     const languageOptions = Object.keys(localeCodes)
       .map(friendly => <option key={friendly} value={friendly}>{friendly}</option>);
 
+    // console.log('misc', this.props.model.misc)
+    // const language = this.props.model.misc && (this.props.model.misc as any).language;
+    // console.log('language', language)
     const savedLocale = Object.entries(localeCodes).find(
       ([_, code]) => code as string === this.props.model.language);
+    console.log('saved locale', savedLocale)
 
-    const defaultValue = savedLocale ? savedLocale[0] : localeCodes['Spanish (LATAM)'];
+    const defaultValue = savedLocale ? savedLocale[0] : 'English (USA)';
+    console.log('default value', defaultValue)
 
     return (
       <div className="row">
@@ -405,8 +411,9 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const model = this.props.model.with({
       language: localeFriendly in localeCodes
         ? localeCodes[localeFriendly]
-        : localeCodes['Spanish (LATAM)'],
+        : localeCodes['English (USA)'],
     });
+    console.log('model', model)
     this.props.courseChanged(model);
     const doc = new Document().with({
       _courseId: model.guid,
