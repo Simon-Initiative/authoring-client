@@ -151,7 +151,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         : contentTypes.MetaData.fromPersistence(c.metadata.jsonObject);
 
     const language =
-      isNullOrUndefined(c.misc.jsonObject)
+      isNullOrUndefined(c.misc) || isNullOrUndefined(c.misc.jsonObject)
         ? 'en_US'
         : c.misc.jsonObject['language'];
 
