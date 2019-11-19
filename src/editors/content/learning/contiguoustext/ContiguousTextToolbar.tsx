@@ -369,8 +369,7 @@ class ContiguousTextToolbar
                 e.toggleMark({
                   type: InlineStyles.Foreign,
                   data: Data.create({
-                    lang: courseModel.language ||
-                      localeCodes['Spanish (LATAM)'],
+                    lang: courseModel.language || localeCodes['English (USA)'],
                   }),
                 });
               })

@@ -368,7 +368,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const savedLocale = Object.entries(localeCodes).find(
       ([_, code]) => code as string === this.props.model.language);
 
-    const defaultValue = savedLocale ? savedLocale[0] : localeCodes['Spanish (LATAM)'];
+    const defaultValue = savedLocale ? savedLocale[0] : 'English (USA)';
 
     return (
       <div className="row">
@@ -405,7 +405,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     const model = this.props.model.with({
       language: localeFriendly in localeCodes
         ? localeCodes[localeFriendly]
-        : localeCodes['Spanish (LATAM)'],
+        : localeCodes['English (USA)'],
     });
     this.props.courseChanged(model);
     const doc = new Document().with({
