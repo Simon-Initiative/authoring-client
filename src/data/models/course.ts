@@ -152,7 +152,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
 
     const language =
       isNullOrUndefined(c.misc.jsonObject)
-        ? ''
+        ? 'en_US'
         : c.misc.jsonObject['language'];
 
     const resources =
