@@ -556,6 +556,74 @@ function removeResponsesWithNoMatch(question: Question): Question {
   });
 }
 
+type Match = string;
+function isStarMatch(match: Match): boolean {
+  return match === '*';
+}
+export function areResponsesWithStarMatchesValid(question: Question): boolean {
+  // Helpers
+  function responses(question: Question): ct.Response[] {
+    return question.parts.flatMap(part => part.responses).toArray();
+  }
+  function matches(responses: ct.Response[]): Match[] {
+    return responses.map(response => response.match);
+  }
+  function starMatches(question: Question): Match[] {
+    return matches(responses(question)).filter(isStarMatch);
+  }
+  function hasStarMatch(question: Question): boolean {
+    return starMatches(question).length > 0;
+  }
+  function hasMultipleStarMatches(question: Question): boolean {
+    return starMatches(question).length > 1;
+  }
+  function isStarMatchAtEnd(question: Question): boolean {
+    // assert: question contains single match '*' response
+    function isAtEnd(matches: Match[], match: Match) {
+      return matches.indexOf(match) === matches.length - 1;
+    }
+    return isAtEnd(matches(responses(question)), '*');
+  }
+
+  // Logic
+  if (!hasStarMatch(question)) {
+    return true;
+  }
+
+  if (hasMultipleStarMatches(question)) {
+    return false;
+  }
+
+  return isStarMatchAtEnd(question);
+}
+
+function putMatchStarResponseAtEnd(question: Question): Question {
+  // Helpers
+  function responsesWithoutStarMatches(
+    responses: Immutable.OrderedMap<string, ct.Response>): Immutable.Iterable<string, ct.Response> {
+    return responses.filter(response => !isStarMatch(response.match));
+  }
+
+  function responsesWithStarMatches(
+    responses: Immutable.OrderedMap<string, ct.Response>): Immutable.Iterable<string, ct.Response> {
+    return responses.filter(response => isStarMatch(response.match));
+  }
+
+  // Logic
+  if (areResponsesWithStarMatchesValid(question)) {
+    return question;
+  }
+
+  return question.with({
+    parts: question.parts.map(part =>
+      part.with({
+        responses: responsesWithoutStarMatches(part.responses)
+          .concat(responsesWithStarMatches(part.responses))
+          .toOrderedMap(),
+      })).toOrderedMap(),
+  });
+}
+
 function parseVariables(item: any, model: Question) {
 
   const vars = [];
@@ -771,6 +839,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       migrateThenSyncFeedbackAndExplanation,
       ensureInputAttrsExist,
       removeResponsesWithNoMatch,
+      putMatchStarResponseAtEnd,
     )(model);
   }
 
