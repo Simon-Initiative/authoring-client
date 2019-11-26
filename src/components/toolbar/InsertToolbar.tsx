@@ -909,9 +909,10 @@ class InsertToolbar
                       onInsert(new contentTypes.WbInline().with({ idref: resource.id }));
                       onUpdateCourse(courseModel.with({
                         embedActivityTypes: courseModel.embedActivityTypes.set(resource.id, 'REPL'),
+                        resources: courseModel.resources.set(resource.guid, resource),
+                        resourcesById: courseModel.resourcesById.set(resource.id, resource),
                       }));
                     });
-
                 }}
                 disabled={!editMode || !parentSupportsElementType('wb:inline')}>
                 <i style={{ width: 22 }} className="fa fa-terminal" /> Create REPL Activity

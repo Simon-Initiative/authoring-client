@@ -170,6 +170,10 @@ class ContextAwareToolbar
       return true;
     }
 
+    if (this.props.courseModel !== nextProps.courseModel) {
+      return true;
+    }
+
     // Only other thing we need to check is for a change in
     // the supported elements
     if (this.props.supportedElements !== nextProps.supportedElements) {

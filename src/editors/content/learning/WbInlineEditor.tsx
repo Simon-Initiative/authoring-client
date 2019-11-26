@@ -42,7 +42,8 @@ export default class WbInlineEditor
   }
 
   shouldComponentUpdate(nextProps: WbInlineEditorProps): boolean {
-    return this.props.model !== nextProps.model;
+    return this.props.model !== nextProps.model
+      || this.props.context.courseModel !== nextProps.context.courseModel;
   }
 
   onPurposeEdit(purpose: string): void {
