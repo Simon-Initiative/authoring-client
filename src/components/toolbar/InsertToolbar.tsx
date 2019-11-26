@@ -46,10 +46,7 @@ const imgSize = 24;
 
 import SizePicker from 'editors/content/learning/table/SizePicker';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
-import {
-  renderLayoutHtml, renderDefaultStylesCss, renderDefaultControlsHtml, renderQuestionsXml,
-  renderSolutionsXml,
-} from 'editors/content/learning/repl/repl_assets';
+import { ActivityType } from 'data/models/embedactivity';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object, context?) => void;
@@ -867,42 +864,7 @@ class InsertToolbar
               </ToolbarButtonMenuItem>
               <ToolbarButtonMenuItem
                 onClick={() => {
-                  const id = guid();
-                  const model = new EmbedActivityModel({
-                    id,
-                    title: 'New REPL Activity',
-                    activityType: Maybe.just('REPL'),
-                    width: Maybe.just('670'),
-                    height: Maybe.just('600'),
-                    source: 'webcontent/repl/repl.js',
-                    assets: Immutable.List([
-                      new contentTypes.Asset({
-                        name: 'layout',
-                        src: `webcontent/repl/${id}/layout.html`,
-                        content: Maybe.just(renderLayoutHtml()),
-                      }),
-                      new contentTypes.Asset({
-                        name: 'emstyles',
-                        src: 'webcontent/repl/emstyles.css',
-                        content: Maybe.just(renderDefaultStylesCss()),
-                      }),
-                      new contentTypes.Asset({
-                        name: 'controls',
-                        src: 'webcontent/repl/controls.html',
-                        content: Maybe.just(renderDefaultControlsHtml()),
-                      }),
-                      new contentTypes.Asset({
-                        name: 'questions',
-                        src: `webcontent/repl/${id}/questions.xml`,
-                        content: Maybe.just(renderQuestionsXml()),
-                      }),
-                      new contentTypes.Asset({
-                        name: 'solutions',
-                        src: `webcontent/repl/${id}/solutions.xml`,
-                        content: Maybe.just(renderSolutionsXml()),
-                      }),
-                    ]),
-                  });
+                  const model = EmbedActivityModel.createNew(guid(), undefined, ActivityType.REPL);
 
                   onCreateNew(model)
                     .then((resource) => {

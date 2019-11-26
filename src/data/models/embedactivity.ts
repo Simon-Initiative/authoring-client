@@ -7,6 +7,13 @@ import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
 import { Asset } from 'data/content/embedactivity/asset';
+import guid from '../../utils/guid';
+import { renderLayoutHtml, renderDefaultStylesCss, renderDefaultControlsHtml, renderQuestionsXml, renderSolutionsXml } from 'editors/content/learning/repl/repl_assets';
+import { caseOf } from 'utils/utils';
+
+export enum ActivityType {
+  REPL = 'REPL',
+}
 
 // oli_feedback_1_2.dtd
 export type EmbedActivityModelParams = {
@@ -67,6 +74,46 @@ export class EmbedActivityModel extends Immutable.Record(defaultEmbedActivityMod
     return ensureIdGuidPresent(this.with({
       assets: this.assets.map(asset => asset.clone()).toList(),
     }));
+  }
+
+  static createNew(id: string, title?: string, activityType?: ActivityType) {
+    return caseOf<EmbedActivityModel>(activityType)({
+      [ActivityType.REPL]: new EmbedActivityModel({
+        id,
+        title: title || 'New REPL Activity',
+        activityType: Maybe.just('REPL'),
+        width: Maybe.just('670'),
+        height: Maybe.just('600'),
+        source: 'webcontent/repl/repl.js',
+        assets: Immutable.List([
+          new contentTypes.Asset({
+            name: 'layout',
+            src: `webcontent/repl/${id}/layout.html`,
+            content: Maybe.just(renderLayoutHtml()),
+          }),
+          new contentTypes.Asset({
+            name: 'emstyles',
+            src: 'webcontent/repl/emstyles.css',
+            content: Maybe.just(renderDefaultStylesCss()),
+          }),
+          new contentTypes.Asset({
+            name: 'controls',
+            src: 'webcontent/repl/controls.html',
+            content: Maybe.just(renderDefaultControlsHtml()),
+          }),
+          new contentTypes.Asset({
+            name: 'questions',
+            src: `webcontent/repl/${id}/questions.xml`,
+            content: Maybe.just(renderQuestionsXml()),
+          }),
+          new contentTypes.Asset({
+            name: 'solutions',
+            src: `webcontent/repl/${id}/solutions.xml`,
+            content: Maybe.just(renderSolutionsXml()),
+          }),
+        ]),
+      }),
+    })(new EmbedActivityModel());
   }
 
   static fromPersistence(json: any, notify: () => void = () => null): EmbedActivityModel {

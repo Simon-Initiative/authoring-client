@@ -1,4 +1,4 @@
-import { updateCourseResources } from 'actions/course';
+import { updateCourseResources, courseChanged } from 'actions/course';
 import * as viewActions from 'actions/view';
 import { Resource, ResourceState } from 'data/content/resource';
 import * as models from 'data/models';
@@ -22,6 +22,7 @@ import { ImportOrgModal } from 'components/resourceview/ImportOrgModal';
 import { ImportWbpModal } from 'components/resourceview/ImportWbpModal';
 import { ImportAssessmentModal } from 'components/resourceview/ImportAssessmentModal';
 import { ImportObjSkillsModal } from 'components/resourceview/ImportObjSkillsModal';
+import { ActivityType } from 'data/models/embedactivity';
 
 type TitleIcon = {
   name: string,
@@ -157,8 +158,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     viewActions.viewDocument(id, course.idvers, Maybe.just(currentOrg));
   }
 
-  onCreateResource = (type: LegacyTypes) => {
-    const { dispatch } = this.props;
+  onCreateResource = (type: LegacyTypes, activityType?: ActivityType) => {
+    const { dispatch, course } = this.props;
     const { newItemTitle } = this.state;
 
     if (!newItemTitle) {
@@ -192,6 +193,15 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       [LegacyTypes.feedback]: models.FeedbackModel.createNew(guid(), title, ''),
       [LegacyTypes.workbook_page]: models.WorkbookPageModel.createNew(
         guid(), title, NEW_PAGE_CONTENT),
+      [LegacyTypes.embed_activity]: () => {
+        const model = models.EmbedActivityModel.createNew(guid(), title, activityType);
+
+        dispatch(courseChanged(course.with({
+          embedActivityTypes: course.embedActivityTypes.set(model.id, 'REPL'),
+        })));
+
+        return model;
+      },
     })(null);
 
     this.setState({
@@ -249,6 +259,11 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         : highlightMatches(prop, r, this.state.searchText);
     };
 
+    const icon = (r: Resource) =>
+      getNameAndIconByType(r, course.embedActivityTypes).icon;
+    const resourceType = (r: Resource) =>
+      getNameAndIconByType(r,  course.embedActivityTypes).name;
+
     const titleColumnRenderer = (r: Resource) => {
       const link = resource => element => (
         <a className="btn-link"
@@ -262,14 +277,11 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       );
     };
 
-    const icon = r => getNameAndIconByType(r.type, course.embedActivityTypes).icon;
-    const resourceType = r => getNameAndIconByType(r.type,  course.embedActivityTypes).name;
-
     const columnRenderers = [
-      r => titleColumnRenderer(r),
-      r => <span>{icon(r)} {resourceType(r)}</span>,
-      r => highlightedColumnRenderer('id', r),
-      r => <span>{relativeToNow(
+      (r: Resource) => titleColumnRenderer(r),
+      (r: Resource) => <span>{icon(r)} {resourceType(r)}</span>,
+      (r: Resource) => highlightedColumnRenderer('id', r),
+      (r: Resource) => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
       (r: Resource) => <span>{relativeToNow(
         adjustForSkew(r.dateUpdated, this.props.serverTimeSkewInMs))}</span>,
@@ -349,10 +361,16 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
                     onClick={() => this.onCreateResource(LegacyTypes.assessment2_pool)}>
                     Create Question Pool
                 </button>
-                  <button
+                <button
                     className="dropdown-item"
                     onClick={() => this.onCreateResource(LegacyTypes.feedback)}>
                     Create Survey
+                </button>
+                <button
+                    className="dropdown-item"
+                    onClick={() => this.onCreateResource(
+                      LegacyTypes.embed_activity, ActivityType.REPL)}>
+                    Create REPL Activity
                 </button>
                 </div>
               </div>
