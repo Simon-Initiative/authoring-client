@@ -604,9 +604,9 @@ function putMatchStarResponseAtEnd(question: Question): Question {
     return responses.filter(response => !isStarMatch(response.match));
   }
 
-  function responsesWithStarMatches(
+  function responseWithStarMatch(
     responses: Immutable.OrderedMap<string, ct.Response>): Immutable.Iterable<string, ct.Response> {
-    return responses.filter(response => isStarMatch(response.match));
+    return responses.filter(response => isStarMatch(response.match)).first();
   }
 
   // Logic
@@ -618,7 +618,7 @@ function putMatchStarResponseAtEnd(question: Question): Question {
     parts: question.parts.map(part =>
       part.with({
         responses: responsesWithoutStarMatches(part.responses)
-          .concat(responsesWithStarMatches(part.responses))
+          .concat(responseWithStarMatch(part.responses))
           .toOrderedMap(),
       })).toOrderedMap(),
   });
