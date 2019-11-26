@@ -625,9 +625,9 @@ class ReplEditor
                       <div
                         className="dropdown-item"
                         onClick={() => this.onSelectLanguage('python')}>Python</div>
-                      <div
+                      {/* <div
                         className="dropdown-item"
-                        onClick={() => this.onSelectLanguage('java')}>Java</div>
+                        onClick={() => this.onSelectLanguage('java')}>Java</div> */}
                     </div>
                   </div>
                 </span>

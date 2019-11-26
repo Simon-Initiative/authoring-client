@@ -7,8 +7,10 @@ import { Maybe } from 'tsmonad';
 import { isArray } from 'util';
 import { augment, ensureIdGuidPresent } from 'data/content/common';
 import { Asset } from 'data/content/embedactivity/asset';
-import guid from '../../utils/guid';
-import { renderLayoutHtml, renderDefaultStylesCss, renderDefaultControlsHtml, renderQuestionsXml, renderSolutionsXml } from 'editors/content/learning/repl/repl_assets';
+import {
+  renderLayoutHtml, renderDefaultStylesCss, renderDefaultControlsHtml,
+  renderQuestionsXml, renderSolutionsXml,
+} from 'editors/content/learning/repl/repl_assets';
 import { caseOf } from 'utils/utils';
 
 export enum ActivityType {
