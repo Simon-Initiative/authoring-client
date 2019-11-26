@@ -606,7 +606,11 @@ function putMatchStarResponseAtEnd(question: Question): Question {
 
   function responseWithStarMatch(
     responses: Immutable.OrderedMap<string, ct.Response>): Immutable.Iterable<string, ct.Response> {
-    return responses.filter(response => isStarMatch(response.match)).first();
+    const matches = responses.filter(response => isStarMatch(response.match));
+    if (matches && matches.size > 0) {
+      return matches.first();
+    }
+    return matches;
   }
 
   // Logic
