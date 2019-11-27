@@ -476,8 +476,12 @@ let renderRange =
             let value = ReactDOMRe.domElementToObj(
                           ReactEventRe.Form.target(event),
                         )##value;
+            let validRangeEnd = switch (float_of_string(value), float_of_string(rangeEnd)) {
+              | (valueFloat, rangeEndFloat) => valueFloat > rangeEndFloat ? value : rangeEnd
+              | exception Failure(_) => rangeEnd
+              };
 
-            let matchValue = "[" ++ value ++ "," ++ rangeEnd ++ "]";
+            let matchValue = "[" ++ value ++ "," ++ validRangeEnd ++ "]";
 
             if (isValidInput(value)) {
               onEditMatch(. responseId, matchValue);
@@ -490,7 +494,7 @@ let renderRange =
           }
         )
       />
-      <div className=(jssClass("rangeLabel"))> (strEl("to")) </div>
+      <div className=(jssClass("rangeLabel"))> (strEl("up to")) </div>
       <input
         className=(
           classNames([
@@ -508,8 +512,12 @@ let renderRange =
             let value = ReactDOMRe.domElementToObj(
                           ReactEventRe.Form.target(event),
                         )##value;
+            let validRangeStart = switch (float_of_string(value), float_of_string(rangeStart)) {
+              | (valueFloat, rangeStartFloat) => valueFloat < rangeStartFloat ? value : rangeStart
+              | exception Failure(_) => rangeStart
+              };
 
-            let matchValue = "[" ++ rangeStart ++ "," ++ value ++ "]";
+            let matchValue = "[" ++ validRangeStart ++ "," ++ value ++ "]";
 
             if (isValidInput(value)) {
               onEditMatch(. responseId, matchValue);
