@@ -89,7 +89,6 @@ export class OrgComponentEditor
     }
     if (this.props.componentId !== nextProps.componentId
       || isDifferentOrg(this.props.org, nextProps.org)) {
-      console.log('Finding component model')
       this.findComponentModel(nextProps);
     }
   }
