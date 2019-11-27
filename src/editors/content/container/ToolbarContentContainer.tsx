@@ -146,7 +146,9 @@ class ToolbarContentContainer
               () => this.props.editor.lift((e) => {
                 e.toggleMark({
                   type: InlineStyles.Foreign,
-                  data: Data.create({ lang: course.language || localeCodes['Spanish (LATAM)'] }),
+                  data: Data.create({
+                    lang: course.language || localeCodes['English (USA)'],
+                  }),
                 });
               })
             }
