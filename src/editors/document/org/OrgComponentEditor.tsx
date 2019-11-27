@@ -83,8 +83,13 @@ export class OrgComponentEditor
   }
 
   componentWillReceiveProps(nextProps: OrgComponentEditorProps) {
+    function isDifferentOrg(thisOrg, nextOrg) {
+      const thisOrgId = thisOrg.valueOr({ resource: {} }).resource.id;
+      return !thisOrgId || thisOrgId !== nextOrg.valueOr({ resource: {} }).resource.id;
+    }
     if (this.props.componentId !== nextProps.componentId
-      || this.props.org !== nextProps.org) {
+      || isDifferentOrg(this.props.org, nextProps.org)) {
+      console.log('Finding component model')
       this.findComponentModel(nextProps);
     }
   }
