@@ -403,21 +403,39 @@ function renderPrecision(jssClass, editMode, matchPattern, isValid, responseId, 
                 }));
 }
 
-function renderRangeInstructions(jssClass) {
-  return React.createElement("div", {
-              className: StyleUtils$CourseEditor.classNames(/* :: */[
-                    Curry._1(jssClass, "optionsRow"),
-                    /* :: */[
-                      Curry._1(jssClass, "rangeInstr"),
-                      /* [] */0
-                    ]
-                  ])
-            }, ReactUtils$CourseEditor.strEl("Range includes lower and upper bounds"), React.createElement("div", {
-                  className: StyleUtils$CourseEditor.classNames(/* :: */[
-                        Curry._1(jssClass, "precisionSpacer"),
+function renderRangeInstructions(jssClass, range1, range2) {
+  var match = range1 && range2;
+  if (match) {
+    return React.createElement("div", {
+                className: StyleUtils$CourseEditor.classNames(/* :: */[
+                      Curry._1(jssClass, "optionsRow"),
+                      /* :: */[
+                        Curry._1(jssClass, "rangeInstr"),
                         /* [] */0
-                      ])
-                }));
+                      ]
+                    ])
+              }, ReactUtils$CourseEditor.strEl("Range is inclusive of lower and upper bounds"), React.createElement("div", {
+                    className: StyleUtils$CourseEditor.classNames(/* :: */[
+                          Curry._1(jssClass, "precisionSpacer"),
+                          /* [] */0
+                        ])
+                  }));
+  } else {
+    return React.createElement("div", {
+                className: StyleUtils$CourseEditor.classNames(/* :: */[
+                      Curry._1(jssClass, "optionsRow"),
+                      /* :: */[
+                        Curry._1(jssClass, "rangeErrMsg"),
+                        /* [] */0
+                      ]
+                    ])
+              }, ReactUtils$CourseEditor.strEl("Range entered is invalid. Values must be valid numbers and lower bound must be less than or equal to upper bound"), React.createElement("div", {
+                    className: StyleUtils$CourseEditor.classNames(/* :: */[
+                          Curry._1(jssClass, "precisionSpacer"),
+                          /* [] */0
+                        ])
+                  }));
+  }
 }
 
 function renderRange(jssClass, editMode, matchPattern, isValid1, isValid2, responseId, onEditMatch, updateState, setValid1, setValid2) {
@@ -478,7 +496,8 @@ function renderRange(jssClass, editMode, matchPattern, isValid1, isValid2, respo
                       value: rangeStart,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
-                          var validRangeEnd;
+                          var matchValue = "[" + (value + ("," + (rangeEnd + "]")));
+                          var isValidRange;
                           var exit = 0;
                           var val;
                           var val$1;
@@ -490,19 +509,21 @@ function renderRange(jssClass, editMode, matchPattern, isValid1, isValid2, respo
                           catch (raw_exn){
                             var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);
                             if (exn[0] === Caml_builtin_exceptions.failure) {
-                              validRangeEnd = rangeEnd;
+                              isValidRange = false;
                             } else {
                               throw exn;
                             }
                           }
                           if (exit === 1) {
-                            var match = val > val$1;
-                            validRangeEnd = match ? value : rangeEnd;
+                            isValidRange = val <= val$1;
                           }
-                          var matchValue = "[" + (value + ("," + (validRangeEnd + "]")));
-                          if (isValidInput(value)) {
+                          if (isValidInput(value) && isValidRange) {
                             onEditMatch(responseId, matchValue);
                             Curry._1(setValid1, true);
+                            Curry._1(setValid2, isValidInput(rangeEnd));
+                          } else if (isValidInput(value)) {
+                            Curry._1(setValid1, isValidInput(value) && isValidRange);
+                            Curry._1(setValid2, isValidInput(rangeEnd) && isValidRange);
                           } else {
                             Curry._1(setValid1, false);
                           }
@@ -531,7 +552,8 @@ function renderRange(jssClass, editMode, matchPattern, isValid1, isValid2, respo
                       value: rangeEnd,
                       onChange: (function ($$event) {
                           var value = $$event.target.value;
-                          var validRangeStart;
+                          var matchValue = "[" + (rangeStart + ("," + (value + "]")));
+                          var isValidRange;
                           var exit = 0;
                           var val;
                           var val$1;
@@ -543,19 +565,21 @@ function renderRange(jssClass, editMode, matchPattern, isValid1, isValid2, respo
                           catch (raw_exn){
                             var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);
                             if (exn[0] === Caml_builtin_exceptions.failure) {
-                              validRangeStart = rangeStart;
+                              isValidRange = false;
                             } else {
                               throw exn;
                             }
                           }
                           if (exit === 1) {
-                            var match = val < val$1;
-                            validRangeStart = match ? value : rangeStart;
+                            isValidRange = val >= val$1;
                           }
-                          var matchValue = "[" + (validRangeStart + ("," + (value + "]")));
-                          if (isValidInput(value)) {
+                          if (isValidInput(value) && isValidRange) {
                             onEditMatch(responseId, matchValue);
                             Curry._1(setValid2, true);
+                            Curry._1(setValid1, isValidInput(rangeStart));
+                          } else if (isValidInput(value)) {
+                            Curry._1(setValid2, isValidInput(value) && isValidRange);
+                            Curry._1(setValid1, isValidInput(rangeStart) && isValidRange);
                           } else {
                             Curry._1(setValid2, false);
                           }
@@ -632,7 +656,7 @@ function make(classes, className, editMode, responseId, matchPattern, onEditMatc
                                     className: StyleUtils$CourseEditor.jssClass(classes, "optionsRow")
                                   }, React.createElement("div", {
                                         className: StyleUtils$CourseEditor.jssClass(classes, "condition")
-                                      }, renderConditionSelect(editMode, responseId, Option$CourseEditor.valueOr(state[/* matchPattern */4], ""), onEditMatch, updateState)), renderRange(jssClass, editMode, Option$CourseEditor.valueOr(state[/* matchPattern */4], ""), state[/* range1 */1], state[/* range2 */2], responseId, onEditMatch, updateState, setValidRange1, setValidRange2)), renderRangeInstructions(jssClass)));
+                                      }, renderConditionSelect(editMode, responseId, Option$CourseEditor.valueOr(state[/* matchPattern */4], ""), onEditMatch, updateState)), renderRange(jssClass, editMode, Option$CourseEditor.valueOr(state[/* matchPattern */4], ""), state[/* range1 */1], state[/* range2 */2], responseId, onEditMatch, updateState, setValidRange1, setValidRange2)), renderRangeInstructions(jssClass, state[/* range1 */1], state[/* range2 */2])));
             }),
           /* initialState */(function (param) {
               return /* record */[
