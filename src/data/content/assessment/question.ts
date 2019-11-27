@@ -556,65 +556,48 @@ function removeResponsesWithNoMatch(question: Question): Question {
   });
 }
 
-type Match = string;
-function isStarMatch(match: Match): boolean {
-  return match === '*';
-}
-export function areResponsesWithStarMatchesValid(question: Question): boolean {
+const isStarMatch = match => match === '*';
+
+export function responsesAreValid(question: Question): boolean {
   // Helpers
-  function responses(question: Question): ct.Response[] {
-    return question.parts.flatMap(part => part.responses).toArray();
-  }
-  function matches(responses: ct.Response[]): Match[] {
-    return responses.map(response => response.match);
-  }
-  function starMatches(question: Question): Match[] {
-    return matches(responses(question)).filter(isStarMatch);
-  }
-  function hasStarMatch(question: Question): boolean {
-    return starMatches(question).length > 0;
-  }
-  function hasMultipleStarMatches(question: Question): boolean {
-    return starMatches(question).length > 1;
-  }
-  function isStarMatchAtEnd(question: Question): boolean {
-    // assert: question contains single match '*' response
-    function isAtEnd(matches: Match[], match: Match) {
-      return matches.indexOf(match) === matches.length - 1;
-    }
-    return isAtEnd(matches(responses(question)), '*');
-  }
+  const responseMatches = responses => responses.map(response => response.match);
+  const partStarMatches = part => responseMatches(part.responses).filter(isStarMatch);
+  const partHasStarMatch = part => partStarMatches(part).size > 0;
+  const isAtEnd = (indexable, x) => indexable.last() === x;
+
+  const questionHasMultipleStarMatches =
+    question.parts.some(part => partStarMatches(part).length > 1);
+  const questionHasNoStarMatches = !question.parts.some(partHasStarMatch);
+  const areStarMatchesAtEnd = question.parts.every(part =>
+    isAtEnd(responseMatches(part.responses), '*'));
 
   // Logic
-  if (!hasStarMatch(question)) {
+  if (questionHasNoStarMatches) {
     return true;
   }
 
-  if (hasMultipleStarMatches(question)) {
+  if (questionHasMultipleStarMatches) {
     return false;
   }
 
-  return isStarMatchAtEnd(question);
+  return areStarMatchesAtEnd;
 }
 
 function putMatchStarResponseAtEnd(question: Question): Question {
   // Helpers
-  function responsesWithoutStarMatches(
-    responses: Immutable.OrderedMap<string, ct.Response>): Immutable.Iterable<string, ct.Response> {
-    return responses.filter(response => !isStarMatch(response.match));
-  }
+  const responsesWithoutStarMatches = responses =>
+    responses.filter(({ match }) => !isStarMatch(match));
 
-  function responseWithStarMatch(
-    responses: Immutable.OrderedMap<string, ct.Response>): Immutable.Iterable<string, ct.Response> {
-    const matches = responses.filter(response => isStarMatch(response.match));
-    if (matches && matches.size > 0) {
-      return matches.first();
+  const firstResponseWithStarMatch = (responses) => {
+    const starMatches = responses.filter(({ match }) => isStarMatch(match));
+    if (starMatches && starMatches.size > 1) {
+      return Immutable.OrderedMap([[starMatches.first().guid, starMatches.first()]]);
     }
-    return matches;
-  }
+    return starMatches;
+  };
 
   // Logic
-  if (areResponsesWithStarMatchesValid(question)) {
+  if (responsesAreValid(question)) {
     return question;
   }
 
@@ -622,7 +605,7 @@ function putMatchStarResponseAtEnd(question: Question): Question {
     parts: question.parts.map(part =>
       part.with({
         responses: responsesWithoutStarMatches(part.responses)
-          .concat(responseWithStarMatch(part.responses))
+          .concat(firstResponseWithStarMatch(part.responses))
           .toOrderedMap(),
       })).toOrderedMap(),
   });
