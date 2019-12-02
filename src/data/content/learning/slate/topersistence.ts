@@ -190,6 +190,12 @@ function terminalInline(i: Inline, container) {
 // content inlines serialize the embedded wrapper, but also
 // additional slate objects
 function contentBasedInline(i: Inline, container) {
+  const inlineHasContent = (i: Inline) => i.nodes.size > 0 && i.nodes.first().text.trim() !== '';
+  // Don't persist content-based inlines with no text content
+  if (!inlineHasContent(i)) {
+    return;
+  }
+
   const item = i.data.get('value').toPersistence();
   const key = common.getKey(item);
   container.push(item);
