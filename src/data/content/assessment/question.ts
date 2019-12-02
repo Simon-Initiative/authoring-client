@@ -584,6 +584,7 @@ export function catchallResponseOrderingIsValid(question: Question): boolean {
 }
 
 /*
+See AUTHORING-2170.
 Each question part has a list of responses with scores and feedback that are given to students
 depending on their answer. Each response has a `match` attribute which tells OLI which
 answer should receive that response. Now, some question types allow a "catchall" response to match
