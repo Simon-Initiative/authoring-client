@@ -35,7 +35,6 @@ function translateNode(node: Block, seenIds: Object) {
   node.nodes.forEach((n) => {
     if (n.object === 'text' && n.text.length > 0) {
       handleText(n, content);
-      // Don't save inlines with empty text content inside
     } else if (n.object === 'inline') {
       handleInline(n, content);
     }
