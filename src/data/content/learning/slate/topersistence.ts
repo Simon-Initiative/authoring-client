@@ -29,15 +29,15 @@ export function toPersistence(value: Value, inlineText = false): Object {
 
 // Top-level block handler.
 function translateNode(node: Block, seenIds: Object) {
-  const inlineHasContent = (n: Inline) => n.nodes.size > 0 && n.nodes.first().text.trim() !== '';
   const content = [];
 
   // Process each child node
   node.nodes.forEach((n) => {
+    console.log('n', n)
     if (n.object === 'text' && n.text.length > 0) {
       handleText(n, content);
       // Don't save inlines with empty text content inside
-    } else if (n.object === 'inline' && inlineHasContent(n)) {
+    } else if (n.object === 'inline') {
       handleInline(n, content);
     }
   });
@@ -192,6 +192,12 @@ function terminalInline(i: Inline, container) {
 // content inlines serialize the embedded wrapper, but also
 // additional slate objects
 function contentBasedInline(i: Inline, container) {
+  const inlineHasContent = (i: Inline) => i.nodes.size > 0 && i.nodes.first().text.trim() !== '';
+  // Don't persist content-based inlines with no text content
+  if (!inlineHasContent(i)) {
+    return;
+  }
+
   const item = i.data.get('value').toPersistence();
   const key = common.getKey(item);
   container.push(item);
