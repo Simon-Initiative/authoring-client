@@ -33,7 +33,6 @@ function translateNode(node: Block, seenIds: Object) {
 
   // Process each child node
   node.nodes.forEach((n) => {
-    console.log('n', n)
     if (n.object === 'text' && n.text.length > 0) {
       handleText(n, content);
       // Don't save inlines with empty text content inside
