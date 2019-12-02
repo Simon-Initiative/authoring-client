@@ -590,7 +590,7 @@ depending on their answer. Each response has a `match` attribute which tells OLI
 answer should receive that response. Now, some question types allow a "catchall" response to match
 any answer choice that is not specifically listed by the course author. These catchall responses
 have the `match` attribute set to the "*" string. OLI processes question responses in-order,
-meaning that if a catchall response comes before a targeted response in the DTO json, it will
+meaning that if a catchall response comes before a targeted response in the json DTO, it will
 ignore all of the following targeted responses. The problem was that Echo sometimes puts the
 catchall response in the middle of the targeted feedback, and so we ran into bugs where, for
 example, numeric input questions could not have two correct answers because the catchall response
