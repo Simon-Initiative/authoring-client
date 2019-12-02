@@ -29,7 +29,7 @@ export function toPersistence(value: Value, inlineText = false): Object {
 
 // Top-level block handler.
 function translateNode(node: Block, seenIds: Object) {
-  const isInlineEmpty = (n: Inline) => n.nodes.size > 0 && n.nodes.first().text.trim() === '';
+  const inlineHasContent = (n: Inline) => n.nodes.size > 0 && n.nodes.first().text.trim() !== '';
   const content = [];
 
   // Process each child node
@@ -37,7 +37,7 @@ function translateNode(node: Block, seenIds: Object) {
     if (n.object === 'text' && n.text.length > 0) {
       handleText(n, content);
       // Don't save inlines with empty text content inside
-    } else if (n.object === 'inline' && !isInlineEmpty(n)) {
+    } else if (n.object === 'inline' && inlineHasContent(n)) {
       handleInline(n, content);
     }
   });
