@@ -86,9 +86,9 @@ const logger = createLogger({
 
 const middleware = nodeEnv === 'production'
   ? applyMiddleware(thunkMiddleware, logger)
-  : composeEnhancers(applyMiddleware(
-    thunkMiddleware, logger,
-  ));
+  : reduxLoggingEnabled
+    ? composeEnhancers(applyMiddleware(thunkMiddleware, logger))
+    : applyMiddleware(thunkMiddleware);
 
 function getPathName(pathname: string): string {
   return pathname.startsWith('/state') ? '' : pathname;
