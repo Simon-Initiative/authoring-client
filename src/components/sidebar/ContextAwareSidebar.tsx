@@ -40,6 +40,8 @@ import { viewDocument, viewOrganizations } from 'actions/view';
 import { getNameAndIconByType } from 'components/resourceview/ResourceView';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
+import RichTextToolbar
+  from 'editors/content/learning/contiguoustext/RichTextToolbar.controller';
 
 interface SidebarRowProps {
   label?: string;
@@ -140,6 +142,7 @@ export interface ContextAwareSidebarProps {
   supportedElements: Immutable.List<string>;
   show: boolean;
   sidebarContent: JSX.Element;
+  embedActivityTypes: Immutable.Map<string, string>;
   onInsert: (content: ContentElement, textSelection) => void;
   onEdit: (content: ContentElement) => void;
   onHide: () => void;
@@ -322,7 +325,7 @@ class ContextAwareSidebar
     const idDisplay = (
       <SidebarGroup label="OLI Identifier">
         <SidebarRow>
-          <Tooltip title={resource.id}
+          <Tooltip title={resource.id} style={{ fontSize: 14 }}
             delay={150} distance={5} size="small" arrowSize="small">
             {resource.id}
           </Tooltip>
@@ -395,8 +398,7 @@ class ContextAwareSidebar
                               }
                               }>
                                 <span style={{ width: 26, textAlign: 'center', marginRight: 5 }}>
-                                  {
-                                    getNameAndIconByType(res.type).icon}
+                                  {getNameAndIconByType(res, course.embedActivityTypes).icon}
                                 </span>
                                 {res.title}
                               </a>
@@ -669,6 +671,38 @@ class ContextAwareSidebar
             </SidebarGroup>
           </SidebarContent>
         );
+      case ModelTypes.EmbedActivityModel:
+        return (
+          <SidebarContent title="Embed Activity" onHide={this.props.onHide}>
+            <SidebarGroup label="General">
+              <SidebarRow>
+                <Tooltip title={dateFormatted(adjusted(resource.dateCreated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  Created {relativeToNowIfLessThanDays(resource.dateCreated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+              <SidebarRow>
+                <Tooltip title={dateFormatted(adjusted(resource.dateUpdated))}
+                  delay={150} distance={5} size="small" arrowSize="small">
+                  Updated {relativeToNowIfLessThanDays(resource.dateUpdated, MAX_DAYS)}
+                </Tooltip>
+              </SidebarRow>
+            </SidebarGroup>
+            {idDisplay}
+            {referenceLocations}
+            <SidebarGroup label="Advanced">
+              <SidebarRow>
+                <Button
+                  className={classes.deleteButton}
+                  onClick={this.showDeleteModal}
+                  editMode={editMode}
+                  type="outline-danger">
+                  Delete this Embed Activity
+              </Button>
+              </SidebarRow>
+            </SidebarGroup>
+          </SidebarContent>
+        );
       default:
         return null;
     }
@@ -712,7 +746,9 @@ class ContextAwareSidebar
         onUpdateHover: () => { },
       };
 
-      if (contentElement.contentType === 'ContiguousText') {
+      if (contentElement.contentType === 'RichText') {
+        contentRenderer = <RichTextToolbar {...props} />;
+      } else if (contentElement.contentType === 'ContiguousText') {
         contentRenderer = <ContiguousTextToolbar {...props} />;
       } else {
         contentRenderer = React.createElement(

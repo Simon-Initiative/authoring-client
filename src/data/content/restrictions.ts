@@ -13,4 +13,9 @@ export const nonMoveableTypes = {
   TechReport: true,
   Misc: true,
   Unpublished: true,
+  RichText: true,
+};
+
+export const nonRemovableTypes = {
+  RichText: true,
 };

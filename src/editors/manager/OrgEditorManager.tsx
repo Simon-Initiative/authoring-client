@@ -27,6 +27,7 @@ export interface OrgEditorManagerProps {
   expanded: any;
   editingAllowed: boolean;
   undoRedoGuid: string;
+  undoRedoActionGuid: string;
   skills: Immutable.Map<string, Skill>;
   objectives: Immutable.Map<string, LearningObjective>;
   onDispatch: (...args: any[]) => any;
@@ -90,7 +91,7 @@ export default class OrgEditorManager
   renderLoaded(document: persistence.Document) {
 
     const { course, documentId, expanded, userId, onDispatch,
-      editingAllowed, undoRedoGuid } = this.props;
+      editingAllowed, undoRedoGuid, undoRedoActionGuid } = this.props;
 
     return (
       <OrgEditor
@@ -105,6 +106,7 @@ export default class OrgEditorManager
           documentId,
           userId,
           undoRedoGuid,
+          undoRedoActionGuid,
           resourcePath: this.determineBaseUrl((document.model as any).resource),
           baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
           courseModel: course,

@@ -21,6 +21,7 @@ interface StateProps {
   objectives: Map<string, LearningObjective>;
   document: Document;
   undoRedoGuid: string;
+  undoRedoActionGuid: string;
   editingAllowed: boolean;
   hasFailed: boolean;
   canUndo: boolean;
@@ -55,6 +56,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
   let document = null;
   let undoRedoGuid = 'Loading';
+  let undoRedoActionGuid = 'Loading';
   let editingAllowed = ownProps.course.editable;
   let hasFailed = false;
 
@@ -63,6 +65,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     nothing: () => null,
   });
   undoRedoGuid = '';
+  undoRedoActionGuid = '';
   editingAllowed = ownProps.course.editable;
   hasFailed = false;
 
@@ -72,6 +75,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     objectives,
     document,
     undoRedoGuid,
+    undoRedoActionGuid,
     editingAllowed,
     hasFailed,
     canUndo: false,

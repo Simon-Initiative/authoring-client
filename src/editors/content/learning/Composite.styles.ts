@@ -2,7 +2,7 @@ import { JSSStyles } from 'styles/jss';
 
 export const styles: JSSStyles = {
   composite: {
-    marginLeft: '30px',
+
   },
   instructions: {
     display: 'flex',

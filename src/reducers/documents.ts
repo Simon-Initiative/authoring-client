@@ -37,6 +37,7 @@ function processUndo(
 
   return state.set(action.documentId, ed.with({
     undoRedoGuid: createGuid(),
+    undoRedoActionGuid: createGuid(),
     redoStack,
     undoStack,
     document,
@@ -66,6 +67,7 @@ function processRedo(
 
   return state.set(action.documentId, ed.with({
     undoRedoGuid: createGuid(),
+    undoRedoActionGuid: createGuid(),
     redoStack,
     undoStack,
     document,

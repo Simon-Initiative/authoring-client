@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { ActiveContextState } from 'reducers/active';
-import { ContentModel, AssessmentModel } from 'data/models';
+import { ContentModel, AssessmentModel, EmbedActivityModel } from 'data/models';
 import { withStyles } from 'styles/jss';
 import { ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -46,6 +46,7 @@ const imgSize = 24;
 
 import SizePicker from 'editors/content/learning/table/SizePicker';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
+import { ActivityType } from 'data/models/embedactivity';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object, context?) => void;
@@ -58,6 +59,7 @@ export interface InsertToolbarProps {
   onCreateNew: (model: ContentModel) => Promise<Resource>;
   resourcePath: string;
   courseModel: CourseModel;
+  onUpdateCourse: (courseModel: CourseModel) => void;
   onShowMessage: (message: Message) => void;
   onDismissMessage: (message: Message) => void;
   content: Maybe<Object>;
@@ -128,7 +130,7 @@ class InsertToolbar
 
   render() {
     const { onInsert, parentSupportsElementType, resourcePath, context, editMode,
-      courseModel, onDisplayModal, onDismissModal, requestLatestModel,
+      courseModel, onDisplayModal, onDismissModal, requestLatestModel, onUpdateCourse,
       onCreateNew, activeContext } = this.props;
 
     const isParagraphSelected = activeContext.activeChild.caseOf({
@@ -828,6 +830,54 @@ class InsertToolbar
                 disabled={!editMode || !parentSupportsElementType('multipanel')}>
                 {getContentIcon(insertableContentTypes.Multipanel, { width: 22 })}
                 {' Image hotspot activity'}
+              </ToolbarButtonMenuItem>
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  requestLatestModel()
+                    .then((model) => {
+
+                      const existingInlines = collectInlines(model);
+
+                      return onDisplayModal(
+                        <ResourceSelection
+                          filterPredicate={(res: Resource): boolean =>
+                            (res.type === LegacyTypes.embed_activity
+                              && courseModel.embedActivityTypes.get(res.id) === 'REPL'
+                              && res.resourceState !== ResourceState.DELETED
+                              && !existingInlines.has(res.id))
+                          }
+                          courseId={context.courseModel.guid}
+                          onInsert={(resource) => {
+                            onDismissModal();
+                            const resources = context.courseModel.resources.toArray();
+                            const found = resources.find(r => r.id === resource.id);
+                            if (found !== undefined) {
+                              onInsert(new contentTypes.WbInline().with({ idref: found.id }));
+                            }
+                          }}
+                          onCancel={onDismissModal}
+                        />);
+                    });
+                }}
+                disabled={!editMode || !parentSupportsElementType('wb:inline')}>
+                <i style={{ width: 22 }} className="fa fa-terminal" /> Insert REPL Activity
+              </ToolbarButtonMenuItem>
+              <ToolbarButtonMenuItem
+                onClick={() => {
+                  const model = EmbedActivityModel.createNew(guid(), undefined, ActivityType.REPL);
+
+                  onCreateNew(model)
+                    .then((resource) => {
+                      onInsert(new contentTypes.WbInline().with({ idref: resource.id }));
+                      onUpdateCourse(courseModel.with({
+                        embedActivityTypes: courseModel.embedActivityTypes.set(resource.id, 'REPL'),
+                        resources: courseModel.resources.set(resource.guid, resource),
+                        resourcesById: courseModel.resourcesById.set(resource.id, resource),
+                      }));
+                    });
+                }}
+                disabled={!editMode || !parentSupportsElementType('wb:inline')}>
+                <i style={{ width: 22 }} className="fa fa-terminal" /> Create REPL Activity
               </ToolbarButtonMenuItem>
             </ToolbarWideMenu>
           </ToolbarLayout.Column>

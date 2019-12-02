@@ -130,10 +130,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return new ContiguousText({ guid, mode, slateValue: valueFromText(text) });
   }
 
-  static fromHTML(html: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
-    return new ContiguousText({ guid, mode, slateValue: Html.deserialize(html) });
-  }
-
   // Creates a new ContiguousText, but with all of the block level ids changed
   assignNewIds(): ContiguousText {
     const nodes = this.slateValue.document.nodes.map((node) => {

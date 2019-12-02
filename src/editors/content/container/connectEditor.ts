@@ -10,7 +10,7 @@ import { Inline } from 'slate';
 export const connectEditor = (component) => {
   const mapStateToProps = (state: State, ownProps) => {
     return {
-
+      course: state.course,
     };
   };
 
