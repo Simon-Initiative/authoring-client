@@ -177,9 +177,11 @@ export const documents = (
       // Else we are setting the node, so also set the corresponding page
       const node = action.nodeOrPageId;
       const currentPage = assessment.modelType === 'AssessmentModel'
-        ? assessment.pages.reduce(
+        ? assessment.pages.toArray().reduce(
           (activePage, page: contentTypes.Page) =>
-            page.nodes.contains(node) ? Maybe.just(page.guid) : activePage,
+            page.nodes.toArray().includes(node)
+              ? Maybe.just(page.guid)
+              : activePage,
           ed.currentPage)
         : Maybe.nothing<string>();
       const currentNode = Maybe.just(node);
