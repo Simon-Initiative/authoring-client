@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { Tooltip } from 'utils/tooltip';
+import { Tooltip, TooltipProps } from 'utils/tooltip';
 import './HelpPopover.scss';
 import { ModalMessage } from 'utils/ModalMessage';
 
-export type HelpPopoverProps = {
-  position?: Position,
-  activateOnClick?: boolean,
+export interface HelpPopoverProps extends TooltipProps {
+  position?: Position;
+  activateOnClick?: boolean;
   modalTitle?: string;
   displayModal: (component: any) => void;
   dismissModal: () => void;
-};
+}
 
 export enum Position {
   Top = 'top',

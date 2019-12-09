@@ -20,6 +20,7 @@ export interface ContiguousTextEditorProps
   viewOnly?: boolean;
   editorStyles?: any;
   hideBorder?: boolean;
+  placeholder?: string;
   onUpdateEditor: (editor) => void;
   onSelectInline: (inline: Maybe<Inline>) => void;
   onInsertParsedContent: (resourcePath: string, o) => void;
@@ -154,7 +155,7 @@ class ContiguousTextEditor
   }
 
   renderMain(): JSX.Element {
-    const { className, classes, editMode, viewOnly,
+    const { className, classes, editMode, viewOnly, editorStyles, placeholder,
       hideBorder = false, context, onSelectInline } = this.props;
 
     const showBorder = !viewOnly && !hideBorder;
@@ -172,6 +173,7 @@ class ContiguousTextEditor
 
     return (
       <div
+        style={editorStyles}
         className={classNames([
           'contiguousTextEditor', classes.contiguousText,
           showBorder && classes.showBorder,
@@ -180,6 +182,8 @@ class ContiguousTextEditor
 
         <Editor
           ref={editor => this.editor = editor}
+          className={classes.contiguousTextSlateEditor}
+          placeholder={placeholder}
           onPaste={this.onPaste}
           onFocus={this.slateOnFocus}
           plugins={plugins}

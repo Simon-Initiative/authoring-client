@@ -9,7 +9,7 @@ import { styles } from './ItemToolbar.styles';
 import { loadFromLocalStorage } from 'utils/localstorage';
 import { ContentElement } from 'data/content/common/interfaces';
 import { CourseModel } from 'data/models';
-import { nonMoveableTypes } from 'data/content/restrictions';
+import { nonMoveableTypes, nonRemovableTypes } from 'data/content/restrictions';
 import { StyledComponentProps } from 'types/component';
 
 export interface ItemToolbarProps {
@@ -48,7 +48,7 @@ class ItemToolbar
   canDuplicate() {
     const { activeContext } = this.props;
 
-    const disallowDuplicates = ['Multipanel', 'WbInline', 'Activity', 'Speaker', 'Line', 'Hint'];
+    const disallowDuplicates = ['Multipanel', 'WbInline', 'Activity', 'Speaker', 'Line', 'Hint', 'RichText'];
 
     return activeContext.activeChild.caseOf({
       just: activeChild => activeChild &&
@@ -86,6 +86,11 @@ class ItemToolbar
 
     const canMove = activeContext.activeChild.caseOf({
       just: c => !nonMoveableTypes[c.contentType],
+      nothing: () => false,
+    });
+
+    const canRemove = activeContext.activeChild.caseOf({
+      just: c => !nonRemovableTypes[c.contentType],
       nothing: () => false,
     });
 
@@ -133,7 +138,7 @@ class ItemToolbar
             onClick={() => onRemove(this.getItem())}
             tooltip="Remove Item"
             size={ToolbarButtonSize.Wide}
-            disabled={!editMode || !(this.hasSelection())}>
+            disabled={!editMode || !(this.hasSelection() && canRemove)}>
             <i className="fas fa-times" /> Remove
           </ToolbarButton>
         </ToolbarLayout.Column>

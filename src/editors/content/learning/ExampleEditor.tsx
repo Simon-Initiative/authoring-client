@@ -57,17 +57,17 @@ export default class ExampleEditor
 
   renderMain(): JSX.Element {
     return (
-      <div>
-        <TitleTextEditor
-          context={this.props.context}
-          services={this.props.services}
-          onFocus={this.props.onFocus}
-          model={(this.props.model.title.text.content.first() as ContiguousText)}
-          editMode={this.props.editMode}
-          onEdit={this.onTitleEdit}
-          editorStyles={{ fontSize: 20 }} />
-
+      <div className="ExampleEditor">
         <div className="nested-container">
+          <TitleTextEditor
+            context={this.props.context}
+            services={this.props.services}
+            onFocus={this.props.onFocus}
+            model={(this.props.model.title.text.content.first() as ContiguousText)}
+            editMode={this.props.editMode}
+            onEdit={this.onTitleEdit}
+            editorStyles={{ fontSize: 20 }} />
+
           <ContentContainer
             {...this.props}
             model={this.props.model.content}

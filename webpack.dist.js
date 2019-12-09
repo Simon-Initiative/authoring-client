@@ -18,6 +18,7 @@ module.exports = {
             'history',
             'immutable',
             'json-beautify',
+            'jquery',
             'keycloak-js',
             'react',
             'react-addons-css-transition-group',

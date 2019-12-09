@@ -20,6 +20,8 @@ import {
 } from 'components/toolbar/ContextAwareToolbar.styles';
 import ContiguousTextToolbar
   from 'editors/content/learning/contiguoustext/ContiguousTextToolbar.controller';
+import RichTextToolbar
+  from 'editors/content/learning/contiguoustext/RichTextToolbar.controller';
 
 interface ToolbarGroupProps {
   className?: string;
@@ -137,6 +139,7 @@ export interface ContextAwareToolbarProps {
   onCreateNew: (model: ContentModel) => Promise<Resource>;
   onShowMessage: (message: Message) => void;
   onDismissMessage: (message: Message) => void;
+  onUpdateCourse: (course: CourseModel) => void;
 }
 
 type StyledContextAwareToolbarProps = StyledComponentProps<ContextAwareToolbarProps, typeof styles>;
@@ -167,6 +170,10 @@ class ContextAwareToolbar
       return true;
     }
 
+    if (this.props.courseModel !== nextProps.courseModel) {
+      return true;
+    }
+
     // Only other thing we need to check is for a change in
     // the supported elements
     if (this.props.supportedElements !== nextProps.supportedElements) {
@@ -181,7 +188,7 @@ class ContextAwareToolbar
     const {
       onInsert, onEdit, content, container, supportedElements, model,
       classes, onDisplayModal, onDismissModal, context, resource, editMode,
-      onCreateNew, onDismissMessage, onShowMessage, activeContext,
+      onCreateNew, onDismissMessage, onShowMessage, activeContext, onUpdateCourse,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -210,7 +217,9 @@ class ContextAwareToolbar
         onUpdateHover: () => { },
       };
 
-      if (contentModel.contentType === 'ContiguousText') {
+      if (contentModel.contentType === 'RichText') {
+        contentRenderer = <RichTextToolbar {...props} />;
+      } else if (contentModel.contentType === 'ContiguousText') {
         contentRenderer = <ContiguousTextToolbar {...props} />;
       } else {
         contentRenderer = React.createElement(
@@ -262,7 +271,8 @@ class ContextAwareToolbar
             onDismissMessage={onDismissMessage}
             onShowMessage={onShowMessage}
             onDisplayModal={onDisplayModal}
-            onDismissModal={onDismissModal} />
+            onDismissModal={onDismissModal}
+            onUpdateCourse={onUpdateCourse} />
         </ToolbarGroup>
 
         <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={7.4}>

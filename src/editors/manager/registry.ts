@@ -18,8 +18,3 @@ export function register(registration: RegisteredEditor) {
 export function lookUpByName(name: string) : RegisteredEditor {
   return REGISTRY[name];
 }
-
-
-
-
-

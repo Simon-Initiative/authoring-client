@@ -6,6 +6,7 @@ export enum DiscoverableId {
   DlEditorTitle,
   DtEditorTitle,
   DdEditorTitle,
+  ReplEditorDetails,
   OrderedListEditorTitle,
   OrderedListEditorStyle,
   OrderedListEditorStart,

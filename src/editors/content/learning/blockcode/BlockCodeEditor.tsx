@@ -57,15 +57,17 @@ class BlockCodeEditor
 
     return (
       <div className={classNames(['codeEditor', classes.codeEditor])}>
-        <ContiguousTextEditor
-          {...this.props}
-          onUpdateEditor={this.props.onUpdateEditor}
-          onInsertParsedContent={() => { }}
-          orderedIds={null}
-          onFocus={this.onFocusOverride}
-          model={this.props.model.text}
-          onEdit={this.onEditText}
-        />
+        <div className={classes.codeEditorWrapper}>
+          <ContiguousTextEditor
+            {...this.props}
+            onUpdateEditor={this.props.onUpdateEditor}
+            onInsertParsedContent={() => { }}
+            orderedIds={null}
+            onFocus={this.onFocusOverride}
+            model={this.props.model.text}
+            onEdit={this.onEditText}
+          />
+        </div>
       </div>
     );
   }

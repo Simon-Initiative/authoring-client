@@ -16,6 +16,7 @@ export type EditedDocumentParams = {
   undoStack?: Immutable.Stack<ContentModel>;
   redoStack?: Immutable.Stack<ContentModel>;
   undoRedoGuid?: string;
+  undoRedoActionGuid?: string;
   editingAllowed?: boolean;
   currentPage?: Maybe<string>;
   currentNode?: Maybe<contentTypes.Node>;
@@ -34,6 +35,7 @@ const defaultContent = {
   undoStack: Immutable.Stack<ContentModel>(),
   redoStack: Immutable.Stack<ContentModel>(),
   undoRedoGuid: createGuid(),
+  undoRedoActionGuid: createGuid(),
   editingAllowed: false,
   currentPage: Maybe.nothing<string>(),
   currentNode: Maybe.nothing<contentTypes.Node>(),
@@ -53,6 +55,7 @@ export class EditedDocument extends Immutable.Record(defaultContent) {
   undoStack: Immutable.Stack<ContentModel>;
   redoStack: Immutable.Stack<ContentModel>;
   undoRedoGuid: string;
+  undoRedoActionGuid: string;
   editingAllowed: boolean;
   currentPage: Maybe<string>;
   currentNode: Maybe<contentTypes.Node>;

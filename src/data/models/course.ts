@@ -51,6 +51,7 @@ export type CourseModelParams = {
   resourcesById?: Immutable.OrderedMap<string, contentTypes.Resource>,
   webContents?: Immutable.OrderedMap<string, contentTypes.WebContent>,
   developers?: Immutable.OrderedMap<string, contentTypes.UserInfo>,
+  embedActivityTypes?: Immutable.OrderedMap<string, string>,
 };
 
 const defaultCourseModel = {
@@ -78,6 +79,7 @@ const defaultCourseModel = {
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>(),
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>(),
   developers: Immutable.OrderedMap<string, contentTypes.UserInfo>(),
+  embedActivityTypes: Immutable.OrderedMap<string, string>(),
 };
 
 function toKV(arr, deserialize) {
@@ -132,6 +134,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>;
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>;
   developers: Immutable.OrderedMap<string, contentTypes.UserInfo>;
+  embedActivityTypes: Immutable.OrderedMap<string, string>;
 
   constructor(params?: CourseModelParams) {
     params ? super(buildResourceMap(params)) : super();
@@ -177,6 +180,13 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       });
     }
 
+    let embedActivityTypes = Immutable.OrderedMap<string, string>();
+    if (c.embedActivityTypes !== undefined && c.embedActivityTypes !== null) {
+      Object.keys(c.embedActivityTypes).forEach((key) => {
+        embedActivityTypes = embedActivityTypes.set(key, c.embedActivityTypes[key]);
+      });
+    }
+
     const model = new CourseModel({
       rev: c.rev,
       guid: CourseGuid.of(c.guid),
@@ -200,6 +210,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       resources,
       webContents,
       developers,
+      embedActivityTypes,
     });
 
     return model;
