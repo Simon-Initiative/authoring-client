@@ -68,6 +68,11 @@ export const styles: JSSStyles = {
     marginTop: 5,
     color: colors.gray,
   },
+  rangeErrMsg: {
+    fontSize: '0.8em',
+    marginTop: 5,
+    color: colors.danger,
+  },
   rangeSpacer: {
     flex: 1,
   },
