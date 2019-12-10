@@ -80,21 +80,23 @@ export class Link extends Immutable.Record(defaultContent) {
 
   toPersistence(): Object {
 
-    if (this.href.startsWith('#')) {
-      const xref = new contentTypes.Xref().with({
-        idref: this.href.substr(0),
-      });
-      return xref.toPersistence();
-    }
-
-    const link = {
-      link: {
-        '@title': this.title,
-        '@href': this.href,
-        '@target': this.target,
-        '@internal': this.internal ? 'true' : 'false',
-      },
-    };
+    const link =  this.href.startsWith('#')
+      ? {
+        link: {
+          '@title': this.title,
+          '@href': this.href.substr(1),
+          '@target': this.target,
+          '@internal': 'true',
+        },
+      }
+      : {
+        link: {
+          '@title': this.title,
+          '@href': this.href,
+          '@target': this.target,
+          '@internal': this.internal ? 'true' : 'false',
+        },
+      };
 
     const imageContent: Image = this.content.caseOf({
       just: c => [c.toPersistence()],
