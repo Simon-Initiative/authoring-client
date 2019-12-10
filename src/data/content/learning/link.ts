@@ -3,6 +3,7 @@ import { Maybe } from 'tsmonad';
 import { augment, getChildren, ensureIdGuidPresent } from 'data/content/common';
 import { Image } from 'data/content/learning/image';
 import { LinkTarget } from 'data/content/learning/common';
+import * as contentTypes from 'data/contentTypes';
 
 export type LinkParams = {
   target?: LinkTarget,
@@ -78,6 +79,14 @@ export class Link extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
+
+    if (this.href.startsWith('#')) {
+      const xref = new contentTypes.Xref().with({
+        idref: this.href.substr(0),
+      });
+      return xref.toPersistence();
+    }
+
     const link = {
       link: {
         '@title': this.title,
