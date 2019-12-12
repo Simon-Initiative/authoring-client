@@ -15,6 +15,7 @@ import { ContentModel } from 'data/models';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Message } from 'types/messages';
 import { showMessage, dismissSpecificMessage } from 'actions/messages';
+import { courseChanged } from 'actions/course';
 
 interface StateProps {
   supportedElements: Immutable.List<string>;
@@ -34,6 +35,7 @@ interface DispatchProps {
   onCreateNew: (model: ContentModel) => Promise<Resource>;
   onShowMessage: (message: Message) => void;
   onDismissMessage: (message: Message) => void;
+  onUpdateCourse: (course: CourseModel) => void;
 }
 
 interface OwnProps {
@@ -82,6 +84,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     onDismissMessage: (message: Message) => {
       dispatch(dismissSpecificMessage(message));
+    },
+    onUpdateCourse: (course: CourseModel) => {
+      dispatch(courseChanged(course));
     },
   };
 };

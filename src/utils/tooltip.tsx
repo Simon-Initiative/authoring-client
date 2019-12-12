@@ -13,7 +13,7 @@ const DEFAULT_TOOLTIP_PROPS = {
 const mergeWithDefaultProps = props =>
   Object.assign({}, DEFAULT_TOOLTIP_PROPS, props);
 
-interface TooltipProps {
+export interface TooltipProps {
   title?: string;
   disabled?: boolean;
   open?: boolean;

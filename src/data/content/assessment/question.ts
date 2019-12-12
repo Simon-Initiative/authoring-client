@@ -556,6 +556,78 @@ function removeResponsesWithNoMatch(question: Question): Question {
   });
 }
 
+const isStarMatch = match => match === '*';
+
+export function catchallResponseOrderingIsValid(question: Question): boolean {
+  // Helpers
+  const responseMatches = responses => responses.map(response => response.match);
+  const partStarMatches = part => responseMatches(part.responses).filter(isStarMatch);
+  const partHasStarMatch = part => partStarMatches(part).size > 0;
+  const isAtEnd = (indexable, x) => indexable.last() === x;
+
+  const questionHasMultipleStarMatches =
+    question.parts.some(part => partStarMatches(part).length > 1);
+  const questionHasNoStarMatches = !question.parts.some(partHasStarMatch);
+  const areStarMatchesAtEnd = question.parts.every(part =>
+    isAtEnd(responseMatches(part.responses), '*'));
+
+  // Logic
+  if (questionHasNoStarMatches) {
+    return true;
+  }
+
+  if (questionHasMultipleStarMatches) {
+    return false;
+  }
+
+  return areStarMatchesAtEnd;
+}
+
+/*
+See AUTHORING-2170.
+Each question part has a list of responses with scores and feedback that are given to students
+depending on their answer. Each response has a `match` attribute which tells OLI which
+answer should receive that response. Now, some question types allow a "catchall" response to match
+any answer choice that is not specifically listed by the course author. These catchall responses
+have the `match` attribute set to the "*" string. OLI processes question responses in-order,
+meaning that if a catchall response comes before a targeted response in the json DTO, it will
+ignore all of the following targeted responses. The problem was that Echo sometimes puts the
+catchall response in the middle of the targeted feedback, and so we ran into bugs where, for
+example, numeric input questions could not have two correct answers because the catchall response
+was overriding the second, targeted, correct response.
+
+We added this check to correct any questions that have the catchall response saved in the middle
+of the response list. It just finds the catchall response if it exists and moves it to the end
+of the list.
+*/
+function putMatchStarResponseAtEnd(question: Question): Question {
+  // Helpers
+  const responsesWithoutStarMatches = responses =>
+    responses.filter(({ match }) => !isStarMatch(match));
+
+  const firstResponseWithStarMatch = (responses) => {
+    const starMatches = responses.filter(({ match }) => isStarMatch(match));
+    if (starMatches && starMatches.size > 1) {
+      return Immutable.OrderedMap([[starMatches.first().guid, starMatches.first()]]);
+    }
+    return starMatches;
+  };
+
+  // Logic
+  if (catchallResponseOrderingIsValid(question)) {
+    return question;
+  }
+
+  return question.with({
+    parts: question.parts.map(part =>
+      part.with({
+        responses: responsesWithoutStarMatches(part.responses)
+          .concat(firstResponseWithStarMatch(part.responses))
+          .toOrderedMap(),
+      })).toOrderedMap(),
+  });
+}
+
 function parseVariables(item: any, model: Question) {
 
   const vars = [];
@@ -771,6 +843,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       migrateThenSyncFeedbackAndExplanation,
       ensureInputAttrsExist,
       removeResponsesWithNoMatch,
+      putMatchStarResponseAtEnd,
     )(model);
   }
 

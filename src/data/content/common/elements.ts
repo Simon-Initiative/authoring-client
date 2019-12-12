@@ -117,15 +117,6 @@ export class ContentElements extends Immutable.Record(defaultContent) {
     });
   }
 
-  static fromHTML(html: string, guid: string, supportedElements: string[]): ContentElements {
-    const t = ContiguousText.fromHTML(html, createGuid());
-    return new ContentElements({
-      guid,
-      supportedElements: Immutable.List(supportedElements),
-      content: Immutable.OrderedMap<string, ContentElement>().set(t.guid, t),
-    });
-  }
-
   toPersistence(): Object[] {
     const initial: Object[] = [];
 

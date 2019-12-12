@@ -20,4 +20,9 @@ export const styles: JSSStyles = {
     border: '1px solid #ced4da',
     borderRadius: 4,
   },
+  contiguousTextSlateEditor: {
+    '& p:last-child': {
+      marginBottom: 0,
+    },
+  },
 };

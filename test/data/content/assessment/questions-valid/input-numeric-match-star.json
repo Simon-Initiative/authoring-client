@@ -1,0 +1,157 @@
+{
+  "question": {
+    "@id": "b69defe978c745f8b4416221d05f071c",
+    "@grading": "automatic",
+    "#array": [
+      {
+        "body": {
+          "#array": [
+            {
+              "p": {
+                "#array": [
+                  {
+                    "#text": "Add "
+                  },
+                  {
+                    "input_ref": {
+                      "@input": "d1a2a2b522374a59ac397e59cffd5999"
+                    }
+                  },
+                  {
+                    "#text": ", text, or dropdown components"
+                  }
+                ],
+                "@id": "a870369acb6c413099a328303de1b79d"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "numeric": {
+          "@id": "d1a2a2b522374a59ac397e59cffd5999",
+          "@size": "small",
+          "@notation": "automatic"
+        }
+      },
+      {
+        "part": {
+          "@id": "f648a7e1970843e0b1a884238a42efce",
+          "@targets": "",
+          "#array": [
+            {
+              "title": {
+                "#text": ""
+              }
+            },
+            {
+              "response": {
+                "@match": "0",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#array": [
+                              {
+                                "#text": "Correct!"
+                              }
+                            ],
+                            "@id": "ad53eecf76624e5a9cd0894a3d4a19e1"
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@score": "1",
+                "@input": "d1a2a2b522374a59ac397e59cffd5999"
+              }
+            },
+            {
+              "response": {
+                "@match": "1",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#array": [
+                              {
+                                "#text": "Correct!"
+                              }
+                            ],
+                            "@id": "a63fda9f42e2467ca1109ac72e410334"
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@score": "1",
+                "@input": "d1a2a2b522374a59ac397e59cffd5999"
+              }
+            },
+            {
+              "response": {
+                "@match": "*",
+                "@name": "",
+                "#array": [
+                  {
+                    "feedback": {
+                      "#array": [
+                        {
+                          "p": {
+                            "#array": [
+                              {
+                                "#text": "Incorrect."
+                              }
+                            ],
+                            "@id": "c0eab005ab9c4d38bc0ae41f316c37c5"
+                          }
+                        }
+                      ],
+                      "@targets": ""
+                    }
+                  }
+                ],
+                "@score": "0",
+                "@input": "d1a2a2b522374a59ac397e59cffd5999"
+              }
+            },
+            {
+              "explanation": {
+                "#array": [
+                  {
+                    "p": {
+                      "#array": [],
+                      "@id": "a52a448asdf22fb242928062552b5b93df20"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "explanation": {
+          "#array": [
+            {
+              "p": {
+                "#array": [],
+                "@id": "dffc76b349e54eaa969efd61b71b7b43"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

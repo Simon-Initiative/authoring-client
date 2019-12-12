@@ -80,3 +80,10 @@
 input::placeholder {
   color: $gray-light;
 }
+
+.textarea, .text-input {
+	border: 1px solid #ced4da;
+	padding: 5px;
+	border-radius: 4px;
+	background-color: white;
+}

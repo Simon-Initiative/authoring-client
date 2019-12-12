@@ -21,7 +21,6 @@ export interface ToolbarButtonProps {
   onClick: () => void;
   disabled?: boolean;
   selected?: boolean;
-  active?: boolean;
   tooltip?: string;
 }
 
@@ -35,10 +34,8 @@ class ToolbarButton
   render() {
     const {
       className, classes, disabled, selected, size = ToolbarButtonSize.Small, onClick,
-      tooltip, style, active = false,
+      tooltip, style,
     } = this.props;
-
-    const activeStyle = active ? { color: 'blue' } : {};
 
     const button = (
       <button
@@ -49,7 +46,7 @@ class ToolbarButton
         style={style}
         onClick={onClick}
         disabled={disabled}>
-        <span style={activeStyle}>{this.props.children}</span>
+        {this.props.children}
       </button>
     );
 

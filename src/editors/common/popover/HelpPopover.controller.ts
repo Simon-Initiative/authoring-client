@@ -2,6 +2,7 @@ import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { HelpPopover } from './HelpPopover';
 import { modalActions } from 'actions/modal';
+import { TooltipProps } from 'utils/tooltip';
 
 interface StateProps {
 
@@ -12,7 +13,7 @@ interface DispatchProps {
   dismissModal: () => void;
 }
 
-interface OwnProps {
+interface OwnProps extends TooltipProps {
   activateOnClick?: boolean;
   modalTitle?: string;
 }
