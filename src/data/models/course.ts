@@ -201,7 +201,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       svnLocation: c.svnLocation,
       deploymentStatus: c.deploymentStatus,
       dateCreated: parseDate(c.dateCreated),
-      options: JSON.stringify(c.options),
+      options: c.options,
       icon: new contentTypes.WebContent(),
       theme: c.theme,
       activeDataset: c.activeDataset,
@@ -217,6 +217,15 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   }
 
   toPersistence(): Object {
+    // Fix an bug where we converted preferences to a string in echo.
+    // It should be an object.
+    let preferences = this.options;
+    try {
+      if (typeof this.options === 'string') {
+        preferences = JSON.parse(this.options);
+      }
+    } catch (e) { }
+
     const doc = [{
       package: {
         '@id': this.id,
@@ -226,7 +235,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         '@version': this.version,
         metadata: this.metadata.toPersistence(),
         description: this.description,
-        preferences: this.options,
+        preferences,
         misc: { language: this.language || 'en_US' },
       },
     }];
@@ -241,6 +250,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       deploymentStatus: this.deploymentStatus,
       doc,
     };
+
     return Object.assign({}, values);
   }
 }
