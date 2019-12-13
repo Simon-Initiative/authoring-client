@@ -18,6 +18,7 @@ import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
 import { duplicate } from 'actions/duplication';
 import { CourseState } from 'reducers/course';
+import { Value } from 'slate';
 
 interface StateProps {
   content: Maybe<ContentElement>;
@@ -30,6 +31,7 @@ interface StateProps {
   currentPage: string;
   timeSkewInMs: number;
   selectedOrganization: Maybe<OrganizationModel>;
+  embedActivityTypes: Immutable.Map<string, string>;
 }
 
 interface DispatchProps {
@@ -82,6 +84,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     }),
     selectedOrganization: orgs.activeOrg.lift(doc =>
       (doc.model as OrganizationModel)),
+    embedActivityTypes: state.course.embedActivityTypes,
   };
 };
 

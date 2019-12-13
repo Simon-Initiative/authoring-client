@@ -1332,16 +1332,14 @@ class ObjectiveSkillView
 
     return (
       <div className="objective-skill-view container-fluid new">
-        <div className="row">
-          <div className="col-sm-12 col-md-12 document">
-            <div className="container-fluid editor">
-              <div className="row">
-                <div className="col-12">
-                  {this.renderTitle()}
-                  {this.renderCreation()}
-                  {this.renderFilterbar()}
-                  {content}
-                </div>
+        <div className="col-sm-12 col-md-12 document">
+          <div className="container-fluid editor">
+            <div className="row">
+              <div className="col-12">
+                {this.renderTitle()}
+                {this.renderCreation()}
+                {this.renderFilterbar()}
+                {content}
               </div>
             </div>
           </div>

@@ -8,7 +8,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { validateRemoval } from 'data/models/utils/validation';
 import { displayModalMessasge } from 'utils/message';
 import { Editor, Inline } from 'slate';
-import { removeInlineEntity, getInlineAtCursor }
+import { removeInlineEntity }
   from 'editors/content/learning/contiguoustext/utils';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -70,7 +70,8 @@ export type UpdateContextAction = {
 
 export const updateContext = (
   documentId: string,
-  content: ContentElement, container: ParentContainer,
+  content: ContentElement,
+  container: ParentContainer,
   textSelection: Maybe<TextSelection>): UpdateContextAction => ({
     type: UPDATE_CONTEXT,
     documentId,

@@ -45,8 +45,13 @@ export class MetaData extends Immutable.Record({
   }
 
   toPersistence(): Object {
+    // `authors` must be an array for the server to correctly parse it
+    const authors = Array.isArray(this.authors)
+      ? this.authors
+      : [...this.authors];
+
     return {
-      authors: this.authors,
+      authors,
       license: this.license,
       copyright: this.copyright,
       keywords: this.keywords,

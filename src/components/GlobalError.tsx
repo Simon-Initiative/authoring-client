@@ -22,6 +22,11 @@ const GlobalError:
     classes, user, error,
   }) => {
 
+    useEffect(() => {
+      // Report this error to the console
+      console.error(error);
+    });
+
     const [reported, setReported] = useState(false);
     useEffect(() => {
       // Report this error event to google analytics

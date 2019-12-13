@@ -19,6 +19,7 @@ import { PurposeTypes } from 'data/content/learning/common';
 
 import { Maybe } from 'tsmonad';
 
+import './nested.scss';
 import { styles } from 'editors/content/learning/Composite.styles';
 
 export interface CompositeEditorProps
@@ -169,25 +170,26 @@ class CompositeEditor
 
     return (
       <div className={classNames([classes.composite, className])}>
+        <div className="nested-container">
+          <TitleTextEditor
+            {...this.props}
+            model={(currentTitle.text.content.first() as ContiguousText)}
+            onEdit={this.onTitleEdit}
+            editorStyles={{ fontSize: 20 }} />
 
-        <TitleTextEditor
-          {...this.props}
-          model={(currentTitle.text.content.first() as ContiguousText)}
-          onEdit={this.onTitleEdit}
-          editorStyles={{ fontSize: 20 }} />
+          {instructionsEditor}
 
-        {instructionsEditor}
+          <ContentContainer
+            {...this.props}
+            model={this.props.model.content}
+            onEdit={this.onEdit.bind(this)}
+          />
 
-        <ContentContainer
-          {...this.props}
-          model={this.props.model.content}
-          onEdit={this.onEdit.bind(this)}
-        />
-
-        <button type="button"
-          disabled={!editMode || !canAddInstructions}
-          onClick={this.onAddInstructions.bind(this)}
-          className="btn btn-link">+ Add instructions</button>
+          <button type="button"
+            disabled={!editMode || !canAddInstructions}
+            onClick={this.onAddInstructions.bind(this)}
+            className="btn btn-link">+ Add instructions</button>
+        </div>
       </div>
     );
   }

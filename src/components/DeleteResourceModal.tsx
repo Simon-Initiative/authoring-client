@@ -29,15 +29,19 @@ interface DeleteResourceModalState {
 
 export function prettyPrintResourceType(type: LegacyTypes): string {
   switch (type) {
-    case 'x-oli-workbook_page':
+    case LegacyTypes.workbook_page:
       return 'Workbook Page';
-    case 'x-oli-inline-assessment':
-    case 'x-oli-assessment2':
+    case LegacyTypes.inline:
+    case LegacyTypes.assessment2:
       return 'Assessment';
-    case 'x-oli-assessment2-pool':
+    case LegacyTypes.assessment2_pool:
       return 'Assessment Pool';
-    case 'x-oli-organization':
+    case LegacyTypes.organization:
       return 'Organization';
+    case LegacyTypes.feedback:
+      return 'Survey';
+    case LegacyTypes.embed_activity:
+      return 'Embed Activity';
     default:
       return type;
   }
@@ -186,11 +190,11 @@ export default class DeleteResourceModal extends
 
     const edgeTable =
       <React.Fragment>
-        <p><b>Cannot delete assessment '{resource.title}'</b></p>
+        <p><b>Cannot delete '{resource.title}'</b></p>
         <p>
           {`The following ${edges.size === 1 ? 'resource' : edges.size.toString() + ' resources'} `}
           {`use${edges.size === 1 ? 's' : ''} this ${resourceTypeLowercase}. `}
-          {`Please remove all references before deleting this ${resourceTypeLowercase}.`}
+          Please remove all references before deleting.
         </p>
         <SortableTable
           model={rows}

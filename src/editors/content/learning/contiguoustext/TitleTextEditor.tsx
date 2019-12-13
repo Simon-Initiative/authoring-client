@@ -11,6 +11,7 @@ import { connectTextEditor } from 'editors/content/container/connectEditor';
 
 export interface TitleTextEditorProps {
   editorStyles?: any;
+  placeholder?: string;
   model: ContiguousText;
   context: AppContext;
   services: AppServices;
@@ -27,7 +28,7 @@ export interface TitleTextEditorProps {
  */
 const TitleTextEditorInner
   = withStyles<TitleTextEditorProps>(styles)(({
-    className, classes, context, services, model,
+    className, classes, context, services, model, placeholder,
     editMode, onEdit, onFocus, editorStyles, onUpdateEditor,
   }) => {
     return (
@@ -50,6 +51,7 @@ const TitleTextEditorInner
           editMode={editMode}
           model={(model as ContiguousText).with({ mode: ContiguousTextMode.SimpleText })}
           editorStyles={editorStyles}
+          placeholder={placeholder || 'Enter a title'}
           orderedIds={null}
           hideBorder={true}
           onEdit={onEdit} />

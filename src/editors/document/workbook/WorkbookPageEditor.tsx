@@ -416,8 +416,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
             {localStorage.getItem('prereq-editing') === 'true' && this.renderDependencies()}
 
-            <span className="wbLabel">Content</span>
-
             <ContentContainer
               parent={null}
               activeContentGuid={activeGuid}

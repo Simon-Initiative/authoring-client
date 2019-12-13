@@ -258,7 +258,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
 
   renderContent() {
 
-    const { selectedItem } = this.props;
+    const { selectedItem, course } = this.props;
     const isExpanded = guid => this.props.expanded.caseOf({
       just: v => v.has(guid),
       nothing: () => false,
@@ -295,6 +295,7 @@ class OrgEditor extends React.Component<OrgEditorProps,
         labels={this.props.model.labels}
         model={node}
         org={this.props.model}
+        course={course}
         context={this.props.context}
         parentModel={parent}
         onEdit={this.onNodeEdit}

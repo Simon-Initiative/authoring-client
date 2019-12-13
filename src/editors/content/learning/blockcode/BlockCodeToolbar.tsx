@@ -102,8 +102,7 @@ class BlockCodeToolbar
 
   renderToolbar() {
 
-    const { editMode, selection, editor } = this.props;
-    const noTextSelected = selection && selection.isCollapsed();
+    const { editMode, editor } = this.props;
     const styles = editorUtils.getActiveStyles(editor);
 
     return (
@@ -114,8 +113,8 @@ class BlockCodeToolbar
             onClick={
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Bold))
             }
-            disabled={noTextSelected || !editMode}
-            active={styles.has('em')}
+            disabled={!editMode}
+            selected={styles.has('em')}
             tooltip="Bold">
             <i className={'fa fa-bold'} />
           </ToolbarButton>
@@ -123,8 +122,8 @@ class BlockCodeToolbar
             onClick={
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Italic))
             }
-            disabled={noTextSelected || !editMode}
-            active={styles.has('italic')}
+            disabled={!editMode}
+            selected={styles.has('italic')}
             tooltip="Italic">
             <i className={'fa fa-italic'} />
           </ToolbarButton>
@@ -132,8 +131,8 @@ class BlockCodeToolbar
             onClick={
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Strikethrough))
             }
-            disabled={noTextSelected || !editMode}
-            active={styles.has('line-through')}
+            disabled={!editMode}
+            selected={styles.has('line-through')}
             tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
@@ -141,8 +140,8 @@ class BlockCodeToolbar
             onClick={
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Highlight))
             }
-            disabled={noTextSelected || !editMode}
-            active={styles.has('highlight')}
+            disabled={!editMode}
+            selected={styles.has('highlight')}
             tooltip="Highlight">
             <i className={'fas fa-pencil-alt'} />
           </ToolbarButton>
@@ -150,8 +149,8 @@ class BlockCodeToolbar
             onClick={
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Superscript))
             }
-            disabled={noTextSelected || !editMode}
-            active={styles.has('sup')}
+            disabled={!editMode}
+            selected={styles.has('sup')}
             tooltip="Superscript">
             <i className={'fa fa-superscript'} />
           </ToolbarButton>
@@ -159,8 +158,8 @@ class BlockCodeToolbar
             onClick={
               () => this.props.editor.lift(e => e.toggleMark(InlineStyles.Subscript))
             }
-            disabled={noTextSelected || !editMode}
-            active={styles.has('sub')}
+            disabled={!editMode}
+            selected={styles.has('sub')}
             tooltip="Subscript">
             <i className={'fa fa-subscript'} />
           </ToolbarButton>

@@ -83,7 +83,7 @@ export default class OrgLibrary extends React.Component<OrgLibraryProps, OrgLibr
           Active organization</span></b></small>
         : <small>&nbsp;</small>;
       const classes
-        = 'list-group-item list-group-item-action align-items-start flex-column';
+        = 'list-group-item list-group-item-action align-items-start flex-column org-item';
       const since = relativeToNow(org.dateUpdated);
 
       const onClick = (e) => { e.preventDefault(); this.props.onSelectOrg(thisId); };
@@ -129,17 +129,14 @@ export default class OrgLibrary extends React.Component<OrgLibraryProps, OrgLibr
 
   render() {
     return (
-      <div style={{ paddingLeft: 15, paddingRight: 15 }}
-        className="resource-view container-fluid new">
-        <div className="row">
-          <div className="col-sm-12 col-md-12 document">
-            <div className="container-fluid editor">
-              <div className="row">
-                <div className="col-12">
-                  {this.renderDescription()}
-                  {this.renderCreation()}
-                  {this.renderResources()}
-                </div>
+      <div className="org-library">
+        <div className="col-sm-12 col-md-12 document infoContain">
+          <div className="editor">
+            <div className="row">
+              <div className="col-12">
+                {this.renderDescription()}
+                {this.renderCreation()}
+                {this.renderResources()}
               </div>
             </div>
           </div>
