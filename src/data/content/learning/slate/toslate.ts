@@ -7,7 +7,7 @@ import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON, Data, Mark } from 's
 
 // The elements that we handle as slate marks
 const marks = Immutable.Set<string>(
-  ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em']);
+  ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em', 'code']);
 
 // The elements that are handled as slate inlines, and their corresponding
 // handlers.
@@ -18,7 +18,6 @@ const inlineHandlers = {
   activity_link: contentBasedInline,
   input_ref: inputRef,
   quote: contentBasedInline,
-  code: contentBasedInline,
   formula: stripOutInline,
   'm:math': terminalInline,
   '#math': terminalInline,
