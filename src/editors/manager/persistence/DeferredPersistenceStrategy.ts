@@ -37,8 +37,6 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
 
   save(doc: persistence.Document) {
 
-    return;
-
     this.pending = doc;
 
     if (this.stateChangeCallback !== null) {
