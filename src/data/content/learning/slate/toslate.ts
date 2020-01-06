@@ -117,6 +117,15 @@ function isNestedMark(item: Object): boolean {
   return item['#text'] === undefined;
 }
 
+// Given a style mark object, determine if it is empty, that is it
+// contains no actual text and no nested mark.
+function isEmptyMark(item: Object): boolean {
+
+  // A mark object is empty if it only contains attributes or is empty.
+  // In other words, it is missing #text and it is missing a nested element.
+  return Object.keys(item).filter(k => !k.startsWith('@')).length === 0;
+}
+
 // Create a slate mark from a persisted from a mark element. For em elements,
 // we use 'em' as the mark style for bold, all other em styles we use
 // the style name. sub, sup and other non em styles are just their
@@ -318,16 +327,21 @@ function processMark(item: Object,
   //   }
   // }
   //
-  if (isNestedMark(item)) {
-    processMark(getChildren(item)[0], parent, previousMarks.push(getMark(item)));
-    return;
-  }
 
-  parent.nodes.push({
-    object: 'text',
-    text: item['#text'],
-    marks: previousMarks.toArray(),
-  });
+  if (!isEmptyMark(item)) {
+
+    if (isNestedMark(item)) {
+      processMark(getChildren(item)[0], parent, previousMarks.push(getMark(item)));
+      return;
+    }
+
+    parent.nodes.push({
+      object: 'text',
+      text: item['#text'],
+      marks: previousMarks.toArray(),
+    });
+
+  }
 }
 
 function extractId(item: any): Object {
