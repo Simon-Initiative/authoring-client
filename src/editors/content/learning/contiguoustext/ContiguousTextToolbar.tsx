@@ -288,7 +288,7 @@ class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={13.4}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={14.4}>
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
@@ -351,8 +351,17 @@ class ContiguousTextToolbar
             }
             disabled={!supports('var') || !editMode}
             selected={styles.has('var')}
+            tooltip="Variable">
+            <i className={'fa fa-heading'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => this.props.editor.lift(e => editorUtils.toggleMark(e, InlineStyles.Code))
+            }
+            disabled={!supports('code') || !editMode}
+            selected={styles.has('code')}
             tooltip="Code">
-            {getContentIcon(insertableContentTypes.BlockCode)}
+            <i className={'fa fa-code'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
