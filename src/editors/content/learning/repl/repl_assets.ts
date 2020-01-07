@@ -37,7 +37,7 @@ Copyright (c) 2019 Carnegie Mellon University.
 /* The console container element */
 #console {
     height: 250px;
-    width: 340px;
+    width: 310px;
     position:relative;
     background-color: black;
     border: 2px solid #CCC;
@@ -146,7 +146,7 @@ Copyright (c) 2019 Carnegie Mellon University.
 }
 #editor {
     height: 250px;
-    width: 320px;
+    width: 310px;
     border: 2px solid #CCC;
     position:relative;
     display: inline-block;
