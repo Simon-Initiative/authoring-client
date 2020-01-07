@@ -97,7 +97,7 @@ const questionFromModel = (model: EmbedActivityModel) => {
   return q1 && {
     id: q1.getAttribute('id'),
     initeditortext: $('initeditortext', q1).text().trim(),
-    language: $('language', q1).text().trim(),
+    language: $('language', q1).text().trim() || 'python',
     functionname: $('functionname', q1).text().trim(),
     testCases: $('testcase', q1).map(function () {
       return {

@@ -7,7 +7,7 @@ import { Value, ValueJSON, BlockJSON, InlineJSON, MarkJSON, Data, Mark } from 's
 
 // The elements that we handle as slate marks
 const marks = Immutable.Set<string>(
-  ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em']);
+  ['foreign', 'ipa', 'sub', 'sup', 'term', 'bdo', 'var', 'em', 'code']);
 
 // The elements that are handled as slate inlines, and their corresponding
 // handlers.
@@ -18,7 +18,6 @@ const inlineHandlers = {
   activity_link: contentBasedInline,
   input_ref: inputRef,
   quote: contentBasedInline,
-  code: contentBasedInline,
   formula: stripOutInline,
   'm:math': terminalInline,
   '#math': terminalInline,
@@ -115,6 +114,15 @@ function handleBlock(item: Object, json: ValueJSON, backingTextProvider: Object)
 // so we simply check for that to be undefined.
 function isNestedMark(item: Object): boolean {
   return item['#text'] === undefined;
+}
+
+// Given a style mark object, determine if it is empty, that is it
+// contains no actual text and no nested mark.
+function isEmptyMark(item: Object): boolean {
+
+  // A mark object is empty if it only contains attributes or is empty.
+  // In other words, it is missing #text and it is missing a nested element.
+  return Object.keys(item).filter(k => !k.startsWith('@')).length === 0;
 }
 
 // Create a slate mark from a persisted from a mark element. For em elements,
@@ -318,16 +326,21 @@ function processMark(item: Object,
   //   }
   // }
   //
-  if (isNestedMark(item)) {
-    processMark(getChildren(item)[0], parent, previousMarks.push(getMark(item)));
-    return;
-  }
 
-  parent.nodes.push({
-    object: 'text',
-    text: item['#text'],
-    marks: previousMarks.toArray(),
-  });
+  if (!isEmptyMark(item)) {
+
+    if (isNestedMark(item)) {
+      processMark(getChildren(item)[0], parent, previousMarks.push(getMark(item)));
+      return;
+    }
+
+    parent.nodes.push({
+      object: 'text',
+      text: item['#text'],
+      marks: previousMarks.toArray(),
+    });
+
+  }
 }
 
 function extractId(item: any): Object {
