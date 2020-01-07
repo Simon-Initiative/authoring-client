@@ -74,6 +74,7 @@ function handleText(node: Text, content) {
 // Handler for a text node that contains one or more marks
 function handleMarkedText(node: Text, content) {
   const isBdo = (m: Mark) => m.type === 'bdo';
+  const isCode = (m: Mark) => m.type === 'code';
   const isForeign = (m: Mark) => m.type === 'foreign';
 
   // const marks = node.marks.toArray().map(m => m.type);
@@ -81,9 +82,14 @@ function handleMarkedText(node: Text, content) {
 
   // if bdo is present, it must be the first element that
   // we place in the OLI JSON.  This is a DTD constraint.
-  const adjustedMarks = marks.some(isBdo)
+  let adjustedMarks = marks.some(isBdo)
     ? [Mark.create({ type: 'bdo' }), ...marks.filter(m => !isBdo(m))]
     : marks;
+
+  // Ultimately, code elements have to be the outermost (even more so than bdo)
+  adjustedMarks = adjustedMarks.some(isCode)
+    ? [Mark.create({ type: 'code' }), ...adjustedMarks.filter(m => !isCode(m))]
+    : adjustedMarks;
 
   const root = { root: {} };
   let last = root;
@@ -164,6 +170,7 @@ const styleContainers = {
   foreign: () => ({ foreign: {} }),
   sub: () => ({ sub: {} }),
   sup: () => ({ sup: {} }),
+  code: () => ({ code: {} }),
 };
 
 // The handlers for the items that we represent as slate inlines.
@@ -174,7 +181,6 @@ const inlineHandlers = {
   Xref: contentBasedInline,
   ActivityLink: contentBasedInline,
   Quote: contentBasedInline,
-  Code: contentBasedInline,
   Math: terminalInline,
   Extra: subElementInlineHandler.bind(undefined, 'extra', 'anchor'),
   Image: terminalInline,

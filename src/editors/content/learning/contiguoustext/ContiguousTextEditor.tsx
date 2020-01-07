@@ -113,8 +113,7 @@ class ContiguousTextEditor
       || this.props.editMode !== nextProps.editMode
       || this.state.value !== nextState.value
       || nextProps.selectedEntity !== this.props.selectedEntity
-      || nextProps.orderedIds !== this.props.orderedIds
-      || this.props.hover !== nextProps.hover;
+      || nextProps.orderedIds !== this.props.orderedIds;
   }
 
   renderSidebar() {

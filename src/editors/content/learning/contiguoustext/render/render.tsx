@@ -49,6 +49,8 @@ export function renderBlock(props, editor, next) {
 // Slate mark rendering
 export function renderMark(props, editor, next) {
   switch (props.mark.type) {
+    case 'code':
+      return <code>{props.children}</code>;
     case 'sub':
       return <sub>{props.children}</sub>;
     case 'sup':
@@ -98,8 +100,6 @@ export function renderInline(extras, props, editor: Editor, next) {
   switch (node.type) {
     case 'Cite':
       return <CiteDisplay {...standardProps} />;
-    case 'Code':
-      return <code {...attributes}>{children}</code>;
     case 'Link': {
       return tip('External Hyperlink', 'oli-link', attributes, children);
     }

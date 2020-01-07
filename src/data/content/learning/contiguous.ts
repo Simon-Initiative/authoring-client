@@ -62,6 +62,7 @@ export enum InlineStyles {
   Subscript = 'sub',
   Superscript = 'sup',
   BidirectionTextOverride = 'bdo',
+  Code = 'code',
 }
 
 export enum InlineEntities {
