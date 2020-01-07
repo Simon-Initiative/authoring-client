@@ -5,6 +5,13 @@ import { PaginatedResponse, CourseIdVers, CourseGuid } from 'data/types';
 import { Edge } from 'types/edge';
 import { WebContent } from 'data/content/webcontent';
 
+const blobToFile = (blob: Blob, fileName: string): File => {
+  const b: any = blob;
+  b.lastModifiedDate = new Date();
+  b.name = fileName;
+  return b as File;
+};
+
 /**
  * Uploads a file, receives a promise to deliver path on server
  * that the file is being stored as. Rejects if the file name conflicts
@@ -27,8 +34,18 @@ export function createWebContent(course: CourseGuid | CourseIdVers, file: File):
   const extension = file.name.indexOf('.') !== -1
     ? file.name.substr(file.name.indexOf('.') + 1).toLowerCase()
     : '';
-  const newFile = new File([blob], fileNameWithDot + extension, { type: file.type });
-  body.append('file', newFile);
+
+  let newFile;
+  // detect if not Edge
+  if (!navigator.msSaveBlob) {
+    newFile = new File([blob], fileNameWithDot + extension, { type: file.type });
+  } else {
+    // use IE/Edge workaround
+    newFile = new Blob([blob], { type: file.type });
+    newFile = blobToFile(newFile, fileNameWithDot + extension);
+  }
+
+  body.append('file', newFile, fileNameWithDot + extension);
 
   return authenticatedFetch({ method, url, headers, body })
     .then(result => result[0].fileNode.pathTo);
