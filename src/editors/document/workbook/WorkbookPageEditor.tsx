@@ -231,6 +231,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   onFocus(model, parent, textSelection) {
+    console.log('onFocus - WorkbookPageEditor', model);
     this.props.onUpdateContentSelection(
       this.props.context.documentId, model, parent, textSelection);
   }

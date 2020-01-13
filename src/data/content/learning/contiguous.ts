@@ -4,7 +4,6 @@ import { Maybe } from 'tsmonad';
 import { augment } from 'data/content/common';
 import guid from 'utils/guid';
 import { Value, Block, Inline } from 'slate';
-import Html from 'slate-html-serializer';
 import { toSlate } from 'data/content/learning/slate/toslate';
 import { toPersistence } from 'data/content/learning/slate/topersistence';
 

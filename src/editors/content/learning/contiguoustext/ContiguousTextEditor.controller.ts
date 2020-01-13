@@ -26,15 +26,18 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   };
 };
 
-const mapDispatchToProps = (dispatch, getState): DispatchProps => {
+const mapDispatchToProps = (dispatch, ownProps): DispatchProps => {
 
   return {
-    onUpdateEditor: editor =>
-      dispatch(updateEditor(editor)),
+    onUpdateEditor: editor => {
+      console.log('onUpdateEditor (controller)', editor);
+      dispatch(updateEditor(editor));
+    },
+
     onSelectInline: inline =>
       dispatch(selectInline(inline)),
-    onInsertParsedContent: (
-      resourcePath: string, content: ParsedContent) =>
+
+    onInsertParsedContent: (resourcePath: string, content: ParsedContent) =>
       dispatch(insertParsedContent(resourcePath, content)),
   };
 };
