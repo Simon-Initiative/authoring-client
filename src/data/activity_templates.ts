@@ -24,7 +24,7 @@ export function assessmentTemplate(title: string) {
                   '#array': [
                     {
                       em: {
-                        '@style': 'emphasis',
+                        '@style': 'bold',
                         '#text': 'THIS IS EXAMPLE SUPPORTING CONTENT. PLEASE EDIT OR DELETE IT.',
                       },
                     },
@@ -58,7 +58,7 @@ export function assessmentTemplate(title: string) {
                         '#array': [
                           {
                             em: {
-                              '@style': 'emphasis',
+                              '@style': 'bold',
                               '#text': 'THIS IS AN EXAMPLE MULTIPLE CHOICE QUESTION. '
                                 + 'PLEASE EDIT OR DELETE IT.',
                             },
