@@ -21,6 +21,7 @@ export interface ConfirmModalProps {
   confirmClass?: string;
   cancelLabel?: string;
   cancelClass?: string;
+  title?: string;
   onCancel?: () => void;
   onConfirm?: () => void;
 }
@@ -45,7 +46,7 @@ class ConfirmModal extends React.PureComponent<
   render() {
     const {
       className, classes, cancelLabel, confirmLabel, onCancel, onConfirm,
-      confirmClass, cancelClass,
+      confirmClass, cancelClass, title,
     } = this.props;
 
     return (
@@ -57,6 +58,7 @@ class ConfirmModal extends React.PureComponent<
         <div className="modal-dialog modal-lg" role="document">
           <div className="modal-content">
             <div className="modal-header">
+              {title}
               <button onClick={this.props.onCancel} type="button" className="close"
                 data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>

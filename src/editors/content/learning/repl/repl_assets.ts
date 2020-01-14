@@ -1,4 +1,5 @@
 import { valueOr } from 'utils/utils';
+import * as contentTypes from 'data/contentTypes';
 
 type RenderLayoutHtmlOptions = Partial<{
   prompt: string,
@@ -16,7 +17,8 @@ export const renderLayoutHtml = ({
   ${showCodeEditor
     ? `
     <div>
-      <button id="run" class="btn btn-primary btn-xs">${isGraded ? 'Submit' : 'Run'}</button>
+      <button id="run" class="btn btn-primary btn-xs">Run</button>
+      ${isGraded ? '<button id="submit" class="btn btn-primary btn-xs">Submit</button>' : ''}
       <button id="clear" class="btn btn-primary btn-xs" style="float: right;">Clear</button>
     </div>
     <div id="editor"></div>
@@ -25,7 +27,7 @@ export const renderLayoutHtml = ({
     <div>
       <button id="clear" class="btn btn-primary btn-xs" style="float: right;">Clear</button>
     </div>
-    <div id="console"></div>`
+    <div id="console"${isGraded ? '' : ' class="console-only"'}></div>`
   }
 </div>
 `;
@@ -36,122 +38,72 @@ Copyright (c) 2019 Carnegie Mellon University.
 
 /* The console container element */
 #console {
-    height: 250px;
-    width: 310px;
-    position:relative;
-    background-color: black;
-    border: 2px solid #CCC;
-    margin: 0 auto;
-    margin-top: 0px;
-    display: inline-block;
-    left: 0;
-    margin-left: -10px;
+  height: 250px;
+  width: 335px;
+  position:relative;
+  background-color: black;
+  border: 2px solid #CCC;
+  margin: 0 auto;
+  margin-top: 0px;
+  display: inline-block;
+  left: 0;
 }
-/*#console {
-    width: 670px;
-    height: 400px;
-    background-color:black;
-}*/
-/* The inner console element. */
-.jqconsole {
-    padding: 10px;
+#console.console-only {
+  width: 670px;
 }
-/* The cursor. */
-.jqconsole-cursor {
-    background-color: gray;
-}
-/* The cursor color when the console looses focus. */
-.jqconsole-blurred .jqconsole-cursor {
-    background-color: #666;
-}
-
-.jqconsole-header {
-    color: white;
-    font-size: smaller;
-}
-/* The current prompt text color */
-.jqconsole-prompt {
-    color: #0d0;
-}
-/* The command history */
-.jqconsole-old-prompt {
-    color: #0b0;
-    font-weight: normal;
-}
-/* The text color when in input mode. */
-.jqconsole-input {
-    color: #dd0;
-}
-/* Previously entered input. */
-.jqconsole-old-input {
-    color: #bb0;
-    font-weight: normal;
-}
-/* The text color of the output. */
-.jqconsole-output {
-    color: white;
-}
-/* The text color of the output. */
-.jqconsole-hint {
-    color: yellow;
+#editor {
+  height: 250px;
+  width: 335px;
+  border: 2px solid #CCC;
+  position:relative;
+  display: inline-block;
+  left: 0;
+  margin-right: -5px;
 }
 #oli-embed {
-    position: relative;
-    margin-bottom: 5px;
+  position: relative;
+  margin-bottom: 5px;
 }
 .hints {
-    border-radius: 10px;
-    background: #fde9a2;
-    border: solid 2px;
-    border-color: #73716e;
-    padding: 4px 7px 4px 7px;
-    display: none;
-    position: relative;
+  border-radius: 10px;
+  background: #fde9a2;
+  border: solid 2px;
+  border-color: #73716e;
+  padding: 4px 7px 4px 7px;
+  display: none;
+  position: relative;
 }
 .hints .next {
-    display: block;
-    position: absolute;
-    top: 31%;
-    right: 15px;
-    background: url("asSprite.png") no-repeat -8px 0px;
-    text-indent: -9999px;
-    height: 15px;
-    width: 10px;
+  display: block;
+  position: absolute;
+  top: 31%;
+  right: 15px;
+  background: url("asSprite.png") no-repeat -8px 0px;
+  text-indent: -9999px;
+  height: 15px;
+  width: 10px;
 }
 .hints .content {
-    display: inline-block;
+  display: inline-block;
 }
 .feedback {
-    margin-top: 5px;
-    border-radius: 10px;
-    border: solid 2px;
-    border-color: #73716e;
-    padding: 4px 7px 4px 7px;
-    display: none;
+  margin-top: 5px;
+  border-radius: 10px;
+  border: solid 2px;
+  border-color: #73716e;
+  padding: 4px 7px 4px 7px;
+  display: none;
 }
 
 /* ace editor styles */
 .ace_editor {
-    height: 250px;
-    width: 350px;
-    border: 1px solid #CCC;
+  height: 250px;
+  width: 350px;
+  border: 1px solid #CCC;
 }
 
 .scrollmargin {
-    height: 80px;
-}
-.out_val {
-    color: black;
-    background-color: aquamarine;
-}
-#editor {
-    height: 250px;
-    width: 310px;
-    border: 2px solid #CCC;
-    position:relative;
-    display: inline-block;
-    left: 0;
-    margin-right: -1px;
+  height: 80px;
 }
 `;
 
@@ -168,12 +120,18 @@ export type TestCase = {
   output: string;
 };
 
+export type Hint = {
+  id: string,
+  content: contentTypes.RichText,
+};
+
 export type Question = {
   id: string,
   initeditortext: string,
   language: string,
   functionname: string,
   testCases: TestCase[],
+  hints: Hint[],
 };
 
 type RenderQuestionsXmlParams = Partial<{
@@ -205,6 +163,9 @@ ${
           `
           : ''
         }
+        ${question.hints.map(hint => `<hint id="${hint}">
+          ${hint.content.toHtml()}
+        </hint>`)}
     </part>
   </question>
 `)

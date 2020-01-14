@@ -37,7 +37,28 @@ import { Tooltip } from 'utils/tooltip';
 import colors from 'styles/colors';
 import { Badge } from 'editors/content/common/Badge';
 import { markHotkey } from '../contiguoustext/render/render';
-import { caseOf } from 'utils/utils';
+import { caseOf, valueOr } from 'utils/utils';
+import { ConfirmModal } from 'components/ConfirmModal';
+import { AppServices } from 'editors/common/AppServices';
+
+const ACE_EDITOR_OPTIONS = {
+  enableBasicAutocompletion: true,
+  enableLiveAutocompletion: true,
+  enableSnippets: false,
+  showLineNumbers: true,
+  tabSize: 2,
+  useWorker: false,
+  showGutter: true,
+  highlightActiveLine: false,
+};
+
+const RICH_TEXT_EDITOR_PLUGINS = [
+  markHotkey({ key: 'b', type: 'bold' }),
+  markHotkey({ key: 'i', type: 'italic' }),
+  markHotkey({ key: 'u', type: 'underline' }),
+  markHotkey({ key: 'h', type: 'highlight' }),
+];
+
 
 const parseLayoutHtmlFromModel = (model: EmbedActivityModel) => {
   const layoutHtml = maybe(model.assets.find(asset => asset.name === 'layout')).caseOf({
@@ -106,6 +127,12 @@ const questionFromModel = (model: EmbedActivityModel) => {
         output: $('output', this).text().trim(),
       };
     }).toArray(),
+    hints: $('hint', q1).map(function () {
+      return {
+        id: this.getAttribute('id'),
+        content: RichText.fromHtml(valueOr(this.innerHTML, '<div></div>').trim()),
+      };
+    }).toArray(),
   };
 };
 
@@ -115,6 +142,7 @@ const defaultQuestion = () => ({
   language: 'python',
   functionname: '',
   testCases: [],
+  hints: [],
 });
 
 const solutionTextFromModel = (model: EmbedActivityModel) => {
@@ -137,6 +165,7 @@ export interface ReplEditorProps extends AbstractContentEditorProps<EmbedActivit
     textSelection:  Maybe<TextSelection>,
   ) => void;
   onUpdateEditor: (editor) => void;
+  services: AppServices;
 }
 
 export interface ReplEditorState {
@@ -144,6 +173,8 @@ export interface ReplEditorState {
   showCodeEditor: boolean;
   solutionText: string;
   question: Question;
+  isRunning: boolean;
+  isSubmitting: boolean;
 }
 
 class ReplEditor
@@ -152,6 +183,7 @@ class ReplEditor
   replClient: any;
   promptEditor: Editor;
   consoleDiv: HTMLDivElement;
+  hintEditors: { [key: string]: Editor } = {};
 
   constructor(props) {
     super(props);
@@ -161,6 +193,8 @@ class ReplEditor
       showCodeEditor: true,
       solutionText: '',
       question: defaultQuestion(),
+      isRunning: false,
+      isSubmitting: false,
     };
   }
 
@@ -258,13 +292,62 @@ class ReplEditor
   }
 
   setShowCodeEditor(show: boolean) {
-    this.setState({
-      showCodeEditor: show,
-    }, () => {
-      this.saveActivityFromCurrentState();
+    const { services } = this.props;
+    const { question, solutionText } = this.state;
 
-      this.replClient.terminal.fit();
-    });
+    const confirmSetShowEditor = () => {
+      this.setState({
+        showCodeEditor: show,
+        question: show
+          ? question
+          : {
+            ...question,
+            functionname: '',
+            testCases: [],
+            hints: [],
+          },
+        solutionText: '',
+      }, () => {
+        this.saveActivityFromCurrentState();
+
+        this.replClient.terminal.fit();
+      });
+    };
+
+    const userWillLoseQuestionData = !(
+      question.functionname === ''
+      && question.testCases.length === 0
+      && question.hints.length === 0
+      && solutionText === ''
+    );
+
+    if (userWillLoseQuestionData && this.state.showCodeEditor) {
+      // make sure the user confirms when hiding the code editor and having data to lose
+      services.displayModal(
+        <ConfirmModal
+          title="Disable Code Editor"
+          confirmLabel="Continue"
+          onCancel={() => {
+            services.dismissModal();
+          }}
+          onConfirm={() => {
+            services.dismissModal();
+            confirmSetShowEditor();
+          }}>
+          <div className="message alert alert-warning">
+            <b><i className="fa fa-info-circle" /> Warning</b>
+            <br />
+            <br />
+            Disabling the Code Editor will <b>permanently remove</b> the <b>Test Cases</b>,
+            {' '}<b>Hints</b> and <b>Solutions</b> defined for this activity.
+          </div>
+          <br />
+          Do you want to continue?
+        </ConfirmModal>,
+      );
+    } else {
+      confirmSetShowEditor();
+    }
   }
 
   onRunBtnClick () {
@@ -273,8 +356,11 @@ class ReplEditor
     const editorText = question.initeditortext;
 
     this.replClient.clearScreen();
+    this.replClient.writeln('EXECUTING CODE:');
     this.replClient.writeln(editorText);
     this.replClient.disableStdin();
+
+    this.setState({ isRunning: true });
 
     ReplClient.exec(
       editorText, {
@@ -283,7 +369,51 @@ class ReplEditor
       })
       .then((result) => {
         this.replClient.writeln('---------------------------------------');
+        this.replClient.writeln('RESULT:');
         this.replClient.write(result.combined);
+      })
+      .catch((err) => {
+        console.error(err);
+        this.replClient.writeln('An unexpected error occurred: ' + err);
+        this.replClient.writeln('Please try reloading the page or contact support if the issue persists');
+      })
+      .finally(() => {
+        this.setState({ isRunning: false });
+      });
+  }
+
+  onSubmitBtnClick () {
+    const ReplClient = (window as any).ReplClient;
+    const { question } = this.state;
+    const editorText = question.initeditortext;
+
+    this.replClient.clearScreen();
+    this.replClient.writeln('EXECUTING CODE:');
+    this.replClient.writeln(editorText);
+    this.replClient.disableStdin();
+
+    this.setState({ isSubmitting: true });
+
+    ReplClient.exec(
+      editorText, {
+        host: 'repl.oli.cmu.edu',
+        language: replLangFromQuetsion(question),
+      })
+      .then((result) => {
+        this.replClient.writeln('---------------------------------------');
+        this.replClient.writeln('RESULT:');
+        this.replClient.write(result.combined);
+
+        // TODO: Send the submission off to a grading service that will return and
+        // display the results
+      })
+      .catch((err) => {
+        console.error(err);
+        this.replClient.writeln('An unexpected error occurred: ' + err);
+        this.replClient.writeln('Please try reloading the page or contact support if the issue persists');
+      })
+      .finally(() => {
+        this.setState({ isSubmitting: false });
       });
   }
 
@@ -436,6 +566,70 @@ class ReplEditor
     }, () => this.saveActivityFromCurrentState());
   }
 
+  onAddHint() {
+    const { question } = this.state;
+
+    const updatedQuestion = question;
+    updatedQuestion.hints.push({
+      id: guid(),
+      content: RichText.fromHtml('<div></div>'),
+    });
+
+    this.setState({
+      question: updatedQuestion,
+    }, () => this.saveActivityFromCurrentState());
+  }
+
+  onEditHint(id: string, value: Value) {
+    const { onUpdateEditor } = this.props;
+    const { question } = this.state;
+
+    let edited = false;
+    let updateSelection = false;
+
+    // find the relevant hint and update its content
+    question.hints = question.hints.map((hint) => {
+      if (hint.id === id) {
+        edited = value.document !== hint.content.value.document;
+        updateSelection = value.selection !== hint.content.value.selection;
+        hint.content = hint.content.with({ value });
+      }
+      return hint;
+    });
+
+    this.setState({
+      question,
+    }, () => {
+      const activeHintEditor = this.hintEditors[id];
+
+      if (edited) {
+        // But only notify our parent of an edit when something
+        // has actually changed
+        this.saveActivityFromCurrentState();
+
+        // We must always broadcast the latest version of the editor
+        onUpdateEditor(activeHintEditor);
+        activeHintEditor.focus();
+
+      } else if (updateSelection) {
+        // Broadcast the fact that the editor updated
+        onUpdateEditor(activeHintEditor);
+      }
+    });
+  }
+
+  onRemoveHint(id) {
+    const question = this.state.question;
+    question.hints = question.hints.filter(hint =>
+      hint.id !== id);
+
+    this.setState({
+      question,
+    }, () => this.saveActivityFromCurrentState());
+
+    delete this.hintEditors[id];
+  }
+
   onSelectLanguage(language: string) {
     const { question } = this.state;
 
@@ -485,24 +679,9 @@ class ReplEditor
     return <div />;
   }
 
-  render(): JSX.Element {
-    const { className, classes, editMode, onRichTextFocus } = this.props;
-    const {
-      maybePrompt, showCodeEditor, solutionText, question,
-    } = this.state;
-    const editorText = question.initeditortext;
-    const isGraded = question.testCases.length > 0 && showCodeEditor;
-
-    const ACE_EDITOR_OPTIONS = {
-      enableBasicAutocompletion: true,
-      enableLiveAutocompletion: true,
-      enableSnippets: false,
-      showLineNumbers: true,
-      tabSize: 2,
-      useWorker: false,
-      showGutter: true,
-      highlightActiveLine: false,
-    };
+  renderGradingEditor() {
+    const { classes, editMode, onRichTextFocus } = this.props;
+    const { solutionText, question } = this.state;
 
     const HelpPopover = ({ children }) => (
       <Tooltip
@@ -516,12 +695,168 @@ class ReplEditor
       </Tooltip>
     );
 
-    const editorPlugins = [
-      markHotkey({ key: 'b', type: 'bold' }),
-      markHotkey({ key: 'i', type: 'italic' }),
-      markHotkey({ key: 'u', type: 'underline' }),
-      markHotkey({ key: 'h', type: 'highlight' }),
-    ];
+    return (
+      <div className={classes.gradingEditor}>
+
+      {/** Test Cases */}
+      <h4>Test Cases <Badge>{question.testCases.length}</Badge></h4>
+      <div className={classes.explanation}>
+        Student responses can be evaluated for correctness by specifying
+        a set of test cases below. <HelpPopover>
+          <div className={classes.helpPopover}>
+            Each test case below should specify an expected result
+            given a particular set of parameters for the function
+            specified.
+            <br /><br />
+            <b>Parameters</b> and <b>Expected Result</b> must be
+            specified in the exact syntax of the language being evaluated.
+            <br /><br />
+            For example, in python <b>parameters</b> should be
+            comma-separated: <code>param1, param2</code> and <b>
+            Expected Result</b> should contain quotes if it
+            is a string: <code>"result string"</code>.
+          </div>
+      </HelpPopover>
+      </div>
+      <label>Function Name</label> <input type="text"
+        className={classNames([classes.monospace , 'text-input'])}
+        placeholder="Enter a function name"
+        onChange={({ target: { value } }) => this.onEditFunctionName(value)}
+        style={{ marginLeft: 10, width: 300, color: '#e83e8c' }}
+        value={question.functionname} />
+      <div className={classes.testCases}>
+        {question.testCases.map((testCase, index) => (
+          <div key={testCase.guid} className={classes.testCase}>
+            <div className={classes.testCaseNumber}>
+              {index + 1}.
+            </div>
+            <div>
+              <div className={classes.monospace}>
+                <span style={{ color: '#e83e8c' }}>{question.functionname}</span> (
+                <input type="text"
+                  className={classes.codeInput}
+                  onChange={({ target: { value } }) =>
+                    this.onEditTestCaseInput(testCase.guid, value)}
+                  value={testCase.input} />)
+              </div>
+              <div className={classes.resultLabel}>
+                <b>Expected Result</b> <input type="text"
+                  className={classes.codeInput}
+                  onChange={({ target: { value } }) =>
+                    this.onEditTestCaseOutput(testCase.guid, value)}
+                  value={testCase.output} />
+              </div>
+            </div>
+            <div className="flex-spacer" />
+            <div>
+              <Button
+                editMode={editMode}
+                type="secondary"
+                className="btn-remove"
+                onClick={() => this.onRemoveTestCase(testCase.guid)}>Remove</Button>
+            </div>
+          </div>
+        ))}
+        {question.testCases.length < 1 && (
+          <div className={classes.noTestCasesMsg}>
+            No test cases have been created for this activity, therefore it
+            will be scored based on whether execution is successful or not.
+          </div>
+        )}
+      </div>
+      <div className={classes.testCaseButtons}>
+        <div className="flex-spacer" />
+        <div>
+          <Button
+            type="secondary"
+            editMode={editMode}
+            onClick={() => this.onAddTestCase()}>Add Test Case</Button>
+        </div>
+      </div>
+
+      {/** Hints */}
+      <h4>Hints <Badge>{question.hints.length}</Badge></h4>
+      <div className={classes.explanation}>
+        Students can request a hint from the set of hints specified below.
+      </div>
+      <div className={classes.hints}>
+        {question.hints.map((hint, index) => (
+          <div key={hint.id} className={classes.hint}>
+            <div className={classes.hintNumber}>
+              {index + 1}.
+            </div>
+            {/* Prevent click event from propagating through to parent to keep correct focus */}
+            <div className="flex-spacer" onClick={e => e.stopPropagation()}>
+              <Editor
+                ref={ref => this.hintEditors[hint.id] = ref}
+                className={classNames([classes.hintContent, classes.textarea])}
+                value={hint.content.value}
+                placeholder="Enter a hint"
+                onChange={({ value }) => this.onEditHint(hint.id, value)}
+                onFocus={() =>
+                  onRichTextFocus(
+                    hint.content,
+                    this.promptEditor,
+                    maybe(new TextSelection(hint.content.value.selection)),
+                  )
+                }
+                renderBlock={renderNode}
+                renderMark={renderMark}
+                plugins={RICH_TEXT_EDITOR_PLUGINS} />
+            </div>
+            <div>
+              <Button
+                editMode={editMode}
+                type="secondary"
+                className="btn-remove"
+                onClick={() => this.onRemoveHint(hint.id)}>Remove</Button>
+            </div>
+          </div>
+        ))}
+        {question.hints.length < 1 && (
+          <div className={classes.noHintsMsg}>
+            No hints have been added to this activity
+          </div>
+        )}
+      </div>
+      <div className={classes.hintButtons}>
+        <div className="flex-spacer" />
+        <div>
+          <Button
+            type="secondary"
+            editMode={editMode}
+            onClick={() => this.onAddHint()}>Add Hint</Button>
+        </div>
+      </div>
+
+      {/** Solution */}
+      <div className={classes.solution}>
+        <h4>Solution</h4>
+        <div className={classes.explanation}>
+          Students can request to see the solution after an activity has been submitted.
+        </div>
+        <AceEditor
+            name="REPL_CODE_EDITOR"
+            width="700px"
+            height="250px"
+            mode={question.language}
+            theme="chrome"
+            readOnly={!editMode}
+            value={solutionText}
+            onChange={text => this.onEditSolutionText(text)}
+            setOptions={ACE_EDITOR_OPTIONS} />
+      </div>
+    </div>
+    );
+  }
+
+  render(): JSX.Element {
+    const { className, classes, editMode, onRichTextFocus } = this.props;
+    const {
+      maybePrompt, showCodeEditor, question, isRunning, isSubmitting,
+    } = this.state;
+    const editorText = question.initeditortext;
+    const isGraded = question.testCases.length > 0 && showCodeEditor;
 
     const languageToReadableLabel = (language: string) => caseOf(language)({
       python3: 'Python 3',
@@ -533,6 +868,41 @@ class ReplEditor
     return (
       <div className={classNames([classes.ReplEditor, className])}>
         <div className={classes.replActivityLabel}>REPL Activity</div>
+
+        <div className={classes.options}>
+          <ToggleSwitch
+            label="Show Code Editor"
+            checked={showCodeEditor}
+            className={classes.showCodeEditorToggle}
+            onClick={() => this.setShowCodeEditor(!showCodeEditor)}
+            editMode={editMode}/>
+
+          <span className={classes.languageDropdown}>
+            <div className="btn-group">
+              <button
+                className="btn btn-secondary dropdown-toggle"
+                type="button"
+                data-toggle="dropdown">
+                Language: {languageToReadableLabel(question.language)}
+              </button>
+              <div className="dropdown-menu">
+                <div
+                  className="dropdown-item"
+                  onClick={() => this.onSelectLanguage('python')}>
+                    {languageToReadableLabel('python')}
+                </div>
+                {/* TODO: Add support for other languages
+                  <div
+                    className="dropdown-item"
+                    onClick={() => this.onSelectLanguage('java')}>
+                      {languageToReadableLabel('java')}
+                    </div>
+                */}
+              </div>
+            </div>
+          </span>
+        </div>
+
         {maybePrompt.caseOf({
           just: prompt => (
             <React.Fragment>
@@ -553,20 +923,34 @@ class ReplEditor
                   }
                   renderBlock={renderNode}
                   renderMark={renderMark}
-                  plugins={editorPlugins} />
+                  plugins={RICH_TEXT_EDITOR_PLUGINS} />
               </div>
 
               <div className={classes.combined}>
                 <div className={classes.explanation}>
-                  Run your activity below using the '{isGraded ? 'Submit' : 'Run'}' and
-                  'Clear' buttons, similar to how students will see it.
+                  Run your activity below using the {isGraded ? 'Run, Submit' : 'Run'} and
+                  Clear buttons, similar to how students will see it.
                 </div>
-                <div>
-                  <button
-                    id="run"
-                    className="btn btn-primary btn-xs"
-                    onClick={() => this.onRunBtnClick()}
-                    disabled={!showCodeEditor}>{isGraded ? 'Submit' : 'Run'}</button>
+                <div className={classes.activityControls}>
+                  {showCodeEditor &&
+                    <button
+                      id="run"
+                      className="btn btn-primary btn-xs"
+                      style={{ marginRight: 5 }}
+                      onClick={() => this.onRunBtnClick()}
+                      disabled={!showCodeEditor || isRunning}>
+                      {isRunning ? 'Running...' : 'Run'}
+                    </button>
+                  }
+                  {isGraded &&
+                    <button
+                      id="run"
+                      className="btn btn-primary btn-xs"
+                      onClick={() => this.onSubmitBtnClick()}
+                      disabled={!showCodeEditor || isSubmitting}>
+                      {isSubmitting ? 'Submitting...' : 'Submit'}
+                    </button>
+                  }
                   <button
                     id="clear"
                     className="btn btn-primary btn-xs"
@@ -595,6 +979,7 @@ class ReplEditor
                     style={{ width: showCodeEditor ? 350 : 700 }}
                     ref={div => this.onConsoleLoad(div)}></div>
                 </div>
+
                 {showCodeEditor &&
                   <div className={classes.explanation}>
                     Use the editor above to specify any initial code
@@ -604,124 +989,8 @@ class ReplEditor
                 }
               </div>
 
-              <div className={classes.options}>
-                <h4>Options</h4>
-                <ToggleSwitch
-                  label="Show Code Editor"
-                  checked={showCodeEditor}
-                  className={classes.showCodeEditorToggle}
-                  onClick={() => this.setShowCodeEditor(!showCodeEditor)}
-                  editMode={editMode}/>
+              {showCodeEditor && this.renderGradingEditor()}
 
-                <span className={classes.languageDropdown}>
-                  <div className="btn-group">
-                    <button
-                      className="btn btn-secondary dropdown-toggle"
-                      type="button"
-                      data-toggle="dropdown">
-                      Language: {languageToReadableLabel(question.language)}
-                    </button>
-                    <div className="dropdown-menu">
-                      <div
-                        className="dropdown-item"
-                        onClick={() => this.onSelectLanguage('python')}>Python</div>
-                      {/* <div
-                        className="dropdown-item"
-                        onClick={() => this.onSelectLanguage('java')}>Java</div> */}
-                    </div>
-                  </div>
-                </span>
-              </div>
-
-              <div className={classes.gradingEditor}>
-                <h4>Test Cases <Badge>{question.testCases.length}</Badge></h4>
-                <div className={classes.explanation}>
-                  Student responses can be evaluated for correctness by specifying
-                  a set of test cases below. <HelpPopover>
-                    <div className={classes.helpPopover}>
-                      Each test case below should specify an expected result
-                      given a particular set of parameters for the function
-                      specified.
-                      <br /><br />
-                      <b>Parameters</b> and <b>Expected Result</b> must be
-                      specified in the exact syntax of the language being evaluated.
-                      <br /><br />
-                      For example, in python <b>parameters</b> should be
-                      comma-separated: <code>param1, param2</code> and <b>
-                      Expected Result</b> should contain quotes if it
-                      is a string: <code>"result string"</code>.
-                    </div>
-                </HelpPopover>
-                </div>
-                <label>Function Name</label> <input type="text"
-                  className={classNames([classes.monospace , 'text-input'])}
-                  placeholder="Enter a function name"
-                  onChange={({ target: { value } }) => this.onEditFunctionName(value)}
-                  style={{ marginLeft: 10, width: 300, color: '#e83e8c' }}
-                  value={question.functionname} />
-                <div className={classes.testCases}>
-                  {question.testCases.map((testCase, index) => (
-                    <div key={testCase.guid} className={classes.testCase}>
-                      <div className={classes.testCaseNumber}>
-                        {index + 1}.
-                      </div>
-                      <div>
-                        <div className={classes.monospace}>
-                          <span style={{ color: '#e83e8c' }}>{question.functionname}</span> (
-                          <input type="text"
-                            className={classes.codeInput}
-                            onChange={({ target: { value } }) =>
-                              this.onEditTestCaseInput(testCase.guid, value)}
-                            value={testCase.input} />)
-                        </div>
-                        <div className={classes.resultLabel}>
-                          <b>Expected Result</b> <input type="text"
-                            className={classes.codeInput}
-                            onChange={({ target: { value } }) =>
-                              this.onEditTestCaseOutput(testCase.guid, value)}
-                            value={testCase.output} />
-                        </div>
-                      </div>
-                      <div className="flex-spacer" />
-                      <div>
-                        <Button
-                          editMode={editMode}
-                          type="secondary"
-                          className="btn-remove"
-                          onClick={() => this.onRemoveTestCase(testCase.guid)}>Remove</Button>
-                      </div>
-                    </div>
-                  ))}
-                  {question.testCases.length < 1 && (
-                    <div className={classes.noTestCasesMsg}>
-                      No test cases have been created for this activity, therefore it
-                      will be considered <b>ungraded</b>.
-                    </div>
-                  )}
-                </div>
-                <div className={classes.testCaseButtons}>
-                  <div className="flex-spacer" />
-                  <div>
-                    <Button
-                      type="secondary"
-                      editMode={editMode}
-                      onClick={() => this.onAddTestCase()}>Add Test Case</Button>
-                  </div>
-                </div>
-                <div className={classes.solution}>
-                  <h4>Solution</h4>
-                  <AceEditor
-                      name="REPL_CODE_EDITOR"
-                      width="700px"
-                      height="250px"
-                      mode={question.language}
-                      theme="chrome"
-                      readOnly={!editMode}
-                      value={solutionText}
-                      onChange={text => this.onEditSolutionText(text)}
-                      setOptions={ACE_EDITOR_OPTIONS} />
-                </div>
-              </div>
             </React.Fragment>
           ),
           nothing: () => undefined,
