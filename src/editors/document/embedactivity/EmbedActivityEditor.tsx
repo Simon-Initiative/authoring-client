@@ -114,6 +114,7 @@ export default class EmbedActivityEditor
   ) => {
     this.props.onUpdateEditor(editor);
     this.onFocus(model, null, textSelection);
+    editor.focus();
   }
 
   unFocus = () => {

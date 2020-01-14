@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { withStyles, classNames, JSSStyles } from 'styles/jss';
 import {
@@ -175,6 +176,7 @@ export interface ReplEditorState {
   question: Question;
   isRunning: boolean;
   isSubmitting: boolean;
+  hintEditors: Immutable.Map<string, Editor>;
 }
 
 class ReplEditor
@@ -183,7 +185,6 @@ class ReplEditor
   replClient: any;
   promptEditor: Editor;
   consoleDiv: HTMLDivElement;
-  hintEditors: { [key: string]: Editor } = {};
 
   constructor(props) {
     super(props);
@@ -195,6 +196,7 @@ class ReplEditor
       question: defaultQuestion(),
       isRunning: false,
       isSubmitting: false,
+      hintEditors: Immutable.Map(),
     };
   }
 
@@ -289,6 +291,19 @@ class ReplEditor
       });
     });
 
+  }
+
+  onFocusPrompt = () => {
+    const { onRichTextFocus } = this.props;
+    const { maybePrompt } = this.state;
+
+    maybePrompt.lift((prompt) => {
+      onRichTextFocus(
+        prompt,
+        this.promptEditor,
+        maybe(new TextSelection(prompt.value.selection)),
+      );
+    });
   }
 
   setShowCodeEditor(show: boolean) {
@@ -582,7 +597,7 @@ class ReplEditor
 
   onEditHint(id: string, value: Value) {
     const { onUpdateEditor } = this.props;
-    const { question } = this.state;
+    const { question, hintEditors } = this.state;
 
     let edited = false;
     let updateSelection = false;
@@ -597,11 +612,11 @@ class ReplEditor
       return hint;
     });
 
+    const activeHintEditor = hintEditors.get(id);
+
     this.setState({
       question,
     }, () => {
-      const activeHintEditor = this.hintEditors[id];
-
       if (edited) {
         // But only notify our parent of an edit when something
         // has actually changed
@@ -614,8 +629,23 @@ class ReplEditor
       } else if (updateSelection) {
         // Broadcast the fact that the editor updated
         onUpdateEditor(activeHintEditor);
+
+        // fixes an issue where hints dont re-render when selection changes
+        this.forceUpdate();
       }
     });
+  }
+
+  onFocusHint = (hint) => {
+    const { onRichTextFocus } = this.props;
+
+    const hintEditor = this.state.hintEditors.get(hint.id);
+
+    onRichTextFocus(
+      hint.content,
+      hintEditor,
+      maybe(new TextSelection(hint.content.value.selection)),
+    );
   }
 
   onRemoveHint(id) {
@@ -625,9 +655,8 @@ class ReplEditor
 
     this.setState({
       question,
+      hintEditors: this.state.hintEditors.delete(id),
     }, () => this.saveActivityFromCurrentState());
-
-    delete this.hintEditors[id];
   }
 
   onSelectLanguage(language: string) {
@@ -680,8 +709,8 @@ class ReplEditor
   }
 
   renderGradingEditor() {
-    const { classes, editMode, onRichTextFocus } = this.props;
-    const { solutionText, question } = this.state;
+    const { classes, editMode } = this.props;
+    const { solutionText, question, hintEditors } = this.state;
 
     const HelpPopover = ({ children }) => (
       <Tooltip
@@ -788,18 +817,12 @@ class ReplEditor
             {/* Prevent click event from propagating through to parent to keep correct focus */}
             <div className="flex-spacer" onClick={e => e.stopPropagation()}>
               <Editor
-                ref={ref => this.hintEditors[hint.id] = ref}
+                ref={ref => this.setState({ hintEditors: hintEditors.set(hint.id, ref) })}
                 className={classNames([classes.hintContent, classes.textarea])}
                 value={hint.content.value}
                 placeholder="Enter a hint"
                 onChange={({ value }) => this.onEditHint(hint.id, value)}
-                onFocus={() =>
-                  onRichTextFocus(
-                    hint.content,
-                    this.promptEditor,
-                    maybe(new TextSelection(hint.content.value.selection)),
-                  )
-                }
+                onFocus={() => this.onFocusHint(hint)}
                 renderBlock={renderNode}
                 renderMark={renderMark}
                 plugins={RICH_TEXT_EDITOR_PLUGINS} />
@@ -914,13 +937,7 @@ class ReplEditor
                   value={prompt.value}
                   placeholder="Enter a prompt for this REPL activity"
                   onChange={this.onEditPrompt}
-                  onFocus={() =>
-                    onRichTextFocus(
-                      prompt,
-                      this.promptEditor,
-                      maybe(new TextSelection(prompt.value.selection)),
-                    )
-                  }
+                  onFocus={this.onFocusPrompt}
                   renderBlock={renderNode}
                   renderMark={renderMark}
                   plugins={RICH_TEXT_EDITOR_PLUGINS} />
