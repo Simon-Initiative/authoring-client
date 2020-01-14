@@ -27,7 +27,7 @@ export const renderLayoutHtml = ({
     <div>
       <button id="clear" class="btn btn-primary btn-xs" style="float: right;">Clear</button>
     </div>
-    <div id="console"${isGraded ? '' : ' class="console-only"'}></div>`
+    <div id="console"${showCodeEditor ? '' : ' class="console-only"'}></div>`
   }
 </div>
 `;
