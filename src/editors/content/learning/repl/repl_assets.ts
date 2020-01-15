@@ -163,7 +163,7 @@ ${
           `
           : ''
         }
-        ${question.hints.map(hint => `<hint id="${hint}">
+        ${question.hints.map(hint => `<hint id="${hint.id}">
           ${hint.content.toHtml()}
         </hint>`)}
     </part>
