@@ -173,7 +173,7 @@ class ContiguousTextEditor
           ref={editor => this.editor = editor}
           className={classes.contiguousTextSlateEditor}
           placeholder={placeholder}
-          onPaste={this.onPaste}
+          onPaste={this.onPaste as any}
           onFocus={this.slateOnFocus}
           plugins={plugins}
           value={this.state.value}
