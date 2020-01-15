@@ -509,8 +509,8 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     );
   }
 
-  onFocus = (
-    model: ContentElement, parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
+  onFocus = (model: ContentElement, parent: ParentContainer,
+    textSelection: Maybe<TextSelection>) => {
     this.props.onUpdateContentSelection(
       this.props.context.documentId, model, parent, textSelection);
   }

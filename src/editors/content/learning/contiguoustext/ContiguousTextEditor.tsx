@@ -15,8 +15,7 @@ import { Value, Inline, Editor as EditorCore } from 'slate';
 import { renderMark, renderInline, plugins, renderBlock } from './render/render';
 import * as editorUtils from './utils';
 
-export interface ContiguousTextEditorProps
-  extends AbstractContentEditorProps<contentTypes.ContiguousText> {
+export interface Props extends AbstractContentEditorProps<contentTypes.ContiguousText> {
   viewOnly?: boolean;
   editorStyles?: any;
   hideBorder?: boolean;
@@ -27,37 +26,29 @@ export interface ContiguousTextEditorProps
   orderedIds: Immutable.Map<string, number>;
 }
 
-export interface ContiguousTextEditorState {
+export interface State {
   value: Value;
 }
 
-type StyledContiguousTextEditorProps =
-  StyledComponentProps<ContiguousTextEditorProps, typeof styles>;
-
+type StyledProps = StyledComponentProps<Props, typeof styles>;
 
 /**
  * The content editor for contiguous text.
  */
 class ContiguousTextEditor
-  extends AbstractContentEditor<contentTypes.ContiguousText,
-  StyledContiguousTextEditorProps, ContiguousTextEditorState> {
+  extends AbstractContentEditor<contentTypes.ContiguousText, StyledProps, State> {
 
   editor: Editor;
 
   constructor(props) {
     super(props);
 
-    this.slateOnFocus = this.slateOnFocus.bind(this);
-    this.onPaste = this.onPaste.bind(this);
-
     this.state = {
       value: this.props.model.slateValue,
     };
-
   }
 
   onChange = ({ value }) => {
-
     const v: Value = value;
 
     const edited = v.document !== this.state.value.document;
@@ -95,7 +86,7 @@ class ContiguousTextEditor
 
   }
 
-  componentWillReceiveProps(nextProps: StyledContiguousTextEditorProps) {
+  componentWillReceiveProps(nextProps: StyledProps) {
 
     // We ignore the model being pushed down to us from parent updates,
     // because we know we already have the most up to date Slate value in
@@ -107,13 +98,12 @@ class ContiguousTextEditor
     }
   }
 
-  shouldComponentUpdate(
-    nextProps: ContiguousTextEditorProps, nextState: ContiguousTextEditorState) {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
     return this.props.model.forcedUpdateCount !== nextProps.model.forcedUpdateCount
       || this.props.editMode !== nextProps.editMode
-      || this.state.value !== nextState.value
-      || nextProps.selectedEntity !== this.props.selectedEntity
-      || nextProps.orderedIds !== this.props.orderedIds;
+      || this.props.selectedEntity !== nextProps.selectedEntity
+      || this.props.orderedIds !== nextProps.orderedIds
+      || this.state.value !== nextState.value;
   }
 
   renderSidebar() {
@@ -129,12 +119,12 @@ class ContiguousTextEditor
     e.stopPropagation();
   }
 
-  slateOnFocus(e) {
+  slateOnFocus = (e) => {
     this.props.onUpdateEditor(this.editor);
     this.props.onFocus(this.props.model, this.props.parent, Maybe.nothing());
   }
 
-  onPaste(event, editor: EditorCore, next): boolean {
+  onPaste = (event, editor: EditorCore, next) => {
 
     const et = getEventTransfer(event);
 
@@ -198,6 +188,6 @@ class ContiguousTextEditor
   }
 }
 
-const StyledContiguousTextEditor = withStyles<ContiguousTextEditorProps>(styles)
+const StyledContiguousTextEditor = withStyles<Props>(styles)
   (ContiguousTextEditor);
 export default StyledContiguousTextEditor;

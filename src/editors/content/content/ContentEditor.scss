@@ -9,15 +9,15 @@
     flex-direction: row;
     font-size: 0.8rem;
     padding-top: 15px;
+
     @include disable-select;
 
     select {
-      margin-top: -5px
+      margin-top: -5px;
     }
   }
 
   .content-body {
     margin: 15px 0;
-    @include disable-select;
   }
 }
