@@ -31,7 +31,9 @@ import 'brace/mode/text';
 import 'brace/theme/chrome';
 import { RichText, renderMark, renderNode } from 'data/content/rich_text';
 import { TextSelection } from 'types/active';
-import { renderLayoutHtml, renderQuestionsXml, renderSolutionsXml, Question } from './repl_assets';
+import {
+  renderLayoutHtml, renderQuestionsXml, renderSolutionsXml, Question,
+} from './repl_assets';
 import guid from 'utils/guid';
 import { Button } from 'components/common/Button';
 import { Tooltip } from 'utils/tooltip';
@@ -386,6 +388,7 @@ class ReplEditor
         this.replClient.writeln('---------------------------------------');
         this.replClient.writeln('RESULT:');
         this.replClient.write(result.combined);
+        this.replClient.terminal.scrollToBottom();
       })
       .catch((err) => {
         console.error(err);
@@ -418,6 +421,7 @@ class ReplEditor
         this.replClient.writeln('---------------------------------------');
         this.replClient.writeln('RESULT:');
         this.replClient.write(result.combined);
+        this.replClient.terminal.scrollToBottom();
 
         // TODO: Send the submission off to a grading service that will return and
         // display the results

@@ -1,10 +1,54 @@
 import { valueOr } from 'utils/utils';
 import * as contentTypes from 'data/contentTypes';
+import guid from 'utils/guid';
+
+export const EXAMPLE_PROMPT_HTML = '<p><strong>THIS IS EXAMPLE CONTENT. PLEASE EDIT OR \
+DELETE IT.</strong></p><p>Implement the function <code>add(a, b)</code> below. Add your \
+own assertions to cover any edge cases. Click <strong>Run</strong> to test out your \
+solution. When satisfied with your implementation, click <strong>Submit</strong> to score \
+your solution.</p>';
+
+export const EXAMPLE_CODE = `# THIS IS EXAMPLE CONTENT.
+# PLEASE EDIT OR DELETE IT.
+
+""" Returns the sum of 2 numbers """
+def add(a, b):
+  ## IMPLEMENT YOUR SOLUTION HERE ##
+
+assert add(1,1) == 2
+assert add(-1, 3) == 2
+## ADD YOUR OWN ASSERTIONS HERE ##
+
+print("Nice job! All assertions passed.")
+print("Click Submit to score your solution.")
+`;
+
+export const createExampleQuestion = (): Question => ({
+  id: guid(),
+  initeditortext: EXAMPLE_CODE,
+  language: 'python',
+  functionname: 'add',
+  testCases: [{
+    guid: guid(),
+    input: '1,1',
+    output: '2',
+  }],
+  hints: [],
+});
+
+const EXAMPLE_SOLUTION = `""" Returns the sum of 2 numbers """
+def add(a, b):
+  return a + b
+`;
+
+export const createExampleSolution = (): Solution => ({
+  language: 'python',
+  value: EXAMPLE_SOLUTION,
+});
 
 type RenderLayoutHtmlOptions = Partial<{
   prompt: string,
   showCodeEditor: boolean,
-  editorText: string,
   isGraded: boolean,
 }>;
 

@@ -9,7 +9,8 @@ import { augment, ensureIdGuidPresent } from 'data/content/common';
 import { Asset } from 'data/content/embedactivity/asset';
 import {
   renderLayoutHtml, renderDefaultStylesCss, renderDefaultControlsHtml,
-  renderQuestionsXml, renderSolutionsXml,
+  renderQuestionsXml, renderSolutionsXml, EXAMPLE_PROMPT_HTML, EXAMPLE_CODE,
+  createExampleQuestion, createExampleSolution,
 } from 'editors/content/learning/repl/repl_assets';
 import { caseOf } from 'utils/utils';
 
@@ -91,7 +92,11 @@ export class EmbedActivityModel extends Immutable.Record(defaultEmbedActivityMod
           new contentTypes.Asset({
             name: 'layout',
             src: `webcontent/repl/${id}/layout.html`,
-            content: Maybe.just(renderLayoutHtml()),
+            content: Maybe.just(renderLayoutHtml({
+              prompt: EXAMPLE_PROMPT_HTML,
+              showCodeEditor: true,
+              isGraded: true,
+            })),
           }),
           new contentTypes.Asset({
             name: 'emstyles',
@@ -106,12 +111,16 @@ export class EmbedActivityModel extends Immutable.Record(defaultEmbedActivityMod
           new contentTypes.Asset({
             name: 'questions',
             src: `webcontent/repl/${id}/questions.xml`,
-            content: Maybe.just(renderQuestionsXml()),
+            content: Maybe.just(renderQuestionsXml({
+              questions: [createExampleQuestion()],
+            })),
           }),
           new contentTypes.Asset({
             name: 'solutions',
             src: `webcontent/repl/${id}/solutions.xml`,
-            content: Maybe.just(renderSolutionsXml()),
+            content: Maybe.just(renderSolutionsXml({
+              solutions: [createExampleSolution()],
+            })),
           }),
         ]),
       }),
