@@ -49,11 +49,6 @@ class ContiguousTextEditor
   }
 
   onChange = ({ value }) => {
-    console.log('ContiguousTextEditor.onChange, value:', value);
-    // if (this.state.value === value) {
-    // return;
-    // }
-
     const v: Value = value;
 
     const edited = v.document !== this.state.value.document;
@@ -69,19 +64,16 @@ class ContiguousTextEditor
         this.props.onEdit(updated, updated);
 
         // We must always broadcast the latest version of the editor
-        console.log('Edited value -> calling onUpdateEditor');
         this.props.onUpdateEditor(this.editor);
         this.editor.focus();
 
         // Do not broadcast changes if the editor is unfocused (de-selected)
       } else if (updateSelection && !v.selection.isFocused) {
-        console.log('Not focused -> returning');
         return;
 
       } else if (updateSelection) {
 
         // Broadcast the fact that the editor updated
-        console.log('Updated selection -> calling onUpdateEditor');
         this.props.onUpdateEditor(this.editor);
 
         // Based on the new selection, update whether or not
@@ -102,38 +94,16 @@ class ContiguousTextEditor
     // as that is a signal to us that something external has changed the
     // content and we must pull it down into state to rerender.
     if (this.props.model.forcedUpdateCount !== nextProps.model.forcedUpdateCount) {
-      console.log('componentWillReceiveProps - Setting state with new value', nextProps.model.slateValue);
       this.setState({ value: nextProps.model.slateValue });
     }
   }
 
-  shouldComponentUpdate(
-    nextProps: Props, nextState: State) {
-    const a = this.props.model.forcedUpdateCount !== nextProps.model.forcedUpdateCount;
-    const b = this.props.editMode !== nextProps.editMode;
-    const c = this.state.value !== nextState.value;
-    const d = nextProps.selectedEntity !== this.props.selectedEntity;
-    const e = nextProps.orderedIds !== this.props.orderedIds;
-
-    if (a || b || c || d || e) {
-      console.log('shouldComponentUpdate - rerendering');
-      if (a) {
-        console.log('(Forced update count different)');
-      }
-      if (b) {
-        console.log('(edit mode different)');
-      }
-      if (c) {
-        console.log('(state value different', this.state.value, nextState.value, ')');
-      }
-      if (d) {
-        console.log('(selected entity different', this.props.selectedEntity, nextProps.selectedEntity, ')');
-      }
-      if (e) {
-        console.log('(orderedIds different)');
-      }
-    }
-    return a || b || c || d || e;
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    return this.props.model.forcedUpdateCount !== nextProps.model.forcedUpdateCount
+      || this.props.editMode !== nextProps.editMode
+      || this.props.selectedEntity !== nextProps.selectedEntity
+      || this.props.orderedIds !== nextProps.orderedIds
+      || this.state.value !== nextState.value;
   }
 
   renderSidebar() {
@@ -150,14 +120,8 @@ class ContiguousTextEditor
   }
 
   slateOnFocus = (e) => {
-    console.log('Event', e);
-    console.log('(1) ContiguousTextEditor -> calling onUpdateEditor with ', this.editor);
     this.props.onUpdateEditor(this.editor);
-    console.log('(2) ContiguousTextEditor -> calling onFocus with ', this.props.model, this.props.parent);
     this.props.onFocus(this.props.model, this.props.parent, Maybe.nothing());
-    console.log('this editor value in slateOnFocus:', this.editor.value);
-    // this.setState({ value: this.editor.value });
-
   }
 
   onPaste = (event, editor: EditorCore, next) => {
@@ -195,8 +159,6 @@ class ContiguousTextEditor
       parentProps: this.props,
       parent: this,
     };
-
-    console.log('State selection', this.state.value.selection);
 
     return (
       <div

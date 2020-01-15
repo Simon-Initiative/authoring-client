@@ -30,7 +30,6 @@ export const activeContext = (
       });
 
     case actions.UPDATE_EDITOR:
-      console.log('UPDATE_EDITOR - active reducer, editor is', action.editor);
       return state.with({
         activeInline: Maybe.nothing(),
         editor: Maybe.maybe(action.editor),
@@ -43,7 +42,6 @@ export const activeContext = (
       });
 
     case actions.UPDATE_CONTEXT:
-      console.log('UPDATE_CONTEXT - active reducer, activeChild is', action.content, 'container is', action.container);
       return state.with({
         activeChild: Maybe.maybe(action.content),
         container: Maybe.maybe(action.container),

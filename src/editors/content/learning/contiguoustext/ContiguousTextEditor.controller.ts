@@ -29,10 +29,8 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = (dispatch, ownProps): DispatchProps => {
 
   return {
-    onUpdateEditor: editor => {
-      console.log('onUpdateEditor (controller)', editor);
-      dispatch(updateEditor(editor));
-    },
+    onUpdateEditor: editor =>
+      dispatch(updateEditor(editor)),
 
     onSelectInline: inline =>
       dispatch(selectInline(inline)),
