@@ -9,7 +9,6 @@
     flex-direction: row;
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;
-    @include disable-select;
 
     .title {
       font-size: 1.3em;
@@ -50,11 +49,6 @@
         }
       }
     }
-  }
-
-  .question-content {
-    padding: 0 10px;
-    @include disable-select;
   }
 
   .item-part-editor {
