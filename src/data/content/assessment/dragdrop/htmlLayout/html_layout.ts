@@ -11,22 +11,9 @@ import { UnsupportedTargetArea } from
 import { domParser } from 'utils/domParser';
 
 /**
- * MINIFIED_TABLE_STYLES is generated using css in html_layout_styles.css.
- * See html_layout_styles.css for more details.
+ * MINIFIED_TABLE_STYLES have been moved to the theme (whirlwind/chaperone)
  */
-const MINIFIED_TABLE_STYLES = `<style type="text/css">
-.oli-dnd-table{display:table;text-align:center}.dnd-row{display:table-row}.dnd-\
-row-header{font-weight:600;background-color:#cacaca;text-align:center}.dnd-cell{\
-display:table-cell;padding:4px}.target{min-width:50px;min-height:50px;padding:4p\
-x;border:1px dashed #999}.initiator{color:#58646c;border:2px solid transparent;p\
-adding:6px;display:inline-block;font-size:14px;box-shadow:2px 2px 10px 0 rgba(15\
-5,165,173,1);border-radius:5px;white-space:nowrap;margin:5px;background-color:#E7\
-F4FE;cursor:grab;cursor:-webkit-grab;user-select:none}.initiator::before{content\
-:"";display:inline-block;vertical-align:middle;margin-right:4px;width:12px;height\
-:24px;background-image:-webkit-repeating-radial-gradient(center center,rgba(0,0,0\
-,.2),rgba(0,0,0,.3) 1px,transparent 1px,transparent 100%);background-repeat:repeat;\
-background-size:4px 4px}.initiator:active{cursor:grabbing;cursor:-webkit-grabbing}
-</style>`;
+const MINIFIED_TABLE_STYLES = '<style type="text/css"></style>';
 
 export type TargetArea = TableTargetArea | UnsupportedTargetArea;
 
