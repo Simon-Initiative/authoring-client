@@ -230,12 +230,17 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     // the server creates a lock on upload, so we must upload files one at a
     // time. This factory function returns a new promise to upload a file
     // recursively until fileList is empty
+    const results = [];
     const createWebContentPromiseFactory = (courseId, file) =>
       persistence.createWebContent(courseId, file)
         .then((result) => {
+          results.push(result);
+
           if (fileList.length > 0) {
             return createWebContentPromiseFactory(courseId, fileList.pop());
           }
+
+          return results;
         });
 
     // sequentially upload files one at a time, then reload the media page
@@ -247,7 +252,8 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           .then((mediaItems) => {
             mediaItems.lift((files) => {
               if (files.size > 0) {
-                this.onSelect(files.sortBy(file => file.dateUpdated).last().guid);
+                Maybe.maybe(files.find(f => f.pathTo === result[0])).lift(file =>
+                  this.onSelect(file.guid));
               }
             });
           });

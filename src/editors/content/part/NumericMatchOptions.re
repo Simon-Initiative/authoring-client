@@ -396,12 +396,22 @@ let renderPrecision =
   </div>;
 };
 
-let renderRangeInstructions = jssClass =>
-  <div
-    className=(classNames([jssClass("optionsRow"), jssClass("rangeInstr")]))>
-    (strEl("Range includes lower and upper bounds"))
-    <div className=(classNames([jssClass("precisionSpacer")])) />
-  </div>;
+let renderRangeInstructions = (jssClass, range1, range2) =>
+  switch (range1 && range2) {
+  | true => (
+    <div
+      className=(classNames([jssClass("optionsRow"), jssClass("rangeInstr")]))>
+      (strEl("Range is inclusive of lower and upper bounds"))
+      <div className=(classNames([jssClass("precisionSpacer")])) />
+    </div>
+  )
+  | false => (
+    <div
+      className=(classNames([jssClass("optionsRow"), jssClass("rangeErrMsg")]))>
+      (strEl("Range entered is invalid. Values must be valid numbers and lower bound must be less than or equal to upper bound"))
+      <div className=(classNames([jssClass("precisionSpacer")])) />
+  </div>
+  )};
 
 let renderRange =
     (jssClass, editMode, matchPattern, isValid1, isValid2, responseId, onEditMatch, updateState, setValid1, setValid2) => {
@@ -446,7 +456,7 @@ let renderRange =
         "";
       }
     );
-    let inputClass2 =
+  let inputClass2 =
     (
      if (!isValid2) {
        "is-invalid";
@@ -476,21 +486,31 @@ let renderRange =
             let value = ReactDOMRe.domElementToObj(
                           ReactEventRe.Form.target(event),
                         )##value;
-
             let matchValue = "[" ++ value ++ "," ++ rangeEnd ++ "]";
+            let isValidRange = switch (float_of_string(value), float_of_string(rangeEnd)) {
+              | (valueFloat, rangeEndFloat) => valueFloat <= rangeEndFloat
+              | exception Failure(_) => false
+              };
 
-            if (isValidInput(value)) {
+            if (isValidInput(value) && isValidRange) {
+              /* value and range are valid */
               onEditMatch(. responseId, matchValue);
               setValid1(true);
-            } else {
+              setValid2(isValidInput(rangeEnd));
+            } else if (!isValidInput(value)) {
+              /* value is invalid, only set this input as invalid */
               setValid1(false);
-            };
+            } else {
+              /* value is valid */
+              setValid1(isValidInput(value) && isValidRange);
+              setValid2(isValidInput(rangeEnd) && isValidRange);
+            }
 
             updateState(matchValue);
           }
         )
       />
-      <div className=(jssClass("rangeLabel"))> (strEl("to")) </div>
+      <div className=(jssClass("rangeLabel"))> (strEl("up to")) </div>
       <input
         className=(
           classNames([
@@ -508,14 +528,24 @@ let renderRange =
             let value = ReactDOMRe.domElementToObj(
                           ReactEventRe.Form.target(event),
                         )##value;
-
             let matchValue = "[" ++ rangeStart ++ "," ++ value ++ "]";
+            let isValidRange = switch (float_of_string(value), float_of_string(rangeStart)) {
+              | (valueFloat, rangeStartFloat) => valueFloat >= rangeStartFloat
+              | exception Failure(_) => false
+              };
 
-            if (isValidInput(value)) {
+            if (isValidInput(value) && isValidRange) {
+              /* value and range are valid */
               onEditMatch(. responseId, matchValue);
               setValid2(true);
-            } else {
+              setValid1(isValidInput(rangeStart));
+            } else if (!isValidInput(value)) {
+              /* value is invalid, only set this input as invalid */
               setValid2(false);
+            } else {
+              /* value is valid */
+              setValid2(isValidInput(value) && isValidRange);
+              setValid1(isValidInput(rangeStart) && isValidRange);
             }
 
             updateState(matchValue);
@@ -672,7 +702,7 @@ let make =
                 )
               )
             </div>
-            (renderRangeInstructions(jssClass))
+            (renderRangeInstructions(jssClass, state.range1, state.range2))
           </div>
         | Unknown =>
           <div className=(jssClass("optionsRow"))>

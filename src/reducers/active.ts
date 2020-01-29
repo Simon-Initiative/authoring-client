@@ -28,42 +28,34 @@ export const activeContext = (
       return state.with({
         activeInline: action.inline,
       });
+
     case actions.UPDATE_EDITOR:
       return state.with({
         activeInline: Maybe.nothing(),
-        editor: action.editor === null || action.editor === undefined
-          ? Maybe.nothing() : Maybe.just(action.editor),
+        editor: Maybe.maybe(action.editor),
       });
+
     case actions.UPDATE_CONTENT:
       return state.with({
-        activeChild: action.content === null || action.content === undefined
-          ? Maybe.nothing() : Maybe.just(action.content),
+        activeChild: Maybe.maybe(action.content),
         documentId: Maybe.just(action.documentId),
       });
+
     case actions.UPDATE_CONTEXT:
       return state.with({
-        activeChild: action.content === null || action.content === undefined
-          ? Maybe.nothing() : Maybe.just(action.content),
-        container: action.container === null || action.container === undefined
-          ? Maybe.nothing() : Maybe.just(action.container),
+        activeChild: Maybe.maybe(action.content),
+        container: Maybe.maybe(action.container),
         documentId: Maybe.just(action.documentId),
       });
+
     case documentActions.DOCUMENT_RELEASED:
-      return state.with({
-        activeInline: Maybe.nothing(),
-        activeChild: Maybe.nothing(),
-        container: Maybe.nothing(),
-        documentId: Maybe.nothing(),
-        editor: Maybe.nothing(),
-      });
+      return new ActiveContext();
+
     case documentActions.DOCUMENT_LOADED:
-      return state.with({
-        activeInline: Maybe.nothing(),
-        activeChild: Maybe.nothing(),
-        container: Maybe.nothing(),
+      return new ActiveContext({
         documentId: Maybe.just(action.documentId),
-        editor: Maybe.nothing(),
       });
+
     case actions.RESET_ACTIVE:
     case documentActions.CHANGE_UNDONE:
     case documentActions.CHANGE_REDONE:

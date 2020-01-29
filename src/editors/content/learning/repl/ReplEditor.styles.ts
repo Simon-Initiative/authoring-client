@@ -49,6 +49,10 @@ export const styles: JSSStyles = {
     border: '1px solid #ced4da',
     borderRadius: 4,
   },
+  activityControls: {
+    height: 38,
+    marginBottom: 10,
+  },
   showCodeEditorToggle: {
     marginRight: 10,
   },
@@ -85,8 +89,9 @@ export const styles: JSSStyles = {
     verticalAlign: 'top',
   },
   options: {
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: 5,
+    marginBottom: 20,
+    paddingBottom: 20,
   },
   gradingEditor: {
     marginTop: 30,
@@ -99,6 +104,10 @@ export const styles: JSSStyles = {
     border: [1, 'solid', '#ddd'],
     borderRadius: 2,
     backgroundColor: colors.white,
+  },
+  hints: {
+    marginTop: 20,
+    marginBottom: 10,
   },
   monospace: {
     fontFamily: 'monospace',
@@ -116,6 +125,17 @@ export const styles: JSSStyles = {
     },
   },
   testCaseNumber: {
+    marginRight: 20,
+    fontWeight: 600,
+  },
+  hint: {
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  hintNumber: {
     marginRight: 20,
     fontWeight: 600,
   },
@@ -141,6 +161,20 @@ export const styles: JSSStyles = {
     padding: 40,
     textAlign: 'center',
     fontSize: 14,
+  },
+  hintButtons: {
+    marginTop: 10,
+    marginBottom: 10,
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  noHintsMsg: {
+    padding: 40,
+    textAlign: 'center',
+    fontSize: 14,
+  },
+  hintContent: {
+    marginRight: 10,
   },
   solutionEditor: {
     marginTop: 20,

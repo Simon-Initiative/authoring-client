@@ -1,82 +1,78 @@
-@import "oli/colors";
-@import "oli/mixins";
+@import 'oli/colors';
+@import 'oli/mixins';
 
 .feedback-question-editor {
-    padding: 0 10px 0 30px;
+  padding: 0 10px 0 30px;
 
-    .question-body {
-        margin: 15px 0;
-
-        @include disable-select;
-    }
+  .question-body {
+    margin: 15px 0;
+  }
 }
 
 .feedback-title {
-    display: flex;
-    flex-direction: row;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    line-height: 31px;
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  line-height: 31px;
 
-    @include disable-select;
+  .title {
+    font-size: 1.3em;
+  }
 
-    .title {
-        font-size: 1.3em;
+  .action-btn {
+    cursor: pointer;
+
+    i {
+      padding: 6px;
     }
 
-    .action-btn {
-        cursor: pointer;
-
+    &.action-btn-duplicate {
+      &:hover {
         i {
-            padding: 6px;
+          color: darken($selection, 10%);
         }
+      }
 
-        &.action-btn-duplicate {
-            &:hover {
-                i {
-                    color: darken($selection, 10%);
-                }
-            }
-
-            &:active {
-                i {
-                    color: darken($selection, 15%);
-                }
-            }
-
-            &.disabled {
-                cursor: default;
-
-                &, &:hover, &:active {
-                    i {
-                        color: $gray;
-                    }
-                }
-            }
+      &:active {
+        i {
+          color: darken($selection, 15%);
         }
+      }
 
-        &.action-btn-remove {
-            &:hover {
-                i {
-                    color: darken($remove, 10%);
-                }
-            }
+      &.disabled {
+        cursor: default;
 
-            &:active {
-                i {
-                    color: darken($remove, 15%);
-                }
-            }
-
-            &.disabled {
-                cursor: default;
-
-                &, &:hover, &:active {
-                    i {
-                        color: $gray;
-                    }
-                }
-            }
+        &, &:hover, &:active {
+          i {
+            color: $gray;
+          }
         }
+      }
     }
+
+    &.action-btn-remove {
+      &:hover {
+        i {
+          color: darken($remove, 10%);
+        }
+      }
+
+      &:active {
+        i {
+          color: darken($remove, 15%);
+        }
+      }
+
+      &.disabled {
+        cursor: default;
+
+        &, &:hover, &:active {
+          i {
+            color: $gray;
+          }
+        }
+      }
+    }
+  }
 }

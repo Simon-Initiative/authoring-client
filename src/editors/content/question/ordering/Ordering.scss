@@ -2,8 +2,6 @@
 @import 'oli/mixins';
 
 .ordering-feedback {
-  @include disable-select;
-
   .feedback-items {
     .response {
       margin-bottom: 25px;
@@ -25,7 +23,7 @@
   .order-selection {
     border-radius: 4px;
     background-color: #E7F4FE;
-    box-shadow: 2px 2px 10px 0px rgba(155,165,173,1);
+    box-shadow: 2px 2px 10px 0px rgba(155, 165, 173, 1);
     padding: 5px 10px;
 
     .input-list-item-content {
