@@ -20,5 +20,5 @@ jobs:
           node-version: '12.x'
       - name: Install & Tests
         run: |
-          npm install
+          yarn
           npm run build
