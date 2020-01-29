@@ -427,11 +427,11 @@ export function fetchContentElementByPredicate(documentId: string, pred) {
     }
     if (model.modelType === 'AssessmentModel') {
       return Promise.resolve(
-        toMaybe(findAssessmentNodes(model, pred))) as Promise<Maybe<IdentifiableContentElement>>;;
+        toMaybe(findAssessmentNodes(model, pred))) as Promise<Maybe<IdentifiableContentElement>>;
     }
     if (model.modelType === 'PoolModel') {
       return Promise.resolve(
-        toMaybe(findPoolNodes(model, pred))) as Promise<Maybe<IdentifiableContentElement>>;;
+        toMaybe(findPoolNodes(model, pred))) as Promise<Maybe<IdentifiableContentElement>>;
     }
     return Promise.resolve(Maybe.nothing());
   };
