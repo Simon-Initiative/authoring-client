@@ -61,7 +61,7 @@
     "xml-beautifier": "^0.3.0"
   },
   "peerDependencies": {
-    "@types/node": "^12.11.7",
+    "@types/node": "^12.11.7"
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.41",
