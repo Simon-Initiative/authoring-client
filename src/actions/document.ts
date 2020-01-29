@@ -422,13 +422,16 @@ export function fetchContentElementByPredicate(documentId: string, pred) {
     };
 
     if (model.modelType === 'WorkbookPageModel') {
-      return Promise.resolve(toMaybe(findWorkbookNodes(model, pred)));
+      return Promise.resolve(
+        toMaybe(findWorkbookNodes(model, pred))) as Promise<Maybe<IdentifiableContentElement>>;
     }
     if (model.modelType === 'AssessmentModel') {
-      return Promise.resolve(toMaybe(findAssessmentNodes(model, pred)));
+      return Promise.resolve(
+        toMaybe(findAssessmentNodes(model, pred))) as Promise<Maybe<IdentifiableContentElement>>;;
     }
     if (model.modelType === 'PoolModel') {
-      return Promise.resolve(toMaybe(findPoolNodes(model, pred)));
+      return Promise.resolve(
+        toMaybe(findPoolNodes(model, pred))) as Promise<Maybe<IdentifiableContentElement>>;;
     }
     return Promise.resolve(Maybe.nothing());
   };
