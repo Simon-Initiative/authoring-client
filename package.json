@@ -121,7 +121,7 @@
     "build": "npm run clean && npm run lint && npm run test && npm run dist",
     "clean": "del coverage/** dev/** dist/** !dist !dist/.gitkeep test-out/** !test-out !test-out/.gitkeep",
     "dev": "webpack-dev-server --watch --config=./webpack.dev.js",
-    "dist": "webpack --config=./webpack.dist.js",
+    "dist": "NODE_OPTIONS=--max-old-space-size=4096 webpack --config=./webpack.dist.js ",
     "lint": "tslint -p . -c tslint.json 'src/**/*.ts*'",
     "lint:fix": "tslint --fix -p . -c tslint.json 'src/**/*.ts*'",
     "lint:watch": "chokidar \"src/**/*.ts*\" -c \"echo Running lint... && tslint -p . -c tslint.json 'src/**/*.ts*' && echo Linting Passed.\" --initial --verbose",
