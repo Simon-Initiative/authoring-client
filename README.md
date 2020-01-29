@@ -2,7 +2,7 @@
 
 [![Open Learning Initiative](https://oli.cmu.edu/wp-content/uploads/2018/10/oli-logo-78px-high-1.svg)](http://oli.cmu.edu/)
 
-[![Build Status](https://dalaran.oli.cmu.edu/jenkins/buildStatus/icon?job=authoring-client)](https://dalaran.oli.cmu.edu/jenkins/job/authoring-client/)
+[![CI](https://github.com/Simon-Initiative/authoring-client/workflows/CI/badge.svg)](https://github.com/Simon-Initiative/authoring-client/actions)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Simon-Initiative/authoring-client/blob/master/LICENSE)
 
 Typescript/React/Redux based front-end for authoring and editing Open Learning Initiative course packages.

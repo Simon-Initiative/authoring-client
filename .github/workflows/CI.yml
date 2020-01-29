@@ -13,11 +13,11 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     container:
-      image: node
+      image: node:12
 
     steps:
       - uses: actions/checkout@v1
       - name: Install & Tests
         run: |
-          npm install
+          yarn
           npm run build
