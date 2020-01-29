@@ -195,9 +195,8 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
           const i = m.data.get('value');
           const mapped = itemMap[i.input];
           if (mapped !== undefined) {
-            const inputType = i.inputType;
             const data = m.data.merge({
-              value: i.with({ input: itemMap[i.input], inputType }),
+              value: i.with({ input: itemMap[i.input] }),
             });
             return m.merge({ data });
           }
