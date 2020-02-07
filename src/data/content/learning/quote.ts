@@ -44,7 +44,7 @@ export class Quote extends Immutable.Record(defaultContent) {
     const t = (root as any).quote;
 
     const text = ContentElements.fromPersistence(getChildren(t), '', TEXT_ELEMENTS, null, notify);
-    const entry = t['@entry'] === undefined
+    const entry : Maybe<string> = t['@entry'] === undefined
       ? Maybe.nothing()
       : Maybe.just(t['@entry']);
 

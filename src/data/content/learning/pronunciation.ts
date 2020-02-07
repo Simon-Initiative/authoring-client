@@ -57,15 +57,15 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
       ? t['@id']
       : (notify(), createGuid());
 
-    const title = t['@title'] !== undefined
+    const title : Maybe<string> = t['@title'] !== undefined
       ? Maybe.just(t['@title'])
       : Maybe.nothing();
 
-    const src = t['@src'] !== undefined
+    const src : Maybe<string>  = t['@src'] !== undefined
       ? Maybe.just(t['@src'])
       : Maybe.nothing();
 
-    const srcContentType = t['@type'] !== undefined
+    const srcContentType : Maybe<string>  = t['@type'] !== undefined
       ? Maybe.just(t['@type'])
       : Maybe.nothing();
 

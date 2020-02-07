@@ -1,6 +1,6 @@
 {
   "name": "course-editor",
-  "version": "0.40.3",
+  "version": "0.41.0",
   "description": "Course Authoring Web Application for the Open Learning Initiative",
   "main": "./src/app.tsx",
   "author": "Carnegie Mellon University",
@@ -48,7 +48,6 @@
     "tslint": "^5.8.0",
     "tslint-config-airbnb": "^5.4.2",
     "tsmonad": "^0.7.2",
-    "typescript": "3.4.5",
     "uglifyjs-webpack-plugin": "^1.1.6",
     "underscore-template-loader": "^1.0.0",
     "upath": "^1.1.0",
@@ -60,11 +59,13 @@
     "whatwg-fetch": "^2.0.2",
     "xml-beautifier": "^0.3.0"
   },
+  "peerDependencies": {
+    "@types/node": "^12.11.7"
+  },
   "devDependencies": {
     "@types/jasmine": "^2.5.41",
     "@types/jest": "^24.0.15",
     "@types/jquery": "^3.3.31",
-    "@types/node": "^12.11.7",
     "@types/slate-html-serializer": "^0.6.3",
     "babel-core": "^6.22.1",
     "babel-loader": "^7.1.4",
@@ -88,7 +89,8 @@
     "jss-preset-default": "^10.0.0-alpha.14",
     "jsx-loader": "^0.13.2",
     "react-hot-loader": "^4.12.15",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.7.5"
   },
   "jest": {
     "verbose": true,
@@ -121,7 +123,7 @@
     "build": "npm run clean && npm run lint && npm run test && npm run dist",
     "clean": "del coverage/** dev/** dist/** !dist !dist/.gitkeep test-out/** !test-out !test-out/.gitkeep",
     "dev": "webpack-dev-server --watch --config=./webpack.dev.js",
-    "dist": "webpack --config=./webpack.dist.js",
+    "dist": "NODE_OPTIONS=--max-old-space-size=4096 webpack --config=./webpack.dist.js ",
     "lint": "tslint -p . -c tslint.json 'src/**/*.ts*'",
     "lint:fix": "tslint --fix -p . -c tslint.json 'src/**/*.ts*'",
     "lint:watch": "chokidar \"src/**/*.ts*\" -c \"echo Running lint... && tslint -p . -c tslint.json 'src/**/*.ts*' && echo Linting Passed.\" --initial --verbose",

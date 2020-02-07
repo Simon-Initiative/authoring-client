@@ -45,7 +45,7 @@ export class BlockQuote extends Immutable.Record(defaultContent) {
 
     const text = ContiguousText.fromPersistence(getChildren(t), '', ContiguousTextMode.SimpleText);
 
-    const entry = t['@entry'] === undefined
+    const entry : Maybe<string> = t['@entry'] === undefined
       ? Maybe.nothing()
       : Maybe.just(t['@entry']);
 
