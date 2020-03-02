@@ -59,6 +59,8 @@ export interface OwnQuestionProps<ModelType>
   onVariablesChange: (vars: Immutable.OrderedMap<string, contentTypes.Variable>) => void;
   onRemoveQuestion: () => void;
   onDuplicate: () => void;
+  onCopy: () => void;
+  onPaste: () => void;
   onUpdateHover: (hover: string) => void;
 }
 
@@ -236,6 +238,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       <ContentTitle
         title={getLabelForQuestion(model)}
         onDuplicate={editMode ? this.props.onDuplicate : undefined}
+        onCopy={editMode ? this.props.onCopy : undefined}
+        onPaste={editMode ? this.props.onPaste : undefined}
         editMode={editMode}
         canRemove={canRemoveQuestion}
         removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
