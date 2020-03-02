@@ -50,7 +50,7 @@ export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
       onRemove: () => onRemove(model.guid),
       onDuplicate: editMode ? onDuplicate : undefined,
       onCopy: editMode ? onCopy : undefined,
-      onPaste: editMode ? onPaste: undefined,
+      onPaste: editMode ? onPaste : undefined,
     };
 
     const isFeedback = model.contentType === 'FeedbackMultipleChoice' ||
