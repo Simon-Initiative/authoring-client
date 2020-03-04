@@ -90,7 +90,7 @@
     "jsx-loader": "^0.13.2",
     "react-hot-loader": "^4.12.15",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.7.5"
+    "typescript": "3.7.5"
   },
   "jest": {
     "verbose": true,
