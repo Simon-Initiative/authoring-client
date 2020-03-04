@@ -238,7 +238,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       <ContentTitle
         title={getLabelForQuestion(model)}
         onDuplicate={editMode ? this.props.onDuplicate : undefined}
-        onCopy={editMode ? this.props.onCopy : undefined}
+        onCopy={this.props.onCopy}
         onPaste={editMode ? this.props.onPaste : undefined}
         editMode={editMode}
         canRemove={canRemoveQuestion}
