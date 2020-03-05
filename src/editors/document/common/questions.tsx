@@ -27,6 +27,8 @@ export interface Props extends AbstractContentEditorProps<Node> {
   onRemove: RemoveHandler;
   canRemove: boolean;
   onDuplicate: DuplicateHandler;
+  onCopy: CopyPasteHandler;
+  onPaste: CopyPasteHandler;
   isQuestionPool: boolean;
 }
 
@@ -34,9 +36,12 @@ export type RemoveHandler = (guid: string) => void;
 
 export type DuplicateHandler = () => void;
 
+export type CopyPasteHandler = () => void;
+
 export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
   render() {
-    const { currentPage, onRemove, onDuplicate, model, nodeParentModel, editMode } = this.props;
+    const { currentPage, onRemove, onDuplicate, onCopy, onPaste,
+      model, nodeParentModel, editMode } = this.props;
     const isParentAssessmentGraded = nodeParentModel.resource.type !== LegacyTypes.inline;
 
     const sharedProps = {
@@ -44,6 +49,8 @@ export class AssessmentNodeRenderer extends React.PureComponent<Props, {}> {
       key: model.guid,
       onRemove: () => onRemove(model.guid),
       onDuplicate: editMode ? onDuplicate : undefined,
+      onCopy: editMode ? onCopy : undefined,
+      onPaste: editMode ? onPaste : undefined,
     };
 
     const isFeedback = model.contentType === 'FeedbackMultipleChoice' ||

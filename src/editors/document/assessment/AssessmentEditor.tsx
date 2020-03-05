@@ -35,6 +35,8 @@ import { RouterState } from 'reducers/router';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import { CourseState } from 'reducers/course';
+import { saveToLocalStorage } from 'utils/localstorage';
+import { Question } from 'data/content/assessment/question';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: CourseIdVers) => void;
@@ -535,6 +537,22 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
     }
   }
 
+  onCopyQuestion = () => {
+    if (this.props.currentNode.contentType === 'Question') {
+      const toSerialize = this.props.currentNode.toPersistence();
+      const serialized = JSON.stringify(toSerialize);
+
+      saveToLocalStorage('clipboard', serialized);
+    }
+
+  }
+
+  onPasteQuestion = () => {
+    Question.fromClipboard(
+      this.props.context.skills.map(s => s.id).toSet())
+      .lift(question => this.addNode(question));
+  }
+
   collapseInsertPopupFn = (e) => {
     if (e.originator !== 'insertPopupToggle') {
       this.setState({
@@ -614,6 +632,8 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
                 onFocus={this.onFocus}
                 canRemove={this.canRemoveNode()}
                 onDuplicate={this.onDuplicateQuestion}
+                onCopy={this.onCopyQuestion}
+                onPaste={this.onPasteQuestion}
                 nodeParentModel={model}
                 parent={this}
                 isQuestionPool={false}

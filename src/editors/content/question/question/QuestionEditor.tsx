@@ -27,6 +27,8 @@ import { InputRefType } from 'data/content/learning/input_ref';
 export interface Props extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   onDuplicate?: () => void;
+  onCopy?: () => void;
+  onPaste?: () => void;
   isParentAssessmentGraded?: boolean;
   isQuestionPool: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
@@ -261,8 +263,8 @@ export class QuestionEditor
   }
 
   renderQuestionBody(): JSX.Element {
-    const { canRemove, model, onDuplicate, isParentAssessmentGraded, isQuestionPool,
-      onRemove } = this.props;
+    const { canRemove, model, onDuplicate, onCopy, onPaste,
+      isParentAssessmentGraded, isQuestionPool, onRemove } = this.props;
 
     const item = model.items.first();
     const part = model.parts.first();
@@ -284,6 +286,8 @@ export class QuestionEditor
       onGradingChange: this.onGradingChange,
       onVariablesChange: this.onVariablesChange,
       onDuplicate,
+      onCopy,
+      onPaste,
       onBodyEdit: this.onBodyEdit,
       hideGradingCriteria: !isParentAssessmentGraded,
       hideVariables: !isQuestionPool,

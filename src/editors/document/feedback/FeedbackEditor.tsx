@@ -270,6 +270,14 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
     this.addNode(duplicated);
   }
 
+  // COPY_Q - What is this for? Functionality omitted
+  onCopyQuestion = () => {
+    const { currentNode } = this.props;
+  }
+
+  onPasteQuestion = () => {
+  }
+
   collapseInsertPopupFn = (e) => {
     if (e.originator !== 'insertPopupToggle') {
       this.setState({
@@ -345,6 +353,8 @@ export default class FeedbackEditor extends AbstractEditor<models.FeedbackModel,
                 onFocus={this.onFocus}
                 canRemove={this.canRemoveNode()}
                 onDuplicate={this.onDuplicateQuestion}
+                onCopy={this.onCopyQuestion}
+                onPaste={this.onPasteQuestion}
                 nodeParentModel={model}
                 parent={this}
                 isQuestionPool={false}

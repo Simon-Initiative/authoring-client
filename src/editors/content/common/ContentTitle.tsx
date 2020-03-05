@@ -32,12 +32,16 @@ export type ContentTitleProps = {
   editMode: boolean;
   removeDisabledMessage?: string;
   onDuplicate?: (e) => void;
+  onCopy?: (e) => void;
+  onPaste?: (e) => void;
   onRemove?: (e) => void;
   helpPopover?: JSX.Element;
 };
 
 export const ContentTitle: React.StatelessComponent<ContentTitleProps> = ({
-  title, editMode, canRemove, removeDisabledMessage, onDuplicate, onRemove, helpPopover,
+  title, editMode, canRemove, removeDisabledMessage,
+  onDuplicate, onCopy, onPaste,
+  onRemove, helpPopover,
 }) => (
     <div className="content-title">
       <div className="title">{title} {helpPopover}</div>
@@ -48,10 +52,30 @@ export const ContentTitle: React.StatelessComponent<ContentTitleProps> = ({
         ? <div
           className={'action-btn action-btn-duplicate'}
           onClick={onDuplicate}>
-          <i className="fa fa-copy" />
+          <i className="fa fa-clone" />
           Duplicate
       </div>
         : null}
+
+      <span>&nbsp;</span>
+      {onCopy
+        ? <div
+            className={'action-btn action-btn-duplicate'}
+            onClick={onCopy}>
+            <i className="fa fa-clipboard" />
+            Copy
+        </div>
+          : null}
+
+      <span>&nbsp;</span>
+      {onPaste
+        ? <div
+            className={'action-btn action-btn-duplicate'}
+            onClick={onPaste}>
+            <i className="fa fa-paste" />
+            Paste
+        </div>
+          : null}
 
       <span>&nbsp;</span>
 

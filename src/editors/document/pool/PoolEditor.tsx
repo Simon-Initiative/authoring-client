@@ -28,6 +28,10 @@ import { LegacyTypes, CourseIdVers } from 'data/types';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
+import { saveToLocalStorage } from 'utils/localstorage';
+
+import { Question } from 'data/content/assessment/question';
+import guid from 'utils/guid';
 
 interface PoolEditor {
 
@@ -288,6 +292,25 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     });
   }
 
+  onCopyNode = () => {
+    const { currentNode } = this.props;
+
+    currentNode.lift((node) => {
+      if (node.contentType === 'Question') {
+        const toSerialize = node.toPersistence();
+        const serialized = JSON.stringify(toSerialize);
+
+        saveToLocalStorage('clipboard', serialized);
+      }
+    });
+  }
+
+  onPasteNode = () => {
+    Question.fromClipboard(
+      this.props.context.skills.map(s => s.id).toSet())
+      .lift(question => this.addQuestion(question));
+  }
+
   renderAdd() {
     const { editMode } = this.props;
     const { collapseInsertPopup } = this.state;
@@ -380,6 +403,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                     onFocus={this.onFocus}
                     canRemove={this.canRemoveNode()}
                     onDuplicate={this.onDuplicateNode}
+                    onCopy={this.onCopyNode}
+                    onPaste={this.onPasteNode}
                     nodeParentModel={model}
                     parent={null}
                     isQuestionPool={true}
