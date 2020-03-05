@@ -35,7 +35,7 @@ import { RouterState } from 'reducers/router';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
 import { CourseState } from 'reducers/course';
-import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
+import { saveToLocalStorage } from 'utils/localstorage';
 import { Question } from 'data/content/assessment/question';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
@@ -548,12 +548,9 @@ export default class AssessmentEditor extends AbstractEditor<models.AssessmentMo
   }
 
   onPasteQuestion = () => {
-    const savedData: any = loadFromLocalStorage('clipboard');
-    if (savedData === null) {
-      return;
-    }
-    const pasteMe: Question = Question.fromPersistence(savedData, guid(), null);
-    this.addNode(pasteMe.clone());
+    Question.fromClipboard(
+      this.props.context.skills.map(s => s.id).toSet())
+      .lift(question => this.addNode(question));
   }
 
   collapseInsertPopupFn = (e) => {

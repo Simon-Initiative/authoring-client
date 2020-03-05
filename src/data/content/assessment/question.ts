@@ -27,6 +27,9 @@ import { Custom } from 'data/content/assessment/custom';
 import { pipe } from 'utils/utils';
 import { Inline } from 'slate';
 import { map } from 'data/utils/map';
+import { Maybe } from 'tsmonad';
+import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
+import { currentMarks } from 'editors/content/learning/contiguoustext/utils';
 
 export type InputRefChanges = {
   additions: Immutable.List<ct.InputRef>;
@@ -727,6 +730,33 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   static emptyBody() {
     return ContentElements.fromText('', '', QUESTION_BODY_ELEMENTS);
+  }
+
+  // Possibly restore a question from the local storage clipboard,
+  // ensuring that invalid skills are removed and all ids are changed
+  static fromClipboard(validSkills: Immutable.Set<string>) : Maybe<Question> {
+
+    const blob: any = loadFromLocalStorage('clipboard');
+    if (blob === null || blob.question === undefined) {
+      return Maybe.nothing();
+    }
+
+    try {
+      // Deserialize and change all ids
+      const question = Question
+        .fromPersistence(blob, createGuid(), null)
+        .clone();
+
+      // Filter out any skills references that are not valide
+      return Maybe.just(question
+        .with({ skills: question.skills.intersect(validSkills) })
+        .with({ parts: question.parts.map(p =>
+          p.with({ skills: p.skills.intersect(validSkills) })).toOrderedMap() }));
+    } catch (e) {
+
+      return Maybe.nothing();
+    }
+
   }
 
   static fromPersistence(json: any, guid: string, notify?: () => void) {

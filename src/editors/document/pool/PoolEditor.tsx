@@ -28,7 +28,7 @@ import { LegacyTypes, CourseIdVers } from 'data/types';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Node } from 'data/content/assessment/node';
 import { SidebarToggle } from 'editors/common/SidebarToggle.controller';
-import { saveToLocalStorage, loadFromLocalStorage } from 'utils/localstorage';
+import { saveToLocalStorage } from 'utils/localstorage';
 
 import { Question } from 'data/content/assessment/question';
 import guid from 'utils/guid';
@@ -306,13 +306,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   onPasteNode = () => {
-    const savedData: any = loadFromLocalStorage('clipboard');
-    if (savedData === null) {
-      return;
-    }
-
-    const fromClipboard = Question.fromPersistence(savedData, guid(), null);
-    this.addQuestion(fromClipboard.clone());
+    Question.fromClipboard(
+      this.props.context.skills.map(s => s.id).toSet())
+      .lift(question => this.addQuestion(question));
   }
 
   renderAdd() {
