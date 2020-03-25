@@ -635,12 +635,31 @@ class ObjectiveSkillView
 
     // Now update the skills model contained within that document, yielding
     // ultimately an updated document
-    const skills = (originalDocument.model as models.SkillsModel)
-      .skills.set(model.guid, model);
-    const updatedModel =
-      (originalDocument.model as models.SkillsModel)
-        .with({ skills });
-    const updatedDocument = originalDocument.with({ model: updatedModel });
+
+    // See if we can find the skill based on id instead of guid, to
+    // mitigate an issue with duplicate ids getting created.
+    const currentSkills = (originalDocument.model as models.SkillsModel).skills;
+    const foundSkill = currentSkills.toArray().filter(s => s.id === model.id);
+
+    let updatedDocument;
+
+    if (foundSkill.length > 0) {
+      // We found it based on id, so use that skills guid to ensure we do
+      // no duplicate an id
+      const skills = currentSkills.set(foundSkill[0].guid, model);
+      const updatedModel =
+        (originalDocument.model as models.SkillsModel)
+          .with({ skills });
+      updatedDocument = originalDocument.with({ model: updatedModel });
+    } else {
+      // We did not, so use the guid from the updated model
+      const skills = (originalDocument.model as models.SkillsModel)
+        .skills.set(model.guid, model);
+      const updatedModel =
+        (originalDocument.model as models.SkillsModel)
+          .with({ skills });
+      updatedDocument = originalDocument.with({ model: updatedModel });
+    }
 
     // Determine if we are making an edit to our special document that
     // handles all additions
