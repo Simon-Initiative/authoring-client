@@ -590,13 +590,39 @@ class ObjectiveSkillView
 
     const originalDocument = this.state.objectives.mapping.get(obj.id);
 
-    const objectives = (originalDocument.model as models.LearningObjectivesModel)
-      .objectives.set(obj.guid, obj);
-    const model =
-      (originalDocument.model as models.LearningObjectivesModel)
-        .with({ objectives });
+    let foundKey = null;
+    let foundValue = null;
+    let updatedDocument;
 
-    const updatedDocument = originalDocument.with({ model });
+    // Find an entry with the same id, in a way that gets us both the key and value
+    (originalDocument.model as models.LearningObjectivesModel)
+      .objectives.entrySeq().toArray().forEach(([key, value]) => {
+        if (value.id === obj.id) {
+          foundKey = key;
+          foundValue = value;
+        }
+      });
+
+    if (foundKey != null) {
+      // We found it based on id, so use that skills guid to ensure we do
+      // no duplicate an id
+
+      const updatedGuid = obj.with({ guid: foundValue.guid });
+      const objectives = (originalDocument.model as models.LearningObjectivesModel)
+        .objectives.set(foundKey, updatedGuid);
+      const model =
+        (originalDocument.model as models.LearningObjectivesModel)
+          .with({ objectives });
+      updatedDocument = originalDocument.with({ model });
+    } else {
+      // We did not find it based on id, so just set it in the ordered map using guid
+      const objectives = (originalDocument.model as models.LearningObjectivesModel)
+        .objectives.set(obj.guid, obj);
+      const model =
+        (originalDocument.model as models.LearningObjectivesModel)
+          .with({ objectives });
+      updatedDocument = originalDocument.with({ model });
+    }
 
     const unified = Object.assign({}, this.state.objectives);
 
@@ -639,19 +665,31 @@ class ObjectiveSkillView
     // See if we can find the skill based on id instead of guid, to
     // mitigate an issue with duplicate ids getting created.
     const currentSkills = (originalDocument.model as models.SkillsModel).skills;
-    const foundSkill = currentSkills.toArray().filter(s => s.id === model.id);
+    let foundSkillKey = null;
+    let foundSkillValue = null;
+
+    // Find an entry with the same id, in a way that gets us both the key and value
+    currentSkills.entrySeq().toArray().forEach(([key, value]) => {
+      if (value.id === model.id) {
+        foundSkillKey = key;
+        foundSkillValue = value;
+      }
+    });
 
     let updatedDocument;
 
-    if (foundSkill.length > 0) {
+    if (foundSkillKey != null) {
       // We found it based on id, so use that skills guid to ensure we do
       // no duplicate an id
-      const skills = currentSkills.set(foundSkill[0].guid, model);
+
+      const updatedGuid = model.with({ guid: foundSkillValue.guid });
+      const skills = currentSkills.set(foundSkillKey, updatedGuid);
       const updatedModel =
         (originalDocument.model as models.SkillsModel)
           .with({ skills });
       updatedDocument = originalDocument.with({ model: updatedModel });
     } else {
+
       // We did not, so use the guid from the updated model
       const skills = (originalDocument.model as models.SkillsModel)
         .skills.set(model.guid, model);
