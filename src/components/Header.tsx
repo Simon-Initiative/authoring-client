@@ -183,8 +183,7 @@ class Header
     const email = user.profile.email;
     const formUrl = buildFeedbackFromCurrent(name, email);
     const QUICK_START_GUIDE_URL
-      = 'https://docs.google.com/document/d/1B_AQpFRn2zue6-'
-      + 'nW6h8z6bOGfHWYqAjI7WCZ-WQMrf4/edit?usp=sharing';
+      = 'https://olihelp.freshdesk.com/support/solutions/32000022976';
     const logoutUrl = user.logoutUrl;
 
     return (
