@@ -149,14 +149,14 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     const c = json as any;
 
     const metadata =
-      isNullOrUndefined(c.metadata.jsonObject)
+      isNullOrUndefined(c.metadata)
         ? new contentTypes.MetaData()
-        : contentTypes.MetaData.fromPersistence(c.metadata.jsonObject);
+        : contentTypes.MetaData.fromPersistence(c.metadata);
 
     const language =
-      isNullOrUndefined(c.misc) || isNullOrUndefined(c.misc.jsonObject)
+      isNullOrUndefined(c.misc) || isNullOrUndefined(c.misc)
         ? 'en_US'
-        : c.misc.jsonObject['language'];
+        : c.misc['language'];
 
     const resources =
       isNullOrUndefined(c.resources)

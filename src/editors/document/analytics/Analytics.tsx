@@ -252,7 +252,7 @@ class Analytics
     // using skill edges, create a Map<SkillId, List<QuestionRef>>
     const skillQuestionRefMap = skillEdges.reduce(
       (acc, edge) => getQuestionRefFromPathInfo(
-        edge.metadata.jsonObject.pathInfo,
+        edge.metadata.pathInfo,
         edge.sourceType,
         resourceId(edge.sourceId),
       ).caseOf({
