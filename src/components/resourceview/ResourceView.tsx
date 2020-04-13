@@ -317,6 +317,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   renderCreation() {
     const { course, dispatch } = this.props;
     const { newItemTitle } = this.state;
+    const isTitleValid = newItemTitle.trim() !== '';
+    const validity = isTitleValid ? '' : 'is-invalid';
+    const titleClasses = `form-control mb-2 mr-sm-2 mb-sm-0 ${validity}`;
 
     return (
       <div className="table-toolbar">
@@ -330,13 +333,14 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
                 style={{ width: 300 }}
                 value={newItemTitle}
                 disabled={!course.editable}
-                className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
+                className={titleClasses}
+                id="inlineFormInput"
                 onChange={({ target: { value } }) => this.setState({ newItemTitle: value })}
                 placeholder="Enter title for new resource" />
               <div className="dropdown">
                 <button
                   style={{ height: 38, border: 'none' }}
-                  disabled={!course.editable || !newItemTitle}
+                  disabled={!course.editable || !isTitleValid}
                   className="btn btn-md btn-primary dropdown-toggle"
                   data-toggle="dropdown">{'Choose type... '}
                 </button>
