@@ -43,13 +43,13 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 const getQuestionRefFromSkillEdge = (
   edge: Edge, assessmentType: LegacyTypes, assessmentId: string): Maybe<QuestionRef> => {
   return getQuestionRefFromPathInfo(
-    edge.metadata.jsonObject.pathInfo, assessmentType, assessmentId);
+    edge.metadata.pathInfo, assessmentType, assessmentId);
 };
 
 const getPoolInfoFromPoolRefEdge = (edge: Edge, questionCount: number): Maybe<PoolInfo> => {
   if (!edge) return Maybe.nothing();
 
-  const pathInfo = edge.metadata.jsonObject.pathInfo;
+  const pathInfo = edge.metadata.pathInfo;
   return Maybe.just({
     questionCount,
     count: pathInfo.parent['@count'],

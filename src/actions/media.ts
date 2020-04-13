@@ -106,7 +106,7 @@ export const fetchMediaReferences = (courseId: CourseIdVers) => (
               edgePathTo,
               (acc.get(edgePathTo) || List<MediaRef>()).concat({
                 resourceId: edge.sourceId.replace(/^.*:/, ''),
-                guid: edge.metadata.jsonObject.sourceGuid,
+                guid: edge.metadata.sourceGuid,
               }) as List<MediaRef>,
             );
           },

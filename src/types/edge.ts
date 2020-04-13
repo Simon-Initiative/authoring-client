@@ -18,10 +18,8 @@ export type Edge = {
   referenceType: string;
   status: string;
   metadata: {
-    jsonObject: {
-      pathInfo: PathElement;
-      sourceGuid: string;
-    };
+    pathInfo: PathElement;
+    sourceGuid: string;
   };
 };
 
