@@ -257,8 +257,8 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
 
   const comparators = [
     (direction, a, b) => safeCompare('title', 'id', direction, a, b),
-    (direction, a, b) => safeCompare('id', 'title', direction, a, b),
     (direction, a, b) => safeCompare('version', 'title', direction, a, b),
+    (direction, a, b) => safeCompare('id', 'title', direction, a, b),
     (direction, a, b) => direction === SortDirection.Ascending
       ? compareDates(a.dateCreated, b.dateCreated)
       : compareDates(b.dateCreated, a.dateCreated),
