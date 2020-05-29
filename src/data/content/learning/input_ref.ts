@@ -7,6 +7,7 @@ export enum InputRefType {
   Numeric,
   Text,
   FillInTheBlank,
+  MathText,
 }
 
 export type InputRefParams = {
