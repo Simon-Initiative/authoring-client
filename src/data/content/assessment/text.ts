@@ -77,7 +77,7 @@ export class Text extends Immutable.Record(defaultContent) {
       model = model.with({ evaluation: n['@evaluation'] });
     }
     if (n['@keyboard'] !== undefined) {
-      model = model.with({ evaluation: n['@keyboard'] });
+      model = model.with({ keyboard: n['@keyboard'] });
     }
     
 
