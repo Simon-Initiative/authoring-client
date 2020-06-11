@@ -140,7 +140,7 @@ export class AddQuestion extends React.Component<AddQuestionProps, AddQuestionSt
           ),
           Multipart: (
             <a onClick={() => onQuestionAdd(createMultipart())}
-              className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
+              className="dropdown-item">Input (Text, Numeric, Dropdown, Math)</a>
           ),
           DragAndDrop: (
             <a onClick={() => onQuestionAdd(createDragDrop())}
