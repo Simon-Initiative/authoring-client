@@ -6,6 +6,7 @@ import {
   AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Select, Button } from '../common/controls';
+import { MathField } from '../../../components/MathField';
 import {
   TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
 } from 'components/common/TabContainer';
@@ -117,6 +118,8 @@ export class MathText
             <option value="math">Math</option>
             <option value="chemistry">Chemistry</option>
           </Select>
+
+          <MathField/>
 
         </TabSectionContent>
         <TabSectionHeader title="Feedback">
