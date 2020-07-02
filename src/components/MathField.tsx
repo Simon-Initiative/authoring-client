@@ -19,7 +19,7 @@ export class MathField extends React.Component<MathFieldProps, MathFieldState> {
     componentDidMount() {
       MathLive.makeMathField('mf', {
         fontsDirectory: 'https://unpkg.com/mathlive/dist/fonts/',
-        virtualKeyboardMode: 'manual',
+        virtualKeyboardMode: 'onfocus',
         onContentDidChange: mf => { this.onChange(mf.$text()); },
       });
     }
