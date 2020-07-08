@@ -11,8 +11,6 @@ import { Maybe } from 'tsmonad';
 import { OrgComponentEditor } from './OrgComponentEditor';
 import guid from 'utils/guid';
 import './OrgDetailsEditor.scss';
-import { containsUnitsOnly } from './utils';
-import { ModalMessage } from 'utils/ModalMessage';
 import { TabContainer, Tab } from 'components/common/TabContainer';
 import { UserState } from 'reducers/user';
 import { updateActiveOrgPref } from 'actions/utils/activeOrganization';
@@ -20,43 +18,7 @@ import { duplicate } from 'actions/duplication';
 import UndoRedoToolbar from 'editors/document/common/UndoRedoToolbar';
 import { Document } from 'data/persistence';
 
-function buildMoreInfoAction(display, dismiss) {
-  const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
-    + ' information in the OLI Learning Dashboard.  Therefore it is recommended that a one-level'
-    + ' organization use modules instead of units to organize course material.';
 
-
-  const moreInfoAction = {
-    label: 'More Info',
-    enabled: true,
-    execute: (message: Messages.Message, dispatch) => {
-      display(
-        <ModalMessage onCancel={dismiss}>{moreInfoText}</ModalMessage>);
-    },
-  };
-  return moreInfoAction;
-}
-
-function buildUnitsMessage(display, dismiss, labels: contentTypes.Labels) {
-
-  const lowerCased = labels.module.toLowerCase();
-
-  const content = new Messages.TitledContent().with({
-    title: `No ${lowerCased} found.`,
-    message:
-      `Organizations without at least one ${lowerCased} have learning dashboard limitations in OLI`,
-  });
-
-  return new Messages.Message().with({
-    content,
-    guid: 'UnitsOnly',
-    scope: Messages.Scope.Organization,
-    severity: Messages.Severity.Warning,
-    canUserDismiss: false,
-    actions: List([buildMoreInfoAction(display, dismiss)]),
-  });
-
-}
 
 export interface OrgDetailsEditorProps {
   skills: Map<string, contentTypes.Skill>;
@@ -85,6 +47,28 @@ const enum TABS {
   Actions = 3,
 }
 
+/*
+updateUnitsMessage(props: OrgDetailsEditorProps) {
+  const { model } = this.props;
+
+  model.lift((model) => {
+    const containsOnly = containsUnitsOnly(model);
+
+    if (!containsOnly) {
+      this.unitsMessageDisplayed = false;
+      props.dismissMessage(buildUnitsMessage(
+        props.displayModal, props.dismissModal, model.labels));
+
+    } else if (!this.unitsMessageDisplayed && containsOnly) {
+      this.unitsMessageDisplayed = true;
+      props.showMessage(buildUnitsMessage(
+        props.displayModal, props.dismissModal, model.labels));
+    }
+  });
+}
+*/
+
+
 export interface OrgDetailsEditorState {
   currentTab: TABS;
 }
@@ -107,34 +91,6 @@ export class OrgDetailsEditor
     };
   }
 
-  componentDidMount() {
-    this.updateUnitsMessage(this.props);
-  }
-
-  componentWillReceiveProps(nextProps: Readonly<OrgDetailsEditorProps>) {
-    if (this.props.model !== nextProps.model) {
-      this.updateUnitsMessage(nextProps);
-    }
-  }
-
-  updateUnitsMessage(props: OrgDetailsEditorProps) {
-    const { model } = this.props;
-
-    model.lift((model) => {
-      const containsOnly = containsUnitsOnly(model);
-
-      if (!containsOnly) {
-        this.unitsMessageDisplayed = false;
-        props.dismissMessage(buildUnitsMessage(
-          props.displayModal, props.dismissModal, model.labels));
-
-      } else if (!this.unitsMessageDisplayed && containsOnly) {
-        this.unitsMessageDisplayed = true;
-        props.showMessage(buildUnitsMessage(
-          props.displayModal, props.dismissModal, model.labels));
-      }
-    });
-  }
 
   onNodeEdit(request: org.OrgChangeRequest) {
     this.props.onEdit(request);

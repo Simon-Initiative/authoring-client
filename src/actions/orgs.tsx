@@ -7,6 +7,11 @@ import createGuid from 'utils/guid';
 import { NavigationItem } from 'types/navigation';
 import * as viewActions from 'actions/view';
 import { showMessage, dismissSpecificMessage } from 'actions/messages';
+import * as Messages from 'types/messages';
+import { ModalMessage } from 'utils/ModalMessage';
+import { modalActions } from 'actions/modal';
+ import { containsUnitsOnly } from 'editors/document/org/utils';
+import * as contentTypes from 'data/contentTypes';
 
 import { buildConflictMessage } from 'utils/error';
 import { CourseIdVers } from 'data/types';
@@ -178,6 +183,65 @@ export const modelUpdated = (
     model,
   });
 
+// For units-only warning:
+
+function buildMoreInfoAction(dispatch) {
+  const moreInfoText = 'Organizations that do not contain any modules will not display relevant'
+    + ' information in the OLI Learning Dashboard.  Therefore it is recommended that a one-level'
+    + ' organization use modules instead of units to organize course material.';
+
+  const dismissModal = () => {
+    return dispatch(modalActions.dismiss());
+  };
+  const displayModal = (c) => {
+    return dispatch(modalActions.display(c));
+  }
+
+  const moreInfoAction = {
+    label: 'More Info',
+    enabled: true,
+    execute: (message: Messages.Message, dispatch) => {
+      displayModal(
+        <ModalMessage onCancel={dismissModal}>{moreInfoText}</ModalMessage>);
+    },
+  };
+  return moreInfoAction;
+}
+
+function buildUnitsMessage(labels: contentTypes.Labels, dispatch) {
+
+  const lowerCased = labels.module.toLowerCase();
+
+  const content = new Messages.TitledContent().with({
+    title: `No ${lowerCased} found.`,
+    message:
+      `Organizations without at least one ${lowerCased} have learning dashboard limitations in OLI`,
+  });
+ 
+  return new Messages.Message().with({
+    content,
+    guid: 'UnitsOnly',
+    scope: Messages.Scope.CoursePackage,
+    severity: Messages.Severity.Warning,
+    canUserDismiss: false,
+    actions: Immutable.List([buildMoreInfoAction(dispatch)]),
+  });
+
+}
+
+function updateUnitsMessage(document : persistence.Document, dispatch) {
+  const { model } = document;
+
+  if (model.modelType === 'OrganizationModel') {
+    const unitsOnly = containsUnitsOnly(model);
+
+    if (unitsOnly) { 
+      dispatch(showMessage(buildUnitsMessage(model.labels, dispatch)));    
+    } else  {
+      dispatch(dismissSpecificMessage(buildUnitsMessage(model.labels, dispatch)));
+    }
+  }
+}
 
 
 export function load(courseId: CourseIdVers, organizationId: string) {
@@ -191,6 +255,7 @@ export function load(courseId: CourseIdVers, organizationId: string) {
     return persistence.retrieveDocument(courseId, organizationId, notifyChangeMade)
       .then((document) => {
         dispatch(orgLoaded(document));
+        dispatch(updateUnitsMessage(document, dispatch));
         dispatch(dismissSpecificMessage(buildConflictMessage()));
         return document;
       });
@@ -234,6 +299,7 @@ function applyChange(
       persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
         .then(() => {
           dispatch(orgChangeSucceeded(m.guid));
+          dispatch(updateUnitsMessage(doc, dispatch));
           dispatch(dismissSpecificMessage(buildConflictMessage()));
         })
         .catch((err) => {
