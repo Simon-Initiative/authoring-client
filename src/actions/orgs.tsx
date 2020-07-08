@@ -230,12 +230,12 @@ function buildUnitsMessage(labels: contentTypes.Labels, dispatch) {
 
 function updateUnitsMessage(model: models.OrganizationModel, dispatch) {
   
-    if (containsUnitsOnly(model)) { 
-      return showMessage(buildUnitsMessage(model.labels, dispatch));    
-    } 
-    
-    // else:
-    return dismissSpecificMessage(buildUnitsMessage(model.labels, dispatch));
+  if (containsUnitsOnly(model)) { 
+    return showMessage(buildUnitsMessage(model.labels, dispatch));    
+  } 
+  
+  // else:
+  return dismissSpecificMessage(buildUnitsMessage(model.labels, dispatch));
 }
 
 
