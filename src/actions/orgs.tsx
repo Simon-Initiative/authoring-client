@@ -12,7 +12,6 @@ import { ModalMessage } from 'utils/ModalMessage';
 import { modalActions } from 'actions/modal';
 import { containsUnitsOnly } from 'editors/document/org/utils';
 import * as contentTypes from 'data/contentTypes';
-
 import { buildConflictMessage } from 'utils/error';
 import { CourseIdVers } from 'data/types';
 import { Maybe } from 'tsmonad';
@@ -229,18 +228,14 @@ function buildUnitsMessage(labels: contentTypes.Labels, dispatch) {
 
 }
 
-function updateUnitsMessage(document : persistence.Document, dispatch) {
-  const { model } = document;
-
-  if (model.modelType === 'OrganizationModel') {
-    const unitsOnly = containsUnitsOnly(model);
-
-    if (unitsOnly) { 
+function updateUnitsMessage(model: models.OrganizationModel, dispatch) {
+  
+    if (containsUnitsOnly(model)) { 
       return showMessage(buildUnitsMessage(model.labels, dispatch));    
     } 
+    
     // else:
     return dismissSpecificMessage(buildUnitsMessage(model.labels, dispatch));
-  }
 }
 
 
@@ -255,7 +250,7 @@ export function load(courseId: CourseIdVers, organizationId: string) {
     return persistence.retrieveDocument(courseId, organizationId, notifyChangeMade)
       .then((document) => {
         dispatch(orgLoaded(document));
-        dispatch(updateUnitsMessage(document, dispatch));
+        dispatch(updateUnitsMessage(document.model as models.OrganizationModel, dispatch));
         dispatch(dismissSpecificMessage(buildConflictMessage()));
         return document;
       });
@@ -299,7 +294,7 @@ function applyChange(
       persistence.persistRevisionBasedDocument(doc.with({ model }), nextRevision)
         .then(() => {
           dispatch(orgChangeSucceeded(m.guid));
-          dispatch(updateUnitsMessage(doc, dispatch));
+          dispatch(updateUnitsMessage(model, dispatch));
           dispatch(dismissSpecificMessage(buildConflictMessage()));
         })
         .catch((err) => {
