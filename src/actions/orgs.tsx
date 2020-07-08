@@ -10,7 +10,7 @@ import { showMessage, dismissSpecificMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
 import { ModalMessage } from 'utils/ModalMessage';
 import { modalActions } from 'actions/modal';
- import { containsUnitsOnly } from 'editors/document/org/utils';
+import { containsUnitsOnly } from 'editors/document/org/utils';
 import * as contentTypes from 'data/contentTypes';
 
 import { buildConflictMessage } from 'utils/error';
@@ -195,7 +195,7 @@ function buildMoreInfoAction(dispatch) {
   };
   const displayModal = (c) => {
     return dispatch(modalActions.display(c));
-  }
+  };
 
   const moreInfoAction = {
     label: 'More Info',
@@ -237,9 +237,9 @@ function updateUnitsMessage(document : persistence.Document, dispatch) {
 
     if (unitsOnly) { 
       return showMessage(buildUnitsMessage(model.labels, dispatch));    
-    } else  {
-      return dismissSpecificMessage(buildUnitsMessage(model.labels, dispatch));
-    }
+    } 
+    // else:
+    return dismissSpecificMessage(buildUnitsMessage(model.labels, dispatch));
   }
 }
 
