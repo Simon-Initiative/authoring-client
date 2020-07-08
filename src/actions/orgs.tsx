@@ -236,9 +236,9 @@ function updateUnitsMessage(document : persistence.Document, dispatch) {
     const unitsOnly = containsUnitsOnly(model);
 
     if (unitsOnly) { 
-      dispatch(showMessage(buildUnitsMessage(model.labels, dispatch)));    
+      return showMessage(buildUnitsMessage(model.labels, dispatch));    
     } else  {
-      dispatch(dismissSpecificMessage(buildUnitsMessage(model.labels, dispatch)));
+      return dismissSpecificMessage(buildUnitsMessage(model.labels, dispatch));
     }
   }
 }
