@@ -47,28 +47,6 @@ const enum TABS {
   Actions = 3,
 }
 
-/*
-updateUnitsMessage(props: OrgDetailsEditorProps) {
-  const { model } = this.props;
-
-  model.lift((model) => {
-    const containsOnly = containsUnitsOnly(model);
-
-    if (!containsOnly) {
-      this.unitsMessageDisplayed = false;
-      props.dismissMessage(buildUnitsMessage(
-        props.displayModal, props.dismissModal, model.labels));
-
-    } else if (!this.unitsMessageDisplayed && containsOnly) {
-      this.unitsMessageDisplayed = true;
-      props.showMessage(buildUnitsMessage(
-        props.displayModal, props.dismissModal, model.labels));
-    }
-  });
-}
-*/
-
-
 export interface OrgDetailsEditorState {
   currentTab: TABS;
 }
