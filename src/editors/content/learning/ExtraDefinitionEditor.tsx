@@ -99,7 +99,7 @@ class ExtraDefinitionEditor
       .then((audio) => {
         if (audio !== null) {
           const src = audio.sources.first().src;
-          const type = 'audio/mp3';
+          const type = 'audio/mpeg';
 
           const pronunciation = this.state.model.pronunciation.with(
             { src: Maybe.just(src), srcContentType: Maybe.just(type) });
@@ -127,16 +127,6 @@ class ExtraDefinitionEditor
     });
 
     this.onEdit(model);
-  }
-
-  onPronunciationEdit(pronunciation, src) {
-
-    const model = this.state.model.with({
-      pronunciation,
-    });
-
-    this.onEdit(model);
-
   }
 
   onMeaningEdit(elements, src) {
@@ -270,32 +260,8 @@ class ExtraDefinitionEditor
       onFocus: (m, p, t) => this.props.onFocus(m, translationParent, t),
     });
 
-    const pronunciationParent = {
-      supportedElements: Immutable.List<string>(TEXT_ELEMENTS),
-      onEdit(content: Object, source: Object) {
-        this.onEdit(this.state.model.with({ pronunciation: content }));
-      },
-      onAddNew(content: Object, editor: Maybe<Editor>) { },
-      onRemove(content: Object) { },
-      onDuplicate(content: Object) { },
-      onMoveUp(content: Object) { },
-      onMoveDown(content: Object) { },
-      onPaste() { },
-      props: this.props,
-    };
-
     const translationEditor = React.createElement(
       getEditorByContentType('Translation'), translationProps);
-
-    const pronunciationProps = Object.assign({}, this.props, {
-      model: pronunciation,
-      onEdit: this.onPronunciationEdit.bind(this),
-      onClick: () => { },
-      onFocus: (m, p, t) => this.props.onFocus(m, pronunciationParent, t),
-    });
-
-    const pronunciationEditor = React.createElement(
-      getEditorByContentType('Pronunciation'), pronunciationProps);
 
     const meaningEditors = this.state.model.meaning.size > 0
       ? <ContentContainer
@@ -322,9 +288,6 @@ class ExtraDefinitionEditor
 
         <div>Translation</div>
         {translationEditor}
-
-        <div>Pronunciation</div>
-        {pronunciationEditor}
 
       </div>
     );
