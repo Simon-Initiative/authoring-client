@@ -20,7 +20,8 @@ import { Editor } from 'slate';
 import { InlineTypes } from 'data/content/learning/contiguous';
 import * as editorUtils from 'editors/content/learning/contiguoustext/utils';
 
-export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank' | 'MathText' ) => boolean;
+export type PartAddPredicate =
+  (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank' | 'MathText') => boolean;
 
 export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
@@ -56,7 +57,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
   onInsertInputRef(
     canInsertAnotherPart: PartAddPredicate,
-    type: 'FillInTheBlank' | 'Numeric' | 'Text' | 'MathText' ) {
+    type: 'FillInTheBlank' | 'Numeric' | 'Text' | 'MathText') {
 
     if (canInsertAnotherPart(type)) {
 

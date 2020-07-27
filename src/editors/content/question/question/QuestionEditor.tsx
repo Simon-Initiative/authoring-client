@@ -94,14 +94,15 @@ export class QuestionEditor
 
   canInsertAnotherPart = (
     question: contentTypes.Question,
-    contentTypeToAdd: 'Numeric' | 'Text' | 'FillInTheBlank' | 'MathText'): boolean => {
+    contentTypeToAddVal: 'Numeric' | 'Text' | 'FillInTheBlank' | 'MathText'): boolean => {
 
     if (!this.props.isParentAssessmentGraded) {
       return true;
     }
 
+    let contentTypeToAdd = contentTypeToAddVal;
     // 'MathText' codes for Text part with math input attributes.
-    if (contentTypeToAdd === 'MathText') {
+    if (contentTypeToAddVal === 'MathText') {
       contentTypeToAdd = 'Text';
     }
 
@@ -167,7 +168,7 @@ export class QuestionEditor
         } else if (inputRef.inputType === InputRefType.MathText) {
 
           newItem = new contentTypes.Text().with({ id: inputRef.input, 
-                                                   evaluation: 'latex', keyboard: 'math' });
+            evaluation: 'latex', keyboard: 'math' });
           newPart = this.buildPartWithInitialResponse('answer', inputRef.input);
 
         } else {
