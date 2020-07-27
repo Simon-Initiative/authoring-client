@@ -408,7 +408,7 @@ let renderRangeInstructions = (jssClass, range1, range2) =>
   | false => (
     <div
       className=(classNames([jssClass("optionsRow"), jssClass("rangeErrMsg")]))>
-      (strEl("Range entered is invalid. Values must be valid numbers and lower bound must be less than or equal to upper bound"))
+      (strEl("Range entered is invalid. Values must be valid numbers or variables and lower bound must be less than or equal to upper bound"))
       <div className=(classNames([jssClass("precisionSpacer")])) />
   </div>
   )};
@@ -484,13 +484,18 @@ let renderRange =
         onChange=(
           event => {
             let value = ReactDOMRe.domElementToObj(
-                          ReactEventRe.Form.target(event),
-                        )##value;
+                ReactEventRe.Form.target(event),
+              )##value;
             let matchValue = "[" ++ value ++ "," ++ rangeEnd ++ "]";
             let isValidRange = switch (float_of_string(value), float_of_string(rangeEnd)) {
               | (valueFloat, rangeEndFloat) => valueFloat <= rangeEndFloat
-              | exception Failure(_) => false
-              };
+              | exception Failure(_) => {
+                switch (float_of_string(value)) {
+                | _valueFloat => isValidVariableRef(rangeEnd)
+                | exception Failure(_) => isValidVariableRef(value)
+                };
+              }
+            };
 
             if (isValidInput(value) && isValidRange) {
               /* value and range are valid */
@@ -526,13 +531,18 @@ let renderRange =
         onChange=(
           event => {
             let value = ReactDOMRe.domElementToObj(
-                          ReactEventRe.Form.target(event),
-                        )##value;
+                ReactEventRe.Form.target(event),
+              )##value;
             let matchValue = "[" ++ rangeStart ++ "," ++ value ++ "]";
             let isValidRange = switch (float_of_string(value), float_of_string(rangeStart)) {
               | (valueFloat, rangeStartFloat) => valueFloat >= rangeStartFloat
-              | exception Failure(_) => false
-              };
+              | exception Failure(_) => {
+                switch (float_of_string(value)) {
+                | _valueFloat => isValidVariableRef(rangeStart)
+                | exception Failure(_) => isValidVariableRef(value)
+                };
+              }
+            };
 
             if (isValidInput(value) && isValidRange) {
               /* value and range are valid */
