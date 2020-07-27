@@ -7,7 +7,9 @@ export type TextParams = {
   caseSensitive?: boolean;
   whitespace?: string;
   inputSize?: string;
-  guid?: string
+  guid?: string;
+  evaluation?: string;
+  keyboard?: string;
 };
 
 const defaultContent = {
@@ -19,6 +21,8 @@ const defaultContent = {
   whitespace: 'trim',
   inputSize: 'small',
   guid: '',
+  evaluation: 'regex',
+  keyboard: 'none',
 };
 
 export class Text extends Immutable.Record(defaultContent) {
@@ -31,6 +35,8 @@ export class Text extends Immutable.Record(defaultContent) {
   whitespace: string;
   inputSize: string;
   guid: string;
+  evaluation: string; // 'regex' | 'latex' | 'numeric_computation'
+  keyboard: string;   // 'none' | 'math' | 'chemistry'
 
   constructor(params?: TextParams) {
     super(augment(params));
@@ -42,6 +48,10 @@ export class Text extends Immutable.Record(defaultContent) {
 
   with(values: TextParams) {
     return this.merge(values) as this;
+  }
+
+  isMathText() : boolean { 
+    return (this.evaluation === 'latex' || this.evaluation === 'numeric_computation');
   }
 
   static fromPersistence(json: Object, guid: string, notify: () => void) : Text {
@@ -63,6 +73,13 @@ export class Text extends Immutable.Record(defaultContent) {
     if (n['@size'] !== undefined) {
       model = model.with({ inputSize: n['@size'] });
     }
+    if (n['@evaluation'] !== undefined) {
+      model = model.with({ evaluation: n['@evaluation'] });
+    }
+    if (n['@keyboard'] !== undefined) {
+      model = model.with({ keyboard: n['@keyboard'] });
+    }
+    
 
     return model;
 
@@ -77,6 +94,8 @@ export class Text extends Immutable.Record(defaultContent) {
         '@size': this.inputSize,
         '@whitespace': this.whitespace,
         '@case_sensitive': this.caseSensitive,
+        '@evaluation': this.evaluation,
+        '@keyboard': this.keyboard,
       },
     };
   }

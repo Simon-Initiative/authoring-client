@@ -7,6 +7,7 @@ import { TabContainer } from 'components/common/TabContainer';
 import { FillInTheBlank } from '../../items/FillInTheBlank';
 import { Text } from '../../items/Text';
 import { Numeric } from '../../items/Numeric';
+import { MathText } from '../../items/MathText';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
 import guid from 'utils/guid';
 import './MultipartInput.scss';
@@ -19,7 +20,8 @@ import { Editor } from 'slate';
 import { InlineTypes } from 'data/content/learning/contiguous';
 import * as editorUtils from 'editors/content/learning/contiguoustext/utils';
 
-export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
+export type PartAddPredicate =
+  (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank' | 'MathText') => boolean;
 
 export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
@@ -55,7 +57,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
   onInsertInputRef(
     canInsertAnotherPart: PartAddPredicate,
-    type: 'FillInTheBlank' | 'Numeric' | 'Text') {
+    type: 'FillInTheBlank' | 'Numeric' | 'Text' | 'MathText') {
 
     if (canInsertAnotherPart(type)) {
 
@@ -66,6 +68,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
         inputType = InputRefType.FillInTheBlank;
       } else if (type === 'Text') {
         inputType = InputRefType.Text;
+      } else if (type === 'MathText') {
+        inputType = InputRefType.MathText;
       }
 
       const inputRef = new contentTypes.InputRef({ input, inputType });
@@ -165,7 +169,11 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             onClick={() => this.onInsertInputRef(canInsertAnotherPart, 'FillInTheBlank')}>
             Dropdown
             </button>
-
+          <button className="btn btn-sm btn-link" type="button"
+            disabled={!this.props.editMode || !canInsertAnotherPart('MathText')}
+            onClick={() => this.onInsertInputRef(canInsertAnotherPart, 'MathText')}>
+            Math
+            </button>
         </div>
         <ContentContainer
           onEntitySelected={onEntitySelected}
@@ -195,6 +203,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
         case 'Numeric':
           return 'Numeric';
         case 'Text':
+          return item.isMathText() ? 'Math' : 'Text';      
         default:
           return 'Text';
       }
@@ -242,6 +251,26 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               onEdit={props.onEdit} />
           );
         case 'Text':
+          if (item.isMathText()) {
+            return (
+              <MathText
+                activeContentGuid={this.props.activeContentGuid}
+                hover={this.props.hover}
+                onUpdateHover={this.props.onUpdateHover}
+                context={props.context}
+                services={props.services}
+                editMode={props.editMode}
+                onRemove={this.onRemove}
+                onFocus={props.onFocus}
+                onItemFocus={props.onItemFocus}
+                onBlur={props.onBlur}
+                itemModel={item}
+                partModel={part}
+                branchingQuestions={this.props.branchingQuestions}
+                onEdit={props.onEdit} />
+            );
+          }
+          // else regular Text:
           return (
             <Text
               activeContentGuid={this.props.activeContentGuid}
