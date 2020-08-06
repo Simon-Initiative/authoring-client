@@ -63,7 +63,7 @@ class ExtraDefinitionEditor
                 nothing: () => 'None Set',
               })
             }
-          <button onClick={this.onSelect.bind(this)} className="btn btn-primary">
+          <button onClick={this.onSelectAudio.bind(this)} className="btn btn-primary">
               <div>{getContentIcon(insertableContentTypes.Audio)}</div>
               <div>Pronounciation Audio</div>
           </button>
@@ -77,7 +77,7 @@ class ExtraDefinitionEditor
 
   }
 
-  onSelect() {
+  onSelectAudio() {
     const { context, services } = this.props;
 
     const dispatch = (services as any).dispatch;
@@ -105,6 +105,7 @@ class ExtraDefinitionEditor
             { src: Maybe.just(src), srcContentType: Maybe.just(type) });
           const model = this.state.model.with({ pronunciation });
 
+          this.setState( { model });
           this.props.onEdit(model, null);
         }
       });
@@ -153,17 +154,6 @@ class ExtraDefinitionEditor
 
   }
 
-  onTranslationEdit(translation, src) {
-
-    const model = this.state.model.with({
-      translation,
-    });
-
-    this.onEdit(model);
-
-  }
-
-
   handleOnFocus(e) {
     // We override the parent implementation, as the
     // default focus behavior of setting the parent container
@@ -207,6 +197,7 @@ class ExtraDefinitionEditor
           model={this.state.model.content}
           onEdit={this.onContentEdit.bind(this)}
         />
+
       </div>
     );
   }
@@ -226,8 +217,6 @@ class ExtraDefinitionEditor
 
     const getLabel = (e, i) => <span>{e.contentType + ' ' + (i + 1)}</span>;
 
-    const { translation, pronunciation } = model;
-
     const meanings = new ContentElements().with({
       content: model.meaning,
     });
@@ -236,32 +225,6 @@ class ExtraDefinitionEditor
     model.meaning.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
 
     const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
-
-    const translationParent = {
-      supportedElements: Immutable.List<string>(TEXT_ELEMENTS),
-      onEdit(content: Object, source: Object) {
-        this.onEdit(this.state.model.with({ translation: content }));
-      },
-      onAddNew(content: Object, editor: Maybe<Editor>) { },
-      onRemove(content: Object) { },
-      onDuplicate(content: Object) { },
-      onMoveUp(content: Object) { },
-      onMoveDown(content: Object) { },
-      onPaste() { },
-      props: this.props,
-    };
-
-    const translationProps = Object.assign({}, this.props, {
-      model: translation,
-      label: 'Translation',
-      onEdit: this.onTranslationEdit.bind(this),
-      parent: this,
-      onClick: () => { },
-      onFocus: (m, p, t) => this.props.onFocus(m, translationParent, t),
-    });
-
-    const translationEditor = React.createElement(
-      getEditorByContentType('Translation'), translationProps);
 
     const meaningEditors = this.state.model.meaning.size > 0
       ? <ContentContainer
@@ -279,15 +242,23 @@ class ExtraDefinitionEditor
           Save Changes
         </button>
 
-        <button type="button"
-          disabled={!editMode}
-          onClick={this.onAddMeaning.bind(this)}
-          className="btn btn-link">+ Add meaning</button>
-
         {meaningEditors}
 
-        <div>Translation</div>
-        {translationEditor}
+        <strong>Audio: </strong>
+            {
+              this.state.model.pronunciation.src.caseOf({
+                just: src => src.substr(src.lastIndexOf('/') + 1),
+                nothing: () => 'None Set',
+              })
+            }
+
+      {/* To select audio from within popup
+        <br/>
+        <button onClick={this.onSelectAudio.bind(this)} className="btn btn-primary">
+              <div>{getContentIcon(insertableContentTypes.Audio)}</div>
+              <div>Choose Audio ...</div>
+        </button>
+      */}
 
       </div>
     );
