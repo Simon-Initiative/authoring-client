@@ -78,7 +78,9 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
     if (cb['#text'] !== undefined) {
       model = model.with({ source: cb['#text'] });
     }
-
+    if (cb['#cdata'] !== undefined) {
+      model = model.with({ source: cb['#cdata'] });
+    }
     return model;
   }
 
