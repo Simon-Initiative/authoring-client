@@ -167,7 +167,7 @@ export class QuestionEditor
 
         } else if (inputRef.inputType === InputRefType.MathText) {
 
-          newItem = new contentTypes.Text().with({ id: inputRef.input, 
+          newItem = new contentTypes.Text().with({ id: inputRef.input,
             evaluation: 'latex', keyboard: 'math' });
           newPart = this.buildPartWithInitialResponse('answer', inputRef.input);
 
@@ -302,7 +302,6 @@ export class QuestionEditor
       onPaste,
       onBodyEdit: this.onBodyEdit,
       hideGradingCriteria: !isParentAssessmentGraded,
-      hideVariables: !isQuestionPool,
       canRemoveQuestion: canRemove,
       onRemoveQuestion: onRemove.bind(this, model.guid),
       onEdit: (c, p, src) => this.onItemPartEdit(c, p, src),

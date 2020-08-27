@@ -45,7 +45,6 @@ export interface OwnQuestionProps<ModelType>
   body: any;
   grading: any;
   hideGradingCriteria: boolean;
-  hideVariables: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   model: contentTypes.Question;
   canRemoveQuestion: boolean;
@@ -291,12 +290,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
   renderVariables() {
 
-    const { hideVariables, onFocus, model, editMode, services, context, onVariablesChange,
+    const { onFocus, model, editMode, services, context, onVariablesChange,
       onUpdateHover, hover, activeContentGuid } = this.props;
-
-    if (hideVariables) {
-      return null;
-    }
 
     const enableVariablesButton =
       <button className="btn btn-sm btn-outline-primary" type="button"
