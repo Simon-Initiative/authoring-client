@@ -271,8 +271,18 @@ class Header
     return <span>OLI Course Authoring</span>;
   }
 
+  isCourseRoute() {
+    return this.props.router.route.type === 'RouteCourse';
+  }
+
   render() {
     const { classes, router } = this.props;
+
+    // For our purposes, we need to know if the current route is either course-specific
+    // or application specific.  If course specific, we display the title of the package
+    // here in the header, otherwise for all other routes we display the application title
+    const label = this.isCourseRoute() && this.props.course
+    ? this.renderPackageTitle() : this.renderApplicationLabel();
 
     return (
       <div className={classNames(['Header', classes.Header])}>
@@ -286,7 +296,7 @@ class Header
               className="d-inline-block align-top" alt="" />
           </Link>
 
-          {this.props.course ? this.renderPackageTitle() : this.renderApplicationLabel()}
+          {label}
 
         </div>
         <ReactCSSTransitionGroup transitionName="saving"

@@ -235,10 +235,10 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
     'Created',
   ];
 
+
+  const style = course => course.buildStatus !== 'READY' ? { pointerEvents: 'none', cursor: 'default' } : {};
   const link = course => span =>
-    <button disabled={course.buildStatus !== 'READY'}
-      onClick={() => onSelect(course.idvers)}
-      className="btn btn-link">{span}</button>;
+    <a href={'#/' + course.idvers} style={style(course) as any}>{span}</a>;
 
   const columnRenderers = [
     r => link(r)(highlightedColumnRenderer(
