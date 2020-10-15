@@ -10,7 +10,7 @@ import './CoursesViewSearchable.scss';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import { highlightMatchesStr } from 'components/common/SearchBarLogic';
 import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
-import { safeCompare } from 'components/resourceview/ResourceView';
+import { safeCompare, safeCompareNatural } from 'components/resourceview/ResourceView';
 import { buildGeneralErrorMessage } from 'utils/error';
 import { CourseIdVers, CourseGuid } from 'data/types';
 
@@ -256,8 +256,8 @@ const CoursesViewSearchableTable = ({ rows, onSelect, searchText, serverTimeSkew
       : highlightMatchesStr(r[prop] + appendText, searchText);
 
   const comparators = [
-    (direction, a, b) => safeCompare('title', 'id', direction, a, b),
-    (direction, a, b) => safeCompare('version', 'title', direction, a, b),
+    (direction, a, b) => safeCompareNatural('title', 'version', direction, a, b),
+    (direction, a, b) => safeCompareNatural('version', 'title', direction, a, b),
     (direction, a, b) => safeCompare('id', 'title', direction, a, b),
     (direction, a, b) => direction === SortDirection.Ascending
       ? compareDates(a.dateCreated, b.dateCreated)
