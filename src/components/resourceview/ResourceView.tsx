@@ -441,7 +441,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 }
 
-export function safeCompare(primaryK: string, secondaryK: string, direction: SortDirection, a, b) {
+export function safeCompare(primaryK: string, secondaryK: string, direction: SortDirection, a, b,
+                            options = {}) {
 
   if (a[primaryK] === null && b[primaryK] === null) {
     return 0;
@@ -456,9 +457,14 @@ export function safeCompare(primaryK: string, secondaryK: string, direction: Sor
     if (a[secondaryK] === b[secondaryK]) {
       return 0;
     }
-    return safeCompare(secondaryK, primaryK, direction, a, b);
+    return safeCompare(secondaryK, primaryK, direction, a, b, options);
   }
   return direction === SortDirection.Ascending
-    ? a[primaryK].localeCompare(b[primaryK])
-    : b[primaryK].localeCompare(a[primaryK]);
+    ? a[primaryK].localeCompare(b[primaryK], 'en-US', options)
+    : b[primaryK].localeCompare(a[primaryK], 'en-US', options);
+}
+
+export function safeCompareNatural(primaryK: string, secondaryK: string, direction: SortDirection,
+                                   a, b) {
+  return safeCompare(primaryK, secondaryK, direction, a, b, { numeric: true });
 }
