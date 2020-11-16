@@ -113,7 +113,7 @@ class BlockQuoteToolbar
 
     return (
       <ToolbarGroup
-        label="Quote" highlightColor={CONTENT_COLORS.BlockQuote} columns={6.7}>
+        label="Quote" highlightColor={CONTENT_COLORS.BlockQuote} columns={7.7}>
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
