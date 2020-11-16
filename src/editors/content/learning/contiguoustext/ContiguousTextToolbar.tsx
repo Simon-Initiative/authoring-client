@@ -288,7 +288,7 @@ class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={14.4}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={14.6}>
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
