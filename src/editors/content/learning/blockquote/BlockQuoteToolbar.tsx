@@ -113,7 +113,7 @@ class BlockQuoteToolbar
 
     return (
       <ToolbarGroup
-        label="Quote" highlightColor={CONTENT_COLORS.BlockQuote} columns={6.7}>
+        label="Quote" highlightColor={CONTENT_COLORS.BlockQuote} columns={7.7}>
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
@@ -185,8 +185,18 @@ class BlockQuoteToolbar
               }
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
-            tooltip="MathML or Latex formula">
+            tooltip="MathML formula">
             {getContentIcon(insertableContentTypes.Math)}
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => {
+                this.props.editor.lift(e => e.insertText(' \\( InlineFormula=\\pi r^2 \\) '));
+              }
+            }
+            disabled={!supports('m:math') || !pointEntitiesEnabled}
+            tooltip="LaTex formula">
+            {getContentIcon(insertableContentTypes.LaTex)}
           </ToolbarButton>
           <ToolbarButton
             onClick={

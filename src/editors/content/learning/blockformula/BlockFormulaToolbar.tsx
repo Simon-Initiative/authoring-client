@@ -179,8 +179,18 @@ class BlockFormulaToolbar
               }
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
-            tooltip="MathML or Latex formula">
+            tooltip="MathML formula">
             {getContentIcon(insertableContentTypes.Math)}
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => {
+                this.props.editor.lift(e => e.insertText(' \\( InlineFormula=\\pi r^2 \\) '));
+              }
+            }
+            disabled={!supports('m:math') || !pointEntitiesEnabled}
+            tooltip="LaTex formula">
+            {getContentIcon(insertableContentTypes.LaTex)}
           </ToolbarButton>
         </ToolbarLayout.Inline>
       </ToolbarGroup>

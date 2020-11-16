@@ -288,7 +288,7 @@ class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={14.4}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={14.6}>
         <ToolbarLayout.Inline>
           <ToolbarButton
             onClick={
@@ -490,8 +490,18 @@ class ContiguousTextToolbar
               }
             }
             disabled={!supports('m:math') || !pointEntitiesEnabled}
-            tooltip="MathML or Latex formula">
+            tooltip="MathML formula">
             {getContentIcon(insertableContentTypes.Math)}
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => {
+                this.props.editor.lift(e => e.insertText(' \\( InlineFormula=\\pi r^2 \\) OR\n\\[ BlockFormula=\\frac{1}{2} \\]'));
+              }
+            }
+            disabled={!supports('m:math') || !pointEntitiesEnabled}
+            tooltip="LaTex formula">
+            {getContentIcon(insertableContentTypes.LaTex)}
           </ToolbarButton>
           <ToolbarButton
             onClick={
