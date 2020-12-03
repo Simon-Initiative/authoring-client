@@ -17,7 +17,6 @@ import { Maybe } from 'tsmonad';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import {
   DiscoverableId,
 } from 'components/common/Discoverable.controller';
@@ -105,7 +104,6 @@ class ExtraDefinitionEditor
             { src: Maybe.just(src), srcContentType: Maybe.just(type) });
           const model = this.state.model.with({ pronunciation });
 
-          this.setState( { model });
           this.props.onEdit(model, null);
         }
       });
@@ -151,6 +149,16 @@ class ExtraDefinitionEditor
 
       this.onEdit(model);
     }
+
+  }
+
+  onTranslationEdit(translation, src) {
+
+    const model = this.state.model.with({
+      translation,
+    });
+
+    this.onEdit(model);
 
   }
 
@@ -217,6 +225,8 @@ class ExtraDefinitionEditor
 
     const getLabel = (e, i) => <span>{e.contentType + ' ' + (i + 1)}</span>;
 
+    const { translation } = model;
+
     const meanings = new ContentElements().with({
       content: model.meaning,
     });
@@ -225,6 +235,33 @@ class ExtraDefinitionEditor
     model.meaning.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
 
     const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
+
+    const translationParent = {
+      supportedElements: Immutable.List<string>(TEXT_ELEMENTS),
+      onEdit(content: Object, source: Object) {
+        this.onEdit(this.state.model.with({ translation: content }));
+      },
+      onAddNew(content: Object, editor: Maybe<Editor>) { },
+      onRemove(content: Object) { },
+      onDuplicate(content: Object) { },
+      onMoveUp(content: Object) { },
+      onMoveDown(content: Object) { },
+      onPaste() { },
+      props: this.props,
+    };
+
+    const translationProps = Object.assign({}, this.props, {
+      model: translation,
+      label: 'Translation',
+      onEdit: this.onTranslationEdit.bind(this),
+      parent: this,
+      onClick: () => { },
+      onFocus: (m, p, t) => this.props.onFocus(m, translationParent, t),
+    });
+
+    const translationEditor = React.createElement(
+      getEditorByContentType('Translation'), translationProps);
+
 
     const meaningEditors = this.state.model.meaning.size > 0
       ? <ContentContainer
@@ -244,21 +281,9 @@ class ExtraDefinitionEditor
 
         {meaningEditors}
 
-        <strong>Audio: </strong>
-            {
-              this.state.model.pronunciation.src.caseOf({
-                just: src => src.substr(src.lastIndexOf('/') + 1),
-                nothing: () => 'None Set',
-              })
-            }
+        <br/><b>OR</b><br/><br/>
 
-      {/* To select audio from within popup
-        <br/>
-        <button onClick={this.onSelectAudio.bind(this)} className="btn btn-primary">
-              <div>{getContentIcon(insertableContentTypes.Audio)}</div>
-              <div>Choose Audio ...</div>
-        </button>
-      */}
+        {translationEditor}
 
       </div>
     );
