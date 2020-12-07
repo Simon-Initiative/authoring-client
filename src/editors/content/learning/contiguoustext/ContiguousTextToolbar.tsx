@@ -40,7 +40,6 @@ import { getLeafAtCursor } from 'editors/content/learning/contiguoustext/utils';
 import { localeCodes } from 'data/content/learning/foreign';
 import { Select } from 'editors/content/common/Select';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import { Pronunciation, Translation } from 'data/contentTypes';
 
 
 
@@ -426,8 +425,8 @@ class ContiguousTextToolbar
                 const m = new contentTypes.Meaning().with({ material });
                 const extra = new contentTypes.Extra().with({
                   meaning: Immutable.OrderedMap<string, contentTypes.Meaning>().set(m.guid, m),
-                  translation: new Translation(),
-                  pronunciation: new Pronunciation()
+                  translation: new contentTypes.Translation(),
+                  pronunciation: new contentTypes.Pronunciation(),
                 });
 
                 applyInline(this.props.editor, extra);
