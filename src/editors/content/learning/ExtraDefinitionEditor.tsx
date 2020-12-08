@@ -234,7 +234,8 @@ class ExtraDefinitionEditor
     const labels = {};
     model.meaning.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
 
-    const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
+    const bindProps = el => [{ propertyName: 'label', value: labels[el.guid] },
+                            { propertyName: 'hideBorder', value: false }];
 
     const translationParent = {
       supportedElements: Immutable.List<string>(TEXT_ELEMENTS),
@@ -267,7 +268,7 @@ class ExtraDefinitionEditor
       ? <ContentContainer
         {...this.props}
         model={meanings}
-        bindProperties={bindLabel}
+        bindProperties={bindProps}
         onEdit={this.onMeaningEdit.bind(this)}
       />
       : null;
