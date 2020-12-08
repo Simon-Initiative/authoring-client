@@ -211,12 +211,18 @@ class ExtraDefinitionEditor
   }
 
   onSaveChanges() {
-    this.props.onEdit(this.state.model);
+    // partial update to avoid clobbering pronunciation, may have been updated from sidebar
+    const newModel = this.props.model.with({
+      translation: this.state.model.translation,
+      meaning: this.state.model.meaning,
+    });
+    this.props.onEdit(newModel);
   }
 
   onEdit(model) {
     this.setState({ model });
   }
+
 
   renderAsDefinition(): JSX.Element {
 
