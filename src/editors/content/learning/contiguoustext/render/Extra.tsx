@@ -52,6 +52,7 @@ export class Extra extends React.PureComponent<ExtraProps, ExtraState> {
       renderContext: RenderContext.MainEditor,
       model: extra,
       onEdit: this.onEdit.bind(this),
+      onClose: this.onClose.bind(this),
       parent: this.props.parent,
     });
     const editorComponent = React.createElement(editor, props);

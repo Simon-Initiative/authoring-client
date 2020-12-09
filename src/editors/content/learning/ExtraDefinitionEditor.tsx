@@ -28,6 +28,7 @@ export interface ExtraDefinitionEditorProps
   extends AbstractContentEditorProps<contentTypes.Extra> {
   onShowSidebar: () => void;
   onDiscover: (id: DiscoverableId) => void;
+  onClose: () => void;
 }
 
 export interface ExtraDefinitionEditorState {
@@ -217,6 +218,7 @@ class ExtraDefinitionEditor
       meaning: this.state.model.meaning,
     });
     this.props.onEdit(newModel);
+    this.props.onClose();
   }
 
   onEdit(model) {
