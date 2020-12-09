@@ -429,7 +429,7 @@ function renderRangeInstructions(jssClass, range1, range2) {
                         /* [] */0
                       ]
                     ])
-              }, ReactUtils$CourseEditor.strEl("Range entered is invalid. Values must be valid numbers and lower bound must be less than or equal to upper bound"), React.createElement("div", {
+              }, ReactUtils$CourseEditor.strEl("Range entered is invalid. Values must be valid numbers or variables and lower bound must be less than or equal to upper bound"), React.createElement("div", {
                     className: StyleUtils$CourseEditor.classNames(/* :: */[
                           Curry._1(jssClass, "precisionSpacer"),
                           /* [] */0
@@ -509,7 +509,24 @@ function renderRange(jssClass, editMode, matchPattern, isValid1, isValid2, respo
                           catch (raw_exn){
                             var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);
                             if (exn[0] === Caml_builtin_exceptions.failure) {
-                              isValidRange = false;
+                              var exit$1 = 0;
+                              var _valueFloat;
+                              try {
+                                _valueFloat = Caml_format.caml_float_of_string(value);
+                                exit$1 = 2;
+                              }
+                              catch (raw_exn$1){
+                                var exn$1 = Caml_js_exceptions.internalToOCamlException(raw_exn$1);
+                                if (exn$1[0] === Caml_builtin_exceptions.failure) {
+                                  isValidRange = isValidVariableRef(value);
+                                } else {
+                                  throw exn$1;
+                                }
+                              }
+                              if (exit$1 === 2) {
+                                isValidRange = isValidVariableRef(rangeEnd);
+                              }
+                              
                             } else {
                               throw exn;
                             }
@@ -565,7 +582,24 @@ function renderRange(jssClass, editMode, matchPattern, isValid1, isValid2, respo
                           catch (raw_exn){
                             var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);
                             if (exn[0] === Caml_builtin_exceptions.failure) {
-                              isValidRange = false;
+                              var exit$1 = 0;
+                              var _valueFloat;
+                              try {
+                                _valueFloat = Caml_format.caml_float_of_string(value);
+                                exit$1 = 2;
+                              }
+                              catch (raw_exn$1){
+                                var exn$1 = Caml_js_exceptions.internalToOCamlException(raw_exn$1);
+                                if (exn$1[0] === Caml_builtin_exceptions.failure) {
+                                  isValidRange = isValidVariableRef(value);
+                                } else {
+                                  throw exn$1;
+                                }
+                              }
+                              if (exit$1 === 2) {
+                                isValidRange = isValidVariableRef(rangeStart);
+                              }
+                              
                             } else {
                               throw exn;
                             }
