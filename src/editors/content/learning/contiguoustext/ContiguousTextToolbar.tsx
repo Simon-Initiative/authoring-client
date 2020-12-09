@@ -425,6 +425,8 @@ class ContiguousTextToolbar
                 const m = new contentTypes.Meaning().with({ material });
                 const extra = new contentTypes.Extra().with({
                   meaning: Immutable.OrderedMap<string, contentTypes.Meaning>().set(m.guid, m),
+                  translation: new contentTypes.Translation(),
+                  pronunciation: new contentTypes.Pronunciation(),
                 });
 
                 applyInline(this.props.editor, extra);

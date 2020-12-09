@@ -50,6 +50,10 @@ class TranslationEditor
 
     const { model, label, classes, className } = this.props;
 
+    const bindProps = (element) => {
+      return [{ propertyName: 'hideBorder', value: false }];
+    };
+
     return (
       <div className={classNames([classes.translation, className])}>
         <div className={classNames([classes.translationLabel, className])}>{label}</div>
@@ -57,6 +61,7 @@ class TranslationEditor
           <ContentContainer
           {...this.props}
           model={model.content}
+          bindProperties={bindProps}
           onEdit={this.onTranslationEdit.bind(this)}
           />
         </div>
