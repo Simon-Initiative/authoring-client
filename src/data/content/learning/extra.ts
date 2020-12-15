@@ -5,13 +5,13 @@ import { augment, getChildren, except, ensureIdGuidPresent } from 'data/content/
 import { getKey } from 'data/common';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
 import createGuid from 'utils/guid';
-import { ContiguousText } from 'data/contentTypes';
-import { ContiguousTextMode } from 'data/content/learning/contiguous';
+import { Pronunciation } from 'data/content/learning/pronunciation';
+import { Translation } from 'data/content/learning/translation';
 
 export type ExtraParams = {
   anchor?: Anchor;
-  pronunciation?: ContiguousText;
-  translation?: ContiguousText;
+  pronunciation?: Pronunciation;
+  translation?: Translation;
   meaning?: Immutable.OrderedMap<string, Meaning>;
   content?: ContentElements,
   id?: string,
@@ -23,8 +23,8 @@ const defaultContent = {
   elementType: 'extra',
   id: '',
   anchor: new Anchor(),
-  pronunciation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
-  translation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
+  pronunciation: new Pronunciation(),
+  translation: new Translation(),
   meaning: Immutable.OrderedMap<string, Meaning>(),
   content: new ContentElements().with({ supportedElements: Immutable.List(EXTRA_ELEMENTS) }),
   guid: '',
@@ -36,8 +36,8 @@ export class Extra extends Immutable.Record(defaultContent) {
   contentType: 'Extra';
   elementType: 'extra';
   anchor: Anchor;
-  pronunciation: ContiguousText;
-  translation: ContiguousText;
+  pronunciation: Pronunciation;
+  translation: Translation;
   meaning: Immutable.OrderedMap<string, Meaning>;
   content: ContentElements;
   id: string;
@@ -85,14 +85,14 @@ export class Extra extends Immutable.Record(defaultContent) {
           break;
         case 'pronunciation':
           model = model.with({ pronunciation:
-            ContiguousText.fromPersistence(
-              (item as any).pronunciation, '', ContiguousTextMode.SimpleText),
+            Pronunciation.fromPersistence(
+              (item as any), '', () => {}),
           });
           break;
         case 'translation':
           model = model.with({ translation:
-            ContiguousText.fromPersistence(
-              (item as any).translation, '', ContiguousTextMode.SimpleText),
+            Translation.fromPersistence(
+              (item as any), '', () => {}),
           });
           break;
         case 'meaning':
@@ -113,13 +113,7 @@ export class Extra extends Immutable.Record(defaultContent) {
   }
 
   isDefinition() : boolean {
-
-    const hasPronunciation = this.pronunciation.extractPlainText().caseOf(
-      { just: p => p !== '', nothing: () => false });
-    const hasTranslation = this.translation.extractPlainText().caseOf(
-      { just: p => p !== '', nothing: () => false });
-
-    return hasPronunciation || hasTranslation || this.meaning.size > 0;
+    return this.meaning.size > 0;
   }
 
   toPersistence() : Object {
@@ -131,27 +125,15 @@ export class Extra extends Immutable.Record(defaultContent) {
       content = this.content.content.size === 0
       ? [{ p: { '#text': 'Placeholder' } }]
       : this.content.toPersistence();
+
+      (content as Object[]).forEach(c => children.push(c));
+    } else {
+
+      children.push(this.pronunciation.toPersistence());
+      children.push(this.translation.toPersistence());
+
+      this.meaning.toArray().forEach(m => children.push(m.toPersistence()));
     }
-
-    (content as Object[]).forEach(c => children.push(c));
-
-    const hasPronunciation = this.pronunciation.extractPlainText().caseOf(
-      { just: p => p !== '', nothing: () => false });
-    const hasTranslation = this.translation.extractPlainText().caseOf(
-      { just: p => p !== '', nothing: () => false });
-
-    if (hasPronunciation) {
-      const o = {};
-      o['#array'] = this.pronunciation.toPersistence();
-      children.push({ pronunciation: o });
-    }
-    if (hasTranslation) {
-      const o = {};
-      o['#array'] = this.translation.toPersistence();
-      children.push({ translation: o });
-    }
-
-    this.meaning.toArray().forEach(m => children.push(m.toPersistence()));
 
     const m = {
       extra: {

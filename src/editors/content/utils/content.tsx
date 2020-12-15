@@ -94,7 +94,7 @@ export enum insertableContentTypes {
   BlockQuote, CellData, CellHeader, CodeBlock, Command, Composite, Conjugate, Conjugation,
   ContiguousText, Custom, Definition, Dd, Dl, Dt, Dialog, Director, Example, Feedback,
   FeedbackChoice, Figure, Flash, Hint, IFrame, Image, Inquiry, InquiryQuestion, Instructions,
-  Li, Line, Materials, Math, Mathematica, Meaning, Multipanel,
+  LaTex, Li, Line, Materials, Math, Mathematica, Meaning, Multipanel,
   Ol, Panopto, Param, Pronunciation, Proof, Pullout,
   Section, Speaker, Statement, Sym, Table, Theorem, Translation,
   Ul, Unity, Video, WbInline, YouTube,
@@ -140,6 +140,7 @@ export const getContentIcon = (type: insertableContentTypes, style?: React.CSSPr
     case i.Booklet: return <i style={style} className={'far fa-bookmark'} />;
     case i.Conference: return <i style={style} className={'far fa-bookmark'} />;
     case i.InCollection: return <i style={style} className={'far fa-bookmark'} />;
+    case i.LaTex: return <i style={style} className="unicode-icon">L<sup>a</sup></i>;
     case i.Manual: return <i style={style} className={'far fa-bookmark'} />;
     case i.MastersThesis: return <i style={style} className={'far fa-bookmark'} />;
     case i.PhdThesis: return <i style={style} className={'far fa-bookmark'} />;
