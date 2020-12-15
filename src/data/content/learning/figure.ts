@@ -9,6 +9,8 @@ import { Caption } from 'data/content/learning/caption';
 import { Cite } from 'data/content/learning/cite';
 import { ContiguousText } from 'data/contentTypes';
 
+const BOX_ELEMENTS_WITHOUT_WBINLINE = BOX_ELEMENTS.filter(e => e !== 'wb:inline');
+
 export type FigureParams = {
   guid?: string,
   // core.attrs
@@ -30,7 +32,9 @@ const defaultContent = {
   title: Title.fromText('Title'),
   caption: Maybe.nothing(),
   cite: Maybe.nothing(),
-  content: new ContentElements().with({ supportedElements: Immutable.List<string>(BOX_ELEMENTS) }),
+  content: new ContentElements().with({
+    supportedElements: Immutable.List<string>(BOX_ELEMENTS_WITHOUT_WBINLINE),
+  }),
 };
 
 export class Figure extends Immutable.Record(defaultContent) {
@@ -92,9 +96,13 @@ export class Figure extends Immutable.Record(defaultContent) {
     });
 
     model = model.with({
-      content: ContentElements
-        .fromPersistence(
-          except(getChildren(t), 'title', 'caption', 'cite'), '', BOX_ELEMENTS, null, notify),
+      content: ContentElements.fromPersistence(
+        except(getChildren(t), 'title', 'caption', 'cite'),
+        '',
+        BOX_ELEMENTS_WITHOUT_WBINLINE,
+        null,
+        notify,
+      ),
     });
 
     return model;
