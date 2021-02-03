@@ -1,6 +1,6 @@
 {
   "name": "course-editor",
-  "version": "0.43.10",
+  "version": "0.43.11",
   "description": "Course Authoring Web Application for the Open Learning Initiative",
   "main": "./src/app.tsx",
   "author": "Carnegie Mellon University",

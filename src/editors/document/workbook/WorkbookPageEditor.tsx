@@ -285,7 +285,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   addEntry(rawEntry) {
 
-    const e = rawEntry.with({ id: createGuid() });
+    const guid = createGuid();
+    const e = rawEntry.with({ guid, id: guid });
     const bibEntries = this.props.model.bibliography.bibEntries.set(e.guid, e);
     const bibliography = this.props.model.bibliography.with({ bibEntries });
     const model = this.props.model.with({ bibliography });
