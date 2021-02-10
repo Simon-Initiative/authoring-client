@@ -70,7 +70,7 @@ function selectBibEntry(bib: contentTypes.Bibliography, display, dismiss)
     const selected = { entry: Maybe.nothing() };
 
     const bibPicker = (
-      <ModalSelection title="Select an existing bibliography entry"
+      <ModalSelection title="Select a bibliography entry"
         onInsert={() => { dismiss(); resolve(selected.entry as Maybe<contentTypes.Entry>); }}
         onCancel={() => { dismiss(); resolve(Maybe.nothing()); }}>
         <EntryList
@@ -508,7 +508,7 @@ class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
             onClick={() => createCitationForExistingEntry()}
-            tooltip="Cite an Existing Bibliography Entry"
+            tooltip="Cite a Bibliography Entry"
             disabled={!supports('cite') || !pointEntitiesEnabled}>
             {getContentIcon(insertableContentTypes.Bibliography)}
           </ToolbarButton>
