@@ -8,14 +8,9 @@ import {
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
 import { ToolbarGroup, ToolbarLayout, determineBaseUrl }
   from 'components/toolbar/ContextAwareToolbar';
-import {
-  ToolbarNarrowMenu,
-  ToolbarButtonMenuItem,
-} from 'components/toolbar/ToolbarButtonMenu';
 import { InlineStyles, InlineTypes } from 'data/content/learning/contiguous';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { entryInstances } from 'editors/content/learning/bibliography/utils';
 import { CONTENT_COLORS, getContentIcon, insertableContentTypes } from
   'editors/content/utils/content';
 import { selectImage } from 'editors/content/learning/ImageEditor';
@@ -25,7 +20,6 @@ import {
   selectTargetElement,
 } from 'components/message/selection';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
-import createGuid from 'utils/guid';
 import { styles } from './ContiguousText.styles';
 import { Maybe } from 'tsmonad';
 import { ContentElement } from 'data/content/common/interfaces';
@@ -205,7 +199,25 @@ class ContiguousTextToolbar
     );
   }
 
-  renderEntryOptions() {
+  getModel() {
+    const { editor } = this.props;
+    const value = editor.caseOf({
+      just: e => e.value,
+      nothing: () => this.props.model.slateValue,
+    });
+
+    return this.props.model.with({ slateValue: value });
+  }
+
+  renderToolbar() {
+    const { editMode, editor, courseModel } = this.props;
+    const supports = el => this.props.parent.supportedElements.contains(el);
+    const cursorInEntity = editorUtils.cursorInEntity(editor);
+    const rangeEntitiesEnabled = editMode && editorUtils.bareTextSelected(editor);
+    const pointEntitiesEnabled = editMode && !cursorInEntity && editorUtils.noTextSelected(editor);
+    const bdoDisabled = editorUtils.bdoDisabled(editor);
+    const styles = editorUtils.getActiveStyles(editor);
+
 
     const addCitationWithEntry = (id) => {
       insertInline(this.props.editor, new contentTypes.Cite().with({ entry: id }));
@@ -226,65 +238,6 @@ class ContiguousTextToolbar
           });
         });
     };
-
-    const addNewBibEntry = (e) => {
-
-      const withId = e.with({ id: createGuid() });
-
-      this.props.onAddEntry(withId, this.props.context.documentId);
-
-      // This is a hack - but I was having problems bridging the onEdit based mutation
-      // with the dispatched based mutation
-      setTimeout(
-        () => {
-          insertInline(this.props.editor, new contentTypes.Cite().with({ entry: withId.id }));
-        },
-        100);
-
-    };
-
-    const buttons = Object.keys(entryInstances).map((key) => {
-      return (
-        <ToolbarButtonMenuItem
-          disabled={false}
-          onClick={() => addNewBibEntry(entryInstances[key])}>
-          {key}
-        </ToolbarButtonMenuItem>
-      );
-    });
-
-    return (
-      <div style={{ backgroundColor: 'white', margin: '8px' }}>
-        <ToolbarButtonMenuItem
-          disabled={false}
-          onClick={() => createCitationForExistingEntry()}>
-          Cite existing entry...
-        </ToolbarButtonMenuItem>
-        <div className="dropdown-divider"></div>
-        <h6 className="dropdown-header">Cite new entry</h6>
-        {buttons}
-      </div>
-    );
-  }
-
-  getModel() {
-    const { editor } = this.props;
-    const value = editor.caseOf({
-      just: e => e.value,
-      nothing: () => this.props.model.slateValue,
-    });
-
-    return this.props.model.with({ slateValue: value });
-  }
-
-  renderToolbar() {
-    const { editMode, editor, courseModel } = this.props;
-    const supports = el => this.props.parent.supportedElements.contains(el);
-    const cursorInEntity = editorUtils.cursorInEntity(editor);
-    const rangeEntitiesEnabled = editMode && editorUtils.bareTextSelected(editor);
-    const pointEntitiesEnabled = editMode && !cursorInEntity && editorUtils.noTextSelected(editor);
-    const bdoDisabled = editorUtils.bdoDisabled(editor);
-    const styles = editorUtils.getActiveStyles(editor);
 
     return (
       <ToolbarGroup
@@ -553,14 +506,12 @@ class ContiguousTextToolbar
 
             {getContentIcon(insertableContentTypes.Command)}
           </ToolbarButton>
-          <ToolbarNarrowMenu
-            icon={<i className={'fa fa-asterisk'} />}
-            label={''}
-            tooltip="Insert Citation"
+          <ToolbarButton
+            onClick={() => createCitationForExistingEntry()}
+            tooltip="Cite a Bibliography Entry"
             disabled={!supports('cite') || !pointEntitiesEnabled}>
-
-            {this.renderEntryOptions()}
-          </ToolbarNarrowMenu>
+            {getContentIcon(insertableContentTypes.Bibliography)}
+          </ToolbarButton>
         </ToolbarLayout.Inline>
       </ToolbarGroup >
     );
