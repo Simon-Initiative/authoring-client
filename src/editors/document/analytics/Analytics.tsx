@@ -184,7 +184,7 @@ export interface AnalyticsState {
  * Analytics React Component
  */
 class Analytics
-  extends React.PureComponent<StyledComponentProps<AnalyticsProps, typeof styles>,
+  extends React.Component<StyledComponentProps<AnalyticsProps, typeof styles>,
   AnalyticsState> {
 
   constructor(props) {
@@ -201,10 +201,21 @@ class Analytics
     nextProps: Readonly<AnalyticsProps>, nextState: Readonly<AnalyticsState>) {
     // this assumes that aggregateModel, skills, objectives are all set together
     if (nextProps.model !== null
-      && nextProps.model !== this.props.model) {
+      && nextProps.model.id !== this.props.model.id) {
       this.fetchResources(nextProps);
       this.setState(this.getDefaultState());
     }
+  }
+
+  shouldComponentUpdate(nextProps: Readonly<StyledComponentProps<AnalyticsProps, JSSStyles>>,
+    nextState: Readonly<AnalyticsState>) {
+    return nextState !== this.state ||
+      nextProps.course.idvers !== this.props.course.idvers ||
+      nextProps.model.id !== this.props.model.id ||
+      nextProps.analytics !== this.props.analytics ||
+      nextProps.objectives !== this.props.objectives ||
+      nextProps.skills !== this.props.skills ||
+      nextProps.organization.id !== this.props.organization.id;
   }
 
   getDefaultState = () => {
