@@ -126,7 +126,26 @@ export class Extra extends Immutable.Record(defaultContent) {
       ? [{ p: { '#text': 'Placeholder' } }]
       : this.content.toPersistence();
 
-      (content as Object[]).forEach(c => children.push(c));
+      let hasContent : boolean = false;
+      (content as Object[]).forEach((c) => {
+        if ((c['p']['#array']).length > 0) {
+          hasContent = true;
+          children.push(c);
+        }
+        return;
+      });
+
+      if (!hasContent) {
+        const pronunciation = this.pronunciation.toPersistence();
+        if (pronunciation['pronunciation']['@src']) {
+          children.push(pronunciation);
+        }
+
+        const translation = this.translation.toPersistence();
+        if ((translation['translation']['#array']).length > 0) {
+          children.push(translation);
+        }
+      }
     } else {
 
       children.push(this.pronunciation.toPersistence());
