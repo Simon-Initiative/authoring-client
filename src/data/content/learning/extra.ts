@@ -148,8 +148,15 @@ export class Extra extends Immutable.Record(defaultContent) {
       }
     } else {
 
-      children.push(this.pronunciation.toPersistence());
-      children.push(this.translation.toPersistence());
+      const pronunciation = this.pronunciation.toPersistence();
+      if (pronunciation['pronunciation']['@src']) {
+        children.push(pronunciation);
+      }
+
+      const translation = this.translation.toPersistence();
+      if ((translation['translation']['#array']).length > 0) {
+        children.push(translation);
+      }
 
       this.meaning.toArray().forEach(m => children.push(m.toPersistence()));
     }
