@@ -268,7 +268,7 @@ class Header
   }
 
   renderApplicationLabel() {
-    return <span>OLI Course Authoring</span>;
+    return <span>OLI Echo</span>;
   }
 
   isCourseRoute() {
