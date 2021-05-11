@@ -68,6 +68,12 @@ export function toSlate(
   return Value.fromJSON(json);
 }
 
+// true of inline pieces that can be collected within an enclosing paragraph
+function inlinePiece(e: any) : boolean {
+  const key = common.getKey(e);
+  return marks.contains(key) || inlineHandlers[key] !== undefined || key === '#text';
+}
+
 // Normalize the sometimes strange format of the input to an array of blocks
 function normalizeInput(toParse, isInlineText: boolean): Object[] {
 
@@ -81,18 +87,23 @@ function normalizeInput(toParse, isInlineText: boolean): Object[] {
     return [{ p: { '#array': [toParse] } }];
   }
 
-  // Normalize the case where a single entry exists - and that entry is a
-  // mark or inline.  This can happen with choice bodies, where we strip
-  // out the outer paragraph on one paragraph long choice bodies.
-  if (toParse instanceof Array && toParse.length === 1) {
-    const key = common.getKey(toParse[0]);
-    if (marks.contains(key) || inlineHandlers[key] !== undefined) {
+  if (toParse instanceof Array) {
+    // Normalize the case where a single entry exists - and that entry is a
+    // mark or inline.  This can happen with choice bodies, where we strip
+    // out the outer paragraph on one paragraph long choice bodies.
+    if (toParse.length === 1) {
+      const key = common.getKey(toParse[0]);
+      if (marks.contains(key) || inlineHandlers[key] !== undefined) {
+        return [{ p: { '#array': toParse } }];
+      }
+    } else if (toParse.every(inlinePiece)) {
+      // (AUTHORING-2324) wrap up multiple inline pieces including #text. This
+      // can arise from styled complex list item content not wrapped in paragraph
       return [{ p: { '#array': toParse } }];
     }
   }
 
   return toParse;
-
 }
 
 // Handle parsing of a block based off of a registry of
