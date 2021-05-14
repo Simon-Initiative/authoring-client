@@ -78,8 +78,8 @@ const getSortMappingKey = (orderBy: string, order?: string) => {
 };
 
 // Characters disallowed in media filenames
-const BAD_CHARS = ':';
-const BAD_CHAR_PAT = new RegExp('[' + BAD_CHARS + ']');
+const BAD_CHARS = ':;/\\';
+const BAD_CHAR_PAT = /[:;\/\\]/;
 
 const popOpenImage = ({ target: link }) => {
   const w = window.open(
@@ -240,7 +240,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     if (badFiles.length > 0) {
       const msg = 'Bad file name' + ((badFiles.length > 1) ? 's ' : ' ')
                   + badFiles.map(f => f.name).join(', ') + '. '
-                  + 'File names should not contain ' + BAD_CHARS + ' characters';
+                  + 'File names may not contain any of ' + BAD_CHARS;
       this.setState({ error: Maybe.just(msg) });
       return;
     }
