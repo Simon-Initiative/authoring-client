@@ -14,6 +14,7 @@ import './MediaManager.scss';
 import { LoadingSpinner, LoadingSpinnerSize } from 'components/common/LoadingSpinner';
 import * as viewActions from 'actions/view';
 
+
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 const MAX_NAME_LENGTH = 26;
 const PAGE_LOADING_MESSAGE = 'Hang on while more items are loaded...';
@@ -76,6 +77,10 @@ const getSortMappingKey = (orderBy: string, order?: string) => {
     && (order === undefined || order === SORT_MAPPINGS[key].order));
 };
 
+// Characters disallowed in media filenames
+const BAD_CHARS = ':;/\\';
+const BAD_CHAR_PAT = /[:;\/\\]/;
+
 const popOpenImage = ({ target: link }) => {
   const w = window.open(
     link.href,
@@ -113,6 +118,7 @@ export interface MediaManagerState {
   order: string;
   layout: LAYOUTS;
   showDetails: boolean;
+  error: Maybe<string>;
 }
 
 /**
@@ -132,6 +138,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       order: SORT_MAPPINGS.Newest.order,
       layout: LAYOUTS.GRID,
       showDetails: true,
+      error: Maybe.nothing<string>(),
     };
 
     this.onScroll = this.onScroll.bind(this);
@@ -162,6 +169,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               }),
             ).filter(i => i),
           ),
+          error: Maybe.nothing(),
         });
       });
     }
@@ -227,6 +235,16 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       fileList.push(files[i]);
     }
 
+    // AUTHORING-2319: prevent upload of files with problem characters in filename
+    const badFiles = fileList.filter(f => BAD_CHAR_PAT.test(f.name));
+    if (badFiles.length > 0) {
+      const msg = 'Bad file name' + ((badFiles.length > 1) ? 's ' : ' ')
+                  + badFiles.map(f => f.name).join(', ') + '. '
+                  + 'File names may not contain any of ' + BAD_CHARS;
+      this.setState({ error: Maybe.just(msg) });
+      return;
+    }
+
     // the server creates a lock on upload, so we must upload files one at a
     // time. This factory function returns a new promise to upload a file
     // recursively until fileList is empty
@@ -263,6 +281,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   onChangeLayout(newLayout: LAYOUTS) {
     this.setState({
       layout: newLayout,
+      error: Maybe.nothing(),
     });
   }
 
@@ -295,6 +314,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
     this.setState({
       selection: updatedSelection,
+      error: Maybe.nothing(),
     });
 
     const mediaLibrary = media.valueOr(null);
@@ -318,6 +338,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     this.setState({
       orderBy: SORT_MAPPINGS[sortKey].orderBy,
       order: SORT_MAPPINGS[sortKey].order,
+      error: Maybe.nothing(),
     });
 
     onResetMedia();
@@ -552,6 +573,19 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     }
   }
 
+  renderError() {
+    const { error } = this.state;
+
+    return error.caseOf({
+      just: error => (
+        <div className="alert alert-danger fade show" role="alert">
+          {error}
+        </div>
+      ),
+      nothing: () => null,
+    });
+  }
+
   render() {
     const { className, mimeFilter, media } = this.props;
     const { searchText, layout, orderBy, order } = this.state;
@@ -565,6 +599,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
     return (
       <div className={`media-manager ${className || ''}`}>
+        {this.renderError()}
         <div className="media-toolbar">
           <input
             id={id}
