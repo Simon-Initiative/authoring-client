@@ -212,11 +212,18 @@ class ExtraDefinitionEditor
   }
 
   onSaveChanges() {
+
     // partial update to avoid clobbering pronunciation, may have been updated from sidebar
-    const newModel = this.props.model.with({
-      translation: this.state.model.translation,
-      meaning: this.state.model.meaning,
-    });
+    const newModel =
+      this.props.model.isDefinition()
+        ? this.props.model.with({
+          translation: this.state.model.translation,
+          meaning: this.state.model.meaning,
+        })
+        : this.props.model.with({
+          content: this.state.model.content,
+        });
+
     this.props.onEdit(newModel);
     this.props.onClose();
   }
@@ -281,6 +288,8 @@ class ExtraDefinitionEditor
       />
       : null;
 
+    const separator = this.state.model.meaning.size > 0 ? <div><b>OR</b><br/></div> : null;
+
     return (
       <div className={classNames([classes.definition, className])}>
 
@@ -290,7 +299,7 @@ class ExtraDefinitionEditor
 
         {meaningEditors}
 
-        <br/><b>OR</b><br/><br/>
+        {separator}
 
         {translationEditor}
 
