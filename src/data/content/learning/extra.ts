@@ -113,7 +113,11 @@ export class Extra extends Immutable.Record(defaultContent) {
   }
 
   isDefinition() : boolean {
-    return this.meaning.size > 0;
+    const hasAudio = this.pronunciation.src.valueOr('').trim() !== '';
+    const hasTranslation = this.translation.content.extractPlainText().valueOr('').trim() !== '';
+    const hasMeaning = this.meaning.size > 0;
+
+    return hasMeaning || hasAudio || hasTranslation;
   }
 
   toPersistence() : Object {
