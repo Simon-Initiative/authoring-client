@@ -97,7 +97,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       org = a.doc.organization;
     }
 
-    model = setId(model, a, notify);
+    model = setId(model, org, notify);
 
     if (org['@version'] !== undefined) {
       model = model.with({ version: org['@version'] });
