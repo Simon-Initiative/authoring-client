@@ -15,7 +15,7 @@ export type XrefParams = {
 const defaultContent = {
   contentType: 'Xref',
   elementType: 'xref',
-  target: 'self',
+  target: 'new',
   idref: '',
   page: '',
   title: '',
