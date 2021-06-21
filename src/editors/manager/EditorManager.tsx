@@ -60,9 +60,11 @@ export default class EditorManager
 
   onEdit(model: models.ContentModel) {
 
-    const { onSave, documentId } = this.props;
+    const { onSave, documentId, editingAllowed } = this.props;
 
-    onSave(documentId, model);
+    if (editingAllowed) {
+      onSave(documentId, model);
+    }
   }
 
   determineBaseUrl(resource: Resource) {
