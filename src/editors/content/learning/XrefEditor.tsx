@@ -211,16 +211,18 @@ export default class XrefEditor
           <Target {...this.props} targetIsPage={this.state.targetIsPage} target={target}
             onChangeTarget={this.onChangeTarget} />
         </SidebarGroup>
-        <SidebarGroup label="On Click">
-          <Select
-            editMode={editMode}
-            value={model.target}
-            onChange={v =>
-              onEdit(model.with({ target: v === 'self' ? LinkTarget.Self : LinkTarget.New }))}>
-            <option value={LinkTarget.Self}>Open in this window</option>
-            <option value={LinkTarget.New}>Open in new window</option>
-          </Select>
-        </SidebarGroup>
+        {false &&  // hide b/c delivery ignores this setting (always opens in new popup)
+          <SidebarGroup label="On Click">
+            <Select
+              editMode={editMode}
+              value={model.target}
+              onChange={v =>
+                onEdit(model.with({ target: v === 'self' ? LinkTarget.Self : LinkTarget.New }))}>
+              <option value={LinkTarget.Self}>Open in this window</option>
+              <option value={LinkTarget.New}>Open in new window</option>
+            </Select>
+          </SidebarGroup>
+        }
       </SidebarContent>
     );
   }
