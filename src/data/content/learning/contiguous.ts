@@ -147,7 +147,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   // Return the OLI ID of the first paragraph in the text block
   getFirstReferenceId(): string | undefined {
-    const firstBlock = this.slateValue.document.nodes[0];
+    const firstBlock = this.slateValue.document.nodes.first() as Block;
     if (firstBlock) {
       return firstBlock.data.get('id');
     }
