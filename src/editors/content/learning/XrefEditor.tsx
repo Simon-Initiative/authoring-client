@@ -149,7 +149,7 @@ export default class XrefEditor
     if (!this.state.targetIsPage) {
       // To avoid invalid xref state (unbuildable if written out),
       // a page change from element target resets to whole page target.
-      this.setState({ targetIsPage: true});
+      this.setState({ targetIsPage: true });
       setTimeout(() => updateTarget(model.page, model.page), 0);
     }
 
