@@ -280,7 +280,7 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
     <div className="target__container">
       <div className="target__instructions">
         <small>
-          1. Open the target page in a new tab.
+          1. Open the target page.
         </small>
         <br />
         <small>
@@ -290,7 +290,7 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
         </small>
         <br />
         <small>
-          3. Use the button to link to the copied element.
+          3. Click this button to link to the copied element:
         </small>
       </div>
       <Button editMode={editMode && validItemCopied} onClick={onChangeTarget}>
