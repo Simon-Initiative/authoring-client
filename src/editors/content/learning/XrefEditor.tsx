@@ -145,15 +145,14 @@ export default class XrefEditor
   onChangePage(page: string) {
 
     const { onEdit, model, updateTarget } = this.props;
-    if (this.state.targetIsPage) {
-      onEdit(model.with({ page, idref: page }));
-    } else {
-      onEdit(model.with({ page }));
+    onEdit(model.with({ page, idref: page }));
+    if (!this.state.targetIsPage) {
+      // To avoid invalid xref state (unbuildable if written out),
+      // a page change from element target resets to whole page target.
+      this.setState({ targetIsPage: true });
+      setTimeout(() => updateTarget(model.page, model.page), 0);
     }
-    // Search for the target element in the new page
-    if (model.idref) {
-      setTimeout(() => updateTarget(model.idref, page), 0);
-    }
+
   }
 
   onToggleTargetPage(targetIsPage: boolean) {
@@ -162,7 +161,7 @@ export default class XrefEditor
     this.setState({ targetIsPage });
     if (targetIsPage) {
       onEdit(model.with({ idref: model.page }));
-      setTimeout(() => updateTarget(model.idref, model.page), 0);
+      setTimeout(() => updateTarget(model.page, model.page), 0);
     }
   }
 
@@ -281,7 +280,7 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
     <div className="target__container">
       <div className="target__instructions">
         <small>
-          1. Open the target page in a new tab.
+          1. Open the target page.
         </small>
         <br />
         <small>
@@ -291,7 +290,7 @@ const Target = ({ target, editMode, clipboard, onChangeTarget, targetIsPage }: T
         </small>
         <br />
         <small>
-          3. Use the button to link to the copied element.
+          3. Click this button to link to the copied element:
         </small>
       </div>
       <Button editMode={editMode && validItemCopied} onClick={onChangeTarget}>
