@@ -121,10 +121,10 @@ function handleBlock(item: Object, json: ValueJSON, backingTextProvider: Object)
 }
 
 // Given a style mark object, determine if it is the parent of
-// another, nested mark.  A regular mark would have a #text attr,
-// so we simply check for that to be undefined.
+// another, nested mark.  A regular mark would have either a #text
+// or #cdata attr, so we simply check that neither is defined.
 function isNestedMark(item: Object): boolean {
-  return item['#text'] === undefined;
+  return item['#text'] === undefined && item['#cdata'] === undefined;
 }
 
 // Given a style mark object, determine if it is empty, that is it
@@ -345,9 +345,11 @@ function processMark(item: Object,
       return;
     }
 
+    // terminal mark should have unmarked text in either #cdata or #text attr
+    const itemText = item['#cdata'] !== undefined ? item['#cdata'] : item['#text'];
     parent.nodes.push({
       object: 'text',
-      text: item['#text'],
+      text: itemText,
       marks: previousMarks.toArray(),
     });
 
