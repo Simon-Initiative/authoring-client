@@ -14,6 +14,10 @@ export const highlightMatches = (prop: string, r: RowData, searchText): JSX.Elem
   return highlightMatchesStr(textToSearchIn, searchText);
 };
 
+// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
 
 export const highlightMatchesStr = (textToSearchIn: string, searchText): JSX.Element => {
   const lowercasedTextToSearchIn = textToSearchIn.trim().toLowerCase();
@@ -26,7 +30,7 @@ export const highlightMatchesStr = (textToSearchIn: string, searchText): JSX.Ele
     return divWith(cache[key]);
   }
 
-  const searchTextExpression = new RegExp(searchText, 'i');
+  const searchTextExpression = new RegExp(escapeRegExp(searchText), 'i');
   const highlightedText =
     '<span>' +
     textToSearchIn.replace(searchTextExpression,
