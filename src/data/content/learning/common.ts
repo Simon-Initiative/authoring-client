@@ -62,7 +62,7 @@ export const PackageLicenseTypes: PackageLicenseType[] = [
   {
     acronym: 'CCByNCND',
     description: 'CC BY-NC-ND: Attribution-NonCommercial-NoDerivatives',
-    url: 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+    url: 'http://creativecommons.org/licenses/by-nc-nd/3.0/',
   },
 ];
 
